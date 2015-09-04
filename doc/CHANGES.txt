@@ -1,0 +1,119 @@
+ideas/open issues
+----------------------------
+- add xml validation
+- add checker
+
+iox-ili 1.10.6 (2015-09-04)
+-----------------------------
+- ItfReader2: fixed eye handling in Arc/Arc overlap remover
+
+iox-ili 1.10.5 (2015-08-14)
+-----------------------------
+- ItfReader2: Arc/Arc overlap remover added
+
+iox-ili 1.10.4 (2015-06-15)
+-----------------------------
+- ItfReader2: Arc/Straight overlap remover added
+
+iox-ili 1.10.3 (2015-06-15)
+-----------------------------
+- ItfWriter2 added
+- use CompoundCurveNoder to detect intersections
+
+iox-ili 1.10.2 (2015-06-03)
+-----------------------------
+- improved repository access logging
+- fixed NullPointerException if wrong/missing schemaLanguage in ilimodels.xml
+
+iox-ili 1.10.0 (2014-12-30)
+-----------------------------
+- added XTF24 BETA
+- removed XRF
+- fixed leading zero error in calc of MD5 
+- read also modelnames from XTF header
+
+iox-ili 1.9.0 (2013-11-29)
+-----------------------------
+- XtfWriter: don't trim attribute values
+
+iox-ili 1.8.0 (2013-04-12)
+-----------------------------
+- added XRF BETA
+
+iox-ili 1.7.1 (2012-11-20)
+-----------------------------
+- bug: ItfReader failed to read polyline
+
+iox-ili 1.7.0 (2012-11-15)
+-----------------------------
+- ItfWriter: improved error msg in case of trying to write non numeric values as a numbers
+- added generics
+- added annotations Deprecated, Override
+- API changes include minor incompatibilities
+
+iox-ili 1.6.9 (2012-10-26)
+-----------------------------
+- iox-api 1.0.2 (2012-10-26)
+
+iox-ili 1.6.8 (2012-08-31)
+-----------------------------
+- bug: XtfReader failed to skip element content of OIDType
+
+iox-ili 1.6.7 (2012-07-23)
+-----------------------------
+- bug: XtfWriter failed to write OIDType with XML-attribute
+
+iox-ili 1.6.6 (2012-06-28)
+-----------------------------
+- bug: ItfWriter didn't round numeric values
+- added DbUtility.getInt(), DbUtility.getDouble()
+
+iox-ili 1.6.5 (2012-06-06)
+-----------------------------
+- bug: write OIDSPACES
+
+iox-ili 1.6.4 (2012-05-01)
+-----------------------------
+- bug: tries to find model INTERLIS
+
+iox-ili 1.6.3 (2012-02-20)
+-----------------------------
+- MakeIliModelsXml: java.lang.NullPointerException if no existing ilimodels.xml
+
+iox-ili 1.6.2 (2011-12-22)
+-----------------------------
+- added resolver to customize repository access
+- ili2c-4.4.2
+
+iox-ili 1.6.1 (2011-09-05)
+-----------------------------
+- skip empty dependencies in ilimodels.xml
+- new MakeIliModelsXml that can update existing file and reads meta attributes (precursorVersion, tags, furtherInformation, furtherMetadata, Original, IDGeoIV, technicalContact)
+
+iox-ili 1.6.0 (2011-08-19)
+-----------------------------
+- switched from wstx to jre StaX
+
+iox-ili 1.5.5 (2011-04-14)
+-----------------------------
+- added XtfStartTransferEvent to better support XTF header
+- bug: Attribute URI missing in OIDSPACE
+
+iox-ili 1.5.4 (2011-01-26)
+-----------------------------
+- ili2c-4.3.4
+- java.lang.NoSuchMethodError: ch.interlis.ili2c.metamodel.Constant$Numeric.getValue()D
+- add java.io.Serializable to Iom_jObject
+
+iox-ili 1.5.3 (2010-12-02)
+-----------------------------
+- bug itf reader: skip space after 'CONT'
+
+iox-ili 1.5.2 (2010-11-16)
+-----------------------------
+- itf reader: skip/ignore missing 3rd value of a coord
+- renamed iox.jar to iox-ili.jar
+
+iox-ili 1.5.0 (2009-12-03)
+-----------------------------
+- initial public version

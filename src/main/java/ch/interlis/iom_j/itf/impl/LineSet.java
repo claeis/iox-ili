@@ -1,0 +1,194 @@
+package ch.interlis.iom_j.itf.impl;
+
+import java.util.ArrayList;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.operation.valid.IsValidOp;
+import com.vividsolutions.jts.operation.valid.TopologyValidationError;
+
+import ch.ehi.basics.logging.EhiLogger;
+import ch.interlis.ili2c.metamodel.Table;
+import ch.interlis.iom.IomConstants;
+import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
+import ch.interlis.iox.IoxException;
+import ch.interlis.iox_j.jts.Iox2jts;
+import ch.interlis.iox_j.jts.Iox2jtsException;
+import ch.interlis.iox_j.jts.Iox2jtsext;
+import ch.interlis.iox_j.jts.Jtsext2iox;
+
+public class LineSet {
+
+	private boolean isSurface=true;
+	private String helperTableGeomAttrName=null;
+	private Table linattrTab=null;
+	
+	public LineSet(boolean isSurface,Table lineattrTab,String geomAttr) {
+		this.isSurface=isSurface;
+		helperTableGeomAttrName=geomAttr;
+		linattrTab=lineattrTab;
+	}
+	
+	public ArrayList<CompoundCurve> buildBoundaries(ArrayList<IomObject> lines, JtsextGeometryFactory jtsFact) throws IoxException
+	{
+		ArrayList<ArrayList<CurveSegment>> boundaries=new ArrayList<ArrayList<CurveSegment>>();
+		ArrayList<String> boundaryTids=new ArrayList<String>();
+		//FORALL: alle Linien
+		ArrayList<CurveSegment> currentBoundary=null;
+		String currentBoundaryTid=null;
+		for(IomObject line:lines){
+			IomObject polyline=line.getattrobj(helperTableGeomAttrName, 0);
+			com.vividsolutions.jts.geom.Coordinate currentSegmentStartpoint=null;
+			{
+				IomObject sequence=polyline.getattrobj("sequence",0);
+				IomObject segment=sequence.getattrobj("segment",0);
+				currentSegmentStartpoint=Iox2jtsext.coord2JTS(segment);
+			}
+			  if(currentBoundary!=null && currentBoundary.size()>0){
+					boundaries.add(currentBoundary);
+					boundaryTids.add(currentBoundaryTid);
+			  }
+			  // neuer Rand
+			currentBoundaryTid=line.getobjectoid();
+			  currentBoundary=new ArrayList<CurveSegment>();
+			if(linattrTab!=null){
+				// TODO handle lineattr
+			}
+			boolean clipped=polyline.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
+			if(clipped){
+				throw new IoxException("clipped polyline not supported");
+			}
+			  //FORALL: alle Kurvenstuecke (Gerade: neuer Punkt; Kreisbogen: neuer Punkt + Zwischenpunkt)
+			for(int sequencei=0;sequencei<polyline.getattrvaluecount("sequence");sequencei++){
+				if(clipped){
+					//out.startElement(tags::get_CLIPPED(),0,0);
+				}else{
+					// an unclipped polyline should have only one sequence element
+					if(sequencei>0){
+						throw new IoxException("unclipped polyline with multi 'sequence' elements");
+					}
+				}
+				com.vividsolutions.jts.geom.Coordinate lastSegmentEndpoint=null;
+				IomObject sequence=polyline.getattrobj("sequence",sequencei);
+				for(int segmenti=0;segmenti<sequence.getattrvaluecount("segment");segmenti++){
+					IomObject segment=sequence.getattrobj("segment",segmenti);
+					//EhiLogger.debug("segmenttag "+segment.getobjecttag());
+					CurveSegment curve=null;
+					if(segment.getobjecttag().equals("COORD")){
+						// COORD
+						if(lastSegmentEndpoint==null){
+							curve=null;
+							lastSegmentEndpoint=Iox2jtsext.coord2JTS(segment);
+						}else{
+							Coordinate newSegEndPt=Iox2jtsext.coord2JTS(segment);
+							curve=new StraightSegment(lastSegmentEndpoint,newSegEndPt);
+						}
+					}else if(segment.getobjecttag().equals("ARC")){
+						// ARC
+						//arc2JTS(ret,segment,p);
+						Coordinate newSegMidPt=Iox2jtsext.getArcMidPt(segment);
+						Coordinate newSegEndPt=Iox2jtsext.getArcEndPt(segment);
+						curve=new ArcSegment(lastSegmentEndpoint,newSegMidPt,newSegEndPt);
+						if(((ArcSegment) curve).isStraight()){
+							EhiLogger.logAdaption("arc converted to straight at tid "+currentBoundaryTid+", "+((ArcSegment) curve).getMidPoint());
+							curve=new StraightSegment(curve.getStartPoint(),curve.getEndPoint());
+						}
+					}else{
+						// custum line form
+						throw new IoxException("custom line form not supported");
+						//out.startElement(segment->getTag(),0,0);
+						//writeAttrs(out,segment);
+						//out.endElement(/*segment*/);
+					}
+					if(curve!=null){
+						/*IF neuer Punkt weniger als zwei Einheiten entfernt von altem Punkt
+						THEN Fehler; Abbruch
+						IF neue Gerade
+						  IF Gerade in gleicher Richtung rueckwaerts wie alte Gerade
+						  THEN Fehler; Abbruch
+						IF neue Kreis
+						  IF Kreis in gleicher Richtung rueckwaerts wie alter Kreis
+						  THEN Fehler; Abbruch
+						IF neues Stueck schneidet bisherigen Rand 
+						THEN:
+							IF Schnittpunkt nicht beim letzten Stueck
+							THEN Fehler; Abbruch
+							If zu grosser Overlaps (Pfeilhoehe des Kreisbogen bis Schnittpunkt)
+							THEN Fehler; Abbruch
+							IF Gerade-Kreisbogen mit Overlaps THEN
+							  neuer Zwischenpunkt bei Kreisbogen einrechnen
+							ELSIF Kreisbogen-Gerade mit Overlaps THEN
+							  neuer Zwischenpunkt bei (altem) Kreisbogen einrechnen
+							ELSIF grosserKresibogen-kleiner Kreisbogen mit Overlaps THEN
+							  neuer Zwischenpunkt bei kleinem Kreisbogen einrechnen
+							ELSIF kleinerKresibogen-grosserKreisbogen mit Overlaps THEN
+							  neuer Zwischenpunkt bei kleinem Kreisbogen einrechnen
+						*/
+						int endPointIdx=findEndpointOnBoundary(currentBoundary,curve);
+						// IF neuer Punkt identisch mit erstem Punkt auf bisherigem Rand
+						if(endPointIdx==0){
+							// Rand fertig; Rand in Zwischenspeicher
+							currentBoundary.add(curve);
+							boundaries.add(currentBoundary);
+							boundaryTids.add(currentBoundaryTid);
+							// neuen Rand anfangen
+							currentBoundary=new ArrayList<CurveSegment>();
+						}else if(endPointIdx>0){
+							// IF neuer Punkt identisch mit Punkt auf bisherigem Rand
+							// THEN neuer Rand (von Punkt bis neur Punkt) in Zwischenspeicher; bisheriger Randanfang fortsetzen
+							java.util.List<CurveSegment> sub=currentBoundary.subList(endPointIdx+1, currentBoundary.size());
+							ArrayList<CurveSegment> boundary=new ArrayList<CurveSegment>();
+							boundary.addAll(sub);
+							boundaries.add(boundary);
+							boundaryTids.add(currentBoundaryTid);
+							sub.clear(); // remove boundary from currentBoundary
+						}else if(false){
+							// TODO IF neuer Punkt liegt auf bisherigem Rand
+							// THEN Fehler; Abbruch
+						}else{
+							// Rand normal fortsetzen
+							currentBoundary.add(curve);
+						}
+						lastSegmentEndpoint=curve.getEndPoint();
+					}
+				}
+				if(clipped){
+					//out.endElement(/*CLIPPED*/);
+				}
+			}
+		}
+		if(currentBoundary.size()>0){
+			boundaries.add(currentBoundary);
+			boundaryTids.add(currentBoundaryTid);
+		}
+		
+		ArrayList<CompoundCurve> segv=new ArrayList<CompoundCurve>(); 
+		java.util.Iterator<String> tids=boundaryTids.iterator();
+		for(ArrayList<CurveSegment> boundaryLine:boundaries){
+			CompoundCurve boundary=jtsFact.createCompoundCurve(boundaryLine);
+			String tid=tids.next();
+			boundary.setUserData(tid);
+			boundary.setSegmentsUserData(tid);
+			segv.add(boundary);
+		}
+		
+		return segv;
+		
+	}
+	private int findEndpointOnBoundary(ArrayList<CurveSegment> currentBoundary,
+			CurveSegment curve) throws IoxException {
+		for(int i=0;i<currentBoundary.size();i++){
+			if(curve.getEndPoint().equals2D(currentBoundary.get(i).getStartPoint())){
+				return i;
+			}
+		}
+		return -1;
+	}
+
+}
