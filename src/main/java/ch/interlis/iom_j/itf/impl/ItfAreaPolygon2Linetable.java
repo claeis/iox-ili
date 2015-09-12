@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import ch.ehi.basics.logging.EhiLogger;
+import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveDissolver;
@@ -59,6 +60,33 @@ public class ItfAreaPolygon2Linetable {
 			}
 		}
 		return ioxlines;
+	}
+
+	public static ArrayList<IomObject> getLinesFromPolygon(IomObject polygon)
+	{
+		ArrayList<IomObject> ret=new ArrayList<IomObject>();
+		boolean clipped=polygon.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
+		for(int surfacei=0;surfacei<polygon.getattrvaluecount("surface");surfacei++){
+			if(clipped){
+				throw new IllegalArgumentException("clipped surface not supported");
+			}else{
+				// an unclipped surface should have only one surface element
+				if(surfacei>0){
+					throw new IllegalArgumentException("unclipped surface with multi 'surface' elements");
+				}
+			}
+			IomObject surface=polygon.getattrobj("surface",surfacei);
+			for(int boundaryi=0;boundaryi<surface.getattrvaluecount("boundary");boundaryi++){
+				IomObject boundary=surface.getattrobj("boundary",boundaryi);
+				for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
+					IomObject polyline=boundary.getattrobj("polyline",polylinei);
+					ret.add(polyline);
+				}
+			}
+			if(clipped){
+			}
+		}
+		return ret;
 	}
 
 }

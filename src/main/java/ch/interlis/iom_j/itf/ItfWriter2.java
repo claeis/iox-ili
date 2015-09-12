@@ -252,7 +252,7 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 										if(iomPolygon!=null){
 											String internalTid=iomObj.getattrvalue(INTERNAL_T_ID);
 											// get lines
-											ArrayList<IomObject> lines=getLinesFromPolygon(iomPolygon);
+											ArrayList<IomObject> lines=ItfAreaPolygon2Linetable.getLinesFromPolygon(iomPolygon);
 											allLines.addLines(mainObjTid,internalTid,lines);
 										}
 									}
@@ -299,7 +299,7 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 										// write line objects
 										IomObject polygon=iomObj.getattrobj(attrName, 0);
 										if(polygon!=null){
-											ArrayList<IomObject> lines=getLinesFromPolygon(polygon);
+											ArrayList<IomObject> lines=ItfAreaPolygon2Linetable.getLinesFromPolygon(polygon);
 											for(IomObject line:lines){
 												IomObject lineTableObj=new Iom_jObject(lineTableName, Long.toString(++maxOid));
 												String iomAttrName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableGeomAttrName(attr);
@@ -322,32 +322,6 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 			// write EndTransferEvent
 			out.write(event);
 		}
-	}
-	private ArrayList<IomObject> getLinesFromPolygon(IomObject polygon)
-	{
-		ArrayList<IomObject> ret=new ArrayList<IomObject>();
-		boolean clipped=polygon.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
-		for(int surfacei=0;surfacei<polygon.getattrvaluecount("surface");surfacei++){
-			if(clipped){
-				throw new IllegalArgumentException("clipped surface not supported");
-			}else{
-				// an unclipped surface should have only one surface element
-				if(surfacei>0){
-					throw new IllegalArgumentException("unclipped surface with multi 'surface' elements");
-				}
-			}
-			IomObject surface=polygon.getattrobj("surface",surfacei);
-			for(int boundaryi=0;boundaryi<surface.getattrvaluecount("boundary");boundaryi++){
-				IomObject boundary=surface.getattrobj("boundary",boundaryi);
-				for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
-					IomObject polyline=boundary.getattrobj("polyline",polylinei);
-					ret.add(polyline);
-				}
-			}
-			if(clipped){
-			}
-		}
-		return ret;
 	}
 	private java.util.Map<String, IomObject> getObjectPool(String classQName) throws IoxException {
 		PrimaryTreeMap<String, IomObject> m = recman.treeMap(classQName);

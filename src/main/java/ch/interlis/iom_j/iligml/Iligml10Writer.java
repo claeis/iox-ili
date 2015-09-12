@@ -25,26 +25,69 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Polygon;
+
 import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.iom.*;
 import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iox.EndBasketEvent;
+import ch.interlis.iox.EndTransferEvent;
+import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
+import ch.interlis.iox.IoxFactoryCollection;
+import ch.interlis.iox.StartBasketEvent;
+import ch.interlis.iox.StartTransferEvent;
+import ch.interlis.iox_j.ObjectEvent;
+import ch.interlis.iox_j.jts.Iox2jtsext;
+import ch.interlis.iox_j.jts.Jtsext2iox;
 import ch.interlis.iom_j.ViewableProperties;
 import ch.interlis.iom_j.ViewableProperty;
+import ch.interlis.iom_j.itf.ModelUtilities;
+import ch.interlis.iom_j.itf.impl.ItfAreaPolygon2Linetable;
+import ch.interlis.iom_j.itf.impl.JdbmUtility;
+import ch.interlis.iom_j.xtf.Ili2cUtility;
 import ch.interlis.iom_j.xtf.XtfModel;
 import ch.interlis.ili2c.generator.Gml32Generator;
+import ch.interlis.ili2c.metamodel.AbstractClassDef;
+import ch.interlis.ili2c.metamodel.AreaType;
+import ch.interlis.ili2c.metamodel.AttributeDef;
+import ch.interlis.ili2c.metamodel.Element;
+import ch.interlis.ili2c.metamodel.SurfaceType;
+import ch.interlis.ili2c.metamodel.Table;
+import ch.interlis.ili2c.metamodel.TransferDescription;
+import ch.interlis.ili2c.metamodel.Type;
+import ch.interlis.ili2c.metamodel.Viewable;
+import ch.interlis.ili2c.metamodel.ViewableTransferElement;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+
+import jdbm.PrimaryTreeMap;
+import jdbm.RecordManager;
 
 	/** Writer of an INTERLIS 2 transfer file.
 	 * @author ceis
 	 */
-    public class IligmlWriterAlt
+    public class Iligml10Writer implements ch.interlis.iox.IoxWriter
     {
         private XMLStreamWriter xout=null;
+    	private RecordManager recman = null;
+    	private String cacheFileBasename=null;
         private ViewableProperties mapping = null;
+    	private XtfModel xtfModels[]=null;
         private java.util.HashMap nameMapping=null;
         private HashSet unkClsv = new HashSet();
+    	private long maxOid=0;
+    	private String currentTopic=null;
+    	private TransferDescription td=null;
+    	private IoxFactoryCollection factory=new  ch.interlis.iox_j.DefaultIoxFactoryCollection();
+        
+    	public static final String INTERNAL_T_ID="_t_id";
         public static final String iligmlBase=Gml32Generator.ILIGML_XMLNSBASE;
         public static final String xmlns_ili=iligmlBase+"/INTERLIS";
         public static final String xmlns_gml="http://www.opengis.net/gml/3.2";
@@ -53,15 +96,41 @@ import java.util.HashSet;
 
         /** Creates a new writer.
          * @param buffer Writer to write to
-         * @param mapping1 model of data to write
-         * @param version transfer format version (2.2 or 2.3)
          * @throws IoxException
          */
-        public IligmlWriterAlt(java.io.OutputStreamWriter buffer,ViewableProperties mapping1,java.util.HashMap nameMapping,String version)
+        public Iligml10Writer(java.io.OutputStreamWriter buffer,TransferDescription td)
 		throws IoxException
         { 
-            mapping = mapping1;
-            this.nameMapping=nameMapping;
+        	this.td=td;
+        	init(buffer);
+        }
+        /** Creates a new writer.
+         * @param buffer Writer to write to
+         * @throws IoxException
+         */
+        public Iligml10Writer(java.io.File buffer,TransferDescription td)
+		throws IoxException
+        { 
+        	this.td=td;
+			String encoding="UTF-8";
+			try{
+	        	init(new java.io.OutputStreamWriter(new java.io.FileOutputStream(buffer),encoding));
+			} catch (UnsupportedEncodingException ex) {
+				throw new IoxException(ex);
+			} catch (FileNotFoundException ex) {
+				throw new IoxException(ex);
+			}
+        }
+    	private void init(java.io.OutputStreamWriter buffer) throws IoxException{
+            mapping = createMapping(td);
+            nameMapping=ch.interlis.ili2c.generator.Gml32Generator.createName2NameMapping(td);
+            xtfModels=Ili2cUtility.buildModelList(td);
+    		cacheFileBasename=JdbmUtility.getCacheTmpFilename();
+    		try {
+    			recman=JdbmUtility.createRecordManager(cacheFileBasename);
+    		} catch (IOException e) {
+    			throw new IoxException(e);
+    		}
 			XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 			//if (useRepairing) {
 			//	outputFactory.setProperty("javax.xml.stream.isRepairingNamespaces", Boolean.TRUE);
@@ -76,15 +145,46 @@ import java.util.HashSet;
 			}catch(XMLStreamException ex){
 				throw new IoxException(ex);
 			}
-
-        }
-        public XMLStreamWriter getXout()
+    	}
+        private ViewableProperties createMapping(TransferDescription td) {
+    		ViewableProperties mapping=new ViewableProperties();
+        	java.util.HashMap tagv=ch.interlis.ili2c.generator.Gml32Generator.createDef2NameMapping(td);
+			Iterator tagi=tagv.keySet().iterator();
+			for(;tagi.hasNext();){
+				Element ili2cEle=(Element)tagi.next();
+				String tag=null;
+				ArrayList propv=null; // ViewableProperty
+				if(ili2cEle instanceof AttributeDef){
+					AttributeDef attr=(AttributeDef)ili2cEle;
+					tag=ili2cEle.getContainer().getScopedName(null)+"."+ili2cEle.getName();
+					propv=Ili2cUtility.mapLinetable(attr);
+				}else if(ili2cEle instanceof Viewable){
+					propv=new ArrayList(); // ViewableProperty
+					Viewable v=(Viewable)ili2cEle;
+					tag=v.getScopedName(null);
+					Iterator iter = v.getAttributesAndRoles2();
+					while (iter.hasNext()) {
+						ViewableTransferElement obj = (ViewableTransferElement)iter.next();
+						ViewableProperty prop=Ili2cUtility.mapViewableTransferElement( v, obj);
+						propv.add(prop);
+					}
+					
+				}
+				if(tag!=null){
+					mapping.defineClass(tag, (ViewableProperty[])propv.toArray(new ViewableProperty[propv.size()]));
+				}
+			}
+			return mapping;
+		}
+		public XMLStreamWriter getXout()
         {
         	return xout;
         }
+        @Override
         public void close() 
         	throws IoxException
         {
+        	flush();
         	if(xout!=null){
 				try{
 					xout.flush();
@@ -93,7 +193,17 @@ import java.util.HashSet;
 				}
 				xout=null;
         	}
+    		if(recman!=null){
+    			try {
+    				recman.close();
+    				JdbmUtility.removeRecordManagerFiles(cacheFileBasename);
+    			} catch (IOException e) {
+    				throw new IoxException(e);
+    			}
+    		}
+    		recman=null;
         }
+        @Override
 		public void flush() 
 			throws IoxException
 		{
@@ -120,7 +230,7 @@ import java.util.HashSet;
 				throw new IoxException(ex);
 			}
 		}
-        public void writeStartTransfer(String sender, String comment,XtfModel models[])
+        private void writeStartTransfer(String sender, String comment,XtfModel models[])
 		throws IoxException
         {
 			try{
@@ -151,7 +261,7 @@ import java.util.HashSet;
 			}
 
         }
-        public void writeEndTransfer()
+        private void writeEndTransfer()
 		throws IoxException
         {
 			try{
@@ -163,15 +273,16 @@ import java.util.HashSet;
 			}
             xout=null;
         }
-        public void writeStartBasket(String type, String bid)
+        private void writeStartBasket(String type, String bid)
 		throws IoxException
         {
             writeStartBasket(type,bid,IomConstants.IOM_COMPLETE, IomConstants.IOM_FULL,null,null, null);
         }
         private String lastBasketNs=null;
-        public void writeStartBasket(String type,String bid,int consistency, int kind,String startstate,String endstate, String[] topicv)
+        private void writeStartBasket(String type,String bid,int consistency, int kind,String startstate,String endstate, String[] topicv)
 		throws IoxException
         {
+        	currentTopic=type;
 			try{
 				xout.writeStartElement(xmlns_ili,Gml32Generator.TRANSFERMEMBER);
 				newline();
@@ -191,9 +302,15 @@ import java.util.HashSet;
 			}
 
         }
-        public void writeEndBasket()
+        private void writeEndBasket()
 		throws IoxException
         {
+        	String modelName=null;
+        	String topicName=null;
+        	int mdlNameSep=currentTopic.indexOf('.');
+        	modelName=currentTopic.substring(0,mdlNameSep);
+        	topicName=currentTopic.substring(mdlNameSep+1);
+        	flushBasket(modelName,topicName);
 			try{
 				xout.writeEndElement();
 				newline();
@@ -204,18 +321,114 @@ import java.util.HashSet;
 				throw new IoxException(ex);
 			}
         }
-        public void writeObject(IomObject obj)
+        private void flushBasket(String modelName, String topicName) throws IoxException {
+			ArrayList itftablev=ModelUtilities.getItfTables(td,modelName,topicName);
+			// FORALL tables
+			for(Object tableo:itftablev){
+				if(!(tableo instanceof Table)){
+					continue;
+				}
+				Table table=(Table)tableo;
+				String tableQName=table.getScopedName(null);
+				ArrayList<AttributeDef> areaAttrs=new ArrayList<AttributeDef>();
+				getPolygonAttrs(table,areaAttrs);
+				// IF Table without surface or area attrs
+				if(areaAttrs.size()==0){
+					// write objects
+					java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
+					for(IomObject iomObj : pool.values()){
+						writeInternalObject(iomObj);
+					}
+				}else{
+					// write area helper tables
+					// FORALL area attrs
+					for(AttributeDef attr:areaAttrs){
+						String attrName=attr.getName();
+						String lineTableName=tableQName+"."+attrName;
+						EhiLogger.logState("build linetable "+lineTableName+"...");
+						ItfAreaPolygon2Linetable allLines=new ItfAreaPolygon2Linetable();
+						// FORALL main objects
+						java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
+						for(IomObject iomObj : pool.values()){
+							String mainObjTid=iomObj.getobjectoid();
+							IomObject iomPolygon=iomObj.getattrobj(attrName, 0);
+							if(iomPolygon!=null){
+								String internalTid=iomObj.getattrvalue(INTERNAL_T_ID);
+								// get lines
+								ArrayList<IomObject> lines=ItfAreaPolygon2Linetable.getLinesFromPolygon(iomPolygon);
+								allLines.addLines(mainObjTid,internalTid,lines);
+							}
+						}
+						// nodes it / check noding
+						// polygonize
+						// write line objects
+						for(IomObject line:allLines.getLines()){
+							IomObject lineTableObj=new Iom_jObject(lineTableName, Long.toString(++maxOid));
+							String iomAttrName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableGeomAttrName(attr);
+							lineTableObj.addattrobj(iomAttrName, line);
+							writeInternalObject(lineTableObj);
+						}
+					}
+					// write main table
+					{
+						// FORALL main objects
+						java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
+						for(IomObject iomObj : pool.values()){
+							// FORALL area attrs
+							for(AttributeDef attr:areaAttrs){
+								String attrName=attr.getName();
+								// set georef into main object
+								IomObject iomPolygon=iomObj.getattrobj(attrName, 0);
+								if(iomPolygon!=null){
+									// calc geo ref
+									Polygon polygon=Iox2jtsext.surface2JTS(iomPolygon, 0.0);
+									Coordinate geoRef=polygon.getInteriorPoint().getCoordinate();
+									iomObj.changeattrobj(attrName, 0,Jtsext2iox.JTS2coord(geoRef));
+								}
+							}
+							// write main object
+							writeInternalObject(iomObj);
+						}
+					}
+					
+				}
+			}
+        	
+		}
+		private void writeObject(IomObject iomObj)
 		throws IoxException
         {
+			String currentTid=iomObj.getobjectoid();
+			String iliQName=iomObj.getobjecttag();
+			// save object
+			java.util.Map<String, IomObject> pool=getObjectPool(iliQName);
+			if(pool.containsKey(currentTid)){
+				throw new IoxException("duplicate tid "+currentTid+" in "+iliQName);
+			}else{
+				pool.put(currentTid, iomObj);
+			}
+			try {
+				int tidInt=Integer.parseInt(currentTid);
+				if(tidInt>maxOid){
+					maxOid=tidInt;
+				}
+			} catch (NumberFormatException e) {
+				// ignore it
+			}
+        }
+		private void writeInternalObject(IomObject iomObj)
+		throws IoxException
+        {
+			String currentTid=iomObj.getobjectoid();
+			String iliQName=iomObj.getobjecttag();
 			try{
-				String type=obj.getobjecttag();
 				xout.writeStartElement(lastBasketNs,Gml32Generator.BASKETMEMBER);
-				xout.writeStartElement(getXmlNs(type),getXmlName(type));
-				xout.writeAttribute(xmlns_gml,"id",makeOid(obj.getobjectoid()));
+				xout.writeStartElement(getXmlNs(iliQName),getXmlName(iliQName));
+				xout.writeAttribute(xmlns_gml,"id",makeOid(currentTid));
 				//writeAttributeStringOptional("BID", makeOid(obj.getobjectbid()));
 				//writeAttributeStringOptional("OPERATION", encodeOperation(obj.getobjectoperation()));
 				//writeAttributeStringOptional("CONSISTENCY", encodeConsistency(obj.getobjectconsistency()));
-				writeObjAttrs(obj);
+				writeObjAttrs(iomObj);
 				xout.writeEndElement(); 
 				xout.writeEndElement(); 
 				newline();
@@ -285,7 +498,11 @@ import java.util.HashSet;
 							else if (child.getobjecttag().equals("POLYLINE"))
 							{
 								// POLYLINE
-								xout.writeStartElement(xmlns_attr,attrName);
+								if(attrName.startsWith(ModelUtilities.HELPER_TABLE_GEOM_ATTR_PREFIX)){
+									xout.writeStartElement(xmlns_attr,"geometry");
+								}else{
+									xout.writeStartElement(xmlns_attr,attrName);
+								}
 								writePolyline(child, false,"EPSG:21781");
 								xout.writeEndElement(/*attr*/);
 								if (valueCount > 1)
@@ -778,4 +995,59 @@ import java.util.HashSet;
         {
         	return "iox"+Integer.toString(tid++);
         }
+    	private java.util.Map<String, IomObject> getObjectPool(String classQName) throws IoxException {
+    		PrimaryTreeMap<String, IomObject> m = recman.treeMap(classQName);
+    		return m;
+    		
+    	}
+    	private void getPolygonAttrs(AbstractClassDef<?> aclass,ArrayList<AttributeDef> attrs_areaAttrs) {
+    		Iterator<?> attri = aclass.getAttributes ();
+    		while (attri.hasNext ()){
+    		  Object attrObj = attri.next();
+    		  if (attrObj instanceof AttributeDef)
+    		  {
+    			AttributeDef attr = (AttributeDef) attrObj;
+    			Type type = Type.findReal (attr.getDomain());
+    			if(type instanceof AreaType){
+    				attrs_areaAttrs.add(attr);
+    			}
+    		  }
+    		}
+    		
+    		
+    	}
+		@Override
+		public IomObject createIomObject(String type, String oid)
+				throws IoxException {
+			return factory.createIomObject(type, oid);
+		}
+		@Override
+		public IoxFactoryCollection getFactory() throws IoxException {
+			return factory;
+		}
+		@Override
+		public void setFactory(IoxFactoryCollection arg0) throws IoxException {
+			this.factory=factory;
+		}
+		@Override
+		public void write(IoxEvent event) throws IoxException {
+			if(event instanceof StartTransferEvent){
+				StartTransferEvent e=(StartTransferEvent)event;
+				writeStartTransfer(e.getSender(),e.getComment(),xtfModels);
+			}else if(event instanceof StartBasketEvent){
+				StartBasketEvent e=(StartBasketEvent)event;
+				writeStartBasket(e.getType(),e.getBid(),e.getConsistency(),e.getKind(),e.getStartstate(),e.getEndstate(),e.getTopicv());
+			}else if(event instanceof ObjectEvent){
+				ObjectEvent e=(ObjectEvent)event;
+				writeObject(e.getIomObject());
+			}else if(event instanceof EndBasketEvent){
+				writeEndBasket();
+			}else if(event instanceof EndTransferEvent){
+				writeEndTransfer();
+			}else{
+				throw new IoxException("unknown event type "+event.getClass().getName());
+			}
+			
+		}
+        
     }

@@ -3,6 +3,10 @@ ideas/open issues
 - add xml validation
 - add checker
 
+iox-ili 1.11.0 (2015-09-10)
+-----------------------------
+- Iligml10Writer: adjusted to approved eCH-0118-1.0
+
 iox-ili 1.10.6 (2015-09-04)
 -----------------------------
 - ItfReader2: fixed eye handling in Arc/Arc overlap remover
