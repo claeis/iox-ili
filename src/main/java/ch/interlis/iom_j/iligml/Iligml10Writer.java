@@ -325,10 +325,10 @@ import jdbm.RecordManager;
 			ArrayList itftablev=ModelUtilities.getItfTables(td,modelName,topicName);
 			// FORALL tables
 			for(Object tableo:itftablev){
-				if(!(tableo instanceof Table)){
+				if(!(tableo instanceof Viewable)){
 					continue;
 				}
-				Table table=(Table)tableo;
+				Viewable table=(Viewable)tableo;
 				String tableQName=table.getScopedName(null);
 				ArrayList<AttributeDef> areaAttrs=new ArrayList<AttributeDef>();
 				getPolygonAttrs(table,areaAttrs);
@@ -1000,7 +1000,7 @@ import jdbm.RecordManager;
     		return m;
     		
     	}
-    	private void getPolygonAttrs(AbstractClassDef<?> aclass,ArrayList<AttributeDef> attrs_areaAttrs) {
+    	private void getPolygonAttrs(Viewable aclass,ArrayList<AttributeDef> attrs_areaAttrs) {
     		Iterator<?> attri = aclass.getAttributes ();
     		while (attri.hasNext ()){
     		  Object attrObj = attri.next();
