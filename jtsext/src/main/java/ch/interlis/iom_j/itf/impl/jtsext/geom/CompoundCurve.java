@@ -95,7 +95,11 @@ public class CompoundCurve extends LineString {
 	 */
 	public boolean removeOverlap(boolean atStartOfLine, CurveSegment otherSegment,
 			Coordinate newVertexPt,double newVertexOffset) {
-		ArcSegment thisSegment=(ArcSegment) segments.get(atStartOfLine ? 0 : getNumSegments()-1);
+		CurveSegment thisSegmentO=segments.get(atStartOfLine ? 0 : getNumSegments()-1);
+		if(!(thisSegmentO instanceof ArcSegment)){
+			throw new IllegalArgumentException();
+		}
+		ArcSegment thisSegment=(ArcSegment) thisSegmentO;
 		CurveSegment newSegment=null;
 		if(otherSegment instanceof ArcSegment){
 			// move otherSegment in direction of thisSegment center

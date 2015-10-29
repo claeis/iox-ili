@@ -6,6 +6,7 @@ ideas/open issues
 iox-ili 1.11.1 (2015-09-xx)
 -----------------------------
 - Iligml10Writer: fixed missing link objects (assocs)
+- fixed "StraightSegment cannot be cast to ArcSegment" exception if ring end segment overlaps with ring start segment
 
 iox-ili 1.11.0 (2015-09-10)
 -----------------------------

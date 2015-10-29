@@ -210,10 +210,6 @@ private void removeOverlap(CurveSegmentIntersector li,Coordinate node,
 		PolygonizeDirectedEdge de0, PolygonizeDirectedEdge de1,double newVertexOffset) {
 	PolygonizeEdge edge0=(PolygonizeEdge)de0.getEdge();
 	  CompoundCurve line0 = (CompoundCurve)edge0.getLine();
-	  boolean line0AtStart=false;
-	  if(line0.getSegments().get(0).getStartPoint().equals2D(node)){
-		  line0AtStart=true;
-	  }
 	  CurveSegment s0=null;
 		int s0idx = 0;
 		if (de0.getEdgeDirection() == true) {
@@ -223,12 +219,12 @@ private void removeOverlap(CurveSegmentIntersector li,Coordinate node,
 
 		}
 		s0 = line0.getSegments().get(s0idx);
+	  boolean line0AtStart=false;
+	  if(s0.getStartPoint().equals2D(node)){
+		  line0AtStart=true;
+	  }
 	  PolygonizeEdge edge1=(PolygonizeEdge)de1.getEdge();
 	  CompoundCurve line1 = (CompoundCurve)edge1.getLine();
-	  boolean line1AtStart=false;
-	  if(line1.getSegments().get(0).getStartPoint().equals2D(node)){
-		  line1AtStart=true;
-	  }
 	  CurveSegment s1=null;
 	  int s1idx=0;
 		if (de1.getEdgeDirection() == true) {
@@ -237,6 +233,10 @@ private void removeOverlap(CurveSegmentIntersector li,Coordinate node,
 			s1idx = line1.getNumSegments() - 1;
 		}
 		s1=line1.getSegments().get(s1idx);
+		  boolean line1AtStart=false;
+		  if(s1.getStartPoint().equals2D(node)){
+			  line1AtStart=true;
+		  }
 	if(s0 instanceof StraightSegment && s1 instanceof StraightSegment){
 		// could not intersect, if correct noded
 	}else{
