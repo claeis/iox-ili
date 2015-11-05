@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.ehi.basics.logging.EhiLogger;
+import ch.interlis.iom_j.itf.impl.jtsext.io.WKTWriterJtsext;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 
@@ -12,6 +13,7 @@ import com.vividsolutions.jts.algorithm.LineIntersector;
 import com.vividsolutions.jts.algorithm.RobustLineIntersector;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geomgraph.GeometryGraph;
@@ -134,13 +136,32 @@ public class CompoundCurveRing extends LinearRing {
 	    }
 	    CompoundCurveNoder validator=new CompoundCurveNoder(lines, true);
 		boolean ret= validator.isValid();
-		//if(ret==false){
-		//	List<Intersection> isv = validator.getIntersections();
-		//	for(Intersection is:isv){
-		//		EhiLogger.debug("is "+is.getPt()[0]);
-		//	}
-		//}
+		if(ret==false){
+			List<Intersection> isv = validator.getIntersections();
+			for(Intersection is:isv){
+				EhiLogger.traceState("invalid CompoundCurve: "+is.toString());
+			}
+		}
 		return ret;
 	}
+	@Override
+	public String toText() {
+	    WKTWriterJtsext writer = new WKTWriterJtsext();
+	    return writer.write(this);
+	}
+	@Override
+	  protected Envelope computeEnvelopeInternal() {
+		Envelope ret= new Envelope();
+	    if (isEmpty()) {
+	        return ret;
+	      }
+	    
+		for(CompoundCurve line:lines){
+		    for(CurveSegment seg:line.getSegments()){
+		    	ret=seg.expandEnvelope(ret);
+		    }
+		}
+	      return ret;
+	  }
 
 }
