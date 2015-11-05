@@ -1,9 +1,10 @@
 package ch.interlis.iom_j.itf.impl.hrg;
 
 public class HrgUtility {
-	//static final double EPS=0.0001; // epsilon, linear tolerance (1mm in military coordinates)
+	//static final double EPS=0.001; // epsilon, linear tolerance (1mm in military coordinates)
+	//static final double EPS100=EPS;
 	static final double EPS=0.00000001;
-	static final double EPS100=EPS*100.0;
+	static final double EPS100=EPS*150.0;
 	
 public static void CTRC3P(double P1I,double P2I,double  S1I,double S2I,double Q1I,double Q2I,double Z1O[],double Z2O[],double DETAO[],double SIGNO[])
 { ///////////////////////////////////////////////////////
@@ -709,8 +710,7 @@ public static void ISCISR(double AV1I[],double AV2I[],double SL1I[],double SL2I[
 			}
 			if(NHO[0]>=2){
 				// escape with error message, more than 2 IPs (possible?) 
-				NHO[0]=-1;
-				return;
+				throw new IllegalStateException("more than 2 IPs");
 			}
 			NHO[0] = NHO[0] +  1;
 			H1O[NHO[0]] = P1[JP]; 
