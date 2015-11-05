@@ -10,13 +10,16 @@ import java.util.Map;
 import java.util.Set;
 
 import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
+import com.vividsolutions.jts.algorithm.locate.SimplePointInAreaLocator;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Location;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.TopologyException;
 import com.vividsolutions.jts.index.strtree.STRtree;
 import com.vividsolutions.jts.noding.FastNodingValidator;
 import com.vividsolutions.jts.noding.BasicSegmentString;
@@ -38,6 +41,7 @@ import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CurvePolygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
@@ -145,13 +149,43 @@ public class ItfAreaLinetable2Polygon {
 				if(!validator.isValid()){
 					boolean hasIntersections=false;
 					for(Intersection is:validator.getIntersections()){
-						boolean seg1WithValidOverlap=ItfSurfaceLinetable2Polygon.isFirstOrLastSegment(is.getCurve1(),is.getSegment1());
-						boolean seg2WithValidOverlap=ItfSurfaceLinetable2Polygon.isFirstOrLastSegment(is.getCurve2(),is.getSegment2());
-						if(seg1WithValidOverlap && seg2WithValidOverlap && is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
+						CompoundCurve e0=is.getCurve1();
+						CompoundCurve e1=is.getCurve2();
+						CurveSegment seg0=is.getSegment1();
+						CurveSegment seg1=is.getSegment2();
+						int segIndex0=e0.getSegments().indexOf(is.getSegment1());
+						int segIndex1=e1.getSegments().indexOf(is.getSegment2());
+						Coordinate p00;
+						Coordinate p01;
+						Coordinate p10;
+						Coordinate p11;
+						p00 = e0.getSegments().get(segIndex0).getStartPoint();
+						p01 = e0.getSegments().get(segIndex0).getEndPoint();
+						p10 = e1.getSegments().get(segIndex1).getStartPoint();
+						p11 = e1.getSegments().get(segIndex1).getEndPoint();
+						if((segIndex0==0 || segIndex0==e0.getSegments().size()-1) && (segIndex1==0 || segIndex1==e1.getSegments().size()-1) && is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
 							// valid overlap, ignore for now, will be removed later in IoxPolygonizer
+						}else if(e0==e1 && (
+								  Math.abs(segIndex0-segIndex1)==1 
+								  || Math.abs(segIndex0-segIndex1)==e0.getNumSegments()-1  ) // bei Ring: letztes Segment und Erstes Segment
+								  && (is.isIntersection(p00) || is.isIntersection(p01))
+								  && (is.isIntersection(p10) || is.isIntersection(p11))){
+							// aufeinanderfolgende Segmente der selben Linie
+							  // overlap entfernen
+							  Coordinate newVertexPt=new Coordinate();
+							  if(seg0 instanceof StraightSegment){
+								  e0.removeOverlap((ArcSegment) seg1, seg0, newVertexPt, newVertexOffset);
+							  }else if(seg1 instanceof StraightSegment){
+								  e0.removeOverlap((ArcSegment) seg0, seg1, newVertexPt, newVertexOffset);
+							  }else if(((ArcSegment) seg0).getRadius()>((ArcSegment) seg1).getRadius()){
+								  e0.removeOverlap((ArcSegment) seg1, seg0, newVertexPt, newVertexOffset);
+							  }else{
+								  // seg1.getRadius() > seg0.getRadius()
+								  e0.removeOverlap((ArcSegment) seg0, seg1, newVertexPt, newVertexOffset);
+							  }
 						}else{
 							EhiLogger.logError("intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
-							EhiLogger.traceState("overlap "+is.getOverlap()+", seg1 "+is.getSegment1()+", seg2 "+is.getSegment2());
+							EhiLogger.traceState(is.toString());
 							hasIntersections=true;
 						}
 					}
@@ -172,22 +206,22 @@ public class ItfAreaLinetable2Polygon {
 			Collection cutEdges = polygonizer.getCutEdges();
 			if(!cutEdges.isEmpty()){
 				for(Object edge:cutEdges){
-					EhiLogger.logError("cut edge: tids "+getSegmentTids((CompoundCurve) edge)+", "+edge);
+					EhiLogger.logError("cut edge: tids "+((CompoundCurve) edge).getSegmentTids()+", "+edge);
 				}
 				throw new IoxInvalidDataException("cut edges");
 			}
 			Collection dangles=polygonizer.getDangles();
 			if(!dangles.isEmpty()){
 				for(Object dangle:dangles){
-					EhiLogger.logError("dangle: tids "+getSegmentTids((CompoundCurve) dangle)+", "+dangle);
+					EhiLogger.logError("dangle: tids "+((CompoundCurve) dangle).getSegmentTids()+", "+dangle);
 				}
 				throw new IoxInvalidDataException("dangles");
 			}
 			Collection invalidRingLines=polygonizer.getInvalidRingLines();
 			if(!invalidRingLines.isEmpty()){
 				for(Object invalidRingLine:invalidRingLines){
-					EhiLogger.logError("invalid ring line: tids "+getSegmentTids((CompoundCurve) invalidRingLine)+", "+invalidRingLine);
-					//dumpLine((CompoundCurve) invalidRingLine);
+					EhiLogger.logError("invalid ring line: tids "+((CompoundCurve)invalidRingLine).getSegmentTids()+", "+invalidRingLine);
+					//((CompoundCurve) invalidRingLine).dumpLineAsJava();
 				}
 				throw new IoxInvalidDataException("invalid ring lines");
 			}
@@ -199,7 +233,7 @@ public class ItfAreaLinetable2Polygon {
 				polyidx.insert(poly.getEnvelopeInternal(), poly);
 				//System.out.println(poly);
 			}
-			HashSet<Polygon> hitPolys=new HashSet<Polygon>();
+			HashMap<Polygon,Coordinate> hitPolys=new HashMap<Polygon,Coordinate>();
 			for(String tid:mainTids.keySet()){
 				IomObject georef=mainTids.get(tid);
 				Coordinate coord=Iox2jtsext.coord2JTS(georef);
@@ -207,47 +241,44 @@ public class ItfAreaLinetable2Polygon {
 				List<Polygon> hits=polyidx.query(new Envelope(coord));
 				Polygon hit=null;
 				for(Polygon candHit:hits){
-					if(candHit.contains(point)){
+					if(SimplePointInAreaLocator.locate(coord, candHit)==Location.INTERIOR){
 						hit=candHit;
+					}
+					if(false){
+					try{
+						if(candHit.contains(point)){
+							hit=candHit;
+						}
+					}catch(TopologyException ex)
+					{
+						EhiLogger.traceState("side location conflict tid "+tid+", coord "+coord+", polygon "+candHit);
+						EhiLogger.logError(ex);
+						((CurvePolygon) candHit).dumpPolygonAsJava("poly");
+						hit=candHit;
+					}
 					}
 				}
 				if(hit==null){
-					throw new IoxInvalidDataException("no polygon for "+tid);
+					//throw new IoxInvalidDataException("no polygon for tid "+tid+", arearef "+coord);
+					EhiLogger.traceState("no polygon for tid "+tid+", arearef "+coord);
+				}else{
+					if(hitPolys.containsKey(hit)){
+						//EhiLogger.traceState("multiple polygon-refs ("+coord+") and ("+hitPolys.get(hit)+") to polygon "+hit);
+						//((CurvePolygon) hit).dumpPolygonAsJava("poly");
+						throw new IoxInvalidDataException("multiple polygon-refs ("+coord+") and ("+hitPolys.get(hit)+") to polygon "+hit);
+					}
+					polygons.put(tid, hit);
+					hitPolys.put(hit,coord);
 				}
-				if(hitPolys.contains(hit)){
-					throw new IoxInvalidDataException("multiple polygon-refs to polygon "+hit);
-				}
-				polygons.put(tid, hit);
-				hitPolys.add(hit);
 			}
 			
 			// only ITF
 			for(Polygon poly:polys){
-				if(!hitPolys.contains(poly)){
+				if(!hitPolys.containsKey(poly)){
 					throw new IoxInvalidDataException("no polygon-ref to polygon "+poly);
+					//EhiLogger.traceState("no arearef to polygon "+poly);
+					//((CurvePolygon) poly).dumpPolygonAsJava("poly");
 				}
 			}
 		}
-	private void dumpLine(CompoundCurve line) {
-		for(CurveSegment seg:line.getSegments()){
-			if(seg instanceof StraightSegment){
-				StraightSegment s=(StraightSegment) seg;
-				EhiLogger.debug("l.add(new StraightSegment(\""+s.getUserData()+"\",new Coordinate("+s.getStartPoint().x+", "+s.getStartPoint().y+"),new Coordinate( "+s.getEndPoint().x+", "+s.getEndPoint().y+")));");
-			}else{
-				ArcSegment s=(ArcSegment) seg;
-				EhiLogger.debug("l.add(new ArcSegment(\""+s.getUserData()+"\",new Coordinate("+s.getStartPoint().x+", "+s.getStartPoint().y+"),new Coordinate("+s.getMidPoint().x+", "+s.getMidPoint().y+"),new Coordinate( "+s.getEndPoint().x+", "+s.getEndPoint().y+")));");
-			}
-		}
-		
-	}
-	public static String getSegmentTids(CompoundCurve line) {
-		StringBuilder str=new StringBuilder();
-		String sep="";
-		for(CurveSegment seg:line.getSegments()){
-			str.append(sep);
-			str.append(seg.getUserData());
-			sep=", ";
-		}
-		return str.toString();
-	}
 }
