@@ -1,5 +1,7 @@
 package ch.interlis.iom_j.itf.impl.jtsext.noding;
 
+import java.util.Arrays;
+
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 
@@ -50,5 +52,25 @@ public class Intersection {
 	public Double getOverlap()
 	{
 		return overlap;
+	}
+	public boolean isIntersection(Coordinate p00) {
+		for(Coordinate p:pt){
+			if(p.equals2D(p00)){
+				return true;
+			}
+		}
+		return false;
+	}
+	@Override
+	public String toString() {
+		return "Intersection"
+				+ " overlap " + overlap
+				+", coord1 " + pt[0].toString()+(pt.length==2?(", coord2 "+pt[1].toString()):"") 
+				+ ", tid1 " + seg1.getUserData()
+				+ ", tid2 " + seg2.getUserData()
+				+ ", idx1 "+curve1.getSegments().indexOf(seg1)+", idx2 "+curve2.getSegments().indexOf(seg2)
+				+ ", seg1 " + seg1 + ", seg2 " + seg2
+				;
+		
 	}
 }
