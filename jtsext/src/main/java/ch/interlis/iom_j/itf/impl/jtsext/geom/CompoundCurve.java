@@ -3,6 +3,7 @@ package ch.interlis.iom_j.itf.impl.jtsext.geom;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.iom_j.itf.impl.hrg.HrgUtility;
 import ch.interlis.iom_j.itf.impl.jtsext.algorithm.CurveSegmentIntersector;
 import ch.interlis.iom_j.itf.impl.jtsext.io.WKTWriterJtsext;
@@ -93,13 +94,11 @@ public class CompoundCurve extends LineString {
 	 * @param newVertexOffset used to calculate new vertex
 	 * @return true if line has changed
 	 */
-	public boolean removeOverlap(boolean atStartOfLine, CurveSegment otherSegment,
+	public boolean removeOverlap(ArcSegment thisSegment, CurveSegment otherSegment,
 			Coordinate newVertexPt,double newVertexOffset) {
-		CurveSegment thisSegmentO=segments.get(atStartOfLine ? 0 : getNumSegments()-1);
-		if(!(thisSegmentO instanceof ArcSegment)){
-			throw new IllegalArgumentException();
-		}
-		ArcSegment thisSegment=(ArcSegment) thisSegmentO;
+		//CurveSegment thisSegmentO=segments.get(atStartOfLine ? 0 : getNumSegments()-1);
+		int thisSegmentIdx=segments.indexOf(thisSegment);
+		boolean atStartOfLine=thisSegment.getStartPoint().equals2D(otherSegment.getStartPoint()) || thisSegment.getStartPoint().equals2D(otherSegment.getEndPoint()); 
 		CurveSegment newSegment=null;
 		if(otherSegment instanceof ArcSegment){
 			// move otherSegment in direction of thisSegment center
@@ -145,7 +144,7 @@ public class CompoundCurve extends LineString {
 			Coordinate newArcMidPt=null;
 			{
 				if(!atStartOfLine){
-					// new last segment
+					// modify end of segment
 					double s = CurveSegment.dist(newVertexPt,thisSegment.getEndPoint());
 					double s2=s/2.0;
 					double h=otherRadius-Math.sqrt(otherRadius*otherRadius-s2*s2);
@@ -155,7 +154,7 @@ public class CompoundCurve extends LineString {
 						newArcMidPt=calcKleinp(newVertexPt,thisSegment.getEndPoint(),s2,h);						
 					}
 				}else{
-					// new first segment
+					// modify start of segment
 					double s = CurveSegment.dist(thisSegment.getStartPoint(),newVertexPt);
 					double s2=s/2.0;
 					double h=otherRadius-Math.sqrt(otherRadius*otherRadius-s2*s2);
@@ -169,10 +168,10 @@ public class CompoundCurve extends LineString {
 			
 			// adjust thisSegment		
 			if(!atStartOfLine){
-				// new last segment
+				// modify end of segment
 				newSegment=new ArcSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),newVertexPt,newArcMidPt,thisSegment.getEndPoint());
 			}else{
-				// new first segment
+				// modify start of segment
 				newSegment=new ArcSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),thisSegment.getStartPoint(),newArcMidPt,newVertexPt);
 			}
 		}else{
@@ -211,10 +210,10 @@ public class CompoundCurve extends LineString {
 			
 			// adjust thisSegment		
 			if(!atStartOfLine){
-				// new last segment
+				// modify end of segment
 				newSegment=new StraightSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),newVertexPt,thisSegment.getEndPoint());
 			}else{
-				// new first segment
+				// modify start of segment
 				newSegment=new StraightSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),thisSegment.getStartPoint(),newVertexPt);
 			}
 			
@@ -234,8 +233,8 @@ public class CompoundCurve extends LineString {
 			}
 			// modified next to last segment
 			modifiedSegment=new ArcSegment(MODIFIED_TID_TAG+thisSegment.getUserData(),thisSegment.getStartPoint(),midPt,newVertexPt);
-			segments.set(getNumSegments()-1, modifiedSegment);
-			segments.add(newSegment);
+			segments.set(thisSegmentIdx, modifiedSegment);
+			segments.add(thisSegmentIdx+1,newSegment);
 		}else{
 			// make sure, midpt is on new arc
 			Coordinate midPt=thisSegment.getMidPoint();
@@ -249,8 +248,8 @@ public class CompoundCurve extends LineString {
 			}
 			// modified second segment
 			modifiedSegment=new ArcSegment(MODIFIED_TID_TAG+thisSegment.getUserData(),newVertexPt,midPt,thisSegment.getEndPoint());
-			segments.set(0, modifiedSegment);
-			segments.add(0,newSegment);
+			segments.set(thisSegmentIdx, modifiedSegment);
+			segments.add(thisSegmentIdx,newSegment);
 		}
 		
 		// recalc points
@@ -308,6 +307,28 @@ public class CompoundCurve extends LineString {
 	public void setSegmentsUserData(Object obj) {
 		for(CurveSegment seg:segments){
 			seg.setUserData(obj);
+		}
+		
+	}
+	public String getSegmentTids() {
+		StringBuilder str=new StringBuilder();
+		String sep="";
+		for(CurveSegment seg:getSegments()){
+			str.append(sep);
+			str.append(seg.getUserData());
+			sep=", ";
+		}
+		return str.toString();
+	}
+	public void dumpLineAsJava(String segs) {
+		for(CurveSegment seg:segments){
+			if(seg instanceof StraightSegment){
+				StraightSegment s=(StraightSegment) seg;
+				EhiLogger.debug(segs+".add(new StraightSegment(\""+s.getUserData()+"\",new Coordinate("+s.getStartPoint().x+", "+s.getStartPoint().y+"),new Coordinate( "+s.getEndPoint().x+", "+s.getEndPoint().y+")));");
+			}else{
+				ArcSegment s=(ArcSegment) seg;
+				EhiLogger.debug(segs+".add(new ArcSegment(\""+s.getUserData()+"\",new Coordinate("+s.getStartPoint().x+", "+s.getStartPoint().y+"),new Coordinate("+s.getMidPoint().x+", "+s.getMidPoint().y+"),new Coordinate( "+s.getEndPoint().x+", "+s.getEndPoint().y+")));");
+			}
 		}
 		
 	}

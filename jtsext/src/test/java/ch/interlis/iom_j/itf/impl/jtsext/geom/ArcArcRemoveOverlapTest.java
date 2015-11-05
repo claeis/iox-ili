@@ -31,7 +31,7 @@ public class ArcArcRemoveOverlapTest {
 		assertEquals(1.0, s1.getSign(),EPSILON);
 		System.out.println("s1 r "+s1.getRadius()+"; center "+s1.getCenterPoint()+"; sign "+s1.sign);
 		Coordinate newVertexPt=new Coordinate();
-		boolean modified=line0.removeOverlap(true, s1, newVertexPt, 1.0);
+		boolean modified=line0.removeOverlap(s0, s1, newVertexPt, 1.0);
 		assertTrue(modified);
 		System.out.println(line0);
 		ArcSegment s00=(ArcSegment) line0.getSegments().get(0);
@@ -68,7 +68,7 @@ public class ArcArcRemoveOverlapTest {
 		assertEquals(-1.0, s1.getSign(),EPSILON);
 		System.out.println("s1 r "+s1.getRadius()+"; center "+s1.getCenterPoint()+"; sign "+s1.sign);
 		Coordinate newVertexPt=new Coordinate();
-		boolean modified=line0.removeOverlap(true, s1, newVertexPt, 1.0);
+		boolean modified=line0.removeOverlap(s0, s1, newVertexPt, 1.0);
 		assertTrue(modified);
 		System.out.println(line0);
 		ArcSegment s00=(ArcSegment) line0.getSegments().get(0);
@@ -105,7 +105,7 @@ public class ArcArcRemoveOverlapTest {
 		assertEquals(1.0, s1.getSign(),EPSILON);
 		System.out.println("s1 r "+s1.getRadius()+"; center "+s1.getCenterPoint()+"; sign "+s1.sign);
 		Coordinate newVertexPt=new Coordinate();
-		boolean modified=line0.removeOverlap(true, s1, newVertexPt, 1.0);
+		boolean modified=line0.removeOverlap(s0, s1, newVertexPt, 1.0);
 		assertTrue(modified);
 		System.out.println(line0);
 		ArcSegment newseg=(ArcSegment) line0.getSegments().get(0);
@@ -142,7 +142,7 @@ public class ArcArcRemoveOverlapTest {
 		assertEquals(-1.0, s1.getSign(),EPSILON);
 		System.out.println("s1 r "+s1.getRadius()+"; center "+s1.getCenterPoint()+"; sign "+s1.sign);
 		Coordinate newVertexPt=new Coordinate();
-		boolean modified=line0.removeOverlap(true, s1, newVertexPt, 1.0);
+		boolean modified=line0.removeOverlap(s0, s1, newVertexPt, 1.0);
 		assertTrue(modified);
 		System.out.println(line0);
 		ArcSegment newseg=(ArcSegment) line0.getSegments().get(0);
@@ -181,7 +181,7 @@ public class ArcArcRemoveOverlapTest {
 		assertEquals(1.0, s1.getSign(),EPSILON);
 		System.out.println("s1 r "+s1.getRadius()+"; center "+s1.getCenterPoint()+"; sign "+s1.sign);
 		Coordinate newVertexPt=new Coordinate();
-		boolean modified=line0.removeOverlap(true, s1, newVertexPt, 1.0);
+		boolean modified=line0.removeOverlap(s0, s1, newVertexPt, 1.0);
 		assertTrue(modified);
 		System.out.println(line0);
 		ArcSegment newseg=(ArcSegment) line0.getSegments().get(0);
@@ -220,7 +220,7 @@ public class ArcArcRemoveOverlapTest {
 		assertEquals(1.0, s1.getSign(),EPSILON);
 		System.out.println("s1 r "+s1.getRadius()+"; center "+s1.getCenterPoint()+"; sign "+s1.sign);
 		Coordinate newVertexPt=new Coordinate();
-		boolean modified=line0.removeOverlap(false, s1, newVertexPt, 1.0);
+		boolean modified=line0.removeOverlap(s0, s1, newVertexPt, 1.0);
 		assertTrue(modified);
 		System.out.println(line0);
 		ArcSegment modseg=(ArcSegment) line0.getSegments().get(0);
@@ -257,7 +257,7 @@ public class ArcArcRemoveOverlapTest {
 		assertEquals(-1.0, s1.getSign(),EPSILON);
 		System.out.println("s1 r "+s1.getRadius()+"; center "+s1.getCenterPoint()+"; sign "+s1.sign);
 		Coordinate newVertexPt=new Coordinate();
-		boolean modified=line0.removeOverlap(false, s1, newVertexPt, 1.0);
+		boolean modified=line0.removeOverlap(s0, s1, newVertexPt, 1.0);
 		assertTrue(modified);
 		System.out.println(line0);
 		ArcSegment modseg=(ArcSegment) line0.getSegments().get(0);
@@ -294,7 +294,7 @@ public class ArcArcRemoveOverlapTest {
 		assertEquals(1.0, s1.getSign(),EPSILON);
 		System.out.println("s1 r "+s1.getRadius()+"; center "+s1.getCenterPoint()+"; sign "+s1.sign);
 		Coordinate newVertexPt=new Coordinate();
-		boolean modified=line0.removeOverlap(false, s1, newVertexPt, 1.0);
+		boolean modified=line0.removeOverlap(s0, s1, newVertexPt, 1.0);
 		assertTrue(modified);
 		System.out.println(line0);
 		ArcSegment modseg=(ArcSegment) line0.getSegments().get(0);
@@ -331,7 +331,7 @@ public class ArcArcRemoveOverlapTest {
 		assertEquals(-1.0, s1.getSign(),EPSILON);
 		System.out.println("s1 r "+s1.getRadius()+"; center "+s1.getCenterPoint()+"; sign "+s1.sign);
 		Coordinate newVertexPt=new Coordinate();
-		boolean modified=line0.removeOverlap(false, s1, newVertexPt, 1.0);
+		boolean modified=line0.removeOverlap(s0, s1, newVertexPt, 1.0);
 		assertTrue(modified);
 		System.out.println(line0);
 		ArcSegment modseg=(ArcSegment) line0.getSegments().get(0);

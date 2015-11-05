@@ -261,29 +261,28 @@ private void removeOverlap(CurveSegmentIntersector li,Coordinate node,
 					  }else if(is1.equals2D(node)){
 			    		  is=new Intersection(is0,line0,line1,s0,s1,li.getOverlap());
 					  }else{
-						  throw new IllegalStateException("unexpected overlap tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
+						  throw new IllegalStateException("unexpected overlap "+is.toString());
 					  }
 					  if(is!=null){
-							EhiLogger.traceState("valoverlap tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
-							EhiLogger.traceState("overlap "+is.getOverlap()+", seg1 "+is.getSegment1()+", seg2 "+is.getSegment2());
+							EhiLogger.traceState("valoverlap "+is.toString());
 					  }
 					  Coordinate newDirectionPt=new Coordinate();
 		    		  if(s0 instanceof StraightSegment){
-		    			  if(line1.removeOverlap(line1AtStart,s0,newDirectionPt,newVertexOffset)){
+		    			  if(line1.removeOverlap((ArcSegment) s1,s0,newDirectionPt,newVertexOffset)){
 				    		  de1.adjustDirectionPt(newDirectionPt);
 		    			  }
 		    		  }else if(s1 instanceof StraightSegment){
-		    			  if(line0.removeOverlap(line0AtStart,s1,newDirectionPt,newVertexOffset)){
+		    			  if(line0.removeOverlap((ArcSegment) s0,s1,newDirectionPt,newVertexOffset)){
 				    		  de0.adjustDirectionPt(newDirectionPt);
 		    			  }
 		    		  }else{
 		    			  // both segments are arcs
 			    		  if(((ArcSegment) s0).getRadius()>((ArcSegment) s1).getRadius()){
-			    			  if(line1.removeOverlap(line1AtStart,s0,newDirectionPt,newVertexOffset)){
+			    			  if(line1.removeOverlap((ArcSegment) s1,s0,newDirectionPt,newVertexOffset)){
 					    		  de1.adjustDirectionPt(newDirectionPt);
 			    			  }
 			    		  }else{
-			    			  if(line0.removeOverlap(line0AtStart,s1,newDirectionPt,newVertexOffset)){
+			    			  if(line0.removeOverlap((ArcSegment) s0,s1,newDirectionPt,newVertexOffset)){
 					    		  de0.adjustDirectionPt(newDirectionPt);
 			    			  }
 			    		  }
