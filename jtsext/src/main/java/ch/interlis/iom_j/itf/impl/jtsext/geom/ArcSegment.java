@@ -154,11 +154,20 @@ public class ArcSegment extends CurveSegment {
 			double Z2O[]=new double[1];
 			double DETAO[]=new double[1];
 			double SIGNO[]=new double[1];
-			  HrgUtility.CTRC3P(startPoint.x,startPoint.y,  midPoint.x,midPoint.y, endPoint.x,endPoint.y, Z1O,Z2O,DETAO,SIGNO);
-			  centerPoint=new Coordinate(Z1O[0],Z2O[0]);
-			  sign=SIGNO[0];
-			  deta=DETAO[0];
-			  radius=CurveSegment.dist(startPoint.x,startPoint.y,centerPoint.x,centerPoint.y);
+			if(startPoint.compareTo(endPoint)>=0){
+				  HrgUtility.CTRC3P(startPoint.x,startPoint.y,  midPoint.x,midPoint.y, endPoint.x,endPoint.y, Z1O,Z2O,DETAO,SIGNO);
+				  centerPoint=new Coordinate(Z1O[0],Z2O[0]);
+				  sign=SIGNO[0];
+				  deta=DETAO[0];
+				  radius=CurveSegment.dist(startPoint.x,startPoint.y,centerPoint.x,centerPoint.y);
+			}else{
+				  HrgUtility.CTRC3P( endPoint.x,endPoint.y,  midPoint.x,midPoint.y,startPoint.x,startPoint.y, Z1O,Z2O,DETAO,SIGNO);
+				  centerPoint=new Coordinate(Z1O[0],Z2O[0]);
+				  sign=-SIGNO[0];
+				  deta=DETAO[0];
+				  radius=CurveSegment.dist(endPoint.x,endPoint.y,centerPoint.x,centerPoint.y);
+			}
+			  
 		}
 		return centerPoint;
 	}
