@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.noding.BasicSegmentString;
@@ -171,6 +172,7 @@ public class ItfSurfaceLinetable2Polygon {
 		int objc=1;
 		EhiLogger.traceState("build surfaces..."+helperTableGeomAttrName+", maxOverlaps "+maxOverlaps);
 
+		boolean isDisconnected=false;
 		for(String mainTid:linepool.keySet()){
 			//EhiLogger.debug("tid <"+mainTid+"> "+objc+"/"+totalObj);objc++;
 			ArrayList<IomObject> lines=linepool.get(mainTid);
@@ -262,24 +264,34 @@ public class ItfSurfaceLinetable2Polygon {
 			if(polys.size()>1){
 				Iterator<Polygon> pi=polys.iterator();
 				poly=pi.next();
-				Polygon shell=jtsFact.createPolygon((LinearRing) poly.getExteriorRing());
-				boolean isDisconnected=false;
+				Envelope shell=poly.getEnvelopeInternal();
 				while(pi.hasNext()){
 					Polygon nextPoly=pi.next();
-					Polygon nextShell=jtsFact.createPolygon((LinearRing) nextPoly.getExteriorRing());
-					if(nextShell.covers(shell)){
+					Envelope nextEnv=nextPoly.getEnvelopeInternal();
+					if(nextEnv.contains(shell)){
 						poly=nextPoly;
-						shell=nextShell;
-					}else if(!shell.covers(nextShell)){
-						isDisconnected=true;
-						throw new IoxInvalidDataException("Interior is disconnected");
+						shell=nextEnv;
 					}
 				}
+				pi=polys.iterator();
+				while(pi.hasNext()){
+					Polygon holePoly=pi.next();
+					Envelope holeEnv=holePoly.getEnvelopeInternal();
+					if(shell.contains(holeEnv)){
+					}else{
+						isDisconnected=true;
+						EhiLogger.logError("multipolygon with tid "+mainTid+", polygonN "+holePoly);
+					}
+				}
+				
 			}else{
 				poly=polys.iterator().next();
 			}
 			poly.normalize();
 			polygons.put(mainTid, poly);
+		}
+		if(isDisconnected){
+			throw new IoxInvalidDataException("multipolygon detected");
 		}
 		surfacesBuilt=true;
 	}
