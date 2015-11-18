@@ -163,7 +163,11 @@ public class ItfAreaLinetable2Polygon {
 						p01 = e0.getSegments().get(segIndex0).getEndPoint();
 						p10 = e1.getSegments().get(segIndex1).getStartPoint();
 						p11 = e1.getSegments().get(segIndex1).getEndPoint();
-						if((segIndex0==0 || segIndex0==e0.getSegments().size()-1) && (segIndex1==0 || segIndex1==e1.getSegments().size()-1) && is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
+						if(e0!=e1 && 
+								(segIndex0==0 || segIndex0==e0.getSegments().size()-1) 
+								&& (segIndex1==0 || segIndex1==e1.getSegments().size()-1) 
+								&& is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
+							// Ende- bzw. Anfangs-Segment verschiedener Linien
 							// valid overlap, ignore for now, will be removed later in IoxPolygonizer
 						}else if(e0==e1 && (
 								  Math.abs(segIndex0-segIndex1)==1 

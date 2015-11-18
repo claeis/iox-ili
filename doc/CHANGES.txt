@@ -6,7 +6,11 @@ ideas/open issues
 iox-ili 1.11.1 (2015-09-xx)
 -----------------------------
 - Iligml10Writer: fixed missing link objects (assocs)
-- fixed "StraightSegment cannot be cast to ArcSegment" exception if ring end segment overlaps with ring start segment
+- ItfReader2: fixed "StraightSegment cannot be cast to ArcSegment" exception if ring end segment overlaps with ring start segment
+- ItfReader2: fixed "side location conflict"
+- ItfReader2: remove overlaps at nodes that are not start/end of line
+- ItfReader2: log queued errors at end of transfer (if not yet done)
+- ItfReader2: fixed overlap case, where otherSegment end is inside overlap buffer
 
 iox-ili 1.11.0 (2015-09-10)
 -----------------------------
