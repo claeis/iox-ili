@@ -100,6 +100,7 @@ public class CompoundCurve extends LineString {
 		int thisSegmentIdx=segments.indexOf(thisSegment);
 		boolean atStartOfLine=thisSegment.getStartPoint().equals2D(otherSegment.getStartPoint()) || thisSegment.getStartPoint().equals2D(otherSegment.getEndPoint()); 
 		CurveSegment newSegment=null;
+		boolean replaceArcWithStraight = false;
 		if(otherSegment instanceof ArcSegment){
 			// move otherSegment in direction of thisSegment center
 			// by increasing or decreasing its radius
@@ -128,51 +129,52 @@ public class CompoundCurve extends LineString {
 			CurveSegmentIntersector li = new CurveSegmentIntersector();
 			  li.computeIntersection(thisSegment, helperSeg);
 			  if(!li.hasIntersection()){
-				  // don't change line
-				  return false;
-			  }
-			if(li.getIntersectionNum()!=1){
+				  // replace arc with a straight
+				  replaceArcWithStraight = true;
+			  }else	if(li.getIntersectionNum()!=1){
 				throw new IllegalStateException("unexpected number of intersections");
-			}
+			  }else{
+					Coordinate is=li.getIntersection(0);
+					newVertexPt.x=is.x;
+					newVertexPt.y=is.y;
+					newVertexPt.z=is.z;
+			  }
 			
-			Coordinate is=li.getIntersection(0);
-			newVertexPt.x=is.x;
-			newVertexPt.y=is.y;
-			newVertexPt.z=is.z;
-			
-			// calulate mid pt of new arc
-			Coordinate newArcMidPt=null;
-			{
-				if(!atStartOfLine){
-					// modify end of segment
-					double s = CurveSegment.dist(newVertexPt,thisSegment.getEndPoint());
-					double s2=s/2.0;
-					double h=otherRadius-Math.sqrt(otherRadius*otherRadius-s2*s2);
-					if(CGAlgorithms.computeOrientation(newVertexPt,thisSegment.getEndPoint(), otherSegCenter)>0){
-						newArcMidPt=calcKleinp(newVertexPt,thisSegment.getEndPoint(),s2,-h);						
+			if(!replaceArcWithStraight){
+				// calulate mid pt of new arc
+				Coordinate newArcMidPt=null;
+				{
+					if(!atStartOfLine){
+						// modify end of segment
+						double s = CurveSegment.dist(newVertexPt,thisSegment.getEndPoint());
+						double s2=s/2.0;
+						double h=otherRadius-Math.sqrt(otherRadius*otherRadius-s2*s2);
+						if(CGAlgorithms.computeOrientation(newVertexPt,thisSegment.getEndPoint(), otherSegCenter)>0){
+							newArcMidPt=calcKleinp(newVertexPt,thisSegment.getEndPoint(),s2,-h);						
+						}else{
+							newArcMidPt=calcKleinp(newVertexPt,thisSegment.getEndPoint(),s2,h);						
+						}
 					}else{
-						newArcMidPt=calcKleinp(newVertexPt,thisSegment.getEndPoint(),s2,h);						
-					}
-				}else{
-					// modify start of segment
-					double s = CurveSegment.dist(thisSegment.getStartPoint(),newVertexPt);
-					double s2=s/2.0;
-					double h=otherRadius-Math.sqrt(otherRadius*otherRadius-s2*s2);
-					if(CGAlgorithms.computeOrientation(thisSegment.getStartPoint(),newVertexPt, otherSegCenter)>0){
-						newArcMidPt=calcKleinp(thisSegment.getStartPoint(),newVertexPt,s2,-h);
-					}else{
-						newArcMidPt=calcKleinp(thisSegment.getStartPoint(),newVertexPt,s2,h);
+						// modify start of segment
+						double s = CurveSegment.dist(thisSegment.getStartPoint(),newVertexPt);
+						double s2=s/2.0;
+						double h=otherRadius-Math.sqrt(otherRadius*otherRadius-s2*s2);
+						if(CGAlgorithms.computeOrientation(thisSegment.getStartPoint(),newVertexPt, otherSegCenter)>0){
+							newArcMidPt=calcKleinp(thisSegment.getStartPoint(),newVertexPt,s2,-h);
+						}else{
+							newArcMidPt=calcKleinp(thisSegment.getStartPoint(),newVertexPt,s2,h);
+						}
 					}
 				}
-			}
-			
-			// adjust thisSegment		
-			if(!atStartOfLine){
-				// modify end of segment
-				newSegment=new ArcSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),newVertexPt,newArcMidPt,thisSegment.getEndPoint());
-			}else{
-				// modify start of segment
-				newSegment=new ArcSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),thisSegment.getStartPoint(),newArcMidPt,newVertexPt);
+				
+				// adjust thisSegment		
+				if(!atStartOfLine){
+					// modify end of segment
+					newSegment=new ArcSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),newVertexPt,newArcMidPt,thisSegment.getEndPoint());
+				}else{
+					// modify start of segment
+					newSegment=new ArcSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),thisSegment.getStartPoint(),newArcMidPt,newVertexPt);
+				}
 			}
 		}else{
 			// otherSegment is a StraightSegment
@@ -196,60 +198,65 @@ public class CompoundCurve extends LineString {
 			CurveSegmentIntersector li = new CurveSegmentIntersector();
 			  li.computeIntersection(thisSegment, movedOtherSeg);
 			  if(!li.hasIntersection()){
-				  // don't change line
-				  return false;
-			  }
-			if(li.getIntersectionNum()!=1){
+				  // replace arc with a straight
+				  replaceArcWithStraight = true;
+			  }else if(li.getIntersectionNum()!=1){
 				throw new IllegalStateException("unexpected number of intersections");
-			}
-
-			Coordinate is=li.getIntersection(0);
-			newVertexPt.x=is.x;
-			newVertexPt.y=is.y;
-			newVertexPt.z=is.z;
-			
-			// adjust thisSegment		
-			if(!atStartOfLine){
-				// modify end of segment
-				newSegment=new StraightSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),newVertexPt,thisSegment.getEndPoint());
 			}else{
-				// modify start of segment
-				newSegment=new StraightSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),thisSegment.getStartPoint(),newVertexPt);
+
+				Coordinate is=li.getIntersection(0);
+				newVertexPt.x=is.x;
+				newVertexPt.y=is.y;
+				newVertexPt.z=is.z;
+				
+				// adjust thisSegment		
+				if(!atStartOfLine){
+					// modify end of segment
+					newSegment=new StraightSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),newVertexPt,thisSegment.getEndPoint());
+				}else{
+					// modify start of segment
+					newSegment=new StraightSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),thisSegment.getStartPoint(),newVertexPt);
+				}
 			}
 			
 			
 		}
-		ArcSegment modifiedSegment=null;
-		if(!atStartOfLine){
-			// make sure, midpt is on new arc
-			Coordinate midPt=thisSegment.getMidPoint();
-			{
-				Coordinate start=thisSegment.getStartPoint();
-				Coordinate end=newVertexPt;
-				Coordinate center=thisSegment.getCenterPoint();
-				double r=thisSegment.getRadius();
-				double sign=thisSegment.sign;
-				midPt = adjustMidPt(start, midPt, end, center, r, sign);
-			}
-			// modified next to last segment
-			modifiedSegment=new ArcSegment(MODIFIED_TID_TAG+thisSegment.getUserData(),thisSegment.getStartPoint(),midPt,newVertexPt);
+		if(replaceArcWithStraight){
+			StraightSegment modifiedSegment=new StraightSegment(MODIFIED_TID_TAG+thisSegment.getUserData(),thisSegment.getStartPoint(),thisSegment.getEndPoint());
 			segments.set(thisSegmentIdx, modifiedSegment);
-			segments.add(thisSegmentIdx+1,newSegment);
 		}else{
-			// make sure, midpt is on new arc
-			Coordinate midPt=thisSegment.getMidPoint();
-			{
-				Coordinate start=newVertexPt;
-				Coordinate end=thisSegment.getEndPoint();
-				Coordinate center=thisSegment.getCenterPoint();
-				double r=thisSegment.getRadius();
-				double sign=thisSegment.sign;
-				midPt = adjustMidPt(start, midPt, end, center, r, sign);
+			ArcSegment modifiedSegment=null;
+			if(!atStartOfLine){
+				// make sure, midpt is on new arc
+				Coordinate midPt=thisSegment.getMidPoint();
+				{
+					Coordinate start=thisSegment.getStartPoint();
+					Coordinate end=newVertexPt;
+					Coordinate center=thisSegment.getCenterPoint();
+					double r=thisSegment.getRadius();
+					double sign=thisSegment.sign;
+					midPt = adjustMidPt(start, midPt, end, center, r, sign);
+				}
+				// modified next to last segment
+				modifiedSegment=new ArcSegment(MODIFIED_TID_TAG+thisSegment.getUserData(),thisSegment.getStartPoint(),midPt,newVertexPt);
+				segments.set(thisSegmentIdx, modifiedSegment);
+				segments.add(thisSegmentIdx+1,newSegment);
+			}else{
+				// make sure, midpt is on new arc
+				Coordinate midPt=thisSegment.getMidPoint();
+				{
+					Coordinate start=newVertexPt;
+					Coordinate end=thisSegment.getEndPoint();
+					Coordinate center=thisSegment.getCenterPoint();
+					double r=thisSegment.getRadius();
+					double sign=thisSegment.sign;
+					midPt = adjustMidPt(start, midPt, end, center, r, sign);
+				}
+				// modified second segment
+				modifiedSegment=new ArcSegment(MODIFIED_TID_TAG+thisSegment.getUserData(),newVertexPt,midPt,thisSegment.getEndPoint());
+				segments.set(thisSegmentIdx, modifiedSegment);
+				segments.add(thisSegmentIdx,newSegment);
 			}
-			// modified second segment
-			modifiedSegment=new ArcSegment(MODIFIED_TID_TAG+thisSegment.getUserData(),newVertexPt,midPt,thisSegment.getEndPoint());
-			segments.set(thisSegmentIdx, modifiedSegment);
-			segments.add(thisSegmentIdx,newSegment);
 		}
 		
 		// recalc points
