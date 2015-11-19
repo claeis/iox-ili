@@ -142,7 +142,8 @@ public class LineSet {
 						}else if(endPointIdx>0){
 							// IF neuer Punkt identisch mit Punkt auf bisherigem Rand
 							// THEN neuer Rand (von Punkt bis neur Punkt) in Zwischenspeicher; bisheriger Randanfang fortsetzen
-							java.util.List<CurveSegment> sub=currentBoundary.subList(endPointIdx+1, currentBoundary.size());
+							currentBoundary.add(curve);
+							java.util.List<CurveSegment> sub=currentBoundary.subList(endPointIdx, currentBoundary.size());
 							ArrayList<CurveSegment> boundary=new ArrayList<CurveSegment>();
 							boundary.addAll(sub);
 							boundaries.add(boundary);
