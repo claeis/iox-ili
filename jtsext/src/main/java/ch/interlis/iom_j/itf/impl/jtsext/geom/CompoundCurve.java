@@ -90,16 +90,16 @@ public class CompoundCurve extends LineString {
 	/** remove overlap in given segment.
 	 * @param atStartOfLine true if overlap is at start of line, else false. First (true) or last (false) must be an ArcSegment.
 	 * @param otherSegment segment that overlaps with this. If an ArcSegment, its radius must be greather than radius of this. 
-	 * @param newVertexPt new direction pt (new vertex) of manipulated segment this
 	 * @param newVertexOffset used to calculate new vertex
 	 * @return true if line has changed
 	 */
 	public boolean removeOverlap(ArcSegment thisSegment, CurveSegment otherSegment,
-			Coordinate newVertexPt,double newVertexOffset) {
+			double newVertexOffset) {
 		//CurveSegment thisSegmentO=segments.get(atStartOfLine ? 0 : getNumSegments()-1);
 		int thisSegmentIdx=segments.indexOf(thisSegment);
 		boolean atStartOfLine=thisSegment.getStartPoint().equals2D(otherSegment.getStartPoint()) || thisSegment.getStartPoint().equals2D(otherSegment.getEndPoint()); 
 		CurveSegment newSegment=null;
+		Coordinate newVertexPt=null;
 		boolean replaceArcWithStraight = false;
 		if(otherSegment instanceof ArcSegment){
 			// move otherSegment in direction of thisSegment center
@@ -135,9 +135,7 @@ public class CompoundCurve extends LineString {
 				throw new IllegalStateException("unexpected number of intersections");
 			  }else{
 					Coordinate is=li.getIntersection(0);
-					newVertexPt.x=is.x;
-					newVertexPt.y=is.y;
-					newVertexPt.z=is.z;
+					newVertexPt=new Coordinate(is);
 			  }
 			
 			if(!replaceArcWithStraight){
@@ -205,9 +203,7 @@ public class CompoundCurve extends LineString {
 			}else{
 
 				Coordinate is=li.getIntersection(0);
-				newVertexPt.x=is.x;
-				newVertexPt.y=is.y;
-				newVertexPt.z=is.z;
+				newVertexPt=new Coordinate(is);
 				
 				// adjust thisSegment		
 				if(!atStartOfLine){

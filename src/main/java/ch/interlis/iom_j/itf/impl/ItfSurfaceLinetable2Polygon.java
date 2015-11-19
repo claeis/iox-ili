@@ -212,16 +212,15 @@ public class ItfSurfaceLinetable2Polygon {
 								  && (is.isIntersection(p10) || is.isIntersection(p11))){
 							// aufeinanderfolgende Segmente der selben Linie
 							  // overlap entfernen
-							  Coordinate newVertexPt=new Coordinate();
 							  if(seg0 instanceof StraightSegment){
-								  e0.removeOverlap((ArcSegment) seg1, seg0, newVertexPt, newVertexOffset);
+								  e0.removeOverlap((ArcSegment) seg1, seg0, newVertexOffset);
 							  }else if(seg1 instanceof StraightSegment){
-								  e0.removeOverlap((ArcSegment) seg0, seg1, newVertexPt, newVertexOffset);
+								  e0.removeOverlap((ArcSegment) seg0, seg1, newVertexOffset);
 							  }else if(((ArcSegment) seg0).getRadius()>((ArcSegment) seg1).getRadius()){
-								  e0.removeOverlap((ArcSegment) seg1, seg0, newVertexPt, newVertexOffset);
+								  e0.removeOverlap((ArcSegment) seg1, seg0, newVertexOffset);
 							  }else{
 								  // seg1.getRadius() > seg0.getRadius()
-								  e0.removeOverlap((ArcSegment) seg0, seg1, newVertexPt, newVertexOffset);
+								  e0.removeOverlap((ArcSegment) seg0, seg1, newVertexOffset);
 							  }
 					}else{
 						EhiLogger.logError("intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));

@@ -266,24 +266,23 @@ private void removeOverlap(CurveSegmentIntersector li,Coordinate node,
 					  if(is!=null){
 							EhiLogger.traceState("valoverlap "+is.toString());
 					  }
-					  Coordinate newDirectionPt=new Coordinate();
 		    		  if(s0 instanceof StraightSegment){
-		    			  if(line1.removeOverlap((ArcSegment) s1,s0,newDirectionPt,newVertexOffset)){
-				    		  de1.adjustDirectionPt(newDirectionPt);
+		    			  if(line1.removeOverlap((ArcSegment) s1,s0,newVertexOffset)){
+				    		  de1.adjustDirectionPt();
 		    			  }
 		    		  }else if(s1 instanceof StraightSegment){
-		    			  if(line0.removeOverlap((ArcSegment) s0,s1,newDirectionPt,newVertexOffset)){
-				    		  de0.adjustDirectionPt(newDirectionPt);
+		    			  if(line0.removeOverlap((ArcSegment) s0,s1,newVertexOffset)){
+				    		  de0.adjustDirectionPt();
 		    			  }
 		    		  }else{
 		    			  // both segments are arcs
 			    		  if(((ArcSegment) s0).getRadius()>((ArcSegment) s1).getRadius()){
-			    			  if(line1.removeOverlap((ArcSegment) s1,s0,newDirectionPt,newVertexOffset)){
-					    		  de1.adjustDirectionPt(newDirectionPt);
+			    			  if(line1.removeOverlap((ArcSegment) s1,s0,newVertexOffset)){
+					    		  de1.adjustDirectionPt();
 			    			  }
 			    		  }else{
-			    			  if(line0.removeOverlap((ArcSegment) s0,s1,newDirectionPt,newVertexOffset)){
-					    		  de0.adjustDirectionPt(newDirectionPt);
+			    			  if(line0.removeOverlap((ArcSegment) s0,s1,newVertexOffset)){
+					    		  de0.adjustDirectionPt();
 			    			  }
 			    		  }
 		    		  }
