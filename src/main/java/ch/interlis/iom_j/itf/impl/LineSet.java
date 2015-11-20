@@ -141,7 +141,7 @@ public class LineSet {
 							currentBoundary=new ArrayList<CurveSegment>();
 						}else if(endPointIdx>0){
 							// IF neuer Punkt identisch mit Punkt auf bisherigem Rand
-							// THEN neuer Rand (von Punkt bis neur Punkt) in Zwischenspeicher; bisheriger Randanfang fortsetzen
+							// THEN neuer Rand (von Punkt bis neur Punkt) in Zwischenspeicher; bisheriger Randanfang abschliessen und neuen Rand anfrangen
 							currentBoundary.add(curve);
 							java.util.List<CurveSegment> sub=currentBoundary.subList(endPointIdx, currentBoundary.size());
 							ArrayList<CurveSegment> boundary=new ArrayList<CurveSegment>();
@@ -149,6 +149,13 @@ public class LineSet {
 							boundaries.add(boundary);
 							boundaryTids.add(currentBoundaryTid);
 							sub.clear(); // remove boundary from currentBoundary
+							// bisheriger Randanfang abschliessen (so dass es einen Knoten hat, und allenfalls ein overlap beim polygonieren entfernt wird)
+							boundaries.add(currentBoundary);
+							boundaryTids.add(currentBoundaryTid);
+							// neuen Rand anfangen
+							currentBoundary=new ArrayList<CurveSegment>();
+							
+							
 						}else if(false){
 							// TODO IF neuer Punkt liegt auf bisherigem Rand
 							// THEN Fehler; Abbruch
