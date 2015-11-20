@@ -20,6 +20,9 @@ public class ArcSegment extends CurveSegment {
 		this.startPoint=new Coordinate(startPoint);
 		this.midPoint=new Coordinate(midPoint);
 		this.endPoint=new Coordinate(endPoint);
+		if(this.midPoint.z==Double.NaN && this.endPoint.z!=Double.NaN){
+			this.midPoint.z=(this.endPoint.z+this.startPoint.z)/2.0;
+		}
 	}
 	public ArcSegment(Coordinate startPoint, Coordinate midPoint,
 			Coordinate endPoint) {
