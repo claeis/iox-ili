@@ -176,6 +176,9 @@ public class ItfAreaLinetable2Polygon {
 								  && (is.isIntersection(p10) || is.isIntersection(p11))){
 							// aufeinanderfolgende Segmente der selben Linie
 							  // overlap entfernen
+							  if(is!=null){
+									EhiLogger.traceState("valoverlap "+is.toString());
+							  }
 							  if(seg0 instanceof StraightSegment){
 								  e0.removeOverlap((ArcSegment) seg1, seg0, newVertexOffset);
 							  }else if(seg1 instanceof StraightSegment){
