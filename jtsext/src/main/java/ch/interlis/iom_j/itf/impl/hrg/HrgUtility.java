@@ -4,7 +4,7 @@ public class HrgUtility {
 	//static final double EPS=0.001; // epsilon, linear tolerance (1mm in military coordinates)
 	//static final double EPS100=EPS;
 	static final double EPS=0.00000001;
-	static final double EPS100=EPS*190.0;
+	static final double EPS100=EPS*600.0;
 	
 public static void CTRC3P(double P1I,double P2I,double  S1I,double S2I,double Q1I,double Q2I,double Z1O[],double Z2O[],double DETAO[],double SIGNO[])
 { ///////////////////////////////////////////////////////
@@ -303,7 +303,7 @@ public static void ISCICR(double AV1I[],double AV2I[],double AW1I[],double AW2I[
 					double PA1 = AV1I[J1];
 					double PA2 = AV2I[J1];
 					NHO[0]=-1;
-					return;
+					throw new IllegalArgumentException("definition of arc V is wrong "+PA1+", "+PA2);
 				}
 				if(AW1I[J1]==AW1I[J2] && AW2I[J1]==AW2I[J2]){
 					// 	definition of W is wrong
@@ -311,7 +311,7 @@ public static void ISCICR(double AV1I[],double AV2I[],double AW1I[],double AW2I[
 					double PA1 = AW1I[J1];
 					double PA2 = AW2I[J1];
 					NHO[0]=-1;
-					return;
+					throw new IllegalArgumentException("definition of arc W is wrong "+PA1+", "+PA2);
 				}
 			}
 		}
@@ -477,9 +477,8 @@ public static void ISCICR(double AV1I[],double AV2I[],double AW1I[],double AW2I[
 			}
 						 
 			if(NHO[0] >= 2){
-				// THEN 	escape with error message, more than 2 IPs (possible?) 
-				NHO[0]=-1;
-				return;
+				// THEN 	escape with error message, more than 2 IPs (possible, if EPS,EPS100 to small) 
+				throw new IllegalStateException("more than 2 IPs ("+H1O[1]+", "+H2O[1]+"), ("+H1O[2]+", "+H2O[2]+"), ("+P1[JP]+", "+P2[JP]+")");
 			}
 			NHO[0] = NHO[0]+1;
 			H1O[NHO[0]] =  P1[JP];
@@ -550,7 +549,7 @@ public static void ISCISR(double AV1I[],double AV2I[],double SL1I[],double SL2I[
 					double PA1 = AV1I[J1];
 					double PA2 = AV2I[J1];
 					NHO[0]=-1;
-					return;
+					throw new IllegalArgumentException("definition of arc W is wrong "+PA1+", "+PA2);
 				}
 			}
 		}
@@ -560,7 +559,7 @@ public static void ISCISR(double AV1I[],double AV2I[],double SL1I[],double SL2I[
 			double PA1 = SL1I[1];
 			double PA2 = SL2I[1];
 			NHO[0]=-1;
-			return;
+			throw new IllegalArgumentException("definition of straight L is wrong "+PA1+", "+PA2);
 		}
 
 		//check if definition points are equal
@@ -709,7 +708,7 @@ public static void ISCISR(double AV1I[],double AV2I[],double SL1I[],double SL2I[
 				}
 			}
 			if(NHO[0]>=2){
-				// escape with error message, more than 2 IPs (possible?) 
+				// escape with error message, more than 2 IPs (possible, if EPS,EPS100 to small) 
 				throw new IllegalStateException("more than 2 IPs ("+H1O[1]+", "+H2O[1]+"), ("+H1O[2]+", "+H2O[2]+"), ("+P1[JP]+", "+P2[JP]+")");
 			}
 			NHO[0] = NHO[0] +  1;
