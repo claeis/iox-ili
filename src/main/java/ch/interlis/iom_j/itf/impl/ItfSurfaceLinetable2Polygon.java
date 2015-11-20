@@ -168,6 +168,7 @@ public class ItfSurfaceLinetable2Polygon {
 	}
 	public void buildSurfaces() throws IoxException
 	{
+		surfacesBuilt=true;
 		int totalObj=linepool.keySet().size();
 		int objc=1;
 		EhiLogger.traceState("build surfaces..."+helperTableGeomAttrName+", maxOverlaps "+maxOverlaps);
@@ -296,7 +297,6 @@ public class ItfSurfaceLinetable2Polygon {
 		if(isDisconnected){
 			throw new IoxInvalidDataException("multipolygon detected");
 		}
-		surfacesBuilt=true;
 	}
 }
 
