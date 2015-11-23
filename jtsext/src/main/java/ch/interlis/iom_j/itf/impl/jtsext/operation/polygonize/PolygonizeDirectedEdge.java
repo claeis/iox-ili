@@ -3,6 +3,7 @@ package ch.interlis.iom_j.itf.impl.jtsext.operation.polygonize;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateArrays;
 import com.vividsolutions.jts.geomgraph.Quadrant;
 import com.vividsolutions.jts.planargraph.DirectedEdge;
 import com.vividsolutions.jts.planargraph.Node;
@@ -41,10 +42,12 @@ class PolygonizeDirectedEdge
 	  Coordinate directionPt=null;
 		 PolygonizeEdge edge=(PolygonizeEdge)getEdge();
 		 CompoundCurve line = (CompoundCurve)edge.getLine();
+	Coordinate[] linePts = CoordinateArrays.removeRepeatedPoints(line.getCoordinates());
+
 	  if(getEdgeDirection()){
-		 directionPt=line.getSegments().get(0).getEndPoint();
+		 directionPt=linePts[1];
 	  }else{
-		  directionPt=line.getSegments().get(line.getNumSegments()-1).getStartPoint();
+		  directionPt=linePts[linePts.length - 2];
 	  }
 	  
 	  

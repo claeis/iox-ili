@@ -257,7 +257,7 @@ public class CompoundCurve extends LineString {
 		
 		// recalc points
 		points=derivePoints(segments, factory);
-		
+		envelope=null;
 		// line changed
 		return true;
 	}
