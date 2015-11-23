@@ -3,7 +3,7 @@ ideas/open issues
 - add xml validation
 - add checker
 
-iox-ili 1.11.1 (2015-09-xx)
+iox-ili 1.11.1 (2015-11-23)
 -----------------------------
 - Iligml10Writer: fixed missing link objects (assocs)
 - ItfReader2: fixed "StraightSegment cannot be cast to ArcSegment" exception if ring end segment overlaps with ring start segment
