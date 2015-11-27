@@ -180,7 +180,9 @@ class EdgeRing {
   public boolean isValid()
   {
     getCoordinates();
-    if (ringPts.getCoordinates().length <= 3) return false;
+    if (ringPts.getCoordinates().length <= 3){
+    	return false;
+    }
     try{
     	getRing();
     }catch(Exception e){

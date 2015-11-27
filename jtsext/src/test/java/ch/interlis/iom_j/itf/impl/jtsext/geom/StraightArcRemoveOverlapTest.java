@@ -28,8 +28,7 @@ public class StraightArcRemoveOverlapTest {
 		CompoundCurve line0=new CompoundCurve(segments,fact);
 		StraightSegment s1=new StraightSegment(startPt,endPt);
 		System.out.println(line0);
-		Coordinate newVertexPt=new Coordinate();
-		boolean modified=line0.removeOverlap(true, s1, newVertexPt, 0.2);
+		boolean modified=line0.removeOverlap(s0, s1, 0.2);
 		assertTrue(modified);
 		System.out.println(line0);
 		StraightSegment s00=(StraightSegment) line0.getSegments().get(0);
@@ -60,8 +59,7 @@ public class StraightArcRemoveOverlapTest {
 		CompoundCurve line0=new CompoundCurve(segments,fact);
 		StraightSegment s1=new StraightSegment(startPt,endPt);
 		System.out.println(line0);
-		Coordinate newVertexPt=new Coordinate();
-		boolean modified=line0.removeOverlap(true, s1, newVertexPt, 0.2);
+		boolean modified=line0.removeOverlap(s0, s1, 0.2);
 		assertTrue(modified);
 		System.out.println(line0);
 		StraightSegment s00=(StraightSegment) line0.getSegments().get(0);
@@ -92,8 +90,7 @@ public class StraightArcRemoveOverlapTest {
 		CompoundCurve line0=new CompoundCurve(segments,fact);
 		StraightSegment s1=new StraightSegment(startPt,endPt);
 		System.out.println(line0);
-		Coordinate newVertexPt=new Coordinate();
-		boolean modified=line0.removeOverlap(false, s1, newVertexPt, 0.2);
+		boolean modified=line0.removeOverlap(s0, s1, 0.2);
 		assertTrue(modified);
 		System.out.println(line0);
 		StraightSegment s00=(StraightSegment) line0.getSegments().get(2);
@@ -124,8 +121,7 @@ public class StraightArcRemoveOverlapTest {
 		CompoundCurve line0=new CompoundCurve(segments,fact);
 		StraightSegment s1=new StraightSegment(startPt,endPt);
 		System.out.println(line0);
-		Coordinate newVertexPt=new Coordinate();
-		boolean modified=line0.removeOverlap(false, s1, newVertexPt, 0.2);
+		boolean modified=line0.removeOverlap(s0, s1, 0.2);
 		assertTrue(modified);
 		System.out.println(line0);
 		StraightSegment s00=(StraightSegment) line0.getSegments().get(2);

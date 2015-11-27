@@ -66,10 +66,10 @@ public class JtsextGeometryFactory extends GeometryFactory {
 	public CompoundCurveRing createCompoundCurveRing(CompoundCurve line){
 		return new CompoundCurveRing(line, this);
 	}
-	public Polygon createCurvePolygon(LinearRing shell, LinearRing[] holes) {
+	public CurvePolygon createCurvePolygon(LinearRing shell, LinearRing[] holes) {
 		return new CurvePolygon(shell,holes,this);
 	}
-	public Polygon createCurvePolygon(LinearRing shell) {
+	public CurvePolygon createCurvePolygon(LinearRing shell) {
 		return new CurvePolygon(shell,null,this);
 	}
 

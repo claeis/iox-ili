@@ -3,6 +3,9 @@ package ch.interlis.iom_j.itf.impl.jtsext.geom;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import ch.ehi.basics.logging.EhiLogger;
+import ch.interlis.iom_j.itf.impl.jtsext.io.WKTWriterJtsext;
+
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateArrays;
@@ -62,4 +65,38 @@ public class CurvePolygon extends Polygon {
 			    }
 		    }
 		  }
+		@Override
+		public String toText() {
+		    WKTWriterJtsext writer = new WKTWriterJtsext();
+		    return writer.write(this);
+		}
+		public void dumpPolygonAsJava(String poly) {
+			EhiLogger.debug("CompoundCurveRing shell=null;");
+		    dumpRingAsJava(shell,"shell");
+		    if(holes.length>0){
+				EhiLogger.debug("CompoundCurveRing holes[]=new CompoundCurveRing["+holes.length+"];");
+			    for (int i = 0; i < holes.length; i++) {
+			      dumpRingAsJava(holes[i],"holes[i]");
+			    }
+		    }
+		    if(holes.length>0){
+				EhiLogger.debug(poly+"=new CurvePolygon(shell,holes);");
+		    }else{
+				EhiLogger.debug(poly+"=new CurvePolygon(shell);");
+		    }
+		}
+
+		public void dumpRingAsJava(LinearRing shell,String ring) {
+			EhiLogger.debug("ArrayList<CurveSegment> segs = new ArrayList<CurveSegment>();");
+			if(shell instanceof CompoundCurveRing){
+				CompoundCurveRing ringo=(CompoundCurveRing )shell;
+				for(CompoundCurve line:ringo.getLines()){
+					line.dumpLineAsJava("segs");
+				}
+			}else{
+				throw new IllegalArgumentException("not yet implemented");
+			}
+			EhiLogger.debug("CompoundCurve line=new CompoundCurve(segs);");
+			EhiLogger.debug(ring+"=new CompoundCurveRing(line);");
+		}
 }

@@ -176,7 +176,9 @@ class PolygonizeGraph
 	    for (Iterator iNode = nodeIterator(); iNode.hasNext(); ) {
 	        Node node = (Node) iNode.next();
 	        //computeNextCWEdges(node);
-	        {
+	        boolean overlapRemoved=false;
+	        do{
+		        overlapRemoved=false;
 	            DirectedEdgeStar deStar = node.getOutEdges();
 	            PolygonizeDirectedEdge startDE = null;
 	            PolygonizeDirectedEdge prevDE = null;
@@ -190,30 +192,28 @@ class PolygonizeGraph
 	                startDE = outDE;
 	              if (prevDE != null) {
 	            	  // check outDE,prevDE
-	            	  removeOverlap(li,node.getCoordinate(),prevDE, outDE,newVertexOffset);
+	            	  overlapRemoved=overlapRemoved || removeOverlap(li,node.getCoordinate(),prevDE, outDE,newVertexOffset);
 	              }
 	              prevDE = outDE;
 	            }
 	            if (prevDE != null) {
 	            	  // check prevDE,startDE
-	            	  removeOverlap(li,node.getCoordinate(),prevDE, startDE,newVertexOffset);
+	            	overlapRemoved=overlapRemoved || removeOverlap(li,node.getCoordinate(),prevDE, startDE,newVertexOffset);
 	            }
-	          }
-	        // if overlaps removed, re-sort outgoing edges in node
-		    DirectedEdgeStar deStar = node.getOutEdges();
-		    Collections.sort(deStar.getEdges());
+	        	if(overlapRemoved){
+	    	        // if overlaps removed, re-sort outgoing edges in node
+	    		    Collections.sort(deStar.getEdges());
+	        	}
+	          }while(overlapRemoved);
 	      }
 	  
   }
 
-private void removeOverlap(CurveSegmentIntersector li,Coordinate node,
+private boolean removeOverlap(CurveSegmentIntersector li,Coordinate node,
 		PolygonizeDirectedEdge de0, PolygonizeDirectedEdge de1,double newVertexOffset) {
+	boolean overlapRemoved=false;
 	PolygonizeEdge edge0=(PolygonizeEdge)de0.getEdge();
 	  CompoundCurve line0 = (CompoundCurve)edge0.getLine();
-	  boolean line0AtStart=false;
-	  if(line0.getSegments().get(0).getStartPoint().equals2D(node)){
-		  line0AtStart=true;
-	  }
 	  CurveSegment s0=null;
 		int s0idx = 0;
 		if (de0.getEdgeDirection() == true) {
@@ -223,12 +223,12 @@ private void removeOverlap(CurveSegmentIntersector li,Coordinate node,
 
 		}
 		s0 = line0.getSegments().get(s0idx);
+	  boolean line0AtStart=false;
+	  if(s0.getStartPoint().equals2D(node)){
+		  line0AtStart=true;
+	  }
 	  PolygonizeEdge edge1=(PolygonizeEdge)de1.getEdge();
 	  CompoundCurve line1 = (CompoundCurve)edge1.getLine();
-	  boolean line1AtStart=false;
-	  if(line1.getSegments().get(0).getStartPoint().equals2D(node)){
-		  line1AtStart=true;
-	  }
 	  CurveSegment s1=null;
 	  int s1idx=0;
 		if (de1.getEdgeDirection() == true) {
@@ -237,6 +237,10 @@ private void removeOverlap(CurveSegmentIntersector li,Coordinate node,
 			s1idx = line1.getNumSegments() - 1;
 		}
 		s1=line1.getSegments().get(s1idx);
+		  boolean line1AtStart=false;
+		  if(s1.getStartPoint().equals2D(node)){
+			  line1AtStart=true;
+		  }
 	if(s0 instanceof StraightSegment && s1 instanceof StraightSegment){
 		// could not intersect, if correct noded
 	}else{
@@ -261,30 +265,32 @@ private void removeOverlap(CurveSegmentIntersector li,Coordinate node,
 					  }else if(is1.equals2D(node)){
 			    		  is=new Intersection(is0,line0,line1,s0,s1,li.getOverlap());
 					  }else{
-						  throw new IllegalStateException("unexpected overlap tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
+						  throw new IllegalStateException("unexpected overlap "+is.toString());
 					  }
 					  if(is!=null){
-							EhiLogger.traceState("valoverlap tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
-							EhiLogger.traceState("overlap "+is.getOverlap()+", seg1 "+is.getSegment1()+", seg2 "+is.getSegment2());
+							EhiLogger.traceState("valoverlap "+is.toString());
 					  }
-					  Coordinate newDirectionPt=new Coordinate();
 		    		  if(s0 instanceof StraightSegment){
-		    			  if(line1.removeOverlap(line1AtStart,s0,newDirectionPt,newVertexOffset)){
-				    		  de1.adjustDirectionPt(newDirectionPt);
+		    			  if(line1.removeOverlap((ArcSegment) s1,s0,newVertexOffset)){
+				    		  de1.adjustDirectionPt();
+				    		  overlapRemoved=true;
 		    			  }
 		    		  }else if(s1 instanceof StraightSegment){
-		    			  if(line0.removeOverlap(line0AtStart,s1,newDirectionPt,newVertexOffset)){
-				    		  de0.adjustDirectionPt(newDirectionPt);
+		    			  if(line0.removeOverlap((ArcSegment) s0,s1,newVertexOffset)){
+				    		  de0.adjustDirectionPt();
+				    		  overlapRemoved=true;
 		    			  }
 		    		  }else{
 		    			  // both segments are arcs
 			    		  if(((ArcSegment) s0).getRadius()>((ArcSegment) s1).getRadius()){
-			    			  if(line1.removeOverlap(line1AtStart,s0,newDirectionPt,newVertexOffset)){
-					    		  de1.adjustDirectionPt(newDirectionPt);
+			    			  if(line1.removeOverlap((ArcSegment) s1,s0,newVertexOffset)){
+					    		  de1.adjustDirectionPt();
+					    		  overlapRemoved=true;
 			    			  }
 			    		  }else{
-			    			  if(line0.removeOverlap(line0AtStart,s1,newDirectionPt,newVertexOffset)){
-					    		  de0.adjustDirectionPt(newDirectionPt);
+			    			  if(line0.removeOverlap((ArcSegment) s0,s1,newVertexOffset)){
+					    		  de0.adjustDirectionPt();
+					    		  overlapRemoved=true;
 			    			  }
 			    		  }
 		    		  }
@@ -293,6 +299,7 @@ private void removeOverlap(CurveSegmentIntersector li,Coordinate node,
 			  }
 		}
 	}
+	return  overlapRemoved;
 }
   /**
    * Computes the minimal EdgeRings formed by the edges in this graph.

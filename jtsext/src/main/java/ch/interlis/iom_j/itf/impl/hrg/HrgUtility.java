@@ -1,11 +1,30 @@
 package ch.interlis.iom_j.itf.impl.hrg;
 
+import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
+
 public class HrgUtility {
-	//static final double EPS=0.0001; // epsilon, linear tolerance (1mm in military coordinates)
+	//static final double EPS=0.001; // epsilon, linear tolerance (1mm in military coordinates)
+	//static final double EPS100=EPS;
 	static final double EPS=0.00000001;
-	static final double EPS100=EPS*100.0;
-	
-public static void CTRC3P(double P1I,double P2I,double  S1I,double S2I,double Q1I,double Q2I,double Z1O[],double Z2O[],double DETAO[],double SIGNO[])
+	static final double EPS100=EPS*190.0;
+
+	public static void CTRC3P(double P1I,double P2I,double  S1I,double S2I,double Q1I,double Q2I,double Z1O[],double Z2O[],double DETAO[],double SIGNO[])
+	{
+		double dx=P1I;
+		double dy=P2I;
+		double P1I_=P1I-dx;
+		double P2I_=P2I-dy;
+		double S1I_=S1I-dx;
+		double S2I_=S2I-dy;
+		double Q1I_=Q1I-dx;
+		double Q2I_=Q2I-dy;
+		CTRC3P_(P1I_,P2I_,S1I_,S2I_,Q1I_,Q2I_,Z1O,Z2O,DETAO,SIGNO);
+		Z1O[0]+=dx;
+		Z2O[0]+=dy;
+		
+	}
+
+public static void CTRC3P_(double P1I,double P2I,double  S1I,double S2I,double Q1I,double Q2I,double Z1O[],double Z2O[],double DETAO[],double SIGNO[])
 { ///////////////////////////////////////////////////////
 	//	Center point of a circle defined by 3 points
 	//P1I,P2I I-arguments: mil coord of 1st circle de£ pt
@@ -255,6 +274,20 @@ private static double DISTDF(double a1, double b1, double a2, double b2) {
  * @param H2O
  */
 public static void ISCICR(double AV1I[],double AV2I[],double AW1I[],double AW2I[],int NHO[],double H1O[],double H2O[],double overlap[])
+{
+	double dx=AV1I[1];
+	double dy=AV2I[1];
+	double[] AV1I_={AV1I[0]-dx, AV1I[1]-dx,AV1I[2]-dx,AV1I[3]-dx};
+	double[] AV2I_={AV2I[0]-dy, AV2I[1]-dy,AV2I[2]-dy,AV2I[3]-dy};
+	double[] AW1I_={AW1I[0]-dx, AW1I[1]-dx,AW1I[2]-dx,AW1I[3]-dx};
+	double[] AW2I_={AW2I[0]-dy, AW2I[1]-dy,AW2I[2]-dy,AW2I[3]-dy};
+	ISCICR_(AV1I_,AV2I_,AW1I_,AW2I_,NHO,H1O,H2O,overlap);
+	for(int i=1;i<=NHO[0];i++){
+		H1O[i]+=dx;
+		H2O[i]+=dy;
+	}
+}
+public static void ISCICR_(double AV1I[],double AV2I[],double AW1I[],double AW2I[],int NHO[],double H1O[],double H2O[],double overlap[])
 	{
 	//ENTRY ISCICR (AV1I,AV2I,AW1I,AW2I,NHO,H10,H20,MSGIO,Y2IPDO)
 	// 	intersection of 2 circles, R*8 arguments
@@ -302,7 +335,7 @@ public static void ISCICR(double AV1I[],double AV2I[],double AW1I[],double AW2I[
 					double PA1 = AV1I[J1];
 					double PA2 = AV2I[J1];
 					NHO[0]=-1;
-					return;
+					throw new IllegalArgumentException("definition of arc V is wrong "+PA1+", "+PA2);
 				}
 				if(AW1I[J1]==AW1I[J2] && AW2I[J1]==AW2I[J2]){
 					// 	definition of W is wrong
@@ -310,7 +343,7 @@ public static void ISCICR(double AV1I[],double AV2I[],double AW1I[],double AW2I[
 					double PA1 = AW1I[J1];
 					double PA2 = AW2I[J1];
 					NHO[0]=-1;
-					return;
+					throw new IllegalArgumentException("definition of arc W is wrong "+PA1+", "+PA2);
 				}
 			}
 		}
@@ -476,9 +509,8 @@ public static void ISCICR(double AV1I[],double AV2I[],double AW1I[],double AW2I[
 			}
 						 
 			if(NHO[0] >= 2){
-				// THEN 	escape with error message, more than 2 IPs (possible?) 
-				NHO[0]=-1;
-				return;
+				// THEN 	escape with error message, more than 2 IPs (possible, if EPS,EPS100 to small) 
+				throw new IllegalStateException("more than 2 IPs ("+H1O[1]+", "+H2O[1]+"), ("+H1O[2]+", "+H2O[2]+"), ("+P1[JP]+", "+P2[JP]+")");
 			}
 			NHO[0] = NHO[0]+1;
 			H1O[NHO[0]] =  P1[JP];
@@ -500,6 +532,21 @@ public static void ISCICR(double AV1I[],double AV2I[],double AW1I[],double AW2I[
  * @param H2O
  */
 public static void ISCISR(double AV1I[],double AV2I[],double SL1I[],double SL2I[],int NHO[],double H1O[],double H2O[],double overlap[])
+{
+	double dx=AV1I[1];
+	double dy=AV2I[1];
+	double[] AV1I_={AV1I[0]-dx, AV1I[1]-dx,AV1I[2]-dx,AV1I[3]-dx};
+	double[] AV2I_={AV2I[0]-dy, AV2I[1]-dy,AV2I[2]-dy,AV2I[3]-dy};
+	double[] SL1I_={SL1I[0]-dx, SL1I[1]-dx,SL1I[2]-dx};
+	double[] SL2I_={SL2I[0]-dy, SL2I[1]-dy,SL2I[2]-dy};
+	ISCISR_(AV1I_,AV2I_,SL1I_,SL2I_,NHO,H1O,H2O,overlap);
+	for(int i=1;i<=NHO[0];i++){
+		H1O[i]+=dx;
+		H2O[i]+=dy;
+	}
+	
+}
+public static void ISCISR_(double AV1I[],double AV2I[],double SL1I[],double SL2I[],int NHO[],double H1O[],double H2O[],double overlap[])
 	{
 		//double AV1I[] = null,AV2I[]=null; //[3] I-arguments:  mil coord of 1st 3 vert 
 		//double SL1I[]=null,SL2I[]=null; //[3] I-arg: mil coord of 2 vertices defi­
@@ -549,7 +596,7 @@ public static void ISCISR(double AV1I[],double AV2I[],double SL1I[],double SL2I[
 					double PA1 = AV1I[J1];
 					double PA2 = AV2I[J1];
 					NHO[0]=-1;
-					return;
+					throw new IllegalArgumentException("definition of arc W is wrong "+PA1+", "+PA2);
 				}
 			}
 		}
@@ -559,7 +606,7 @@ public static void ISCISR(double AV1I[],double AV2I[],double SL1I[],double SL2I[
 			double PA1 = SL1I[1];
 			double PA2 = SL2I[1];
 			NHO[0]=-1;
-			return;
+			throw new IllegalArgumentException("definition of straight L is wrong "+PA1+", "+PA2);
 		}
 
 		//check if definition points are equal
@@ -708,9 +755,8 @@ public static void ISCISR(double AV1I[],double AV2I[],double SL1I[],double SL2I[
 				}
 			}
 			if(NHO[0]>=2){
-				// escape with error message, more than 2 IPs (possible?) 
-				NHO[0]=-1;
-				return;
+				// escape with error message, more than 2 IPs (possible, if EPS,EPS100 to small) 
+				throw new IllegalStateException("more than 2 IPs ("+H1O[1]+", "+H2O[1]+"), ("+H1O[2]+", "+H2O[2]+"), ("+P1[JP]+", "+P2[JP]+")");
 			}
 			NHO[0] = NHO[0] +  1;
 			H1O[NHO[0]] = P1[JP]; 

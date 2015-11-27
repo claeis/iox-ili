@@ -263,9 +263,9 @@ public class WKTWriterJtsext
       Point point = (Point) geometry;
       appendPointTaggedText(point.getCoordinate(), level, writer, point.getPrecisionModel());
     }
-    //else if (geometry instanceof CompoundCurveRing) {
-    //    appendCompoundCurveRingTaggedText((CompoundCurveRing) geometry, level, writer);
-    //}
+    else if (geometry instanceof CompoundCurveRing) {
+        appendCompoundCurveRingTaggedText((CompoundCurveRing) geometry, level, writer);
+    }
     else if (geometry instanceof LinearRing) {
       appendLinearRingTaggedText((LinearRing) geometry, level, writer);
     }
@@ -275,9 +275,9 @@ public class WKTWriterJtsext
     else if (geometry instanceof LineString) {
       appendLineStringTaggedText((LineString) geometry, level, writer);
     }
-    //else if (geometry instanceof CurvePolygon) {
-    //    appendCurvePolygonTaggedText((CurvePolygon) geometry, level, writer);
-    //}
+    else if (geometry instanceof CurvePolygon) {
+        appendCurvePolygonTaggedText((CurvePolygon) geometry, level, writer);
+    }
     else if (geometry instanceof Polygon) {
       appendPolygonTaggedText((Polygon) geometry, level, writer);
     }
@@ -439,9 +439,15 @@ private void appendCompoundCurveText(CompoundCurve lineString, int level,
   private void appendLinearRingTaggedText(LinearRing linearRing, int level, Writer writer)
     throws IOException
   {
-    writer.write("LINEARRING ");
-    appendLineStringText(linearRing, level, false, writer);
+    appendLineStringTaggedText(linearRing, level,  writer);
   }
+  private void appendCompoundCurveRingTaggedText(CompoundCurveRing linearRing, int level, Writer writer)
+		    throws IOException
+		  {
+	  		for(CompoundCurve line : linearRing.getLines()){
+			    appendCompoundCurveText(line, level, false,writer);
+	  		}
+		  }
 
   /**
    *  Converts a <code>Polygon</code> to &lt;Polygon Tagged Text&gt; format,
@@ -456,6 +462,12 @@ private void appendCompoundCurveText(CompoundCurve lineString, int level,
     writer.write("POLYGON ");
     appendPolygonText(polygon, level, false, writer);
   }
+  private void appendCurvePolygonTaggedText(CurvePolygon polygon, int level, Writer writer)
+		    throws IOException
+		  {
+		    writer.write("CURVEPOLYGON ");
+		    appendCurvePolygonText(polygon, level, false, writer);
+		  }
 
   /**
    *  Converts a <code>MultiPoint</code> to &lt;MultiPoint Tagged Text&gt;
@@ -671,6 +683,35 @@ private void appendCompoundCurveText(CompoundCurve lineString, int level,
       writer.write(")");
     }
   }
+  private void appendCurvePolygonText(CurvePolygon polygon, int level, boolean indentFirst, Writer writer)
+		    throws IOException
+		  {
+		    if (polygon.isEmpty()) {
+		      writer.write("EMPTY");
+		    }
+		    else {
+		      if (indentFirst) indent(level, writer);
+		      writer.write("(");
+		      if(polygon.getExteriorRing() instanceof CompoundCurveRing){
+			      appendCompoundCurveRingTaggedText((CompoundCurveRing)polygon.getExteriorRing(), level,  writer);
+		      }else if(polygon.getExteriorRing() instanceof CompoundCurve){
+			      appendCompoundCurveTaggedText((CompoundCurve)polygon.getExteriorRing(), level,  writer);
+		      }else{
+			      appendLineStringText(polygon.getExteriorRing(), level, false, writer);
+		      }
+		      for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+		        writer.write(", ");
+		        if(polygon.getInteriorRingN(i) instanceof CompoundCurveRing){
+			        appendCompoundCurveRingTaggedText((CompoundCurveRing)polygon.getInteriorRingN(i), level + 1, writer);
+		        }else if(polygon.getInteriorRingN(i) instanceof CompoundCurve){
+			        appendCompoundCurveTaggedText((CompoundCurve)polygon.getInteriorRingN(i), level + 1, writer);
+		        }else{
+			        appendLineStringText(polygon.getInteriorRingN(i), level + 1, true, writer);
+		        }
+		      }
+		      writer.write(")");
+		    }
+		  }
 
   /**
    *  Converts a <code>MultiPoint</code> to &lt;MultiPoint Text&gt; format, then

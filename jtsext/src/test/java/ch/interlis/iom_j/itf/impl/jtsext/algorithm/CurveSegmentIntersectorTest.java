@@ -23,38 +23,5 @@ public class CurveSegmentIntersectorTest {
 		assertFalse(li.hasIntersection());
 		
 	}
-	@Test
-	public void xx()
-	{
-		//CIRCULARSTRING (606959.432 232126.214, 606959.442 232125.874, 606959.471 232125.535), seg2 (606959.471 232125.535, 606958.009 232138.34)
-		CurveSegmentIntersector li=new CurveSegmentIntersector();
-		ArcSegment s0=new ArcSegment(new Coordinate(606959.432, 232126.214), 
-				new Coordinate(606959.442, 232125.874),
-				new Coordinate(606959.471, 232125.535));
-		StraightSegment s1=new StraightSegment(new Coordinate(606959.471, 232125.535), 
-				new Coordinate(606958.009, 232138.34));
-		li.computeIntersection(s0, s1);
-		System.out.println(li.getIntersectionNum());
-		for(int i=0;i<li.getIntersectionNum();i++){
-			System.out.println(li.getIntersection(i));
-		}
-		
-	}
-	public void calcULP() {
-		double a=6000000.0;
-		double diff=1.0;
-		while(a+diff!=a){
-			double diff2 = diff /2.0;
-			if(diff2==0.0){
-				break;
-			}
-			diff=diff2;
-		}
-		System.out.println(Math.ulp(a));
-		System.out.println(diff);
-		System.out.println(Long.toHexString(Double.doubleToRawLongBits(diff)));
-		System.out.println(Long.toHexString(Double.doubleToRawLongBits(a)));
-	}
-
 	
 }

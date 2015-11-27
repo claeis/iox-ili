@@ -59,111 +59,20 @@ public class Ili2cUtility {
 			for(;tagi.hasNext();){
 				Element ili2cEle=(Element)tagi.next();
 				String tag=null;
-				ArrayList propv=new ArrayList(); // ViewableProperty
+				ArrayList propv=null; // ViewableProperty
 				if(ili2cEle instanceof AttributeDef){
 					AttributeDef attr=(AttributeDef)ili2cEle;
 					tag=ili2cEle.getContainer().getScopedName(null)+"."+ili2cEle.getName();
-					Table linattrTab=((AreaType)attr.getDomainResolvingAliases()).getLineAttributeStructure();
-					if(linattrTab!=null){
-						Iterator iter = linattrTab.getAttributesAndRoles2();
-						while (iter.hasNext()) {
-							String propName=null;
-							ViewableTransferElement obj = (ViewableTransferElement)iter.next();
-							if (obj.obj instanceof AttributeDef) {
-								propName = ((AttributeDef) obj.obj).getName();
-							}
-							if(obj.obj instanceof RoleDef){
-								RoleDef role = (RoleDef) obj.obj;
-								// a role of an embedded association?
-								if(obj.embedded){
-									AssociationDef roleOwner = (AssociationDef) role.getContainer();
-									if(roleOwner.getDerivedFrom()==null){
-										propName=role.getName();
-									}
-								}
-							}
-							if(propName!=null){
-								ViewableProperty prop=new ViewableProperty(propName);
-								propv.add(prop);
-							}
-						}
-					}
-
-					
-					ViewableProperty prop=new ViewableProperty(ModelUtilities.getHelperTableGeomAttrName(attr));
-					if(attr.isFinal()){
-						prop.setTypeFinal(true);
-					}
-					propv.add(prop);
+					propv=mapLinetable(attr);
 				}else if(ili2cEle instanceof Viewable){
+					propv=new ArrayList(); // ViewableProperty
 					Viewable v=(Viewable)ili2cEle;
 					tag=v.getScopedName(null);
 					Iterator iter = v.getAttributesAndRoles2();
 					while (iter.hasNext()) {
 						ViewableTransferElement obj = (ViewableTransferElement)iter.next();
-						if (obj.obj instanceof AttributeDef) {
-							AttributeDef attr = (AttributeDef) obj.obj;
-							ViewableProperty prop=new ViewableProperty(attr.getName());
-							ch.interlis.ili2c.metamodel.Type type=attr.getDomain();
-							if(type instanceof ch.interlis.ili2c.metamodel.TypeAlias){
-								ch.interlis.ili2c.metamodel.Domain domainDef=((ch.interlis.ili2c.metamodel.TypeAlias)type).getAliasing();
-								if(domainDef.getType() instanceof ch.interlis.ili2c.metamodel.EnumerationType){
-									prop.setEnumType(domainDef.getScopedName(null));
-								}
-								if(domainDef.isFinal()){
-									prop.setTypeFinal(true);
-								}
-							}else{
-								if(type instanceof ch.interlis.ili2c.metamodel.EnumerationType){
-									prop.setEnumType(attr.getContainer().getScopedName(null)+":"+attr.getName());
-								}						
-								if(attr.isFinal()){
-									prop.setTypeFinal(true);
-								}
-							}
-							if(attr.getDomainResolvingAliases() instanceof ch.interlis.ili2c.metamodel.OIDType){
-								prop.setTypeOid(true);
-							}
-							AttributeDef baseAttr = attr;
-							if(attr.getExtending()!=null){
-								baseAttr = (AttributeDef)attr.getExtending();
-								while(baseAttr.getExtending()!=null){
-									baseAttr = (AttributeDef)baseAttr.getExtending();
-								}
-							}
-							if(baseAttr.getContainer()!=v){
-								prop.setBaseDefInClass(baseAttr.getContainer().getScopedName(null));
-							}
-							propv.add(prop);
-						}
-						if(obj.obj instanceof RoleDef){
-							RoleDef role = (RoleDef) obj.obj;
-							
-							// not an embedded role and roledef not defined in a lightweight association?
-							if (!obj.embedded && !((AssociationDef)v).isLightweight()){
-								ViewableProperty prop=new ViewableProperty(role.getName());
-								RoleDef baseRole=role.getRootExtending();
-								if(baseRole==null)baseRole=role;
-								if(baseRole.getContainer()!=v){
-									prop.setBaseDefInClass(baseRole.getContainer().getScopedName(null));
-								}
-								propv.add(prop);
-							}
-							// a role of an embedded association?
-							if(obj.embedded){
-								AssociationDef roleOwner = (AssociationDef) role.getContainer();
-								if(roleOwner.getDerivedFrom()==null){
-									// role is oppend;
-									ViewableProperty prop=new ViewableProperty(role.getName());
-									RoleDef baseOppRole=role.getOppEnd().getRootExtending();
-									if(baseOppRole==null)baseOppRole=role.getOppEnd();
-									if(baseOppRole.getDestination()!=v){
-										prop.setBaseDefInClass(baseOppRole.getDestination().getScopedName(null));
-									}
-									propv.add(prop);
-								}
-							}
-						}
+						ViewableProperty prop=mapViewableTransferElement( v, obj);
+						propv.add(prop);
 					}
 					
 				}
@@ -180,69 +89,8 @@ public class Ili2cUtility {
 				ArrayList propv=new ArrayList(); // ViewableProperty
 				while (iter.hasNext()) {
 					ViewableTransferElement obj = (ViewableTransferElement)iter.next();
-					if (obj.obj instanceof AttributeDef) {
-						AttributeDef attr = (AttributeDef) obj.obj;
-						ViewableProperty prop=new ViewableProperty(attr.getName());
-						ch.interlis.ili2c.metamodel.Type type=attr.getDomain();
-						if(type instanceof ch.interlis.ili2c.metamodel.TypeAlias){
-							ch.interlis.ili2c.metamodel.Domain domainDef=((ch.interlis.ili2c.metamodel.TypeAlias)type).getAliasing();
-							if(domainDef.getType() instanceof ch.interlis.ili2c.metamodel.EnumerationType){
-								prop.setEnumType(domainDef.getScopedName(null));
-							}
-							if(domainDef.isFinal()){
-								prop.setTypeFinal(true);
-							}
-						}else{
-							if(type instanceof ch.interlis.ili2c.metamodel.EnumerationType){
-								prop.setEnumType(attr.getContainer().getScopedName(null)+":"+attr.getName());
-							}						
-							if(attr.isFinal()){
-								prop.setTypeFinal(true);
-							}
-						}
-						if(attr.getDomainResolvingAliases() instanceof ch.interlis.ili2c.metamodel.OIDType){
-							prop.setTypeOid(true);
-						}
-						AttributeDef baseAttr = attr;
-						if(attr.getExtending()!=null){
-							baseAttr = (AttributeDef)attr.getExtending();
-							while(baseAttr.getExtending()!=null){
-								baseAttr = (AttributeDef)baseAttr.getExtending();
-							}
-						}
-						if(baseAttr.getContainer()!=v){
-							prop.setBaseDefInClass(baseAttr.getContainer().getScopedName(null));
-						}
-						propv.add(prop);
-					}
-					if(obj.obj instanceof RoleDef){
-						RoleDef role = (RoleDef) obj.obj;
-						
-						// not an embedded role and roledef not defined in a lightweight association?
-						if (!obj.embedded && !((AssociationDef)v).isLightweight()){
-							ViewableProperty prop=new ViewableProperty(role.getName());
-							RoleDef baseRole=role.getRootExtending();
-							if(baseRole==null)baseRole=role;
-							if(baseRole.getContainer()!=v){
-								prop.setBaseDefInClass(baseRole.getContainer().getScopedName(null));
-							}
-							propv.add(prop);
-						}
-						// a role of an embedded association?
-						if(obj.embedded){
-							AssociationDef roleOwner = (AssociationDef) role.getContainer();
-							if(roleOwner.getDerivedFrom()==null){
-								// role is oppend;
-								ViewableProperty prop=new ViewableProperty(role.getName());
-								RoleDef baseOppRole=role.getOppEnd().getRootExtending();
-								if(baseOppRole==null)baseOppRole=role.getOppEnd();
-								if(baseOppRole.getDestination()!=v){
-									prop.setBaseDefInClass(baseOppRole.getDestination().getScopedName(null));
-								}
-								propv.add(prop);
-							}
-						}
-					}
+					ViewableProperty prop=mapViewableTransferElement( v, obj);
+					propv.add(prop);
 				}
 				
 				mapping.defineClass(tag, (ViewableProperty[])propv.toArray(new ViewableProperty[propv.size()]));
@@ -251,6 +99,107 @@ public class Ili2cUtility {
 		}
 		
 		return mapping;
+	}
+	public static ArrayList mapLinetable(AttributeDef attr) {
+		ArrayList propv=new ArrayList();
+		Table linattrTab=((AreaType)attr.getDomainResolvingAliases()).getLineAttributeStructure();
+		if(linattrTab!=null){
+			Iterator iter = linattrTab.getAttributesAndRoles2();
+			while (iter.hasNext()) {
+				String propName=null;
+				ViewableTransferElement obj = (ViewableTransferElement)iter.next();
+				if (obj.obj instanceof AttributeDef) {
+					propName = ((AttributeDef) obj.obj).getName();
+				}
+				if(obj.obj instanceof RoleDef){
+					RoleDef role = (RoleDef) obj.obj;
+					// a role of an embedded association?
+					if(obj.embedded){
+						AssociationDef roleOwner = (AssociationDef) role.getContainer();
+						if(roleOwner.getDerivedFrom()==null){
+							propName=role.getName();
+						}
+					}
+				}
+				if(propName!=null){
+					ViewableProperty prop=new ViewableProperty(propName);
+					propv.add(prop);
+				}
+			}
+		}
+
+		
+		ViewableProperty prop=new ViewableProperty(ModelUtilities.getHelperTableGeomAttrName(attr));
+		if(attr.isFinal()){
+			prop.setTypeFinal(true);
+		}
+		propv.add(prop);
+		return propv;
+	}
+	public static ViewableProperty mapViewableTransferElement(Viewable v,
+			ViewableTransferElement obj) {
+		ViewableProperty prop=null;
+		if (obj.obj instanceof AttributeDef) {
+			AttributeDef attr = (AttributeDef) obj.obj;
+			prop=new ViewableProperty(attr.getName());
+			ch.interlis.ili2c.metamodel.Type type=attr.getDomain();
+			if(type instanceof ch.interlis.ili2c.metamodel.TypeAlias){
+				ch.interlis.ili2c.metamodel.Domain domainDef=((ch.interlis.ili2c.metamodel.TypeAlias)type).getAliasing();
+				if(domainDef.getType() instanceof ch.interlis.ili2c.metamodel.EnumerationType){
+					prop.setEnumType(domainDef.getScopedName(null));
+				}
+				if(domainDef.isFinal()){
+					prop.setTypeFinal(true);
+				}
+			}else{
+				if(type instanceof ch.interlis.ili2c.metamodel.EnumerationType){
+					prop.setEnumType(attr.getContainer().getScopedName(null)+":"+attr.getName());
+				}						
+				if(attr.isFinal()){
+					prop.setTypeFinal(true);
+				}
+			}
+			if(attr.getDomainResolvingAliases() instanceof ch.interlis.ili2c.metamodel.OIDType){
+				prop.setTypeOid(true);
+			}
+			AttributeDef baseAttr = attr;
+			if(attr.getExtending()!=null){
+				baseAttr = (AttributeDef)attr.getExtending();
+				while(baseAttr.getExtending()!=null){
+					baseAttr = (AttributeDef)baseAttr.getExtending();
+				}
+			}
+			if(baseAttr.getContainer()!=v){
+				prop.setBaseDefInClass(baseAttr.getContainer().getScopedName(null));
+			}
+		}
+		if(obj.obj instanceof RoleDef){
+			RoleDef role = (RoleDef) obj.obj;
+			
+			// not an embedded role and roledef not defined in a lightweight association?
+			if (!obj.embedded && !((AssociationDef)v).isLightweight()){
+				prop=new ViewableProperty(role.getName());
+				RoleDef baseRole=role.getRootExtending();
+				if(baseRole==null)baseRole=role;
+				if(baseRole.getContainer()!=v){
+					prop.setBaseDefInClass(baseRole.getContainer().getScopedName(null));
+				}
+			}
+			// a role of an embedded association?
+			if(obj.embedded){
+				AssociationDef roleOwner = (AssociationDef) role.getContainer();
+				if(roleOwner.getDerivedFrom()==null){
+					// role is oppend;
+					prop=new ViewableProperty(role.getName());
+					RoleDef baseOppRole=role.getOppEnd().getRootExtending();
+					if(baseOppRole==null)baseOppRole=role.getOppEnd();
+					if(baseOppRole.getDestination()!=v){
+						prop.setBaseDefInClass(baseOppRole.getDestination().getScopedName(null));
+					}
+				}
+			}
+		}
+		return prop;
 	}
 	public static XtfModel[] buildModelList(TransferDescription td){
 		ArrayList modelv=new ArrayList();

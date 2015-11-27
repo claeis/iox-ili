@@ -353,6 +353,9 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 			
 		}else if(rawEvent instanceof EndTransferEvent){
 			if(dataerrs.size()>0){
+        		for(IoxInvalidDataException dataerr:dataerrs){
+        			EhiLogger.logError(dataerr);
+        		}
 				throw new IoxInvalidDataException("failed to build polygons");
 			}
 		}

@@ -36,8 +36,8 @@ import ch.interlis.iom_j.xtf.XtfModel;
  * @author ce
  * @version $Revision: 1.0 $ $Date: 24.07.2006 $
  */
-public class IligmlWriterBase implements IoxWriter {
-	private IligmlWriterAlt alt=null;
+public class Etf1WriterBase implements IoxWriter {
+	private Etf1WriterAlt alt=null;
 	private java.io.OutputStream outputFile=null;
 	private IoxFactoryCollection factory=new  ch.interlis.iox_j.DefaultIoxFactoryCollection();
 	
@@ -47,10 +47,10 @@ public class IligmlWriterBase implements IoxWriter {
 	 * @param version version of transfer format (2.2 or 2.3)
 	 * @throws IoxException
 	 */
-	public IligmlWriterBase(java.io.OutputStreamWriter buffer,ViewableProperties mapping1,java.util.HashMap nameMapping,String version)
+	public Etf1WriterBase(java.io.OutputStreamWriter buffer,ViewableProperties mapping1,java.util.HashMap nameMapping,String version)
 	throws IoxException
 	{ 
-		alt=new IligmlWriterAlt(buffer,mapping1,nameMapping,version);
+		alt=new Etf1WriterAlt(buffer,mapping1,nameMapping,version);
 	}
 	
 	/** Creates a new instance of a writer.
@@ -59,7 +59,7 @@ public class IligmlWriterBase implements IoxWriter {
 	 * @param version version of transfer format (2.2 or 2.3)
 	 * @throws IoxException
 	 */
-	public IligmlWriterBase(java.io.File outfile,ViewableProperties mapping1,java.util.HashMap nameMapping,String version)
+	public Etf1WriterBase(java.io.File outfile,ViewableProperties mapping1,java.util.HashMap nameMapping,String version)
 	throws IoxException
 	{
 		try{
@@ -82,7 +82,7 @@ public class IligmlWriterBase implements IoxWriter {
 	 * @param version version of transfer format (2.2 or 2.3)
 	 * @throws IoxException
 	 */
-	public IligmlWriterBase(java.io.OutputStream buffer,ViewableProperties mapping1,java.util.HashMap nameMapping,String version)
+	public Etf1WriterBase(java.io.OutputStream buffer,ViewableProperties mapping1,java.util.HashMap nameMapping,String version)
 	throws IoxException
 	{ 
 		init(buffer, mapping1,nameMapping,version);
@@ -90,7 +90,7 @@ public class IligmlWriterBase implements IoxWriter {
 	private void init(java.io.OutputStream buffer, ViewableProperties mapping1,java.util.HashMap nameMapping,String version)
 		throws IoxException {
 		try{
-			alt=new IligmlWriterAlt(new java.io.OutputStreamWriter(buffer,"UTF-8"),mapping1,nameMapping,version);
+			alt=new Etf1WriterAlt(new java.io.OutputStreamWriter(buffer,"UTF-8"),mapping1,nameMapping,version);
 		}catch(java.io.UnsupportedEncodingException ex){
 			throw new IoxException(ex);
 		}
