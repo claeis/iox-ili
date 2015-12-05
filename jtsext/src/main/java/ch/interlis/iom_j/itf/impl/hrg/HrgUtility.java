@@ -282,7 +282,7 @@ public static void ISCICR(double AV1I[],double AV2I[],double AW1I[],double AW2I[
 	double[] AW1I_={AW1I[0]-dx, AW1I[1]-dx,AW1I[2]-dx,AW1I[3]-dx};
 	double[] AW2I_={AW2I[0]-dy, AW2I[1]-dy,AW2I[2]-dy,AW2I[3]-dy};
 	ISCICR_(AV1I_,AV2I_,AW1I_,AW2I_,NHO,H1O,H2O,overlap);
-	for(int i=1;i<=NHO[0];i++){
+	for(int i=1;i<=NHO[0] && i<=2;i++){
 		H1O[i]+=dx;
 		H2O[i]+=dy;
 	}
