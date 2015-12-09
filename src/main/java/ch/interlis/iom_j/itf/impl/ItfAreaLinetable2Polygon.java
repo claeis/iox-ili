@@ -173,7 +173,8 @@ public class ItfAreaLinetable2Polygon {
 								  Math.abs(segIndex0-segIndex1)==1 
 								  || Math.abs(segIndex0-segIndex1)==e0.getNumSegments()-1  ) // bei Ring: letztes Segment und Erstes Segment
 								  && (is.isIntersection(p00) || is.isIntersection(p01))
-								  && (is.isIntersection(p10) || is.isIntersection(p11))){
+								  && (is.isIntersection(p10) || is.isIntersection(p11))
+								  && is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
 							// aufeinanderfolgende Segmente der selben Linie
 							  // overlap entfernen
 							  if(is!=null){

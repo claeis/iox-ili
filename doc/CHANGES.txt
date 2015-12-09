@@ -3,9 +3,10 @@ ideas/open issues
 - add xml validation
 - add checker
 
-iox-ili 1.11.2 (2015-12-xx)
+iox-ili 1.11.2 (2015-12-09)
 -----------------------------
 - fixed IndexOutOfBoundsException in ISCICR()
+- ItfReader2: fixed ClassCastException
 
 iox-ili 1.11.1 (2015-11-23)
 -----------------------------
