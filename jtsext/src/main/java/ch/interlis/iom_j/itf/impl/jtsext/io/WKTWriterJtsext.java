@@ -302,101 +302,100 @@ public class WKTWriterJtsext
   private void appendCompoundCurveTaggedText(CompoundCurve geometry, int level,
 		Writer writer) throws IOException {
 	    writer.write("COMPOUNDCURVE ");
-	    appendCompoundCurveText(geometry, level, false, writer);
+	    appendCompoundCurveText(geometry, level, false, writer,false);
 	
 }
 
-private void appendCompoundCurveText(CompoundCurve lineString, int level,
-		boolean doIndent, Writer writer) 
-			    throws IOException
-{
-    if (lineString.isEmpty()) {
-        writer.write("EMPTY");
-      }
-      else {
-        if (doIndent) indent(level, writer);
-        writer.write("(");
-        int coordi = 0;
-        boolean isLineString=false;
-    	Coordinate endCoord=null;
-        for (CurveSegment seg : lineString.getSegments()) {
-        	if(seg instanceof ArcSegment){
-            	if(isLineString){
-                    writer.write("), ");
-            	}
-            	isLineString=false;
-                // CIRCULARSTRING (x y,x y,x y)
-                writer.write("CIRCULARSTRING (");
-                Coordinate start,mid,end;
-				start = seg.getStartPoint();
-				mid = ((ArcSegment) seg).getMidPoint();
-				end = seg.getEndPoint();
-  	          if (coordi > 0) {
-  	            if (coordsPerLine > 0
-  	                && coordi % coordsPerLine == 0) {
-  	              indent(level + 1, writer);
-  	            }
-  	          }
-  	          appendCoordinate(start, writer);
-  	          coordi++;
-	          if (coordi > 0) {
-  	            if (coordsPerLine > 0
-  	                && coordi % coordsPerLine == 0) {
-  	              indent(level + 1, writer);
-  	            }
-  	          }
-	          writer.write(", ");
-  	          appendCoordinate(mid, writer);
-  	          coordi++;
-	          if (coordi > 0) {
-  	            if (coordsPerLine > 0
-  	                && coordi % coordsPerLine == 0) {
-  	              indent(level + 1, writer);
-  	            }
-  	          }
-	          writer.write(", ");
-  	          appendCoordinate(end, writer);
-  	          coordi++;
-                
-                writer.write(")");
-        	}else{
-            	if(!isLineString){
-                	Coordinate coord;
-    				coord = seg.getStartPoint();
-        	          if (coordi > 0) {
-                          writer.write(", ");
-        	            if (coordsPerLine > 0
-        	                && coordi % coordsPerLine == 0) {
-        	              indent(level + 1, writer);
-        	            }
-        	          }
-                      writer.write("(");
-        	          appendCoordinate(coord, writer);
-        	          coordi++;
-            		isLineString=true;
-            	}
-            	{
-                	Coordinate coord;
-    				coord = seg.getEndPoint();
-        	          if (coordi > 0) {
-        	            writer.write(", ");
-        	            if (coordsPerLine > 0
-        	                && coordi % coordsPerLine == 0) {
-        	              indent(level + 1, writer);
-        	            }
-        	          }
-        	          appendCoordinate(coord, writer);
-        	          coordi++;        		
-            	}
-        		
-        	}
-        }
-    	if(isLineString){
-            writer.write(")");
-    	}
-        writer.write(")");
-      }
-}
+	private void appendCompoundCurveText(CompoundCurve lineString, int level,
+			boolean doIndent, Writer writer,boolean isPartOfRing) throws IOException {
+		if (lineString.isEmpty()) {
+			writer.write("EMPTY");
+		} else {
+			if (doIndent)
+				indent(level, writer);
+			if(!isPartOfRing){
+				writer.write("(");
+			}
+			int coordi = 0;
+			boolean isLineString = false;
+			Coordinate endCoord = null;
+			for (CurveSegment seg : lineString.getSegments()) {
+				if (seg instanceof ArcSegment) {
+					if (isLineString) {
+						writer.write("), ");
+					}
+					isLineString = false;
+					// CIRCULARSTRING (x y,x y,x y)
+					writer.write("CIRCULARSTRING (");
+					Coordinate start, mid, end;
+					start = seg.getStartPoint();
+					mid = ((ArcSegment) seg).getMidPoint();
+					end = seg.getEndPoint();
+					if (coordi > 0) {
+						if (coordsPerLine > 0 && coordi % coordsPerLine == 0) {
+							indent(level + 1, writer);
+						}
+					}
+					appendCoordinate(start, writer);
+					coordi++;
+					if (coordi > 0) {
+						if (coordsPerLine > 0 && coordi % coordsPerLine == 0) {
+							indent(level + 1, writer);
+						}
+					}
+					writer.write(", ");
+					appendCoordinate(mid, writer);
+					coordi++;
+					if (coordi > 0) {
+						if (coordsPerLine > 0 && coordi % coordsPerLine == 0) {
+							indent(level + 1, writer);
+						}
+					}
+					writer.write(", ");
+					appendCoordinate(end, writer);
+					coordi++;
+
+					writer.write(")");
+				} else {
+					if (!isLineString) {
+						Coordinate coord;
+						coord = seg.getStartPoint();
+						if (coordi > 0) {
+							writer.write(", ");
+							if (coordsPerLine > 0
+									&& coordi % coordsPerLine == 0) {
+								indent(level + 1, writer);
+							}
+						}
+						writer.write("(");
+						appendCoordinate(coord, writer);
+						coordi++;
+						isLineString = true;
+					}
+					{
+						Coordinate coord;
+						coord = seg.getEndPoint();
+						if (coordi > 0) {
+							writer.write(", ");
+							if (coordsPerLine > 0
+									&& coordi % coordsPerLine == 0) {
+								indent(level + 1, writer);
+							}
+						}
+						appendCoordinate(coord, writer);
+						coordi++;
+					}
+
+				}
+			}
+			if (isLineString) {
+				writer.write(")");
+			}
+			if(!isPartOfRing){
+				writer.write(")");
+			}
+		}
+	}
 
 /**
    *  Converts a <code>Coordinate</code> to &lt;Point Tagged Text&gt; format,
@@ -445,7 +444,7 @@ private void appendCompoundCurveText(CompoundCurve lineString, int level,
 		    throws IOException
 		  {
 	  		for(CompoundCurve line : linearRing.getLines()){
-			    appendCompoundCurveText(line, level, false,writer);
+			    appendCompoundCurveText(line, level, false,writer,true);
 	  		}
 		  }
 

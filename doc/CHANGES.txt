@@ -3,6 +3,11 @@ ideas/open issues
 - add xml validation
 - add checker
 
+iox-ili 1.11.3 (2016-01-xx)
+-----------------------------
+- fixed WKT of CURVEPOLYGON
+- moved in iox to wkb conversion
+
 iox-ili 1.11.2 (2015-12-09)
 -----------------------------
 - fixed IndexOutOfBoundsException in ISCICR()
