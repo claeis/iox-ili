@@ -35,7 +35,7 @@ import ch.ehi.iox.ilisite.ILIREPOSITORY09;
 
 /** Tool to create an ilimodels.xml file in a given local folder tree.
  * update (default) md5 und dependsOnModel für bestehende Modelle nachführen
- *        neue Modelle ergänzen (alle Infos)
+ *        neue Modelle ergaenzen (alle Infos)
  *        nicht mehr existierende Modelle löschen
  * updateAll alle Infos für bestehende Modelle aus dem ili übernehmen 
  * rewrite bestehende Datei zuerst löschen und dann neu scannen und erzeugen

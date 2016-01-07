@@ -79,8 +79,8 @@ public class ArcSegment extends CurveSegment {
 			// Distanz zwischen Zwischenpunkt und Bogenendpunkt 
 			double b=CurveSegment.dist(arcPt_re,arcPt_ho,pt2_re,pt2_ho);
 
-			// Zwischenpunkte erzeugen, so dass maximale Pfeilhöhe nicht 
-			// überschritten wird
+			// Zwischenpunkte erzeugen, so dass maximale Pfeilhoehe nicht 
+			// ueberschritten wird
 			// Distanz zwischen Bogenanfanspunkt und Bogenendpunkt 
 			double c=CurveSegment.dist(pt1_re,pt1_ho,pt2_re,pt2_ho);
 			// Radius bestimmen
