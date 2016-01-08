@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jdbm.RecordManager;
+
 import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
 import com.vividsolutions.jts.algorithm.locate.SimplePointInAreaLocator;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -77,13 +79,15 @@ use STRTree and PreparedPolygon to implement Point-In-Polygon test
 public class ItfAreaLinetable2Polygon {
 	private Map<String,Polygon> polygons=new HashMap<String,Polygon>();
 	private Map<String,IomObject> mainTids=new HashMap<String,IomObject>();
-	private ArrayList<IomObject> lines=new ArrayList<IomObject>(); 
+	private Map<String,IomObject> lines=null; 
 	private boolean surfacesBuilt=false;
 	private String helperTableGeomAttrName=null;
 	private Table linattrTab=null;
 	private double maxOverlaps=0.0;
 	private double newVertexOffset=0.0;
 	private JtsextGeometryFactory jtsFact=new JtsextGeometryFactory();
+	private ObjectPoolManager objPool = null;
+
 	public ItfAreaLinetable2Polygon(AttributeDef surfaceAttr)
 	{
 		maxOverlaps=((AreaType)surfaceAttr.getDomainResolvingAliases()).getMaxOverlap().doubleValue();
@@ -96,15 +100,20 @@ public class ItfAreaLinetable2Polygon {
 		}
 		linattrTab=((AreaType)surfaceAttr.getDomainResolvingAliases()).getLineAttributeStructure();
 		helperTableGeomAttrName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableGeomAttrName(surfaceAttr);
+		objPool=new ObjectPoolManager<IomObject>();
 	}
 	public ItfAreaLinetable2Polygon(String geomAttr)
 	{
 		helperTableGeomAttrName=geomAttr;
+		objPool=new ObjectPoolManager<IomObject>();
 		
 	}
 	public void addItfLinetableObject(IomObject iomObj)
 	{
-		lines.add(iomObj);
+		if(lines==null){
+			lines=objPool.newObjectPool();
+		}
+		lines.put(iomObj.getobjectoid(),iomObj);
 	}
 	public void addGeoRef(String tid,IomObject iomCoord)
 	{
@@ -143,6 +152,9 @@ public class ItfAreaLinetable2Polygon {
 
 			ArrayList<CompoundCurve> segv=lineset.buildBoundaries(lines,jtsFact);
 			lineset=null;
+			lines=null;
+			objPool.close();
+			objPool=null;
 			//EhiLogger.debug("Memory segv "+(getUsedMemory()-startMem));
 			
 			EhiLogger.traceState("validate noding..."+helperTableGeomAttrName+", maxOverlaps "+maxOverlaps+", offset "+newVertexOffset);

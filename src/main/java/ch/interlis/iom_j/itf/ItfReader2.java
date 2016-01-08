@@ -35,6 +35,7 @@ import ch.interlis.iom_j.itf.impl.ItfLineKind;
 import ch.interlis.iom_j.itf.impl.ItfScanner;
 import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
 import ch.interlis.iom_j.itf.impl.JdbmUtility;
+import ch.interlis.iom_j.itf.impl.ObjectPoolManager;
 import ch.interlis.iom.*;
 import ch.interlis.ili2c.metamodel.*;
 
@@ -63,8 +64,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 	private java.util.Map<String,IomObject> currentMainObjs=null;
 	private HashMap<AttributeDef,ItfSurfaceLinetable2Polygon> currentSurfaceAttrs=null;
 	private HashMap<AttributeDef,ItfAreaLinetable2Polygon> currentAreaAttrs=null;
-	private RecordManager recman = null;
-	
+	private ObjectPoolManager objPool=null;
 	private ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
 	/** Creates a new reader.
 	 * @param in Input stream to read from.
@@ -87,7 +87,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 		init();
 	}
 	private void init(){
-		cacheFileBasename=JdbmUtility.getCacheTmpFilename();
+		objPool=new ObjectPoolManager<IomObject>();
 	}
 	@Override
 	public void close() throws IoxException {
@@ -95,15 +95,10 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 			rawReader.close();
 		}
 		rawReader=null;
-		if(recman!=null){
-			try {
-				recman.close();
-				JdbmUtility.removeRecordManagerFiles(cacheFileBasename);
-			} catch (IOException e) {
-				throw new IoxException(e);
-			}
+		if(objPool!=null){
+			objPool.close();
+			objPool=null;
 		}
-		recman=null;
 	}
 	@Override
 	public IomObject createIomObject(String type, String oid)
@@ -217,11 +212,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 				// maintable
 				surfaceOrAreaAttr=null;
 				//mainObjs=new HashMap<String,IomObject>();
-				try {
-					currentMainObjs=getObjectPool();
-				} catch (IOException e1) {
-					throw new IoxException(e1);
-				}
+				currentMainObjs=objPool.newObjectPool();
 				iliQName=aclass.getScopedName(null);
 				while(true){
 					  // collect objects
@@ -390,17 +381,6 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 			dataerrs.add(e);
 		}
 	}
-	private java.util.Map<String, IomObject> getObjectPool() throws IOException {
-		if(recman!=null){
-			recman.close();
-			JdbmUtility.removeRecordManagerFiles(cacheFileBasename);
-		}
-		recman=JdbmUtility.createRecordManager(cacheFileBasename);
-		PrimaryTreeMap<String, IomObject> m = recman.treeMap("hugemap");
-		return m;
-		
-	}
-	private String cacheFileBasename=null;
 	private IoxEvent _next_Event=null;
 	private void pushBackEvent(IoxEvent rawEvent) {
 		if(_next_Event!=null){
