@@ -41,6 +41,7 @@ import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurveRing;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurvePolygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
@@ -240,7 +241,7 @@ public class ItfAreaLinetable2Polygon {
 				polyidx.insert(poly.getEnvelopeInternal(), poly);
 				//System.out.println(poly);
 			}
-			HashMap<Polygon,Coordinate> hitPolys=new HashMap<Polygon,Coordinate>();
+			HashMap<Polygon,String> hitPolys=new HashMap<Polygon,String>();
 			for(String tid:mainTids.keySet()){
 				IomObject georef=mainTids.get(tid);
 				Coordinate coord=Iox2jtsext.coord2JTS(georef);
@@ -272,10 +273,14 @@ public class ItfAreaLinetable2Polygon {
 					if(hitPolys.containsKey(hit)){
 						//EhiLogger.traceState("multiple polygon-refs ("+coord+") and ("+hitPolys.get(hit)+") to polygon "+hit);
 						//((CurvePolygon) hit).dumpPolygonAsJava("poly");
-						throw new IoxInvalidDataException("multiple polygon-refs ("+coord+") and ("+hitPolys.get(hit)+") to polygon "+hit);
+						String tid2=hitPolys.get(hit);
+						IomObject georef2=mainTids.get(tid2);
+						Coordinate coord2=Iox2jtsext.coord2JTS(georef2);
+						String hitTids=getTids(hit);
+						throw new IoxInvalidDataException("multiple polygon-refs tid "+tid+" ("+coord+") and tid "+tid2+" ("+coord2+") to lines "+hitTids+", polygon "+hit);
 					}
 					polygons.put(tid, hit);
-					hitPolys.put(hit,coord);
+					hitPolys.put(hit,tid);
 				}
 			}
 			
@@ -288,4 +293,33 @@ public class ItfAreaLinetable2Polygon {
 				}
 			}
 		}
+	public String getTids(Polygon hit) {
+		StringBuilder hitTids=new StringBuilder();
+		if(hit instanceof CurvePolygon){
+			CurvePolygon cp=(CurvePolygon) hit;
+			String sep="";
+			ArrayList<CurveSegment> segs=new ArrayList<CurveSegment>();
+			CompoundCurveRing c=(CompoundCurveRing) cp.getExteriorRing();
+			for(CompoundCurve cv:c.getLines()){
+				segs.addAll(cv.getSegments());
+			}
+			for(int ri=0;ri<cp.getNumInteriorRing();ri++){
+				c=(CompoundCurveRing) cp.getInteriorRingN(ri);
+				for(CompoundCurve cv:c.getLines()){
+					segs.addAll(cv.getSegments());
+				}
+			}
+			java.util.HashSet<String> uniqueTids=new java.util.HashSet<String>();
+			for(CurveSegment seg:segs){
+				String tidx=seg.getUserData().toString();
+				if(!uniqueTids.contains(tidx)){
+					hitTids.append(sep);
+					hitTids.append(tidx);
+					sep=", ";
+					uniqueTids.add(tidx);
+				}
+			}
+		}
+		return hitTids.toString();
+	}
 }
