@@ -4,10 +4,9 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import com.vividsolutions.jts.geom.TopologyException;
-
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxException;
+import ch.interlis.iom_j.itf.impl.IoxAssert;
 
 public class ItfAreaLinetable2PolygonTest {
 

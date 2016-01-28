@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxException;
+import ch.interlis.iom_j.itf.impl.IoxAssert;
 
 public class ItfSurfaceLinetable2PolygonTest {
 

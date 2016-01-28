@@ -35,7 +35,7 @@ public class ItfReader2Test {
 	
 	@Test
 	public void testA() throws Iox2jtsException, IoxException {
-		ItfReader2 reader=new ItfReader2(new File("test/data/Test1.itf"));
+		ItfReader2 reader=new ItfReader2(new File("test/data/Test1.itf"),false);
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{
@@ -54,7 +54,7 @@ public class ItfReader2Test {
 
 	@Test
 	public void testB() throws Iox2jtsException, IoxException {
-		ItfReader2 reader=new ItfReader2(new File("test/data/TestB.itf"));
+		ItfReader2 reader=new ItfReader2(new File("test/data/TestB.itf"),false);
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{
@@ -72,7 +72,7 @@ public class ItfReader2Test {
 	}
 	@Test
 	public void testC() throws Iox2jtsException, IoxException {
-		ItfReader2 reader=new ItfReader2(new File("test/data/TestC.itf"));
+		ItfReader2 reader=new ItfReader2(new File("test/data/TestC.itf"),false);
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{
@@ -90,7 +90,7 @@ public class ItfReader2Test {
 	}
 	@Test
 	public void testD() throws Iox2jtsException, IoxException {
-		ItfReader2 reader=new ItfReader2(new File("test/data/TestD.itf"));
+		ItfReader2 reader=new ItfReader2(new File("test/data/TestD.itf"),false);
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{
@@ -108,7 +108,7 @@ public class ItfReader2Test {
 	}
 	@Test
 	public void testE() throws Iox2jtsException, IoxException {
-		ItfReader2 reader=new ItfReader2(new File("test/data/TestE.itf"));
+		ItfReader2 reader=new ItfReader2(new File("test/data/TestE.itf"),false);
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{

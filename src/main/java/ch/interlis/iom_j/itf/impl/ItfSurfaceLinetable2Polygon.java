@@ -109,8 +109,10 @@ public class ItfSurfaceLinetable2Polygon {
 	private double maxOverlaps=0.0;
 	private double newVertexOffset=0.0;
 	private ObjectPoolManager objPool=null;
-	public ItfSurfaceLinetable2Polygon(AttributeDef surfaceAttr)
+	private boolean ignorePolygonBuildingErrors=false;
+	public ItfSurfaceLinetable2Polygon(AttributeDef surfaceAttr,boolean ignorePolygonBuildingErrors1)
 	{
+		ignorePolygonBuildingErrors=ignorePolygonBuildingErrors1;
 		PrecisionDecimal overlapDef=((SurfaceType)surfaceAttr.getDomainResolvingAliases()).getMaxOverlap();
 		if(overlapDef!=null){
 			maxOverlaps=overlapDef.doubleValue();

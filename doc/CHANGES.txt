@@ -9,6 +9,7 @@ iox-ili 1.11.3 (2016-01-xx)
 - moved in iox to wkb conversion
 - fixed lost inner ring (if bbox calculated from cw and ccw line not exactly equal)
 - jts-1.14
+- add ignorePolygonBuildingErrors to ItfReader2
 
 iox-ili 1.11.2 (2015-12-09)
 -----------------------------

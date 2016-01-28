@@ -87,9 +87,11 @@ public class ItfAreaLinetable2Polygon {
 	private double newVertexOffset=0.0;
 	private JtsextGeometryFactory jtsFact=new JtsextGeometryFactory();
 	private ObjectPoolManager objPool = null;
+	private boolean ignorePolygonBuildingErrors=true;
 
-	public ItfAreaLinetable2Polygon(AttributeDef surfaceAttr)
+	public ItfAreaLinetable2Polygon(AttributeDef surfaceAttr,boolean ignorePolygonBuildingErrors1)
 	{
+		ignorePolygonBuildingErrors=ignorePolygonBuildingErrors1;
 		maxOverlaps=((AreaType)surfaceAttr.getDomainResolvingAliases()).getMaxOverlap().doubleValue();
 		if(maxOverlaps>0){
 		    NumericalType[] dimensions = ((CoordType) ((AreaType)surfaceAttr.getDomainResolvingAliases()).getControlPointDomain().getType()).getDimensions();
@@ -226,9 +228,15 @@ public class ItfAreaLinetable2Polygon {
 			Collection cutEdges = polygonizer.getCutEdges();
 			if(!cutEdges.isEmpty()){
 				for(Object edge:cutEdges){
-					EhiLogger.logError("cut edge: tids "+((CompoundCurve) edge).getSegmentTids()+", "+edge);
+					if(ignorePolygonBuildingErrors){
+						EhiLogger.traceState("cut edge: tids "+((CompoundCurve) edge).getSegmentTids()+", "+edge);
+					}else{
+						EhiLogger.logError("cut edge: tids "+((CompoundCurve) edge).getSegmentTids()+", "+edge);
+					}
 				}
-				throw new IoxInvalidDataException("cut edges");
+				if(!ignorePolygonBuildingErrors){
+					throw new IoxInvalidDataException("cut edges");
+				}
 			}
 			Collection dangles=polygonizer.getDangles();
 			if(!dangles.isEmpty()){
@@ -289,7 +297,11 @@ public class ItfAreaLinetable2Polygon {
 						IomObject georef2=mainTids.get(tid2);
 						Coordinate coord2=Iox2jtsext.coord2JTS(georef2);
 						String hitTids=getTids(hit);
-						throw new IoxInvalidDataException("multiple polygon-refs tid "+tid+" ("+coord+") and tid "+tid2+" ("+coord2+") to lines "+hitTids+", polygon "+hit);
+						if(ignorePolygonBuildingErrors){
+							EhiLogger.traceState("multiple polygon-refs tid "+tid+" ("+coord+") and tid "+tid2+" ("+coord2+") to lines "+hitTids+", polygon "+hit);
+						}else{
+							throw new IoxInvalidDataException("multiple polygon-refs tid "+tid+" ("+coord+") and tid "+tid2+" ("+coord2+") to lines "+hitTids+", polygon "+hit);
+						}
 					}
 					polygons.put(tid, hit);
 					hitPolys.put(hit,tid);
