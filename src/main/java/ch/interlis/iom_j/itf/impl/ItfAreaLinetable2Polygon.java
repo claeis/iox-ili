@@ -88,9 +88,14 @@ public class ItfAreaLinetable2Polygon {
 	private JtsextGeometryFactory jtsFact=new JtsextGeometryFactory();
 	private ObjectPoolManager objPool = null;
 	private boolean ignorePolygonBuildingErrors=true;
+	ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>(); 
+	private String linetableIliqname=null;
+	private String geomattrIliqname=null;
 
 	public ItfAreaLinetable2Polygon(AttributeDef surfaceAttr,boolean ignorePolygonBuildingErrors1)
 	{
+		linetableIliqname=surfaceAttr.getContainer().getScopedName(null)+"_"+surfaceAttr.getName();
+		geomattrIliqname=surfaceAttr.getContainer().getScopedName(null)+"."+surfaceAttr.getName();
 		ignorePolygonBuildingErrors=ignorePolygonBuildingErrors1;
 		maxOverlaps=((AreaType)surfaceAttr.getDomainResolvingAliases()).getMaxOverlap().doubleValue();
 		if(maxOverlaps>0){
@@ -206,13 +211,18 @@ public class ItfAreaLinetable2Polygon {
 								  e0.removeOverlap((ArcSegment) seg0, seg1, newVertexOffset);
 							  }
 						}else{
-							EhiLogger.logError("intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
-							EhiLogger.traceState(is.toString());
+							String []tids=new String[2];
+							tids[0]=(String) is.getCurve1().getUserData();
+							tids[1]=(String) is.getCurve2().getUserData();
+							dataerrs.add(new IoxInvalidDataException("intersection",linetableIliqname,tids,Jtsext2iox.JTS2coord(is.getPt()[0])));
+							if(is.getPt().length==2){
+								dataerrs.add(new IoxInvalidDataException("intersection",linetableIliqname,tids,Jtsext2iox.JTS2coord(is.getPt()[1])));
+							}
 							hasIntersections=true;
 						}
 					}
 					if(hasIntersections){
-						throw new IoxException("intersections");
+						throw new IoxInvalidDataException("intersections");
 					}
 				}
 				validator=null;
@@ -228,10 +238,10 @@ public class ItfAreaLinetable2Polygon {
 			Collection cutEdges = polygonizer.getCutEdges();
 			if(!cutEdges.isEmpty()){
 				for(Object edge:cutEdges){
-					if(ignorePolygonBuildingErrors){
-						EhiLogger.traceState("cut edge: tids "+((CompoundCurve) edge).getSegmentTids()+", "+edge);
-					}else{
-						EhiLogger.logError("cut edge: tids "+((CompoundCurve) edge).getSegmentTids()+", "+edge);
+					try {
+						dataerrs.add(new IoxInvalidDataException("cut edge",linetableIliqname,((CompoundCurve) edge).getSegmentTids(),Jtsext2iox.JTS2polyline((CompoundCurve)edge)));
+					} catch (Iox2jtsException e) {
+						throw new IllegalStateException(e);
 					}
 				}
 				if(!ignorePolygonBuildingErrors){
@@ -241,17 +251,28 @@ public class ItfAreaLinetable2Polygon {
 			Collection dangles=polygonizer.getDangles();
 			if(!dangles.isEmpty()){
 				for(Object dangle:dangles){
-					EhiLogger.logError("dangle: tids "+((CompoundCurve) dangle).getSegmentTids()+", "+dangle);
+						try {
+							dataerrs.add(new IoxInvalidDataException("dangle",linetableIliqname,((CompoundCurve) dangle).getSegmentTids(),Jtsext2iox.JTS2polyline((CompoundCurve)dangle)));
+						} catch (Iox2jtsException e) {
+							throw new IllegalStateException(e);
+						}
 				}
-				throw new IoxInvalidDataException("dangles");
+				if(!ignorePolygonBuildingErrors){
+					throw new IoxInvalidDataException("dangles");
+				}
 			}
 			Collection invalidRingLines=polygonizer.getInvalidRingLines();
 			if(!invalidRingLines.isEmpty()){
 				for(Object invalidRingLine:invalidRingLines){
-					EhiLogger.logError("invalid ring line: tids "+((CompoundCurve)invalidRingLine).getSegmentTids()+", "+invalidRingLine);
-					//((CompoundCurve) invalidRingLine).dumpLineAsJava();
+					try {
+						dataerrs.add(new IoxInvalidDataException("invald ring line",linetableIliqname,((CompoundCurve) invalidRingLine).getSegmentTids(),Jtsext2iox.JTS2polyline((CompoundCurve)invalidRingLine)));
+					} catch (Iox2jtsException e) {
+						throw new IllegalStateException(e);
+					}
 				}
-				throw new IoxInvalidDataException("invalid ring lines");
+				if(!ignorePolygonBuildingErrors){
+					throw new IoxInvalidDataException("invalid ring lines");
+				}
 			}
 			Collection<Polygon> polys = polygonizer.getPolygons();
 			EhiLogger.traceState("georef polygons..."+helperTableGeomAttrName);
@@ -287,8 +308,14 @@ public class ItfAreaLinetable2Polygon {
 					}
 				}
 				if(hit==null){
-					//throw new IoxInvalidDataException("no polygon for tid "+tid+", arearef "+coord);
-					EhiLogger.traceState("no polygon for tid "+tid+", arearef "+coord);
+					String tids[]=new String[1];
+					tids[0]=tid;
+					IoxInvalidDataException ex=new IoxInvalidDataException("no polygon for tid",geomattrIliqname,tids,Jtsext2iox.JTS2coord(coord));
+					if(ignorePolygonBuildingErrors){
+						dataerrs.add(ex);
+					}else{
+						throw ex;
+					}
 				}else{
 					if(hitPolys.containsKey(hit)){
 						//EhiLogger.traceState("multiple polygon-refs ("+coord+") and ("+hitPolys.get(hit)+") to polygon "+hit);
@@ -297,10 +324,19 @@ public class ItfAreaLinetable2Polygon {
 						IomObject georef2=mainTids.get(tid2);
 						Coordinate coord2=Iox2jtsext.coord2JTS(georef2);
 						String hitTids=getTids(hit);
+						String tids[]=new String[2];
+						tids[0]=tid;
+						tids[1]=tid2;
+						IoxInvalidDataException ex=null;
+						try {
+							ex=new IoxInvalidDataException("multiple area-refs to polygon",geomattrIliqname,tids,Jtsext2iox.JTS2surface(hit));
+						} catch (Iox2jtsException e) {
+							throw new IllegalStateException(e);
+						}
 						if(ignorePolygonBuildingErrors){
-							EhiLogger.traceState("multiple polygon-refs tid "+tid+" ("+coord+") and tid "+tid2+" ("+coord2+") to lines "+hitTids+", polygon "+hit);
+							dataerrs.add(ex);
 						}else{
-							throw new IoxInvalidDataException("multiple polygon-refs tid "+tid+" ("+coord+") and tid "+tid2+" ("+coord2+") to lines "+hitTids+", polygon "+hit);
+							throw ex;
 						}
 					}
 					polygons.put(tid, hit);
@@ -311,9 +347,17 @@ public class ItfAreaLinetable2Polygon {
 			// only ITF
 			for(Polygon poly:polys){
 				if(!hitPolys.containsKey(poly)){
-					throw new IoxInvalidDataException("no polygon-ref to polygon "+poly);
-					//EhiLogger.traceState("no arearef to polygon "+poly);
-					//((CurvePolygon) poly).dumpPolygonAsJava("poly");
+					IoxInvalidDataException ex=null;
+					try {
+						ex=new IoxInvalidDataException("no area-ref to polygon",geomattrIliqname,Jtsext2iox.JTS2surface(poly));
+					} catch (Iox2jtsException e) {
+						throw new IllegalStateException(e);
+					}
+					if(ignorePolygonBuildingErrors){
+						dataerrs.add(ex);
+					}else{
+						throw ex;
+					}
 				}
 			}
 		}
@@ -345,5 +389,8 @@ public class ItfAreaLinetable2Polygon {
 			}
 		}
 		return hitTids.toString();
+	}
+	public ArrayList<IoxInvalidDataException> getDataerrs() {
+		return dataerrs;
 	}
 }
