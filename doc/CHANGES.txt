@@ -6,6 +6,7 @@ ideas/open issues
 iox-ili 1.11.5 (2016-04-07)
 -----------------------------
 - ehibasics-1.1.0
+- ili2c-4.5.22
 - free object pool resources used by AREA/SURFACE polygon builders
 
 iox-ili 1.11.4 (2016-02-04)
