@@ -141,6 +141,16 @@ public class ItfSurfaceLinetable2Polygon {
 		objPool=new ObjectPoolManager<java.util.ArrayList<IomObject>>();
 		
 	}
+	public void close()
+	{
+		if(objPool!=null){
+			linepool=null;
+			polygons=null;
+			mainTids=null;
+			objPool.close();
+			objPool=null;
+		}
+	}
 	public void addItfLinetableObject(IomObject iomObj)
 	{
 		if(linepool==null){

@@ -115,6 +115,15 @@ public class ItfAreaLinetable2Polygon {
 		objPool=new ObjectPoolManager<IomObject>();
 		
 	}
+	public void close()
+	{
+		if(objPool!=null){
+			lines=null;
+			mainTids=null;
+			objPool.close();
+			objPool=null;
+		}
+	}
 	public void addItfLinetableObject(IomObject iomObj)
 	{
 		if(lines==null){

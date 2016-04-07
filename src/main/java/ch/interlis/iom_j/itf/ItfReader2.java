@@ -97,6 +97,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 			rawReader.close();
 		}
 		rawReader=null;
+		closePolygonizers();
 		if(objPool!=null){
 			objPool.close();
 			objPool=null;
@@ -139,6 +140,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 				}
 				return new ObjectEvent(nextObj);
 			}
+			closePolygonizers();
 			currentMainObjs=null;
 			currentSurfaceAttrs=null;
 			currentAreaAttrs=null;
@@ -357,6 +359,25 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 			}
 		}
 		return rawEvent;
+	}
+	private void closePolygonizers() {
+		if(currentAreaAttrs!=null){
+			// FOR all area attrs: cleanup
+			for(AttributeDef areaAttr : currentAreaAttrs.keySet()){
+				String areaAttrName=areaAttr.getName();
+				ItfAreaLinetable2Polygon polygonizer=currentAreaAttrs.get(areaAttr);
+				polygonizer.close();
+			}
+			
+		}
+		if(currentSurfaceAttrs!=null){
+			// FOR all surface attrs: cleanup
+			for(AttributeDef surfaceAttr : currentSurfaceAttrs.keySet()){
+				String surfaceAttrName=surfaceAttr.getName();
+				ItfSurfaceLinetable2Polygon polygonizer=currentSurfaceAttrs.get(surfaceAttr);
+				polygonizer.close();
+			}
+		}
 	}
 	private void mergeSurfaceGeomToMainObj(String surfaceAttrName,
 			ItfSurfaceLinetable2Polygon polygonizer, String mainObjOid,
