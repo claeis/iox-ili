@@ -1,5 +1,6 @@
 package ch.interlis.iox_j.validator;
 
+import java.math.BigDecimal;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,14 +18,18 @@ import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.PolylineType;
+import ch.interlis.ili2c.metamodel.PrecisionDecimal;
 import ch.interlis.ili2c.metamodel.ReferenceType;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.SurfaceOrAreaType;
+import ch.interlis.ili2c.metamodel.Table;
+import ch.interlis.ili2c.metamodel.TextType;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.Type;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iox.IoxLogEvent;
 import ch.interlis.iox.IoxLogging;
 import ch.interlis.iox.IoxValidationConfig;
 import ch.interlis.iox_j.IoxInvalidDataException;
@@ -113,6 +118,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		// ASSERT: an ordinary class/table
 		Viewable aclass1=(Viewable)modelele;		
+		if(isObject){
+			// check that object is instance of a concrete class
+			if(aclass1.isAbstract()){
+				errs.addEvent(errFact.logErrorMsg("Object must be a non-abstract class"));
+			}
+		}
 		Iterator iter = aclass1.getAttributesAndRoles2();
 		while (iter.hasNext()) {
 			ViewableTransferElement obj = (ViewableTransferElement)iter.next();
@@ -199,51 +210,132 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		 }else{
 			 attrPath=attrPath+"/"+attrName;
 		 }
+		 String checkMultiplicity=validationConfig.getConfigValue(attrQName, ValidationConfig.MULTIPLICITY);
+		 String checkType=validationConfig.getConfigValue(attrQName, ValidationConfig.TYPE);
 		 
 			Type type = attr.getDomainResolvingAliases();
 			if (type instanceof CompositionType){
 				 int structc=iomObj.getattrvaluecount(attrName);
-				 Cardinality card = ((CompositionType)type).getCardinality();
-				 if(structc<card.getMinimum() || structc>card.getMaximum()){
-					 errs.addEvent(errFact.logErrorMsg("Attribute {0} has wrong number of values", attrPath));
-				 }
+					if(ValidationConfig.OFF.equals(checkMultiplicity)){
+						// skip it
+					}else{
+						 Cardinality card = ((CompositionType)type).getCardinality();
+						 if(structc<card.getMinimum() || structc>card.getMaximum()){
+							 logMsg(checkMultiplicity,"Attribute {0} has wrong number of values", attrPath);
+						 }
+					}
 				 for(int structi=0;structi<structc;structi++){
 					 IomObject structEle=iomObj.getattrobj(attrName, structi);
+						if(ValidationConfig.OFF.equals(checkType)){
+							// skip it
+						}else{
+							String tag=structEle.getobjecttag();
+							Object modelele=tag2class.get(tag);
+							if(modelele==null){
+								if(!unknownTypev.contains(tag)){
+									errs.addEvent(errFact.logErrorMsg("unknown type <{0}>",tag));
+								}
+							}else{
+								Viewable structEleClass=(Viewable) modelele;
+								Table requiredClass=((CompositionType)type).getComponentType();
+								if(!structEleClass.isExtending(requiredClass)){
+									 logMsg(checkType,"Attribute {0} requires a structure {1}", attrPath,requiredClass.getScopedName(null));
+								}
+								if(structEleClass.isAbstract()){
+									// check that object is instance of concrete class
+									 logMsg(checkType,"Attribute {0} requires a non-abstract structure", attrPath);
+								}
+							}
+						}
 					 checkObject(structEle, attrPath+"["+structi+"]");
 				 }
 			}else{
-				 int structc=iomObj.getattrvaluecount(attrName);
-				 if(type.isMandatory() && structc==0){
-					 String param=validationConfig.getConfigValue(attrQName, ValidationConfig.MULTIPLICITY);
-					 if(ValidationConfig.WARNING.equals(param)){
-						 errs.addEvent(errFact.logWarningMsg("Attribute {0} requires a value", attrPath));
-					 }else if(ValidationConfig.OFF.equals(param)){
-						 // skip it
-					 }else{
-						 errs.addEvent(errFact.logErrorMsg("Attribute {0} requires a value", attrPath));
+				if(ValidationConfig.OFF.equals(checkMultiplicity)){
+					// skip it
+				}else{
+					 int structc=iomObj.getattrvaluecount(attrName);
+					 if(type.isMandatory() && structc==0){
+						 logMsg(checkMultiplicity,"Attribute {0} requires a value", attrPath);
 					 }
-				 }
+				}
+				if(ValidationConfig.OFF.equals(checkType)){
+					// skip it
+				}else{
+					if( attr.isDomainBoolean()) {
+					}else if(attr.isDomainIliUuid()){
+					}else if(attr.isDomainIli1Date()) {
+					}else if(attr.isDomainIli2Date()) {
+					}else if(attr.isDomainIli2Time()) {
+					}else if(attr.isDomainIli2DateTime()) {
+					}else if (type instanceof PolylineType){
+					}else if(type instanceof SurfaceOrAreaType){
+					}else if(type instanceof CoordType){
+					}else if(type instanceof NumericType){
+						String valueStr=iomObj.getattrvalue(attrName);
+						if(valueStr!=null){
+							PrecisionDecimal value=null;
+							try {
+								value=new PrecisionDecimal(valueStr);
+							} catch (NumberFormatException e) {
+								 logMsg(checkType,"value <{0}> is not a number", valueStr);
+							}
+							if(value!=null){
+								PrecisionDecimal minimum=((NumericType) type).getMinimum();
+								PrecisionDecimal maximum=((NumericType) type).getMaximum();
+							BigDecimal rounded = new BigDecimal(
+									value.toString()).setScale(
+									value.getExponent(),
+									BigDecimal.ROUND_HALF_UP);
+							BigDecimal min_general = new BigDecimal(
+									minimum.toString()).setScale(
+									minimum.getExponent(),
+									BigDecimal.ROUND_HALF_UP);
+							BigDecimal max_general = new BigDecimal(
+									maximum.toString()).setScale(
+									maximum.getExponent(),
+									BigDecimal.ROUND_HALF_UP);
+						      if (rounded.compareTo (min_general) == -1
+						    	  || rounded.compareTo (max_general) == +1){
+									 logMsg(checkType,"value {0} is out of range", valueStr);
+						      }
+							}							
+						}
+					}else if(type instanceof EnumerationType){
+						String value=iomObj.getattrvalue(attrName);
+						if(value!=null){
+							if(!((EnumerationType) type).getValues().contains(value)){
+								 logMsg(checkType,"value {0} is not a member of the enumeration", value);
+							}
+						}
+					}else if(type instanceof ReferenceType){
+					}else if(type instanceof TextType){
+						String value=iomObj.getattrvalue(attrName);
+						if(value!=null){
+							int maxLength=((TextType) type).getMaxLength();
+							if(maxLength!=-1){
+								if(value.length()>maxLength){
+									 logMsg(checkType,"Attribute {0} is length restricted to {1}", attrPath,Integer.toString(maxLength));
+								}
+							}
+							if(((TextType) type).isNormalized()){
+								if(value.indexOf('\n')>0 || value.indexOf('\r')>0 || value.indexOf('\t')>0){
+									 logMsg(checkType,"Attribute {0} must not contain control characters", attrPath);
+								}
+							}
+						}
+					}else{
+					}
+				}
 			}
 			
-				//if( Ili2cUtility.isBoolean(td,attr)) {
-				//}else if(Ili2cUtility.isUuidOid(td, attr)){
-				//}else if( Ili2cUtility.isIli1Date(td,attr)) {
-				//}else if( Ili2cUtility.isIli2Date(td,attr)) {
-				//}else if( Ili2cUtility.isIli2Time(td,attr)) {
-				//}else if( Ili2cUtility.isIli2DateTime(td,attr)) {
-				//}else{
-					//Type type = attr.getDomainResolvingAliases();
-					//if (type instanceof CompositionType){
-					//}else if (type instanceof PolylineType){
-					//}else if(type instanceof SurfaceOrAreaType){
-					//}else if(type instanceof CoordType){
-					//}else if(type instanceof NumericType){
-					//}else if(type instanceof EnumerationType){
-					//}else if(type instanceof ReferenceType){
-					//}else{
-					//}
-				//}
 		
+	}
+	private void logMsg(String checkKind,String msg,String... args){
+		 if(ValidationConfig.WARNING.equals(checkKind)){
+			 errs.addEvent(errFact.logWarningMsg(msg, args));
+		 }else{
+			 errs.addEvent(errFact.logErrorMsg(msg, args));
+		 }
 	}
 
 	private void checkItfLineTableObject(IomObject iomObj, AttributeDef modelele) {
