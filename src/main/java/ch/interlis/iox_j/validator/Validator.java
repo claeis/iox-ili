@@ -254,7 +254,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					// skip it
 				}else{
 					 int structc=iomObj.getattrvaluecount(attrName);
-					 if(type.isMandatory() && structc==0){
+					 if(attr.getDomain().isMandatoryConsideringAliases() && structc==0){
 						 logMsg(checkMultiplicity,"Attribute {0} requires a value", attrPath);
 					 }
 				}

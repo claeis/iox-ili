@@ -2,6 +2,10 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.13.0 (2016-08-xx)
+-----------------------------
+- validator: fix mandatory check if attr type is a domain def
+
 iox-ili 1.12.0 (2016-06-08)
 -----------------------------
 - added validator
