@@ -3,7 +3,7 @@ package ch.interlis.iom_j.itf.impl.jtsext.geom;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
-abstract public class CurveSegment {
+abstract public class CurveSegment implements java.io.Serializable {
 	protected Object userData=null;
 	public CurveSegment() {
 	}
