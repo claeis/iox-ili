@@ -1,46 +1,52 @@
 package ch.interlis.iom_j.itf.impl;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Random;
 
-import jdbm.PrimaryTreeMap;
-import jdbm.RecordManager;
+import ch.ehi.iox.objpool.impl.ObjPoolImpl;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxException;
 
-public class ObjectPoolManager<T> {
+public class ObjectPoolManager {
 
-	private RecordManager recman = null;
+	protected final long MIN_FREE_MEM=1024L*1024L;
 	private String cacheFileBasename = null;
-
+	private ArrayList<ObjPoolImpl> maps=new ArrayList<ObjPoolImpl>(); 
 	public ObjectPoolManager() {
-		cacheFileBasename = JdbmUtility.getCacheTmpFilename();
+		cacheFileBasename = ObjectPoolManager.getCacheTmpFilename();
 	}
 
-	public java.util.Map<String, T> newObjectPool() {
-		try {
-			if (recman != null) {
-				recman.close();
-				JdbmUtility.removeRecordManagerFiles(cacheFileBasename);
-			}
-			recman = JdbmUtility.createRecordManager(cacheFileBasename);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-		PrimaryTreeMap<String, T> m = recman.treeMap("hugemap");
+	public <T> java.util.Map<String, T> newObjectPool() {
+		ObjPoolImpl m=null;
+		m = new ObjPoolImpl();
+		maps.add(m);
 		return m;
 
 	}
 
 	public void close() {
-		if (recman != null) {
-			try {
-				recman.close();
-				JdbmUtility.removeRecordManagerFiles(cacheFileBasename);
-			} catch (IOException e) {
-				throw new IllegalStateException(e);
-			}
+		for (ObjPoolImpl m: maps) {
+			m.clear();
 		}
-		recman = null;
+		maps.clear();
 	}
 
+	static public String getCacheTmpFilename() {
+		String tmp=System.getProperty("java.io.tmpdir");
+		return new File(tmp,getTmpName()).getPath();
+	}
+
+	static public String getTmpName() {
+		long n=new java.util.Random().nextLong();
+		if (n == Long.MIN_VALUE) {
+			n = 0;
+		} else {
+			n = Math.abs(n);
+		}
+		return "ioxtmp"+n;
+		
+	}
 }

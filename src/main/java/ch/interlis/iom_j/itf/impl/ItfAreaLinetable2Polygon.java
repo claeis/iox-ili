@@ -107,12 +107,12 @@ public class ItfAreaLinetable2Polygon {
 		}
 		linattrTab=((AreaType)surfaceAttr.getDomainResolvingAliases()).getLineAttributeStructure();
 		helperTableGeomAttrName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableGeomAttrName(surfaceAttr);
-		objPool=new ObjectPoolManager<IomObject>();
+		objPool=new ObjectPoolManager();
 	}
 	public ItfAreaLinetable2Polygon(String geomAttr)
 	{
 		helperTableGeomAttrName=geomAttr;
-		objPool=new ObjectPoolManager<IomObject>();
+		objPool=new ObjectPoolManager();
 		
 	}
 	public void close()

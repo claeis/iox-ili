@@ -98,7 +98,7 @@ Polygon aus Raendern zusammensetzen
 */	
 
 public class ItfSurfaceLinetable2Polygon {
-	private Map<String,Polygon> polygons=new HashMap<String,Polygon>();
+	private Map<String,Polygon> polygons=null;
 	private Set<String> mainTids=new java.util.HashSet<String>();
 	private Map<String,java.util.ArrayList<IomObject>> linepool=null;
 	private boolean surfacesBuilt=false;
@@ -132,13 +132,15 @@ public class ItfSurfaceLinetable2Polygon {
 		linattrTab=((SurfaceType)surfaceAttr.getDomainResolvingAliases()).getLineAttributeStructure();
 		helperTableMainTableRef=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableMainTableRef(surfaceAttr);
 		helperTableGeomAttrName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableGeomAttrName(surfaceAttr);
-		objPool=new ObjectPoolManager<java.util.ArrayList<IomObject>>();
+		objPool=new ObjectPoolManager();
+		polygons=objPool.newObjectPool();
 	}
 	public ItfSurfaceLinetable2Polygon(String tableRef, String geomAttr)
 	{
 		helperTableMainTableRef=tableRef;
 		helperTableGeomAttrName=geomAttr;
-		objPool=new ObjectPoolManager<java.util.ArrayList<IomObject>>();
+		objPool=new ObjectPoolManager();
+		polygons=objPool.newObjectPool();
 		
 	}
 	public void close()

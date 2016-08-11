@@ -45,16 +45,13 @@ import ch.interlis.iom_j.ViewableProperties;
 import ch.interlis.iom_j.ViewableProperty;
 import ch.interlis.iom_j.itf.ModelUtilities;
 import ch.interlis.iom_j.itf.impl.ItfAreaPolygon2Linetable;
-import ch.interlis.iom_j.itf.impl.JdbmUtility;
+import ch.interlis.iom_j.itf.impl.ObjectPoolManager;
 import ch.interlis.iom_j.xtf.Ili2cUtility;
 import ch.interlis.iom_j.xtf.XtfModel;
 import ch.interlis.ili2c.generator.Gml32Generator;
-import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.Element;
-import ch.interlis.ili2c.metamodel.SurfaceType;
-import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.Type;
 import ch.interlis.ili2c.metamodel.Viewable;
@@ -67,17 +64,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import jdbm.PrimaryTreeMap;
-import jdbm.RecordManager;
-
 	/** Writer of an INTERLIS 2 transfer file.
 	 * @author ceis
 	 */
     public class Iligml10Writer implements ch.interlis.iox.IoxWriter
     {
         private XMLStreamWriter xout=null;
-    	private RecordManager recman = null;
-    	private String cacheFileBasename=null;
+    	private ObjectPoolManager recman = null;
         private ViewableProperties mapping = null;
     	private XtfModel xtfModels[]=null;
         private java.util.HashMap nameMapping=null;
@@ -125,12 +118,7 @@ import jdbm.RecordManager;
             mapping = createMapping(td);
             nameMapping=ch.interlis.ili2c.generator.Gml32Generator.createName2NameMapping(td);
             xtfModels=Ili2cUtility.buildModelList(td);
-    		cacheFileBasename=JdbmUtility.getCacheTmpFilename();
-    		try {
-    			recman=JdbmUtility.createRecordManager(cacheFileBasename);
-    		} catch (IOException e) {
-    			throw new IoxException(e);
-    		}
+			recman=new ObjectPoolManager();
 			XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 			//if (useRepairing) {
 			//	outputFactory.setProperty("javax.xml.stream.isRepairingNamespaces", Boolean.TRUE);
@@ -194,12 +182,7 @@ import jdbm.RecordManager;
 				xout=null;
         	}
     		if(recman!=null){
-    			try {
-    				recman.close();
-    				JdbmUtility.removeRecordManagerFiles(cacheFileBasename);
-    			} catch (IOException e) {
-    				throw new IoxException(e);
-    			}
+				recman.close();
     		}
     		recman=null;
         }
@@ -996,7 +979,7 @@ import jdbm.RecordManager;
         	return "iox"+Integer.toString(tid++);
         }
     	private java.util.Map<String, IomObject> getObjectPool(String classQName) throws IoxException {
-    		PrimaryTreeMap<String, IomObject> m = recman.treeMap(classQName);
+    		java.util.Map<String, IomObject> m = recman.newObjectPool();
     		return m;
     		
     	}
