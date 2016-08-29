@@ -5,7 +5,7 @@ import java.lang.ref.ReferenceQueue;
 public class ObjPoolEntry extends java.lang.ref.SoftReference{
 
 	private byte[]buffer=null;
-	private long pos=0L;
+	private long pos=-1L;
 	private int size=0;
 	private boolean phantom=false;
 	public ObjPoolEntry(byte[] referentSerialized,Object referent, ReferenceQueue q) {

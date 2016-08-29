@@ -29,18 +29,19 @@ import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
 import ch.interlis.iom.*;
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.ili2c.metamodel.*;
 
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.itf.impl.ItfAreaPolygon2Linetable;
-import ch.interlis.iom_j.itf.impl.ObjectPoolManager;
 
 /** This class implements an INTERLIS 1 writer.
  * @author ce
@@ -210,7 +211,8 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 							if(areaAttrs.size()==0 && surfaceAttrs.size()==0){
 								// write objects
 								java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-								for(IomObject iomObj : pool.values()){
+								for(String poolId : pool.keySet()){
+									IomObject iomObj=pool.get(poolId);
 									out.write(new ObjectEvent(iomObj));
 								}
 							}else{
@@ -223,8 +225,8 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 									ItfAreaPolygon2Linetable allLines=new ItfAreaPolygon2Linetable();
 									// FORALL main objects
 									java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-									for(IomObject iomObj : pool.values()){
-										String mainObjTid=iomObj.getobjectoid();
+									for(String mainObjTid : pool.keySet()){
+										IomObject iomObj=pool.get(mainObjTid);
 										IomObject iomPolygon=iomObj.getattrobj(attrName, 0);
 										if(iomPolygon!=null){
 											String internalTid=iomObj.getattrvalue(INTERNAL_T_ID);
@@ -247,7 +249,8 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 								{
 									// FORALL main objects
 									java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-									for(IomObject iomObj : pool.values()){
+									for(String poolId : pool.keySet()){
+										IomObject iomObj=pool.get(poolId);
 										// FORALL area attrs
 										for(AttributeDef attr:areaAttrs){
 											String attrName=attr.getName();
@@ -272,7 +275,8 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 									EhiLogger.logState("build linetable "+lineTableName+"...");
 									// FORALL main objects
 									java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-									for(IomObject iomObj : pool.values()){
+									for(String poolId : pool.keySet()){
+										IomObject iomObj=pool.get(poolId);
 										// write line objects
 										IomObject polygon=iomObj.getattrobj(attrName, 0);
 										if(polygon!=null){

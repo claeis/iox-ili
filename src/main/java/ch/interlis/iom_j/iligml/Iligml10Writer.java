@@ -29,6 +29,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.iom.*;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox.EndBasketEvent;
@@ -45,7 +46,6 @@ import ch.interlis.iom_j.ViewableProperties;
 import ch.interlis.iom_j.ViewableProperty;
 import ch.interlis.iom_j.itf.ModelUtilities;
 import ch.interlis.iom_j.itf.impl.ItfAreaPolygon2Linetable;
-import ch.interlis.iom_j.itf.impl.ObjectPoolManager;
 import ch.interlis.iom_j.xtf.Ili2cUtility;
 import ch.interlis.iom_j.xtf.XtfModel;
 import ch.interlis.ili2c.generator.Gml32Generator;
@@ -61,8 +61,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 
 	/** Writer of an INTERLIS 2 transfer file.
 	 * @author ceis
@@ -181,6 +183,10 @@ import java.util.Iterator;
 				}
 				xout=null;
         	}
+        	if(pools!=null){
+        		pools.clear();
+        		pools=null;
+        	}
     		if(recman!=null){
 				recman.close();
     		}
@@ -265,6 +271,7 @@ import java.util.Iterator;
         private void writeStartBasket(String type,String bid,int consistency, int kind,String startstate,String endstate, String[] topicv)
 		throws IoxException
         {
+        	pools=new java.util.HashMap<String, java.util.Map<String,IomObject>>();
         	currentTopic=type;
 			try{
 				xout.writeStartElement(xmlns_ili,Gml32Generator.TRANSFERMEMBER);
@@ -294,6 +301,10 @@ import java.util.Iterator;
         	modelName=currentTopic.substring(0,mdlNameSep);
         	topicName=currentTopic.substring(mdlNameSep+1);
         	flushBasket(modelName,topicName);
+        	for(Map<String, IomObject> m:pools.values()){
+        		m.clear();
+        	}
+        	pools=null;
 			try{
 				xout.writeEndElement();
 				newline();
@@ -319,7 +330,8 @@ import java.util.Iterator;
 				if(areaAttrs.size()==0){
 					// write objects
 					java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-					for(IomObject iomObj : pool.values()){
+					for(String objId : pool.keySet()){
+						IomObject iomObj=pool.get(objId);
 						writeInternalObject(iomObj);
 					}
 				}else{
@@ -332,7 +344,8 @@ import java.util.Iterator;
 						ItfAreaPolygon2Linetable allLines=new ItfAreaPolygon2Linetable();
 						// FORALL main objects
 						java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-						for(IomObject iomObj : pool.values()){
+						for(String poolId : pool.keySet()){
+							IomObject iomObj=pool.get(poolId);
 							String mainObjTid=iomObj.getobjectoid();
 							IomObject iomPolygon=iomObj.getattrobj(attrName, 0);
 							if(iomPolygon!=null){
@@ -356,7 +369,8 @@ import java.util.Iterator;
 					{
 						// FORALL main objects
 						java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-						for(IomObject iomObj : pool.values()){
+						for(String poolId : pool.keySet()){
+							IomObject iomObj=pool.get(poolId);
 							// FORALL area attrs
 							for(AttributeDef attr:areaAttrs){
 								String attrName=attr.getName();
@@ -978,8 +992,14 @@ import java.util.Iterator;
         {
         	return "iox"+Integer.toString(tid++);
         }
+        java.util.HashMap<String,java.util.Map<String, IomObject>> pools=null;
     	private java.util.Map<String, IomObject> getObjectPool(String classQName) throws IoxException {
-    		java.util.Map<String, IomObject> m = recman.newObjectPool();
+    		java.util.Map<String, IomObject> m=null;
+    		m=pools.get(classQName);
+    		if(m==null){
+        		m = recman.newObjectPool();
+    			pools.put(classQName,m);
+    		}
     		return m;
     		
     	}

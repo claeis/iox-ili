@@ -16,6 +16,7 @@ import com.vividsolutions.jts.operation.valid.IsValidOp;
 import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.NumericType;

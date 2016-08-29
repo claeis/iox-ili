@@ -1,4 +1,4 @@
-package ch.interlis.iom_j.itf.impl;
+package ch.ehi.iox.objpool;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,19 +12,23 @@ import ch.interlis.iox.IoxException;
 
 public class ObjectPoolManager {
 
-	protected final long MIN_FREE_MEM=1024L*1024L;
-	private String cacheFileBasename = null;
 	private ArrayList<ObjPoolImpl> maps=new ArrayList<ObjPoolImpl>(); 
 	public ObjectPoolManager() {
-		cacheFileBasename = ObjectPoolManager.getCacheTmpFilename();
 	}
 
 	public <T> java.util.Map<String, T> newObjectPool() {
+		flushWriteQueues();
 		ObjPoolImpl m=null;
-		m = new ObjPoolImpl();
+		m = new ObjPoolImpl(this);
 		maps.add(m);
 		return m;
 
+	}
+
+	public void flushWriteQueues() {
+		for (ObjPoolImpl m: maps) {
+			m.flushWriteQueue();
+		}
 	}
 
 	public void close() {

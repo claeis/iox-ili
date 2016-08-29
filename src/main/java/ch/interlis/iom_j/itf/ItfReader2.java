@@ -24,13 +24,13 @@ package ch.interlis.iom_j.itf;
 
 
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.iox_j.*;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
 import ch.interlis.iom_j.itf.impl.ItfAreaLinetable2Polygon;
 import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
-import ch.interlis.iom_j.itf.impl.ObjectPoolManager;
 import ch.interlis.iom.*;
 import ch.interlis.ili2c.metamodel.*;
 

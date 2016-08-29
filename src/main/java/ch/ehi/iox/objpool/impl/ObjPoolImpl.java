@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import ch.interlis.iom_j.itf.impl.ObjectPoolManager;
+import ch.ehi.iox.objpool.ObjectPoolManager;
 
 public class ObjPoolImpl implements Map {
 
@@ -20,12 +20,18 @@ public class ObjPoolImpl implements Map {
 	private java.lang.ref.ReferenceQueue<ObjPoolEntry> writeQueue=new java.lang.ref.ReferenceQueue<ObjPoolEntry>(); 
 	private RandomAccessFile outFile=null;
 	private String outFilename=null;
+	private ObjectPoolManager recman=null;
+	public ObjPoolImpl(ObjectPoolManager objectPoolManager) {
+		recman=objectPoolManager;
+	}
+
 	@Override
 	public void clear() {
 		pool.clear();
 		if(outFile!=null){
 			try {
 				outFile.close();
+				outFile=null;
 				new java.io.File(outFilename).delete();
 				outFilename=null;
 			} catch (IOException e) {
@@ -56,7 +62,9 @@ public class ObjPoolImpl implements Map {
 		if(entry==null){
 			return null;
 		}
-		return getRealObj(entry);
+		Object ret=getRealObj(entry);
+		recman.flushWriteQueues();
+		return ret;
 	}
 
 	@Override
@@ -83,29 +91,32 @@ public class ObjPoolImpl implements Map {
 		}
 		ObjPoolEntry entry=new ObjPoolEntry(byteStream.toByteArray(),value,writeQueue);
 		// check for values to write
-		flushWriteQueue();
+		recman.flushWriteQueues();
 		return pool.put(key, entry);
 	}
 
-	private void flushWriteQueue() {
+	public void flushWriteQueue() {
 		ObjPoolEntry entry = (ObjPoolEntry) writeQueue.poll();
 		while(entry!=null){
 			if(!entry.isPhantom()){
-				// write to file
-				long pos=-1;
-				try {
-					if(outFile==null){
-						// open new file
-						outFilename=ObjectPoolManager.getCacheTmpFilename();
-						outFile=new RandomAccessFile(outFilename, "rw");
+				// not yet written?
+				if(entry.getFilePos()==-1){
+					// write to file
+					long pos=-1;
+					try {
+						if(outFile==null){
+							// open new file
+							outFilename=ObjectPoolManager.getCacheTmpFilename();
+							outFile=new RandomAccessFile(outFilename, "rw");
+						}
+						pos = outFile.length();
+						outFile.seek(pos);
+						outFile.write(entry.getByteBuffer());
+					} catch (IOException e) {
+						throw new IllegalStateException(e);
 					}
-					pos = outFile.length();
-					outFile.seek(pos);
-					outFile.write(entry.getByteBuffer());
-				} catch (IOException e) {
-					throw new IllegalStateException(e);
+					entry.setFilePos(pos);
 				}
-				entry.setFilePos(pos);
 				entry.freeByteBuffer();
 			}
 			// get next entry
@@ -125,7 +136,9 @@ public class ObjPoolImpl implements Map {
 			return null;
 		}
 		entry.setPhantom();
-		return getRealObj(entry);
+		Object ret= getRealObj(entry);
+		recman.flushWriteQueues();
+		return ret;
 	}
 
 	private Object getRealObj(ObjPoolEntry entry) {

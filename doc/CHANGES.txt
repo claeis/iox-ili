@@ -2,6 +2,10 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.13.1 (2016-08-xx)
+-----------------------------
+- object pool: check free memory over get/set calls of all pools
+
 iox-ili 1.13.0 (2016-08-11)
 -----------------------------
 - validator: fix mandatory check if attr type is a domain def
