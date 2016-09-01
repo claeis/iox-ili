@@ -29,30 +29,19 @@ import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
 import ch.interlis.iom.*;
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.ili2c.metamodel.*;
 
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-import jdbm.PrimaryTreeMap;
-import jdbm.RecordManager;
 import ch.interlis.iom_j.Iom_jObject;
-import ch.interlis.iom_j.itf.impl.ItfAreaLinetable2Polygon;
 import ch.interlis.iom_j.itf.impl.ItfAreaPolygon2Linetable;
-import ch.interlis.iom_j.itf.impl.ItfRawWriter;
-import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
-import ch.interlis.iom_j.itf.impl.JdbmUtility;
 
 /** This class implements an INTERLIS 1 writer.
  * @author ce
@@ -61,8 +50,7 @@ import ch.interlis.iom_j.itf.impl.JdbmUtility;
 public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 	private TransferDescription td=null;
 	private ItfWriter out=null;
-	private RecordManager recman = null;
-	private String cacheFileBasename=null;
+	private ObjectPoolManager recman = null;
 	private ArrayList itftablev=null; // Array<Viewable|AttributeDef itfTable> list of tables according to ITF
 	private HashMap tag2class=null;
 	private HashSet topics=null;
@@ -111,12 +99,7 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 		init();
 	}
 	private void init() throws IoxException{
-		cacheFileBasename=JdbmUtility.getCacheTmpFilename();
-		try {
-			recman=JdbmUtility.createRecordManager(cacheFileBasename);
-		} catch (IOException e) {
-			throw new IoxException(e);
-		}
+		recman=new ObjectPoolManager();
 	}
 	public void close()
 		throws IoxException 
@@ -127,12 +110,7 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 			out=null;
 		}
 		if(recman!=null){
-			try {
-				recman.close();
-				JdbmUtility.removeRecordManagerFiles(cacheFileBasename);
-			} catch (IOException e) {
-				throw new IoxException(e);
-			}
+			recman.close();
 		}
 		recman=null;
 		td=null;
@@ -233,7 +211,8 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 							if(areaAttrs.size()==0 && surfaceAttrs.size()==0){
 								// write objects
 								java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-								for(IomObject iomObj : pool.values()){
+								for(String poolId : pool.keySet()){
+									IomObject iomObj=pool.get(poolId);
 									out.write(new ObjectEvent(iomObj));
 								}
 							}else{
@@ -246,8 +225,8 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 									ItfAreaPolygon2Linetable allLines=new ItfAreaPolygon2Linetable();
 									// FORALL main objects
 									java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-									for(IomObject iomObj : pool.values()){
-										String mainObjTid=iomObj.getobjectoid();
+									for(String mainObjTid : pool.keySet()){
+										IomObject iomObj=pool.get(mainObjTid);
 										IomObject iomPolygon=iomObj.getattrobj(attrName, 0);
 										if(iomPolygon!=null){
 											String internalTid=iomObj.getattrvalue(INTERNAL_T_ID);
@@ -270,7 +249,8 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 								{
 									// FORALL main objects
 									java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-									for(IomObject iomObj : pool.values()){
+									for(String poolId : pool.keySet()){
+										IomObject iomObj=pool.get(poolId);
 										// FORALL area attrs
 										for(AttributeDef attr:areaAttrs){
 											String attrName=attr.getName();
@@ -295,7 +275,8 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 									EhiLogger.logState("build linetable "+lineTableName+"...");
 									// FORALL main objects
 									java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-									for(IomObject iomObj : pool.values()){
+									for(String poolId : pool.keySet()){
+										IomObject iomObj=pool.get(poolId);
 										// write line objects
 										IomObject polygon=iomObj.getattrobj(attrName, 0);
 										if(polygon!=null){
@@ -324,7 +305,7 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 		}
 	}
 	private java.util.Map<String, IomObject> getObjectPool(String classQName) throws IoxException {
-		PrimaryTreeMap<String, IomObject> m = recman.treeMap(classQName);
+		java.util.Map<String, IomObject> m = recman.newObjectPool();
 		return m;
 		
 	}

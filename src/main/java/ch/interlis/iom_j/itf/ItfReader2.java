@@ -24,32 +24,19 @@ package ch.interlis.iom_j.itf;
 
 
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.iox_j.*;
-import ch.interlis.iox_j.jts.Iox2jtsException;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
 import ch.interlis.iom_j.itf.impl.ItfAreaLinetable2Polygon;
-import ch.interlis.iom_j.itf.impl.ItfLineCursor;
-import ch.interlis.iom_j.itf.impl.ItfLineKind;
-import ch.interlis.iom_j.itf.impl.ItfScanner;
 import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
-import ch.interlis.iom_j.itf.impl.JdbmUtility;
-import ch.interlis.iom_j.itf.impl.ObjectPoolManager;
 import ch.interlis.iom.*;
 import ch.interlis.ili2c.metamodel.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Iterator;
-
-import javax.smartcardio.ATR;
-
-import jdbm.PrimaryTreeMap;
-import jdbm.RecordManager;
 
 /** This class implements an INTERLIS 1 reader.
  * @author ce
@@ -88,7 +75,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 		init(ignorePolygonBuildingErrors1);
 	}
 	private void init(boolean ignorePolygonBuildingErrors1){
-		objPool=new ObjectPoolManager<IomObject>();
+		objPool=new ObjectPoolManager();
 		ignorePolygonBuildingErrors=ignorePolygonBuildingErrors1;
 	}
 	@Override

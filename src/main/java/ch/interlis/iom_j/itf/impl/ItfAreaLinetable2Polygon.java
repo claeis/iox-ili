@@ -32,6 +32,7 @@ import com.vividsolutions.jts.operation.valid.IsValidOp;
 import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.CoordType;
@@ -107,12 +108,12 @@ public class ItfAreaLinetable2Polygon {
 		}
 		linattrTab=((AreaType)surfaceAttr.getDomainResolvingAliases()).getLineAttributeStructure();
 		helperTableGeomAttrName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableGeomAttrName(surfaceAttr);
-		objPool=new ObjectPoolManager<IomObject>();
+		objPool=new ObjectPoolManager();
 	}
 	public ItfAreaLinetable2Polygon(String geomAttr)
 	{
 		helperTableGeomAttrName=geomAttr;
-		objPool=new ObjectPoolManager<IomObject>();
+		objPool=new ObjectPoolManager();
 		
 	}
 	public void close()
