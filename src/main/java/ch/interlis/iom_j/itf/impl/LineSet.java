@@ -1,6 +1,8 @@
 package ch.interlis.iom_j.itf.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -35,15 +37,15 @@ public class LineSet {
 		linattrTab=lineattrTab;
 	}
 	
-	public ArrayList<CompoundCurve> buildBoundaries(ArrayList<IomObject> lines, JtsextGeometryFactory jtsFact) throws IoxException
+	public ArrayList<CompoundCurve> buildBoundaries(Map<String,IomObject> lines, JtsextGeometryFactory jtsFact) throws IoxException
 	{
 		ArrayList<ArrayList<CurveSegment>> boundaries=new ArrayList<ArrayList<CurveSegment>>();
 		ArrayList<String> boundaryTids=new ArrayList<String>();
 		//FORALL: alle Linien
 		ArrayList<CurveSegment> currentBoundary=null;
 		String currentBoundaryTid=null;
-		for(IomObject line:lines){
-			IomObject polyline=line.getattrobj(helperTableGeomAttrName, 0);
+		for(String line_tid:lines.keySet()){
+			IomObject polyline=lines.get(line_tid).getattrobj(helperTableGeomAttrName, 0);
 			com.vividsolutions.jts.geom.Coordinate currentSegmentStartpoint=null;
 			{
 				IomObject sequence=polyline.getattrobj("sequence",0);
@@ -55,7 +57,7 @@ public class LineSet {
 					boundaryTids.add(currentBoundaryTid);
 			  }
 			  // neuer Rand
-			currentBoundaryTid=line.getobjectoid();
+			currentBoundaryTid=line_tid;
 			  currentBoundary=new ArrayList<CurveSegment>();
 			if(linattrTab!=null){
 				// TODO handle lineattr

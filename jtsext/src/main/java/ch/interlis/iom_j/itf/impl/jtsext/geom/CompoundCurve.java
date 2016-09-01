@@ -313,20 +313,15 @@ public class CompoundCurve extends LineString {
 		}
 		
 	}
-	public String getSegmentTids() {
-		StringBuilder str=new StringBuilder();
-		String sep="";
+	public String[] getSegmentTids() {
 		java.util.HashSet<String> uniqueTids=new java.util.HashSet<String>();
 		for(CurveSegment seg:getSegments()){
 			String tid=seg.getUserData().toString();
 			if(!uniqueTids.contains(tid)){
-				str.append(sep);
-				str.append(tid);
-				sep=", ";
 				uniqueTids.add(tid);
 			}
 		}
-		return str.toString();
+		return uniqueTids.toArray(new String[uniqueTids.size()]);
 	}
 	public void dumpLineAsJava(String segs) {
 		for(CurveSegment seg:segments){

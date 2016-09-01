@@ -16,6 +16,7 @@ import com.vividsolutions.jts.operation.valid.IsValidOp;
 import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.NumericType;
@@ -98,9 +99,9 @@ Polygon aus Raendern zusammensetzen
 */	
 
 public class ItfSurfaceLinetable2Polygon {
-	private Map<String,Polygon> polygons=new HashMap<String,Polygon>();
+	private Map<String,Polygon> polygons=null;
 	private Set<String> mainTids=new java.util.HashSet<String>();
-	private Map<String,java.util.ArrayList<IomObject>> linepool=new HashMap<String,java.util.ArrayList<IomObject>>();
+	private Map<String,java.util.ArrayList<IomObject>> linepool=null;
 	private boolean surfacesBuilt=false;
 	private String helperTableMainTableRef=null;
 	private String helperTableGeomAttrName=null;
@@ -108,8 +109,16 @@ public class ItfSurfaceLinetable2Polygon {
 	private JtsextGeometryFactory jtsFact=new JtsextGeometryFactory();
 	private double maxOverlaps=0.0;
 	private double newVertexOffset=0.0;
-	public ItfSurfaceLinetable2Polygon(AttributeDef surfaceAttr)
+	private ObjectPoolManager objPool=null;
+	private boolean ignorePolygonBuildingErrors=false;
+	ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
+	private String linetableIliqname=null;
+	private String geomattrIliqname=null;
+	public ItfSurfaceLinetable2Polygon(AttributeDef surfaceAttr,boolean ignorePolygonBuildingErrors1)
 	{
+		linetableIliqname=surfaceAttr.getContainer().getScopedName(null)+"_"+surfaceAttr.getName();
+		geomattrIliqname=surfaceAttr.getContainer().getScopedName(null)+"."+surfaceAttr.getName();
+		ignorePolygonBuildingErrors=ignorePolygonBuildingErrors1;
 		PrecisionDecimal overlapDef=((SurfaceType)surfaceAttr.getDomainResolvingAliases()).getMaxOverlap();
 		if(overlapDef!=null){
 			maxOverlaps=overlapDef.doubleValue();
@@ -124,25 +133,44 @@ public class ItfSurfaceLinetable2Polygon {
 		linattrTab=((SurfaceType)surfaceAttr.getDomainResolvingAliases()).getLineAttributeStructure();
 		helperTableMainTableRef=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableMainTableRef(surfaceAttr);
 		helperTableGeomAttrName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableGeomAttrName(surfaceAttr);
+		objPool=new ObjectPoolManager();
+		polygons=objPool.newObjectPool();
 	}
 	public ItfSurfaceLinetable2Polygon(String tableRef, String geomAttr)
 	{
 		helperTableMainTableRef=tableRef;
 		helperTableGeomAttrName=geomAttr;
+		objPool=new ObjectPoolManager();
+		polygons=objPool.newObjectPool();
 		
+	}
+	public void close()
+	{
+		if(objPool!=null){
+			linepool=null;
+			polygons=null;
+			mainTids=null;
+			objPool.close();
+			objPool=null;
+		}
 	}
 	public void addItfLinetableObject(IomObject iomObj)
 	{
+		if(linepool==null){
+			linepool=objPool.newObjectPool();
+		}
 		IomObject structvalue=iomObj.getattrobj(helperTableMainTableRef,0);
 		String refoid=structvalue.getobjectrefoid();
 		java.util.ArrayList<IomObject> lines=null;
 		if(linepool.containsKey(refoid)){
-			lines=linepool.get(refoid);
+			lines=(ArrayList<IomObject>) linepool.get(refoid).clone();
+			lines.add(iomObj);
+			linepool.put(refoid,lines);
 		}else{
 			lines=new java.util.ArrayList<IomObject>();
+			lines.add(iomObj);
 			linepool.put(refoid,lines);
 		}
-		lines.add(iomObj);
 	}
 	public void addMainObjectTid(String tid)
 	{
@@ -169,15 +197,20 @@ public class ItfSurfaceLinetable2Polygon {
 	public void buildSurfaces() throws IoxException
 	{
 		surfacesBuilt=true;
+		if(linepool==null){
+			linepool=new HashMap<String,java.util.ArrayList<IomObject>>();
+		}
 		int totalObj=linepool.keySet().size();
 		int objc=1;
 		EhiLogger.traceState("build surfaces..."+helperTableGeomAttrName+", maxOverlaps "+maxOverlaps);
-
 		boolean isDisconnected=false;
 		for(String mainTid:linepool.keySet()){
 			//EhiLogger.debug("tid <"+mainTid+"> "+objc+"/"+totalObj);objc++;
-			ArrayList<IomObject> lines=linepool.get(mainTid);
-			
+			ArrayList<IomObject> lines1=linepool.get(mainTid);
+			HashMap<String,IomObject> lines=new HashMap<String,IomObject>();
+			for(IomObject line:lines1){
+				lines.put(line.getobjectoid(), line);
+			}
 			LineSet lineset=new LineSet(true,linattrTab,helperTableGeomAttrName);
 			
 			ArrayList<CompoundCurve> segv=lineset.buildBoundaries(lines,jtsFact);
@@ -210,7 +243,8 @@ public class ItfSurfaceLinetable2Polygon {
 								  Math.abs(segIndex0-segIndex1)==1 
 								  || Math.abs(segIndex0-segIndex1)==e0.getNumSegments()-1  ) // bei Ring: letztes Segment und Erstes Segment
 								  && (is.isIntersection(p00) || is.isIntersection(p01))
-								  && (is.isIntersection(p10) || is.isIntersection(p11))){
+								  && (is.isIntersection(p10) || is.isIntersection(p11))
+								  && is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
 							// aufeinanderfolgende Segmente der selben Linie
 							  // overlap entfernen
 							  if(is!=null){
@@ -227,13 +261,18 @@ public class ItfSurfaceLinetable2Polygon {
 								  e0.removeOverlap((ArcSegment) seg0, seg1, newVertexOffset);
 							  }
 					}else{
-						EhiLogger.logError("intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
-						EhiLogger.traceState(is.toString());
+						String []tids=new String[2];
+						tids[0]=(String) is.getCurve1().getUserData();
+						tids[1]=(String) is.getCurve2().getUserData();
+						dataerrs.add(new IoxInvalidDataException("intersection",linetableIliqname,tids,Jtsext2iox.JTS2coord(is.getPt()[0])));
+						if(is.getPt().length==2){
+							dataerrs.add(new IoxInvalidDataException("intersection",linetableIliqname,tids,Jtsext2iox.JTS2coord(is.getPt()[1])));
+						}
 						hasIntersections=true;
 					}
 				}
 				if(hasIntersections){
-					throw new IoxException("intersections");
+					throw new IoxInvalidDataException("intersections");
 				}
 			}
 			IoxPolygonizer polygonizer=new IoxPolygonizer(newVertexOffset);
@@ -244,24 +283,41 @@ public class ItfSurfaceLinetable2Polygon {
 			Collection cutEdges = polygonizer.getCutEdges();
 			if(!cutEdges.isEmpty()){
 				for(Object edge:cutEdges){
-					EhiLogger.logError("cut edge: tids "+((CompoundCurve) edge).getSegmentTids()+", "+edge);
+					try {
+						dataerrs.add(new IoxInvalidDataException("cut edge",linetableIliqname,((CompoundCurve) edge).getSegmentTids(),Jtsext2iox.JTS2polyline((CompoundCurve)edge)));
+					} catch (Iox2jtsException e) {
+						throw new IllegalStateException(e);
+					}
 				}
-				throw new IoxInvalidDataException("cut edges");
+				if(!ignorePolygonBuildingErrors){
+					throw new IoxInvalidDataException("cut edges");
+				}
 			}
 			Collection dangles=polygonizer.getDangles();
 			if(!dangles.isEmpty()){
 				for(Object dangle:dangles){
-					EhiLogger.logError("dangle: tids "+((CompoundCurve) dangle).getSegmentTids()+", "+dangle);
+					try {
+						dataerrs.add(new IoxInvalidDataException("dangle",linetableIliqname,((CompoundCurve) dangle).getSegmentTids(),Jtsext2iox.JTS2polyline((CompoundCurve)dangle)));
+					} catch (Iox2jtsException e) {
+						throw new IllegalStateException(e);
+					}
 				}
-				throw new IoxInvalidDataException("dangles");
+				if(!ignorePolygonBuildingErrors){
+					throw new IoxInvalidDataException("dangles");
+				}
 			}
 			Collection invalidRingLines=polygonizer.getInvalidRingLines();
 			if(!invalidRingLines.isEmpty()){
 				for(Object invalidRingLine:invalidRingLines){
-					EhiLogger.logError("invalid ring line: tids "+((CompoundCurve) invalidRingLine).getSegmentTids()+", "+invalidRingLine);
-					//((CompoundCurve) invalidRingLine).dumpLineAsJava();
+					try {
+						dataerrs.add(new IoxInvalidDataException("invald ring line",linetableIliqname,((CompoundCurve) invalidRingLine).getSegmentTids(),Jtsext2iox.JTS2polyline((CompoundCurve)invalidRingLine)));
+					} catch (Iox2jtsException e) {
+						throw new IllegalStateException(e);
+					}
 				}
-				throw new IoxInvalidDataException("invalid ring lines");
+				if(!ignorePolygonBuildingErrors){
+					throw new IoxInvalidDataException("invalid ring lines");
+				}
 			}
 			Collection<Polygon> polys = polygonizer.getPolygons();
 			if(polys.isEmpty()){
@@ -287,7 +343,13 @@ public class ItfSurfaceLinetable2Polygon {
 					if(shell.contains(holeEnv)){
 					}else{
 						isDisconnected=true;
-						EhiLogger.logError("multipolygon with tid "+mainTid+", polygonN "+holePoly);
+						try {
+							String tids[]=new String[1];
+							tids[0]=mainTid;
+							dataerrs.add(new IoxInvalidDataException("multipolygon",geomattrIliqname,tids,Jtsext2iox.JTS2surface(holePoly)));
+						} catch (Iox2jtsException e) {
+							throw new IllegalStateException(e);
+						}
 					}
 				}
 				
@@ -300,6 +362,9 @@ public class ItfSurfaceLinetable2Polygon {
 		if(isDisconnected){
 			throw new IoxInvalidDataException("multipolygon detected");
 		}
+	}
+	public ArrayList<IoxInvalidDataException> getDataerrs() {
+		return dataerrs;
 	}
 }
 

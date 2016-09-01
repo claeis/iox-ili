@@ -20,34 +20,28 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
  * DEALINGS IN THE SOFTWARE.
  */
-package ch.interlis.ilirepository;
+package ch.interlis.iox_j.wkb;
 
-import java.util.Iterator;
-import java.util.ArrayList;
-
-/** represents an ilisite.xml file.
+/** Any converter error.
+ * @author ce
+ * @version $Revision: 1.0 $ $Date: 07.08.2006 $
  */
-public class IliSite {
-	private ArrayList<String> parents=new ArrayList<String>();
-	private ArrayList<String> subsidiaries=new ArrayList<String>();
-	/** adds a link to a parent repository.
-	 */
-	public void addParentSite(String uri){
-		parents.add(uri);
+public class Iox2wkbException extends Exception {
+
+	public Iox2wkbException() {
+		super();
 	}
-	/** access to list of links to parent repositories.
-	 */
-	public Iterator<String> iteratorParentSite(){
-		return parents.iterator();
+
+	public Iox2wkbException(String message) {
+		super(message);
 	}
-	/** adds a link to a subsidiary repository.
-	 */
-	public void addSubsidiarySite(String uri){
-		subsidiaries.add(uri);
+
+	public Iox2wkbException(Throwable cause) {
+		super(cause);
 	}
-	/** access to list of links to subsidiary repositories.
-	 */
-	public Iterator<String> iteratorSubsidiarySite(){
-		return subsidiaries.iterator();
+
+	public Iox2wkbException(String message, Throwable cause) {
+		super(message, cause);
 	}
+
 }

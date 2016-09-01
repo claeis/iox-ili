@@ -29,6 +29,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.iom.*;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox.EndBasketEvent;
@@ -45,16 +46,12 @@ import ch.interlis.iom_j.ViewableProperties;
 import ch.interlis.iom_j.ViewableProperty;
 import ch.interlis.iom_j.itf.ModelUtilities;
 import ch.interlis.iom_j.itf.impl.ItfAreaPolygon2Linetable;
-import ch.interlis.iom_j.itf.impl.JdbmUtility;
 import ch.interlis.iom_j.xtf.Ili2cUtility;
 import ch.interlis.iom_j.xtf.XtfModel;
 import ch.interlis.ili2c.generator.Gml32Generator;
-import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.Element;
-import ch.interlis.ili2c.metamodel.SurfaceType;
-import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.Type;
 import ch.interlis.ili2c.metamodel.Viewable;
@@ -64,11 +61,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-
-import jdbm.PrimaryTreeMap;
-import jdbm.RecordManager;
+import java.util.Map;
 
 	/** Writer of an INTERLIS 2 transfer file.
 	 * @author ceis
@@ -76,8 +72,7 @@ import jdbm.RecordManager;
     public class Iligml10Writer implements ch.interlis.iox.IoxWriter
     {
         private XMLStreamWriter xout=null;
-    	private RecordManager recman = null;
-    	private String cacheFileBasename=null;
+    	private ObjectPoolManager recman = null;
         private ViewableProperties mapping = null;
     	private XtfModel xtfModels[]=null;
         private java.util.HashMap nameMapping=null;
@@ -125,12 +120,7 @@ import jdbm.RecordManager;
             mapping = createMapping(td);
             nameMapping=ch.interlis.ili2c.generator.Gml32Generator.createName2NameMapping(td);
             xtfModels=Ili2cUtility.buildModelList(td);
-    		cacheFileBasename=JdbmUtility.getCacheTmpFilename();
-    		try {
-    			recman=JdbmUtility.createRecordManager(cacheFileBasename);
-    		} catch (IOException e) {
-    			throw new IoxException(e);
-    		}
+			recman=new ObjectPoolManager();
 			XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 			//if (useRepairing) {
 			//	outputFactory.setProperty("javax.xml.stream.isRepairingNamespaces", Boolean.TRUE);
@@ -193,13 +183,12 @@ import jdbm.RecordManager;
 				}
 				xout=null;
         	}
+        	if(pools!=null){
+        		pools.clear();
+        		pools=null;
+        	}
     		if(recman!=null){
-    			try {
-    				recman.close();
-    				JdbmUtility.removeRecordManagerFiles(cacheFileBasename);
-    			} catch (IOException e) {
-    				throw new IoxException(e);
-    			}
+				recman.close();
     		}
     		recman=null;
         }
@@ -282,6 +271,7 @@ import jdbm.RecordManager;
         private void writeStartBasket(String type,String bid,int consistency, int kind,String startstate,String endstate, String[] topicv)
 		throws IoxException
         {
+        	pools=new java.util.HashMap<String, java.util.Map<String,IomObject>>();
         	currentTopic=type;
 			try{
 				xout.writeStartElement(xmlns_ili,Gml32Generator.TRANSFERMEMBER);
@@ -311,6 +301,10 @@ import jdbm.RecordManager;
         	modelName=currentTopic.substring(0,mdlNameSep);
         	topicName=currentTopic.substring(mdlNameSep+1);
         	flushBasket(modelName,topicName);
+        	for(Map<String, IomObject> m:pools.values()){
+        		m.clear();
+        	}
+        	pools=null;
 			try{
 				xout.writeEndElement();
 				newline();
@@ -336,7 +330,8 @@ import jdbm.RecordManager;
 				if(areaAttrs.size()==0){
 					// write objects
 					java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-					for(IomObject iomObj : pool.values()){
+					for(String objId : pool.keySet()){
+						IomObject iomObj=pool.get(objId);
 						writeInternalObject(iomObj);
 					}
 				}else{
@@ -349,7 +344,8 @@ import jdbm.RecordManager;
 						ItfAreaPolygon2Linetable allLines=new ItfAreaPolygon2Linetable();
 						// FORALL main objects
 						java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-						for(IomObject iomObj : pool.values()){
+						for(String poolId : pool.keySet()){
+							IomObject iomObj=pool.get(poolId);
 							String mainObjTid=iomObj.getobjectoid();
 							IomObject iomPolygon=iomObj.getattrobj(attrName, 0);
 							if(iomPolygon!=null){
@@ -373,7 +369,8 @@ import jdbm.RecordManager;
 					{
 						// FORALL main objects
 						java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-						for(IomObject iomObj : pool.values()){
+						for(String poolId : pool.keySet()){
+							IomObject iomObj=pool.get(poolId);
 							// FORALL area attrs
 							for(AttributeDef attr:areaAttrs){
 								String attrName=attr.getName();
@@ -995,8 +992,14 @@ import jdbm.RecordManager;
         {
         	return "iox"+Integer.toString(tid++);
         }
+        java.util.HashMap<String,java.util.Map<String, IomObject>> pools=null;
     	private java.util.Map<String, IomObject> getObjectPool(String classQName) throws IoxException {
-    		PrimaryTreeMap<String, IomObject> m = recman.treeMap(classQName);
+    		java.util.Map<String, IomObject> m=null;
+    		m=pools.get(classQName);
+    		if(m==null){
+        		m = recman.newObjectPool();
+    			pools.put(classQName,m);
+    		}
     		return m;
     		
     	}

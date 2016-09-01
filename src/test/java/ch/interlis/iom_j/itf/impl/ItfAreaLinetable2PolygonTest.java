@@ -4,10 +4,12 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import com.vividsolutions.jts.geom.TopologyException;
+import com.vividsolutions.jts.geom.Polygon;
 
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxException;
+import ch.interlis.iox_j.jts.Iox2jts;
+import ch.interlis.iox_j.jts.Iox2jtsException;
 
 public class ItfAreaLinetable2PolygonTest {
 
@@ -234,6 +236,14 @@ public class ItfAreaLinetable2PolygonTest {
 		
 		builder.buildSurfaces();
 		IomObject polygon=builder.getSurfaceObject(mainObjectTid);
+		Polygon jtsPolygon;
+		try {
+			jtsPolygon = Iox2jts.surface2JTS(polygon, 0.0);
+			System.out.println(jtsPolygon.toText());
+		} catch (Iox2jtsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//System.out.println(polygon);
 		assertEquals("MULTISURFACE {surface SURFACE {boundary ["
 				+ "BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}, "

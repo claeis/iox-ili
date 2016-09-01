@@ -48,6 +48,7 @@ class EdgeRing {
       Envelope tryShellEnv = tryShellRing.getEnvelopeInternal();
       // the hole envelope cannot equal the shell envelope
       // (also guards against testing rings against themselves)
+      if(isSameRing(tryShell,testEr)) continue;
       if (tryShellEnv.equals(testEnv)) continue;
       // hole must be contained in shell
       if (! tryShellEnv.contains(testEnv)) continue;
@@ -69,7 +70,30 @@ class EdgeRing {
     return minShell;
   }
 
-  /**
+  private static boolean isSameRing(EdgeRing tryShell, EdgeRing testEr) {
+	  List edge1=DirectedEdge.toEdges(tryShell.deList);
+	  List edge2=DirectedEdge.toEdges(testEr.deList);
+	  int trySize=edge1.size();
+	  if(trySize!=edge2.size()){
+		  return false;
+	  }
+	  if(edge1.get(0)==edge2.get(0)){
+		  for(int i=0;i<trySize;i++){
+			  if(edge1.get(i)!=edge2.get(i)){
+				  return false;
+			  }
+		  }
+	  }else{
+		  for(int i=0;i<trySize;i++){
+			  if(edge1.get(i)!=edge2.get(trySize-i-1)){
+				  return false;
+			  }
+		  }
+	  }
+	return true;
+}
+
+/**
    * Finds a point in a list of points which is not contained in another list of points
    * @param testPts the {@link Coordinate}s to test
    * @param pts an array of {@link Coordinate}s to test the input points against

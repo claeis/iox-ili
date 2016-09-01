@@ -24,31 +24,19 @@ package ch.interlis.iom_j.itf;
 
 
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.iox_j.*;
-import ch.interlis.iox_j.jts.Iox2jtsException;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
 import ch.interlis.iom_j.itf.impl.ItfAreaLinetable2Polygon;
-import ch.interlis.iom_j.itf.impl.ItfLineCursor;
-import ch.interlis.iom_j.itf.impl.ItfLineKind;
-import ch.interlis.iom_j.itf.impl.ItfScanner;
 import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
-import ch.interlis.iom_j.itf.impl.JdbmUtility;
 import ch.interlis.iom.*;
 import ch.interlis.ili2c.metamodel.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Iterator;
-
-import javax.smartcardio.ATR;
-
-import jdbm.PrimaryTreeMap;
-import jdbm.RecordManager;
 
 /** This class implements an INTERLIS 1 reader.
  * @author ce
@@ -63,31 +51,32 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 	private java.util.Map<String,IomObject> currentMainObjs=null;
 	private HashMap<AttributeDef,ItfSurfaceLinetable2Polygon> currentSurfaceAttrs=null;
 	private HashMap<AttributeDef,ItfAreaLinetable2Polygon> currentAreaAttrs=null;
-	private RecordManager recman = null;
-	
+	private ObjectPoolManager objPool=null;
 	private ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
+	private boolean ignorePolygonBuildingErrors=false;
 	/** Creates a new reader.
 	 * @param in Input stream to read from.
 	 * @throws IoxException
 	 */
-	public ItfReader2(java.io.InputStream in)
+	public ItfReader2(java.io.InputStream in,boolean ignorePolygonBuildingErrors1)
 	throws IoxException
 	{
 		rawReader=new ItfReader(in);
-		init();
+		init(ignorePolygonBuildingErrors1);
 	}
 	/** Creates a new reader.
 	 * @param in File to read from.
 	 * @throws IoxException
 	 */
-	public ItfReader2(java.io.File in)
+	public ItfReader2(java.io.File in,boolean ignorePolygonBuildingErrors1)
 	throws IoxException
 	{
 		rawReader=new ItfReader(in);
-		init();
+		init(ignorePolygonBuildingErrors1);
 	}
-	private void init(){
-		cacheFileBasename=JdbmUtility.getCacheTmpFilename();
+	private void init(boolean ignorePolygonBuildingErrors1){
+		objPool=new ObjectPoolManager();
+		ignorePolygonBuildingErrors=ignorePolygonBuildingErrors1;
 	}
 	@Override
 	public void close() throws IoxException {
@@ -95,15 +84,11 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 			rawReader.close();
 		}
 		rawReader=null;
-		if(recman!=null){
-			try {
-				recman.close();
-				JdbmUtility.removeRecordManagerFiles(cacheFileBasename);
-			} catch (IOException e) {
-				throw new IoxException(e);
-			}
+		closePolygonizers();
+		if(objPool!=null){
+			objPool.close();
+			objPool=null;
 		}
-		recman=null;
 	}
 	@Override
 	public IomObject createIomObject(String type, String oid)
@@ -142,6 +127,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 				}
 				return new ObjectEvent(nextObj);
 			}
+			closePolygonizers();
 			currentMainObjs=null;
 			currentSurfaceAttrs=null;
 			currentAreaAttrs=null;
@@ -217,11 +203,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 				// maintable
 				surfaceOrAreaAttr=null;
 				//mainObjs=new HashMap<String,IomObject>();
-				try {
-					currentMainObjs=getObjectPool();
-				} catch (IOException e1) {
-					throw new IoxException(e1);
-				}
+				currentMainObjs=objPool.newObjectPool();
 				iliQName=aclass.getScopedName(null);
 				while(true){
 					  // collect objects
@@ -316,7 +298,9 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 					ItfAreaLinetable2Polygon polygonizer=currentAreaAttrs.get(areaAttr);
 					try {
 						polygonizer.buildSurfaces();
+						dataerrs.addAll(polygonizer.getDataerrs());
 					} catch (IoxInvalidDataException e) {
+						dataerrs.addAll(polygonizer.getDataerrs());
 						dataerrs.add(new IoxInvalidDataException("failed to build polygons of "+aclass.getScopedName(null)+"."+areaAttrName,e));
 						continue;
 					}
@@ -327,7 +311,9 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 					ItfSurfaceLinetable2Polygon polygonizer=currentSurfaceAttrs.get(surfaceAttr);
 					try {
 						polygonizer.buildSurfaces();
+						dataerrs.addAll(polygonizer.getDataerrs());
 					} catch (IoxInvalidDataException e) {
+						dataerrs.addAll(polygonizer.getDataerrs());
 						dataerrs.add( new IoxInvalidDataException("failed to build polygons of "+aclass.getScopedName(null)+"."+surfaceAttrName,e));
 						continue;
 					}
@@ -361,6 +347,25 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 		}
 		return rawEvent;
 	}
+	private void closePolygonizers() {
+		if(currentAreaAttrs!=null){
+			// FOR all area attrs: cleanup
+			for(AttributeDef areaAttr : currentAreaAttrs.keySet()){
+				String areaAttrName=areaAttr.getName();
+				ItfAreaLinetable2Polygon polygonizer=currentAreaAttrs.get(areaAttr);
+				polygonizer.close();
+			}
+			
+		}
+		if(currentSurfaceAttrs!=null){
+			// FOR all surface attrs: cleanup
+			for(AttributeDef surfaceAttr : currentSurfaceAttrs.keySet()){
+				String surfaceAttrName=surfaceAttr.getName();
+				ItfSurfaceLinetable2Polygon polygonizer=currentSurfaceAttrs.get(surfaceAttr);
+				polygonizer.close();
+			}
+		}
+	}
 	private void mergeSurfaceGeomToMainObj(String surfaceAttrName,
 			ItfSurfaceLinetable2Polygon polygonizer, String mainObjOid,
 			IomObject mainObj) throws IoxException {
@@ -390,17 +395,6 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 			dataerrs.add(e);
 		}
 	}
-	private java.util.Map<String, IomObject> getObjectPool() throws IOException {
-		if(recman!=null){
-			recman.close();
-			JdbmUtility.removeRecordManagerFiles(cacheFileBasename);
-		}
-		recman=JdbmUtility.createRecordManager(cacheFileBasename);
-		PrimaryTreeMap<String, IomObject> m = recman.treeMap("hugemap");
-		return m;
-		
-	}
-	private String cacheFileBasename=null;
 	private IoxEvent _next_Event=null;
 	private void pushBackEvent(IoxEvent rawEvent) {
 		if(_next_Event!=null){
@@ -446,9 +440,9 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 			AttributeDef attr = (AttributeDef) attrObj;
 			Type type = Type.findReal (attr.getDomain());
 			if(type instanceof SurfaceType){
-				attrs_surfaceAttrs.put(attr, new ItfSurfaceLinetable2Polygon(attr));
+				attrs_surfaceAttrs.put(attr, new ItfSurfaceLinetable2Polygon(attr,ignorePolygonBuildingErrors));
 			}else if(type instanceof AreaType){
-				attrs_areaAttrs.put(attr, new ItfAreaLinetable2Polygon(attr));
+				attrs_areaAttrs.put(attr, new ItfAreaLinetable2Polygon(attr,ignorePolygonBuildingErrors));
 			}
 		  }
 		}

@@ -48,7 +48,7 @@ public class ItfAreaLinetable2PolygonIli2cTest {
 	public void test1() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
-		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr);
+		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
 		ItfReader reader=new ItfReader(new File("test/data/TestArea1.itf"));
 		reader.setModel(td);
 		IoxEvent event=null;
@@ -78,7 +78,7 @@ public class ItfAreaLinetable2PolygonIli2cTest {
 	public void test1b() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
-		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr);
+		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
 		ItfReader reader=new ItfReader(new File("test/data/TestArea1b.itf"));
 		reader.setModel(td);
 		IoxEvent event=null;

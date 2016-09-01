@@ -1,7 +1,41 @@
 ideas/open issues
 ----------------------------
 - add xml validation
-- add checker
+
+iox-ili 1.13.1 (2016-08-29)
+-----------------------------
+- object pool: check free memory over get/set calls of all pools
+
+iox-ili 1.13.0 (2016-08-11)
+-----------------------------
+- validator: fix mandatory check if attr type is a domain def
+- object pool: replaced jdbm by own implementation that really frees heap if objects written to file
+
+iox-ili 1.12.0 (2016-06-08)
+-----------------------------
+- added validator
+- ili2c-4.5.23
+
+iox-ili 1.11.5 (2016-04-07)
+-----------------------------
+- ehibasics-1.1.0
+- ili2c-4.5.22
+- free object pool resources used by AREA/SURFACE polygon builders
+
+iox-ili 1.11.4 (2016-02-04)
+-----------------------------
+- fixed WKT of CURVEPOLYGON
+- moved in iox to wkb conversion
+- fixed lost inner ring (if bbox calculated from cw and ccw line not exactly equal)
+- jts-1.14
+- add ignorePolygonBuildingErrors to ItfReader2
+- refactored ItfReader2 error reporting
+- refactored dependency to ili2c.jar
+
+iox-ili 1.11.2 (2015-12-09)
+-----------------------------
+- fixed IndexOutOfBoundsException in ISCICR()
+- ItfReader2: fixed ClassCastException
 
 iox-ili 1.11.1 (2015-11-23)
 -----------------------------
