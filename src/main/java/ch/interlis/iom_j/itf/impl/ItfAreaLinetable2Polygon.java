@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jdbm.RecordManager;
 
 import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
 import com.vividsolutions.jts.algorithm.locate.SimplePointInAreaLocator;

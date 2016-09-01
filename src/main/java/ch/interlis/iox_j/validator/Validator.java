@@ -262,7 +262,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					// skip it
 				}else{
 					if( attr.isDomainBoolean()) {
-					}else if(attr.isDomainIliUuid()){
+						// value has to be "true" or "false"
+						String valueStr=iomObj.getattrvalue(attrName);
+						if(valueStr.equals("true") || valueStr.equals("false")){
+							// skip it
+						}else{
+							 logMsg(checkType,"value <{0}> is not a BOOLEAN", valueStr);
+						}
+					}else if(attr.isDomainIliUuid()){						
 					}else if(attr.isDomainIli1Date()) {
 					}else if(attr.isDomainIli2Date()) {
 					}else if(attr.isDomainIli2Time()) {
