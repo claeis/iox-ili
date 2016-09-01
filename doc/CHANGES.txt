@@ -2,7 +2,7 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
-iox-ili 1.13.1 (2016-08-xx)
+iox-ili 1.13.1 (2016-08-29)
 -----------------------------
 - object pool: check free memory over get/set calls of all pools
 
