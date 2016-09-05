@@ -105,7 +105,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		Object modelele=tag2class.get(tag);
 		if(modelele==null){
 			if(!unknownTypev.contains(tag)){
-				errs.addEvent(errFact.logErrorMsg("unknown type <{0}>",tag));
+				errs.addEvent(errFact.logErrorMsg("unknown class <{0}>",tag));
 			}
 			return;
 		}
