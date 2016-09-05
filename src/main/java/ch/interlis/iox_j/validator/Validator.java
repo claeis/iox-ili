@@ -15,6 +15,7 @@ import ch.interlis.ili2c.metamodel.Cardinality;
 import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.EnumerationType;
+import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.PolylineType;
@@ -283,12 +284,72 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(ValidationConfig.OFF.equals(checkType)){
 					// skip it
 				}else{
-					if( attr.isDomainBoolean()) {
-					}else if(attr.isDomainIliUuid()){
-					}else if(attr.isDomainIli1Date()) {
-					}else if(attr.isDomainIli2Date()) {
-					}else if(attr.isDomainIli2Time()) {
-					}else if(attr.isDomainIli2DateTime()) {
+					if (attr.isDomainBoolean()) {
+						// Value has to be not null and ("true" or "false")
+						String valueStr = iomObj.getattrvalue(attrName);
+						if (valueStr == null || (valueStr.equals("true") || valueStr.equals("false"))) {
+							// Value okay, skip it
+						} else {
+							logMsg(checkType, "value <{0}> is not a BOOLEAN", valueStr);
+						}
+					} else if (attr.isDomainIliUuid()) {
+						// Value is exactly 36 chars long and matches the regex
+						String valueStr = iomObj.getattrvalue(attrName);
+						if (valueStr == null || valueStr.length() == 36 && valueStr.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}?")) {
+								// Value ok, Skip it
+						} else {
+							logMsg(checkType, "value <{0}> is not a valid UUID", valueStr);
+						}
+					} else if (attr.isDomainIli1Date()) {
+						String valueStr = iomObj.getattrvalue(attrName);
+						// Value has to be not null and exactly 8 numbers long
+						if (valueStr == null){
+							// no value, skip test
+						}else if(valueStr.length() == 8) {
+							// Value has to be a number
+							try {
+								int year = Integer.parseInt(valueStr.substring(0, 4));
+								int month = Integer.parseInt(valueStr.substring(4, 6));
+								int day = Integer.parseInt(valueStr.substring(6, 8));
+								// Substring value: year, month and day has to be in valid range
+								if (year >= 1582 && year <= 2999 && month >= 01 && month <= 12
+										&& day >= 01 && day <= 31) {
+								} else {
+									logMsg(checkType, "value <{0}> is not in range", valueStr);
+								}
+							} catch (NumberFormatException numberformatexception) {
+								logMsg(checkType, "value <{0}> is not a valid Date", valueStr);
+							}
+						} else {
+							logMsg(checkType, "value <{0}> is not a valid Date", valueStr);
+						}
+					} else if (attr.isDomainIli2Date()) {
+						// Value matches regex and is not null and is in range of type.
+						String valueStr = iomObj.getattrvalue(attrName);
+						FormattedType subType = (FormattedType) type;
+						if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr)) {
+							// Value okay, skip it
+						} else {
+							logMsg(checkType, "value <{0}> is not a valid Date", valueStr);
+						}
+					} else if (attr.isDomainIli2Time()) {
+						// Value is not null and matches 0:0:0.000-23:59:59.999
+						String valueStr = iomObj.getattrvalue(attrName);
+						FormattedType subType = (FormattedType) type;
+						if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr)) {
+							// Value okay, skip it
+						} else {
+							logMsg(checkType, "value <{0}> is not a valid Time", valueStr);
+						}
+					} else if (attr.isDomainIli2DateTime()) {
+						// Value is not null
+						String valueStr = iomObj.getattrvalue(attrName);
+						FormattedType subType = (FormattedType) type;
+						if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr)) {
+							// Value okay, skip it
+						} else {
+							logMsg(checkType, "value <{0}> is not a valid DateTime", valueStr);
+						}
 					}else if (type instanceof PolylineType){
 					}else if(type instanceof SurfaceOrAreaType){
 					}else if(type instanceof CoordType){
