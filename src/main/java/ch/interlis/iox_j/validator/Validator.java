@@ -124,6 +124,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				errs.addEvent(errFact.logErrorMsg("Object must be a non-abstract class"));
 			}
 		}
+		HashSet<String> propNames=new HashSet<String>();
 		Iterator iter = aclass1.getAttributesAndRoles2();
 		while (iter.hasNext()) {
 			ViewableTransferElement obj = (ViewableTransferElement)iter.next();
@@ -134,6 +135,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(proxyType!=null && (proxyType instanceof ObjectType)){
 						// skip implicit particles (base-viewables) of views
 					}else{
+						propNames.add(attr.getName());
 						checkAttrValue(iomObj,attr,null);
 					}
 				}
@@ -152,6 +154,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								// not just a link?
 								IomObject structvalue = iomObj.getattrobj(
 										roleName, 0);
+								propNames.add(roleName);
 								if (roleOwner.getAttributes().hasNext()
 										|| roleOwner
 												.getLightweightAssociations()
@@ -180,6 +183,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						} else {
 							IomObject structvalue = iomObj.getattrobj(
 									roleName, 0);
+							propNames.add(roleName);
 							refoid = structvalue.getobjectrefoid();
 							long orderPos = structvalue
 									.getobjectreforderpos();
@@ -200,6 +204,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			 }
 		}
+		// check if no superfluous properties
+		int propc=iomObj.getattrcount();
+		for(int propi=0;propi<propc;propi++){
+			String propName=iomObj.getattrname(propi);
+			if(propName.startsWith("_")){
+				// ok, software internal properties start with a '_'
+			}else{
+				if(!propNames.contains(propName)){
+					errs.addEvent(errFact.logErrorMsg("unknown property <{0}>",propName));
+				}
+			}
+		}
+		
 	}
 
 	private void checkAttrValue(IomObject iomObj, AttributeDef attr,String attrPath) {
@@ -233,7 +250,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							Object modelele=tag2class.get(tag);
 							if(modelele==null){
 								if(!unknownTypev.contains(tag)){
-									errs.addEvent(errFact.logErrorMsg("unknown type <{0}>",tag));
+									errs.addEvent(errFact.logErrorMsg("unknown class <{0}>",tag));
 								}
 							}else{
 								Viewable structEleClass=(Viewable) modelele;
