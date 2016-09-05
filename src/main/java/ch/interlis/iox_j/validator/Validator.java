@@ -43,6 +43,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private TransferDescription td=null;
 	private boolean doItfLineTables=false;
 	private Settings config=null;
+	private boolean validationOff=false;
 
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
 			IoxLogging errs, LogEventFactory errFact, Settings config) {
@@ -59,6 +60,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			tag2class=ch.interlis.ili2c.generator.XSDGenerator.getTagMap(td);
 		}
 		unknownTypev=new HashSet<String>();
+		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
 	}
 
 	/** mappings from xml-tags to Viewable|AttributeDef
@@ -88,6 +90,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	@Override
 	public void validate(ch.interlis.iox.IoxEvent event) {
+		if(validationOff){
+			return;
+		}
 		if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=((ch.interlis.iox.ObjectEvent)event).getIomObject();
 			checkObject(iomObj,null);
