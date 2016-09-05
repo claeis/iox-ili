@@ -9,11 +9,13 @@ import java.util.Iterator;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
+import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.Cardinality;
 import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.CoordType;
+import ch.interlis.ili2c.metamodel.Domain;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.NumericType;
@@ -128,6 +130,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			// check that object is instance of a concrete class
 			if(aclass1.isAbstract()){
 				errs.addEvent(errFact.logErrorMsg("Object must be a non-abstract class"));
+			}
+			if(aclass1 instanceof AbstractClassDef){
+				Domain oidType=((AbstractClassDef) aclass1).getOid();
+				if(oidType!=null && oidType==td.INTERLIS.UUIDOID){
+					String oid=iomObj.getobjectoid();
+					if(!isValidUuid(oid)){
+						errs.addEvent(errFact.logErrorMsg("TID <{0}> is not a valid UUID", oid));
+					}
+				}
 			}
 		}
 		HashSet<String> propNames=new HashSet<String>();
@@ -295,7 +306,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					} else if (attr.isDomainIliUuid()) {
 						// Value is exactly 36 chars long and matches the regex
 						String valueStr = iomObj.getattrvalue(attrName);
-						if (valueStr == null || valueStr.length() == 36 && valueStr.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}?")) {
+						if (valueStr == null || isValidUuid(valueStr)) {
 								// Value ok, Skip it
 						} else {
 							logMsg(checkType, "value <{0}> is not a valid UUID", valueStr);
@@ -412,6 +423,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			
 		
+	}
+
+	public boolean isValidUuid(String valueStr) {
+		return valueStr.length() == 36 && valueStr.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}?");
 	}
 	private void logMsg(String checkKind,String msg,String... args){
 		 if(ValidationConfig.WARNING.equals(checkKind)){
