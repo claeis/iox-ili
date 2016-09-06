@@ -9,11 +9,13 @@ import java.util.Iterator;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
+import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.Cardinality;
 import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.CoordType;
+import ch.interlis.ili2c.metamodel.Domain;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.NumericType;
@@ -44,6 +46,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private TransferDescription td=null;
 	private boolean doItfLineTables=false;
 	private Settings config=null;
+	private boolean validationOff=false;
 
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
 			IoxLogging errs, LogEventFactory errFact, Settings config) {
@@ -60,6 +63,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			tag2class=ch.interlis.ili2c.generator.XSDGenerator.getTagMap(td);
 		}
 		unknownTypev=new HashSet<String>();
+		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
 	}
 
 	/** mappings from xml-tags to Viewable|AttributeDef
@@ -89,6 +93,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	@Override
 	public void validate(ch.interlis.iox.IoxEvent event) {
+		if(validationOff){
+			return;
+		}
 		if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=((ch.interlis.iox.ObjectEvent)event).getIomObject();
 			checkObject(iomObj,null);
@@ -106,7 +113,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		Object modelele=tag2class.get(tag);
 		if(modelele==null){
 			if(!unknownTypev.contains(tag)){
-				errs.addEvent(errFact.logErrorMsg("unknown type <{0}>",tag));
+				errs.addEvent(errFact.logErrorMsg("unknown class <{0}>",tag));
 			}
 			return;
 		}
@@ -124,7 +131,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(aclass1.isAbstract()){
 				errs.addEvent(errFact.logErrorMsg("Object must be a non-abstract class"));
 			}
+			if(aclass1 instanceof AbstractClassDef){
+				Domain oidType=((AbstractClassDef) aclass1).getOid();
+				if(oidType!=null && oidType==td.INTERLIS.UUIDOID){
+					String oid=iomObj.getobjectoid();
+					if(!isValidUuid(oid)){
+						errs.addEvent(errFact.logErrorMsg("TID <{0}> is not a valid UUID", oid));
+					}
+				}
+			}
 		}
+		HashSet<String> propNames=new HashSet<String>();
 		Iterator iter = aclass1.getAttributesAndRoles2();
 		while (iter.hasNext()) {
 			ViewableTransferElement obj = (ViewableTransferElement)iter.next();
@@ -135,6 +152,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(proxyType!=null && (proxyType instanceof ObjectType)){
 						// skip implicit particles (base-viewables) of views
 					}else{
+						propNames.add(attr.getName());
 						checkAttrValue(iomObj,attr,null);
 					}
 				}
@@ -153,6 +171,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								// not just a link?
 								IomObject structvalue = iomObj.getattrobj(
 										roleName, 0);
+								propNames.add(roleName);
 								if (roleOwner.getAttributes().hasNext()
 										|| roleOwner
 												.getLightweightAssociations()
@@ -181,6 +200,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						} else {
 							IomObject structvalue = iomObj.getattrobj(
 									roleName, 0);
+							propNames.add(roleName);
 							refoid = structvalue.getobjectrefoid();
 							long orderPos = structvalue
 									.getobjectreforderpos();
@@ -201,6 +221,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			 }
 		}
+		// check if no superfluous properties
+		int propc=iomObj.getattrcount();
+		for(int propi=0;propi<propc;propi++){
+			String propName=iomObj.getattrname(propi);
+			if(propName.startsWith("_")){
+				// ok, software internal properties start with a '_'
+			}else{
+				if(!propNames.contains(propName)){
+					errs.addEvent(errFact.logErrorMsg("unknown property <{0}>",propName));
+				}
+			}
+		}
+		
 	}
 
 	private void checkAttrValue(IomObject iomObj, AttributeDef attr,String attrPath) {
@@ -234,7 +267,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							Object modelele=tag2class.get(tag);
 							if(modelele==null){
 								if(!unknownTypev.contains(tag)){
-									errs.addEvent(errFact.logErrorMsg("unknown type <{0}>",tag));
+									errs.addEvent(errFact.logErrorMsg("unknown class <{0}>",tag));
 								}
 							}else{
 								Viewable structEleClass=(Viewable) modelele;
@@ -273,7 +306,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					} else if (attr.isDomainIliUuid()) {
 						// Value is exactly 36 chars long and matches the regex
 						String valueStr = iomObj.getattrvalue(attrName);
-						if (valueStr == null || valueStr.length() == 36 && valueStr.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}?")) {
+						if (valueStr == null || isValidUuid(valueStr)) {
 								// Value ok, Skip it
 						} else {
 							logMsg(checkType, "value <{0}> is not a valid UUID", valueStr);
@@ -392,6 +425,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			
 		
+	}
+
+	public boolean isValidUuid(String valueStr) {
+		return valueStr.length() == 36 && valueStr.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}?");
 	}
 	private void logMsg(String checkKind,String msg,String... args){
 		 if(ValidationConfig.WARNING.equals(checkKind)){

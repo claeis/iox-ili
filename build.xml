@@ -23,10 +23,13 @@
     <mkdir dir="${build}/classes"/>
     <javac destdir="${build}/classes" includes="**/*.java" excludes="**/bak~/*.java"  debug="true" source="1.6" target="1.6">
       <classpath>
+        <pathelement location="lib/antlr.jar"/>
+        <pathelement location="lib/ehibasics.jar"/>
+        <pathelement location="lib/gson-2.6.2.jar"/>
+        <pathelement location="lib/toml4j-0.5.1.jar"/>
         <pathelement location="lib/ili2c-core.jar"/>
         <pathelement location="lib/ili2c-tool.jar"/>
         <pathelement location="lib/jts-core-1.14.0.jar"/>
-        <pathelement location="lib/jdbm-2.4.jar"/>
         <pathelement location="lib/iox-api.jar"/>
         <!-- pathelement location="lib/stax-api-1.0.jar"/>
         <pathelement location="lib/wstx-asl-3.2.8.jar"/ -->
@@ -43,9 +46,12 @@
     <mkdir dir="${build}/javadoc"/>
     <javadoc Public="true" Windowtitle="${ant.project.name}" destdir="${build}/javadoc" packagenames="ch.interlis.*">
       <classpath>
+        <pathelement location="lib/antlr.jar"/>
+        <pathelement location="lib/ehibasics.jar"/>
+        <pathelement location="lib/gson-2.6.2.jar"/>
+        <pathelement location="lib/toml4j-0.5.1.jar"/>
         <pathelement location="lib/ili2c-core.jar"/>
         <pathelement location="lib/jts-core-1.14.0.jar"/>
-        <pathelement location="lib/jdbm-2.4.jar"/>
         <!-- pathelement location="lib/stax-api-1.0.jar"/>
         <pathelement location="lib/wstx-asl-3.2.8.jar"/-->
       </classpath>
@@ -86,10 +92,13 @@
     	<zipfileset dir="." prefix="${ant.project.name}-${buildnr}">
     		<patternset includes="doc/CHANGES.txt"/>
 		<patternset includes="doc/README.txt"/>
+		<patternset includes="lib/antlr.jar"/>
+		<patternset includes="lib/ehibasics.jar"/>
+		<patternset includes="lib/gson-2.6.2.jar"/>
+		<patternset includes="lib/toml4j-0.5.1.jar"/>
 		<patternset includes="lib/ili2c-core.jar"/>
 		<patternset includes="lib/ili2c-tool.jar"/>
 		<patternset includes="lib/jts-core-1.14.0.jar"/>
-		<patternset includes="lib/jdbm-2.4.jar"/>
 		<patternset includes="lib/iox-api.jar"/>
 	</zipfileset>
     	<zipfileset dir="build/javadoc" prefix="${ant.project.name}-${buildnr}/doc/api">
@@ -137,7 +146,6 @@
     	<zipfileset src="lib/ili2c-core.jar"/>
     	<zipfileset src="lib/ili2c-tool.jar"/>
     	<zipfileset src="lib/jts-core-1.14.0.jar"/>
-	<zipfileset src="lib/jdbm-2.4.jar"/>
 	<zipfileset src="${projectjar}"/>
     </jar>
 	<delete file="${dist}/geovalid-${buildnr}.zip" quiet="true"/>
