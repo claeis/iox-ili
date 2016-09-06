@@ -265,7 +265,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if (attr.isDomainBoolean()) {
 						// Value has to be not null and ("true" or "false")
 						String valueStr = iomObj.getattrvalue(attrName);
-						if (valueStr == null || (valueStr.equals("true") || valueStr.equals("false"))) {
+						if (valueStr == null || valueStr.matches("^(true|false)$")) {
 							// Value okay, skip it
 						} else {
 							logMsg(checkType, "value <{0}> is not a BOOLEAN", valueStr);
@@ -314,7 +314,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						// Value is not null and matches 0:0:0.000-23:59:59.999
 						String valueStr = iomObj.getattrvalue(attrName);
 						FormattedType subType = (FormattedType) type;
-						if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr)) {
+						// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
+						if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr) && valueStr.length() >= 9 && valueStr.length() <= 12) {
 							// Value okay, skip it
 						} else {
 							logMsg(checkType, "value <{0}> is not a valid Time", valueStr);
@@ -323,7 +324,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						// Value is not null
 						String valueStr = iomObj.getattrvalue(attrName);
 						FormattedType subType = (FormattedType) type;
-						if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr)) {
+						// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
+						if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr) && valueStr.length() >= 18 && valueStr.length() <= 23) {
 							// Value okay, skip it
 						} else {
 							logMsg(checkType, "value <{0}> is not a valid DateTime", valueStr);
