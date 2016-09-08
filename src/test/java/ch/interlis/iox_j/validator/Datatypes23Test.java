@@ -10,6 +10,7 @@ import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
+import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox.IoxLogging;
 import ch.interlis.iox_j.ObjectEvent;
@@ -436,6 +437,235 @@ public class Datatypes23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new ObjectEvent(objMinSecond));
 		// Assert
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void numericIntTypeMin(){
+		Iom_jObject objMinLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMinLength.setattrvalue("numericInt", "0");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMinLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void numericIntTypeMax(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("numericInt", "10");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void numericDecTypeMin(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("numericDec", "0.0");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void numericDecTypeMax(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("numericDec", "10.0");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void enumerationTypeMin(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("aufzaehlung", "null");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void enumerationTypeEins(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("aufzaehlung", "eins");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void enumerationTypeVier(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("aufzaehlung", "mehr.vier");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void enumerationTypeDrei(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("aufzaehlung", "mehr.zehn");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void textTypeTextLimitedMax(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("textLimited", "aaaaabbbbb");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void textTypeTextUnLimitedMax(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("textUnlimited", ch.ehi.basics.tools.StringUtility.STRING(20000, ' '));
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void textTypeMTextLimitedMax(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("mtextLimited", "aaaaabbbbb");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	@Test
+	public void textTypeMTextLimitedSpecialCharacter(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("mtextLimited", "\n");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void textTypeMTextUnLimitedSpecialCharacter(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("mtextUnlimited", ch.ehi.basics.tools.StringUtility.STRING(20000, '\n'));
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void coordType1DOk(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		IomObject coordValue=objWrongFormat.addattrobj("scoord", "COORD");
+		coordValue.setattrvalue("C1", "480000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objWrongFormat));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void coordType2DOk(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		IomObject coordValue=objWrongFormat.addattrobj("lcoord", "COORD");
+		coordValue.setattrvalue("C1", "480000.000");
+		coordValue.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objWrongFormat));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void coordType3DOk(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		IomObject coordValue=objWrongFormat.addattrobj("hcoord", "COORD");
+		coordValue.setattrvalue("C1", "480000.000");
+		coordValue.setattrvalue("C2", "70000.000");
+		coordValue.setattrvalue("C3", "0.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objWrongFormat));
+		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
@@ -939,4 +1169,220 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-2-29V12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
+	
+	@Test
+	public void numericTypeWrongFormat(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objWrongFormat.setattrvalue("numericInt", "a");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objWrongFormat));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value <a> is not a number", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void numericTypeMinWrong(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objWrongFormat.setattrvalue("numericInt", "-1");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objWrongFormat));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value -1 is out of range", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void numericTypeMaxWrong(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objWrongFormat.setattrvalue("numericInt", "11");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objWrongFormat));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value 11 is out of range", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void numericTypeDecWrongFormat(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objWrongFormat.setattrvalue("numericDec", "a");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objWrongFormat));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value <a> is not a number", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void numericTypeDecMinWrong(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objWrongFormat.setattrvalue("numericDec", "-1");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objWrongFormat));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value -1 is out of range", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void numericTypeDecMaxWrong(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objWrongFormat.setattrvalue("numericDec", "11");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objWrongFormat));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value 11 is out of range", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void enumerationTypeWrongSubValue(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objWrongFormat.setattrvalue("aufzaehlung", "mehr.elf");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objWrongFormat));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value mehr.elf is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void enumerationTypeWrongValue(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objWrongFormat.setattrvalue("aufzaehlung", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objWrongFormat));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value 5 is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void textTypeTextLimitedToLong(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("textLimited", "aaaaabbbbbc");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Attribute textLimited is length restricted to 10", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void textTypeTextLimitedWrongFormat(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("textLimited", "\n");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Attribute textLimited must not contain control characters", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void textTypeTextUnLimitedWrongFormat(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("textUnlimited", "\n");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Attribute textUnlimited must not contain control characters", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void textTypeMTextLimitedToHigh(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("mtextLimited", "aaaaabbbbbc");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objMaxLength));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Attribute mtextLimited is length restricted to 10", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void coordType4Dimensions(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		IomObject coordValue=objWrongFormat.addattrobj("hcoord", "COORD");
+		coordValue.setattrvalue("C1", "480000.000");
+		coordValue.setattrvalue("C2", "70000.000");
+		coordValue.setattrvalue("C3", "6.000");
+		coordValue.setattrvalue("C4", "2.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objWrongFormat));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+	}
+	
+	@Test
+	public void coordType3DMissingC3(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		IomObject coordValue=objWrongFormat.addattrobj("hcoord", "COORD");
+		coordValue.setattrvalue("C1", "480000.000");
+		coordValue.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objWrongFormat));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
+	}
+	
 }

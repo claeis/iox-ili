@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
+
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
@@ -19,6 +20,7 @@ import ch.interlis.ili2c.metamodel.Domain;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.NumericType;
+import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
@@ -247,6 +249,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		 String checkMultiplicity=validationConfig.getConfigValue(attrQName, ValidationConfig.MULTIPLICITY);
 		 String checkType=validationConfig.getConfigValue(attrQName, ValidationConfig.TYPE);
 		 
+			Type type0 = attr.getDomain();
 			Type type = attr.getDomainResolvingAliases();
 			if (type instanceof CompositionType){
 				 int structc=iomObj.getattrvaluecount(attrName);
@@ -366,35 +369,52 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}else if (type instanceof PolylineType){
 					}else if(type instanceof SurfaceOrAreaType){
 					}else if(type instanceof CoordType){
+						// If one dimension of coordType is created, C1 has to be set.
+						// if two dimensions of coordType is created, C1 and C2 has to be set.
+						// if three dimensions of coordType is created, C1, C2 and C3 has to be set.
+						 IomObject coordValue=iomObj.getattrobj(attrName, 0);
+						 if(coordValue!=null){
+							CoordType coordType=(CoordType)type;
+							if (coordType.getDimensions().length >= 1){
+								if (coordValue.getattrvalue("C1") != null){
+									checkNumericType(checkType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"));
+								} else {
+									logMsg(checkType, "Wrong COORD structure, C1 expected");
+								}
+							}
+							if (coordType.getDimensions().length >= 2){
+								if (coordValue.getattrvalue("C2") != null){
+									checkNumericType(checkType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"));
+								} else {
+									logMsg(checkType, "Wrong COORD structure, C2 expected");
+								}
+							}
+							if (coordType.getDimensions().length == 3){
+								if (coordValue.getattrvalue("C3") != null){
+									checkNumericType(checkType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"));
+								} else {
+									logMsg(checkType, "Wrong COORD structure, C3 expected");
+								}
+							}
+							// check if no superfluous properties
+							int propc=coordValue.getattrcount();
+							for(int propi=0;propi<propc;propi++){
+								String propName=coordValue.getattrname(propi);
+								if(propName.startsWith("_")){
+									// ok, software internal properties start with a '_'
+								}else{
+									if(!propName.equals("C1") && !propName.equals("C2") && !propName.equals("C3")){
+										errs.addEvent(errFact.logErrorMsg("Wrong COORD structure, unknown property <{0}>",propName));
+									}
+								}
+							}
+							
+							
+						 } 
 					}else if(type instanceof NumericType){
 						String valueStr=iomObj.getattrvalue(attrName);
 						if(valueStr!=null){
-							PrecisionDecimal value=null;
-							try {
-								value=new PrecisionDecimal(valueStr);
-							} catch (NumberFormatException e) {
-								 logMsg(checkType,"value <{0}> is not a number", valueStr);
-							}
-							if(value!=null){
-								PrecisionDecimal minimum=((NumericType) type).getMinimum();
-								PrecisionDecimal maximum=((NumericType) type).getMaximum();
-							BigDecimal rounded = new BigDecimal(
-									value.toString()).setScale(
-									value.getExponent(),
-									BigDecimal.ROUND_HALF_UP);
-							BigDecimal min_general = new BigDecimal(
-									minimum.toString()).setScale(
-									minimum.getExponent(),
-									BigDecimal.ROUND_HALF_UP);
-							BigDecimal max_general = new BigDecimal(
-									maximum.toString()).setScale(
-									maximum.getExponent(),
-									BigDecimal.ROUND_HALF_UP);
-						      if (rounded.compareTo (min_general) == -1
-						    	  || rounded.compareTo (max_general) == +1){
-									 logMsg(checkType,"value {0} is out of range", valueStr);
-						      }
-							}							
+							checkNumericType(checkType, (NumericType)type, valueStr);							
 						}
 					}else if(type instanceof EnumerationType){
 						String value=iomObj.getattrvalue(attrName);
@@ -414,7 +434,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								}
 							}
 							if(((TextType) type).isNormalized()){
-								if(value.indexOf('\n')>0 || value.indexOf('\r')>0 || value.indexOf('\t')>0){
+								if(value.indexOf('\n')>=0 || value.indexOf('\r')>=0 || value.indexOf('\t')>=0){
 									 logMsg(checkType,"Attribute {0} must not contain control characters", attrPath);
 								}
 							}
@@ -425,6 +445,35 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			
 		
+	}
+
+	private void checkNumericType(String checkType, NumericType type, String valueStr) {
+		PrecisionDecimal value=null;
+		try {
+			value=new PrecisionDecimal(valueStr);
+		} catch (NumberFormatException e) {
+			 logMsg(checkType,"value <{0}> is not a number", valueStr);
+		}
+		if(value!=null){
+			PrecisionDecimal minimum=((NumericType) type).getMinimum();
+			PrecisionDecimal maximum=((NumericType) type).getMaximum();
+		BigDecimal rounded = new BigDecimal(
+				value.toString()).setScale(
+				value.getExponent(),
+				BigDecimal.ROUND_HALF_UP);
+		BigDecimal min_general = new BigDecimal(
+				minimum.toString()).setScale(
+				minimum.getExponent(),
+				BigDecimal.ROUND_HALF_UP);
+		BigDecimal max_general = new BigDecimal(
+				maximum.toString()).setScale(
+				maximum.getExponent(),
+				BigDecimal.ROUND_HALF_UP);
+		  if (rounded.compareTo (min_general) == -1
+			  || rounded.compareTo (max_general) == +1){
+				 logMsg(checkType,"value {0} is out of range", valueStr);
+		  }
+		}
 	}
 
 	public boolean isValidUuid(String valueStr) {
@@ -442,6 +491,4 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		// TODO Auto-generated method stub
 		
 	}
-
-
 }
