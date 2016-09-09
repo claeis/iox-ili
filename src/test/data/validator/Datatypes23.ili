@@ -5,10 +5,14 @@ MODEL Datatypes23
 	TOPIC Topic=
 
 		DOMAIN 
-			Lkoord = COORD 480000.000.. 850000.000 [INTERLIS.m],
-				70000.000 .. 310000.000 [INTERLIS.m],
-				ROTATION 2 -> 1;
-		
+			Skoord = COORD 480000.000 .. 850000.000 [INTERLIS.m];
+			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					70000.000 .. 310000.000 [INTERLIS.m],
+						ROTATION 2 -> 1;
+			Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					70000.000 .. 310000.000 [INTERLIS.m],
+					0.000 .. 5000.000 [INTERLIS.m];
+			
 		CLASS ClassA =
 		   !! TextType
 		   textLimited : TEXT*10;
@@ -30,7 +34,9 @@ MODEL Datatypes23
 		   aDate : INTERLIS.XMLDate;
 		   aDateTime : INTERLIS.XMLDateTime;
 		   !! CoordinateType
-		   coord : Lkoord;
+		   scoord : Skoord;
+		   lcoord : Lkoord;
+		   hcoord : Hkoord;
 		   !! OIDType
 		   aOid : OID TEXT*30;
 		   aUuid : INTERLIS.UUIDOID;
