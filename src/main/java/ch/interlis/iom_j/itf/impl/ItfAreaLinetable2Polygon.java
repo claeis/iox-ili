@@ -163,6 +163,10 @@ public class ItfAreaLinetable2Polygon {
 	public void buildSurfaces() throws IoxException
 	{
 			surfacesBuilt=true;
+			// optional AREA, no lines at all?
+			if(lines==null){
+				return;
+			}
 			//long startMem=getUsedMemory();
 			LineSet lineset=new LineSet(false,linattrTab,helperTableGeomAttrName);
 

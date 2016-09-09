@@ -2,6 +2,10 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.13.3 (2016-09-xx)
+-----------------------------
+- ItfReader2: fixed NullPointerException if OPTIONAL AREA with not geometries at all
+
 iox-ili 1.13.2 (2016-09-05)
 -----------------------------
 - validator: validate DATE, BOOLEAN, XMLDate, XMLDateTime, XMLTime, UUIDOID
