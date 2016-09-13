@@ -8,6 +8,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
+import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 
 public class CurveSegmentIntersectorTest {
 
@@ -23,5 +24,20 @@ public class CurveSegmentIntersectorTest {
 		assertFalse(li.hasIntersection());
 		
 	}
+	@Test
+	public void testStartPtEquals() {
+		CurveSegmentIntersector li=new CurveSegmentIntersector();
+		StraightSegment s0=new StraightSegment(new Coordinate(110.0, 110.0), 
+				new Coordinate(120.0,110.0));
+		StraightSegment s1=new StraightSegment(new Coordinate(110.0, 110.0), 
+				new Coordinate(110.0,140.0));
+		li.computeIntersection(s0, s1);
+		assertTrue(li.hasIntersection());
+		assertTrue(li.getIntersectionNum()==1);
+		Coordinate is=li.getIntersection(0);
+		assertTrue(is.x==110.0);
+		assertTrue(is.y==110.0);
+	}
+
 	
 }

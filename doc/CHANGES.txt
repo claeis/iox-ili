@@ -6,6 +6,7 @@ iox-ili 1.13.3 (2016-09-xx)
 -----------------------------
 - ItfWriter2: fixed missing objects in output
 - ItfReader2: fixed NullPointerException if OPTIONAL AREA with not geometries at all
+- list intersections only once
 
 iox-ili 1.13.2 (2016-09-05)
 -----------------------------

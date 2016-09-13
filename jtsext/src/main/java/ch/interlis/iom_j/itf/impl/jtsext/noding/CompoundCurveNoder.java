@@ -63,7 +63,7 @@ public class CompoundCurveNoder
   	}
   }
 
-  private HashSet<CurvePair> compared=new HashSet<CurvePair>();
+  private HashMap<CurvePair,HashSet<Coordinate>> compared=new HashMap<CurvePair,HashSet<Coordinate>>();
   private void checkIntersections()
   {
 	segInt=new java.util.ArrayList<Intersection>();
@@ -77,9 +77,9 @@ public class CompoundCurveNoder
 			List<CompoundCurve> hits=polyidx.query(e0.getEnvelopeInternal());
 	        for (CompoundCurve e1 :  hits) {
 	        	CurvePair pair=new CurvePair(e0,e1);
-	        	if(!compared.contains(pair)){
+	        	if(!compared.containsKey(pair)){
+	        		compared.put(pair,new HashSet<Coordinate>());
 	                computeIntersects(e0, e1);
-	        		compared.add(pair);
 	        	}
 	        }
 	      }
@@ -88,10 +88,9 @@ public class CompoundCurveNoder
 	    for (CompoundCurve e0 :  segStrings) {
 	        for (CompoundCurve e1 :  segStrings) {
 	        	CurvePair pair=new CurvePair(e0,e1);
-	        	if(!compared.contains(pair)){
-
+	        	if(!compared.containsKey(pair)){
+	        		compared.put(pair,new HashSet<Coordinate>());
 	                computeIntersects(e0, e1);
-	        		compared.add(pair);
 	        	}
 	        }
 	      }
@@ -181,7 +180,7 @@ private void computeIntersects(CompoundCurve ss0, CompoundCurve ss1) {
 			  }else{
 				  // Intersection
 				  if(validateOnly){
-					  segInt.add(new Intersection(li.getIntersection(0),e0,e1,s0,s1,li.getOverlap()));
+					  segIntAdd(li.getIntersection(0),e0,e1,s0,s1,li.getOverlap());
 				  }else{
 					  //if((li.isIntersection(p00) || li.isIntersection(p01))  // start/end-punkt segment a
 						//&& (li.isIntersection(p10) || li.isIntersection(p11))){ // start/end-punkt segment b
@@ -196,7 +195,7 @@ private void computeIntersects(CompoundCurve ss0, CompoundCurve ss1) {
 							  createNode(e1,segIndex1+1);
 						  }else{
 							  // schnitt innerhalb von segment b
-							  segInt.add(new Intersection(li.getIntersection(0),e0,e1,s0,s1,li.getOverlap()));
+							  segIntAdd(li.getIntersection(0),e0,e1,s0,s1,li.getOverlap());
 						  }
 					  }else if(li.isIntersection(p01)){
 						  if(li.isIntersection(p10)){
@@ -209,11 +208,11 @@ private void computeIntersects(CompoundCurve ss0, CompoundCurve ss1) {
 							  createNode(e1,segIndex1+1);
 						  }else{
 							  // schnitt innerhalb von segment b
-							  segInt.add(new Intersection(li.getIntersection(0),e0,e1,s0,s1,li.getOverlap()));
+							  segIntAdd(li.getIntersection(0),e0,e1,s0,s1,li.getOverlap());
 						  }
 					  }else{
 						  // schnitt innerhalb von segment a und/oder b
-						  segInt.add(new Intersection(li.getIntersection(0),e0,e1,s0,s1,li.getOverlap()));
+						  segIntAdd(li.getIntersection(0),e0,e1,s0,s1,li.getOverlap());
 					  }
 				  }
 			  }
@@ -231,7 +230,7 @@ private void computeIntersects(CompoundCurve ss0, CompoundCurve ss1) {
 					  // ok (Schnittpunkte sind Endpunkte)
 			  }else{
 				  if(validateOnly){
-					  segInt.add(new Intersection(li.getIntersection(0),li.getIntersection(1),e0,e1,s0,s1,li.getOverlap()));
+					  segIntAdd(li.getIntersection(0),li.getIntersection(1),e0,e1,s0,s1,li.getOverlap());
 					  
 				  }else{
 					  // wenn es zwei Schnittpunkte gibt, muessen die Start und Endpunkt beider Segmente 
@@ -243,7 +242,7 @@ private void computeIntersects(CompoundCurve ss0, CompoundCurve ss1) {
 								  createNode(e1,segIndex1);
 								  createNode(e1,segIndex1+1);
 					  }else{
-						  segInt.add(new Intersection(li.getIntersection(0),li.getIntersection(1),e0,e1,s0,s1,li.getOverlap()));
+						  segIntAdd(li.getIntersection(0),li.getIntersection(1),e0,e1,s0,s1,li.getOverlap());
 					  }
 				  }
 			  }
@@ -251,6 +250,36 @@ private void computeIntersects(CompoundCurve ss0, CompoundCurve ss1) {
 	  }
 	}
 
+
+	private void segIntAdd(Coordinate intersection, Coordinate intersection2,
+			CompoundCurve e0, CompoundCurve e1, CurveSegment s0,
+			CurveSegment s1, Double overlap) {
+		HashSet<Coordinate> isList=compared.get(new CurvePair(e0, e1));
+		boolean added=false;
+		if(!isList.contains(intersection)){
+			added=true;
+			isList.add(intersection);
+		}
+		if(!isList.contains(intersection2)){
+			added=true;
+			isList.add(intersection2);
+		}
+		if(added){
+			Intersection is=new Intersection(intersection, intersection2, e0, e1, s0, s1, overlap);
+			segInt.add(is);
+		}
+		
+	}
+
+	private void segIntAdd(Coordinate intersection, CompoundCurve e0,
+			CompoundCurve e1, CurveSegment s0, CurveSegment s1, Double overlap) {
+		HashSet<Coordinate> isList=compared.get(new CurvePair(e0, e1));
+		if(!isList.contains(intersection)){
+			isList.add(intersection);
+			Intersection is=new Intersection(intersection, e0, e1, s0, s1, overlap);
+			segInt.add(is);
+		}
+	}
 
 	private void createNode(CompoundCurve line, int nodeSegIndex) {
 		if(nodeSegIndex==0){ // first segment
