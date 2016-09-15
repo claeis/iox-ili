@@ -391,12 +391,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						String valueStr=iomObj.getattrvalue(attrName);
 						if(valueStr!=null){
 							checkNumericType(checkType, (NumericType)type, valueStr);							
+						}else{
+							IomObject structValue=iomObj.getattrobj(attrName, 0);
+							if(structValue!=null){
+								logMsg(checkType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
+							}
 						}
 					}else if(type instanceof EnumerationType){
 						String value=iomObj.getattrvalue(attrName);
 						if(value!=null){
 							if(!((EnumerationType) type).getValues().contains(value)){
 								 logMsg(checkType,"value {0} is not a member of the enumeration", value);
+							}
+						}else{
+							IomObject structValue=iomObj.getattrobj(attrName, 0);
+							if(structValue!=null){
+								logMsg(checkType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
 							}
 						}
 					}else if(type instanceof ReferenceType){
@@ -413,6 +423,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								if(value.indexOf('\n')>=0 || value.indexOf('\r')>=0 || value.indexOf('\t')>=0){
 									 logMsg(checkType,"Attribute {0} must not contain control characters", attrPath);
 								}
+							}
+						}else{
+							IomObject structValue=iomObj.getattrobj(attrName, 0);
+							if(structValue!=null){
+								logMsg(checkType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
 							}
 						}
 					}
