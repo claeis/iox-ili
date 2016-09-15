@@ -19,6 +19,7 @@ import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.Domain;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.FormattedType;
+import ch.interlis.ili2c.metamodel.LineForm;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.ObjectType;
@@ -33,6 +34,7 @@ import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.Type;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
+import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxLogEvent;
 import ch.interlis.iox.IoxLogging;
@@ -367,49 +369,23 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							logMsg(checkType, "value <{0}> is not a valid DateTime", valueStr);
 						}
 					}else if (type instanceof PolylineType){
+						PolylineType polylineType=(PolylineType)type;
+						IomObject polylineValue=iomObj.getattrobj(attrName, 0);
+						if (polylineValue != null){
+							checkPolyline(checkType, polylineType, polylineValue);
+						}
 					}else if(type instanceof SurfaceOrAreaType){
+						SurfaceOrAreaType surfaceOrAreaType=(SurfaceOrAreaType)type;
+						IomObject surfaceValue=iomObj.getattrobj(attrName,0);
+						if (surfaceValue != null){
+						}
 					}else if(type instanceof CoordType){
 						// If one dimension of coordType is created, C1 has to be set.
 						// if two dimensions of coordType is created, C1 and C2 has to be set.
 						// if three dimensions of coordType is created, C1, C2 and C3 has to be set.
 						 IomObject coordValue=iomObj.getattrobj(attrName, 0);
 						 if(coordValue!=null){
-							CoordType coordType=(CoordType)type;
-							if (coordType.getDimensions().length >= 1){
-								if (coordValue.getattrvalue("C1") != null){
-									checkNumericType(checkType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"));
-								} else {
-									logMsg(checkType, "Wrong COORD structure, C1 expected");
-								}
-							}
-							if (coordType.getDimensions().length >= 2){
-								if (coordValue.getattrvalue("C2") != null){
-									checkNumericType(checkType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"));
-								} else {
-									logMsg(checkType, "Wrong COORD structure, C2 expected");
-								}
-							}
-							if (coordType.getDimensions().length == 3){
-								if (coordValue.getattrvalue("C3") != null){
-									checkNumericType(checkType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"));
-								} else {
-									logMsg(checkType, "Wrong COORD structure, C3 expected");
-								}
-							}
-							// check if no superfluous properties
-							int propc=coordValue.getattrcount();
-							for(int propi=0;propi<propc;propi++){
-								String propName=coordValue.getattrname(propi);
-								if(propName.startsWith("_")){
-									// ok, software internal properties start with a '_'
-								}else{
-									if(!propName.equals("C1") && !propName.equals("C2") && !propName.equals("C3")){
-										errs.addEvent(errFact.logErrorMsg("Wrong COORD structure, unknown property <{0}>",propName));
-									}
-								}
-							}
-							
-							
+							checkCoordType(checkType, (CoordType)type, coordValue);
 						 } 
 					}else if(type instanceof NumericType){
 						String valueStr=iomObj.getattrvalue(attrName);
@@ -439,12 +415,131 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								}
 							}
 						}
-					}else{
 					}
 				}
 			}
-			
 		
+	}
+
+	private void checkPolyline(String checkType, PolylineType polylineType, IomObject polylineValue) {
+		if (polylineValue.getobjecttag().equals("POLYLINE")){
+			boolean clipped = polylineValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
+			for(int sequencei=0;sequencei<polylineValue.getattrvaluecount("sequence");sequencei++){
+				if(!clipped && sequencei>0){
+					// an unclipped polyline should have only one sequence element
+					logMsg(checkType,"invalid number of sequences in COMPLETE basket");
+				}
+				IomObject sequence=polylineValue.getattrobj("sequence",sequencei);
+				LineForm[] lineforms = polylineType.getLineForms();
+				HashSet<String> lineformNames=new HashSet<String>();
+				for(LineForm lf:lineforms){
+					lineformNames.add(lf.getName());
+				}
+				if(sequence.getobjecttag().equals("SEGMENTS")){
+					for(int segmenti=0;segmenti<sequence.getattrvaluecount("segment");segmenti++){
+						// segment = all segments which are in the actual sequence.
+						IomObject segment=sequence.getattrobj("segment",segmenti);
+						if(segment.getobjecttag().equals("COORD")){
+							if(lineformNames.contains("STRAIGHTS") || segmenti==0){
+								checkCoordType(checkType, (CoordType) polylineType.getControlPointDomain().getType(), segment);
+							}else{
+								logMsg(checkType, "unexpected COORD");
+							}
+						} else if (segment.getobjecttag().equals("ARC")){
+							if(lineformNames.contains("ARCS") && segmenti>0){
+								checkARCSType(checkType, (CoordType) polylineType.getControlPointDomain().getType(), segment);
+							}else{
+								logMsg(checkType, "unexpected ARC");
+							}
+						} else {
+							logMsg(checkType, "unexpected Type "+segment.getobjecttag());
+						}
+					}
+				} else {
+					logMsg(checkType, "unexpected Type "+sequence.getobjecttag());
+				}
+			}
+		} else {
+			logMsg(checkType, "unexpected Type "+polylineValue.getobjecttag()+"; POLYLINE expected");
+		}
+	}
+
+	private void checkCoordType(String checkType, CoordType coordType, IomObject coordValue) {
+		if (coordType.getDimensions().length >= 1){
+			if (coordValue.getattrvalue("C1") != null){
+				checkNumericType(checkType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"));
+			} else if (coordValue.getattrvalue("A1") != null) {
+				logMsg(checkType, "Not a type of COORD");
+			} else {
+				logMsg(checkType, "Wrong COORD structure, C1 expected");
+			}
+		}
+		if (coordType.getDimensions().length >= 2){
+			if (coordValue.getattrvalue("C2") != null){
+				checkNumericType(checkType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"));
+			} else if (coordValue.getattrvalue("A2") != null) {
+				logMsg(checkType, "Not a type of COORD");
+			} else {
+				logMsg(checkType, "Wrong COORD structure, C2 expected");
+			}
+		}
+		if (coordType.getDimensions().length == 3){
+			if (coordValue.getattrvalue("C3") != null){
+				checkNumericType(checkType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"));
+			} else {
+				logMsg(checkType, "Wrong COORD structure, C3 expected");
+			}
+		}
+		// check if no superfluous properties
+		int propc=coordValue.getattrcount();
+		for(int propi=0;propi<propc;propi++){
+			String propName=coordValue.getattrname(propi);
+			if(propName.startsWith("_")){
+				// ok, software internal properties start with a '_'
+			}else{
+				if(!propName.equals("C1") && !propName.equals("C2") && !propName.equals("C3")){
+					errs.addEvent(errFact.logErrorMsg("Wrong COORD structure, unknown property <{0}>",propName));
+				}
+			}
+		}
+	}
+	
+	private void checkARCSType(String checkType, CoordType coordType, IomObject coordValue) {
+		if (coordType.getDimensions().length >= 2){
+			if (coordValue.getattrvalue("A1") != null && coordValue.getattrvalue("A2") != null && coordValue.getattrvalue("C1") != null && coordValue.getattrvalue("C2") != null && coordValue.getattrvalue("C3") == null){
+				// if in ili, 2 coords are defined, then in coordValue.getDimensions()[0,1] are only 0 or 1 valid.
+				checkNumericType(checkType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("A1"));
+				checkNumericType(checkType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("A2"));
+				checkNumericType(checkType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"));
+				checkNumericType(checkType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"));
+			} else if (coordValue.getattrvalue("A1") != null && coordValue.getattrvalue("A2") != null && coordValue.getattrvalue("C1") != null && coordValue.getattrvalue("C2") != null && coordValue.getattrvalue("C3") != null){
+				//  if in ili, 3 coords are defined, then in coordValue.getDimensions()[0,1,2] are only 0 or 1 or 2 valid.
+				checkNumericType(checkType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("A1"));
+				checkNumericType(checkType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("A2"));
+				checkNumericType(checkType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"));
+				checkNumericType(checkType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"));
+				checkNumericType(checkType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"));
+			// a 2d Arc depends on: A1, A2, C1, C2. 
+			} else if (coordValue.getattrvalue("A1") == null || coordValue.getattrvalue("A2") == null || coordValue.getattrvalue("C1") == null || coordValue.getattrvalue("C2") == null){
+				logMsg(checkType, "A1, A2, C1, C2 expected! (C3 is expected if 3d)");
+			} else {
+				logMsg(checkType, "Wrong ARC structure");
+			}
+		}
+		// check if no superfluous properties
+		int propc=coordValue.getattrcount();
+		for(int propi=0;propi<propc;propi++){
+			String propName=coordValue.getattrname(propi);
+			if(propName.startsWith("_")){
+				// ok, software internal properties start with a '_'
+			}else{
+				if(!propName.equals("A1") || !propName.equals("A2") || !propName.equals("C1") || !propName.equals("C2") || !propName.equals("C3")){
+					// ok.
+				} else {
+					errs.addEvent(errFact.logErrorMsg("Wrong ARC structure, unknown property <{0}>",propName));
+				}
+			}
+		}
 	}
 
 	private void checkNumericType(String checkType, NumericType type, String valueStr) {

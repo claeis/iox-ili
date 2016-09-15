@@ -10,6 +10,7 @@ import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
+import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox.IoxLogging;
@@ -623,23 +624,23 @@ public class Datatypes23Test {
 	
 	@Test
 	public void coordType1DOk(){
-		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		IomObject coordValue=objWrongFormat.addattrobj("scoord", "COORD");
+		Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		IomObject coordValue=objSuccessFormat.addattrobj("scoord", "COORD");
 		coordValue.setattrvalue("C1", "480000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new ObjectEvent(objSuccessFormat));
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
 	@Test
 	public void coordType2DOk(){
-		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		IomObject coordValue=objWrongFormat.addattrobj("lcoord", "COORD");
+		Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		IomObject coordValue=objSuccessFormat.addattrobj("lcoord", "COORD");
 		coordValue.setattrvalue("C1", "480000.000");
 		coordValue.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -647,15 +648,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new ObjectEvent(objSuccessFormat));
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
 	@Test
 	public void coordType3DOk(){
-		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		IomObject coordValue=objWrongFormat.addattrobj("hcoord", "COORD");
+		Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		IomObject coordValue=objSuccessFormat.addattrobj("hcoord", "COORD");
 		coordValue.setattrvalue("C1", "480000.000");
 		coordValue.setattrvalue("C2", "70000.000");
 		coordValue.setattrvalue("C3", "0.000");
@@ -664,11 +665,180 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new ObjectEvent(objSuccessFormat));
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	@Test
+	public void polylineTypeStraights2dOk(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject coordStart=segments.addattrobj("segment", "COORD");
+		IomObject coordEnd=segments.addattrobj("segment", "COORD");
+		coordStart.setattrvalue("C1", "480000.000");
+		coordStart.setattrvalue("C2", "70000.000");
+		coordEnd.setattrvalue("C1", "480001.000");
+		coordEnd.setattrvalue("C2", "70001.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void polylineTypeStraights3dOk(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+		IomObject polylineValue=objStraightsSuccess.addattrobj("straights3d", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject coordStart=segments.addattrobj("segment", "COORD");
+		coordStart.setattrvalue("C1", "480000.000");
+		coordStart.setattrvalue("C2", "70000.000");
+		coordStart.setattrvalue("C3", "4000.000");
+		IomObject coordEnd=segments.addattrobj("segment", "COORD");
+		coordEnd.setattrvalue("C1", "480000.000");
+		coordEnd.setattrvalue("C2", "70000.000");
+		coordEnd.setattrvalue("C3", "4000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+//	@Test
+//	public void polylineTypeArcs2dOk(){
+//		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+//		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d", "POLYLINE");
+//		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+//		IomObject coordStart=segments.addattrobj("segment", "COORD");
+//		coordStart.setattrvalue("C1", "480000.000");
+//		coordStart.setattrvalue("C2", "70000.000");
+//		coordStart.setattrvalue("C3", "4000.000");
+//		IomObject coordEnd=segments.addattrobj("segment", "COORD");
+//		coordEnd.setattrvalue("C1", "480000.000");
+//		coordEnd.setattrvalue("C2", "70000.000");
+//		coordEnd.setattrvalue("C3", "4000.000");
+//		ValidationConfig modelConfig=new ValidationConfig();
+//		LogCollector logger=new LogCollector();
+//		LogEventFactory errFactory=new LogEventFactory();
+//		Settings settings=new Settings();
+//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+//		validator.validate(new ObjectEvent(objStraightsSuccess));
+//		// Asserts
+//		assertTrue(logger.getErrs().size()==0);
+//	}
+	
+	@Test
+	public void polylineTypeSTRAIGHTSARCS2DOk(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs2d", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480000.000");
+		endSegment.setattrvalue("C2", "70000.000");
+		IomObject arcSegment=segments.addattrobj("segment", "ARC");
+		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A2", "300000.000");
+		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void polylineTypeSTRAIGHTSARCS3DOk(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs3d", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		startSegment.setattrvalue("C3", "5000.000");
+		IomObject secondSegment=segments.addattrobj("segment", "COORD");
+		secondSegment.setattrvalue("C1", "480000.000");
+		secondSegment.setattrvalue("C2", "70000.000");
+		secondSegment.setattrvalue("C3", "5000.000");
+		IomObject arcSegment=segments.addattrobj("segment", "ARC");
+		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A2", "300000.000");
+		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C2", "70000.000");
+		arcSegment.setattrvalue("C3", "5000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void polylineTypeARCS2DOk(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+		IomObject polylineValue=objStraightsSuccess.addattrobj("arcs2d", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject arcSegment=segments.addattrobj("segment", "ARC");
+		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A2", "300000.000");
+		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void polylineTypeARCS3DOk(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+		IomObject polylineValue=objStraightsSuccess.addattrobj("arcs3d", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		startSegment.setattrvalue("C3", "5000.000");
+		IomObject arcSegment=segments.addattrobj("segment", "ARC");
+		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A2", "300000.000");
+		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C2", "70000.000");
+		arcSegment.setattrvalue("C3", "5000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 	// FAILING Tests.
 	// The following Tests which are given, they throw 1 Error/Test.
 	
@@ -1385,4 +1555,171 @@ public class Datatypes23Test {
 		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	@Test
+	public void polylineTypeAlineDoesNotContainTypePolyline(){
+		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "LINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject coordStart=segments.addattrobj("segment", "COORD");
+		coordStart.setattrvalue("C1", "480000.000");
+		coordStart.setattrvalue("C2", "70000.000");
+		IomObject coordEnd=segments.addattrobj("segment", "COORD");
+		coordEnd.setattrvalue("C1", "480000.000");
+		coordEnd.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objStraightsFail));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value is not a member of POLYLINE", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void polylineTypeSequenceDoesNotContainTypeSegments(){
+		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "COORD");
+		IomObject coordStart=segments.addattrobj("segment", "COORD");
+		IomObject coordEnd=segments.addattrobj("segment", "COORD");
+		coordStart.setattrvalue("C1", "480000.000");
+		coordEnd.setattrvalue("C1", "480000.000");
+		coordStart.setattrvalue("C2", "70000.000");
+		coordEnd.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objStraightsFail));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value is not a Type of SEGMENTS", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void polylineTypeSegmentDoesNotContainTypeCoordOrArc(){
+		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject coordStart=segments.addattrobj("segment", "POLYLINE");
+		IomObject coordEnd=segments.addattrobj("segment", "COORD");
+		coordStart.setattrvalue("C1", "480000.000");
+		coordEnd.setattrvalue("C1", "480000.000");
+		coordStart.setattrvalue("C2", "70000.000");
+		coordEnd.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objStraightsFail));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value is not a Type of COORD or ARC", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void polylineTypeIOMCompleteWith2Sequences(){
+		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "POLYLINE");
+		polylineValue.setobjectconsistency(IomConstants.IOM_COMPLETE);
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject segment2=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject coordStart=segments.addattrobj("segment", "COORD");
+		IomObject coordEnd=segments.addattrobj("segment", "COORD");
+		coordStart.setattrvalue("C1", "480000.000");
+		coordEnd.setattrvalue("C1", "480000.000");
+		coordStart.setattrvalue("C2", "70000.000");
+		coordEnd.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objStraightsFail));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("invalid number of sequences of an IOM_COMPLETE consistence", logger.getErrs().get(0).getEventMsg());
+	}
+	
+//	@Test
+//	public void polylineTypeWith3Lineforms(){
+//		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+//		IomObject polylineValue=objStraightsFail.addattrobj("threeforms", "POLYLINE");
+//		polylineValue.setobjectconsistency(IomConstants.IOM_COMPLETE);
+//		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+//		IomObject segment2=polylineValue.addattrobj("sequence", "SEGMENTS");
+//		IomObject coordStart=segments.addattrobj("segment", "COORD");
+//		coordStart.setattrvalue("C1", "480000.000");
+//		coordStart.setattrvalue("C2", "70000.000");
+//		IomObject coordEnd=segments.addattrobj("segment", "COORD");
+//		coordEnd.setattrvalue("C1", "480000.000");
+//		coordEnd.setattrvalue("C2", "70000.000");
+//		ValidationConfig modelConfig=new ValidationConfig();
+//		LogCollector logger=new LogCollector();
+//		LogEventFactory errFactory=new LogEventFactory();
+//		Settings settings=new Settings();
+//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+//		validator.validate(new ObjectEvent(objStraightsFail));
+//		// Asserts
+//		assertTrue(logger.getErrs().size()==1);
+//		assertEquals("invalid number of sequences of an IOM_COMPLETE consistence", logger.getErrs().get(0).getEventMsg());
+//	}
+	
+	@Test
+	public void polylineTypeUnexpectedARC(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs2d", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject arcSegment=segments.addattrobj("segment", "ARC");
+		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A2", "300000.000");
+		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C2", "70000.000");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480000.000");
+		endSegment.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("unexpected ARC", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void polylineTypeUnexpectedCOORD(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+		IomObject polylineValue=objStraightsSuccess.addattrobj("arcs2d", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480000.000");
+		endSegment.setattrvalue("C2", "70000.000");
+		IomObject arcSegment=segments.addattrobj("segment", "ARC");
+		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A2", "300000.000");
+		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("unexpected COORD", logger.getErrs().get(0).getEventMsg());
+	}
 }

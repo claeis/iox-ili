@@ -3,16 +3,14 @@ INTERLIS 2.3;
 MODEL Datatypes23
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" =
 	TOPIC Topic=
-
-		DOMAIN 
+		DOMAIN
 			Skoord = COORD 480000.000 .. 850000.000 [INTERLIS.m];
 			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
-					70000.000 .. 310000.000 [INTERLIS.m],
-						ROTATION 2 -> 1;
+					        70000.000 .. 310000.000 [INTERLIS.m],
+						   ROTATION 2 -> 1;
 			Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
-					70000.000 .. 310000.000 [INTERLIS.m],
-					0.000 .. 5000.000 [INTERLIS.m];
-			
+					        70000.000 .. 310000.000 [INTERLIS.m],
+					              0.000 .. 5000.000 [INTERLIS.m];
 		CLASS ClassA =
 		   !! TextType
 		   textLimited : TEXT*10;
@@ -33,7 +31,7 @@ MODEL Datatypes23
 		   aTime : INTERLIS.XMLTime;
 		   aDate : INTERLIS.XMLDate;
 		   aDateTime : INTERLIS.XMLDateTime;
-		   !! CoordinateType
+		   !! CoordinateType (s=1d, l=2d, h=3d)
 		   scoord : Skoord;
 		   lcoord : Lkoord;
 		   hcoord : Hkoord;
@@ -45,7 +43,13 @@ MODEL Datatypes23
 		END ClassA;
 		CLASS ClassB =
 		   !! Linientyp
-		   aline : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		   straights2d : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		   straights3d : POLYLINE WITH (STRAIGHTS) VERTEX Hkoord;
+		   arcs2d : POLYLINE WITH (ARCS) VERTEX Lkoord;
+		   arcs3d : POLYLINE WITH (ARCS) VERTEX Hkoord;
+		   straightsarcs2d : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Lkoord;
+		   straightsarcs3d : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
+		   arcsstraights2d : POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Lkoord;
 		END ClassB;
 		CLASS ClassC =
 		   !! Flaechentyp
