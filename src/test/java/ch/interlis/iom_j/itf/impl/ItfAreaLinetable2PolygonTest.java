@@ -347,7 +347,8 @@ public class ItfAreaLinetable2PolygonTest {
 			builder.buildSurfaces();
 			fail();
 		}catch(IoxException ex){
-			IoxAssert.assertStartsWith("intersection",ex.getMessage());
+			IoxAssert.assertStartsWith("cut edges",ex.getMessage());
+			//IoxAssert.assertStartsWith("intersection",ex.getMessage());
 		}
 	}
 	@Test
@@ -386,6 +387,76 @@ public class ItfAreaLinetable2PolygonTest {
 		}
 	}
 	@Test
+	public void testPunktAufRandZweiGetrenntePolygone() throws IoxException {
+		// Punkt 120,115 auf Rand 120,110 -> 120,140
+		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(geomAttr);
+		
+		IomObject polyline=newPolyline();
+		addCoord(polyline,110.0,  110.0);
+		addCoord(polyline,120.0,  110.0); 
+		addCoord(polyline,120.0,  140.0); 
+		addCoord(polyline,110.0,  140.0); 
+		addCoord(polyline,110.0,  110.0);
+		IomObject linetableObj=createLinetableObj("1",tableName,geomAttr,polyline);
+		//System.out.println(linetableObj);
+		builder.addItfLinetableObject(linetableObj);
+		String mainObjectTid="10";
+		builder.addGeoRef(mainObjectTid, newCoord(119,111));
+		
+		polyline=newPolyline();
+		addCoord(polyline,150.0,  140.0); 
+		addCoord(polyline,150.0,  110.0); 
+		addCoord(polyline,120.0,  115.0);
+		addCoord(polyline,150.0,  140.0); 
+		linetableObj=createLinetableObj("2",tableName,geomAttr,polyline);
+		//System.out.println(linetableObj);
+		builder.addItfLinetableObject(linetableObj);
+		String mainObject2Tid="20";
+		builder.addGeoRef(mainObject2Tid, newCoord(121,115));
+		try{
+			builder.buildSurfaces();
+			fail();
+		}catch(IoxException ex){
+			IoxAssert.assertStartsWith("intersection",ex.getMessage());
+		}
+	}
+	@Test
+	public void testPunktAufPunktZweiGetrenntePolygone() throws IoxException {
+		// Polygone haben gemeinsamen Randpunkt 120,115 
+		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(geomAttr);
+		
+		IomObject polyline=newPolyline();
+		addCoord(polyline,110.0,  110.0);
+		addCoord(polyline,120.0,  110.0); 
+		addCoord(polyline,120.0,  115.0);
+		addCoord(polyline,120.0,  140.0); 
+		addCoord(polyline,110.0,  140.0); 
+		addCoord(polyline,110.0,  110.0);
+		IomObject linetableObj=createLinetableObj("1",tableName,geomAttr,polyline);
+		//System.out.println(linetableObj);
+		builder.addItfLinetableObject(linetableObj);
+		String mainObjectTid="10";
+		builder.addGeoRef(mainObjectTid, newCoord(119,111));
+		
+		polyline=newPolyline();
+		addCoord(polyline,150.0,  140.0); 
+		addCoord(polyline,150.0,  110.0); 
+		addCoord(polyline,120.0,  115.0);
+		addCoord(polyline,150.0,  140.0); 
+		linetableObj=createLinetableObj("2",tableName,geomAttr,polyline);
+		//System.out.println(linetableObj);
+		builder.addItfLinetableObject(linetableObj);
+		String mainObject2Tid="20";
+		builder.addGeoRef(mainObject2Tid, newCoord(121,115));
+		builder.buildSurfaces();
+		IomObject polygon=builder.getSurfaceObject(mainObjectTid);
+		IomObject polygon2=builder.getSurfaceObject(mainObject2Tid);
+		//System.out.println(polygon);
+		//System.out.println(polygon2);
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 115.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}",polygon.toString());
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 115.0}, COORD {C1 150.0, C2 140.0}, COORD {C1 150.0, C2 110.0}, COORD {C1 120.0, C2 115.0}]}}}}}",polygon2.toString());
+	}
+	@Test
 	public void testDoppelteRandstreckeEinPolygon() throws IoxException {
 		// gemeinsame Randstrecke zwischen aeusserem und innerem Rand
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(geomAttr);
@@ -416,7 +487,8 @@ public class ItfAreaLinetable2PolygonTest {
 			builder.buildSurfaces();
 			fail();
 		}catch(IoxException ex){
-			IoxAssert.assertStartsWith("intersection",ex.getMessage());
+			IoxAssert.assertStartsWith("cut edges",ex.getMessage());
+			//IoxAssert.assertStartsWith("intersection",ex.getMessage());
 		//}catch(IoxException ex){
 		//	assertTrue(ex.getMessage().startsWith("side location conflict"));
 		}
@@ -532,7 +604,8 @@ public class ItfAreaLinetable2PolygonTest {
 			builder.buildSurfaces();
 			fail();
 		}catch(IoxException ex){
-			IoxAssert.assertStartsWith("intersections",ex.getMessage());
+			IoxAssert.assertStartsWith("no area-ref",ex.getMessage());
+			//IoxAssert.assertStartsWith("intersections",ex.getMessage());
 		}
 		//IomObject polygon=builder.getSurfaceObject(mainObjectTid);
 		//System.out.println(polygon);

@@ -182,7 +182,7 @@ public class ItfAreaLinetable2Polygon {
 				ItfSurfaceLinetable2Polygon.removeValidSelfIntersections(seg,maxOverlaps,newVertexOffset);
 			}
 			
-				CompoundCurveNoder validator=new CompoundCurveNoder(segv,true);
+				CompoundCurveNoder validator=new CompoundCurveNoder(segv,false);
 				if(!validator.isValid()){
 					boolean hasIntersections=false;
 					for(Intersection is:validator.getIntersections()){
@@ -229,16 +229,17 @@ public class ItfAreaLinetable2Polygon {
 						throw new IoxInvalidDataException("intersections");
 					}
 				}
-				validator=null;
 			
 			EhiLogger.traceState("polygonize..."+helperTableGeomAttrName);
 			//System.out.println("polygonizer.lines");
 			//Polygonizer polygonizer=new Polygonizer();
 			IoxPolygonizer polygonizer=new IoxPolygonizer(newVertexOffset);
-			for(CompoundCurve boundary:segv){
+			//for(CompoundCurve boundary:segv){
+			for(CompoundCurve boundary:validator.getNodedSubstrings()){
 				//System.out.println(boundary);
 				polygonizer.add(boundary);
 			}
+			validator=null;
 			Collection cutEdges = polygonizer.getCutEdges();
 			if(!cutEdges.isEmpty()){
 				for(Object edge:cutEdges){
