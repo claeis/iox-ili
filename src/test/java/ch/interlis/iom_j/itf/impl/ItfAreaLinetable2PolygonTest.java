@@ -312,7 +312,7 @@ public class ItfAreaLinetable2PolygonTest {
 			builder.buildSurfaces();
 			fail();
 		}catch(IoxException ex){
-			IoxAssert.assertStartsWith("no polygon-ref to polygon",ex.getMessage());
+			IoxAssert.assertStartsWith("no area-ref to polygon",ex.getMessage());
 		}
 	}
 	@Test

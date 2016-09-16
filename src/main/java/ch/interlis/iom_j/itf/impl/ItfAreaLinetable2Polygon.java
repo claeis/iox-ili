@@ -88,7 +88,7 @@ public class ItfAreaLinetable2Polygon {
 	private double newVertexOffset=0.0;
 	private JtsextGeometryFactory jtsFact=new JtsextGeometryFactory();
 	private ObjectPoolManager objPool = null;
-	private boolean ignorePolygonBuildingErrors=true;
+	private boolean ignorePolygonBuildingErrors=false;
 	ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>(); 
 	private String linetableIliqname=null;
 	private String geomattrIliqname=null;
