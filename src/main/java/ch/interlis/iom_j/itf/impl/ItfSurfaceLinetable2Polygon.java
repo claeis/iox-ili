@@ -262,7 +262,7 @@ public class ItfSurfaceLinetable2Polygon {
 								  && (is.isIntersection(p10) || is.isIntersection(p11))
 								  && is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
 							// aufeinanderfolgende Segmente der selben Linie
-						throw new IllegalStateException("unexpected overlap; should have been removed before");
+						throw new IllegalStateException("unexpected overlap; should have been removed before;"+is);
 					}else{
 						String []tids=new String[2];
 						tids[0]=(String) is.getCurve1().getUserData();
@@ -399,12 +399,12 @@ public class ItfSurfaceLinetable2Polygon {
 						  // overlap entfernen
 						  if(seg0 instanceof StraightSegment){
 							  seg.removeOverlap((ArcSegment) seg1, seg0, newVertexOffset);
-							  segIndex0++;
+							  //segIndex0++;
 						  }else if(seg1 instanceof StraightSegment){
 							  seg.removeOverlap((ArcSegment) seg0, seg1, newVertexOffset);
 						  }else if(((ArcSegment) seg0).getRadius()>((ArcSegment) seg1).getRadius()){
 							  seg.removeOverlap((ArcSegment) seg1, seg0, newVertexOffset);
-							  segIndex0++;
+							  //segIndex0++;
 						  }else{
 							  // seg1.getRadius() > seg0.getRadius()
 							  seg.removeOverlap((ArcSegment) seg0, seg1, newVertexOffset);

@@ -9,6 +9,7 @@ iox-ili 1.13.4 (2016-09-xx)
 - list intersections only once
 - ItfReader2: fixed polygon building in SURFACE with common point between hole and shell that is not start/end point of a boundary line
 - ItfReader2: fixed polygon building in AREA with common point between boundaries that is not start/end point of a boundary line
+- ItfReader2: fixed technical tolerance of circle/circle intersection (affects polygon validation)
 
 iox-ili 1.13.2 (2016-09-05)
 -----------------------------

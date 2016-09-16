@@ -213,7 +213,7 @@ public class ItfAreaLinetable2Polygon {
 								  && (is.isIntersection(p10) || is.isIntersection(p11))
 								  && is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
 							// aufeinanderfolgende Segmente der selben Linie
-							throw new IllegalStateException("unexpected overlap; should have been removed before");
+							throw new IllegalStateException("unexpected overlap; should have been removed before; "+is);
 						}else{
 							String []tids=new String[2];
 							tids[0]=(String) is.getCurve1().getUserData();

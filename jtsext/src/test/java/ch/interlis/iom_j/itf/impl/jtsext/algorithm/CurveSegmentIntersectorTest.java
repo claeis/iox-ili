@@ -38,6 +38,24 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(is.x==110.0);
 		assertTrue(is.y==110.0);
 	}
+	@Test
+	public void testCircleCirleEndptTolerance() {
+		// Testet den Grenzwert HrgUTility.CIRCIR_ENDPT_TOL
+		CurveSegmentIntersector li=new CurveSegmentIntersector();
+		ArcSegment s0=null;
+		ArcSegment s1=null; 
+		s0=new ArcSegment(new Coordinate(645175.553, 248745.374),new Coordinate( 645092.332, 248711.677),new Coordinate( 645009.11, 248677.98)); 
+		s1=new ArcSegment(new Coordinate(645009.11, 248677.98), new Coordinate(644926.69, 248644.616),new Coordinate( 644844.269, 248611.253));
+		
+		
+		
+		li.computeIntersection(s0, s1);
+		assertTrue(li.hasIntersection());
+		assertTrue(li.getIntersectionNum()==1);
+		Coordinate is=li.getIntersection(0);
+		assertTrue(is.x==645009.110);
+		assertTrue(is.y==248677.980);
+	}
 
 	
 }
