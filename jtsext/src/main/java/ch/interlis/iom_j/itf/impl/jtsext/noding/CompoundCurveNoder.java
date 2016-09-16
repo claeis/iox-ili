@@ -30,7 +30,7 @@ public class CompoundCurveNoder
    * Creates a new noding validator for a given set of linework.
    * 
    * @param segStrings a collection of {@link CompoundCurve}s
-   * @param validateOnly if true, no noding is done
+   * @param validateOnly if true, no noding is done. New nodes are only created at start/end of segements.
    */
   public CompoundCurveNoder(Collection<? extends CompoundCurve> segStrings,boolean validateOnly)
   {
