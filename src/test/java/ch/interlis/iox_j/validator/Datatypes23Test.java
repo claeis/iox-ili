@@ -14,7 +14,11 @@ import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox.IoxLogging;
+import ch.interlis.iox_j.EndBasketEvent;
+import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
+import ch.interlis.iox_j.StartBasketEvent;
+import ch.interlis.iox_j.StartTransferEvent;
 import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class Datatypes23Test {
@@ -714,29 +718,6 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-//	@Test
-//	public void polylineTypeArcs2dOk(){
-//		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
-//		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d", "POLYLINE");
-//		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-//		IomObject coordStart=segments.addattrobj("segment", "COORD");
-//		coordStart.setattrvalue("C1", "480000.000");
-//		coordStart.setattrvalue("C2", "70000.000");
-//		coordStart.setattrvalue("C3", "4000.000");
-//		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-//		coordEnd.setattrvalue("C1", "480000.000");
-//		coordEnd.setattrvalue("C2", "70000.000");
-//		coordEnd.setattrvalue("C3", "4000.000");
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new ObjectEvent(objStraightsSuccess));
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==0);
-//	}
-	
 	@Test
 	public void polylineTypeSTRAIGHTSARCS2DOk(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
@@ -839,6 +820,612 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+	@Test
+	public void surfaceTypeSurface1Boundary2DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void surfaceTypeSurface2Boundaries2DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		// outer boundary
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		// inner boundary
+		IomObject innerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		IomObject polylineValue2 = innerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+		startSegment2.setattrvalue("C1", "480000.000");
+		startSegment2.setattrvalue("C2", "70000.000");
+		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+		endSegment2.setattrvalue("C1", "480001.000");
+		endSegment2.setattrvalue("C2", "70001.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void surfaceTypeSurface2Polylines2DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline 1
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		// polyline 2
+		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
+		startSegment11.setattrvalue("C1", "480000.000");
+		startSegment11.setattrvalue("C2", "70000.000");
+		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
+		endSegment11.setattrvalue("C1", "480001.000");
+		endSegment11.setattrvalue("C2", "70001.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void surfaceTypeSurfaceWithArc2DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		// Arc
+		IomObject arcSegment=segments.addattrobj("segment", "ARC");
+		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A2", "300000.000");
+		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void surfaceTypeSurface1Boundary3DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		startSegment.setattrvalue("C3", "5000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		endSegment.setattrvalue("C3", "5000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void surfaceTypeSurface2Boundaries3DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		// outer boundary
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		startSegment.setattrvalue("C3", "5000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		endSegment.setattrvalue("C3", "5000.000");
+		// inner boundary
+		IomObject innerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		IomObject polylineValue2 = innerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+		startSegment2.setattrvalue("C1", "480000.000");
+		startSegment2.setattrvalue("C2", "70000.000");
+		startSegment2.setattrvalue("C3", "5000.000");
+		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+		endSegment2.setattrvalue("C1", "480001.000");
+		endSegment2.setattrvalue("C2", "70001.000");
+		endSegment2.setattrvalue("C3", "5000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void surfaceTypeSurface2Polylines3DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline 1
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		startSegment.setattrvalue("C3", "5000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		endSegment.setattrvalue("C3", "5000.000");
+		// polyline 2
+		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
+		startSegment11.setattrvalue("C1", "480000.000");
+		startSegment11.setattrvalue("C2", "70000.000");
+		startSegment11.setattrvalue("C3", "5000.000");
+		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
+		endSegment11.setattrvalue("C1", "480001.000");
+		endSegment11.setattrvalue("C2", "70001.000");
+		endSegment11.setattrvalue("C3", "5000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void surfaceTypeSurfaceWithArc3DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		startSegment.setattrvalue("C3", "5000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		endSegment.setattrvalue("C3", "5000.000");
+		// Arc
+		IomObject arcSegment=segments.addattrobj("segment", "ARC");
+		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A2", "300000.000");
+		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C2", "70000.000");
+		arcSegment.setattrvalue("C3", "5000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// AREA
+	@Test
+	public void surfaceTypeArea1Boundary2DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void surfaceTypeArea2Boundaries2DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		// outer boundary
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		// inner boundary
+		IomObject innerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		IomObject polylineValue2 = innerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+		startSegment2.setattrvalue("C1", "480000.000");
+		startSegment2.setattrvalue("C2", "70000.000");
+		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+		endSegment2.setattrvalue("C1", "480001.000");
+		endSegment2.setattrvalue("C2", "70001.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void surfaceTypeArea2Polylines2DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline 1
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		// polyline 2
+		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
+		startSegment11.setattrvalue("C1", "480000.000");
+		startSegment11.setattrvalue("C2", "70000.000");
+		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
+		endSegment11.setattrvalue("C1", "480001.000");
+		endSegment11.setattrvalue("C2", "70001.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void surfaceTypeAreaWithArc2DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		// Arc
+		IomObject arcSegment=segments.addattrobj("segment", "ARC");
+		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A2", "300000.000");
+		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void surfaceTypeArea1Boundary3DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		startSegment.setattrvalue("C3", "5000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		endSegment.setattrvalue("C3", "5000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void surfaceTypeArea2Boundaries3DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		// outer boundary
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		startSegment.setattrvalue("C3", "5000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		endSegment.setattrvalue("C3", "5000.000");
+		// inner boundary
+		IomObject innerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		IomObject polylineValue2 = innerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+		startSegment2.setattrvalue("C1", "480000.000");
+		startSegment2.setattrvalue("C2", "70000.000");
+		startSegment2.setattrvalue("C3", "5000.000");
+		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+		endSegment2.setattrvalue("C1", "480001.000");
+		endSegment2.setattrvalue("C2", "70001.000");
+		endSegment2.setattrvalue("C3", "5000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void surfaceTypeArea2Polylines3DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline 1
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		startSegment.setattrvalue("C3", "5000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		endSegment.setattrvalue("C3", "5000.000");
+		// polyline 2
+		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
+		startSegment11.setattrvalue("C1", "480000.000");
+		startSegment11.setattrvalue("C2", "70000.000");
+		startSegment11.setattrvalue("C3", "5000.000");
+		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
+		endSegment11.setattrvalue("C1", "480001.000");
+		endSegment11.setattrvalue("C2", "70001.000");
+		endSegment11.setattrvalue("C3", "5000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void surfaceTypeAreaWithArc3DOk(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		startSegment.setattrvalue("C3", "5000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "480001.000");
+		endSegment.setattrvalue("C2", "70001.000");
+		endSegment.setattrvalue("C3", "5000.000");
+		// Arc
+		IomObject arcSegment=segments.addattrobj("segment", "ARC");
+		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A2", "300000.000");
+		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C2", "70000.000");
+		arcSegment.setattrvalue("C3", "5000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	
+	
 	// FAILING Tests.
 	// The following Tests which are given, they throw 1 Error/Test.
 	
@@ -1574,7 +2161,7 @@ public class Datatypes23Test {
 		validator.validate(new ObjectEvent(objStraightsFail));
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value is not a member of POLYLINE", logger.getErrs().get(0).getEventMsg());
+		assertEquals("unexpected Type LINE; POLYLINE expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1596,7 +2183,7 @@ public class Datatypes23Test {
 		validator.validate(new ObjectEvent(objStraightsFail));
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value is not a Type of SEGMENTS", logger.getErrs().get(0).getEventMsg());
+		assertEquals("unexpected Type COORD", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1618,7 +2205,7 @@ public class Datatypes23Test {
 		validator.validate(new ObjectEvent(objStraightsFail));
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value is not a Type of COORD or ARC", logger.getErrs().get(0).getEventMsg());
+		assertEquals("unexpected Type POLYLINE", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1642,32 +2229,8 @@ public class Datatypes23Test {
 		validator.validate(new ObjectEvent(objStraightsFail));
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid number of sequences of an IOM_COMPLETE consistence", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid number of sequences in COMPLETE basket", logger.getErrs().get(0).getEventMsg());
 	}
-	
-//	@Test
-//	public void polylineTypeWith3Lineforms(){
-//		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
-//		IomObject polylineValue=objStraightsFail.addattrobj("threeforms", "POLYLINE");
-//		polylineValue.setobjectconsistency(IomConstants.IOM_COMPLETE);
-//		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-//		IomObject segment2=polylineValue.addattrobj("sequence", "SEGMENTS");
-//		IomObject coordStart=segments.addattrobj("segment", "COORD");
-//		coordStart.setattrvalue("C1", "480000.000");
-//		coordStart.setattrvalue("C2", "70000.000");
-//		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-//		coordEnd.setattrvalue("C1", "480000.000");
-//		coordEnd.setattrvalue("C2", "70000.000");
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new ObjectEvent(objStraightsFail));
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==1);
-//		assertEquals("invalid number of sequences of an IOM_COMPLETE consistence", logger.getErrs().get(0).getEventMsg());
-//	}
 	
 	@Test
 	public void polylineTypeUnexpectedARC(){
@@ -1721,5 +2284,461 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("unexpected COORD", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void surfaceTypeNotTypeMULTISURFACE(){
+		Iom_jObject objNotMultisurface=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject surfaceValue=objNotMultisurface.addattrobj("surface2d", "SURFACE");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objNotMultisurface));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("unexpected Type SURFACE; MULTISURFACE expected", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void surfaceTypeCompleteAndTwoSurfaces(){
+		Iom_jObject objCompleteMultisurface=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objCompleteMultisurface.addattrobj("surface2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_COMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject surfaceValue2 = multisurfaceValue.addattrobj("surface", "SURFACE");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objCompleteMultisurface));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("invalid number of surfaces in COMPLETE basket", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void surface2dWith3dImplementation(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject segment=segments.addattrobj("segment", "COORD");
+		segment.setattrvalue("C1", "480000.000");
+		segment.setattrvalue("C2", "70000.000");
+		segment.setattrvalue("C3", "5000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Wrong COORD structure, C3 not expected", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void surface3dWith2dImplementation(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject segment=segments.addattrobj("segment", "COORD");
+		segment.setattrvalue("C1", "480000.000");
+		segment.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void area2dWith3dImplementation(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject segment=segments.addattrobj("segment", "COORD");
+		segment.setattrvalue("C1", "480000.000");
+		segment.setattrvalue("C2", "70000.000");
+		segment.setattrvalue("C3", "5000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Wrong COORD structure, C3 not expected", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void area3dWith2dImplementation(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject coordSegment=segments.addattrobj("segment", "COORD");
+		coordSegment.setattrvalue("C1", "480000.000");
+		coordSegment.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void surface3dInvalidValueRange(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject segment=segments.addattrobj("segment", "COORD");
+		segment.setattrvalue("C1", "4800000.000");
+		segment.setattrvalue("C2", "700000.000");
+		segment.setattrvalue("C3", "50000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==3);
+		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
+		assertEquals("value 50000.000 is out of range", logger.getErrs().get(2).getEventMsg());
+	}
+	
+	@Test
+	public void surface2dInvalidValueRange(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject coordSegment=segments.addattrobj("segment", "COORD");
+		coordSegment.setattrvalue("C1", "4800000.000");
+		coordSegment.setattrvalue("C2", "700000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
+	}
+	
+	@Test
+	public void area3dInvalidValueRange(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject segment=segments.addattrobj("segment", "COORD");
+		segment.setattrvalue("C1", "4800000.000");
+		segment.setattrvalue("C2", "700000.000");
+		segment.setattrvalue("C3", "50000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==3);
+		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
+		assertEquals("value 50000.000 is out of range", logger.getErrs().get(2).getEventMsg());
+	}
+	
+	@Test
+	public void area2dInvalidValueRange(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject coordSegment=segments.addattrobj("segment", "COORD");
+		coordSegment.setattrvalue("C1", "4800000.000");
+		coordSegment.setattrvalue("C2", "700000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
+	}
+	
+	@Test
+	public void surface3dWithARCInvalidValueRange(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject segment=segments.addattrobj("segment", "COORD");
+		segment.setattrvalue("C1", "480000.000");
+		segment.setattrvalue("C2", "70000.000");
+		segment.setattrvalue("C3", "5000.000");
+		IomObject arcSegment=segments.addattrobj("segment", "ARC");
+		arcSegment.setattrvalue("A1", "4800000.000");
+		arcSegment.setattrvalue("A2", "700000.000");
+		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C2", "70000.000");
+		arcSegment.setattrvalue("C3", "5000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
+	}
+	
+	@Test
+	public void surface2dWithARCInvalidValueRange(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject coordSegment=segments.addattrobj("segment", "COORD");
+		coordSegment.setattrvalue("C1", "480000.000");
+		coordSegment.setattrvalue("C2", "70000.000");
+		IomObject arcSegment=segments.addattrobj("segment", "ARC");
+		arcSegment.setattrvalue("A1", "4800000.000");
+		arcSegment.setattrvalue("A2", "700000.000");
+		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
+	}
+	
+	@Test
+	public void area3dWithARCInvalidValueRange(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject segment=segments.addattrobj("segment", "COORD");
+		segment.setattrvalue("C1", "480000.000");
+		segment.setattrvalue("C2", "70000.000");
+		segment.setattrvalue("C3", "5000.000");
+		IomObject arcSegment=segments.addattrobj("segment", "ARC");
+		arcSegment.setattrvalue("A1", "4800000.000");
+		arcSegment.setattrvalue("A2", "700000.000");
+		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C2", "70000.000");
+		arcSegment.setattrvalue("C3", "5000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
+	}
+	
+	@Test
+	public void area2dWithARCInvalidValueRange(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject coordSegment=segments.addattrobj("segment", "COORD");
+		coordSegment.setattrvalue("C1", "480000.000");
+		coordSegment.setattrvalue("C2", "70000.000");
+		IomObject arcSegment=segments.addattrobj("segment", "ARC");
+		arcSegment.setattrvalue("A1", "4800000.000");
+		arcSegment.setattrvalue("A2", "700000.000");
+		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
+	}
+	
+	@Test
+	public void areaTypeNotTypeMULTISURFACE(){
+		Iom_jObject objAreaMultisurface=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject areaValue=objAreaMultisurface.addattrobj("area2d", "AREA");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objAreaMultisurface));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("unexpected Type AREA; MULTISURFACE expected", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void areaTypeCompleteAndTwoAreas(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_COMPLETE);
+		IomObject areaValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject areaValue2 = multisurfaceValue.addattrobj("surface", "SURFACE");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("invalid number of surfaces in COMPLETE basket", logger.getErrs().get(0).getEventMsg());
 	}
 }

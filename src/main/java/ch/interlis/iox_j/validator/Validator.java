@@ -20,6 +20,7 @@ import ch.interlis.ili2c.metamodel.Domain;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.LineForm;
+import ch.interlis.ili2c.metamodel.LineType;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.ObjectType;
@@ -36,6 +37,7 @@ import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox.IoxLogEvent;
 import ch.interlis.iox.IoxLogging;
 import ch.interlis.iox.IoxValidationConfig;
@@ -378,6 +380,33 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						SurfaceOrAreaType surfaceOrAreaType=(SurfaceOrAreaType)type;
 						IomObject surfaceValue=iomObj.getattrobj(attrName,0);
 						if (surfaceValue != null){
+							if (surfaceValue.getobjecttag().equals("MULTISURFACE")){
+								boolean clipped = surfaceValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
+								for(int surfacei=0;surfacei< surfaceValue.getattrvaluecount("surface");surfacei++){
+								  if(!clipped && surfacei>0){
+								    // unclipped surface with multi 'surface' elements
+									  logMsg(checkType,"invalid number of surfaces in COMPLETE basket");
+								  }
+								  IomObject surface= surfaceValue.getattrobj("surface",surfacei);
+								  int boundaryc=surface.getattrvaluecount("boundary");
+								  for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
+								    IomObject boundary=surface.getattrobj("boundary",boundaryi);
+								    if(boundaryi==0){
+								    	// shell
+								    }else{
+								    	// hole
+								    }    
+								    for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
+								      IomObject polyline=boundary.getattrobj("polyline",polylinei);
+								      checkPolyline(checkType, surfaceOrAreaType, polyline);
+								      // add line to shell or hole
+								    }
+								    // add shell or hole to surface
+								  }
+								}
+							} else {
+								logMsg(checkType, "unexpected Type "+surfaceValue.getobjecttag()+"; MULTISURFACE expected");
+							}
 						}
 					}else if(type instanceof CoordType){
 						// If one dimension of coordType is created, C1 has to be set.
@@ -436,7 +465,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 	}
 
-	private void checkPolyline(String checkType, PolylineType polylineType, IomObject polylineValue) {
+	private void checkPolyline(String checkType, LineType polylineType, IomObject polylineValue) {
 		if (polylineValue.getobjecttag().equals("POLYLINE")){
 			boolean clipped = polylineValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
 			for(int sequencei=0;sequencei<polylineValue.getattrvaluecount("sequence");sequencei++){
@@ -489,6 +518,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				logMsg(checkType, "Wrong COORD structure, C1 expected");
 			}
 		}
+		if (coordType.getDimensions().length == 2){
+			if (coordValue.getattrvalue("C3") != null){
+				logMsg(checkType, "Wrong COORD structure, C3 not expected");
+			}
+		}
 		if (coordType.getDimensions().length >= 2){
 			if (coordValue.getattrvalue("C2") != null){
 				checkNumericType(checkType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"));
@@ -518,8 +552,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 	}
-	
+
 	private void checkARCSType(String checkType, CoordType coordType, IomObject coordValue) {
+		if (coordType.getDimensions().length == 2){
+			if (coordValue.getattrvalue("C3") != null){
+				logMsg(checkType, "Wrong ARC structure, C3 not expected");
+			}
+		} else if (coordType.getDimensions().length == 3){
+			if (coordValue.getattrvalue("C3") == null){
+				logMsg(checkType, "Wrong ARC structure, C3 expected");
+			}
+		}
 		if (coordType.getDimensions().length >= 2){
 			if (coordValue.getattrvalue("A1") != null && coordValue.getattrvalue("A2") != null && coordValue.getattrvalue("C1") != null && coordValue.getattrvalue("C2") != null && coordValue.getattrvalue("C3") == null){
 				// if in ili, 2 coords are defined, then in coordValue.getDimensions()[0,1] are only 0 or 1 valid.
