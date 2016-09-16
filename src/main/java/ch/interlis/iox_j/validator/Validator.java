@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 
+
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
@@ -27,6 +28,7 @@ import ch.interlis.ili2c.metamodel.PrecisionDecimal;
 import ch.interlis.ili2c.metamodel.ReferenceType;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.SurfaceOrAreaType;
+import ch.interlis.ili2c.metamodel.SurfaceType;
 import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.ili2c.metamodel.TextType;
 import ch.interlis.ili2c.metamodel.TransferDescription;
@@ -42,6 +44,9 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 
 
 public class Validator implements ch.interlis.iox.IoxValidator {
+	public static final String CONFIG_DO_ITF_LINETABLES="ch.interlis.iox_j.validator.doItfLinetables";
+	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
+	
 	private ch.interlis.iox.IoxValidationConfig validationConfig=null;
 	private IoxLogging errs=null;
 	private LogEventFactory errFact=null;
@@ -58,7 +63,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		this.errs = errs;
 		this.errFact = errFact;
 		this.config=config;
-		this.doItfLineTables = false;
+		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
 		if(doItfLineTables){
 			tag2class=ch.interlis.iom_j.itf.ModelUtilities.getTagMap(td);
 		}else{
@@ -292,7 +297,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}else{
 					 int structc=iomObj.getattrvaluecount(attrName);
 					 if(attr.getDomain().isMandatoryConsideringAliases() && structc==0){
-						 logMsg(checkMultiplicity,"Attribute {0} requires a value", attrPath);
+						 if(doItfLineTables && type instanceof SurfaceType){
+							 // SURFACE; no attrValue in maintable
+						 }else{
+							 logMsg(checkMultiplicity,"Attribute {0} requires a value", attrPath);
+						 }
 					 }
 				}
 				if(ValidationConfig.OFF.equals(checkType)){
@@ -368,6 +377,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 					}else if (type instanceof PolylineType){
 					}else if(type instanceof SurfaceOrAreaType){
+						 if(doItfLineTables){
+							 if(type instanceof SurfaceType){
+								 // SURFACE; no attributeValue in mainTable
+							 }else{
+								 // AREA
+								 // validate coord
+							 }
+						 }else{
+							 // check polygon
+						 }
 					}else if(type instanceof CoordType){
 						// If one dimension of coordType is created, C1 has to be set.
 						// if two dimensions of coordType is created, C1 and C2 has to be set.
