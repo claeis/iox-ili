@@ -33,9 +33,15 @@ public class ArcSegment extends CurveSegment {
 	public Coordinate getEndPoint()  {
 		return endPoint;
 	}
+	public Coordinate getNormalizedEndPoint()  {
+		return isArcNormalized() ? endPoint : startPoint;
+	}
 	@Override
 	public Coordinate getStartPoint()  {
 		return startPoint;
+	}
+	public Coordinate getNormalizedStartPoint()  {
+		return isArcNormalized() ? startPoint : endPoint;
 	}
 	public Coordinate getMidPoint()  {
 		return midPoint;
@@ -157,7 +163,7 @@ public class ArcSegment extends CurveSegment {
 			double Z2O[]=new double[1];
 			double DETAO[]=new double[1];
 			double SIGNO[]=new double[1];
-			if(startPoint.compareTo(endPoint)>=0){
+			if(isArcNormalized()){
 				  HrgUtility.CTRC3P(startPoint.x,startPoint.y,  midPoint.x,midPoint.y, endPoint.x,endPoint.y, Z1O,Z2O,DETAO,SIGNO);
 				  centerPoint=new Coordinate(Z1O[0],Z2O[0]);
 				  sign=SIGNO[0];
@@ -173,6 +179,9 @@ public class ArcSegment extends CurveSegment {
 			  
 		}
 		return centerPoint;
+	}
+	public boolean isArcNormalized() {
+		return startPoint.compareTo(endPoint)>=0;
 	}
 	public double getRadius() {
 		if(centerPoint==null){

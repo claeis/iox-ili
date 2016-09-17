@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jdbm.RecordManager;
+
 
 import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
 import com.vividsolutions.jts.algorithm.locate.SimplePointInAreaLocator;
@@ -88,7 +88,7 @@ public class ItfAreaLinetable2Polygon {
 	private double newVertexOffset=0.0;
 	private JtsextGeometryFactory jtsFact=new JtsextGeometryFactory();
 	private ObjectPoolManager objPool = null;
-	private boolean ignorePolygonBuildingErrors=true;
+	private boolean ignorePolygonBuildingErrors=false;
 	ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>(); 
 	private String linetableIliqname=null;
 	private String geomattrIliqname=null;
@@ -164,18 +164,25 @@ public class ItfAreaLinetable2Polygon {
 	public void buildSurfaces() throws IoxException
 	{
 			surfacesBuilt=true;
+			// optional AREA, no lines at all?
+			if(lines==null){
+				return;
+			}
 			//long startMem=getUsedMemory();
 			LineSet lineset=new LineSet(false,linattrTab,helperTableGeomAttrName);
 
 			ArrayList<CompoundCurve> segv=lineset.buildBoundaries(lines,jtsFact);
 			lineset=null;
-			lines=null;
+			lines=null;		
 			objPool.close();
 			objPool=null;
-			//EhiLogger.debug("Memory segv "+(getUsedMemory()-startMem));
-			
+
 			EhiLogger.traceState("validate noding..."+helperTableGeomAttrName+", maxOverlaps "+maxOverlaps+", offset "+newVertexOffset);
-				CompoundCurveNoder validator=new CompoundCurveNoder(segv,true);
+			for(CompoundCurve seg : segv){
+				ItfSurfaceLinetable2Polygon.removeValidSelfIntersections(seg,maxOverlaps,newVertexOffset);
+			}
+			
+				CompoundCurveNoder validator=new CompoundCurveNoder(segv,false);
 				if(!validator.isValid()){
 					boolean hasIntersections=false;
 					for(Intersection is:validator.getIntersections()){
@@ -206,20 +213,7 @@ public class ItfAreaLinetable2Polygon {
 								  && (is.isIntersection(p10) || is.isIntersection(p11))
 								  && is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
 							// aufeinanderfolgende Segmente der selben Linie
-							  // overlap entfernen
-							  if(is!=null){
-									EhiLogger.traceState("valoverlap "+is.toString());
-							  }
-							  if(seg0 instanceof StraightSegment){
-								  e0.removeOverlap((ArcSegment) seg1, seg0, newVertexOffset);
-							  }else if(seg1 instanceof StraightSegment){
-								  e0.removeOverlap((ArcSegment) seg0, seg1, newVertexOffset);
-							  }else if(((ArcSegment) seg0).getRadius()>((ArcSegment) seg1).getRadius()){
-								  e0.removeOverlap((ArcSegment) seg1, seg0, newVertexOffset);
-							  }else{
-								  // seg1.getRadius() > seg0.getRadius()
-								  e0.removeOverlap((ArcSegment) seg0, seg1, newVertexOffset);
-							  }
+							throw new IllegalStateException("unexpected overlap; should have been removed before; "+is);
 						}else{
 							String []tids=new String[2];
 							tids[0]=(String) is.getCurve1().getUserData();
@@ -235,16 +229,17 @@ public class ItfAreaLinetable2Polygon {
 						throw new IoxInvalidDataException("intersections");
 					}
 				}
-				validator=null;
 			
 			EhiLogger.traceState("polygonize..."+helperTableGeomAttrName);
 			//System.out.println("polygonizer.lines");
 			//Polygonizer polygonizer=new Polygonizer();
 			IoxPolygonizer polygonizer=new IoxPolygonizer(newVertexOffset);
-			for(CompoundCurve boundary:segv){
+			//for(CompoundCurve boundary:segv){
+			for(CompoundCurve boundary:validator.getNodedSubstrings()){
 				//System.out.println(boundary);
 				polygonizer.add(boundary);
 			}
+			validator=null;
 			Collection cutEdges = polygonizer.getCutEdges();
 			if(!cutEdges.isEmpty()){
 				for(Object edge:cutEdges){

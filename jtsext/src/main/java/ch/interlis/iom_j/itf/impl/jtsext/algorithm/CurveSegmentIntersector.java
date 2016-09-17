@@ -21,10 +21,10 @@ public class CurveSegmentIntersector {
 		boolean seg1isArc=isTrueArc(seg1);
 		boolean seg2isArc=isTrueArc(seg2);
 		if(seg1isArc && seg2isArc){
-			Coordinate startPt1 = seg1.getStartPoint();
-			Coordinate endPt1 = seg1.getEndPoint();
-			Coordinate startPt2 = seg2.getStartPoint();
-			Coordinate endPt2 = seg2.getEndPoint();
+			Coordinate startPt1 = ((ArcSegment) seg1).getNormalizedStartPoint();
+			Coordinate endPt1 = ((ArcSegment) seg1).getNormalizedEndPoint();
+			Coordinate startPt2 = ((ArcSegment) seg2).getNormalizedStartPoint();
+			Coordinate endPt2 = ((ArcSegment) seg2).getNormalizedEndPoint();
 			double[] AV1I={0.0, startPt1.x,((ArcSegment) seg1).getMidPoint().x,endPt1.x};
 			double[] AV2I={0.0, startPt1.y,((ArcSegment) seg1).getMidPoint().y,endPt1.y};
 			double[] AW1I={0.0, startPt2.x,((ArcSegment) seg2).getMidPoint().x,endPt2.x};
@@ -82,8 +82,8 @@ public class CurveSegmentIntersector {
 	}
 
 	public void intersectArcStraight(ArcSegment seg1, CurveSegment seg2) {
-		Coordinate startPt1 = seg1.getStartPoint();
-		Coordinate endPt1 = seg1.getEndPoint();
+		Coordinate startPt1 = seg1.getNormalizedStartPoint();
+		Coordinate endPt1 = seg1.getNormalizedEndPoint();
 		Coordinate startPt2 = seg2.getStartPoint();
 		Coordinate endPt2 = seg2.getEndPoint();
 		double[] AV1I={0.0, startPt1.x,seg1.getMidPoint().x,endPt1.x};

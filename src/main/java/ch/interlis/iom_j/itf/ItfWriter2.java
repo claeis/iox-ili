@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
@@ -105,6 +106,12 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 		throws IoxException 
 	{
 		flush();
+		
+    	for(Map<String, IomObject> m:pools.values()){
+    		m.clear();
+    	}
+    	pools=null;
+		
 		if(out!=null){
 			out.close();
 			out=null;
@@ -127,6 +134,7 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 		throws IoxException 
 	{
 		if(event instanceof StartTransferEvent){
+        	pools=new java.util.HashMap<String, java.util.Map<String,IomObject>>();
 			out.write(event);
 		}else if(event instanceof StartBasketEvent){
 			// save event
@@ -304,8 +312,14 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 			out.write(event);
 		}
 	}
+    java.util.HashMap<String,java.util.Map<String, IomObject>> pools=null;
 	private java.util.Map<String, IomObject> getObjectPool(String classQName) throws IoxException {
-		java.util.Map<String, IomObject> m = recman.newObjectPool();
+		java.util.Map<String, IomObject> m=null;
+		m=pools.get(classQName);
+		if(m==null){
+    		m = recman.newObjectPool();
+			pools.put(classQName,m);
+		}
 		return m;
 		
 	}
