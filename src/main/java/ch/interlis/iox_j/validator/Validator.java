@@ -7,21 +7,28 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
+
+
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
+import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.Cardinality;
 import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.CoordType;
+import ch.interlis.ili2c.metamodel.Domain;
 import ch.interlis.ili2c.metamodel.EnumerationType;
+import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.NumericType;
+import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
 import ch.interlis.ili2c.metamodel.ReferenceType;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.SurfaceOrAreaType;
+import ch.interlis.ili2c.metamodel.SurfaceType;
 import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.ili2c.metamodel.TextType;
 import ch.interlis.ili2c.metamodel.TransferDescription;
@@ -37,12 +44,16 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 
 
 public class Validator implements ch.interlis.iox.IoxValidator {
+	public static final String CONFIG_DO_ITF_LINETABLES="ch.interlis.iox_j.validator.doItfLinetables";
+	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
+	
 	private ch.interlis.iox.IoxValidationConfig validationConfig=null;
 	private IoxLogging errs=null;
 	private LogEventFactory errFact=null;
 	private TransferDescription td=null;
 	private boolean doItfLineTables=false;
 	private Settings config=null;
+	private boolean validationOff=false;
 
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
 			IoxLogging errs, LogEventFactory errFact, Settings config) {
@@ -52,13 +63,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		this.errs = errs;
 		this.errFact = errFact;
 		this.config=config;
-		this.doItfLineTables = false;
+		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
 		if(doItfLineTables){
 			tag2class=ch.interlis.iom_j.itf.ModelUtilities.getTagMap(td);
 		}else{
 			tag2class=ch.interlis.ili2c.generator.XSDGenerator.getTagMap(td);
 		}
 		unknownTypev=new HashSet<String>();
+		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
 	}
 
 	/** mappings from xml-tags to Viewable|AttributeDef
@@ -88,6 +100,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	@Override
 	public void validate(ch.interlis.iox.IoxEvent event) {
+		if(validationOff){
+			return;
+		}
 		if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=((ch.interlis.iox.ObjectEvent)event).getIomObject();
 			checkObject(iomObj,null);
@@ -105,7 +120,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		Object modelele=tag2class.get(tag);
 		if(modelele==null){
 			if(!unknownTypev.contains(tag)){
-				errs.addEvent(errFact.logErrorMsg("unknown type <{0}>",tag));
+				errs.addEvent(errFact.logErrorMsg("unknown class <{0}>",tag));
 			}
 			return;
 		}
@@ -123,7 +138,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(aclass1.isAbstract()){
 				errs.addEvent(errFact.logErrorMsg("Object must be a non-abstract class"));
 			}
+			if(aclass1 instanceof AbstractClassDef){
+				Domain oidType=((AbstractClassDef) aclass1).getOid();
+				if(oidType!=null && oidType==td.INTERLIS.UUIDOID){
+					String oid=iomObj.getobjectoid();
+					if(!isValidUuid(oid)){
+						errs.addEvent(errFact.logErrorMsg("TID <{0}> is not a valid UUID", oid));
+					}
+				}
+			}
 		}
+		HashSet<String> propNames=new HashSet<String>();
 		Iterator iter = aclass1.getAttributesAndRoles2();
 		while (iter.hasNext()) {
 			ViewableTransferElement obj = (ViewableTransferElement)iter.next();
@@ -134,6 +159,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(proxyType!=null && (proxyType instanceof ObjectType)){
 						// skip implicit particles (base-viewables) of views
 					}else{
+						propNames.add(attr.getName());
 						checkAttrValue(iomObj,attr,null);
 					}
 				}
@@ -152,6 +178,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								// not just a link?
 								IomObject structvalue = iomObj.getattrobj(
 										roleName, 0);
+								propNames.add(roleName);
 								if (roleOwner.getAttributes().hasNext()
 										|| roleOwner
 												.getLightweightAssociations()
@@ -180,6 +207,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						} else {
 							IomObject structvalue = iomObj.getattrobj(
 									roleName, 0);
+							propNames.add(roleName);
 							refoid = structvalue.getobjectrefoid();
 							long orderPos = structvalue
 									.getobjectreforderpos();
@@ -200,6 +228,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			 }
 		}
+		// check if no superfluous properties
+		int propc=iomObj.getattrcount();
+		for(int propi=0;propi<propc;propi++){
+			String propName=iomObj.getattrname(propi);
+			if(propName.startsWith("_")){
+				// ok, software internal properties start with a '_'
+			}else{
+				if(!propNames.contains(propName)){
+					errs.addEvent(errFact.logErrorMsg("unknown property <{0}>",propName));
+				}
+			}
+		}
+		
 	}
 
 	private void checkAttrValue(IomObject iomObj, AttributeDef attr,String attrPath) {
@@ -213,6 +254,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		 String checkMultiplicity=validationConfig.getConfigValue(attrQName, ValidationConfig.MULTIPLICITY);
 		 String checkType=validationConfig.getConfigValue(attrQName, ValidationConfig.TYPE);
 		 
+			Type type0 = attr.getDomain();
 			Type type = attr.getDomainResolvingAliases();
 			if (type instanceof CompositionType){
 				 int structc=iomObj.getattrvaluecount(attrName);
@@ -233,7 +275,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							Object modelele=tag2class.get(tag);
 							if(modelele==null){
 								if(!unknownTypev.contains(tag)){
-									errs.addEvent(errFact.logErrorMsg("unknown type <{0}>",tag));
+									errs.addEvent(errFact.logErrorMsg("unknown class <{0}>",tag));
 								}
 							}else{
 								Viewable structEleClass=(Viewable) modelele;
@@ -255,50 +297,143 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}else{
 					 int structc=iomObj.getattrvaluecount(attrName);
 					 if(attr.getDomain().isMandatoryConsideringAliases() && structc==0){
-						 logMsg(checkMultiplicity,"Attribute {0} requires a value", attrPath);
+						 if(doItfLineTables && type instanceof SurfaceType){
+							 // SURFACE; no attrValue in maintable
+						 }else{
+							 logMsg(checkMultiplicity,"Attribute {0} requires a value", attrPath);
+						 }
 					 }
 				}
 				if(ValidationConfig.OFF.equals(checkType)){
 					// skip it
 				}else{
-					if( attr.isDomainBoolean()) {
-					}else if(attr.isDomainIliUuid()){
-					}else if(attr.isDomainIli1Date()) {
-					}else if(attr.isDomainIli2Date()) {
-					}else if(attr.isDomainIli2Time()) {
-					}else if(attr.isDomainIli2DateTime()) {
+					if (attr.isDomainBoolean()) {
+						// Value has to be not null and ("true" or "false")
+						String valueStr = iomObj.getattrvalue(attrName);
+						if (valueStr == null || valueStr.matches("^(true|false)$")) {
+							// Value okay, skip it
+						} else {
+							logMsg(checkType, "value <{0}> is not a BOOLEAN", valueStr);
+						}
+					} else if (attr.isDomainIliUuid()) {
+						// Value is exactly 36 chars long and matches the regex
+						String valueStr = iomObj.getattrvalue(attrName);
+						if (valueStr == null || isValidUuid(valueStr)) {
+								// Value ok, Skip it
+						} else {
+							logMsg(checkType, "value <{0}> is not a valid UUID", valueStr);
+						}
+					} else if (attr.isDomainIli1Date()) {
+						String valueStr = iomObj.getattrvalue(attrName);
+						// Value has to be not null and exactly 8 numbers long
+						if (valueStr == null){
+							// no value, skip test
+						}else if(valueStr.length() == 8) {
+							// Value has to be a number
+							try {
+								int year = Integer.parseInt(valueStr.substring(0, 4));
+								int month = Integer.parseInt(valueStr.substring(4, 6));
+								int day = Integer.parseInt(valueStr.substring(6, 8));
+								// Substring value: year, month and day has to be in valid range
+								if (year >= 1582 && year <= 2999 && month >= 01 && month <= 12
+										&& day >= 01 && day <= 31) {
+								} else {
+									logMsg(checkType, "value <{0}> is not in range", valueStr);
+								}
+							} catch (NumberFormatException numberformatexception) {
+								logMsg(checkType, "value <{0}> is not a valid Date", valueStr);
+							}
+						} else {
+							logMsg(checkType, "value <{0}> is not a valid Date", valueStr);
+						}
+					} else if (attr.isDomainIli2Date()) {
+						// Value matches regex and is not null and is in range of type.
+						String valueStr = iomObj.getattrvalue(attrName);
+						FormattedType subType = (FormattedType) type;
+						if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr)) {
+							// Value okay, skip it
+						} else {
+							logMsg(checkType, "value <{0}> is not a valid Date", valueStr);
+						}
+					} else if (attr.isDomainIli2Time()) {
+						// Value is not null and matches 0:0:0.000-23:59:59.999
+						String valueStr = iomObj.getattrvalue(attrName);
+						FormattedType subType = (FormattedType) type;
+						// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
+						if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr) && valueStr.length() >= 9 && valueStr.length() <= 12) {
+							// Value okay, skip it
+						} else {
+							logMsg(checkType, "value <{0}> is not a valid Time", valueStr);
+						}
+					} else if (attr.isDomainIli2DateTime()) {
+						// Value is not null
+						String valueStr = iomObj.getattrvalue(attrName);
+						FormattedType subType = (FormattedType) type;
+						// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
+						if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr) && valueStr.length() >= 18 && valueStr.length() <= 23) {
+							// Value okay, skip it
+						} else {
+							logMsg(checkType, "value <{0}> is not a valid DateTime", valueStr);
+						}
 					}else if (type instanceof PolylineType){
 					}else if(type instanceof SurfaceOrAreaType){
+						 if(doItfLineTables){
+							 if(type instanceof SurfaceType){
+								 // SURFACE; no attributeValue in mainTable
+							 }else{
+								 // AREA
+								 // validate coord
+							 }
+						 }else{
+							 // check polygon
+						 }
 					}else if(type instanceof CoordType){
+						// If one dimension of coordType is created, C1 has to be set.
+						// if two dimensions of coordType is created, C1 and C2 has to be set.
+						// if three dimensions of coordType is created, C1, C2 and C3 has to be set.
+						 IomObject coordValue=iomObj.getattrobj(attrName, 0);
+						 if(coordValue!=null){
+							CoordType coordType=(CoordType)type;
+							if (coordType.getDimensions().length >= 1){
+								if (coordValue.getattrvalue("C1") != null){
+									checkNumericType(checkType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"));
+								} else {
+									logMsg(checkType, "Wrong COORD structure, C1 expected");
+								}
+							}
+							if (coordType.getDimensions().length >= 2){
+								if (coordValue.getattrvalue("C2") != null){
+									checkNumericType(checkType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"));
+								} else {
+									logMsg(checkType, "Wrong COORD structure, C2 expected");
+								}
+							}
+							if (coordType.getDimensions().length == 3){
+								if (coordValue.getattrvalue("C3") != null){
+									checkNumericType(checkType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"));
+								} else {
+									logMsg(checkType, "Wrong COORD structure, C3 expected");
+								}
+							}
+							// check if no superfluous properties
+							int propc=coordValue.getattrcount();
+							for(int propi=0;propi<propc;propi++){
+								String propName=coordValue.getattrname(propi);
+								if(propName.startsWith("_")){
+									// ok, software internal properties start with a '_'
+								}else{
+									if(!propName.equals("C1") && !propName.equals("C2") && !propName.equals("C3")){
+										errs.addEvent(errFact.logErrorMsg("Wrong COORD structure, unknown property <{0}>",propName));
+									}
+								}
+							}
+							
+							
+						 } 
 					}else if(type instanceof NumericType){
 						String valueStr=iomObj.getattrvalue(attrName);
 						if(valueStr!=null){
-							PrecisionDecimal value=null;
-							try {
-								value=new PrecisionDecimal(valueStr);
-							} catch (NumberFormatException e) {
-								 logMsg(checkType,"value <{0}> is not a number", valueStr);
-							}
-							if(value!=null){
-								PrecisionDecimal minimum=((NumericType) type).getMinimum();
-								PrecisionDecimal maximum=((NumericType) type).getMaximum();
-							BigDecimal rounded = new BigDecimal(
-									value.toString()).setScale(
-									value.getExponent(),
-									BigDecimal.ROUND_HALF_UP);
-							BigDecimal min_general = new BigDecimal(
-									minimum.toString()).setScale(
-									minimum.getExponent(),
-									BigDecimal.ROUND_HALF_UP);
-							BigDecimal max_general = new BigDecimal(
-									maximum.toString()).setScale(
-									maximum.getExponent(),
-									BigDecimal.ROUND_HALF_UP);
-						      if (rounded.compareTo (min_general) == -1
-						    	  || rounded.compareTo (max_general) == +1){
-									 logMsg(checkType,"value {0} is out of range", valueStr);
-						      }
-							}							
+							checkNumericType(checkType, (NumericType)type, valueStr);							
 						}
 					}else if(type instanceof EnumerationType){
 						String value=iomObj.getattrvalue(attrName);
@@ -318,7 +453,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								}
 							}
 							if(((TextType) type).isNormalized()){
-								if(value.indexOf('\n')>0 || value.indexOf('\r')>0 || value.indexOf('\t')>0){
+								if(value.indexOf('\n')>=0 || value.indexOf('\r')>=0 || value.indexOf('\t')>=0){
 									 logMsg(checkType,"Attribute {0} must not contain control characters", attrPath);
 								}
 							}
@@ -329,6 +464,39 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			
 		
+	}
+
+	private void checkNumericType(String checkType, NumericType type, String valueStr) {
+		PrecisionDecimal value=null;
+		try {
+			value=new PrecisionDecimal(valueStr);
+		} catch (NumberFormatException e) {
+			 logMsg(checkType,"value <{0}> is not a number", valueStr);
+		}
+		if(value!=null){
+			PrecisionDecimal minimum=((NumericType) type).getMinimum();
+			PrecisionDecimal maximum=((NumericType) type).getMaximum();
+		BigDecimal rounded = new BigDecimal(
+				value.toString()).setScale(
+				value.getExponent(),
+				BigDecimal.ROUND_HALF_UP);
+		BigDecimal min_general = new BigDecimal(
+				minimum.toString()).setScale(
+				minimum.getExponent(),
+				BigDecimal.ROUND_HALF_UP);
+		BigDecimal max_general = new BigDecimal(
+				maximum.toString()).setScale(
+				maximum.getExponent(),
+				BigDecimal.ROUND_HALF_UP);
+		  if (rounded.compareTo (min_general) == -1
+			  || rounded.compareTo (max_general) == +1){
+				 logMsg(checkType,"value {0} is out of range", valueStr);
+		  }
+		}
+	}
+
+	public boolean isValidUuid(String valueStr) {
+		return valueStr.length() == 36 && valueStr.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}?");
 	}
 	private void logMsg(String checkKind,String msg,String... args){
 		 if(ValidationConfig.WARNING.equals(checkKind)){
@@ -342,6 +510,4 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		// TODO Auto-generated method stub
 		
 	}
-
-
 }
