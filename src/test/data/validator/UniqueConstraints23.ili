@@ -1,0 +1,31 @@
+INTERLIS 2.3;
+MODEL UniqueConstraints23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-09-13" =
+	TOPIC Topic=
+		DOMAIN 
+			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					        70000.000 .. 310000.000 [INTERLIS.m],
+						   ROTATION 2 -> 1;	
+		CLASS ClassA =
+		  !! uniqueConstraint
+		  attr1 : TEXT*10;
+		  attr2 : 0 .. 100;
+		END ClassA;
+		CLASS ClassB =
+		  attr1 : TEXT*10;
+		  attr2 : 0 .. 100;
+		  UNIQUE attr1;
+		END ClassB;
+		CLASS ClassC =
+		  attr1 : TEXT*10;
+		  attr2 : 0 .. 100;
+		  UNIQUE attr1, attr2;
+		END ClassC;
+		CLASS ClassD =
+		  attr1 : TEXT*10;
+		  attr2 : 0 .. 100;
+		  UNIQUE attr1;
+		  UNIQUE attr2;
+		END ClassD;
+	END Topic;
+END UniqueConstraints23.

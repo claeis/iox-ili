@@ -23,6 +23,7 @@ import ch.interlis.ili2c.metamodel.LineForm;
 import ch.interlis.ili2c.metamodel.LineType;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
+import ch.interlis.ili2c.metamodel.ObjectPath;
 import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
@@ -33,6 +34,7 @@ import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.ili2c.metamodel.TextType;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.Type;
+import ch.interlis.ili2c.metamodel.UniquenessConstraint;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
 import ch.interlis.iom.IomConstants;
@@ -106,9 +108,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			IomObject iomObj=((ch.interlis.iox.ObjectEvent)event).getIomObject();
 			checkObject(iomObj,null);
 		}
-		
 	}
-
+	
+	// Hashset of unique constraints.
+	HashMap<AttributeArray, String> seenValues = new HashMap<AttributeArray, String>();
+	
 	private void checkObject(IomObject iomObj,String attrPath) {
 		boolean isObject= attrPath==null;
 		if(isObject){
@@ -147,6 +151,38 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 		}
+		
+		
+		if(isObject){
+			String oid=iomObj.getobjectoid();
+			// for each UNIQUE
+			Iterator attrI=aclass1.iterator();
+			// iteriere durch alle attribute, solange es ein nächstes attr hat
+			while (attrI.hasNext()) {
+				Object obj1 = attrI.next();
+				if(obj1 instanceof UniquenessConstraint){
+					UniquenessConstraint uniqueConstraint=(UniquenessConstraint) obj1;
+					StringBuilder contentUniqueAttrs = new StringBuilder();
+					// get list of attributes, that should be unique
+					ArrayList<String> uniqueAttrs=new ArrayList<String>();
+					// füge das uniqueConstraint zum uniqueAttrs hinzu.
+					Iterator iter = uniqueConstraint.getElements().iteratorAttribute();
+					while (iter.hasNext()) {
+						ObjectPath object = (ObjectPath)iter.next();
+						uniqueAttrs.add(object.getLastPathEl().getName());
+						contentUniqueAttrs.append(object.getLastPathEl().getName());
+					}
+					AttributeArray returnValue = checkUnique(iomObj,uniqueAttrs);
+					if (returnValue == null){
+						// ok
+					} else {
+						errs.addEvent(errFact.logErrorMsg("Unique is violated! Values {0} already exist in Object: {1}", returnValue.valuesAsString(), seenValues.get(returnValue)));
+					}
+				}
+			}
+		}
+		
+		
 		HashSet<String> propNames=new HashSet<String>();
 		Iterator iter = aclass1.getAttributesAndRoles2();
 		while (iter.hasNext()) {
@@ -240,6 +276,24 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 		
+	}
+	
+	
+	// viewable aClass
+	private AttributeArray checkUnique(IomObject currentObject,ArrayList<String>uniqueAttrs) {
+		int sizeOfUniqueAttribute = uniqueAttrs.size();
+		
+		ArrayList<String> accu = new ArrayList<String>();
+		for (int i=0;i<sizeOfUniqueAttribute;i++){
+			accu.add(currentObject.getattrvalue(uniqueAttrs.get(i)));
+		}
+		AttributeArray values=new AttributeArray(accu);
+		if (seenValues.containsKey(values)){
+			return values;
+		} else {
+			seenValues.put(values, currentObject.getobjectoid());
+		}
+		return null;
 	}
 
 	private void checkAttrValue(IomObject iomObj, AttributeDef attr,String attrPath) {
