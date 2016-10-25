@@ -71,7 +71,8 @@ import java.util.Map;
 	 */
     public class Iligml10Writer implements ch.interlis.iox.IoxWriter
     {
-        private XMLStreamWriter xout=null;
+        private static final String defaultCrs = "EPSG:21781";
+		private XMLStreamWriter xout=null;
     	private ObjectPoolManager recman = null;
         private ViewableProperties mapping = null;
     	private XtfModel xtfModels[]=null;
@@ -485,7 +486,7 @@ import java.util.Map;
 							{
 								// COORD
 								xout.writeStartElement(xmlns_attr,attrName);
-								writeCoord(child,"EPSG:21781");
+								writeCoord(child,defaultCrs);
 								xout.writeEndElement(/*attr*/);
 								if (valueCount > 1)
 								{
@@ -500,7 +501,7 @@ import java.util.Map;
 								}else{
 									xout.writeStartElement(xmlns_attr,attrName);
 								}
-								writePolyline(child, false,"EPSG:21781");
+								writePolyline(child, false,defaultCrs);
 								xout.writeEndElement(/*attr*/);
 								if (valueCount > 1)
 								{
@@ -511,7 +512,7 @@ import java.util.Map;
 							{
 								// MULTISURFACE
 								xout.writeStartElement(xmlns_attr,attrName);
-								writeSurface(child,"EPSG:21781");
+								writeSurface(child,defaultCrs);
 								xout.writeEndElement(/*attr*/);
 								if (valueCount > 1)
 								{
