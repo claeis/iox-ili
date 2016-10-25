@@ -30,7 +30,7 @@ public class HrgUtility {
 public static void CTRC3P_(double P1I,double P2I,double  S1I,double S2I,double Q1I,double Q2I,double Z1O[],double Z2O[],double DETAO[],double SIGNO[])
 { ///////////////////////////////////////////////////////
 	//	Center point of a circle defined by 3 points
-	//P1I,P2I I-arguments: mil coord of 1st circle de£ pt
+	//P1I,P2I I-arguments: mil coord of 1st circle def pt
 	//Q1I,Q2I I-arguments:mil coord of 3rd circle def pt
 	//Sli,S2I I-arguments:mil coord of 2nd circle def pt
 	//Z1O,Z2O O-arguments: mil coord of circle center z
@@ -77,8 +77,8 @@ public static void CTRC3P_(double P1I,double P2I,double  S1I,double S2I,double Q
 	// 	CASE	DetA =/= O, m and n are not parallel
 	if(!(DETAO[0]==0.0 || Math.abs(DETAO[0])<EPS)){ // CEIS: 20150615 check also near equal to 0
 		//or select only one
-		//of the 2 possibili­
-		//ties to calculate
+		//of the 2 possibilities 
+		//to calculate
 		//point z
 		L1 = (G1*A22 - A12*G2)/ DETAO[0];
 		L2 = (A11*G2 - G1*A21)/ DETAO[0];
@@ -93,8 +93,8 @@ public static void CTRC3P_(double P1I,double P2I,double  S1I,double S2I,double Q
 		}
 	}else{
 		if(P1I==Q1I && P2I==Q2I){
-			//	CASE 	DetA == 0 with P == Q • This is equivalent to m = k*n with
-			// 	a real k > 0 • In this case, a full circle is defined with center
+			//	CASE 	DetA == 0 with P == Q. This is equivalent to m = k*n with
+			// 	a real k > 0. In this case, a full circle is defined with center
 			// Z in the middle between P = Q and S and for the tangent vector
 			// in P holds t = m and in Q holds t = n = -m
 				Z1O[0] = (P1I + S1I)/ 2.0;
@@ -102,8 +102,8 @@ public static void CTRC3P_(double P1I,double P2I,double  S1I,double S2I,double Q
 				SIGNO[0] = 0.0;
 				DETAO[0]=HrgUtility.TWO_PI; // CEIS: 20150615 set to TWO_PI, so that caller can easily detect full circle
 		}else{
-			// 	CASE	DetA == 0 with P =I= Q • This is equivalent to m =  k*n with
-			// 	a real k > 0 • In this case, the points P,Q,S lie on the same
+			// 	CASE	DetA == 0 with P =I= Q. This is equivalent to m =  k*n with
+			// 	a real k > 0. In this case, the points P,Q,S lie on the same
 			// 	stright line, the circle is degenerated to a stright line.
 			Z1O[0] = S1I;
 			Z2O[0] = S2I;
@@ -552,7 +552,7 @@ public static void ISCISR(double AV1I[],double AV2I[],double SL1I[],double SL2I[
 public static void ISCISR_(double AV1I[],double AV2I[],double SL1I[],double SL2I[],int NHO[],double H1O[],double H2O[],double overlap[])
 	{
 		//double AV1I[] = null,AV2I[]=null; //[3] I-arguments:  mil coord of 1st 3 vert 
-		//double SL1I[]=null,SL2I[]=null; //[3] I-arg: mil coord of 2 vertices defi­
+		//double SL1I[]=null,SL2I[]=null; //[3] I-arg: mil coord of 2 vertices defi
 		//int NHO;		// O-arg: nr of hits = nr of intersection point
 		//double H1O[]=null,H2O[]=null; //[2] O-arg: mil coord of hit (= intersc) pt
 		// ning the stright line. The 3rd array element
