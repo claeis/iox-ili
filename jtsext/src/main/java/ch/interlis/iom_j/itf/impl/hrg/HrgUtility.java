@@ -7,6 +7,9 @@ public class HrgUtility {
 	//static final double EPS100=EPS;
 	static final double EPS=0.00000001;
 	static final double EPS100=EPS*190.0;
+	// Toleranz um berechnete Schnittpunkte (bei Bogen/Bogen Schnitt)
+	//   mit dem Start/Endpunkt der Boegen zu vergleichen
+	static final double CIRCIR_ENDPT_TOL=5E-5;
 
 	public static void CTRC3P(double P1I,double P2I,double  S1I,double S2I,double Q1I,double Q2I,double Z1O[],double Z2O[],double DETAO[],double SIGNO[])
 	{
@@ -275,8 +278,8 @@ private static double DISTDF(double a1, double b1, double a2, double b2) {
  */
 public static void ISCICR(double AV1I[],double AV2I[],double AW1I[],double AW2I[],int NHO[],double H1O[],double H2O[],double overlap[])
 {
-	double dx=AV1I[1];
-	double dy=AV2I[1];
+	double dx=Math.min(AV1I[1],AW1I[1]);
+	double dy=Math.min(AV2I[1],AW2I[1]);
 	double[] AV1I_={AV1I[0]-dx, AV1I[1]-dx,AV1I[2]-dx,AV1I[3]-dx};
 	double[] AV2I_={AV2I[0]-dy, AV2I[1]-dy,AV2I[2]-dy,AV2I[3]-dy};
 	double[] AW1I_={AW1I[0]-dx, AW1I[1]-dx,AW1I[2]-dx,AW1I[3]-dx};
@@ -411,7 +414,7 @@ public static void ISCICR_(double AV1I[],double AV2I[],double AW1I[],double AW2I
 		D1 = W1 - V1;
 		D2 = W2 - V2;
 		DVWSQ =  D1*D1 + D2*D2;
-		DVW =   Math.sqrt(DVWSQ);
+		DVW =   Math.hypot(D1, D2); // Math.sqrt(DVWSQ);
 		
 		//	DO CASE 	distance between circle centers and sumjdiff of radii
 		// 	<---CASE 	identical circle centers and radii, escape with message
@@ -478,10 +481,10 @@ public static void ISCICR_(double AV1I[],double AV2I[],double AW1I[],double AW2I
 				//DO 240 JH =   l,NHO
 				boolean continueJP=false;
 				for(JH=1;JH<=NHO[0];JH++){
-					if(Math.abs(P1[JP] - H1O[JH]) > EPS100){
+					if(Math.abs(P1[JP] - H1O[JH]) > CIRCIR_ENDPT_TOL){
 						continue;
 					}
-					if(Math.abs(P2[JP] - H2O[JH]) > EPS100){
+					if(Math.abs(P2[JP] - H2O[JH]) > CIRCIR_ENDPT_TOL){
 						continue;
 					}
 					// THEN 	check next still existing IP

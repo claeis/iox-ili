@@ -383,16 +383,18 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 			ItfAreaLinetable2Polygon polygonizer, String mainObjOid,
 			IomObject mainObj) throws IoxException {
 		IomObject georef=mainObj.getattrobj(areaAttrName, 0);
-		mainObj.deleteattrobj(areaAttrName, 0);
-		mainObj.addattrobj(SAVED_GEOREF_PREFIX+areaAttrName, georef);
-		IomObject polygon=null;
-		try {
-			polygon = polygonizer.getSurfaceObject(mainObjOid);
-			if(polygon!=null){
-				mainObj.addattrobj(areaAttrName, polygon);
+		if(georef!=null){
+			mainObj.deleteattrobj(areaAttrName, 0);
+			mainObj.addattrobj(SAVED_GEOREF_PREFIX+areaAttrName, georef);
+			IomObject polygon=null;
+			try {
+				polygon = polygonizer.getSurfaceObject(mainObjOid);
+				if(polygon!=null){
+					mainObj.addattrobj(areaAttrName, polygon);
+				}
+			} catch (IoxInvalidDataException e) {
+				dataerrs.add(e);
 			}
-		} catch (IoxInvalidDataException e) {
-			dataerrs.add(e);
 		}
 	}
 	private IoxEvent _next_Event=null;

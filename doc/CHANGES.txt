@@ -2,6 +2,16 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.13.4 (2016-09-17)
+-----------------------------
+- ItfWriter2: fixed missing objects in output
+- ItfReader2: fixed NullPointerException if OPTIONAL AREA with not geometries at all
+- list intersections only once
+- ItfReader2: fixed polygon building in SURFACE with common point between hole and shell that is not start/end point of a boundary line
+- ItfReader2: fixed polygon building in AREA with common point between boundaries that is not start/end point of a boundary line
+- ItfReader2: fixed technical tolerance of circle/circle intersection (affects polygon validation)
+- validator: handle IoxEvents with Itf linetables
+
 iox-ili 1.13.2 (2016-09-05)
 -----------------------------
 - validator: validate DATE, BOOLEAN, XMLDate, XMLDateTime, XMLTime, UUIDOID

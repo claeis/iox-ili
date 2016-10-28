@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import com.sun.xml.internal.fastinfoset.util.StringArray;
 import com.vividsolutions.jts.algorithm.Angle;
 
+
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
@@ -64,6 +65,9 @@ import ch.interlis.models.INTERLIS.*;
 
 
 public class Validator implements ch.interlis.iox.IoxValidator {
+	public static final String CONFIG_DO_ITF_LINETABLES="ch.interlis.iox_j.validator.doItfLinetables";
+	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
+	
 	private ch.interlis.iox.IoxValidationConfig validationConfig=null;
 	private IoxLogging errs=null;
 	private LogEventFactory errFact=null;
@@ -80,7 +84,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		this.errs = errs;
 		this.errFact = errFact;
 		this.config=config;
-		this.doItfLineTables = false;
+		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
 		if(doItfLineTables){
 			tag2class=ch.interlis.iom_j.itf.ModelUtilities.getTagMap(td);
 		}else{
@@ -191,10 +195,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	HashMap<AttributeArray, String> seenValues = new HashMap<AttributeArray, String>();
 	// List of all arrayLists of unique attributes.
 	ArrayList<ArrayList<String>> listOfUniqueAttrsLists = new ArrayList<ArrayList<String>>();
-	// List of all attribute array lists which are not constraints.
-//	ArrayList<ArrayList<String>> listOfNonConstraintAttrsLists = new ArrayList<ArrayList<String>>();
-//	ArrayList<ArrayList<String>> listOfConstraintAttrsLists = new ArrayList<ArrayList<String>>();
-	
 	
 	private void checkObject(IomObject iomObj,String attrPath) {
 		if (uniquenessOfOid != null && uniquenessOfOid.equals(iomObj.getobjectoid().toString())){
@@ -284,85 +284,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(isObject){
 			allObjects.add(iomObj);
 		}
-		// ExistenceConstraint
-//		if(isObject){
-//			boolean attrCheck = false;
-//			boolean valueCheck = false;
-//			boolean classPathCheck = false;
-//			Iterator attrsOfCurrentClass=aclass1.iterator();
-//			while (attrsOfCurrentClass.hasNext()){
-//				ArrayList<String> listOfConstraintAttrs = new ArrayList<String>();
-//				listOfConstraintAttrs.clear();
-//				Object currentAttr = attrsOfCurrentClass.next();
-//				if(currentAttr instanceof ExistenceConstraint){
-//					ExistenceConstraint currentAttrOfExCon=(ExistenceConstraint) currentAttr;
-//					Type attrTypeOfExCon = currentAttrOfExCon.getRestrictedAttribute().getType();
-//					if(attrTypeOfExCon instanceof StructuredUnitType){
-//						
-//					} else if(attrTypeOfExCon instanceof LineType){
-//						
-//					} else if(attrTypeOfExCon instanceof SurfaceType){
-//						
-//					} else if(attrTypeOfExCon instanceof AreaType){
-//						
-//					} else {
-//						// speichere alle attrs von constraint class in ArrayListConstraint.
-//						Iterator<ObjectPath> iter = currentAttrOfExCon.iteratorRequiredIn();
-//						while (iter.hasNext()) {
-//							ObjectPath attrName = (ObjectPath)iter.next();
-//							Table table = (Table) attrName.getRoot();
-//							String nameclass = table.toString();
-//							listOfConstraintAttrs.add(nameclass);
-//							listOfConstraintAttrs.add(attrName.toString());
-//							for(int j=0;j<listOfNonConstraintAttrsLists.size();j++){
-//								ArrayList<String> object = listOfNonConstraintAttrsLists.get(j);
-//								if(object.contains(nameclass) && object.contains(attrName.toString())){
-//									listOfConstraintAttrs.add(2, object.get(2));
-//								}
-//							}
-//							listOfConstraintAttrs.add(3, aclass1.toString());
-//							listOfConstraintAttrsLists.add(listOfConstraintAttrs);
-//						}
-//					}
-//					if (listOfNonConstraintAttrsLists != null && listOfConstraintAttrsLists != null){
-//						for(int j=0;j<listOfNonConstraintAttrsLists.size();j++){
-//							ArrayList<String> object = listOfNonConstraintAttrsLists.get(j);
-//							String classPath = object.get(0).toString();
-//							String attrName = object.get(1).toString();
-//							String attrValue = object.get(2).toString();
-//							for(int i=0;i<listOfConstraintAttrsLists.size();i++){
-//								ArrayList<String> objectConstraint = listOfConstraintAttrsLists.get(i);
-//								String attrNameExCo = objectConstraint.get(1).toString();
-//								String attrValueExCo = objectConstraint.get(2).toString();
-//								String classPathClass = objectConstraint.get(3).toString();
-//								// Complete listOfConstraintAttrs.
-//								if (classPath.equals(classPathClass)){
-//									classPathCheck = true;
-//									if (attrName.equals(attrNameExCo)){
-//										attrCheck = true;
-//										if (attrValue.equals(attrValueExCo)){
-//											valueCheck = true;
-//										}
-//									}
-//									if (j == listOfNonConstraintAttrsLists.size()-1 && i == listOfConstraintAttrsLists.size()-1) {
-//										if (classPathCheck == false){
-//											errs.addEvent(errFact.logErrorMsg("Object of defined ExistenceConstraint has to contain a valid referenced class"));
-//										} else if (classPathCheck == true && attrCheck == false){
-//											errs.addEvent(errFact.logErrorMsg("Object of defined ExistenceConstraint has to contain all attrs in referenced class"));
-//										} else if (classPathCheck == true && attrCheck == true && valueCheck == false){
-//											errs.addEvent(errFact.logErrorMsg("Object of defined ExistenceConstraint has to contain all attributevalues in referenced class"));
-//										} else if (classPathCheck == true && attrCheck == false && valueCheck == false){
-//											errs.addEvent(errFact.logErrorMsg("Object of defined ExistenceConstraint has to contain all attrs and attributevalues in referenced class"));
-//										}
-//									} 
-//								}
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}
-			
 		
 		HashSet<String> propNames=new HashSet<String>();
 		Iterator iter = aclass1.getAttributesAndRoles2();
@@ -530,7 +451,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}else{
 					 int structc=iomObj.getattrvaluecount(attrName);
 					 if(attr.getDomain().isMandatoryConsideringAliases() && structc==0){
-						 logMsg(checkMultiplicity,"Attribute {0} requires a value", attrPath);
+						 if(doItfLineTables && type instanceof SurfaceType){
+							 // SURFACE; no attrValue in maintable
+						 }else{
+							 logMsg(checkMultiplicity,"Attribute {0} requires a value", attrPath);
+						 }
 					 }
 				}
 				if(ValidationConfig.OFF.equals(checkType)){
@@ -611,37 +536,47 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							checkPolyline(checkType, polylineType, polylineValue);
 						}
 					}else if(type instanceof SurfaceOrAreaType){
-						SurfaceOrAreaType surfaceOrAreaType=(SurfaceOrAreaType)type;
-						IomObject surfaceValue=iomObj.getattrobj(attrName,0);
-						if (surfaceValue != null){
-							if (surfaceValue.getobjecttag().equals("MULTISURFACE")){
-								boolean clipped = surfaceValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
-								for(int surfacei=0;surfacei< surfaceValue.getattrvaluecount("surface");surfacei++){
-								  if(!clipped && surfacei>0){
-								    // unclipped surface with multi 'surface' elements
-									  logMsg(checkType,"invalid number of surfaces in COMPLETE basket");
-								  }
-								  IomObject surface= surfaceValue.getattrobj("surface",surfacei);
-								  int boundaryc=surface.getattrvaluecount("boundary");
-								  for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
-								    IomObject boundary=surface.getattrobj("boundary",boundaryi);
-								    if(boundaryi==0){
-								    	// shell
-								    }else{
-								    	// hole
-								    }    
-								    for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
-								      IomObject polyline=boundary.getattrobj("polyline",polylinei);
-								      checkPolyline(checkType, surfaceOrAreaType, polyline);
-								      // add line to shell or hole
-								    }
-								    // add shell or hole to surface
-								  }
+						 if(doItfLineTables){
+							 if(type instanceof SurfaceType){
+								 // SURFACE; no attributeValue in mainTable
+							 }else{
+								 // AREA
+								 // validate coord
+							 }
+						 }else{
+							 // check polygon
+								SurfaceOrAreaType surfaceOrAreaType=(SurfaceOrAreaType)type;
+								IomObject surfaceValue=iomObj.getattrobj(attrName,0);
+								if (surfaceValue != null){
+									if (surfaceValue.getobjecttag().equals("MULTISURFACE")){
+										boolean clipped = surfaceValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
+										for(int surfacei=0;surfacei< surfaceValue.getattrvaluecount("surface");surfacei++){
+										  if(!clipped && surfacei>0){
+										    // unclipped surface with multi 'surface' elements
+											  logMsg(checkType,"invalid number of surfaces in COMPLETE basket");
+										  }
+										  IomObject surface= surfaceValue.getattrobj("surface",surfacei);
+										  int boundaryc=surface.getattrvaluecount("boundary");
+										  for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
+										    IomObject boundary=surface.getattrobj("boundary",boundaryi);
+										    if(boundaryi==0){
+										    	// shell
+										    }else{
+										    	// hole
+										    }    
+										    for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
+										      IomObject polyline=boundary.getattrobj("polyline",polylinei);
+										      checkPolyline(checkType, surfaceOrAreaType, polyline);
+										      // add line to shell or hole
+										    }
+										    // add shell or hole to surface
+										  }
+										}
+									} else {
+										logMsg(checkType, "unexpected Type "+surfaceValue.getobjecttag()+"; MULTISURFACE expected");
+									}
 								}
-							} else {
-								logMsg(checkType, "unexpected Type "+surfaceValue.getobjecttag()+"; MULTISURFACE expected");
-							}
-						}
+						 }
 					}else if(type instanceof CoordType){
 						IomObject coord=iomObj.getattrobj(attrName, 0);
 						// Interlis 2

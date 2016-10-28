@@ -188,6 +188,40 @@ public class ItfSurfaceLinetable2PolygonTest {
 		
 	}
 	@Test
+	public void testInnererRand2LinienOhneGemeinsamerStart() throws IoxException {
+		String refAttr="_itf_ref_TableA";
+		String geomAttr="_itf_geom_TableA";
+		String tableName="Test1.TopicA.TableA_Form";
+		ItfSurfaceLinetable2Polygon builder=new ItfSurfaceLinetable2Polygon(refAttr,geomAttr);
+		String mainObjectTid="10";
+		
+		IomObject polyline=newPolyline();
+		addCoord(polyline,120.0,  110.0); 
+		addCoord(polyline,120.0,  140.0); 
+		addCoord(polyline,110.0,  140.0); 
+		addCoord(polyline,110.0,  110.0);
+		addCoord(polyline,120.0,  110.0); 
+		IomObject linetableObj=createLinetableObj("1",tableName,refAttr,geomAttr,mainObjectTid,polyline);
+		//System.out.println(linetableObj);
+		builder.addItfLinetableObject(linetableObj);
+		
+		polyline=newPolyline();
+		addCoord(polyline,115.0,  115.0); 
+		addCoord(polyline,115.0,  120.0); 
+		addCoord(polyline,112.0,  120.0); 
+		addCoord(polyline,110.0,  110.0);
+		addCoord(polyline,115.0,  115.0); 
+		linetableObj=createLinetableObj("2",tableName,refAttr,geomAttr,mainObjectTid,polyline);
+		//System.out.println(linetableObj);
+		builder.addItfLinetableObject(linetableObj);
+		
+		builder.buildSurfaces();
+		IomObject polygon=builder.getSurfaceObject(mainObjectTid);
+		//System.out.println(polygon);
+		assertEquals("MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}, BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 115.0, C2 115.0}, COORD {C1 115.0, C2 120.0}, COORD {C1 112.0, C2 120.0}, COORD {C1 110.0, C2 110.0}]}}}]}}",polygon.toString());
+		
+	}
+	@Test
 	public void testInnererRand1Linie() throws IoxException {
 		String refAttr="_itf_ref_TableA";
 		String geomAttr="_itf_geom_TableA";
@@ -247,7 +281,7 @@ public class ItfSurfaceLinetable2PolygonTest {
 			builder.buildSurfaces();
 			fail();
 		}catch(IoxException ex){
-			IoxAssert.assertStartsWith("intersection", ex.getMessage());
+			IoxAssert.assertStartsWith("cut edges", ex.getMessage());
 		}
 		//IomObject polygon=builder.getSurfaceObject(mainObjectTid);
 		//System.out.println(polygon);
@@ -323,14 +357,14 @@ public class ItfSurfaceLinetable2PolygonTest {
 			builder.buildSurfaces();
 			fail();
 		}catch(IoxException ex){
-			IoxAssert.assertStartsWith("intersections",ex.getMessage());
+			IoxAssert.assertStartsWith("multipolygon",ex.getMessage());
 		}
 		//IomObject polygon=builder.getSurfaceObject(mainObjectTid);
 		//System.out.println(polygon);
 		
 	}
-	@Test
-	public void testInnererRandZweiGemeinsamePunkteMehrerLinienStuecke() throws IoxException {
+	@Test // Problem
+	public void testInnererRandZweiGemeinsameEndPunkte() throws IoxException {
 		String refAttr="_itf_ref_TableA";
 		String geomAttr="_itf_geom_TableA";
 		String tableName="Test1.TopicA.TableA_Form";
@@ -343,6 +377,7 @@ public class ItfSurfaceLinetable2PolygonTest {
 		addCoord(polyline,120.0,  140.0); 
 		IomObject linetableObj=createLinetableObj("1a",tableName,refAttr,geomAttr,mainObjectTid,polyline);
 		builder.addItfLinetableObject(linetableObj);
+		
 		polyline=newPolyline();
 		addCoord(polyline,120.0,  140.0); 
 		addCoord(polyline,110.0,  140.0); 
@@ -356,6 +391,7 @@ public class ItfSurfaceLinetable2PolygonTest {
 		addCoord(polyline,120.0,  140.0); 
 		linetableObj=createLinetableObj("2a",tableName,refAttr,geomAttr,mainObjectTid,polyline);
 		builder.addItfLinetableObject(linetableObj);
+		
 		polyline=newPolyline();
 		addCoord(polyline,120.0,  140.0); 
 		addCoord(polyline,112.0,  120.0); 
@@ -367,10 +403,86 @@ public class ItfSurfaceLinetable2PolygonTest {
 			builder.buildSurfaces();
 			fail();
 		}catch(IoxException ex){
-			IoxAssert.assertStartsWith("Interior is disconnected",ex.getMessage());
+			IoxAssert.assertStartsWith("multipolygon",ex.getMessage());
 		}
 		//IomObject polygon=builder.getSurfaceObject(mainObjectTid);
 		//System.out.println(polygon);
+		
+	}
+	@Test
+	public void testAeussererRand2Linien() throws IoxException {
+		String refAttr="_itf_ref_TableA";
+		String geomAttr="_itf_geom_TableA";
+		String tableName="Test1.TopicA.TableA_Form";
+		ItfSurfaceLinetable2Polygon builder=new ItfSurfaceLinetable2Polygon(refAttr,geomAttr);
+		String mainObjectTid="10";
+		
+		IomObject polyline=newPolyline();
+		addCoord(polyline,110.0,  110.0);
+		addCoord(polyline,120.0,  110.0); 
+		addCoord(polyline,120.0,  140.0); 
+		addCoord(polyline,110.0,  140.0); 
+		addCoord(polyline,110.0,  110.0);
+		IomObject linetableObj=createLinetableObj("1",tableName,refAttr,geomAttr,mainObjectTid,polyline);
+		//System.out.println(linetableObj);
+		builder.addItfLinetableObject(linetableObj);
+		
+		polyline=newPolyline();
+		addCoord(polyline,120.0,  140.0);
+		addCoord(polyline,125.0,  140.0); 
+		addCoord(polyline,125.0,  145.0); 
+		addCoord(polyline,120.0,  145.0); 
+		addCoord(polyline,120.0,  140.0);
+		linetableObj=createLinetableObj("2",tableName,refAttr,geomAttr,mainObjectTid,polyline);
+		//System.out.println(linetableObj);
+		builder.addItfLinetableObject(linetableObj);
+		
+		try{
+			builder.buildSurfaces();
+			fail();
+		}catch(IoxException ex){
+			//System.out.println(ex.getMessage());
+			//IoxAssert.assertStartsWith("Rand nicht geschlossen",ex.getMessage());
+			IoxAssert.assertStartsWith("multipolygon",ex.getMessage());
+		}
+		
+	}
+	@Test
+	public void testAeussererRand2LinienOhneGemeinsamerStart() throws IoxException {
+		String refAttr="_itf_ref_TableA";
+		String geomAttr="_itf_geom_TableA";
+		String tableName="Test1.TopicA.TableA_Form";
+		ItfSurfaceLinetable2Polygon builder=new ItfSurfaceLinetable2Polygon(refAttr,geomAttr);
+		String mainObjectTid="10";
+		
+		IomObject polyline=newPolyline();
+		addCoord(polyline,120.0,  110.0); 
+		addCoord(polyline,120.0,  140.0); 
+		addCoord(polyline,110.0,  140.0); 
+		addCoord(polyline,110.0,  110.0);
+		addCoord(polyline,120.0,  110.0); 
+		IomObject linetableObj=createLinetableObj("1",tableName,refAttr,geomAttr,mainObjectTid,polyline);
+		//System.out.println(linetableObj);
+		builder.addItfLinetableObject(linetableObj);
+		
+		polyline=newPolyline();
+		addCoord(polyline,125.0,  140.0); 
+		addCoord(polyline,125.0,  145.0); 
+		addCoord(polyline,120.0,  145.0); 
+		addCoord(polyline,120.0,  140.0);
+		addCoord(polyline,125.0,  140.0); 
+		linetableObj=createLinetableObj("2",tableName,refAttr,geomAttr,mainObjectTid,polyline);
+		//System.out.println(linetableObj);
+		builder.addItfLinetableObject(linetableObj);
+		
+		try{
+			builder.buildSurfaces();
+			fail();
+		}catch(IoxException ex){
+			//System.out.println(ex.getMessage());
+			//IoxAssert.assertStartsWith("Rand nicht geschlossen",ex.getMessage());
+			IoxAssert.assertStartsWith("multipolygon",ex.getMessage());
+		}
 		
 	}
 	@Test
