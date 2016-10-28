@@ -34,10 +34,10 @@ public class Datatypes23Test {
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
 	}
-	
-	// SUCCESSFUL Tests.
-	// These Tests which follow were successful.
-	
+	//////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////// SUCCESSFUL Tests ////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////// START BOOLEAN ///////////////////////////////////////
 	@Test
 	public void booleanTrue(){
 		Iom_jObject objTrue=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -47,7 +47,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objTrue));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -61,11 +65,16 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objFalse));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
+	///////////////////////////////// END BOOLEAN ////////////////////////////////////
+	///////////////////////////////// START OID //////////////////////////////////////	
 	@Test
 	public void uuidExample(){
 		Iom_jObject objNormal=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -75,7 +84,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objNormal));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -89,7 +102,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMin));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -103,11 +120,52 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMax));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	@Test
+	public void standardidMaxLength(){
+		Iom_jObject objMax=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMax.setattrvalue("aStandardid", "aaaaabbbbbcccccf");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objMax));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void i32idMaxLength(){
+		Iom_jObject objMax=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMax.setattrvalue("aI32id", "2147483647");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objMax));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	///////////////////////////////// END OID /////////////////////////////////////////
+	///////////////////////////////// START DATE //////////////////////////////////////	
 	@Test
 	public void dateMinYear(){
 		Iom_jObject objMinYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -117,7 +175,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinYear));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -131,7 +193,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxYear));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -145,7 +211,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinMonth));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -159,7 +229,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxMonth));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -173,7 +247,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -187,12 +265,16 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
-	
+	///////////////////////////////// END DATE /////////////////////////////////////////
+	///////////////////////////////// START TIME ///////////////////////////////////////	
 	@Test
 	public void timeMinHour(){
 		Iom_jObject objMinHour=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -202,7 +284,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinHour));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -216,7 +302,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxHour));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -230,7 +320,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinMinute));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -244,7 +338,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxMinute));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -258,7 +356,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinSecond));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -272,11 +374,16 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxSecond));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
+	///////////////////////////////// END TIME /////////////////////////////////////////
+	///////////////////////////////// START DATETIME ///////////////////////////////////	
 	@Test
 	public void dateTimeMinYear(){
 		Iom_jObject objMinYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -286,7 +393,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinYear));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Assert
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -300,7 +411,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxYear));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Assert
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -314,7 +429,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxMonth));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Assert
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -328,7 +447,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinMonth));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Assert
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -342,7 +465,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Assert
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -356,7 +483,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Assert
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -370,7 +501,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxHour));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Assert
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -384,7 +519,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinHour));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Assert
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -398,7 +537,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxMinute));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Assert
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -412,7 +555,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinMinute));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Assert
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -426,7 +573,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxSecond));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Assert
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -440,11 +591,16 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinSecond));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Assert
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
+	///////////////////////////////// END DATETIME ///////////////////////////////////////
+	///////////////////////////////// START NUMERIC //////////////////////////////////////	
 	@Test
 	public void numericIntTypeMin(){
 		Iom_jObject objMinLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -454,7 +610,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -468,7 +628,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -482,7 +646,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -496,11 +664,16 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
+	///////////////////////////////// END NUMERIC /////////////////////////////////////////
+	///////////////////////////////// START ENUMERATION ///////////////////////////////////	
 	@Test
 	public void enumerationTypeMin(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -510,7 +683,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -524,7 +701,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -538,7 +719,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -552,11 +737,203 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	@Test
+	public void enumerationTypeCircular(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("aufzaehlungOrdered", "unten");
+		objMaxLength.setattrvalue("aufzaehlungOrdered", "unten");
+		objMaxLength.setattrvalue("aufzaehlungOrdered", "oben");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+	validator.validate(new StartTransferEvent());
+	validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+	validator.validate(new ObjectEvent(objMaxLength));
+	validator.validate(new EndBasketEvent());
+	validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void enumerationTypeOrdered(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("aufzaehlungCircular", "Sonntag");
+		objMaxLength.setattrvalue("aufzaehlungCircular", "Werktage");
+		objMaxLength.setattrvalue("aufzaehlungCircular", "Sonntag");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+	validator.validate(new StartTransferEvent());
+	validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+	validator.validate(new ObjectEvent(objMaxLength));
+	validator.validate(new EndBasketEvent());
+	validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	///////////////////////////////// END ENUMERATION //////////////////////////////////////
+	///////////////////////////////// START ALIGNMENT //////////////////////////////////////	
+	@Test
+	public void horizAlignmentLeft(){
+		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objHighestDay.setattrvalue("horizAlignment", "Left");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objHighestDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void horizAlignmentCenter(){
+		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objHighestDay.setattrvalue("horizAlignment", "Center");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objHighestDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void horizAlignmentRight(){
+		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objHighestDay.setattrvalue("horizAlignment", "Right");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objHighestDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	////////////////// END HorizAlignment /////////////////////////
+	////////////////// START VertAlignment ////////////////////////
+	@Test
+	public void vertAlignmentTop(){
+		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objHighestDay.setattrvalue("vertAlignment", "Top");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objHighestDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void vertAlignmentCap(){
+		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objHighestDay.setattrvalue("vertAlignment", "Cap");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objHighestDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void vertAlignmentHalf(){
+		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objHighestDay.setattrvalue("vertAlignment", "Half");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objHighestDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void vertAlignmentBase(){
+		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objHighestDay.setattrvalue("vertAlignment", "Base");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objHighestDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void vertAlignmentBottom(){
+		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objHighestDay.setattrvalue("vertAlignment", "Bottom");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objHighestDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	///////////////////////////////// END ALIGNMENT /////////////////////////////////////////
+	///////////////////////////////// START TEXT ////////////////////////////////////////////	
 	@Test
 	public void textTypeTextLimitedMax(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -566,7 +943,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -580,7 +961,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -594,7 +979,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -607,7 +996,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -621,11 +1014,52 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	@Test
+	public void textTypeNameMaxLength(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("nametext", ch.ehi.basics.tools.StringUtility.STRING(255, 'a'));
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void textTypeUriMaxLength(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("uritext", ch.ehi.basics.tools.StringUtility.STRING(1023, 'a'));
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	///////////////////////////////// END TEXT /////////////////////////////////////////
+	///////////////////////////////// START COORD //////////////////////////////////////	
 	@Test
 	public void coordType1DOk(){
 		Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -636,7 +1070,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objSuccessFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -652,7 +1090,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objSuccessFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -669,11 +1111,16 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objSuccessFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
+	///////////////////////////////// END COORD /////////////////////////////////////////
+	///////////////////////////////// START POLYLINE ////////////////////////////////////	
 	@Test
 	public void polylineTypeStraights2dOk(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
@@ -690,7 +1137,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -713,7 +1164,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -739,7 +1194,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -768,7 +1227,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -791,7 +1254,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -816,11 +1283,16 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
+	///////////////////////////////// END POLYLINE /////////////////////////////////////////
+	///////////////////////////////// START SURFACE AREA ///////////////////////////////////	
 	@Test
 	public void surfaceTypeSurface1Boundary2DOk(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
@@ -1423,12 +1895,12 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	///////////////////////////////// END SURFACE AREA ///////////////////////////////////
 	
-	
-	
-	// FAILING Tests.
-	// The following Tests which are given, they throw 1 Error/Test.
-	
+	//////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////// FAILING Tests //////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////// START BOOLEAN //////////////////////////////////////
 	@Test
 	public void booleanUppercase(){
 		Iom_jObject objUppercase=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1438,12 +1910,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objUppercase));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <TRUE> is not a BOOLEAN", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void booleanNumber(){
 		Iom_jObject objNumber=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1453,12 +1928,58 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objNumber));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <8> is not a BOOLEAN", logger.getErrs().get(0).getEventMsg());
 	}
+	///////////////////////////////// END BOOLEAN //////////////////////////////////////
+	///////////////////////////////// START HORIZALIGNMENT /////////////////////////////
+	@Test
+	public void horizAlignmentNotTypeOfEnumeration(){
+		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objHighestDay.setattrvalue("horizAlignment", "Top");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objHighestDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value Top is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+	}
 	
+	///////////////////////////////// END HORIZALIGNMENT /////////////////////////////
+	///////////////////////////////// START VERTALIGNMENT /////////////////////////////
+	@Test
+	public void vertAlignmentNotTypeOfEnumeration(){
+		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objHighestDay.setattrvalue("vertAlignment", "Left");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objHighestDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value Left is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+	}
+	///////////////////////////////// START VERTALIGNMENT /////////////////////////////	
+	///////////////////////////////// START OID ///////////////////////////////////////
 	@Test
 	public void uuidNotAllowedChar(){
 		Iom_jObject objNotAllowedChar=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1468,12 +1989,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objNotAllowedChar));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <123e4567-e89b-12d3-z456-426655440000> is not a valid UUID", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void uuidLengthToShort(){
 		Iom_jObject objLengthToShort=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1483,12 +2007,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objLengthToShort));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <123e4567-e89b-12d3-b456-42665544000> is not a valid UUID", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void uuidLengthToLong(){
 		Iom_jObject objLengthToLong=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1499,12 +2026,17 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objLengthToLong));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <123e4567-e89b-12d3-b456-4266554400000> is not a valid UUID", logger.getErrs().get(0).getEventMsg());
 	}
-	
+	///////////////////////////////// END OID /////////////////////////////////////////
+	///////////////////////////////// START DATE //////////////////////////////////////	
 	@Test
 	public void dateYearToLow(){
 		Iom_jObject objYearToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1514,12 +2046,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objYearToLow));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <1580-2-15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateYearToHigh(){
 		Iom_jObject objYearToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1529,12 +2064,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objYearToHigh));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <3000-2-15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateMonthToLow(){
 		Iom_jObject objMonthToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1544,12 +2082,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMonthToLow));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-0-15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateMonthToHigh(){
 		Iom_jObject objMonthToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1559,12 +2100,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMonthToHigh));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-13-15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateDayToLow(){
 		Iom_jObject objDayToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1574,12 +2118,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objDayToLow));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-2-0> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateDayToHigh(){
 		Iom_jObject objDayToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1589,12 +2136,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objDayToHigh));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-2-32> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateFormatWithDots(){
 		Iom_jObject objFormatWithDots=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1604,12 +2154,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objFormatWithDots));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016.2.15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
-
 	@Test
 	public void dateFormatWithSlash(){
 		Iom_jObject objFormatSlash=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1619,12 +2172,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objFormatSlash));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016/2/15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
-
 	@Test
 	public void dateLengthToShort(){
 		Iom_jObject objLengthToShort=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1634,12 +2190,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objLengthToShort));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <216-2-2> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
-
 	@Test
 	public void dateLengthToLong(){
 		Iom_jObject objLengthToLong=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1650,12 +2209,17 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objLengthToLong));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <20016-12-15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
-	
+	///////////////////////////////// END DATE /////////////////////////////////////////
+	///////////////////////////////// START TIME ///////////////////////////////////////	
 	@Test
 	public void timeHourToHigh(){
 		Iom_jObject objHourToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1665,12 +2229,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objHourToHigh));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <24:59:59.999> is not a valid Time", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void timeMinuteToHigh(){
 		Iom_jObject objMinuteToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1680,12 +2247,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinuteToHigh));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <23:60:59.999> is not a valid Time", logger.getErrs().get(0).getEventMsg());
 	}
-
 	@Test
 	public void timeSecondToHigh(){
 		Iom_jObject objSecondToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1695,12 +2265,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objSecondToHigh));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <23:59:60.000> is not a valid Time", logger.getErrs().get(0).getEventMsg());
 	}
-
 	@Test
 	public void timeLengthToShort(){
 		Iom_jObject objTimeToShort=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1710,12 +2283,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objTimeToShort));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <5:5:5.55> is not a valid Time", logger.getErrs().get(0).getEventMsg());
 	}
-
 	@Test
 	public void timeLengthToLong(){
 		Iom_jObject objTimeToLong=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1725,12 +2301,17 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objTimeToLong));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <23:59:59.9990> is not a valid Time", logger.getErrs().get(0).getEventMsg());
 	}
-	
+	///////////////////////////////// END TIME ////////////////////////////////////////
+	///////////////////////////////// START DATETIME //////////////////////////////////	
 	@Test
 	public void dateTimeYearToLow(){
 		Iom_jObject objYearToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1740,12 +2321,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objYearToLow));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <1581-2-29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateTimeYearToHigh(){
 		Iom_jObject objYearToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1755,12 +2339,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objYearToHigh));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <3000-2-29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateTimeMonthToLow(){
 		Iom_jObject objMonthToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1770,12 +2357,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMonthToLow));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-0-29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateTimeMonthToHigh(){
 		Iom_jObject objMonthToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1785,12 +2375,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMonthToHigh));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-13-29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateTimeDayToLow(){
 		Iom_jObject objDayToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1800,12 +2393,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objDayToLow));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-2-0T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateTimeDayToHigh(){
 		Iom_jObject objDayToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1815,12 +2411,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objDayToHigh));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-2-32T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateTimeHourToHigh(){
 		Iom_jObject objHourToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1830,12 +2429,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objHourToHigh));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-2-29T24:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateTimeMinuteToHigh(){
 		Iom_jObject objMinuteToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1845,12 +2447,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMinuteToHigh));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-2-29T12:60:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateTimeSecondToHigh(){
 		Iom_jObject objSecondToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1860,12 +2465,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objSecondToHigh));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-2-29T12:59:60.000> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
-
 	@Test
 	public void dateTimeLengthToShort(){
 		Iom_jObject objLengthToShort=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1875,12 +2483,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objLengthToShort));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-2-2T2:2:2.99> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
-
 	@Test
 	public void dateTimeLengthToHigh(){
 		Iom_jObject objLengthToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1890,12 +2501,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objLengthToHigh));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-12-29T12:59:59.9999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
-
 	@Test
 	public void dateTimeFormatWithDots(){
 		Iom_jObject objFormatWithDots=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1905,12 +2519,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objFormatWithDots));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016.2.29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void dateTimeFormatWithoutT() {
 		Iom_jObject objFormatWithoutT=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1921,12 +2538,17 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objFormatWithoutT));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2016-2-29V12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
-	
+	///////////////////////////////// END DATETIME ////////////////////////////////////
+	///////////////////////////////// START NUMERICTYPE ///////////////////////////////	
 	@Test
 	public void numericTypeWrongFormat(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1936,12 +2558,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <a> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void numericTypeMinWrong(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1951,12 +2576,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value -1 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void numericTypeMaxWrong(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1966,12 +2594,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value 11 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void numericTypeDecWrongFormat(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1981,12 +2612,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <a> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void numericTypeDecMinWrong(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1996,12 +2630,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value -1 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void numericTypeDecMaxWrong(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -2011,12 +2648,17 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value 11 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
-	
+	///////////////////////////////// END NUMERIC /////////////////////////////////////
+	///////////////////////////////// START ENUMERATION ///////////////////////////////	
 	@Test
 	public void enumerationTypeWrongSubValue(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -2026,12 +2668,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value mehr.elf is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void enumerationTypeWrongValue(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -2041,12 +2686,17 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value 5 is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
 	}
-	
+	///////////////////////////////// END ENUMERATION /////////////////////////////////////////
+	///////////////////////////////// START TEXT //////////////////////////////////////////////	
 	@Test
 	public void textTypeTextLimitedToLong(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -2056,12 +2706,15 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Attribute textLimited is length restricted to 10", logger.getErrs().get(0).getEventMsg());
 	}
-	
 	@Test
 	public void textTypeTextLimitedWrongFormat(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -2071,7 +2724,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Attribute textLimited must not contain control characters", logger.getErrs().get(0).getEventMsg());
@@ -2086,7 +2743,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Attribute textUnlimited must not contain control characters", logger.getErrs().get(0).getEventMsg());
@@ -2101,12 +2762,55 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Attribute mtextLimited is length restricted to 10", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	@Test
+	public void textTypeNameLengthToHigh(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("nametext", ch.ehi.basics.tools.StringUtility.STRING(256, 'a'));
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Attribute nametext is length restricted to 255", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void textTypeUriLengthToHigh(){
+		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMaxLength.setattrvalue("uritext", ch.ehi.basics.tools.StringUtility.STRING(1024, 'a'));
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objMaxLength));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Attribute uritext is length restricted to 1023", logger.getErrs().get(0).getEventMsg());
+	}
+	///////////////////////////////// END TEXT /////////////////////////////////////////
+	///////////////////////////////// START COORD //////////////////////////////////////	
 	@Test
 	public void coordType4Dimensions(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -2120,7 +2824,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 	}
@@ -2136,12 +2844,17 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
 	}
-	
+	///////////////////////////////// END COORD /////////////////////////////////////////
+	///////////////////////////////// START POLYLINE ////////////////////////////////////	
 	@Test
 	public void polylineTypeAlineDoesNotContainTypePolyline(){
 		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
@@ -2158,7 +2871,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objStraightsFail));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("unexpected Type LINE; POLYLINE expected", logger.getErrs().get(0).getEventMsg());
@@ -2180,7 +2897,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objStraightsFail));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("unexpected Type COORD", logger.getErrs().get(0).getEventMsg());
@@ -2202,7 +2923,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objStraightsFail));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("unexpected Type POLYLINE", logger.getErrs().get(0).getEventMsg());
@@ -2226,7 +2951,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objStraightsFail));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("invalid number of sequences in COMPLETE basket", logger.getErrs().get(0).getEventMsg());
@@ -2253,7 +2982,11 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("unexpected ARC", logger.getErrs().get(0).getEventMsg());
@@ -2280,12 +3013,17 @@ public class Datatypes23Test {
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("unexpected COORD", logger.getErrs().get(0).getEventMsg());
 	}
-	
+	///////////////////////////////// END POLYLINE /////////////////////////////////////////
+	///////////////////////////////// START SURFACE ////////////////////////////////////////	
 	@Test
 	public void surfaceTypeNotTypeMULTISURFACE(){
 		Iom_jObject objNotMultisurface=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
@@ -2383,7 +3121,35 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
 	}
-	
+	@Test
+	public void surface2dWithoutOverlaps(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
+		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject segment=segments.addattrobj("segment", "COORD");
+		segment.setattrvalue("C1", "480000.000");
+		segment.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+		//assertEquals("", logger.getErrs().get(0).getEventMsg());
+	}
+	///////////////////////////////// END POLYLINE /////////////////////////////////////////
+	///////////////////////////////// START AREA ///////////////////////////////////////////	
 	@Test
 	public void area2dWith3dImplementation(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
@@ -2741,4 +3507,5 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("invalid number of surfaces in COMPLETE basket", logger.getErrs().get(0).getEventMsg());
 	}
+	///////////////////////////////// END AREA /////////////////////////////
 }

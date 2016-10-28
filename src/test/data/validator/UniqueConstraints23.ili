@@ -27,5 +27,11 @@ MODEL UniqueConstraints23
 		  UNIQUE attr1;
 		  UNIQUE attr2;
 		END ClassD;
+		CLASS ClassE =
+		  attr1 : TEXT*10;
+		  attr2 : 0 .. 100;
+		  UNIQUE attr1,attr2;
+		  UNIQUE attr2;
+		END ClassE;
 	END Topic;
 END UniqueConstraints23.
