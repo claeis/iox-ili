@@ -161,6 +161,13 @@ public class Ili2cUtility {
 			}
 			if(attr.getDomainResolvingAliases() instanceof ch.interlis.ili2c.metamodel.OIDType){
 				prop.setTypeOid(true);
+			}else if(attr.getDomainResolvingAliases() instanceof ch.interlis.ili2c.metamodel.BlackboxType){
+				ch.interlis.ili2c.metamodel.BlackboxType bbType=(ch.interlis.ili2c.metamodel.BlackboxType)attr.getDomainResolvingAliases();
+				if(bbType.getKind()==ch.interlis.ili2c.metamodel.BlackboxType.eBINARY){
+					prop.setTypeBlackboxBin(true);
+				}else{
+					prop.setTypeBlackboxXml(true);
+				}
 			}
 			AttributeDef baseAttr = attr;
 			if(attr.getExtending()!=null){

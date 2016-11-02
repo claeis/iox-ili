@@ -21,8 +21,15 @@
  * DEALINGS IN THE SOFTWARE.
  */
 package ch.interlis.iom_j.xtf.impl;
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.XMLEvent;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stax.StAXResult;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.iom.*;
@@ -50,6 +57,8 @@ import java.util.Iterator;
         public static final String ili23Ns="http://www.interlis.ch/INTERLIS2.3";
         private static String iliNs=ili23Ns;
         private boolean isIli22=false;
+		private XMLInputFactory inputFactory = null;
+        
         /** Creates a new writer.
          * @param buffer Writer to write to
          * @param mapping1 model of data to write
@@ -391,6 +400,42 @@ import java.util.Iterator;
 							if(val.length()>0){
 								xout.writeStartElement(iliNs,attrName);
 								xout.writeAttribute("OID", makeOid(val));
+								xout.writeEndElement(/*attr*/);
+							}
+						}else if(attr.isTypeBlackboxBin()){
+							val=val.trim();
+							if(val.length()>0){
+								xout.writeStartElement(iliNs,attrName);
+								xout.writeStartElement(iliNs,"BINBLBOX");
+								xout.writeCharacters(val);
+								int rest=val.length()%2;
+								if(rest==2){
+									xout.writeCharacters("==");
+								}else if(rest==1){
+									xout.writeCharacters("=");
+								}
+								xout.writeEndElement(/*BINBLBOX*/);
+								xout.writeEndElement(/*attr*/);
+							}
+						}else if(attr.isTypeBlackboxXml()){
+							val=val.trim();
+							if(val.length()>0){
+								xout.writeStartElement(iliNs,attrName);
+								xout.writeStartElement(iliNs,"XMLBLBOX");
+								// copy xml
+								if(inputFactory==null){
+									inputFactory = XMLInputFactory.newInstance();
+								}
+								XMLEventReader xmlReader=inputFactory.createXMLEventReader(new java.io.StringBufferInputStream(val));
+								while(xmlReader.hasNext()){
+									XMLEvent event=xmlReader.nextEvent();
+									if(event.getEventType()==XMLEvent.START_DOCUMENT || event.getEventType()==XMLEvent.END_DOCUMENT){
+										// skip it
+									}else{
+										XMLStreamWriterAdapter.add(xout, event);
+									}
+								}
+								xout.writeEndElement(/*XMLBLBOX*/);
 								xout.writeEndElement(/*attr*/);
 							}
 						}else{

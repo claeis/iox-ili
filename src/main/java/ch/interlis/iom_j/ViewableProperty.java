@@ -60,6 +60,20 @@ public class ViewableProperty {
 	public void setTypeOid(boolean typeOid) {
 		this.typeOid = typeOid;
 	}
+	private boolean typeBlackboxXml=false;
+	private boolean typeBlackboxBin=false;
+	public boolean isTypeBlackboxXml() {
+		return typeBlackboxXml;
+	}
+	public void setTypeBlackboxXml(boolean typeBlackboxXml) {
+		this.typeBlackboxXml = typeBlackboxXml;
+	}
+	public boolean isTypeBlackboxBin() {
+		return typeBlackboxBin;
+	}
+	public void setTypeBlackboxBin(boolean typeBlackboxBin) {
+		this.typeBlackboxBin = typeBlackboxBin;
+	}
 	private String enumType=null;
 	/** Gets the qualified ili-Name of the Enumeration type of this property.
 	 * @return qualified ili-name or null if not a enum type property
