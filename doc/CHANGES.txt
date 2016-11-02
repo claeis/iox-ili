@@ -5,6 +5,7 @@ ideas/open issues
 iox-ili 1.13.5 (2016-11-02)
 -----------------------------
 - XtfWriter: fixed BLACKBOX output
+- XtfReader: fixed BLACKBOX parser
 
 iox-ili 1.13.4 (2016-09-17)
 -----------------------------
