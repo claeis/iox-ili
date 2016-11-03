@@ -4,13 +4,9 @@ MODEL ExistenceConstraints23
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" =
   IMPORTS ExistenceConstraints23Condition;
 	TOPIC Topic= DEPENDS ON ExistenceConstraints23Condition.Topic;
-		DOMAIN
-			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
-					        70000.000 .. 310000.000 [INTERLIS.m],
-						   ROTATION 2 -> 1;
-			Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
-					        70000.000 .. 310000.000 [INTERLIS.m],
-					              0.000 .. 5000.000 [INTERLIS.m];
+	
+		!! CONDITIONCLASSES !!
+		
 		CLASS ConditionClass =
 			attr1 : TEXT*10;
 		END ConditionClass;
@@ -21,6 +17,8 @@ MODEL ExistenceConstraints23
 		
 		CLASS ConditionClassX EXTENDS ConditionClass =
 		END ConditionClassX;
+		
+		!! CLASSES !!
 		
 		CLASS ClassA =
 			attr5 : TEXT*10;
@@ -34,40 +32,11 @@ MODEL ExistenceConstraints23
 			EXISTENCE CONSTRAINT attr1 REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClass : attr1;
 		END ClassB;
 		
-		CLASS ClassC =
-			attr1 : 0 .. 100;
-			EXISTENCE CONSTRAINT attr1 REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClass : attr1;
-		END ClassC;
-		
 		CLASS ClassStructureOtherModel =
-			attr1 : ExistenceConstraints23Condition.Topic.structure;
+			attr1 : ExistenceConstraints23Condition.structure;
 			attr2 : TEXT*15;
 			attr3 : TEXT*20;
 			EXISTENCE CONSTRAINT attr1 REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClassStructure : attr1;
 		END ClassStructureOtherModel;
-		
-		CLASS ConditionClassLine =
-			!! Linientyp
-		   straights2d : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
-		   straights3d : POLYLINE WITH (STRAIGHTS) VERTEX Hkoord;
-		   !!EXISTENCE CONSTRAINT straights2d REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClassLine : straights2d;
-		   !!EXISTENCE CONSTRAINT straights3d REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClassLine : straights3d;
-		END ConditionClassLine;
-		
-		CLASS ConditionClassSurface =
-			!! Surfacetype (without overlaps is obligatory for individual surfaces)
-		   surface2d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-		   surface3d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
-		   !!EXISTENCE CONSTRAINT surface2d REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClassSurface : surface2d;
-		   !!EXISTENCE CONSTRAINT surface3d REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClassSurface : surface3d;
-		END ConditionClassSurface;
-		
-		CLASS ConditionClassArea =
-			!! Areatype (without overlaps is obligatory for individual areas)
-		   area2d : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-		   area3d : AREA WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
-		   !!EXISTENCE CONSTRAINT area2d REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClassArea : area2d;
-		   !!EXISTENCE CONSTRAINT area3d REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClassArea : area3d;
-		END ConditionClassArea;
 	END Topic;
 END ExistenceConstraints23.
