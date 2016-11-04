@@ -34,6 +34,10 @@ MODEL ExistenceConstraints23Condition
 			!! Linientyp
 		   straights2d : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
 		   straights3d : POLYLINE WITH (STRAIGHTS) VERTEX Hkoord;
+		   arcs2d : POLYLINE WITH (ARCS) VERTEX Lkoord;
+		   arcs3d : POLYLINE WITH (ARCS) VERTEX Hkoord;
+		   arcsstraights2d : POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Lkoord;
+		   arcsstraights3d : POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Hkoord;
 		END ConditionClassLine;
 		
 		CLASS ConditionClassSurface =

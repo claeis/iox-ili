@@ -193,9 +193,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					} else if (type instanceof PolylineType){
 						PolylineType polylineType = (PolylineType) type;
 						equals = equalsPolylineValue(iomObj, polylineType, otherIomObj, otherAttrName, restrictedAttrName);
-					} else if (type instanceof SurfaceType){
-						SurfaceType surfaceType = (SurfaceType) type;
-						equals = equalsSurfaceValue(iomObj, surfaceType, otherIomObj, otherAttrName, restrictedAttrName);
+					} else if (type instanceof SurfaceOrAreaType){
+						SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
+						equals = equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, otherAttrName, restrictedAttrName);
 					} else if (type instanceof CompositionType){
 						CompositionType compositionType = (CompositionType) type;
 						equals = equalsCompositionValue(iomObj, compositionType, otherIomObj, otherAttrName, restrictedAttrName);
@@ -219,9 +219,116 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return true;
 	}
 
-	private boolean equalsSurfaceValue(IomObject iomObj, SurfaceType surfaceType, IomObject otherIomObj, String otherAttrName, String restrictedAttrName) {
-		IomObject surfaceValueRestricted=iomObj.getattrobj(restrictedAttrName, 0);
-		IomObject surfaceValueOther = otherIomObj.getattrobj(otherAttrName, 0);
+	private boolean equalsSurfaceOrAreaValue(IomObject iomObj, SurfaceOrAreaType surfaceType, IomObject otherIomObj, String otherAttrName, String restrictedAttrName) {
+		IomObject objA=iomObj.getattrobj(restrictedAttrName, 0);
+		IomObject objB = otherIomObj.getattrobj(otherAttrName, 0);
+		if (objA != null && objB != null){
+			// check if count of surfaces or areas of the objects are equal and get current surface or area
+			for (int i=0;i<objA.getattrvaluecount("surface");i++){
+				IomObject surfaceA = objA.getattrobj("surface",i);
+				IomObject surfaceB = objB.getattrobj("surface",i);
+				if (objA.getattrvaluecount("surface") == objB.getattrvaluecount("surface")){
+					// ok
+				} else {
+					return false;
+				}
+				// check if count of boundaries of the current surface is equal and get current boundary
+				for (int j=0;j<surfaceA.getattrvaluecount("boundary");j++){
+					IomObject boundaryA=surfaceA.getattrobj("boundary",j);
+					IomObject boundaryB=surfaceB.getattrobj("boundary",j);
+					if (boundaryA.getattrvaluecount("boundary") == boundaryB.getattrvaluecount("boundary")){
+						// ok
+					} else {
+						return false;
+					}
+					// check if count of polylines of the current boundary is equal and get current polyline
+					for (int k=0;k<boundaryA.getattrvaluecount("polyline");k++){
+						IomObject polylineA=boundaryA.getattrobj("polyline",k);
+						IomObject polylineB=boundaryB.getattrobj("polyline",k);
+						if (polylineA.getattrvaluecount("polyline") == polylineB.getattrvaluecount("polyline")){
+							// ok
+						} else {
+							return false;
+						}
+						// check if count of sequences of the objects is equal and get current sequence
+						for(int l=0;l<polylineA.getattrvaluecount("sequence");l++){
+							IomObject sequenceA=polylineA.getattrobj("sequence",l);
+							IomObject sequenceB=polylineB.getattrobj("sequence",l);
+							if (objA.getattrvaluecount("sequence") == objB.getattrvaluecount("sequence")){
+								// ok
+							} else {
+								return false;
+							}
+							// check if count of segments of the current sequence is equal and get current current segment
+							for(int m=0;m<sequenceA.getattrvaluecount("segment");m++){
+								IomObject segmentA=sequenceA.getattrobj("segment",m);
+								IomObject segmentB=sequenceB.getattrobj("segment", m);
+								if (segmentA.getattrvaluecount("segment") == segmentB.getattrvaluecount("segment")){
+									// ok
+								} else {
+									return false;
+								}
+								for (int n=0;n<segmentA.getattrcount();n++){
+									if (segmentA.getobjecttag().equals("COORD")){
+										// equalation of values of dimensions(C1-3) where C is not null
+										if (segmentA.getattrvalue("C1") != null && segmentB.getattrvalue("C1") != null){
+											if (!segmentA.getattrvalue("C1").equals(segmentB.getattrvalue("C1"))){
+												return false;
+											}
+										} else {
+											return false;
+										}
+										if (segmentA.getattrvalue("C2") != null && segmentB.getattrvalue("C2") != null){
+											if (!segmentA.getattrvalue("C2").equals(segmentB.getattrvalue("C2"))){
+												return false;
+											}
+										}
+										if (segmentA.getattrvalue("C3") != null && segmentB.getattrvalue("C3") != null){
+											if (!segmentA.getattrvalue("C3").equals(segmentB.getattrvalue("C3"))){
+												return false;
+											}
+										}
+									} else if (segmentA.getobjecttag().equals("ARC")) {
+										// equalation of values of dimensions(C1-3) where C or A is not null
+										if (segmentA.getattrvalue("A1") != null && segmentB.getattrvalue("A1") != null){
+											if (!segmentA.getattrvalue("A1").equals(segmentB.getattrvalue("A1"))){
+												return false;
+											}
+										} else {
+											return false;
+										}
+										if (segmentA.getattrvalue("A2") != null && segmentB.getattrvalue("A2") != null){
+											if (!segmentA.getattrvalue("A2").equals(segmentB.getattrvalue("A2"))){
+												return false;
+											}
+										} else {
+											return false;
+										}
+										if (segmentA.getattrvalue("C1") != null && segmentB.getattrvalue("C1") != null){
+											if (!segmentA.getattrvalue("C1").equals(segmentB.getattrvalue("C1"))){
+												return false;
+											}
+										} else {
+											return false;
+										}
+										if (segmentA.getattrvalue("C2") != null && segmentB.getattrvalue("C2") != null){
+											if (!segmentA.getattrvalue("C2").equals(segmentB.getattrvalue("C2"))){
+												return false;
+											}
+										}
+										if (segmentA.getattrvalue("C3") != null && segmentB.getattrvalue("C3") != null){
+											if (!segmentA.getattrvalue("C3").equals(segmentB.getattrvalue("C3"))){
+												return false;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 		return true;
 	}
 	
@@ -248,22 +355,59 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					} else {
 						return false;
 					}
-					// equalation of values of dimensions(C1-3) where C is not null
-					if (segmentA.getattrvalue("C1") != null && segmentB.getattrvalue("C1") != null){
-						if (!segmentA.getattrvalue("C1").equals(segmentB.getattrvalue("C1"))){
-							return false;
-						}
-					} else {
-						return false;
-					}
-					if (segmentA.getattrvalue("C2") != null && segmentB.getattrvalue("C2") != null){
-						if (!segmentA.getattrvalue("C2").equals(segmentB.getattrvalue("C2"))){
-							return false;
-						}
-					}
-					if (segmentA.getattrvalue("C3") != null && segmentB.getattrvalue("C3") != null){
-						if (!segmentA.getattrvalue("C3").equals(segmentB.getattrvalue("C3"))){
-							return false;
+					for (int k=0;k<segmentA.getattrcount();k++){
+						if (segmentA.getobjecttag().equals("COORD")){
+							// equalation of values of dimensions(C1-3) where C is not null
+							if (segmentA.getattrvalue("C1") != null && segmentB.getattrvalue("C1") != null){
+								if (!segmentA.getattrvalue("C1").equals(segmentB.getattrvalue("C1"))){
+									return false;
+								}
+							} else {
+								return false;
+							}
+							if (segmentA.getattrvalue("C2") != null && segmentB.getattrvalue("C2") != null){
+								if (!segmentA.getattrvalue("C2").equals(segmentB.getattrvalue("C2"))){
+									return false;
+								}
+							}
+							if (segmentA.getattrvalue("C3") != null && segmentB.getattrvalue("C3") != null){
+								if (!segmentA.getattrvalue("C3").equals(segmentB.getattrvalue("C3"))){
+									return false;
+								}
+							}
+						} else if (segmentA.getobjecttag().equals("ARC")) {
+							// equalation of values of dimensions(C1-3) where C or A is not null
+							if (segmentA.getattrvalue("A1") != null && segmentB.getattrvalue("A1") != null){
+								if (!segmentA.getattrvalue("A1").equals(segmentB.getattrvalue("A1"))){
+									return false;
+								}
+							} else {
+								return false;
+							}
+							if (segmentA.getattrvalue("A2") != null && segmentB.getattrvalue("A2") != null){
+								if (!segmentA.getattrvalue("A2").equals(segmentB.getattrvalue("A2"))){
+									return false;
+								}
+							} else {
+								return false;
+							}
+							if (segmentA.getattrvalue("C1") != null && segmentB.getattrvalue("C1") != null){
+								if (!segmentA.getattrvalue("C1").equals(segmentB.getattrvalue("C1"))){
+									return false;
+								}
+							} else {
+								return false;
+							}
+							if (segmentA.getattrvalue("C2") != null && segmentB.getattrvalue("C2") != null){
+								if (!segmentA.getattrvalue("C2").equals(segmentB.getattrvalue("C2"))){
+									return false;
+								}
+							}
+							if (segmentA.getattrvalue("C3") != null && segmentB.getattrvalue("C3") != null){
+								if (!segmentA.getattrvalue("C3").equals(segmentB.getattrvalue("C3"))){
+									return false;
+								}
+							}
 						}
 					}
 				}
