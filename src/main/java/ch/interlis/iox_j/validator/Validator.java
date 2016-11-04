@@ -322,12 +322,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	ArrayList<ArrayList<String>> listOfUniqueAttrsLists = new ArrayList<ArrayList<String>>();
 	
 	private void checkObject(IomObject iomObj,String attrPath) {
-		if (uniquenessOfOid != null && uniquenessOfOid.equals(iomObj.getobjectoid().toString())){
-			errs.addEvent(errFact.logErrorMsg("Oid cant exist twice."));
-		}
-		uniquenessOfOid = iomObj.getobjectoid().toString();
 		boolean isObject= attrPath==null;
 		if(isObject){
+			if (uniquenessOfOid != null && uniquenessOfOid.equals(iomObj.getobjectoid().toString())){
+				errs.addEvent(errFact.logErrorMsg("Oid cant exist twice."));
+			}
+			uniquenessOfOid = iomObj.getobjectoid().toString();
 			errFact.setDataObj(iomObj);
 		}
 		String tag=iomObj.getobjecttag();
@@ -350,6 +350,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		Viewable aclass1=(Viewable)modelele;
 		
 		if(isObject){
+			errFact.setDefaultCoord(getDefaultCoord(iomObj));
 			// check that object is instance of a concrete class
 			if(aclass1.isAbstract()){
 				errs.addEvent(errFact.logErrorMsg("Object must be a non-abstract class"));
@@ -518,7 +519,101 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 	}
+	private IomObject getDefaultCoord(IomObject iomObj) {
+		String tag=iomObj.getobjecttag();
+		Object modelele=tag2class.get(tag);
+		if(modelele==null){
+			return null;
+		}
+		Viewable aclass1=(Viewable)modelele;		
+		Iterator iter = aclass1.getAttributesAndRoles2();
+		while (iter.hasNext()) {
+			ViewableTransferElement obj = (ViewableTransferElement)iter.next();
+			if (obj.obj instanceof AttributeDef) {
+				AttributeDef attr = (AttributeDef) obj.obj;
+				if(!attr.isTransient()){
+					Type proxyType=attr.getDomain();
+					if(proxyType!=null && (proxyType instanceof ObjectType)){
+						// skip implicit particles (base-viewables) of views
+					}else{
+						Type type=attr.getDomainResolvingAliases();
+						String attrName=attr.getName();
+						if (type instanceof CompositionType){
+							 int structc=iomObj.getattrvaluecount(attrName);
+							 for(int structi=0;structi<structc;structi++){
+								 IomObject structEle=iomObj.getattrobj(attrName, structi);
+									IomObject coord=getDefaultCoord(structEle);
+									if (coord!=null){
+										return coord;
+									}
+							 }
+						}else if (type instanceof PolylineType){
+							PolylineType polylineType=(PolylineType)type;
+							IomObject polylineValue=iomObj.getattrobj(attrName, 0);
+							if (polylineValue != null){
+								IomObject coord=getFirstCoordFromPolyline(polylineValue);
+								if (coord!=null){
+									return coord;
+								}
+							}
+						}else if(type instanceof SurfaceOrAreaType){
+							 if(doItfLineTables){
+								 if(type instanceof SurfaceType){
+									 // SURFACE; no attributeValue in mainTable
+								 }else{
+									// AREA
+									// coord
+									IomObject coord=iomObj.getattrobj(attrName, 0);
+									if (coord!=null){
+										return coord;
+									}
+								 }
+							 }else{
+								 // polygon
+								SurfaceOrAreaType surfaceOrAreaType=(SurfaceOrAreaType)type;
+								IomObject surfaceValue=iomObj.getattrobj(attrName,0);
+								if (surfaceValue != null){
+									for(int surfacei=0;surfacei< surfaceValue.getattrvaluecount("surface");surfacei++){
+										IomObject surface= surfaceValue.getattrobj("surface",surfacei);
+										int boundaryc=surface.getattrvaluecount("boundary");
+										for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
+											IomObject boundary=surface.getattrobj("boundary",boundaryi);
+											for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
+												IomObject polyline=boundary.getattrobj("polyline",polylinei);
+												IomObject coord=getFirstCoordFromPolyline(polyline);
+												if (coord!=null){
+													return coord;
+												}
+											}
+										}
+									}
+								}
+							 }
+						}else if(type instanceof CoordType){
+							IomObject coord=iomObj.getattrobj(attrName, 0);
+							if (coord!=null){
+								return coord;
+							}
+						}
+						
+					}
+				}
+			}
+		}
+		return null;
+	}
 	
+	private IomObject getFirstCoordFromPolyline(IomObject polylineValue) {
+		for(int sequencei=0;sequencei<polylineValue.getattrvaluecount("sequence");sequencei++){
+			IomObject sequence=polylineValue.getattrobj("sequence",sequencei);
+			for(int segmenti=0;segmenti<sequence.getattrvaluecount("segment");segmenti++){
+				IomObject segment=sequence.getattrobj("segment",segmenti);
+				return segment;
+			}
+		}
+		return null;
+	}
+
 	// viewable aClass
 	private AttributeArray checkUnique(IomObject currentObject,ArrayList<String>uniqueAttrs) {
 		int sizeOfUniqueAttribute = uniqueAttrs.size();
