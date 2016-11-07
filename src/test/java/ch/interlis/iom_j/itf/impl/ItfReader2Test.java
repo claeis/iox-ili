@@ -27,7 +27,7 @@ public class ItfReader2Test {
 	{
 		// compile model
 		Configuration ili2cConfig=new Configuration();
-		FileEntry fileEntry=new FileEntry("test/data/Test1.ili", FileEntryKind.ILIMODELFILE);
+		FileEntry fileEntry=new FileEntry("src/test/data/Test1.ili", FileEntryKind.ILIMODELFILE);
 		ili2cConfig.addFileEntry(fileEntry);
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
@@ -35,7 +35,7 @@ public class ItfReader2Test {
 	
 	@Test
 	public void testA() throws Iox2jtsException, IoxException {
-		ItfReader2 reader=new ItfReader2(new File("test/data/Test1.itf"),false);
+		ItfReader2 reader=new ItfReader2(new File("src/test/data/Test1.itf"),false);
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{
@@ -54,7 +54,7 @@ public class ItfReader2Test {
 
 	@Test
 	public void testB() throws Iox2jtsException, IoxException {
-		ItfReader2 reader=new ItfReader2(new File("test/data/TestB.itf"),false);
+		ItfReader2 reader=new ItfReader2(new File("src/test/data/TestB.itf"),false);
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{
@@ -72,7 +72,7 @@ public class ItfReader2Test {
 	}
 	@Test
 	public void testC() throws Iox2jtsException, IoxException {
-		ItfReader2 reader=new ItfReader2(new File("test/data/TestC.itf"),false);
+		ItfReader2 reader=new ItfReader2(new File("src/test/data/TestC.itf"),false);
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{
@@ -90,7 +90,7 @@ public class ItfReader2Test {
 	}
 	@Test
 	public void testD() throws Iox2jtsException, IoxException {
-		ItfReader2 reader=new ItfReader2(new File("test/data/TestD.itf"),false);
+		ItfReader2 reader=new ItfReader2(new File("src/test/data/TestD.itf"),false);
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{
@@ -108,7 +108,7 @@ public class ItfReader2Test {
 	}
 	@Test
 	public void testE() throws Iox2jtsException, IoxException {
-		ItfReader2 reader=new ItfReader2(new File("test/data/TestE.itf"),false);
+		ItfReader2 reader=new ItfReader2(new File("src/test/data/TestE.itf"),false);
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{

@@ -7,7 +7,9 @@
   
   <property name="build" value="${basedir}/build"/>
   <property name="dist" value="${basedir}/dist"/>
-
+  <property name="report.dir"  value="${build}/junitreport"/>
+  <property name="junit.dir"  value="${build}/junit"/>
+  <property name="junit-out.dir"  value="${build}/junit/test-out"/>
   <target name="init">
     <!-- Create the time stamp -->
     <tstamp/>
@@ -19,12 +21,8 @@
     <mkdir dir="${build}/javadoc"/>
     <mkdir dir="${dist}"/>
   </target>
-
-  <target depends="init" name="compile">
-    <!-- Compile the java code from ${src} into ${build}/classes -->
-    <mkdir dir="${build}/classes"/>
-    <javac destdir="${build}/classes" includes="**/*.java" excludes="**/bak~/*.java"  debug="true" source="1.6" target="1.6">
-      <classpath>
+  
+  <path id="classpath">
         <pathelement location="lib/antlr.jar"/>
         <pathelement location="lib/ehibasics.jar"/>
         <pathelement location="lib/gson-2.6.2.jar"/>
@@ -33,6 +31,18 @@
         <pathelement location="lib/ili2c-tool.jar"/>
         <pathelement location="lib/jts-core-1.14.0.jar"/>
         <pathelement location="lib/iox-api.jar"/>
+  </path>
+  <path id="junit">
+        <pathelement location="lib/junit-4.11.jar"/>
+        <pathelement location="lib/hamcrest-core-1.3.jar"/>
+  </path>
+
+  <target depends="init" name="compile">
+    <!-- Compile the java code from ${src} into ${build}/classes -->
+    <mkdir dir="${build}/classes"/>
+    <javac destdir="${build}/classes" includes="**/*.java" excludes="**/bak~/*.java"  debug="true" source="1.6" target="1.6">
+      <classpath>
+        <path refid="classpath"/>
         <!-- pathelement location="lib/stax-api-1.0.jar"/>
         <pathelement location="lib/wstx-asl-3.2.8.jar"/ -->
       </classpath>
@@ -48,14 +58,7 @@
     <mkdir dir="${build}/javadoc"/>
     <javadoc Public="true" Windowtitle="${ant.project.name}" destdir="${build}/javadoc" packagenames="ch.interlis.*">
       <classpath>
-        <pathelement location="lib/antlr.jar"/>
-        <pathelement location="lib/ehibasics.jar"/>
-        <pathelement location="lib/gson-2.6.2.jar"/>
-        <pathelement location="lib/toml4j-0.5.1.jar"/>
-        <pathelement location="lib/ili2c-core.jar"/>
-        <pathelement location="lib/jts-core-1.14.0.jar"/>
-        <!-- pathelement location="lib/stax-api-1.0.jar"/>
-        <pathelement location="lib/wstx-asl-3.2.8.jar"/-->
+        <path refid="classpath"/>
       </classpath>
     	<sourcepath path="${src}"/>
     	<sourcepath path="${gensrc}" />
@@ -156,4 +159,47 @@
     </zip>
   </target>
 
+    <target name="junit">
+	<delete dir="${junit-out.dir}" quiet="true"/>
+	<delete dir="${junit.dir}" quiet="true"/>
+	<delete dir="${report.dir}" quiet="true"/>
+        <mkdir dir="${junit.dir}"/>
+        <mkdir dir="${junit-out.dir}"/>
+        <mkdir dir="${report.dir}"/>
+	<copy todir="${junit.dir}">
+	    <fileset dir="${basedir}">
+	    	<include name="src/test/data/**/*"/>
+	    </fileset>
+	</copy>
+        <!-- junit  >
+            <classpath>
+                <path refid="classpath"/>
+                <path refid="junit"/>
+                <pathelement location="${build}/classes"/>
+            </classpath>
+            <formatter type="plain"/>
+            <test name="ch.interlis.iox_j.validator.ErrorMsg23Test"/>
+        </junit-->
+        <junit  printsummary="yes" dir="${junit.dir}">
+            <classpath>
+                <path refid="classpath"/>
+                <path refid="junit"/>
+                <pathelement location="${build}/classes"/>
+            </classpath>
+            
+            <formatter type="xml"/>
+            
+            <batchtest fork="yes" todir="${report.dir}">
+                <fileset dir="${basedir}/src/test/java" includes="**/*Test.java"/>
+            </batchtest>
+        </junit>
+    </target>
+    
+    <target name="junitreport">
+        <junitreport todir="${report.dir}">
+            <fileset dir="${report.dir}" includes="TEST-*.xml"/>
+            <report todir="${report.dir}"/>
+        </junitreport>
+    </target>    
+    
 </project>
