@@ -1,0 +1,77 @@
+INTERLIS 2.3;
+
+MODEL Association23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
+	TOPIC Topic=
+	
+		CLASS ClassA =
+		   attrA1 : TEXT*10;
+		END ClassA;
+		
+		CLASS ClassAp EXTENDS ClassA =
+		END ClassAp;
+		
+		CLASS ClassAq EXTENDS ClassA =
+		END ClassAq;
+
+		CLASS ClassB =
+		   attrB1 : TEXT*10;
+		END ClassB;
+		
+		CLASS ClassBp EXTENDS ClassB =
+		END ClassBp;
+		
+		CLASS ClassBq EXTENDS ClassB =
+		END ClassBq;
+
+		CLASS ClassD =
+		   attrD1 : TEXT*10;
+		END ClassD;
+		
+		ASSOCIATION ab1 =
+		  a1 -- {0..1} ClassA;
+		  b1 -- {0..1} ClassB;
+		END ab1;
+
+		ASSOCIATION ab2 =
+		  a2 -- {0..*} ClassA;
+		  b2 -- {0..*} ClassB;
+		END ab2;
+		
+		ASSOCIATION ab3 =
+		  a3 -- {0..1} ClassA;
+		  b3 -- {0..*} ClassB;
+		END ab3;
+		
+		ASSOCIATION abp1 =
+		  ap1 -- {0..1} ClassA RESTRICTION(ClassAp);
+		  bp1 -- {0..1} ClassB RESTRICTION(ClassBp);
+		END abp1;
+
+		ASSOCIATION abp2 =
+		  ap2 -- {0..*} ClassA RESTRICTION(ClassAp);
+		  bp2 -- {0..*} ClassB RESTRICTION(ClassBp);
+		END abp2;
+		
+		ASSOCIATION abp3 =
+		  ap3 -- {0..1} ClassA RESTRICTION(ClassAp);
+		  bp3 -- {0..*} ClassB RESTRICTION(ClassBp);
+		END abp3;
+		
+		ASSOCIATION abd1 =
+		  ad1 -- {0..1} ClassA OR ClassD;
+		  bd1 -- {0..1} ClassB OR ClassD;
+		END abd1;
+
+		ASSOCIATION abd2 =
+		  ad2 -- {0..*} ClassA OR ClassD;
+		  bd2 -- {0..*} ClassB OR ClassD;
+		END abd2;
+		
+		ASSOCIATION abd3 =
+		  ad3 -- {0..1} ClassA OR ClassD;
+		  bd3 -- {0..*} ClassB OR ClassD;
+		END abd3;
+		
+	END Topic;
+END Association23.
