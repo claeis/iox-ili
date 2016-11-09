@@ -1080,6 +1080,7 @@ public class ExistenceConstraints23Test {
 	public void bothObjectsWithoutValuesOk(){
 		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", "o1");
 		Iom_jObject objCoord=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassCoord3d", "o2");
+		objCoord.setattrvalue("attr2", "lars");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();

@@ -235,6 +235,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			return;
 		}
 		String restrictedAttrName = existenceConstraint.getRestrictedAttribute().getLastPathEl().getName();
+		if(iomObj.getattrvaluecount(restrictedAttrName)==0){
+			return;
+		}
 		Type type = existenceConstraint.getRestrictedAttribute().getType();
 		// if type of alias, cast type to TypeAlias
 		if (type instanceof TypeAlias){

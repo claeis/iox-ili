@@ -27,6 +27,7 @@ MODEL ExistenceConstraints23Coords
 		CLASS ClassCoord3d =
 			!! Coord 3d
 			attr1 : Hkoord;
+			attr2 : TEXT*10;
 			EXISTENCE CONSTRAINT attr1 REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClassCoord : attr2;
 		END ClassCoord3d;
 		
