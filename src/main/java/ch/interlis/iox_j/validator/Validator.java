@@ -35,6 +35,7 @@ import ch.interlis.ili2c.metamodel.ExistenceConstraint;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.LineForm;
 import ch.interlis.ili2c.metamodel.LineType;
+import ch.interlis.ili2c.metamodel.LocalAttribute;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.ObjectPath;
@@ -145,32 +146,104 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				IomObject iomObj = objectIterator.next();
 				Object modelElement=tag2class.get(iomObj.getobjecttag());
 				Table classA= (Table) modelElement;
-				// iterate through table
+				// for all ExistenceConstraints
 				Iterator attrIterator=classA.iterator();
 				while (attrIterator.hasNext()) {
 					Object objA = attrIterator.next();
-					// check if object is instance of existence constraint
+					// Existenceconstraint check
 					if(objA instanceof ExistenceConstraint){
 						ExistenceConstraint existenceConstraintObj=(ExistenceConstraint) objA;
-						// go inside the check of existence constraint. Else, run through attributes
 						checkExistenceConstraint(iomObj, existenceConstraintObj);
+					}
+					// Referenceattribute check
+					if (objA instanceof LocalAttribute){
+						Type type = ((LocalAttribute)objA).getDomain();
+						if (type instanceof CompositionType){
+							IomObject structValue = iomObj.getattrobj(iomObj.getattrname(0), 0);
+							Table structure = ((CompositionType)type).getComponentType();
+							checkReferenceAttrs(structValue, structure);
+						}
 					}
 				}
 			}
 		}
 	}
-	
-	private void checkExistenceConstraint(IomObject iomObj, ExistenceConstraint existenceConstraintObj){
-		String restrictedAttrName = existenceConstraintObj.getRestrictedAttribute().getLastPathEl().getName();
-		Type type = existenceConstraintObj.getRestrictedAttribute().getType();
+
+	private void checkReferenceAttrs(IomObject structValue, Table structure) {
+		Iterator attrIter=structure.getAttributesAndRoles();
+		while (attrIter.hasNext()){
+			Object refAttrO = attrIter.next();
+			if (refAttrO instanceof LocalAttribute){
+				Type type = ((LocalAttribute)refAttrO).getDomain();
+				// ReferenceType check
+				if (type instanceof ReferenceType){
+					ReferenceType refAttrType = (ReferenceType) type;
+					AbstractClassDef targetClass = refAttrType.getReferred();
+					String refAttrName = ((Element) refAttrO).getName();
+					IomObject refAttrValue = structValue.getattrobj(refAttrName, 0);
+					if (refAttrValue != null){
+						String targetOid = refAttrValue.getobjectrefoid();
+						String targetObjOid = null;
+						String targetObjClassStr = null;
+						for (IomObject targetObj:allObjects ){
+							Iterator refAttrIter = refAttrType.iteratorRestrictedTo();
+							Object modelElement=tag2class.get(targetObj.getobjecttag());
+							Table targetObjClass = (Table) modelElement;
+							targetObjClassStr = targetObjClass.getScopedName(null);
+							targetObjOid = targetObj.getobjectoid();
+							// compare OID of objects
+							if(targetObjOid.equals(targetOid)){
+								if(refAttrIter.hasNext()){
+									StringBuffer classNames=new StringBuffer();
+									String sep="";
+									while (refAttrIter.hasNext()){
+										Object refAttr = refAttrIter.next();
+										targetClass = (Table) refAttr;
+										// compare class
+										if (targetObjClass.isExtending(targetClass)){
+											// ok
+											return;
+										} else {
+											// try next restriction
+										}
+										classNames.append(sep);
+										classNames.append(targetClass.getScopedName(null));
+										sep=", ";
+									}
+									errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,classNames.toString(),refAttrName ));
+									return;
+								}else{
+									// compare class
+									if (targetObjClass.isExtending(targetClass)){
+										// ok
+									} else {
+										errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,targetClass.getScopedName(null),refAttrName ));
+									}
+									return;
+								}
+							} 
+						}
+						errs.addEvent(errFact.logErrorMsg("attribute {1} references an inexistent object with OID {0}.", targetOid,refAttrName));
+					}
+				}
+			}
+		}
+	}
+
+	private void checkExistenceConstraint(IomObject iomObj, ExistenceConstraint existenceConstraint){
+		if (iomObj.getattrcount() == 0){
+			return;
+		}
+		String restrictedAttrName = existenceConstraint.getRestrictedAttribute().getLastPathEl().getName();
+		Type type = existenceConstraint.getRestrictedAttribute().getType();
 		// if type of alias, cast type to TypeAlias
 		if (type instanceof TypeAlias){
 			TypeAlias aliasType = (TypeAlias) type;
 			Domain domainAliasing = (Domain) aliasType.getAliasing();
 			type = (Type) domainAliasing.getType();
 		}
-		Iterator<ObjectPath> requiredInIterator = existenceConstraintObj.iteratorRequiredIn();
-		boolean equals = false;
+		Iterator<ObjectPath> requiredInIterator = existenceConstraint.iteratorRequiredIn();
+		boolean valueExists = false;
 		Table classA = null;
 		Table otherClass = null;
 		while (requiredInIterator.hasNext()) {
@@ -179,37 +252,44 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			otherClass = (Table) attrName.getRoot();
 			String otherAttrName = attrName.toString();
 			for (IomObject otherIomObj:allObjects ){
-				Object modelElement=tag2class.get(otherIomObj.getobjecttag());
-				classA= (Table) modelElement;
-				// check if otherClass is extending by classA
-				if (classA.isExtending(otherClass)){
-					// if type is type of alias, check instance of
-					if(type instanceof ReferenceType){
-						ReferenceType referenceType = (ReferenceType) type;
-						equals = equalsReferenceValue(iomObj, referenceType, otherIomObj, otherAttrName, restrictedAttrName);
-					} else if (type instanceof CoordType){
-						CoordType coordType = (CoordType) type;
-						equals = equalsCoordValue(iomObj, coordType, otherIomObj, otherAttrName, restrictedAttrName);
-					} else if (type instanceof PolylineType){
-						PolylineType polylineType = (PolylineType) type;
-						equals = equalsPolylineValue(iomObj, polylineType, otherIomObj, otherAttrName, restrictedAttrName);
-					} else if (type instanceof SurfaceOrAreaType){
-						SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
-						equals = equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, otherAttrName, restrictedAttrName);
-					} else if (type instanceof CompositionType){
-						CompositionType compositionType = (CompositionType) type;
-						equals = equalsCompositionValue(iomObj, compositionType, otherIomObj, otherAttrName, restrictedAttrName);
-					} else {
-						// if type is not type of alias, check attribute names
-						if(otherIomObj.getattrvalue(otherAttrName).equals(iomObj.getattrvalue(restrictedAttrName))){
-							equals = true;
+				if (otherIomObj.getattrcount() == 0){
+					// do not check.
+				} else {
+					Object modelElement=tag2class.get(otherIomObj.getobjecttag());
+					classA= (Table) modelElement;
+					// otherAttr defined?
+					if(otherIomObj.getattrvaluecount(otherAttrName)>0){
+						// check if otherClass is extending by classA
+						if (classA.isExtending(otherClass)){
+							// if type is type of alias, check instance of
+							if(type instanceof ReferenceType){
+								ReferenceType referenceType = (ReferenceType) type;
+								valueExists = equalsReferenceValue(iomObj, referenceType, otherIomObj, otherAttrName, restrictedAttrName);
+							} else if (type instanceof CoordType){
+								CoordType coordType = (CoordType) type;
+								valueExists = equalsCoordValue(iomObj, coordType, otherIomObj, otherAttrName, restrictedAttrName);
+							} else if (type instanceof PolylineType){
+								PolylineType polylineType = (PolylineType) type;
+								valueExists = equalsPolylineValue(iomObj, polylineType, otherIomObj, otherAttrName, restrictedAttrName);
+							} else if (type instanceof SurfaceOrAreaType){
+								SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
+								valueExists = equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, otherAttrName, restrictedAttrName);
+							} else if (type instanceof CompositionType){
+								CompositionType compositionType = (CompositionType) type;
+								valueExists = equalsCompositionValue(iomObj, compositionType, otherIomObj, otherAttrName, restrictedAttrName);
+							} else {
+								// if type is not type of alias, check attribute names
+								if(otherIomObj.getattrvalue(otherAttrName).equals(iomObj.getattrvalue(restrictedAttrName))){
+									valueExists = true;
+								}
+							}
 						}
 					}
 				}
 			}
 		}
-		if (!equals){
-			errs.addEvent(errFact.logErrorMsg("The value of the attribute {0} of {1} was not found in the conditional class.", restrictedAttrName.toString(), iomObj.getobjecttag().toString()));
+		if (!valueExists){
+			errs.addEvent(errFact.logErrorMsg("The value of the attribute {0} of {1} was not found in the condition class.", restrictedAttrName.toString(), iomObj.getobjecttag().toString()));
 		}
 	}
 	
@@ -553,22 +633,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 		// alle attrs aus allen Klassen abspeichern.
 		if(isObject){
-			if (allObjects.size() == 0){
-				allObjects.add(iomObj);
-			} else {
-				for (IomObject otherIomObjI:allObjects){
-					if (otherIomObjI.getattrcount() == 0 && iomObj.getattrcount() == 0) {
-						errs.addEvent(errFact.logErrorMsg("Object {0} and Object {1} contain no valid content.", otherIomObjI.toString(), iomObj.toString()));
-						break;
-					} else if (otherIomObjI.getattrcount() == 0){
-						errs.addEvent(errFact.logErrorMsg("Object {0} contains no valid content.", otherIomObjI.toString()));
-					} else if (iomObj.getattrcount() == 0){
-						errs.addEvent(errFact.logErrorMsg("Object {0} contains no valid content.", iomObj.toString()));
-					} else {
-						allObjects.add(iomObj);
-					}
-				}
-			}
+			allObjects.add(iomObj);
 		}
 		
 		HashSet<String> propNames=new HashSet<String>();

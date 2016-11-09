@@ -39,7 +39,7 @@ public class Datatypes23Test {
 	//////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////// START BOOLEAN ///////////////////////////////////////
 	@Test
-	public void booleanTrue(){
+	public void booleanTrueOk(){
 		Iom_jObject objTrue=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objTrue.setattrvalue("aBoolean", "true");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -57,7 +57,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void booleanFalse(){
+	public void booleanFalseOk(){
 		Iom_jObject objFalse=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objFalse.setattrvalue("aBoolean", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -76,7 +76,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END BOOLEAN ////////////////////////////////////
 	///////////////////////////////// START OID //////////////////////////////////////	
 	@Test
-	public void uuidExample(){
+	public void uuidExampleOk(){
 		Iom_jObject objNormal=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objNormal.setattrvalue("aUuid", "123e4567-e89b-12d3-a456-426655440000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -94,7 +94,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void uuidMinLength(){
+	public void uuidMinLengthOk(){
 		Iom_jObject objMin=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMin.setattrvalue("aUuid", "00000000-0000-1000-8080-808080808080");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -112,7 +112,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void uuidMaxLength(){
+	public void uuidMaxLengthOk(){
 		Iom_jObject objMax=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMax.setattrvalue("aUuid", "ffffffff-ffff-1fff-bf7f-7f7f7f7f7f7f");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -130,7 +130,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void standardidMaxLength(){
+	public void standardidMaxLengthOk(){
 		Iom_jObject objMax=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMax.setattrvalue("aStandardid", "aaaaabbbbbcccccf");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -148,7 +148,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void i32idMaxLength(){
+	public void i32idMaxLengthOk(){
 		Iom_jObject objMax=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMax.setattrvalue("aI32id", "2147483647");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -167,7 +167,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END OID /////////////////////////////////////////
 	///////////////////////////////// START DATE //////////////////////////////////////	
 	@Test
-	public void dateMinYear(){
+	public void dateMinYearOk(){
 		Iom_jObject objMinYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinYear.setattrvalue("aDate", "1582-1-30");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -185,7 +185,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateMaxYear(){
+	public void dateMaxYearOk(){
 		Iom_jObject objMaxYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxYear.setattrvalue("aDate", "2999-1-30");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -203,7 +203,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateMinMonth(){
+	public void dateMinMonthOk(){
 		Iom_jObject objMinMonth=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinMonth.setattrvalue("aDate", "2016-1-30");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -221,7 +221,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateMaxMonth(){
+	public void dateMaxMonthOk(){
 		Iom_jObject objMaxMonth=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxMonth.setattrvalue("aDate", "2016-12-30");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -239,7 +239,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateMinDay(){
+	public void dateMinDayOk(){
 		Iom_jObject objMinDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinDay.setattrvalue("aDate", "2016-1-1");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -257,7 +257,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateMaxDay(){
+	public void dateMaxDayOk(){
 		Iom_jObject objMaxDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxDay.setattrvalue("aDate", "2016-1-31");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -276,7 +276,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END DATE /////////////////////////////////////////
 	///////////////////////////////// START TIME ///////////////////////////////////////	
 	@Test
-	public void timeMinHour(){
+	public void timeMinHourOk(){
 		Iom_jObject objMinHour=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinHour.setattrvalue("aTime", "0:30:30.123");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -294,7 +294,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void timeMaxHour(){
+	public void timeMaxHourOk(){
 		Iom_jObject objMaxHour=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxHour.setattrvalue("aTime", "23:30:30.123");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -312,7 +312,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void timeMinMinutes(){
+	public void timeMinMinutesOk(){
 		Iom_jObject objMinMinute=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinMinute.setattrvalue("aTime", "10:0:30.123");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -330,7 +330,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void timeMaxMinutes(){
+	public void timeMaxMinutesOk(){
 		Iom_jObject objMaxMinute=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxMinute.setattrvalue("aTime", "10:59:30.123");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -348,7 +348,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void timeMinSeconds(){
+	public void timeMinSecondsOk(){
 		Iom_jObject objMinSecond=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinSecond.setattrvalue("aTime", "10:30:0.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -366,7 +366,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void timeMaxSeconds(){
+	public void timeMaxSecondsOk(){
 		Iom_jObject objMaxSecond=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxSecond.setattrvalue("aTime", "10:30:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -385,7 +385,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END TIME /////////////////////////////////////////
 	///////////////////////////////// START DATETIME ///////////////////////////////////	
 	@Test
-	public void dateTimeMinYear(){
+	public void dateTimeMinYearOk(){
 		Iom_jObject objMinYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinYear.setattrvalue("aDateTime", "1582-5-15T12:30:30.500");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -403,7 +403,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateTimeMaxYear(){
+	public void dateTimeMaxYearOk(){
 		Iom_jObject objMaxYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxYear.setattrvalue("aDateTime", "2999-5-15T12:30:30.500");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -421,7 +421,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateTimeMaxMonth(){
+	public void dateTimeMaxMonthOk(){
 		Iom_jObject objMaxMonth=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxMonth.setattrvalue("aDateTime", "2016-12-15T12:30:30.500");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -439,7 +439,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateTimeMinMonth(){
+	public void dateTimeMinMonthOk(){
 		Iom_jObject objMinMonth=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinMonth.setattrvalue("aDateTime", "2016-1-15T12:30:30.500");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -457,7 +457,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateTimeMaxDay(){
+	public void dateTimeMaxDayOk(){
 		Iom_jObject objMaxDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxDay.setattrvalue("aDateTime", "2016-5-31T12:30:30.500");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -475,7 +475,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateTimeMinDay(){
+	public void dateTimeMinDayOk(){
 		Iom_jObject objMinDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinDay.setattrvalue("aDateTime", "2016-5-1T12:30:30.500");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -493,7 +493,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateTimeMaxHour(){
+	public void dateTimeMaxHourOk(){
 		Iom_jObject objMaxHour=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxHour.setattrvalue("aDateTime", "2016-5-15T23:30:30.500");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -511,7 +511,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateTimeMinHour(){
+	public void dateTimeMinHourOk(){
 		Iom_jObject objMinHour=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinHour.setattrvalue("aDateTime", "2016-5-15T0:30:30.500");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -529,7 +529,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateTimeMaxMinute(){
+	public void dateTimeMaxMinuteOk(){
 		Iom_jObject objMaxMinute=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxMinute.setattrvalue("aDateTime", "2016-5-15T12:59:30.500");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -547,7 +547,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateTimeMinMinute(){
+	public void dateTimeMinMinuteOk(){
 		Iom_jObject objMinMinute=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinMinute.setattrvalue("aDateTime", "2016-5-15T12:1:30.500");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -565,7 +565,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateTimeMaxSecond(){
+	public void dateTimeMaxSecondOk(){
 		Iom_jObject objMaxSecond=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxSecond.setattrvalue("aDateTime", "2016-5-15T12:30:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -583,7 +583,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void dateTimeMinSecond(){
+	public void dateTimeMinSecondOk(){
 		Iom_jObject objMinSecond=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinSecond.setattrvalue("aDateTime", "2016-5-15T12:30:0.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -602,7 +602,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END DATETIME ///////////////////////////////////////
 	///////////////////////////////// START NUMERIC //////////////////////////////////////	
 	@Test
-	public void numericIntTypeMin(){
+	public void numericIntTypeMinOk(){
 		Iom_jObject objMinLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinLength.setattrvalue("numericInt", "0");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -620,7 +620,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void numericIntTypeMax(){
+	public void numericIntTypeMaxOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("numericInt", "10");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -638,7 +638,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void numericDecTypeMin(){
+	public void numericDecTypeMinOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("numericDec", "0.0");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -656,7 +656,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void numericDecTypeMax(){
+	public void numericDecTypeMaxOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("numericDec", "10.0");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -675,7 +675,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END NUMERIC /////////////////////////////////////////
 	///////////////////////////////// START ENUMERATION ///////////////////////////////////	
 	@Test
-	public void enumerationTypeMin(){
+	public void enumerationTypeMinOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("aufzaehlung", "null");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -693,7 +693,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void enumerationTypeEins(){
+	public void enumerationTypeEinsOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("aufzaehlung", "eins");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -711,7 +711,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void enumerationTypeVier(){
+	public void enumerationTypeVierOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("aufzaehlung", "mehr.vier");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -729,7 +729,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void enumerationTypeDrei(){
+	public void enumerationTypeDreiOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("aufzaehlung", "mehr.zehn");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -747,7 +747,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void enumerationTypeCircular(){
+	public void enumerationTypeCircularOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("aufzaehlungOrdered", "unten");
 		objMaxLength.setattrvalue("aufzaehlungOrdered", "unten");
@@ -767,7 +767,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void enumerationTypeOrdered(){
+	public void enumerationTypeOrderedOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("aufzaehlungCircular", "Sonntag");
 		objMaxLength.setattrvalue("aufzaehlungCircular", "Werktage");
@@ -789,7 +789,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END ENUMERATION //////////////////////////////////////
 	///////////////////////////////// START ALIGNMENT //////////////////////////////////////	
 	@Test
-	public void horizAlignmentLeft(){
+	public void horizAlignmentLeftOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objHighestDay.setattrvalue("horizAlignment", "Left");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -807,7 +807,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void horizAlignmentCenter(){
+	public void horizAlignmentCenterOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objHighestDay.setattrvalue("horizAlignment", "Center");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -825,7 +825,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void horizAlignmentRight(){
+	public void horizAlignmentRightOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objHighestDay.setattrvalue("horizAlignment", "Right");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -844,7 +844,7 @@ public class Datatypes23Test {
 	////////////////// END HorizAlignment /////////////////////////
 	////////////////// START VertAlignment ////////////////////////
 	@Test
-	public void vertAlignmentTop(){
+	public void vertAlignmentTopOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objHighestDay.setattrvalue("vertAlignment", "Top");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -862,7 +862,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void vertAlignmentCap(){
+	public void vertAlignmentCapOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objHighestDay.setattrvalue("vertAlignment", "Cap");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -880,7 +880,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void vertAlignmentHalf(){
+	public void vertAlignmentHalfOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objHighestDay.setattrvalue("vertAlignment", "Half");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -898,7 +898,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void vertAlignmentBase(){
+	public void vertAlignmentBaseOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objHighestDay.setattrvalue("vertAlignment", "Base");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -916,7 +916,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void vertAlignmentBottom(){
+	public void vertAlignmentBottomOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objHighestDay.setattrvalue("vertAlignment", "Bottom");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -935,7 +935,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END ALIGNMENT /////////////////////////////////////////
 	///////////////////////////////// START TEXT ////////////////////////////////////////////	
 	@Test
-	public void textTypeTextLimitedMax(){
+	public void textTypeTextLimitedMaxOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("textLimited", "aaaaabbbbb");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -953,7 +953,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void textTypeTextUnLimitedMax(){
+	public void textTypeTextUnLimitedMaxOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("textUnlimited", ch.ehi.basics.tools.StringUtility.STRING(20000, ' '));
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -971,7 +971,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void textTypeMTextLimitedMax(){
+	public void textTypeMTextLimitedMaxOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("mtextLimited", "aaaaabbbbb");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -988,7 +988,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	@Test
-	public void textTypeMTextLimitedSpecialCharacter(){
+	public void textTypeMTextLimitedSpecialCharacterOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("mtextLimited", "\n");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1006,7 +1006,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void textTypeMTextUnLimitedSpecialCharacter(){
+	public void textTypeMTextUnLimitedSpecialCharacterOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("mtextUnlimited", ch.ehi.basics.tools.StringUtility.STRING(20000, '\n'));
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1024,7 +1024,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void textTypeNameMaxLength(){
+	public void textTypeNameMaxLengthOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("nametext", ch.ehi.basics.tools.StringUtility.STRING(255, 'a'));
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1042,7 +1042,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void textTypeUriMaxLength(){
+	public void textTypeUriMaxLengthOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("uritext", ch.ehi.basics.tools.StringUtility.STRING(1023, 'a'));
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1902,7 +1902,7 @@ public class Datatypes23Test {
 	//////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////// START BOOLEAN //////////////////////////////////////
 	@Test
-	public void booleanUppercase(){
+	public void booleanUppercaseFail(){
 		Iom_jObject objUppercase=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objUppercase.setattrvalue("aBoolean", "TRUE");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1920,7 +1920,7 @@ public class Datatypes23Test {
 		assertEquals("value <TRUE> is not a BOOLEAN", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void booleanNumber(){
+	public void booleanNumberFail(){
 		Iom_jObject objNumber=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objNumber.setattrvalue("aBoolean", "8");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1940,7 +1940,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END BOOLEAN //////////////////////////////////////
 	///////////////////////////////// START HORIZALIGNMENT /////////////////////////////
 	@Test
-	public void horizAlignmentNotTypeOfEnumeration(){
+	public void horizAlignmentNotTypeOfEnumerationFail(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objHighestDay.setattrvalue("horizAlignment", "Top");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1961,7 +1961,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END HORIZALIGNMENT /////////////////////////////
 	///////////////////////////////// START VERTALIGNMENT /////////////////////////////
 	@Test
-	public void vertAlignmentNotTypeOfEnumeration(){
+	public void vertAlignmentNotTypeOfEnumerationFail(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objHighestDay.setattrvalue("vertAlignment", "Left");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1981,7 +1981,7 @@ public class Datatypes23Test {
 	///////////////////////////////// START VERTALIGNMENT /////////////////////////////	
 	///////////////////////////////// START OID ///////////////////////////////////////
 	@Test
-	public void uuidNotAllowedChar(){
+	public void uuidNotAllowedCharFail(){
 		Iom_jObject objNotAllowedChar=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objNotAllowedChar.setattrvalue("aUuid", "123e4567-e89b-12d3-z456-426655440000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1999,7 +1999,7 @@ public class Datatypes23Test {
 		assertEquals("value <123e4567-e89b-12d3-z456-426655440000> is not a valid UUID", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void uuidLengthToShort(){
+	public void uuidLengthToShortFail(){
 		Iom_jObject objLengthToShort=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objLengthToShort.setattrvalue("aUuid", "123e4567-e89b-12d3-b456-42665544000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2017,7 +2017,7 @@ public class Datatypes23Test {
 		assertEquals("value <123e4567-e89b-12d3-b456-42665544000> is not a valid UUID", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void uuidLengthToLong(){
+	public void uuidLengthToLongFail(){
 		Iom_jObject objLengthToLong=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		// Set Attributes
 		objLengthToLong.setattrvalue("aUuid", "123e4567-e89b-12d3-b456-4266554400000");
@@ -2038,7 +2038,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END OID /////////////////////////////////////////
 	///////////////////////////////// START DATE //////////////////////////////////////	
 	@Test
-	public void dateYearToLow(){
+	public void dateYearToLowFail(){
 		Iom_jObject objYearToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objYearToLow.setattrvalue("aDate", "1580-2-15");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2056,7 +2056,7 @@ public class Datatypes23Test {
 		assertEquals("value <1580-2-15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateYearToHigh(){
+	public void dateYearToHighFail(){
 		Iom_jObject objYearToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objYearToHigh.setattrvalue("aDate", "3000-2-15");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2074,7 +2074,7 @@ public class Datatypes23Test {
 		assertEquals("value <3000-2-15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateMonthToLow(){
+	public void dateMonthToLowFail(){
 		Iom_jObject objMonthToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMonthToLow.setattrvalue("aDate", "2016-0-15");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2092,7 +2092,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016-0-15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateMonthToHigh(){
+	public void dateMonthToHighFail(){
 		Iom_jObject objMonthToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMonthToHigh.setattrvalue("aDate", "2016-13-15");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2110,7 +2110,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016-13-15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateDayToLow(){
+	public void dateDayToLowFail(){
 		Iom_jObject objDayToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objDayToLow.setattrvalue("aDate", "2016-2-0");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2128,7 +2128,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016-2-0> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateDayToHigh(){
+	public void dateDayToHighFail(){
 		Iom_jObject objDayToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objDayToHigh.setattrvalue("aDate", "2016-2-32");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2146,7 +2146,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016-2-32> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateFormatWithDots(){
+	public void dateFormatWithDotsFail(){
 		Iom_jObject objFormatWithDots=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objFormatWithDots.setattrvalue("aDate", "2016.2.15");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2164,7 +2164,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016.2.15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateFormatWithSlash(){
+	public void dateFormatWithSlashFail(){
 		Iom_jObject objFormatSlash=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objFormatSlash.setattrvalue("aDate", "2016/2/15");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2182,7 +2182,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016/2/15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateLengthToShort(){
+	public void dateLengthToShortFail(){
 		Iom_jObject objLengthToShort=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objLengthToShort.setattrvalue("aDate", "216-2-2");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2200,7 +2200,7 @@ public class Datatypes23Test {
 		assertEquals("value <216-2-2> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateLengthToLong(){
+	public void dateLengthToLongFail(){
 		Iom_jObject objLengthToLong=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		// Set Attributes
 		objLengthToLong.setattrvalue("aDate", "20016-12-15");
@@ -2221,7 +2221,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END DATE /////////////////////////////////////////
 	///////////////////////////////// START TIME ///////////////////////////////////////	
 	@Test
-	public void timeHourToHigh(){
+	public void timeHourToHighFail(){
 		Iom_jObject objHourToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objHourToHigh.setattrvalue("aTime", "24:59:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2239,7 +2239,7 @@ public class Datatypes23Test {
 		assertEquals("value <24:59:59.999> is not a valid Time", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void timeMinuteToHigh(){
+	public void timeMinuteToHighFail(){
 		Iom_jObject objMinuteToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinuteToHigh.setattrvalue("aTime", "23:60:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2257,7 +2257,7 @@ public class Datatypes23Test {
 		assertEquals("value <23:60:59.999> is not a valid Time", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void timeSecondToHigh(){
+	public void timeSecondToHighFail(){
 		Iom_jObject objSecondToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objSecondToHigh.setattrvalue("aTime", "23:59:60.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2275,7 +2275,7 @@ public class Datatypes23Test {
 		assertEquals("value <23:59:60.000> is not a valid Time", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void timeLengthToShort(){
+	public void timeLengthToShortFail(){
 		Iom_jObject objTimeToShort=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objTimeToShort.setattrvalue("aTime", "5:5:5.55");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2293,7 +2293,7 @@ public class Datatypes23Test {
 		assertEquals("value <5:5:5.55> is not a valid Time", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void timeLengthToLong(){
+	public void timeLengthToLongFail(){
 		Iom_jObject objTimeToLong=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objTimeToLong.setattrvalue("aTime", "23:59:59.9990");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2313,7 +2313,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END TIME ////////////////////////////////////////
 	///////////////////////////////// START DATETIME //////////////////////////////////	
 	@Test
-	public void dateTimeYearToLow(){
+	public void dateTimeYearToLowFail(){
 		Iom_jObject objYearToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objYearToLow.setattrvalue("aDateTime", "1581-2-29T12:59:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2331,7 +2331,7 @@ public class Datatypes23Test {
 		assertEquals("value <1581-2-29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateTimeYearToHigh(){
+	public void dateTimeYearToHighFail(){
 		Iom_jObject objYearToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objYearToHigh.setattrvalue("aDateTime", "3000-2-29T12:59:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2349,7 +2349,7 @@ public class Datatypes23Test {
 		assertEquals("value <3000-2-29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateTimeMonthToLow(){
+	public void dateTimeMonthToLowFail(){
 		Iom_jObject objMonthToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMonthToLow.setattrvalue("aDateTime", "2016-0-29T12:59:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2367,7 +2367,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016-0-29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateTimeMonthToHigh(){
+	public void dateTimeMonthToHighFail(){
 		Iom_jObject objMonthToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMonthToHigh.setattrvalue("aDateTime", "2016-13-29T12:59:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2385,7 +2385,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016-13-29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateTimeDayToLow(){
+	public void dateTimeDayToLowFail(){
 		Iom_jObject objDayToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objDayToLow.setattrvalue("aDateTime", "2016-2-0T12:59:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2403,7 +2403,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016-2-0T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateTimeDayToHigh(){
+	public void dateTimeDayToHighFail(){
 		Iom_jObject objDayToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objDayToHigh.setattrvalue("aDateTime", "2016-2-32T12:59:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2421,7 +2421,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016-2-32T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateTimeHourToHigh(){
+	public void dateTimeHourToHighFail(){
 		Iom_jObject objHourToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objHourToHigh.setattrvalue("aDateTime", "2016-2-29T24:59:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2439,7 +2439,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016-2-29T24:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateTimeMinuteToHigh(){
+	public void dateTimeMinuteToHighFail(){
 		Iom_jObject objMinuteToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMinuteToHigh.setattrvalue("aDateTime", "2016-2-29T12:60:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2457,7 +2457,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016-2-29T12:60:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateTimeSecondToHigh(){
+	public void dateTimeSecondToHighFail(){
 		Iom_jObject objSecondToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objSecondToHigh.setattrvalue("aDateTime", "2016-2-29T12:59:60.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2475,7 +2475,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016-2-29T12:59:60.000> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateTimeLengthToShort(){
+	public void dateTimeLengthToShortFail(){
 		Iom_jObject objLengthToShort=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objLengthToShort.setattrvalue("aDateTime", "2016-2-2T2:2:2.99");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2493,7 +2493,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016-2-2T2:2:2.99> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateTimeLengthToHigh(){
+	public void dateTimeLengthToHighFail(){
 		Iom_jObject objLengthToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objLengthToHigh.setattrvalue("aDateTime", "2016-12-29T12:59:59.9999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2511,7 +2511,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016-12-29T12:59:59.9999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateTimeFormatWithDots(){
+	public void dateTimeFormatWithDotsFail(){
 		Iom_jObject objFormatWithDots=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objFormatWithDots.setattrvalue("aDateTime", "2016.2.29T12:59:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2529,7 +2529,7 @@ public class Datatypes23Test {
 		assertEquals("value <2016.2.29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void dateTimeFormatWithoutT() {
+	public void dateTimeFormatWithoutTFail() {
 		Iom_jObject objFormatWithoutT=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		// Set Attributes
 		objFormatWithoutT.setattrvalue("aDateTime", "2016-2-29V12:59:59.999");
@@ -2550,7 +2550,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END DATETIME ////////////////////////////////////
 	///////////////////////////////// START NUMERICTYPE ///////////////////////////////	
 	@Test
-	public void numericTypeWrongFormat(){
+	public void numericTypeWrongFormatFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objWrongFormat.setattrvalue("numericInt", "a");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2568,7 +2568,7 @@ public class Datatypes23Test {
 		assertEquals("value <a> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void numericTypeMinWrong(){
+	public void numericTypeMinWrongFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objWrongFormat.setattrvalue("numericInt", "-1");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2586,7 +2586,7 @@ public class Datatypes23Test {
 		assertEquals("value -1 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void numericTypeMaxWrong(){
+	public void numericTypeMaxWrongFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objWrongFormat.setattrvalue("numericInt", "11");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2604,7 +2604,7 @@ public class Datatypes23Test {
 		assertEquals("value 11 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void numericTypeDecWrongFormat(){
+	public void numericTypeDecWrongFormatFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objWrongFormat.setattrvalue("numericDec", "a");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2622,7 +2622,7 @@ public class Datatypes23Test {
 		assertEquals("value <a> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void numericTypeDecMinWrong(){
+	public void numericTypeDecMinWrongFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objWrongFormat.setattrvalue("numericDec", "-1");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2640,7 +2640,7 @@ public class Datatypes23Test {
 		assertEquals("value -1 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void numericTypeDecMaxWrong(){
+	public void numericTypeDecMaxWrongFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objWrongFormat.setattrvalue("numericDec", "11");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2660,7 +2660,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END NUMERIC /////////////////////////////////////
 	///////////////////////////////// START ENUMERATION ///////////////////////////////	
 	@Test
-	public void enumerationTypeWrongSubValue(){
+	public void enumerationTypeWrongSubValueFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objWrongFormat.setattrvalue("aufzaehlung", "mehr.elf");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2678,7 +2678,7 @@ public class Datatypes23Test {
 		assertEquals("value mehr.elf is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void enumerationTypeWrongValue(){
+	public void enumerationTypeWrongValueFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objWrongFormat.setattrvalue("aufzaehlung", "5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2698,7 +2698,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END ENUMERATION /////////////////////////////////////////
 	///////////////////////////////// START TEXT //////////////////////////////////////////////	
 	@Test
-	public void textTypeTextLimitedToLong(){
+	public void textTypeTextLimitedToLongFail(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("textLimited", "aaaaabbbbbc");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2716,7 +2716,7 @@ public class Datatypes23Test {
 		assertEquals("Attribute textLimited is length restricted to 10", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void textTypeTextLimitedWrongFormat(){
+	public void textTypeTextLimitedWrongFormatFail(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("textLimited", "\n");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2735,7 +2735,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void textTypeTextUnLimitedWrongFormat(){
+	public void textTypeTextUnLimitedWrongFormatFail(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("textUnlimited", "\n");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2754,7 +2754,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void textTypeMTextLimitedToHigh(){
+	public void textTypeMTextLimitedToHighFail(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("mtextLimited", "aaaaabbbbbc");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2773,7 +2773,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void textTypeNameLengthToHigh(){
+	public void textTypeNameLengthToHighFail(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("nametext", ch.ehi.basics.tools.StringUtility.STRING(256, 'a'));
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2792,7 +2792,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void textTypeUriLengthToHigh(){
+	public void textTypeUriLengthToHighFail(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		objMaxLength.setattrvalue("uritext", ch.ehi.basics.tools.StringUtility.STRING(1024, 'a'));
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2812,7 +2812,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END TEXT /////////////////////////////////////////
 	///////////////////////////////// START COORD //////////////////////////////////////	
 	@Test
-	public void coordType4Dimensions(){
+	public void coordType4DimensionsFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		IomObject coordValue=objWrongFormat.addattrobj("hcoord", "COORD");
 		coordValue.setattrvalue("C1", "480000.000");
@@ -2834,7 +2834,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void coordType3DMissingC3(){
+	public void coordType3DMissingC3Fail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
 		IomObject coordValue=objWrongFormat.addattrobj("hcoord", "COORD");
 		coordValue.setattrvalue("C1", "480000.000");
@@ -2856,7 +2856,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END COORD /////////////////////////////////////////
 	///////////////////////////////// START POLYLINE ////////////////////////////////////	
 	@Test
-	public void polylineTypeAlineDoesNotContainTypePolyline(){
+	public void polylineTypeAlineDoesNotContainTypePolylineFail(){
 		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
 		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "LINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -2882,7 +2882,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void polylineTypeSequenceDoesNotContainTypeSegments(){
+	public void polylineTypeSequenceDoesNotContainTypeSegmentsFail(){
 		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
 		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "COORD");
@@ -2908,7 +2908,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void polylineTypeSegmentDoesNotContainTypeCoordOrArc(){
+	public void polylineTypeSegmentDoesNotContainTypeCoordOrArcFail(){
 		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
 		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -2934,7 +2934,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void polylineTypeIOMCompleteWith2Sequences(){
+	public void polylineTypeIOMCompleteWith2SequencesFail(){
 		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
 		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "POLYLINE");
 		polylineValue.setobjectconsistency(IomConstants.IOM_COMPLETE);
@@ -2962,7 +2962,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void polylineTypeUnexpectedARC(){
+	public void polylineTypeUnexpectedARCFail(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs2d", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -2993,7 +2993,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void polylineTypeUnexpectedCOORD(){
+	public void polylineTypeUnexpectedCOORDFail(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
 		IomObject polylineValue=objStraightsSuccess.addattrobj("arcs2d", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -3025,7 +3025,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END POLYLINE /////////////////////////////////////////
 	///////////////////////////////// START SURFACE ////////////////////////////////////////	
 	@Test
-	public void surfaceTypeNotTypeMULTISURFACE(){
+	public void surfaceTypeNotTypeMULTISURFACEFail(){
 		Iom_jObject objNotMultisurface=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
 		IomObject surfaceValue=objNotMultisurface.addattrobj("surface2d", "SURFACE");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -3044,7 +3044,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void surfaceTypeCompleteAndTwoSurfaces(){
+	public void surfaceTypeCompleteAndTwoSurfacesFail(){
 		Iom_jObject objCompleteMultisurface=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
 		IomObject multisurfaceValue=objCompleteMultisurface.addattrobj("surface2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_COMPLETE);
@@ -3066,7 +3066,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void surface2dWith3dImplementation(){
+	public void surface2dWith3dImplementationFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -3095,7 +3095,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void surface3dWith2dImplementation(){
+	public void surface3dWith2dImplementationFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -3122,7 +3122,7 @@ public class Datatypes23Test {
 		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void surface2dWithoutOverlaps(){
+	public void surface2dWithoutOverlapsFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -3151,7 +3151,7 @@ public class Datatypes23Test {
 	///////////////////////////////// END POLYLINE /////////////////////////////////////////
 	///////////////////////////////// START AREA ///////////////////////////////////////////	
 	@Test
-	public void area2dWith3dImplementation(){
+	public void area2dWith3dImplementationFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -3180,7 +3180,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void area3dWith2dImplementation(){
+	public void area3dWith2dImplementationFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -3208,7 +3208,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void surface3dInvalidValueRange(){
+	public void surface3dInvalidValueRangeFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -3239,7 +3239,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void surface2dInvalidValueRange(){
+	public void surface2dInvalidValueRangeFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -3268,7 +3268,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void area3dInvalidValueRange(){
+	public void area3dInvalidValueRangeFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -3299,7 +3299,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void area2dInvalidValueRange(){
+	public void area2dInvalidValueRangeFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -3328,7 +3328,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void surface3dWithARCInvalidValueRange(){
+	public void surface3dWithARCInvalidValueRangeFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -3364,7 +3364,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void surface2dWithARCInvalidValueRange(){
+	public void surface2dWithARCInvalidValueRangeFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassC", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -3398,7 +3398,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void area3dWithARCInvalidValueRange(){
+	public void area3dWithARCInvalidValueRangeFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -3434,7 +3434,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void area2dWithARCInvalidValueRange(){
+	public void area2dWithARCInvalidValueRangeFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -3468,7 +3468,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void areaTypeNotTypeMULTISURFACE(){
+	public void areaTypeNotTypeMULTISURFACEFail(){
 		Iom_jObject objAreaMultisurface=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
 		IomObject areaValue=objAreaMultisurface.addattrobj("area2d", "AREA");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -3487,7 +3487,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void areaTypeCompleteAndTwoAreas(){
+	public void areaTypeCompleteAndTwoAreasFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_COMPLETE);

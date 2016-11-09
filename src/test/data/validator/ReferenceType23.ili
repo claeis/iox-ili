@@ -1,0 +1,46 @@
+INTERLIS 2.3;
+
+MODEL ReferenceType23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-04" =
+	TOPIC Topic=
+		DOMAIN
+			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					        70000.000 .. 310000.000 [INTERLIS.m],
+						   ROTATION 2 -> 1;
+		CLASS ClassA =
+		   attrA1 : 0.0 .. 10.0;
+		END ClassA;
+		
+		CLASS ClassAp EXTENDS ClassA=
+		END ClassAp;
+		
+		CLASS ClassAq EXTENDS ClassA=
+		END ClassAq;
+
+		CLASS ClassB =
+		   attrB1 : 0.0 .. 10.0;
+		END ClassB;
+		
+		STRUCTURE StructC =
+		   attrC1 : 0.0 .. 10.0;
+		   attrC2 : REFERENCE TO ClassA;
+		   attrC3 : REFERENCE TO ClassAp;
+		   attrC4 : REFERENCE TO ClassA RESTRICTION (ClassAp);
+		END StructC;
+
+		CLASS ClassD =
+		   attrD1 : 0.0 .. 10.0;
+		   attrD2 : BAG {0..*} OF StructC;
+		END ClassD;
+
+		STRUCTURE StructE =
+		   attrE1 : 0.0 .. 10.0;
+		   attrE2 : MANDATORY REFERENCE TO ClassA;
+		END StructE;
+
+		CLASS ClassF =
+		   attrF1 : 0.0 .. 10.0;
+		   attrF2 : BAG {0..*} OF StructE;
+		END ClassF;	
+	END Topic;
+END ReferenceType23.

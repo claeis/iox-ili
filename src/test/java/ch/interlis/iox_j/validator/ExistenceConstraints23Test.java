@@ -181,30 +181,30 @@ public class ExistenceConstraints23Test {
 	////////////////// END CONDITIONCLASS + CLASSB ///////////////
 	//////////////////// START STRUCTURE /////////////////////////
 //	@Test
-//	public void existenceConstraintStructure() throws Exception {
+//	public void existenceConstraintStructureOk() throws Exception {
 //		Iom_jObject structureValueBedingung=new Iom_jObject("ExistenceConstraints23Condition.structure", null);
 //		structureValueBedingung.setattrvalue("attr1", "lars");
-//		structureValueBedingung.setattrvalue("attr2", "andre");
-//		structureValueBedingung.setattrvalue("attr3", "james");
-//		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassStructure", "o1");
-//		objBedingung.addattrobj("attr1", structureValueBedingung);
-//		Iom_jObject structureValueB=new Iom_jObject("ExistenceConstraints23Condition.structure", null);
-//		structureValueB.setattrvalue("attr1", "lars");
-//		structureValueB.setattrvalue("attr2", "andre");
-//		structureValueB.setattrvalue("attr3", "james");
-//		Iom_jObject objB=new Iom_jObject("ExistenceConstraints23.Topic.ClassStructureOtherModel", "o2");
-//		objB.addattrobj("attr1", structureValueB);
+//		//structureValueBedingung.setattrvalue("attr2", "andre");
+//		//structureValueBedingung.setattrvalue("attr3", "james");
+//		Iom_jObject objB=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassStructure", "o1");
+//		objB.addattrobj("attr1", structureValueBedingung);
+//		Iom_jObject structureValueBedingung2=new Iom_jObject("ExistenceConstraints23.Topic.ClassStructureOtherModel", null);
+//		structureValueBedingung2.setattrvalue("attr1", "lars");
+//		//structureValueBedingung2.setattrvalue("attr2", "andre");
+//		//structureValueBedingung2.setattrvalue("attr3", "james");
+//		Iom_jObject objC=new Iom_jObject("ExistenceConstraints23.Topic.ClassStructureOtherModel", "o2");
+//		objC.addattrobj("attr1", structureValueBedingung2);
 //		ValidationConfig modelConfig=new ValidationConfig();
 //		LogCollector logger=new LogCollector();
 //		LogEventFactory errFactory=new LogEventFactory();
 //		Settings settings=new Settings();
 //		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 //		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic","b1"));
+//		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b1"));
 //		validator.validate(new ObjectEvent(objB));
 //		validator.validate(new EndBasketEvent());
-//		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b2"));
-//		validator.validate(new ObjectEvent(objBedingung));
+//		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic","b2"));
+//		validator.validate(new ObjectEvent(objC));
 //		validator.validate(new EndBasketEvent());
 //		validator.validate(new EndTransferEvent());
 //		// Asserts
@@ -1017,8 +1017,86 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	////////////////// END SURFACE AREA ////////////////////////////
-	
-	
+	//////////////////START CONDITION ATTRS UNDEFINED /////////////
+	@Test
+	public void twoObjsOneContainsConditionAttrsOk(){
+		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", "o1");
+		IomObject coordValue=conditionObj.addattrobj("attr1", "COORD");
+		coordValue.setattrvalue("C1", "480000.000");
+		coordValue.setattrvalue("C2", "70000.000");
+		Iom_jObject conditionObj2=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", "o1b");
+		Iom_jObject objCoord=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassCoord2d", "o2");
+		coordValue=objCoord.addattrobj("attr1", "COORD");
+		coordValue.setattrvalue("C1", "480000.000");
+		coordValue.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b1"));
+		validator.validate(new ObjectEvent(conditionObj));
+		validator.validate(new ObjectEvent(conditionObj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23Coords.Topic","b2"));
+		validator.validate(new ObjectEvent(objCoord));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	////////////////// END CONDITION ATTRS UNDEFINED //
+	//////////////////START CLASS ATTRS UNDEFINED ////
+	@Test
+	public void twoObjsNooneContainsConditionAttrsOk(){
+		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", "o1");
+		IomObject conditionValue=conditionObj.addattrobj("attr2", "COORD");
+		conditionValue.setattrvalue("C1", "480000.000");
+		conditionValue.setattrvalue("C2", "70000.000");
+		conditionValue.setattrvalue("C3", "4000.000");
+		Iom_jObject objCoord=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassCoord3d", "o2");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b1"));
+		validator.validate(new ObjectEvent(conditionObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23Coords.Topic","b2"));
+		validator.validate(new ObjectEvent(objCoord));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	////////////////// END CLASS ATTRS UNDEFINED ////////////////
+	////////////////// START ALL ATTRS UNDEFINED ////////////////
+	@Test
+	public void bothObjectsWithoutValuesOk(){
+		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", "o1");
+		Iom_jObject objCoord=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassCoord3d", "o2");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b1"));
+		validator.validate(new ObjectEvent(conditionObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23Coords.Topic","b2"));
+		validator.validate(new ObjectEvent(objCoord));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	////////////////// END ALL ATTRS UNDEFINED //////////////////
 	//############################################################
 	//################ FAIL TESTS ################################
 	//############################################################
@@ -1043,7 +1121,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	//////////////////// END CONDITIONCLASS + CLASS A //////////
 	//////////////////// START CONDITIONCLASS + CLASS B ////////
@@ -1069,7 +1147,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
 	public void existenceConstraintSameOIDo1Fail() throws Exception {
@@ -1117,7 +1195,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	//////////////// END CONDITIONCLASS2 + CLASS A ////////////////
 	////////////////START CONDITIONCLASSX + CLASS A ///////////////
@@ -1141,7 +1219,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	////////////////END CONDITIONCLASSX + CLASS A /////////////////
 	////////////////// START CONDITIONCLASS + CLASSB //////////////
@@ -1167,7 +1245,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
 	public void existenceConstraintInOtherModelRFail() throws Exception {
@@ -1191,7 +1269,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	////////////////// END CONDITIONCLASS + CLASSB ///////////////
 	//////////////////// START STRUCTURE /////////////////////////
@@ -1251,7 +1329,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord1d was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord1d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	////////////////// END COORDTYPE 1D ///////////////
 	////////////////// START COORDTYPE 2D /////////////
@@ -1280,7 +1358,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord2d was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	////////////////// END COORDTYPE 2D ///////////////
 	////////////////// START COORDTYPE 3D /////////////
@@ -1311,88 +1389,10 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord3d was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	////////////////// END COORDTYPE 3D ////////////////////////////
-	////////////////// START CONDITION ATTRS UNDEFINED /////////////
-	@Test
-	public void ExistenceConstraintConditionUndefinedFail(){
-		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", "o1");
-		Iom_jObject objCoord=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassCoord3d", "o2");
-		IomObject coordValue=objCoord.addattrobj("attr1", "COORD");
-		coordValue.setattrvalue("C1", "480000.000");
-		coordValue.setattrvalue("C2", "70000.000");
-		coordValue.setattrvalue("C3", "4001.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b1"));
-		validator.validate(new ObjectEvent(conditionObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent("ExistenceConstraints23Coords.Topic","b2"));
-		validator.validate(new ObjectEvent(objCoord));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Object ExistenceConstraints23Condition.Topic.ConditionClassCoord oid o1 {} contains no valid content.", logger.getErrs().get(0).getEventMsg());
-	}
-	////////////////// END CONDITION ATTRS UNDEFINED //
-	////////////////// START CLASS ATTRS UNDEFINED ////
-	@Test
-	public void ExistenceConstraintClassUndefinedFail(){
-		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", "o1");
-		IomObject conditionValue=conditionObj.addattrobj("attr2", "COORD");
-		conditionValue.setattrvalue("C1", "480000.000");
-		conditionValue.setattrvalue("C2", "70000.000");
-		conditionValue.setattrvalue("C3", "4000.000");
-		Iom_jObject objCoord=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassCoord3d", "o2");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b1"));
-		validator.validate(new ObjectEvent(conditionObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent("ExistenceConstraints23Coords.Topic","b2"));
-		validator.validate(new ObjectEvent(objCoord));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Object ExistenceConstraints23Coords.Topic.ClassCoord3d oid o2 {} contains no valid content.", logger.getErrs().get(0).getEventMsg());
-	}
-	////////////////// END CLASS ATTRS UNDEFINED ////////////////
-	////////////////// START ALL ATTRS UNDEFINED ////////////////
-	@Test
-	public void ExistenceConstraintAllUndefinedFail(){
-		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", "o1");
-		Iom_jObject objCoord=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassCoord3d", "o2");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b1"));
-		validator.validate(new ObjectEvent(conditionObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent("ExistenceConstraints23Coords.Topic","b2"));
-		validator.validate(new ObjectEvent(objCoord));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Object ExistenceConstraints23Condition.Topic.ConditionClassCoord oid o1 {} and Object ExistenceConstraints23Coords.Topic.ClassCoord3d oid o2 {} contain no valid content.", logger.getErrs().get(0).getEventMsg());
-	}
-	////////////////// END ALL ATTRS UNDEFINED //////////////////
+	
 	////////////////// START POLYLINETYPE STRAIGHTS 2D //////////
 	@Test
 	public void polylineTypeStraights2dFail(){
@@ -1431,7 +1431,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute straights2d of ExistenceConstraints23Coords.Topic.ClassLine2d was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute straights2d of ExistenceConstraints23Coords.Topic.ClassLine2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1475,7 +1475,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute straights3d of ExistenceConstraints23Coords.Topic.ClassLine3d was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute straights3d of ExistenceConstraints23Coords.Topic.ClassLine3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1517,7 +1517,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute arcs2d of ExistenceConstraints23Coords.Topic.ClassLine2dArcs was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute arcs2d of ExistenceConstraints23Coords.Topic.ClassLine2dArcs was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1563,7 +1563,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute arcs3d of ExistenceConstraints23Coords.Topic.ClassLine3dArcs was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute arcs3d of ExistenceConstraints23Coords.Topic.ClassLine3dArcs was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1617,7 +1617,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute arcsstraights3d of ExistenceConstraints23Coords.Topic.ClassLine3dArcsStraights was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute arcsstraights3d of ExistenceConstraints23Coords.Topic.ClassLine3dArcsStraights was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1665,7 +1665,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute arcsstraights2d of ExistenceConstraints23Coords.Topic.ClassLine2dArcsStraights was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute arcsstraights2d of ExistenceConstraints23Coords.Topic.ClassLine2dArcsStraights was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	////////////////// END POLYLINETYPE //////////////////////////
 	////////////////// START SURFACE AREA ////////////////////////
@@ -1772,7 +1772,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute surface2d of ExistenceConstraints23Coords.Topic.ClassSurface2d was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute surface2d of ExistenceConstraints23Coords.Topic.ClassSurface2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1894,7 +1894,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute surface3d of ExistenceConstraints23Coords.Topic.ClassSurface3d was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute surface3d of ExistenceConstraints23Coords.Topic.ClassSurface3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -2000,7 +2000,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute area2d of ExistenceConstraints23Coords.Topic.ClassArea2d was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute area2d of ExistenceConstraints23Coords.Topic.ClassArea2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -2122,7 +2122,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute area3d of ExistenceConstraints23Coords.Topic.ClassArea3d was not found in the conditional class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute area3d of ExistenceConstraints23Coords.Topic.ClassArea3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	////////////////// END SURFACE AREA ////////////////////////////
 }

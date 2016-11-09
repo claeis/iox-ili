@@ -45,7 +45,7 @@ public class ErrorMsg23Test {
 		assertNotNull(td);
 	}
 	@Test
-	public void noCoord(){
+	public void noCoordFail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, "o1");
 		iomObj.setattrvalue(ILI_CLASSA_ATTRA, "true");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -64,7 +64,7 @@ public class ErrorMsg23Test {
 		assertEquals(null,logger.getErrs().get(0).getGeomC2());
 	}
 	@Test
-	public void coordFromPoint(){
+	public void coordFromPointFail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, "o1");
 		iomObj.setattrvalue(ILI_CLASSA_ATTRA, "true");
 		Iom_jObject iomCoord=new Iom_jObject("COORD", null);
@@ -87,7 +87,7 @@ public class ErrorMsg23Test {
 		assertEquals(new Double(70001.000),logger.getErrs().get(0).getGeomC2());
 	}
 	@Test
-	public void coordFromLine(){
+	public void coordFromLineFail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, "o1");
 		iomObj.setattrvalue(ILI_CLASSA_ATTRA, "true");
 		IomObject iomSequence=new Iom_jObject("SEGMENTS", null);
@@ -119,7 +119,7 @@ public class ErrorMsg23Test {
 		assertEquals(new Double(70001.000),logger.getErrs().get(0).getGeomC2());
 	}
 	@Test
-	public void coordFromSurface(){
+	public void coordFromSurfaceFail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, "o1");
 		iomObj.setattrvalue(ILI_CLASSA_ATTRA, "true");
 		IomObject iomSequence=new Iom_jObject("SEGMENTS", null);
@@ -161,7 +161,7 @@ public class ErrorMsg23Test {
 		assertEquals(new Double(70001.000),logger.getErrs().get(0).getGeomC2());
 	}
 	@Test
-	public void coordFromStructAttrPoint(){
+	public void coordFromStructAttrPointFail(){
 		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTB, null);
 		Iom_jObject iomCoord=new Iom_jObject("COORD", null);
 		iomCoord.setattrvalue("C1", "480001.000");

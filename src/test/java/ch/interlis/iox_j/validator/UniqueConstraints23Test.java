@@ -265,7 +265,7 @@ public class UniqueConstraints23Test {
 	/////////////// END CLASS C ///////////////////////////////////
 	/////////////// CLASS D ///////////////////////////////////////
 	@Test
-	public void uniqueConstraintTextNrDifferentD(){
+	public void uniqueConstraintTextNrDifferentDOk(){
 	// Set object.
 	Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassD", "o1");
 	obj1.setattrvalue("attr1", "Ralf");
@@ -291,7 +291,7 @@ public class UniqueConstraints23Test {
 	/////////////// END CLASS D ///////////////////////////////////
 	/////////////// CLASS E ///////////////////////////////////////
 	@Test
-	public void uniqueConstraintTextNrDifferentE(){
+	public void uniqueConstraintTextNrDifferentEOk(){
 	// Set object.
 	Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassE", "o1");
 	obj1.setattrvalue("attr1", "Ralf");
@@ -316,7 +316,7 @@ public class UniqueConstraints23Test {
 	}
 	
 	@Test
-	public void uniqueConstraintTextSameNrDifferentE(){
+	public void uniqueConstraintTextSameNrDifferentEOk(){
 	// Set object.
 	Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassE", "o1");
 	obj1.setattrvalue("attr1", "Ralf");
@@ -347,7 +347,7 @@ public class UniqueConstraints23Test {
 	
 	/////////////// CLASS B ///////////////////////////////////////
 	@Test
-	public void uniqueContraintsSameTextSameNumbersB(){
+	public void uniqueContraintsSameTextSameNumbersBFail(){
 		// Set object.
 		Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassB", "o1");
 		obj1.setattrvalue("attr1", "Ralf");
@@ -373,7 +373,7 @@ public class UniqueConstraints23Test {
 	}
 	
 	@Test
-	public void uniqueContraintsSameTextDifferentNumbersB(){
+	public void uniqueContraintsSameTextDifferentNumbersBFail(){
 		// Set object.
 		Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassB", "o1");
 		obj1.setattrvalue("attr1", "Ralf");
@@ -400,7 +400,7 @@ public class UniqueConstraints23Test {
 	/////////////// END CLASS B ///////////////////////////////////
 	/////////////// CLASS C ///////////////////////////////////////
 	@Test
-	public void uniqueContraintsSameTextSameNumbersC(){
+	public void uniqueContraintsSameTextSameNumbersCFail(){
 		// Set object.
 		Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassC", "o1");
 		obj1.setattrvalue("attr1", "Ralf");
@@ -427,7 +427,7 @@ public class UniqueConstraints23Test {
 	/////////////// END CLASS C ///////////////////////////////////
 	/////////////// CLASS D ///////////////////////////////////////
 	@Test
-	public void uniqueConstraintTextDifferentNrSameD(){
+	public void uniqueConstraintTextDifferentNrSameDFail(){
 	// Set object.
 	Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassD", "o1");
 	obj1.setattrvalue("attr1", "Ralf");
@@ -453,7 +453,7 @@ public class UniqueConstraints23Test {
 	}
 	
 	@Test
-	public void uniqueConstraintTextSameNrDifferentD(){
+	public void uniqueConstraintTextSameNrDifferentDFail(){
 	// Set object.
 	Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassD", "o1");
 	obj1.setattrvalue("attr1", "Ralf");
@@ -479,7 +479,7 @@ public class UniqueConstraints23Test {
 	}
 	
 	@Test
-	public void uniqueConstraintTextNrSameD(){
+	public void uniqueConstraintTextNrSameDFail(){
 	// Set object.
 	Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassD", "o1");
 	obj1.setattrvalue("attr1", "Ralf");
@@ -508,7 +508,7 @@ public class UniqueConstraints23Test {
 	/////////////// CLASS E ///////////////////////////////////////
 	
 	@Test
-	public void uniqueConstraintTextDifferentNrSameE(){
+	public void uniqueConstraintTextDifferentNrSameEFail(){
 	// Set object.
 	Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassE", "o1");
 	obj1.setattrvalue("attr1", "Ralf");
@@ -534,7 +534,7 @@ public class UniqueConstraints23Test {
 	}
 	
 	@Test
-	public void uniqueConstraintTextNrSameE(){
+	public void uniqueConstraintTextNrSameEFail(){
 	// Set object.
 	Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassE", "o1");
 	obj1.setattrvalue("attr1", "Ralf");
@@ -561,7 +561,7 @@ public class UniqueConstraints23Test {
 	}
 	/////////////// END CLASS E ///////////////////////////////////
 	@Test
-	public void uniqueConstraintTextNrSameEx(){
+	public void uniqueConstraintTextNrSameExFail(){
 	// Set object.
 	Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassD", "o1");
 	obj1.setattrvalue("attr1", "Ralf");

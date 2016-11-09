@@ -34,8 +34,8 @@ MODEL ExistenceConstraints23
 		
 		CLASS ClassStructureOtherModel =
 			attr1 : ExistenceConstraints23Condition.structure;
-			attr2 : TEXT*15;
-			attr3 : TEXT*20;
+			!!attr2 : TEXT*15;
+			!!attr3 : TEXT*20;
 			EXISTENCE CONSTRAINT attr1 REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClassStructure : attr1;
 		END ClassStructureOtherModel;
 	END Topic;

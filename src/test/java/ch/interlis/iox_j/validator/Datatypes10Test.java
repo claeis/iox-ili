@@ -39,7 +39,7 @@ public class Datatypes10Test {
 	//############################################################/
 	////////////////// START Text /////////////////////////////////
 	@Test
-	public void textMaximum(){
+	public void textMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("text", "aabbccddee");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -57,7 +57,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void textMinimum(){
+	public void textMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("text", "a");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -75,7 +75,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void text2Alphabetica_zA_Z(){
+	public void text2Alphabetica_zA_ZOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("text2", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -92,7 +92,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	@Test
-	public void text2Numeric0_9(){
+	public void text2Numeric0_9Ok(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("text2", "0123456789");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -109,7 +109,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	@Test
-	public void text2Val(){
+	public void text2ValOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("text2", "NUL ETX DEL ESC SP");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -126,7 +126,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	@Test
-	public void text2Signs(){
+	public void text2SignsOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("text2", "{|}~`_^][\\@?<=>;:/.-,+*()'&%$#\"!");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -143,7 +143,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	@Test
-	public void text2WordSeparation(){
+	public void text2WordSeparationOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("text2", "I_am_the_2_Test");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -160,7 +160,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	@Test
-	public void text2ZeichensatzContent(){
+	public void text2ZeichensatzContentOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("text2", "ƒ‚‰‡·Ê«Á…ÍÎËÈÓÔÏÌ—Ò÷ÙˆÚÛ‹˚¸˘˙");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -182,7 +182,7 @@ public class Datatypes10Test {
 	// 10.4 gerundet = 10. valid.
 	// 10.5 gerundet = 11. unvalid.
 	@Test
-	public void bereichMaximum(){
+	public void bereichMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("bereich", "10.4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -202,7 +202,7 @@ public class Datatypes10Test {
 	// -0.4 gerundet =  0. valid.
 	// -0.5 gerundet = -1. unvalid.
 	@Test
-	public void bereichMinimum(){
+	public void bereichMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("bereich", "-0.4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -220,7 +220,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void bereich2Maximum(){
+	public void bereich2MaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("bereich2", "10.499");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -238,7 +238,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void bereich2Minimum(){
+	public void bereich2MinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("bereich2", "-0.499");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -257,7 +257,7 @@ public class Datatypes10Test {
 	////////////////// END Bereich ////////////////////////////////	
 	////////////////// START Aufzaehlung //////////////////////////
 	@Test
-	public void aufzaehlungMaximum(){
+	public void aufzaehlungMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("aufzaehlung", "mehr.zehn");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -275,7 +275,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void aufzaehlungMinimum(){
+	public void aufzaehlungMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("aufzaehlung", "null");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -293,7 +293,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void aufzaehlungVerschachtelung(){
+	public void aufzaehlungVerschachtelungOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("aufzaehlungVerschachtelung", "null.eins.zwei.drei.vier.fuenf");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -312,7 +312,7 @@ public class Datatypes10Test {
 	////////////////// END Aufzaehlung ////////////////////////////	
 	////////////////// START Laenge ///////////////////////////////
 	@Test
-	public void laengeMaximum(){
+	public void laengeMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("laenge", "10.4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -330,7 +330,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void laengeMinimum(){
+	public void laengeMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("laenge", "0.5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -348,7 +348,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void laenge2ThirdPositionAfterDot(){
+	public void laenge2ThirdPositionAfterDotOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("laenge2", "1000.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -367,7 +367,7 @@ public class Datatypes10Test {
 	////////////////// END Laenge /////////////////////////////////	
 	////////////////// START Flaechenmass /////////////////////////
 	@Test
-	public void flaecheMaximum(){
+	public void flaecheMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("flaeche", "10.4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -385,7 +385,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void flaecheMinimum(){
+	public void flaecheMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("flaeche", "0.5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -403,7 +403,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void flaeche2ThirdPositionAfterDot(){
+	public void flaeche2ThirdPositionAfterDotOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("flaeche2", "99.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -422,7 +422,7 @@ public class Datatypes10Test {
 	////////////////// END Flaechenmass ///////////////////////////
 	////////////////// START Winkel ///////////////////////////////
 	@Test
-	public void winkelRadianMaximum(){
+	public void winkelRadianMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("radians", "10.4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -440,7 +440,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void winkelRadianMinimum(){
+	public void winkelRadianMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("radians", "0.5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -458,7 +458,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void winkelGradsMaximum(){
+	public void winkelGradsMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("grads", "10.4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -476,7 +476,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void winkelGradsMinimum(){
+	public void winkelGradsMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("grads", "0.5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -494,7 +494,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void winkelDegreesMaximum(){
+	public void winkelDegreesMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("degrees", "10.4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -512,7 +512,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void winkelDegreesMinimum(){
+	public void winkelDegreesMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("degrees", "0.5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -532,7 +532,7 @@ public class Datatypes10Test {
 	////////////////// END Winkel /////////////////////////////////
 	////////////////// START Datum ////////////////////////////////
 	@Test
-	public void datumLowestYear(){
+	public void datumLowestYearOk(){
 		Iom_jObject objLowestYear=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objLowestYear.setattrvalue("datum", "15821225");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -550,7 +550,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void datumHighestYear(){
+	public void datumHighestYearOk(){
 		Iom_jObject objHighestYear=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestYear.setattrvalue("datum", "29991225");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -568,7 +568,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void datumLowestMonth(){
+	public void datumLowestMonthOk(){
 		Iom_jObject objLowestMonth=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objLowestMonth.setattrvalue("datum", "20160125");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -586,7 +586,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void datumHighestMonth(){
+	public void datumHighestMonthOk(){
 		Iom_jObject objHighestMonth=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestMonth.setattrvalue("datum", "20161225");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -604,7 +604,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void datumLowestDay(){
+	public void datumLowestDayOk(){
 		Iom_jObject objLowestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objLowestDay.setattrvalue("datum", "20161201");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -622,7 +622,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void datumHighestDay(){
+	public void datumHighestDayOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestDay.setattrvalue("datum", "20161231");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -641,7 +641,7 @@ public class Datatypes10Test {
 	////////////////// END Datum //////////////////////////////////
 	////////////////// START HorizAlignment ///////////////////////
 	@Test
-	public void horizAlignmentLeft(){
+	public void horizAlignmentLeftOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestDay.setattrvalue("horizAlignment", "Left");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -659,7 +659,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void horizAlignmentCenter(){
+	public void horizAlignmentCenterOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestDay.setattrvalue("horizAlignment", "Center");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -677,7 +677,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void horizAlignmentRight(){
+	public void horizAlignmentRightOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestDay.setattrvalue("horizAlignment", "Right");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -696,7 +696,7 @@ public class Datatypes10Test {
 	////////////////// END HorizAlignment /////////////////////////
 	////////////////// START VertAlignment ////////////////////////
 	@Test
-	public void vertAlignmentTop(){
+	public void vertAlignmentTopOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestDay.setattrvalue("vertAlignment", "Top");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -714,7 +714,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void vertAlignmentCap(){
+	public void vertAlignmentCapOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestDay.setattrvalue("vertAlignment", "Cap");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -732,7 +732,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void vertAlignmentHalf(){
+	public void vertAlignmentHalfOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestDay.setattrvalue("vertAlignment", "Half");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -750,7 +750,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void vertAlignmentBase(){
+	public void vertAlignmentBaseOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestDay.setattrvalue("vertAlignment", "Base");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -768,7 +768,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void vertAlignmentBottom(){
+	public void vertAlignmentBottomOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestDay.setattrvalue("vertAlignment", "Bottom");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1353,7 +1353,7 @@ public class Datatypes10Test {
 	//############################################################/
 	//////////////////START Text /////////////////////////////////
 	@Test
-	public void textGreaterThanMaximum(){
+	public void textGreaterThanMaximumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("text", "aabbccddeef");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1372,7 +1372,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void textUnknownProperty(){
+	public void textUnknownPropertyFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("Ztext", "a");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1391,7 +1391,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void textContainUnvalidCharacters(){
+	public void textContainUnvalidCharactersFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("text", "\n\t");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1411,7 +1411,7 @@ public class Datatypes10Test {
 	////////////////// END Text ///////////////////////////////////	
 	////////////////// START Bereich //////////////////////////////
 	@Test
-	public void bereichContainLetters(){
+	public void bereichContainLettersFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("bereich", "test");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1430,7 +1430,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void bereichGreaterThanMaximum(){
+	public void bereichGreaterThanMaximumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("bereich", "10.5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1449,7 +1449,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void bereichLessThanMinimum(){
+	public void bereichLessThanMinimumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("bereich", "-0.5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1468,7 +1468,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void bereich2GreaterThanMaximum(){
+	public void bereich2GreaterThanMaximumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("bereich2", "10.500");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1487,7 +1487,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void bereich2LessThanMinimum(){
+	public void bereich2LessThanMinimumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("bereich2", "-0.500");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1507,7 +1507,7 @@ public class Datatypes10Test {
 	////////////////// END Bereich ////////////////////////////////	
 	////////////////// START Aufzaehlung //////////////////////////
 	@Test
-	public void aufzaehlungInvalidHierarchicalLevel(){
+	public void aufzaehlungInvalidHierarchicalLevelFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("aufzaehlung", "mehr.mehr.vier");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1526,7 +1526,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void aufzaehlungNotTypeOfEnumeration(){
+	public void aufzaehlungNotTypeOfEnumerationFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("aufzaelung", "eins");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1545,7 +1545,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void aufzaehlungNotInSameEnumeration(){
+	public void aufzaehlungNotInSameEnumerationFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("aufzaehlung2Oberauszaehlungen", "meter.ml");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1564,7 +1564,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void aufzaehlungNotInSameEnumeration2(){
+	public void aufzaehlungNotInSameEnumeration2Fail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("aufzaehlung2Oberauszaehlungen", "liter.mm");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1584,7 +1584,7 @@ public class Datatypes10Test {
 	////////////////// END Aufzaehlung ////////////////////////////	
 	////////////////// START Laenge ///////////////////////////////
 	@Test
-	public void laengeToHigh(){
+	public void laengeToHighFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("laenge", "10.5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1603,7 +1603,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void laengeToLow(){
+	public void laengeToLowFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("laenge", "0.4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1622,7 +1622,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void laengeNotValid(){
+	public void laengeNotValidFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("laenge", "abc");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1641,7 +1641,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void laengeWith2Dez(){
+	public void laengeWith2DezFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("laenge", "2.0 5.2");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1661,7 +1661,7 @@ public class Datatypes10Test {
 	////////////////// END Laenge /////////////////////////////////	
 	////////////////// START Flaechenmass /////////////////////////
 	@Test
-	public void flaecheToHigh(){
+	public void flaecheToHighFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("flaeche", "10.5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1680,7 +1680,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void flaecheToLow(){
+	public void flaecheToLowFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("flaeche", "0.4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1699,7 +1699,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void flaecheNotValid(){
+	public void flaecheNotValidFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("flaeche", "abc");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1718,7 +1718,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void FlaecheWith2Dez(){
+	public void FlaecheWith2DezFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("flaeche", "2.0 5.2");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1738,7 +1738,7 @@ public class Datatypes10Test {
 	////////////////// END Flaechenmass ///////////////////////////	
 	////////////////// START Winkel ///////////////////////////////
 	@Test
-	public void radiansGreaterThanMax(){
+	public void radiansGreaterThanMaxFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("radians", "10.5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1757,7 +1757,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void radiansLessThanMin(){
+	public void radiansLessThanMinFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("radians", "0.4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1776,7 +1776,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void gradsGreaterThanMax(){
+	public void gradsGreaterThanMaxFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("grads", "10.5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1795,7 +1795,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void gradsLessThanMin(){
+	public void gradsLessThanMinFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("grads", "0.4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1814,7 +1814,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void degreesGreaterThanMax(){
+	public void degreesGreaterThanMaxFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("degrees", "10.5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1833,7 +1833,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void degreesLessThanMin(){
+	public void degreesLessThanMinFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("degrees", "0.4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1852,7 +1852,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void winkelTypeNotValid(){
+	public void winkelTypeNotValidFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("radians", "abc");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1871,7 +1871,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void winkelNotValidR(){
+	public void winkelNotValidRFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("radians", "1.5 5.2");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1890,7 +1890,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void winkelNotValidG(){
+	public void winkelNotValidGFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("grads", "1.5 5.2");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1909,7 +1909,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void winkelNotValidD(){
+	public void winkelNotValidDFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("degrees", "1.5 5.2");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1929,7 +1929,7 @@ public class Datatypes10Test {
 	////////////////// END Winkel /////////////////////////////////	
 	////////////////// START Datum ////////////////////////////////
 	@Test
-	public void datumYearToLow(){
+	public void datumYearToLowFail(){
 		Iom_jObject objYearToLow=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objYearToLow.setattrvalue("datum", "15801225");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1948,7 +1948,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void datumYearToHigh(){
+	public void datumYearToHighFail(){
 		Iom_jObject objYearToHigh=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objYearToHigh.setattrvalue("datum", "30001225");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1967,7 +1967,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void datumMonthToLow(){
+	public void datumMonthToLowFail(){
 		Iom_jObject objMonthToLow=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objMonthToLow.setattrvalue("datum", "20160025");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1986,7 +1986,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void datumMonthToHigh(){
+	public void datumMonthToHighFail(){
 		Iom_jObject objMonthToHigh=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objMonthToHigh.setattrvalue("datum", "20161325");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2005,7 +2005,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void datumDayToLow(){
+	public void datumDayToLowFail(){
 		Iom_jObject objDayToLow=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objDayToLow.setattrvalue("datum", "20161200");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2024,7 +2024,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void datumDayToHigh(){
+	public void datumDayToHighFail(){
 		Iom_jObject objDayToHigh=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objDayToHigh.setattrvalue("datum", "20161232");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2043,7 +2043,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void datumFormatWithDots(){
+	public void datumFormatWithDotsFail(){
 		Iom_jObject objFormatWithDots=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objFormatWithDots.setattrvalue("datum", "2016.12.25");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2062,7 +2062,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void datumLengthToShort(){
+	public void datumLengthToShortFail(){
 		Iom_jObject objLengthToShort=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objLengthToShort.setattrvalue("datum", "2016125");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2081,7 +2081,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void datumLengthToHigh(){
+	public void datumLengthToHighFail(){
 		Iom_jObject objLengthToLong=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objLengthToLong.setattrvalue("datum", "201612251");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2101,7 +2101,7 @@ public class Datatypes10Test {
 	////////////////// END Datum //////////////////////////////////
 	////////////////// START HorizAlignment ///////////////////////
 	@Test
-	public void horizAlignmentNotTypeOfEnumeration(){
+	public void horizAlignmentNotTypeOfEnumerationFail(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestDay.setattrvalue("horizAlignment", "Top");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2122,7 +2122,7 @@ public class Datatypes10Test {
 	////////////////// END HorizAlignment /////////////////////////
 	////////////////// START VertAlignment ////////////////////////
 	@Test
-	public void vertAlignmentNotTypeOfEnumeration(){
+	public void vertAlignmentNotTypeOfEnumerationFail(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestDay.setattrvalue("vertAlignment", "Left");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2143,7 +2143,7 @@ public class Datatypes10Test {
 	////////////////// END VertAlignment //////////////////////////
 	////////////////// START Koord2 ///////////////////////////////
 	@Test
-	public void koord2WrongDimensions(){
+	public void koord2WrongDimensionsFail(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestDay.setattrvalue("koord2", "5.55 200.6 9999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2163,7 +2163,7 @@ public class Datatypes10Test {
 	////////////////// END Koord2 /////////////////////////////////	
 	////////////////// START Koord3 ///////////////////////////////
 	@Test
-	public void koord3WrongDimensions(){
+	public void koord3WrongDimensionsFail(){
 		Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objSuccessFormat.setattrvalue("koord3", "5.55, 200.6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2182,7 +2182,7 @@ public class Datatypes10Test {
 	////////////////// END Koord3 /////////////////////////////////
 	////////////////// START Linientyp ////////////////////////////
 	@Test
-	public void polylineTypeAlineDoesNotContainTypePolyline(){
+	public void polylineTypeAlineDoesNotContainTypePolylineFail(){
 		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
 		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "LINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -2208,7 +2208,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void polylineTypeSequenceDoesNotContainTypeSegments(){
+	public void polylineTypeSequenceDoesNotContainTypeSegmentsFail(){
 		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
 		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "COORD");
@@ -2234,7 +2234,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void polylineTypeSegmentDoesNotContainTypeCoordOrArc(){
+	public void polylineTypeSegmentDoesNotContainTypeCoordOrArcFail(){
 		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
 		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -2260,7 +2260,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void polylineTypeIOMCompleteWith2Sequences(){
+	public void polylineTypeIOMCompleteWith2SequencesFail(){
 		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
 		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "POLYLINE");
 		polylineValue.setobjectconsistency(IomConstants.IOM_COMPLETE);
@@ -2288,7 +2288,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void polylineTypeUnexpectedARC(){
+	public void polylineTypeUnexpectedARCFail(){
 		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
 		IomObject polylineValue=objStraightsFail.addattrobj("straightsarcs2d", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -2319,7 +2319,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void polylineTypeUnexpectedCOORD(){
+	public void polylineTypeUnexpectedCOORDFail(){
 		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
 		IomObject polylineValue=objStraightsFail.addattrobj("arcs2d", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -2356,7 +2356,7 @@ public class Datatypes10Test {
 	////////////////// END LinientypWithoutOverlaps ///////////////
 	////////////////// START FlaechentypSurface ///////////////////
 	@Test
-	public void surfaceTypeNotTypeMULTISURFACE(){
+	public void surfaceTypeNotTypeMULTISURFACEFail(){
 		Iom_jObject objNotMultisurface=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
 		IomObject surfaceValue=objNotMultisurface.addattrobj("surface2d", "SURFACE");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2375,7 +2375,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void surfaceTypeCompleteAndTwoSurfaces(){
+	public void surfaceTypeCompleteAndTwoSurfacesFail(){
 		Iom_jObject objCompleteMultisurface=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
 		IomObject multisurfaceValue=objCompleteMultisurface.addattrobj("surface2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_COMPLETE);
@@ -2397,7 +2397,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void surface2dWith3dImplementation(){
+	public void surface2dWith3dImplementationFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -2426,7 +2426,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void surface3dWith2dImplementation(){
+	public void surface3dWith2dImplementationFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -2453,7 +2453,7 @@ public class Datatypes10Test {
 		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void surface3dInvalidValueRange(){
+	public void surface3dInvalidValueRangeFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -2484,7 +2484,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void surface2dInvalidValueRange(){
+	public void surface2dInvalidValueRangeFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -2512,7 +2512,7 @@ public class Datatypes10Test {
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 	}
 	@Test
-	public void surface3dWithARCInvalidValueRange(){
+	public void surface3dWithARCInvalidValueRangeFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
@@ -2548,7 +2548,7 @@ public class Datatypes10Test {
 	}
 	
 	@Test
-	public void surface2dWithARCInvalidValueRange(){
+	public void surface2dWithARCInvalidValueRangeFail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
