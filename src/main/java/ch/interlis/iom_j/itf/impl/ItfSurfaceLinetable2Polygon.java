@@ -221,7 +221,12 @@ public class ItfSurfaceLinetable2Polygon {
 			ArrayList<IomObject> lines1=linepool.get(mainTid);
 			HashMap<String,IomObject> lines=new HashMap<String,IomObject>();
 			for(IomObject line:lines1){
-				lines.put(line.getobjectoid(), line);
+				IomObject polyline=line.getattrobj(helperTableGeomAttrName, 0);
+				if(polyline==null){
+					dataerrs.add(new IoxInvalidDataException("empty line",linetableIliqname,new String[]{line.getobjectoid()},line));
+				}else{
+					lines.put(line.getobjectoid(), line);
+				}
 			}
 			LineSet lineset=new LineSet(true,linattrTab,helperTableGeomAttrName);
 			
