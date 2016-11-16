@@ -20,216 +20,153 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class Oid23Test {
 
+	private final static String OID23_TOPIC="Oid23.Topic";
+	private final static String OID23_STRUCTA=OID23_TOPIC+".StructA";
+	private final static String OID23_CLASSB=OID23_TOPIC+".ClassB";
+	private final static String OID23_CLASSC=OID23_TOPIC+".ClassC";
+	
 private TransferDescription td=null;
 	
 @Before
 public void setUp() throws Exception {
 	// ili-datei lesen
 	Configuration ili2cConfig=new Configuration();
-	FileEntry existenceConstraintsConditionClass=new FileEntry("src/test/data/validator/ExistenceConstraints23Condition.ili", FileEntryKind.ILIMODELFILE);
-	ili2cConfig.addFileEntry(existenceConstraintsConditionClass);
-	FileEntry existenceConstraints23=new FileEntry("src/test/data/validator/ExistenceConstraints23.ili", FileEntryKind.ILIMODELFILE);
-	ili2cConfig.addFileEntry(existenceConstraints23);
-	FileEntry existenceConstraints23Coords=new FileEntry("src/test/data/validator/ExistenceConstraints23Coords.ili", FileEntryKind.ILIMODELFILE);
-	ili2cConfig.addFileEntry(existenceConstraints23Coords);
-	FileEntry association=new FileEntry("src/test/data/validator/Association23.ili", FileEntryKind.ILIMODELFILE);
-	ili2cConfig.addFileEntry(association);
-	FileEntry datatypes23=new FileEntry("src/test/data/validator/Datatypes23.ili", FileEntryKind.ILIMODELFILE);
-	ili2cConfig.addFileEntry(datatypes23);
-	FileEntry referenceType23=new FileEntry("src/test/data/validator/ReferenceType23.ili", FileEntryKind.ILIMODELFILE);
-	ili2cConfig.addFileEntry(referenceType23);
+	FileEntry iliFile=new FileEntry("src/test/data/validator/Oid23.ili", FileEntryKind.ILIMODELFILE);
+	ili2cConfig.addFileEntry(iliFile);
 	td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 	assertNotNull(td);
 }
 
 	@Test
-	public void ok_DifferentOIDDefined() throws Exception {
-		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClass", "a1");
-		objBedingung.setattrvalue("attr1", "lars");
-		Iom_jObject objB=new Iom_jObject("ExistenceConstraints23.Topic.ClassB", "b2");
-		objB.setattrvalue("attr1", "lars");
-		objB.setattrvalue("attr2", "20");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b1"));
-		validator.validate(new ObjectEvent(objBedingung));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic","b2"));
-		validator.validate(new ObjectEvent(objB));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-
-	@Test
-	public void ok_ClassOIDDefined(){
-		Iom_jObject objTrue=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objTrue.setattrvalue("aBoolean", "true");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objTrue));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-
-	@Test
-	public void ok_AssociatianOIDDefined(){
-		final String OBJ_A1="a1";
+	public void ok_DifferentOid() throws Exception {
 		final String OBJ_B1="b1";
-		Iom_jObject iomObjA=new Iom_jObject("Association23.Topic.ClassA", "a1");
-		Iom_jObject iomObjB=new Iom_jObject("Association23.Topic.ClassB", "b1");
-		Iom_jObject iomObjAB=new Iom_jObject("Association23.Topic.ab2", "c1");
-		iomObjAB.addattrobj("a2", "REF").setobjectrefoid(OBJ_A1);
-		iomObjAB.addattrobj("b2", "REF").setobjectrefoid(OBJ_B1);
+		final String OBJ_B2="b2";
+		Iom_jObject objB1=new Iom_jObject(OID23_CLASSB, OBJ_B1);
+		Iom_jObject objB2=new Iom_jObject(OID23_CLASSB, OBJ_B2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Association23.Topic","b2"));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new ObjectEvent(iomObjB));
-		validator.validate(new ObjectEvent(iomObjAB));
+		validator.validate(new StartBasketEvent(OID23_TOPIC,"x1"));
+		validator.validate(new ObjectEvent(objB1));
+		validator.validate(new ObjectEvent(objB2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
 
+
 	@Test
-	public void ok_AssociatianOIDUndefined(){
-		final String OBJ_A1="a1";
+	public void ok_EmbeddedAssociatianWithoutId(){
 		final String OBJ_B1="b1";
-		Iom_jObject iomObjA=new Iom_jObject("Association23.Topic.ClassA", "a1");
-		Iom_jObject iomObjB=new Iom_jObject("Association23.Topic.ClassB", "b1");
-		Iom_jObject iomObjAB=new Iom_jObject("Association23.Topic.ab2", null);
-		iomObjAB.addattrobj("a2", "REF").setobjectrefoid(OBJ_A1);
-		iomObjAB.addattrobj("b2", "REF").setobjectrefoid(OBJ_B1);
+		final String OBJ_C1="c1";
+		Iom_jObject objB1=new Iom_jObject(OID23_CLASSB, OBJ_B1);
+		Iom_jObject objC1=new Iom_jObject(OID23_CLASSC, OBJ_C1);
+		objC1.addattrobj("b1", "REF").setobjectrefoid(OBJ_B1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Association23.Topic","b2"));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new ObjectEvent(iomObjB));
-		validator.validate(new ObjectEvent(iomObjAB));
+		validator.validate(new StartBasketEvent(OID23_TOPIC,"x1"));
+		validator.validate(new ObjectEvent(objB1));
+		validator.validate(new ObjectEvent(objC1));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
-	
+	@Test
+	public void ok_AssociatianWithoutId(){
+		final String OBJ_B1="b1";
+		final String OBJ_C1="c1";
+		Iom_jObject objB1=new Iom_jObject(OID23_CLASSB, OBJ_B1);
+		Iom_jObject objC1=new Iom_jObject(OID23_CLASSC, OBJ_C1);
+		Iom_jObject objBC=new Iom_jObject(OID23_TOPIC+".bc2", null);
+		objBC.addattrobj("b2", "REF").setobjectrefoid(OBJ_B1);
+		objBC.addattrobj("c2", "REF").setobjectrefoid(OBJ_C1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(OID23_TOPIC,"x1"));
+		validator.validate(new ObjectEvent(objB1));
+		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new ObjectEvent(objBC));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	@Test
+	public void ok_AssociatianWithId(){
+		final String OBJ_B1="b1";
+		final String OBJ_C1="c1";
+		Iom_jObject objB1=new Iom_jObject(OID23_CLASSB, OBJ_B1);
+		Iom_jObject objC1=new Iom_jObject(OID23_CLASSC, OBJ_C1);
+		Iom_jObject objBC=new Iom_jObject(OID23_TOPIC+".bc3", "bc1");
+		objBC.addattrobj("b3", "REF").setobjectrefoid(OBJ_B1);
+		objBC.addattrobj("c3", "REF").setobjectrefoid(OBJ_C1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(OID23_TOPIC,"x1"));
+		validator.validate(new ObjectEvent(objB1));
+		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new ObjectEvent(objBC));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	@Test
+	public void ok_AssociatianWithOid(){
+		final String OBJ_B1="b1";
+		final String OBJ_C1="c1";
+		Iom_jObject objB1=new Iom_jObject(OID23_CLASSB, OBJ_B1);
+		Iom_jObject objC1=new Iom_jObject(OID23_CLASSC, OBJ_C1);
+		Iom_jObject objBC=new Iom_jObject(OID23_TOPIC+".bc4", "842FCD8B-2543-4d2f-837F-EAF813E125B2");
+		objBC.addattrobj("b4", "REF").setobjectrefoid(OBJ_B1);
+		objBC.addattrobj("c4", "REF").setobjectrefoid(OBJ_C1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(OID23_TOPIC,"x1"));
+		validator.validate(new ObjectEvent(objB1));
+		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new ObjectEvent(objBC));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 
-	@Test
-	public void ok_ReferenceOIDDefined(){
-		String objTargetId="o1";
-		Iom_jObject iomObjtarget=new Iom_jObject("ReferenceType23.Topic.ClassAp", objTargetId);
-		Iom_jObject o1Ref=new Iom_jObject("REF", "d1");
-		o1Ref.setobjectrefoid(objTargetId);
-		Iom_jObject iomStruct=new Iom_jObject("ReferenceType23.Topic.StructC", null);
-		iomStruct.addattrobj("attrC2", o1Ref);
-		Iom_jObject iomObj=new Iom_jObject("ReferenceType23.Topic.ClassD", "o2");
-		iomObj.addattrobj("attrD2", iomStruct);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ReferenceType23.Topic","b1"));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new ObjectEvent(iomObjtarget));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
 	
 	@Test
-	public void ok_ReferenceOIDUnDefined(){
-		String objTargetId="o1";
-		Iom_jObject iomObjtarget=new Iom_jObject("ReferenceType23.Topic.ClassAp", objTargetId);
-		Iom_jObject o1Ref=new Iom_jObject("REF", null);
-		o1Ref.setobjectrefoid(objTargetId);
-		Iom_jObject iomStruct=new Iom_jObject("ReferenceType23.Topic.StructC", null);
-		iomStruct.addattrobj("attrC2", o1Ref);
-		Iom_jObject iomObj=new Iom_jObject("ReferenceType23.Topic.ClassD", "o2");
-		iomObj.addattrobj("attrD2", iomStruct);
+	public void ok_Struct(){
+		final String OBJ_B1="b1";
+		Iom_jObject objB1=new Iom_jObject(OID23_CLASSB, OBJ_B1);
+		objB1.addattrobj("attrB2", OID23_STRUCTA);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ReferenceType23.Topic","b1"));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new ObjectEvent(iomObjtarget));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void ok_CompositionStructOIDDefined(){
-		String objTargetId="o1";
-		Iom_jObject iomObjtarget=new Iom_jObject("ReferenceType23.Topic.ClassAp", objTargetId);
-		Iom_jObject o1Ref=new Iom_jObject("REF", null);
-		o1Ref.setobjectrefoid(objTargetId);
-		Iom_jObject iomStruct=new Iom_jObject("ReferenceType23.Topic.StructC", "f1");
-		iomStruct.addattrobj("attrC2", o1Ref);
-		Iom_jObject iomObj=new Iom_jObject("ReferenceType23.Topic.ClassD", "o2");
-		iomObj.addattrobj("attrD2", iomStruct);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ReferenceType23.Topic","b1"));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new ObjectEvent(iomObjtarget));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void ok_CompositionStructOIDUnDefined(){
-		String objTargetId="o1";
-		Iom_jObject iomObjtarget=new Iom_jObject("ReferenceType23.Topic.ClassAp", objTargetId);
-		Iom_jObject o1Ref=new Iom_jObject("REF", null);
-		o1Ref.setobjectrefoid(objTargetId);
-		Iom_jObject iomStruct=new Iom_jObject("ReferenceType23.Topic.StructC", null);
-		iomStruct.addattrobj("attrC2", o1Ref);
-		Iom_jObject iomObj=new Iom_jObject("ReferenceType23.Topic.ClassD", "o2");
-		iomObj.addattrobj("attrD2", iomStruct);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ReferenceType23.Topic","b1"));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new ObjectEvent(iomObjtarget));
+		validator.validate(new StartBasketEvent(OID23_TOPIC,"x1"));
+		validator.validate(new ObjectEvent(objB1));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
@@ -237,48 +174,93 @@ public void setUp() throws Exception {
 	}
 	
 	
-	
 	@Test
-	public void fail_SameOIDDefined() throws Exception {
-		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClass", "o1");
-		objBedingung.setattrvalue("attr1", "lars");
-		Iom_jObject objB=new Iom_jObject("ExistenceConstraints23.Topic.ClassB", "o1");
-		objB.setattrvalue("attr1", "lars");
-		objB.setattrvalue("attr2", "20");
+	public void fail_DuplicateOid() throws Exception {
+		final String OBJ_B1="b1";
+		final String OBJ_B2="b1";
+		Iom_jObject objB1=new Iom_jObject(OID23_CLASSB, OBJ_B1);
+		Iom_jObject objB2=new Iom_jObject(OID23_CLASSB, OBJ_B2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b1"));
-		validator.validate(new ObjectEvent(objBedingung));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic","b2"));
-		validator.validate(new ObjectEvent(objB));
+		validator.validate(new StartBasketEvent(OID23_TOPIC,"x1"));
+		validator.validate(new ObjectEvent(objB1));
+		validator.validate(new ObjectEvent(objB2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The OID number: o1 of CLASS ExistenceConstraints23.Topic.ClassB has already been defined by CLASS ExistenceConstraints23Condition.Topic.ConditionClass.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
-	public void fail_ClassOIDUnDefined(){
-		Iom_jObject objTrue=new Iom_jObject("Datatypes23.Topic.ClassA", null);
-		objTrue.setattrvalue("aBoolean", "true");
+	public void fail_UndefinedOid(){
+		final String OBJ_B1="b1";
+		final String OBJ_B2=null;
+		Iom_jObject objB1=new Iom_jObject(OID23_CLASSB, OBJ_B1);
+		Iom_jObject objB2=new Iom_jObject(OID23_CLASSB, OBJ_B2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objTrue));
+		validator.validate(new StartBasketEvent(OID23_TOPIC,"x1"));
+		validator.validate(new ObjectEvent(objB1));
+		validator.validate(new ObjectEvent(objB2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("An OID for class CLASS Datatypes23.Topic.ClassA is mandatory.", logger.getErrs().get(0).getEventMsg());
+	}
+	@Test
+	public void fail_AssociatianWithId(){
+		final String OBJ_B1="b1";
+		final String OBJ_C1="c1";
+		Iom_jObject objB1=new Iom_jObject(OID23_CLASSB, OBJ_B1);
+		Iom_jObject objC1=new Iom_jObject(OID23_CLASSC, OBJ_C1);
+		Iom_jObject objBC=new Iom_jObject(OID23_TOPIC+".bc3", null);
+		objBC.addattrobj("b3", "REF").setobjectrefoid(OBJ_B1);
+		objBC.addattrobj("c3", "REF").setobjectrefoid(OBJ_C1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(OID23_TOPIC,"x1"));
+		validator.validate(new ObjectEvent(objB1));
+		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new ObjectEvent(objBC));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+	}
+	@Test
+	public void fail_AssociatianWithOid(){
+		final String OBJ_B1="b1";
+		final String OBJ_C1="c1";
+		Iom_jObject objB1=new Iom_jObject(OID23_CLASSB, OBJ_B1);
+		Iom_jObject objC1=new Iom_jObject(OID23_CLASSC, OBJ_C1);
+		Iom_jObject objBC=new Iom_jObject(OID23_TOPIC+".bc4", null);
+		objBC.addattrobj("b4", "REF").setobjectrefoid(OBJ_B1);
+		objBC.addattrobj("c4", "REF").setobjectrefoid(OBJ_C1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(OID23_TOPIC,"x1"));
+		validator.validate(new ObjectEvent(objB1));
+		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new ObjectEvent(objBC));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
 	}
 }

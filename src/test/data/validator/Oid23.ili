@@ -1,0 +1,42 @@
+INTERLIS 2.3;
+
+MODEL Oid23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-16" =
+	TOPIC Topic=
+	
+		STRUCTURE StructA =
+		   attrA1 : TEXT*10;
+		END StructA;
+
+		CLASS ClassB =
+		   attrB1 : TEXT*10;
+		   attrB2 : BAG {0..*} OF StructA;
+		END ClassB;
+
+		CLASS ClassC =
+		   attrC1 : TEXT*10;
+		END ClassC;
+		
+		ASSOCIATION bc1 =
+		  b1 -- {0..1} ClassB;
+		  c1 -- {0..*} ClassC;
+		END bc1;
+
+		ASSOCIATION bc2 =
+		  b2 -- {0..*} ClassB;
+		  c2 -- {0..*} ClassC;
+		END bc2;
+		
+		ASSOCIATION bc3 (OID) =
+		  b3 -- {0..*} ClassB;
+		  c3 -- {0..*} ClassC;
+		END bc3;
+
+		ASSOCIATION bc4 =
+			OID AS INTERLIS.UUIDOID; 
+		  b4 -- {0..*} ClassB;
+		  c4 -- {0..*} ClassC;
+		END bc4;
+		
+	END Topic;
+END Oid23.
