@@ -3,26 +3,35 @@ INTERLIS 2.3;
 MODEL Association23
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
 	TOPIC Topic=
-	
 		CLASS ClassA =
 		   attrA1 : TEXT*10;
 		END ClassA;
+		
+		CLASS ClassB =
+		   attrB1 : TEXT*10;
+		END ClassB;
+		
+		CLASS ClassC =
+		   attrC1 : TEXT*10;
+		END ClassC;
 		
 		CLASS ClassAp EXTENDS ClassA =
 		END ClassAp;
 		
 		CLASS ClassAq EXTENDS ClassA =
 		END ClassAq;
-
-		CLASS ClassB =
-		   attrB1 : TEXT*10;
-		END ClassB;
 		
 		CLASS ClassBp EXTENDS ClassB =
 		END ClassBp;
 		
 		CLASS ClassBq EXTENDS ClassB =
 		END ClassBq;
+		
+		CLASS ClassCp EXTENDS ClassC =
+		END ClassCp;
+		
+		CLASS ClassCq EXTENDS ClassC =
+		END ClassCq;
 
 		CLASS ClassD =
 		   attrD1 : TEXT*10;
@@ -47,12 +56,12 @@ MODEL Association23
 		  ap1 -- {0..1} ClassA RESTRICTION(ClassAp);
 		  bp1 -- {0..1} ClassB RESTRICTION(ClassBp);
 		END abp1;
-
+		
 		ASSOCIATION abp2 =
 		  ap2 -- {0..*} ClassA RESTRICTION(ClassAp);
 		  bp2 -- {0..*} ClassB RESTRICTION(ClassBp);
 		END abp2;
-		
+
 		ASSOCIATION abp3 =
 		  ap3 -- {0..1} ClassA RESTRICTION(ClassAp);
 		  bp3 -- {0..*} ClassB RESTRICTION(ClassBp);
@@ -72,6 +81,5 @@ MODEL Association23
 		  ad3 -- {0..1} ClassA OR ClassD;
 		  bd3 -- {0..*} ClassB OR ClassD;
 		END abd3;
-		
 	END Topic;
 END Association23.

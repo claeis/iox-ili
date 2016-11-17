@@ -1150,30 +1150,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
-	@Test
-	public void existenceConstraintSameOIDo1Fail() throws Exception {
-		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClass", "o1");
-		objBedingung.setattrvalue("attr1", "lars");
-		Iom_jObject objB=new Iom_jObject("ExistenceConstraints23.Topic.ClassB", "o1");
-		objB.setattrvalue("attr1", "lars");
-		objB.setattrvalue("attr2", "20");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b1"));
-		validator.validate(new ObjectEvent(objBedingung));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic","b2"));
-		validator.validate(new ObjectEvent(objB));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Oid cant exist twice.", logger.getErrs().get(0).getEventMsg());
-	}
+	
 	//////////////////// END CONDITIONCLASS + CLASS B ///////////
 	////////////////CONDITIONCLASS2 + CLASS A /////////////////////
 	@Test

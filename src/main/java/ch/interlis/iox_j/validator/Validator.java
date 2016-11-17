@@ -24,6 +24,7 @@ import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.Cardinality;
+import ch.interlis.ili2c.metamodel.ClassType;
 import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.Constant.Text;
 import ch.interlis.ili2c.metamodel.CoordType;
@@ -140,35 +141,82 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	
 	private void iterateThroughAllObjects(){
 		if (allObjects != null){
-			// iterate through iomObject
+			// iterate through iomObjects
 			Iterator<IomObject> objectIterator = allObjects.iterator();
 			while (objectIterator.hasNext()){
 				IomObject iomObj = objectIterator.next();
 				Object modelElement=tag2class.get(iomObj.getobjecttag());
-				Table classA= (Table) modelElement;
-				// for all ExistenceConstraints
-				Iterator attrIterator=classA.iterator();
-				while (attrIterator.hasNext()) {
-					Object objA = attrIterator.next();
-					// Existenceconstraint check
+				Viewable classB= (Viewable) modelElement;
+				Iterator constraintIterator=classB.iterator();
+				while (constraintIterator.hasNext()) {
+					Object objA = constraintIterator.next();
+					// existence constraint
 					if(objA instanceof ExistenceConstraint){
 						ExistenceConstraint existenceConstraintObj=(ExistenceConstraint) objA;
 						checkExistenceConstraint(iomObj, existenceConstraintObj);
 					}
-					// Referenceattribute check
-					if (objA instanceof LocalAttribute){
-						Type type = ((LocalAttribute)objA).getDomain();
+				}
+				Iterator<ViewableTransferElement> attrIterator=classB.getAttributesAndRoles2();
+				while (attrIterator.hasNext()) {
+					ViewableTransferElement objA = attrIterator.next();
+					if (objA.obj instanceof LocalAttribute){
+						Type type = ((LocalAttribute)objA.obj).getDomain();
+						// composition
 						if (type instanceof CompositionType){
 							IomObject structValue = iomObj.getattrobj(iomObj.getattrname(0), 0);
 							Table structure = ((CompositionType)type).getComponentType();
 							checkReferenceAttrs(structValue, structure);
 						}
+					}else if(objA.obj instanceof RoleDef){
+						roleDefValidation((RoleDef)objA.obj, iomObj);
 					}
 				}
 			}
 		}
 	}
 
+	private void roleDefValidation(RoleDef role, IomObject iomObj) {
+		String targetOid = null;
+		// get target oid
+		IomObject roleDefValue = iomObj.getattrobj(role.getName(), 0);
+		if (roleDefValue != null){
+			targetOid = roleDefValue.getobjectrefoid();
+		}
+		if(targetOid==null){
+			return;
+		}
+		
+		// find target object
+		for (IomObject targetObj:allObjects){
+			String targetObjOid = targetObj.getobjectoid();
+			if(targetObjOid!=null && targetObjOid.equals(targetOid)){
+				// target object found
+				// validate target class
+				String targetObjClassname = targetObj.getobjecttag();
+				Viewable targetObjClass=(Viewable) tag2class.get(targetObjClassname);
+				Iterator<AbstractClassDef> targetIterator = role.iteratorDestination();
+				StringBuffer possibleTargetClasses=new StringBuffer();
+				String sep="";
+				while (targetIterator.hasNext()){
+					Viewable targetClass = (Viewable) targetIterator.next();
+					if(targetObjClass.isExtending(targetClass)){
+						// target is ok
+						return;
+					}
+					possibleTargetClasses.append(sep);
+					sep=",";
+					possibleTargetClasses.append(targetClass.getScopedName(null));
+				}
+				// object found, but wrong class
+				errs.addEvent(errFact.logErrorMsg("Object {1} with OID {0} must be of {2}", targetOid,targetObjClassname,possibleTargetClasses.toString()));
+				return;
+			}
+		}
+		// no object with this oid found
+		errs.addEvent(errFact.logErrorMsg("No object found with OID {0}.", targetOid));
+	}
+
+	
 	private void checkReferenceAttrs(IomObject structValue, Table structure) {
 		Iterator attrIter=structure.getAttributesAndRoles();
 		while (attrIter.hasNext()){
@@ -547,16 +595,87 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	HashMap<AttributeArray, String> seenValues = new HashMap<AttributeArray, String>();
 	// List of all arrayLists of unique attributes.
 	ArrayList<ArrayList<String>> listOfUniqueAttrsLists = new ArrayList<ArrayList<String>>();
+	// List of all object Oid's and associated classPath's of uniqueness check of Oid's.
+	Map<String , String> uniqueObjectIDs = new HashMap<String, String>();
 	
 	private void checkObject(IomObject iomObj,String attrPath) {
-		boolean isObject= attrPath==null;
+		// check if object is null
+		boolean isObject = attrPath==null;
 		if(isObject){
-			if (uniquenessOfOid != null && uniquenessOfOid.equals(iomObj.getobjectoid().toString())){
-				errs.addEvent(errFact.logErrorMsg("Oid cant exist twice."));
-			}
-			uniquenessOfOid = iomObj.getobjectoid().toString();
 			errFact.setDataObj(iomObj);
 		}
+		// CHECK OID UNIQUENESS
+//		if(isObject){
+//			Table classOfObject5 = null;
+//			Viewable classpathOfObjectId = null;;
+//			boolean isOrdinaryClass = true;
+//			String tag2=iomObj.getobjecttag();
+//			Object modelele2=tag2class.get(tag2);
+//			// Association
+//			if (modelele2 instanceof AssociationDef){
+//				AssociationDef roleOwner = (AssociationDef) modelele2;
+//				String classpathOfObject = roleOwner.toString();
+//				if (iomObj.getobjectoid() != null){
+//					String oidOfObject = iomObj.getobjectoid();
+//					validateUniquenessOfOID(oidOfObject, classpathOfObject);
+//				}
+//			} else {
+//				classOfObject5 = (Table) modelele2;
+//				classpathOfObjectId=(Viewable)modelele2;
+//				// Abstract
+//				if(classpathOfObjectId.isAbstract()){
+//					isOrdinaryClass = false;
+//				}
+//				Iterator constraintIterator2=classOfObject5.iterator();
+//				while (constraintIterator2.hasNext()) {
+//					Object objA2 = constraintIterator2.next();
+//					// Existenceconstraint
+//					if(objA2 instanceof ExistenceConstraint){
+//						//isOrdinaryClass = false;
+//					}
+//				}
+//				Table classOfObject = (Table) tag2class.get(iomObj.getobjecttag());
+//				Iterator<ViewableTransferElement> attrIterator=classOfObject.getAttributesAndRoles2();
+//				while (attrIterator.hasNext()) {
+//					ViewableTransferElement objA = attrIterator.next();
+//					if (objA.obj instanceof LocalAttribute){
+//						Type type = ((LocalAttribute)objA.obj).getDomain();
+//						// CompositionType
+//						if (type instanceof CompositionType){
+//							isOrdinaryClass = false;
+//						}
+//						// ReferenceType
+//						if(type instanceof ReferenceType){
+//							isOrdinaryClass = false;
+//						}
+//					}
+//					// RoleDef
+//					if(objA.obj instanceof RoleDef){
+//						isOrdinaryClass = false;
+//					}
+//				}
+//				if (classOfObject.getExtending() != null){
+//					isOrdinaryClass = false;
+//				}
+//				
+//				if(isOrdinaryClass){
+//					// ordinary class check uniqueness of oid
+//					if (classpathOfObjectId != null){
+//						String oidOfObject = iomObj.getobjectoid();
+//						validateUniquenessOfOID(oidOfObject, classpathOfObjectId.toString());
+//					}
+//					// ordinary class without oid
+//					if(iomObj.getobjectoid() != null){
+//						// ok
+//					} else {
+//						errs.addEvent(errFact.logErrorMsg("An OID for class {0} is mandatory.", classOfObject.toString()));					
+//					}
+//				}
+//			}
+//		}
+		
+			
+	
 		String tag=iomObj.getobjecttag();
 		//EhiLogger.debug("tag "+tag);
 		Object modelele=tag2class.get(tag);
@@ -731,6 +850,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 	}
+
+//	private void validateUniquenessOfOID(String oidOfObject, String classpathOfObjectId){
+//		if (uniqueObjectIDs.containsKey(oidOfObject)){
+//		     errs.addEvent(errFact.logErrorMsg("The OID number: {0} of {1} has already been defined by {2}.", oidOfObject, classpathOfObjectId.toString(), uniqueObjectIDs.get(oidOfObject).toString()));					
+//		} else {
+//			uniqueObjectIDs.put(oidOfObject, classpathOfObjectId.toString());
+//		}
+//	}
+	
+	
 	private IomObject getDefaultCoord(IomObject iomObj) {
 		String tag=iomObj.getobjecttag();
 		Object modelele=tag2class.get(tag);
