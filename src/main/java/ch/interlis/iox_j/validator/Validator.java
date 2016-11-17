@@ -604,10 +604,27 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(isObject){
 			errFact.setDataObj(iomObj);
 		}
-		// CHECK OID UNIQUENESS
+		// check uniqueness of existing objects on OID and className
+		if(isObject){
+			Object modelElementToCompare = tag2class.get(iomObj.getobjecttag());
+			Viewable classValueToCompare= (Viewable) modelElementToCompare;
+			String objOidToCompare = iomObj.getobjectoid();
+			if (allObjects != null){
+				Iterator<IomObject> objectIterator = allObjects.iterator();
+				while (objectIterator.hasNext()){
+					IomObject objValue = objectIterator.next();
+					Object modelElementOfObject=tag2class.get(objValue.getobjecttag());
+					Viewable classValueOfModelElement= (Viewable) modelElementOfObject;
+					String objOidOfObjValue = objValue.getobjectoid();
+					if (classValueToCompare != null && classValueOfModelElement != null){
+						compareOidAndClassOfObjects(classValueToCompare, objOidToCompare, classValueOfModelElement, objOidOfObjValue, iomObj);
+					}
+				}
+			}
+		}
 //		if(isObject){
 //			Table classOfObject5 = null;
-//			Viewable classpathOfObjectId = null;;
+//			Viewable classpathOfObjectId = null;
 //			boolean isOrdinaryClass = true;
 //			String tag2=iomObj.getobjecttag();
 //			Object modelele2=tag2class.get(tag2);
@@ -850,16 +867,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 	}
+	
+	private void compareOidAndClassOfObjects(Viewable classValueToCompare, String objOidToCompare, Viewable classValueOfModelElement, String objOidOfObjValue, IomObject iomObj) {
+		// compare consistency of classes
+		if (classValueOfModelElement.equals(classValueToCompare)){
+			// compare consistency of OID's
+			if (objOidOfObjValue != null && objOidToCompare != null){
+				if (objOidOfObjValue.equals(objOidToCompare)){
+					errs.addEvent(errFact.logErrorMsg("The OID {0} of object '{1}' already exists in {2}.", objOidToCompare, iomObj.toString(), classValueOfModelElement.toString()));
+					return;
+				}
+			}
+		}
+	}
 
-//	private void validateUniquenessOfOID(String oidOfObject, String classpathOfObjectId){
-//		if (uniqueObjectIDs.containsKey(oidOfObject)){
-//		     errs.addEvent(errFact.logErrorMsg("The OID number: {0} of {1} has already been defined by {2}.", oidOfObject, classpathOfObjectId.toString(), uniqueObjectIDs.get(oidOfObject).toString()));					
-//		} else {
-//			uniqueObjectIDs.put(oidOfObject, classpathOfObjectId.toString());
-//		}
-//	}
-	
-	
 	private IomObject getDefaultCoord(IomObject iomObj) {
 		String tag=iomObj.getobjecttag();
 		Object modelele=tag2class.get(tag);
