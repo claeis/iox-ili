@@ -33,7 +33,7 @@ MODEL Oid23
 		END bc3;
 
 		ASSOCIATION bc4 =
-			OID AS INTERLIS.UUIDOID; 
+			OID AS INTERLIS.UUIDOID;
 		  b4 -- {0..*} ClassB;
 		  c4 -- {0..*} ClassC;
 		END bc4;

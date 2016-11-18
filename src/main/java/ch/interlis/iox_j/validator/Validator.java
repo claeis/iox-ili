@@ -50,6 +50,7 @@ import ch.interlis.ili2c.metamodel.StructuredUnitType;
 import ch.interlis.ili2c.metamodel.SurfaceOrAreaType;
 import ch.interlis.ili2c.metamodel.SurfaceType;
 import ch.interlis.ili2c.metamodel.Table;
+import ch.interlis.ili2c.metamodel.TextOIDType;
 import ch.interlis.ili2c.metamodel.TextType;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.Type;
@@ -604,6 +605,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(isObject){
 			errFact.setDataObj(iomObj);
 		}
+		
 		// check uniqueness of existing objects on OID and className
 		if(isObject){
 			Object modelElementToCompare = tag2class.get(iomObj.getobjecttag());
@@ -622,77 +624,35 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 		}
-//		if(isObject){
-//			Table classOfObject5 = null;
-//			Viewable classpathOfObjectId = null;
-//			boolean isOrdinaryClass = true;
-//			String tag2=iomObj.getobjecttag();
-//			Object modelele2=tag2class.get(tag2);
-//			// Association
-//			if (modelele2 instanceof AssociationDef){
-//				AssociationDef roleOwner = (AssociationDef) modelele2;
-//				String classpathOfObject = roleOwner.toString();
-//				if (iomObj.getobjectoid() != null){
-//					String oidOfObject = iomObj.getobjectoid();
-//					validateUniquenessOfOID(oidOfObject, classpathOfObject);
-//				}
-//			} else {
-//				classOfObject5 = (Table) modelele2;
-//				classpathOfObjectId=(Viewable)modelele2;
-//				// Abstract
-//				if(classpathOfObjectId.isAbstract()){
-//					isOrdinaryClass = false;
-//				}
-//				Iterator constraintIterator2=classOfObject5.iterator();
-//				while (constraintIterator2.hasNext()) {
-//					Object objA2 = constraintIterator2.next();
-//					// Existenceconstraint
-//					if(objA2 instanceof ExistenceConstraint){
-//						//isOrdinaryClass = false;
-//					}
-//				}
-//				Table classOfObject = (Table) tag2class.get(iomObj.getobjecttag());
-//				Iterator<ViewableTransferElement> attrIterator=classOfObject.getAttributesAndRoles2();
-//				while (attrIterator.hasNext()) {
-//					ViewableTransferElement objA = attrIterator.next();
-//					if (objA.obj instanceof LocalAttribute){
-//						Type type = ((LocalAttribute)objA.obj).getDomain();
-//						// CompositionType
-//						if (type instanceof CompositionType){
-//							isOrdinaryClass = false;
-//						}
-//						// ReferenceType
-//						if(type instanceof ReferenceType){
-//							isOrdinaryClass = false;
-//						}
-//					}
-//					// RoleDef
-//					if(objA.obj instanceof RoleDef){
-//						isOrdinaryClass = false;
-//					}
-//				}
-//				if (classOfObject.getExtending() != null){
-//					isOrdinaryClass = false;
-//				}
-//				
-//				if(isOrdinaryClass){
-//					// ordinary class check uniqueness of oid
-//					if (classpathOfObjectId != null){
-//						String oidOfObject = iomObj.getobjectoid();
-//						validateUniquenessOfOID(oidOfObject, classpathOfObjectId.toString());
-//					}
-//					// ordinary class without oid
-//					if(iomObj.getobjectoid() != null){
-//						// ok
-//					} else {
-//						errs.addEvent(errFact.logErrorMsg("An OID for class {0} is mandatory.", classOfObject.toString()));					
-//					}
-//				}
-//			}
-//		}
+		// check class, structure and association on existence of OID
+		if (isObject){
+			Object modelElementOidCheck = tag2class.get(iomObj.getobjecttag());
+			Viewable classValueOidCheck = (Viewable) modelElementOidCheck;
+			// association
+			if (modelElementOidCheck instanceof AssociationDef){
+				AssociationDef modelAssociationDef = (AssociationDef) modelElementOidCheck;
+				Domain oidType=((AbstractClassDef) modelAssociationDef).getOid();
+				if (modelAssociationDef.isIdentifiable() || oidType!=null){
+					if (iomObj.getobjectoid() == null){
+						errs.addEvent(errFact.logErrorMsg("Association {0} has to have an OID", iomObj.getobjecttag()));
+					}
+				} 
+			} else if (classValueOidCheck instanceof Table){
+				Table classValueTable = (Table) classValueOidCheck;
+				// class
+				if (classValueTable.isIdentifiable()){
+					if (iomObj.getobjectoid() == null){
+						errs.addEvent(errFact.logErrorMsg("Class {0} has to have an OID", iomObj.getobjecttag()));
+					}
+				// structure	
+				} else {
+					if (iomObj.getobjectoid() != null){
+						errs.addEvent(errFact.logErrorMsg("Structure {0} has not to have an OID", iomObj.getobjecttag()));
+					}
+				}
+			}
+		}
 		
-			
-	
 		String tag=iomObj.getobjecttag();
 		//EhiLogger.debug("tag "+tag);
 		Object modelele=tag2class.get(tag);
@@ -720,9 +680,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			if(aclass1 instanceof AbstractClassDef){
 				Domain oidType=((AbstractClassDef) aclass1).getOid();
+				
 				if(oidType!=null && oidType==td.INTERLIS.UUIDOID){
 					String oid=iomObj.getobjectoid();
-					if(!isValidUuid(oid)){
+					if(oid != null && !isValidUuid(oid)){
 						errs.addEvent(errFact.logErrorMsg("TID <{0}> is not a valid UUID", oid));
 					}
 				} else if(oidType!=null && oidType==td.INTERLIS.I32OID){
