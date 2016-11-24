@@ -15,6 +15,10 @@ MODEL Association23
 		   attrC1 : TEXT*10;
 		END ClassC;
 		
+		CLASS ClassD =
+		   attrD1 : TEXT*10;
+		END ClassD;
+		
 		CLASS ClassAp EXTENDS ClassA =
 		END ClassAp;
 		
@@ -32,10 +36,6 @@ MODEL Association23
 		
 		CLASS ClassCq EXTENDS ClassC =
 		END ClassCq;
-
-		CLASS ClassD =
-		   attrD1 : TEXT*10;
-		END ClassD;
 		
 		ASSOCIATION ab1 =
 		  a1 -- {0..1} ClassA;
@@ -81,5 +81,6 @@ MODEL Association23
 		  ad3 -- {0..1} ClassA OR ClassD;
 		  bd3 -- {0..*} ClassB OR ClassD;
 		END abd3;
+		
 	END Topic;
 END Association23.

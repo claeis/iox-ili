@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.sun.xml.internal.fastinfoset.util.StringArray;
 import com.vividsolutions.jts.algorithm.Angle;
@@ -147,8 +148,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			while (objectIterator.hasNext()){
 				IomObject iomObj = objectIterator.next();
 				Object modelElement=tag2class.get(iomObj.getobjecttag());
-				Viewable classB= (Viewable) modelElement;
-				Iterator constraintIterator=classB.iterator();
+				Viewable currentClass= (Viewable) modelElement;
+				Iterator constraintIterator=currentClass.iterator();
 				while (constraintIterator.hasNext()) {
 					Object objA = constraintIterator.next();
 					// existence constraint
@@ -157,7 +158,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						validateExistenceConstraint(iomObj, existenceConstraintObj);
 					}
 				}
-				Iterator<ViewableTransferElement> attrIterator=classB.getAttributesAndRoles2();
+				Iterator<ViewableTransferElement> attrIterator=currentClass.getAttributesAndRoles2();
 				while (attrIterator.hasNext()) {
 					ViewableTransferElement objA = attrIterator.next();
 					if (objA.obj instanceof LocalAttribute){
@@ -169,14 +170,33 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							validateReferenceAttrs(structValue, structure);
 						}
 					}else if(objA.obj instanceof RoleDef){
-						roleDefValidation((RoleDef)objA.obj, iomObj);
+						validateRoleReference((RoleDef)objA.obj, iomObj);
+					}
+				}
+				if(currentClass instanceof AbstractClassDef){
+					Iterator<RoleDef> targetRoleIterator=((AbstractClassDef) currentClass).getOpposideRoles();
+					while(targetRoleIterator.hasNext()){
+						RoleDef role=targetRoleIterator.next();
+						validateRoleCardinality(role, iomObj);						
 					}
 				}
 			}
 		}
 	}
 
-	private void roleDefValidation(RoleDef role, IomObject iomObj) {
+	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {
+		int nrOfTargetObjs=linkPool.getTargetObjectCount(iomObj,role);
+		long cardMin=role.getCardinality().getMinimum();
+		long cardMax=role.getCardinality().getMaximum();
+		if(nrOfTargetObjs>=cardMin && nrOfTargetObjs<=cardMax){
+			// valid
+		}else{
+			// not valid
+    		errs.addEvent(errFact.logErrorMsg(role.getName()+" should associate "+cardMin+" to "+cardMax+" target objects (instead of "+nrOfTargetObjs+")"));
+		}
+	}
+
+	private void validateRoleReference(RoleDef role, IomObject iomObj) {
 		String targetOid = null;
 		// get target oid
 		IomObject roleDefValue = iomObj.getattrobj(role.getName(), 0);
@@ -191,7 +211,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		for (IomObject targetObj:allObjects){
 			String targetObjOid = targetObj.getobjectoid();
 			if(targetObjOid!=null && targetObjOid.equals(targetOid)){
-				// target object found
 				// validate target class
 				String targetObjClassname = targetObj.getobjecttag();
 				Viewable targetObjClass=(Viewable) tag2class.get(targetObjClassname);
@@ -216,7 +235,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		// no object with this oid found
 		errs.addEvent(errFact.logErrorMsg("No object found with OID {0}.", targetOid));
 	}
-
+	
+	LinkPool linkPool=new LinkPool();
 	
 	private void validateReferenceAttrs(IomObject structValue, Table structure) {
 		Iterator attrIter=structure.getAttributesAndRoles();
@@ -811,6 +831,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						String targetClass = null;
 						if (refoid != null) {
 							// TODO validate target opbject
+							linkPool.addLink(iomObj,role,refoid);
 						}
 				}
 			 }
@@ -1190,7 +1211,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 				}
 			}
-		
 	}
 
 	private void validatePolyline(String validateType, LineType polylineType, IomObject polylineValue) {
