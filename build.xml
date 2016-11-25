@@ -1,176 +1,177 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="bindist" name="iox-ili">
 
+  <property file="user.properties" />
+  <!-- default if not set by user.properties -->
+  <property name="git" value="git"/>
   <!-- set global properties for this build -->
-  <property name="src" value="${basedir}/src/main/java"/>
-  <property name="gensrc" value="${basedir}/gensrc"/>
-  
-  <property name="build" value="${basedir}/build"/>
-  <property name="dist" value="${basedir}/dist"/>
-  <property name="report.dir"  value="${build}/junitreport"/>
-  <property name="junit.dir"  value="${build}/junit"/>
-  <property name="junit-out.dir"  value="${build}/junit/test-out"/>
-  <target name="init">
+	<property name="src" value="${basedir}/src/main/java"/>
+	<property name="gensrc" value="${basedir}/gensrc"/>
+	<property name="srcVersionFile" value="ch/interlis/iox_j/Version.properties"/>
+	<property name="build" value="${basedir}/build"/>
+	<property name="dist" value="${basedir}/dist"/>
+	<property name="report.dir" value="${build}/junitreport"/>
+	<property name="junit.dir" value="${build}/junit"/>
+	<property name="junit-out.dir" value="${build}/junit/test-out"/>
+	<target name="init">
     <!-- Create the time stamp -->
-    <tstamp/>
-    <property name="projectjar" value="${build}/jar/${ant.project.name}.jar"/>
-    <property name="versionfile" value="${src}/ch/interlis/iox_j/Version.properties"/>
+		<tstamp/>
+		<property name="projectjar" value="${build}/jar/${ant.project.name}.jar"/>
+		<property name="versionfile" value="${build}/classes/${srcVersionFile}"/>
+    
+    
     <!-- Create the build directory structure used by compile -->
-    <mkdir dir="${build}"/>
-    <mkdir dir="${build}/jar"/>
-    <mkdir dir="${build}/javadoc"/>
-    <mkdir dir="${dist}"/>
-  </target>
-  
-  <path id="classpath">
-        <pathelement location="lib/antlr.jar"/>
-        <pathelement location="lib/ehibasics.jar"/>
-        <pathelement location="lib/gson-2.6.2.jar"/>
-        <pathelement location="lib/toml4j-0.5.1.jar"/>
-        <pathelement location="lib/ili2c-core.jar"/>
-        <pathelement location="lib/ili2c-tool.jar"/>
-        <pathelement location="lib/jts-core-1.14.0.jar"/>
-        <pathelement location="lib/iox-api.jar"/>
-  </path>
-  <path id="junit">
-        <pathelement location="lib/junit-4.11.jar"/>
-        <pathelement location="lib/hamcrest-core-1.3.jar"/>
-  </path>
+		<mkdir dir="${build}"/>
+		<mkdir dir="${build}/classes"/>
+		<mkdir dir="${build}/jar"/>
+		<mkdir dir="${build}/javadoc"/>
+		<mkdir dir="${dist}"/>
+	</target>
 
-  <target depends="init" name="compile">
+	<path id="classpath">
+		<pathelement location="lib/antlr.jar"/>
+		<pathelement location="lib/ehibasics.jar"/>
+		<pathelement location="lib/gson-2.6.2.jar"/>
+		<pathelement location="lib/toml4j-0.5.1.jar"/>
+		<pathelement location="lib/ili2c-core.jar"/>
+		<pathelement location="lib/ili2c-tool.jar"/>
+		<pathelement location="lib/jts-core-1.14.0.jar"/>
+		<pathelement location="lib/iox-api.jar"/>
+	</path>
+	<path id="junit">
+		<pathelement location="lib/junit-4.11.jar"/>
+		<pathelement location="lib/hamcrest-core-1.3.jar"/>
+	</path>
+
+	<target depends="init" name="compile">
     <!-- Compile the java code from ${src} into ${build}/classes -->
-    <mkdir dir="${build}/classes"/>
-    <javac destdir="${build}/classes" includes="**/*.java" excludes="**/bak~/*.java"  debug="true" source="1.6" target="1.6">
-      <classpath>
-        <path refid="classpath"/>
+		<javac destdir="${build}/classes" includes="**/*.java" excludes="**/bak~/*.java" debug="true" source="1.6" target="1.6">
+			<classpath>
+				<path refid="classpath"/>
         <!-- pathelement location="lib/stax-api-1.0.jar"/>
         <pathelement location="lib/wstx-asl-3.2.8.jar"/ -->
-      </classpath>
-    	<src path="${src}" />
-    	<src path="${gensrc}" />
-    	<src path="${basedir}/jtsext/src/main/java" />
+			</classpath>
+			<src path="${src}" />
+			<src path="${gensrc}" />
+			<src path="${basedir}/jtsext/src/main/java" />
     	<!-- <src path="${build}/src"/> -->
-    </javac>
-  </target>
+		</javac>
+	</target>
 
 
-  <target depends="init" name="javadocs">
-    <mkdir dir="${build}/javadoc"/>
-    <javadoc Public="true" Windowtitle="${ant.project.name}" destdir="${build}/javadoc" packagenames="ch.interlis.*">
-      <classpath>
-        <path refid="classpath"/>
-      </classpath>
-    	<sourcepath path="${src}"/>
-    	<sourcepath path="${gensrc}" />
-    	<sourcepath path="${basedir}/jtsext/src/main/java" />
-    	<sourcepath path="../../iox-api/trunk/src"/>
-    </javadoc>
-  </target>
+	<target depends="init" name="javadocs">
+		<mkdir dir="${build}/javadoc"/>
+		<javadoc Public="true" Windowtitle="${ant.project.name}" destdir="${build}/javadoc" packagenames="ch.interlis.*">
+			<classpath>
+				<path refid="classpath"/>
+			</classpath>
+			<sourcepath path="${src}"/>
+			<sourcepath path="${gensrc}" />
+			<sourcepath path="${basedir}/jtsext/src/main/java" />
+			<sourcepath path="../../iox-api/trunk/src"/>
+		</javadoc>
+	</target>
 
-  <target depends="init,compile" name="jar">
-    <propertyfile file="${versionfile}">
-	<entry  key="versionDate" type="date" value="now" pattern="yyyyMMdd"/>
-    </propertyfile>
+	<target depends="init,buildnr,compile" name="jar">
 
-    <delete file="${projectjar}" quiet="true"/>
+		<delete file="${projectjar}" quiet="true"/>
 
-    <jar jarfile="${projectjar}" manifest="${basedir}/src/main/config/manifest">
-	<fileset dir="${build}/classes" excludes="**/Test.class" includes="**/*.class"/>
-    	<fileset dir="${src}" includes="**/*.properties"/>
-    	<fileset dir="${src}" includes="**/*.gif"/>
+		<jar jarfile="${projectjar}" manifest="${basedir}/src/main/config/manifest">
+			<fileset dir="${build}/classes" excludes="**/Test.class" includes="**/*.class,**/*.properties"/>
+			<fileset dir="${src}" includes="**/*.properties" excludes="${srcVersionFile}"/>
+			<fileset dir="${src}" includes="**/*.gif"/>
         <!-- zipfileset src="lib/stax-api-1.0.jar"/>
         <zipfileset src="lib/wstx-asl-3.2.8.jar"/ -->
-    </jar>
-  </target>
-
+		</jar>
+	</target>
   
-  <target depends="init" name="buildnr">
-    <property file="${versionfile}" prefix="buildnr."/>
-    <property name="buildnr" value="${buildnr.versionMajor}.${buildnr.versionMinor}.${buildnr.versionMicro}"/>
+
+	<target depends="init" name="buildnr">
+
+		<copy file="${src}/${srcVersionFile}" tofile="${versionfile}"/>
+		<exec executable="${git}" outputproperty="gitBranch" failonerror="true">
+			<arg line="rev-parse --abbrev-ref HEAD"/>
+		</exec>
+		<loadresource property="gitBranchA">
+			<propertyresource name="gitBranch"/>
+			<filterchain>
+				<tokenfilter>
+					<filetokenizer/>
+					<replacestring from="/" to="_"/>
+				</tokenfilter>
+			</filterchain>
+		</loadresource>
+		<propertyfile file="${versionfile}">
+			<entry key="versionBranch" type="string" value="${gitBranchA}"/>
+		</propertyfile>
+		<propertyfile file="${versionfile}">
+			<entry key="versionDate" type="date" value="now" pattern="yyyyMMdd"/>
+		</propertyfile>
+
+		<property file="${versionfile}" prefix="buildnr."/>
+		<condition property="branch" value=".${buildnr.versionBranch}" else="">
+			<length string="${buildnr.versionBranch}" trim="true" when="greater" length="0"/>
+		</condition>
+		<property name="buildnr" value="${buildnr.versionMajor}.${buildnr.versionMinor}.${buildnr.versionMicro}${branch}"/>
+    
     <!--  <property name="buildnr" value="${DSTAMP}"/>  -->
-  </target>
+	</target>
 
-  <target depends="init,buildnr" name="bindist">
-	<delete file="${dist}/${ant.project.name}-${buildnr}.zip" quiet="true"/>
-    <zip zipfile="${dist}/${ant.project.name}-${buildnr}.zip">
-    	<zipfileset dir="." includes="build/jar/${ant.project.name}.jar" fullpath="${ant.project.name}-${buildnr}/${ant.project.name}.jar"/>
-    	<zipfileset dir="." prefix="${ant.project.name}-${buildnr}">
-    		<patternset includes="doc/CHANGES.txt"/>
-		<patternset includes="doc/README.txt"/>
-		<patternset includes="lib/antlr.jar"/>
-		<patternset includes="lib/ehibasics.jar"/>
-		<patternset includes="lib/gson-2.6.2.jar"/>
-		<patternset includes="lib/toml4j-0.5.1.jar"/>
-		<patternset includes="lib/ili2c-core.jar"/>
-		<patternset includes="lib/ili2c-tool.jar"/>
-		<patternset includes="lib/jts-core-1.14.0.jar"/>
-		<patternset includes="lib/iox-api.jar"/>
-	</zipfileset>
-    	<zipfileset dir="build/javadoc" prefix="${ant.project.name}-${buildnr}/doc/api">
-   		<patternset includes="**/*"/>
-	</zipfileset>
-    	<zipfileset dir="doc" prefix="${ant.project.name}-${buildnr}">
-   		<patternset includes="LICENSE.*"/>
-	</zipfileset>
-    </zip>
-  </target>
+	<target depends="init,buildnr" name="bindist">
+		<delete file="${dist}/${ant.project.name}-${buildnr}.zip" quiet="true"/>
+		<zip zipfile="${dist}/${ant.project.name}-${buildnr}.zip">
+			<zipfileset dir="." includes="build/jar/${ant.project.name}.jar" fullpath="${ant.project.name}-${buildnr}/${ant.project.name}.jar"/>
+			<zipfileset dir="." prefix="${ant.project.name}-${buildnr}">
+				<patternset includes="doc/CHANGES.txt"/>
+				<patternset includes="doc/README.txt"/>
+				<patternset includes="lib/antlr.jar"/>
+				<patternset includes="lib/ehibasics.jar"/>
+				<patternset includes="lib/gson-2.6.2.jar"/>
+				<patternset includes="lib/toml4j-0.5.1.jar"/>
+				<patternset includes="lib/ili2c-core.jar"/>
+				<patternset includes="lib/ili2c-tool.jar"/>
+				<patternset includes="lib/jts-core-1.14.0.jar"/>
+				<patternset includes="lib/iox-api.jar"/>
+			</zipfileset>
+			<zipfileset dir="build/javadoc" prefix="${ant.project.name}-${buildnr}/doc/api">
+				<patternset includes="**/*"/>
+			</zipfileset>
+			<zipfileset dir="doc" prefix="${ant.project.name}-${buildnr}">
+				<patternset includes="LICENSE.*"/>
+			</zipfileset>
+		</zip>
+	</target>
 
-  <target depends="init,buildnr" name="srcdist">
-    <delete file="${dist}/${ant.project.name}-${buildnr}.src.zip" quiet="true"/>
-    <zip zipfile="${dist}/${ant.project.name}-${buildnr}.src.zip">
-    	<zipfileset dir="." prefix="${ant.project.name}-${buildnr}">
-	    	<patternset includes="src/**" excludes="**/CVS/*;**/bak~/*"/>
-	    	<patternset includes="${basedir}/jtsext/src/**"/>
-	    	<patternset includes="build.xml"/>
-	    	<patternset includes="lib/**"/>
-	    	<patternset includes="doc/**"/>
-	    	<patternset includes="model/**"/>
-    	</zipfileset>
-    </zip>
-  </target>
+	<target depends="init,buildnr" name="srcdist">
+		<delete file="${dist}/${ant.project.name}-${buildnr}.src.zip" quiet="true"/>
+		<zip zipfile="${dist}/${ant.project.name}-${buildnr}.src.zip">
+			<zipfileset dir="." prefix="${ant.project.name}-${buildnr}">
+				<patternset includes="src/**" excludes="**/CVS/*;**/bak~/*"/>
+				<patternset includes="${basedir}/jtsext/src/**"/>
+				<patternset includes="build.xml"/>
+				<patternset includes="lib/**"/>
+				<patternset includes="doc/**"/>
+				<patternset includes="model/**"/>
+			</zipfileset>
+		</zip>
+	</target>
 
-  <target name="clean">
-    <delete dir="${build}"/>
-  </target>
+	<target name="clean">
+		<delete dir="${build}"/>
+	</target>
 
-  <target depends="init,jar" name="geovalid">
-    <propertyfile file="${src}/ch/ehi/geovalid/Version.properties">
-	<entry  key="versionDate" type="date" value="now" pattern="yyyyMMdd"/>
-    </propertyfile>
-    <property file="${src}/ch/ehi/geovalid/Version.properties" prefix="buildnr."/>
-    <property name="buildnr" value="${buildnr.versionMajor}.${buildnr.versionMinor}.${buildnr.versionMicro}"/>
-
-    <delete file="${build}/jar/geovalid.jar" quiet="true"/>
-
-    <jar jarfile="${build}/jar/geovalid.jar">
-    <manifest>
-      <attribute name="Main-Class"
-            value="ch.ehi.geovalid.GeovalidTool"/>
-    </manifest>
-    	<zipfileset src="lib/iox-api.jar"/>
-    	<zipfileset src="lib/ili2c-core.jar"/>
-    	<zipfileset src="lib/ili2c-tool.jar"/>
-    	<zipfileset src="lib/jts-core-1.14.0.jar"/>
-	<zipfileset src="${projectjar}"/>
-    </jar>
-	<delete file="${dist}/geovalid-${buildnr}.zip" quiet="true"/>
-    <zip zipfile="${dist}/geovalid-${buildnr}.zip">
-    	<zipfileset dir="." includes="build/jar/geovalid.jar" fullpath="geovalid.jar"/>
-    </zip>
-  </target>
-
-    <target name="junit">
-	<delete dir="${junit-out.dir}" quiet="true"/>
-	<delete dir="${junit.dir}" quiet="true"/>
-	<delete dir="${report.dir}" quiet="true"/>
-        <mkdir dir="${junit.dir}"/>
-        <mkdir dir="${junit-out.dir}"/>
-        <mkdir dir="${report.dir}"/>
-	<copy todir="${junit.dir}">
-	    <fileset dir="${basedir}">
-	    	<include name="src/test/data/**/*"/>
-	    </fileset>
-	</copy>
+	<target name="junit">
+		<delete dir="${junit-out.dir}" quiet="true"/>
+		<delete dir="${junit.dir}" quiet="true"/>
+		<delete dir="${report.dir}" quiet="true"/>
+		<mkdir dir="${junit.dir}"/>
+		<mkdir dir="${junit-out.dir}"/>
+		<mkdir dir="${report.dir}"/>
+		<copy todir="${junit.dir}">
+			<fileset dir="${basedir}">
+				<include name="src/test/data/**/*"/>
+			</fileset>
+		</copy>
         <!-- junit  >
             <classpath>
                 <path refid="classpath"/>
@@ -180,26 +181,26 @@
             <formatter type="plain"/>
             <test name="ch.interlis.iox_j.validator.ErrorMsg23Test"/>
         </junit-->
-        <junit  printsummary="yes" dir="${junit.dir}">
-            <classpath>
-                <path refid="classpath"/>
-                <path refid="junit"/>
-                <pathelement location="${build}/classes"/>
-            </classpath>
-            
-            <formatter type="xml"/>
-            
-            <batchtest fork="yes" todir="${report.dir}">
-                <fileset dir="${basedir}/src/test/java" includes="**/*Test.java"/>
-            </batchtest>
-        </junit>
-    </target>
-    
-    <target name="junitreport">
-        <junitreport todir="${report.dir}">
-            <fileset dir="${report.dir}" includes="TEST-*.xml"/>
-            <report todir="${report.dir}"/>
-        </junitreport>
-    </target>    
-    
+		<junit printsummary="yes" dir="${junit.dir}">
+			<classpath>
+				<path refid="classpath"/>
+				<path refid="junit"/>
+				<pathelement location="${build}/classes"/>
+			</classpath>
+
+			<formatter type="xml"/>
+
+			<batchtest fork="yes" todir="${report.dir}">
+				<fileset dir="${basedir}/src/test/java" includes="**/*Test.java"/>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="junitreport">
+		<junitreport todir="${report.dir}">
+			<fileset dir="${report.dir}" includes="TEST-*.xml"/>
+			<report todir="${report.dir}"/>
+		</junitreport>
+	</target>
+
 </project>

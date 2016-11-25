@@ -100,4 +100,30 @@ public class IoxUtility {
 		return model;
 	}
 
+	private static String version=null;
+	public static String getVersion() {
+		  if(version==null){
+		java.util.ResourceBundle resVersion = java.util.ResourceBundle.getBundle("ch/interlis/iox_j/Version");
+			// Major version numbers identify significant functional changes.
+			// Minor version numbers identify smaller extensions to the functionality.
+			// Micro versions are even finer grained versions.
+			StringBuffer ret=new StringBuffer(20);
+		ret.append(resVersion.getString("versionMajor"));
+			ret.append('.');
+		ret.append(resVersion.getString("versionMinor"));
+			ret.append('.');
+		ret.append(resVersion.getString("versionMicro"));
+		ret.append('-');
+		if(resVersion.containsKey("versionBranch")){
+            String branch=ch.ehi.basics.tools.StringUtility.purge(resVersion.getString("versionBranch"));
+            if(branch!=null){
+               ret.append(branch);
+               ret.append('-');
+            }
+		}
+		ret.append(resVersion.getString("versionDate"));
+			version=ret.toString();
+		  }
+		  return version;
+	}
 }
