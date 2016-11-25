@@ -2,7 +2,7 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
-iox-ili 1.13.6 (2016-11-xx)
+iox-ili 1.13.6 (2016-11-25)
 -----------------------------
 - ItfReader2: fixed NullPointerException if empty line in line table
 
