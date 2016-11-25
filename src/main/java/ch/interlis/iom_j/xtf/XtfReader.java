@@ -119,6 +119,8 @@ public class XtfReader implements IoxReader {
 				handler.endElement((EndElement)event);
 			}else if(event instanceof Characters){
 				handler.characters((Characters)event);
+			}else{
+				handler.otherEvents(event);
 			}
 			if(handler.stopParser){
 				//EhiLogger.debug(handler.returnObject.toString());

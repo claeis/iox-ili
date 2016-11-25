@@ -2,6 +2,15 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.13.6 (2016-11-25)
+-----------------------------
+- ItfReader2: fixed NullPointerException if empty line in line table
+
+iox-ili 1.13.5 (2016-11-02)
+-----------------------------
+- XtfWriter: fixed BLACKBOX output
+- XtfReader: fixed BLACKBOX parser
+
 iox-ili 1.13.4 (2016-09-17)
 -----------------------------
 - ItfWriter2: fixed missing objects in output

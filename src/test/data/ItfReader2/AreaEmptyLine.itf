@@ -1,0 +1,17 @@
+
+SCNT
+Beispiel Transfer-File
+////
+MTID Test1
+MODL Test1
+TOPI TopicB
+TABL TableB_Form
+OBJE 1
+ELIN
+ETAB
+TABL TableB
+OBJE 10 115.0 115.0
+ETAB
+ETOP
+EMOD
+ENDE

@@ -11,6 +11,7 @@ import java.util.Set;
 
 
 
+
 import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
 import com.vividsolutions.jts.algorithm.locate.SimplePointInAreaLocator;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -130,7 +131,12 @@ public class ItfAreaLinetable2Polygon {
 		if(lines==null){
 			lines=objPool.newObjectPool();
 		}
-		lines.put(iomObj.getobjectoid(),iomObj);
+		IomObject polyline=iomObj.getattrobj(helperTableGeomAttrName, 0);
+		if(polyline==null){
+			dataerrs.add(new IoxInvalidDataException("empty line",linetableIliqname,new String[]{iomObj.getobjectoid()},iomObj));
+		}else{
+			lines.put(iomObj.getobjectoid(),iomObj);
+		}
 	}
 	public void addGeoRef(String tid,IomObject iomCoord)
 	{
