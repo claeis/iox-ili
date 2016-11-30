@@ -35,17 +35,16 @@ public class UniqueConstraints10Test {
 	//############################################################/
 	//########## SUCCESSFUL TESTS ################################/
 	//############################################################/
-	
 	@Test
 	public void refOk(){
-		Iom_jObject objA1=new Iom_jObject("UniqueConstraints10.Topic.TableA", "a1");
+		Iom_jObject objA1=new Iom_jObject("UniqueConstraints10.Topic.TableA", "oida1");
 		objA1.setattrvalue("a1", "Anna");
-		Iom_jObject objA2=new Iom_jObject("UniqueConstraints10.Topic.TableA", "a2");
+		Iom_jObject objA2=new Iom_jObject("UniqueConstraints10.Topic.TableA", "oida2");
 		objA2.setattrvalue("a1", "Berta");
-		Iom_jObject objB1=new Iom_jObject("UniqueConstraints10.Topic.TableB", "b1");
-		objB1.addattrobj("b2", "REF").setobjectrefoid("a1");
-		Iom_jObject objB2=new Iom_jObject("UniqueConstraints10.Topic.TableB", "b2");
-		objB2.addattrobj("b2", "REF").setobjectrefoid("a2");
+		Iom_jObject objB1=new Iom_jObject("UniqueConstraints10.Topic.TableB", "oidb1");
+		objB1.addattrobj("b2", "REF").setobjectrefoid("oida1");
+		Iom_jObject objB2=new Iom_jObject("UniqueConstraints10.Topic.TableB", "oidb2");
+		objB2.addattrobj("b2", "REF").setobjectrefoid("oida2");
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -53,7 +52,7 @@ public class UniqueConstraints10Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("UniqueConstraints23.Topic","b1"));
+		validator.validate(new StartBasketEvent("UniqueConstraints10.Topic","tidb1"));
 		validator.validate(new ObjectEvent(objA1));
 		validator.validate(new ObjectEvent(objA2));
 		validator.validate(new ObjectEvent(objB1));
@@ -78,7 +77,7 @@ public class UniqueConstraints10Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("UniqueConstraints23.Topic","b1"));
+		validator.validate(new StartBasketEvent("UniqueConstraints10.Topic","b1"));
 		validator.validate(new ObjectEvent(objA1));
 		validator.validate(new ObjectEvent(objB1));
 		validator.validate(new ObjectEvent(objB2));

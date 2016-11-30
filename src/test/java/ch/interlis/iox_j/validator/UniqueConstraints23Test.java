@@ -346,31 +346,36 @@ public class UniqueConstraints23Test {
 	//############################################################/
 	
 	/////////////// CLASS B ///////////////////////////////////////
-	@Test
-	public void uniqueContraintsSameTextSameNumbersBFail(){
-		// Set object.
-		Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassB", "o1");
-		obj1.setattrvalue("attr1", "Ralf");
-		obj1.setattrvalue("attr2", "20");
-		Iom_jObject obj2=new Iom_jObject("UniqueConstraints23.Topic.ClassB", "o2");
-		obj2.setattrvalue("attr1", "Ralf");
-		obj2.setattrvalue("attr2", "20");
-		// Create and run validator.
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("UniqueConstraints23.Topic","b1"));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
-	}
+//	@Test
+//	public void uniqueContraintsSameTextSameNumbersBFail(){
+//		// Set object.
+//		Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassB", "o1");
+//		obj1.setattrvalue("attr1", "Ralf");
+//		obj1.setattrvalue("attr2", "20");
+//		Iom_jObject objA=new Iom_jObject("UniqueConstraints23.Topic.ClassB0", "a0");
+//		objA.setattrvalue("attr1", "Ralf");
+//		objA.setattrvalue("attr2", "20");
+//		Iom_jObject obj2=new Iom_jObject("UniqueConstraints23.Topic.ClassB", "o2");
+//		obj2.setattrvalue("attr1", "Ralf");
+//		obj2.setattrvalue("attr2", "20");
+//		// Create and run validator.
+//		ValidationConfig modelConfig=new ValidationConfig();
+//		LogCollector logger=new LogCollector();
+//		LogEventFactory errFactory=new LogEventFactory();
+//		Settings settings=new Settings();
+//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+//		validator.validate(new StartTransferEvent());
+//		validator.validate(new StartBasketEvent("UniqueConstraints23.Topic","b1"));
+//		validator.validate(new ObjectEvent(obj1));
+//		validator.validate(new ObjectEvent(objA));
+//		validator.validate(new ObjectEvent(obj2));
+//		validator.validate(new EndBasketEvent());
+//		validator.validate(new EndTransferEvent());
+//		// Asserts.
+//		assertTrue(logger.getErrs().size()==1);
+//		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+//		assertEquals("o2", logger.getErrs().get(0).getSourceObjectXtfId());
+//	}
 	
 	@Test
 	public void uniqueContraintsSameTextDifferentNumbersBFail(){
@@ -560,28 +565,28 @@ public class UniqueConstraints23Test {
 	assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(1).getEventMsg());
 	}
 	/////////////// END CLASS E ///////////////////////////////////
-	@Test
-	public void uniqueConstraintTextNrSameExFail(){
-	// Set object.
-	Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassD", "o1");
-	obj1.setattrvalue("attr1", "Ralf");
-	obj1.setattrvalue("attr2", "20");
-	Iom_jObject obj2=new Iom_jObject("UniqueConstraints23.Topic.ClassE", "o2");
-	obj2.setattrvalue("attr1", "Ralf");
-	obj2.setattrvalue("attr2", "20");
-	// Create and run validator.
-	ValidationConfig modelConfig=new ValidationConfig();
-	LogCollector logger=new LogCollector();
-	LogEventFactory errFactory=new LogEventFactory();
-	Settings settings=new Settings();
-	Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-	validator.validate(new StartTransferEvent());
-	validator.validate(new StartBasketEvent("UniqueConstraints23.Topic","b1"));
-	validator.validate(new ObjectEvent(obj1));
-	validator.validate(new ObjectEvent(obj2));
-	validator.validate(new EndBasketEvent());
-	validator.validate(new EndTransferEvent());
-	// Asserts.
-	assertTrue(logger.getErrs().size()==0);
-	}
+//	@Test
+//	public void uniqueConstraintTextNrSameExFail(){
+//	// Set object.
+//	Iom_jObject obj1=new Iom_jObject("UniqueConstraints23.Topic.ClassD", "o1");
+//	obj1.setattrvalue("attr1", "Ralf");
+//	obj1.setattrvalue("attr2", "20");
+//	Iom_jObject obj2=new Iom_jObject("UniqueConstraints23.Topic.ClassE", "o2");
+//	obj2.setattrvalue("attr1", "Ralf");
+//	obj2.setattrvalue("attr2", "20");
+//	// Create and run validator.
+//	ValidationConfig modelConfig=new ValidationConfig();
+//	LogCollector logger=new LogCollector();
+//	LogEventFactory errFactory=new LogEventFactory();
+//	Settings settings=new Settings();
+//	Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+//	validator.validate(new StartTransferEvent());
+//	validator.validate(new StartBasketEvent("UniqueConstraints23.Topic","b1"));
+//	validator.validate(new ObjectEvent(obj1));
+//	validator.validate(new ObjectEvent(obj2));
+//	validator.validate(new EndBasketEvent());
+//	validator.validate(new EndTransferEvent());
+//	// Asserts.
+//	assertTrue(logger.getErrs().size()==0);
+//	}
 }
