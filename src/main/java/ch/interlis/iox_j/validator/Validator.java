@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,24 +25,41 @@ import ch.interlis.ili2c.metamodel.AbstractLeafElement;
 import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.AttributeDef;
+import ch.interlis.ili2c.metamodel.AttributeRef;
 import ch.interlis.ili2c.metamodel.Cardinality;
 import ch.interlis.ili2c.metamodel.ClassType;
 import ch.interlis.ili2c.metamodel.CompositionType;
+import ch.interlis.ili2c.metamodel.Constant;
 import ch.interlis.ili2c.metamodel.Constant.Text;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.Domain;
 import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.EnumTreeValueType;
 import ch.interlis.ili2c.metamodel.EnumerationType;
+import ch.interlis.ili2c.metamodel.Evaluable;
 import ch.interlis.ili2c.metamodel.ExistenceConstraint;
+import ch.interlis.ili2c.metamodel.Expression;
+import ch.interlis.ili2c.metamodel.Expression.Conjunction;
+import ch.interlis.ili2c.metamodel.Expression.DefinedCheck;
+import ch.interlis.ili2c.metamodel.Expression.Disjunction;
+import ch.interlis.ili2c.metamodel.Expression.Equality;
+import ch.interlis.ili2c.metamodel.Expression.GreaterThan;
+import ch.interlis.ili2c.metamodel.Expression.GreaterThanOrEqual;
+import ch.interlis.ili2c.metamodel.Expression.Inequality;
+import ch.interlis.ili2c.metamodel.Expression.LessThan;
+import ch.interlis.ili2c.metamodel.Expression.LessThanOrEqual;
+import ch.interlis.ili2c.metamodel.Expression.Negation;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.LineForm;
 import ch.interlis.ili2c.metamodel.LineType;
 import ch.interlis.ili2c.metamodel.LocalAttribute;
+import ch.interlis.ili2c.metamodel.MandatoryConstraint;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.ObjectPath;
 import ch.interlis.ili2c.metamodel.ObjectType;
+import ch.interlis.ili2c.metamodel.PathEl;
+import ch.interlis.ili2c.metamodel.PathElAbstractClassRole;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
 import ch.interlis.ili2c.metamodel.ReferenceType;
@@ -68,6 +86,7 @@ import ch.interlis.iox.IoxValidationConfig;
 import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.logging.LogEventFactory;
 import ch.interlis.models.INTERLIS.*;
+import ch.interlis.models.IlisMeta07.ModelData.AttributeRefType;
 
 
 public class Validator implements ch.interlis.iox.IoxValidator {
@@ -147,6 +166,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Iterator<IomObject> objectIterator = allObjects.iterator();
 			while (objectIterator.hasNext()){
 				IomObject iomObj = objectIterator.next();
+				errFact.setDataObj(iomObj);
 				Object modelElement=tag2class.get(iomObj.getobjecttag());
 				Viewable currentClass= (Viewable) modelElement;
 				Iterator constraintIterator=currentClass.iterator();
@@ -157,6 +177,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						ExistenceConstraint existenceConstraintObj=(ExistenceConstraint) objA;
 						validateExistenceConstraint(iomObj, existenceConstraintObj);
 					}
+//					if(objA instanceof MandatoryConstraint){
+//						MandatoryConstraint mandatoryConstraintObj=(MandatoryConstraint) objA;
+//						validateMandatoryConstraint(iomObj, mandatoryConstraintObj);
+//					}
 				}
 				Iterator<ViewableTransferElement> attrIterator=currentClass.getAttributesAndRoles2();
 				while (attrIterator.hasNext()) {
@@ -184,11 +208,127 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
+//	private void validateMandatoryConstraint(IomObject iomObj, MandatoryConstraint mandatoryConstraintObj) {
+//		if (iomObj.getattrcount() == 0){
+//			return;
+//		}
+//		Evaluable evaluable = (Evaluable) mandatoryConstraintObj.getCondition();
+//		// expression
+//		if(evaluable instanceof Expression){
+//			Expression expression = (Expression) evaluable;
+//			
+//			String attrName1 = iomObj.getattrname(1);
+//			String attrName2 = iomObj.getattrname(0);
+//			String attrValue1 = iomObj.getattrvalue(attrName1);
+//			String attrValue2 = iomObj.getattrvalue(attrName2);
+//			
+//			// Falls Klammern definiert sind, müssen die attribute in der Klammer zuerst validiert werden.
+//			
+//			// Das Resultat muss dann gespeichert werden.
+//			
+//			// Danach kann das nächste Element auf das Klammerresultat verglichen werden.
+//			
+//			if (!(validateMandatoryExpression(iomObj, expression))){
+//				errs.addEvent(errFact.logErrorMsg("{0}:{1} {5} {3}:{4} is not valid in {2}.",attrName1,attrValue1, iomObj.getobjecttag(), attrName2, attrValue2, evaluable.getClass().getSimpleName()));
+//			}
+//		// constant
+//		} else if(evaluable instanceof Constant){
+//			Constant constant = (Constant) evaluable;
+//		}
+//	}
+
+//	private boolean validateMandatoryExpression(IomObject iomObj, Expression expression) {
+//		int attrLeftValue;
+//		int attrRightValue;
+//		if(expression instanceof Conjunction){
+//			// AND
+////			if(attrLeftValue && attrRightValue){
+////				
+////			}
+//		} else if(expression instanceof DefinedCheck){
+//			// DEFINED
+//			String definedAttr = ((DefinedCheck) expression).getArgument().toString();
+//			String attrValue = iomObj.getattrvalue(definedAttr);
+//			if(attrValue == null){
+//				return false;
+//			}
+//		} else if(expression instanceof Disjunction){
+//			// OR
+////			if(attrLeftValue || attrRightValue){
+////				
+////			}
+//		} else if(expression instanceof Equality){
+//			ObjectPath attrLeftName = (ObjectPath) ((Equality) expression).getLeft();
+//			ObjectPath attrRightName = (ObjectPath) ((Equality) expression).getRight();
+//			attrLeftValue = Integer.parseInt(iomObj.getattrvalue(attrLeftName.getLastPathEl().getName()));
+//			attrRightValue = Integer.parseInt(iomObj.getattrvalue(attrRightName.getLastPathEl().getName()));
+//			if(!(attrLeftValue == attrRightValue)){
+//				return false;
+//			}
+//		} else if(expression instanceof GreaterThan){
+//			ObjectPath attrLeftName = (ObjectPath) ((GreaterThan) expression).getLeft();
+//			ObjectPath attrRightName = (ObjectPath) ((GreaterThan) expression).getRight();
+//			attrLeftValue = Integer.parseInt(iomObj.getattrvalue(attrLeftName.getLastPathEl().getName()));
+//			attrRightValue = Integer.parseInt(iomObj.getattrvalue(attrRightName.getLastPathEl().getName()));
+//			if(!(attrLeftValue > attrRightValue)){
+//				return false;
+//			}
+//		} else if(expression instanceof GreaterThanOrEqual){
+//			ObjectPath attrLeftName = (ObjectPath) ((GreaterThanOrEqual) expression).getLeft();
+//			ObjectPath attrRightName = (ObjectPath) ((GreaterThanOrEqual) expression).getRight();
+//			
+//			PathEl ref = (PathEl) attrLeftName.getLastPathEl();
+//			LocalAttribute aa = (LocalAttribute) ref.getViewable().getAttributesAndRoles2();
+//			
+//			
+//			// Bedingungen je nach Typ anders --> Seite 62 Ref2.
+//			
+//			
+//			attrLeftValue = Integer.parseInt(iomObj.getattrvalue(attrLeftName.getLastPathEl().getName()));
+//			attrRightValue = Integer.parseInt(iomObj.getattrvalue(attrRightName.getLastPathEl().getName()));
+//			if(!(attrLeftValue >= attrRightValue)){
+//				return false;
+//			}
+//		} else if(expression instanceof Inequality){
+//			ObjectPath attrLeftName = (ObjectPath) ((Inequality) expression).getLeft();
+//			ObjectPath attrRightName = (ObjectPath) ((Inequality) expression).getRight();
+//			attrLeftValue = Integer.parseInt(iomObj.getattrvalue(attrLeftName.getLastPathEl().getName()));
+//			attrRightValue = Integer.parseInt(iomObj.getattrvalue(attrRightName.getLastPathEl().getName()));
+//			if(!(attrLeftValue != attrRightValue)){
+//				return false;
+//			}
+//		} else if(expression instanceof LessThan){
+//			ObjectPath attrLeftName = (ObjectPath) ((LessThan) expression).getLeft();
+//			ObjectPath attrRightName = (ObjectPath) ((LessThan) expression).getRight();
+//			attrLeftValue = Integer.parseInt(iomObj.getattrvalue(attrLeftName.getLastPathEl().getName()));
+//			attrRightValue = Integer.parseInt(iomObj.getattrvalue(attrRightName.getLastPathEl().getName()));
+//			if(!(attrLeftValue < attrRightValue)){
+//				return false;
+//			}
+//		} else if(expression instanceof LessThanOrEqual){
+//			ObjectPath attrLeftName = (ObjectPath) ((LessThanOrEqual) expression).getLeft();
+//			ObjectPath attrRightName = (ObjectPath) ((LessThanOrEqual) expression).getRight();
+//			attrLeftValue = Integer.parseInt(iomObj.getattrvalue(attrLeftName.getLastPathEl().getName()));
+//			attrRightValue = Integer.parseInt(iomObj.getattrvalue(attrRightName.getLastPathEl().getName()));
+//			if(!(attrLeftValue <= attrRightValue)){
+//				return false;
+//			}
+//		} else if(expression instanceof Negation){
+//			// NOT
+//			String negatedAttr = ((Negation) expression).getNegated().toString();
+//			String attrValue = iomObj.getattrvalue(negatedAttr);
+//			if(negatedAttr == attrValue){
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
+
 	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {
 		int nrOfTargetObjs=linkPool.getTargetObjectCount(iomObj,role);
 		long cardMin=role.getCardinality().getMinimum();
 		long cardMax=role.getCardinality().getMaximum();
-		if(nrOfTargetObjs>=cardMin && nrOfTargetObjs<=cardMax){
+		if((nrOfTargetObjs>=cardMin && nrOfTargetObjs<=cardMax)){
 			// valid
 		}else{
 			// not valid
@@ -716,13 +856,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 		// Uniqueness
 		if(isObject){
+			
 			// get the current class name
 			String currentClassName = aclass1.getName().toString();
 			// if it is a new class, clear the lists with content of previous class
-			if (previousClassName != null && !currentClassName.equals(previousClassName)){
-				listOfUniqueAttrsLists.clear();
-				seenValues.clear();
-			} 
+//			if (previousClassName != null && !currentClassName.equals(previousClassName)){
+//				listOfUniqueAttrsLists.clear();
+//				seenValues.clear();
+//				
+//			} 
 			Iterator attrI=aclass1.iterator();
 			while (attrI.hasNext()) {
 				Object obj1 = attrI.next();
@@ -736,7 +878,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						uniqueAttrs.add(object.getLastPathEl().getName());
 						contentUniqueAttrs.append(object.getLastPathEl().getName());
 					}
-					// if list not contains the current unique attributes, add these to the list
+					// if list not contains the current unique attributes, add these to the list. list can be null.
 					if (!listOfUniqueAttrsLists.contains(uniqueAttrs)){
 						listOfUniqueAttrsLists.add(uniqueAttrs);
 					}
@@ -963,7 +1105,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		int sizeOfUniqueAttribute = uniqueAttrs.size();
 		ArrayList<String> accu = new ArrayList<String>();
 		for (int i=0;i<sizeOfUniqueAttribute;i++){
-			accu.add(currentObject.getattrvalue(uniqueAttrs.get(i)));
+			String attrValue=currentObject.getattrvalue(uniqueAttrs.get(i));
+			if(attrValue==null){
+				IomObject refObj=currentObject.getattrobj(uniqueAttrs.get(i),0);
+				if(refObj!=null){
+					attrValue=refObj.getobjectrefoid();
+				}
+			}
+			if(attrValue==null){
+				return null;
+			}
+			accu.add(attrValue);
 		}
 		AttributeArray values=new AttributeArray(accu);
 		if (seenValues.containsKey(values)){
