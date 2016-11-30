@@ -16,8 +16,11 @@ public class StdLogger extends AbstractFilteringListener {
 	private int ioxErrc=0;
 	private String logfile=null;
 	private final static String INFO="Info";
-	public StdLogger(String logfile){
-		this.logfile=logfile;
+	public StdLogger(String logfileName){
+		this.logfile=logfileName;
+	}
+	public void setLogfileName(String fileName){
+		this.logfile=fileName;
 	}
 	@Override
 	public void outputEvent(LogEvent event,ArrayList msgv)
