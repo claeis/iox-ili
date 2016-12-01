@@ -750,12 +750,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	// Declaration of the uniqueness of Oid's.
 	String uniquenessOfOid = null;
-	// Declaration of the previous used class to validate in unique constraint, if there is a new class to validate.
-	String previousClassName = null;
 	// HashMap of unique constraints.
-	HashMap<AttributeArray, String> seenValues = new HashMap<AttributeArray, String>();
-	// List of all arrayLists of unique attributes.
-	ArrayList<ArrayList<String>> listOfUniqueAttrsLists = new ArrayList<ArrayList<String>>();
+	HashMap<ArrayList<String>, HashSet<AttributeArray>> seenValues = new HashMap<ArrayList<String>, HashSet<AttributeArray>>();
+	// List of all arrayLists of unique attributes and classes.
+	ArrayList<ArrayList<String>> listOfUniqueObj = new ArrayList<ArrayList<String>>();
 	// List of all object Oid's and associated classPath's of uniqueness validate of Oid's.
 	Map<String , String> uniqueObjectIDs = new HashMap<String, String>();
 	
@@ -856,38 +854,30 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 		// Uniqueness
 		if(isObject){
-			
-			// get the current class name
-			String currentClassName = aclass1.getName().toString();
-			// if it is a new class, clear the lists with content of previous class
-//			if (previousClassName != null && !currentClassName.equals(previousClassName)){
-//				listOfUniqueAttrsLists.clear();
-//				seenValues.clear();
-//				
-//			} 
 			Iterator attrI=aclass1.iterator();
 			while (attrI.hasNext()) {
 				Object obj1 = attrI.next();
 				if(obj1 instanceof UniquenessConstraint){
 					UniquenessConstraint uniqueConstraint=(UniquenessConstraint) obj1;
 					StringBuilder contentUniqueAttrs = new StringBuilder();
-					ArrayList<String> uniqueAttrs=new ArrayList<String>();
+					ArrayList<String> uniqueConstraintAttrs=new ArrayList<String>();
+					// gets all constraint attribute-names.
 					Iterator iter = uniqueConstraint.getElements().iteratorAttribute();
-					while (iter.hasNext()) {
+					uniqueConstraintAttrs.add(aclass1.toString());
+					while (iter.hasNext()){
 						ObjectPath object = (ObjectPath)iter.next();
-						uniqueAttrs.add(object.getLastPathEl().getName());
+						uniqueConstraintAttrs.add(object.getLastPathEl().getName());
 						contentUniqueAttrs.append(object.getLastPathEl().getName());
 					}
-					// if list not contains the current unique attributes, add these to the list. list can be null.
-					if (!listOfUniqueAttrsLists.contains(uniqueAttrs)){
-						listOfUniqueAttrsLists.add(uniqueAttrs);
+					if (!listOfUniqueObj.contains(uniqueConstraintAttrs)){
+						listOfUniqueObj.add(uniqueConstraintAttrs);
 					}
-					AttributeArray returnValue = validateUnique(iomObj,uniqueAttrs);
-					previousClassName = aclass1.getName().toString();
+					AttributeArray returnValue = validateUnique(iomObj,uniqueConstraintAttrs);
+					
 					if (returnValue == null){
 						// ok
 					} else {
-						errs.addEvent(errFact.logErrorMsg("Unique is violated! Values {0} already exist in Object: {1}", returnValue.valuesAsString(), seenValues.get(returnValue)));
+						errs.addEvent(errFact.logErrorMsg("Unique is violated! Values {0} already exist in Object: {1}", returnValue.valuesAsString(), returnValue.getOid()));
 					}
 				}
 			}
@@ -1104,7 +1094,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private AttributeArray validateUnique(IomObject currentObject,ArrayList<String>uniqueAttrs) {
 		int sizeOfUniqueAttribute = uniqueAttrs.size();
 		ArrayList<String> accu = new ArrayList<String>();
-		for (int i=0;i<sizeOfUniqueAttribute;i++){
+		for (int i=1;i<sizeOfUniqueAttribute;i++){
 			String attrValue=currentObject.getattrvalue(uniqueAttrs.get(i));
 			if(attrValue==null){
 				IomObject refObj=currentObject.getattrobj(uniqueAttrs.get(i),0);
@@ -1117,11 +1107,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			accu.add(attrValue);
 		}
-		AttributeArray values=new AttributeArray(accu);
-		if (seenValues.containsKey(values)){
-			return values;
+		AttributeArray values=new AttributeArray(currentObject.getobjectoid(), accu);
+		HashSet<AttributeArray> allValues = new HashSet<AttributeArray>();
+		allValues.add(values);
+		if (seenValues.containsKey(uniqueAttrs)){
+			HashSet<AttributeArray> valuesOfKey = seenValues.get(uniqueAttrs);
+			if (valuesOfKey.equals(allValues)){
+				return values;
+			}
 		} else {
-			seenValues.put(values, currentObject.getobjectoid());
+			seenValues.put(uniqueAttrs, allValues);
 		}
 		return null;
 	}

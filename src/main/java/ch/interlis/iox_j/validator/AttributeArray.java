@@ -4,6 +4,9 @@ import java.util.Arrays;
 
 public class AttributeArray {
 	private String[] values;
+	
+	private String oid;
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -24,9 +27,15 @@ public class AttributeArray {
 			return false;
 		return true;
 	}
-	public AttributeArray(ArrayList<String> values){
+	public AttributeArray(String oid, ArrayList<String> values){
 		this.values = values.toArray(new String[values.size()]);
+		this.oid = oid;
 	}
+	
+	public String getOid() {
+		return oid;
+	}
+	
 	private String[] getValues() {
 		return values;
 	}
