@@ -1,0 +1,112 @@
+INTERLIS 2.3;
+
+MODEL MandatoryConstraints23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
+	TOPIC Topic=
+		
+		!! simple constant
+		CLASS ClassA =
+			MANDATORY CONSTRAINT
+			#true;
+		END ClassA;
+		
+		!! negation (NOT)
+		CLASS ClassB =
+			MANDATORY CONSTRAINT
+			NOT(#false);
+		END ClassB;
+		
+		!! boolean
+		CLASS ClassC =
+			attr1 : BOOLEAN;
+			MANDATORY CONSTRAINT
+			attr1;
+		END ClassC;
+		
+		!! defined
+		CLASS ClassD =
+			MANDATORY CONSTRAINT
+			DEFINED(#true);
+		END ClassD;
+		
+		!! conjunction (AND)
+		CLASS ClassE =
+			MANDATORY CONSTRAINT
+			(#true AND (#true AND (#true AND (#true)))) AND #true AND (#true AND (#true));
+		END ClassE;
+		
+		!! disjunction (OR)
+		CLASS ClassF =
+			MANDATORY CONSTRAINT
+			#false OR #false OR #false OR(#false OR (#false OR (#false OR (#true))));
+		END ClassF;
+		
+		!! equal (==)
+		CLASS ClassG =
+			MANDATORY CONSTRAINT
+			(#true == #false) == (#true == (#true == (#true)));
+		END ClassG;
+		
+		!! not equal (!=)
+		CLASS ClassH =
+			MANDATORY CONSTRAINT
+			(#true != #true) != (#true != (#true != (#false)));
+		END ClassH;
+		
+		!! not equal (<>)
+		CLASS ClassI =
+			MANDATORY CONSTRAINT
+			(#true <> #true) <> (#true <> (#true <> (#false)));
+		END ClassI;
+		
+		!! simple constant fail
+		CLASS ClassAF =
+			MANDATORY CONSTRAINT
+			#false;
+		END ClassAF;
+		
+		!! negation (NOT) fail
+		CLASS ClassBF =
+			MANDATORY CONSTRAINT
+			NOT(#true);
+		END ClassBF;
+		
+		!! boolean fail
+		CLASS ClassCF =
+			attr1 : BOOLEAN;
+			MANDATORY CONSTRAINT
+			attr1;
+		END ClassCF;
+		
+		!! conjunction (AND) fail
+		CLASS ClassEF =
+			MANDATORY CONSTRAINT
+			(#true AND (#true AND (#true AND (#true)))) AND #true AND (#true AND (#false));
+		END ClassEF;
+		
+		!! disjunction (OR) fail
+		CLASS ClassFF =
+			MANDATORY CONSTRAINT
+			#false OR #false OR #false OR(#false OR (#false OR (#false OR (#false))));
+		END ClassFF;
+		
+		!! equal (==) fail
+		CLASS ClassGF =
+			MANDATORY CONSTRAINT
+			(#true == #false) == (#true == (#true == (#false)));
+		END ClassGF;
+		
+		!! not equal (!=) fail
+		CLASS ClassHF =
+			MANDATORY CONSTRAINT
+			(#true != #true);
+		END ClassHF;
+		
+		!! not equal (<>) fail
+		CLASS ClassIF =
+			MANDATORY CONSTRAINT
+			(#true <> #true);
+		END ClassIF;
+		
+	END Topic;
+END MandatoryConstraints23.
