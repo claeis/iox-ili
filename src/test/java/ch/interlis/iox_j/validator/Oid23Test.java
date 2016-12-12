@@ -181,11 +181,10 @@ public class Oid23Test {
 	//######################### FAIL ##############################//
 	//#############################################################//
 	@Test
-	public void duplicateOidFail() throws Exception {
+	public void duplicateOidSameTableFail() throws Exception {
 		final String OBJ_B1="b1";
-		final String OBJ_B2="b1";
 		Iom_jObject objB1=new Iom_jObject(OID23_CLASSB, OBJ_B1);
-		Iom_jObject objB2=new Iom_jObject(OID23_CLASSB, OBJ_B2);
+		Iom_jObject objB2=new Iom_jObject(OID23_CLASSB, OBJ_B1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -200,6 +199,25 @@ public class Oid23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("The OID b1 of object 'Oid23.Topic.ClassB oid b1 {}' already exists in CLASS Oid23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
+	}
+	@Test
+	public void duplicateOidDifferentTableFail() throws Exception {
+		final String OBJ_B1="b1";
+		Iom_jObject objB1=new Iom_jObject(OID23_CLASSB, OBJ_B1);
+		Iom_jObject objB2=new Iom_jObject(OID23_CLASSC, OBJ_B1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(OID23_TOPIC,START_EVENT_BASKET));
+		validator.validate(new ObjectEvent(objB1));
+		validator.validate(new ObjectEvent(objB2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
 	}
 	@Test
 	public void undefinedOidFail(){
