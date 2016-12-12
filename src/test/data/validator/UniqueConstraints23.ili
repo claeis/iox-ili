@@ -14,7 +14,7 @@ MODEL UniqueConstraints23
 		CLASS ClassB =
 		  attr1 : TEXT*10;
 		  attr2 : 0 .. 100;
-		  UNIQUE attr1;
+		  UNIQUE attr1, attr2;
 		END ClassB;
 		CLASS ClassB0 =
 		  attr1 : TEXT*10;

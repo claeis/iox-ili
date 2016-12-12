@@ -2,6 +2,15 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili-1.13.4-feature/validator1 (2016-12-01)
+----------------------------------------------
+- validator: validate unique constraint
+- validator: validate cardinality in associations
+- validator: validate existence constraint
+- validator: validate reference type
+- validator: validate OID/TID uniqueness
+- validator: validate target class in associations
+
 iox-ili 1.13.4 (2016-09-17)
 -----------------------------
 - ItfWriter2: fixed missing objects in output

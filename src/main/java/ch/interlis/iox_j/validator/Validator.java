@@ -1,5 +1,6 @@
 package ch.interlis.iox_j.validator;
 
+import java.beans.beancontext.BeanContextChildSupport;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.sql.Types;
@@ -29,7 +30,10 @@ import ch.interlis.ili2c.metamodel.AttributeRef;
 import ch.interlis.ili2c.metamodel.Cardinality;
 import ch.interlis.ili2c.metamodel.ClassType;
 import ch.interlis.ili2c.metamodel.CompositionType;
+import ch.interlis.ili2c.metamodel.ConditionalExpression;
 import ch.interlis.ili2c.metamodel.Constant;
+import ch.interlis.ili2c.metamodel.Constant.Enumeration;
+import ch.interlis.ili2c.metamodel.Constant.EnumerationRange;
 import ch.interlis.ili2c.metamodel.Constant.Text;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.Domain;
@@ -50,6 +54,9 @@ import ch.interlis.ili2c.metamodel.Expression.LessThan;
 import ch.interlis.ili2c.metamodel.Expression.LessThanOrEqual;
 import ch.interlis.ili2c.metamodel.Expression.Negation;
 import ch.interlis.ili2c.metamodel.FormattedType;
+import ch.interlis.ili2c.metamodel.FunctionCall;
+import ch.interlis.ili2c.metamodel.InspectionFactor;
+import ch.interlis.ili2c.metamodel.LengthOfReferencedText;
 import ch.interlis.ili2c.metamodel.LineForm;
 import ch.interlis.ili2c.metamodel.LineType;
 import ch.interlis.ili2c.metamodel.LocalAttribute;
@@ -58,6 +65,8 @@ import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.ObjectPath;
 import ch.interlis.ili2c.metamodel.ObjectType;
+import ch.interlis.ili2c.metamodel.Objects;
+import ch.interlis.ili2c.metamodel.ParameterValue;
 import ch.interlis.ili2c.metamodel.PathEl;
 import ch.interlis.ili2c.metamodel.PathElAbstractClassRole;
 import ch.interlis.ili2c.metamodel.PolylineType;
@@ -76,6 +85,8 @@ import ch.interlis.ili2c.metamodel.Type;
 import ch.interlis.ili2c.metamodel.TypeAlias;
 import ch.interlis.ili2c.metamodel.UniquenessConstraint;
 import ch.interlis.ili2c.metamodel.Viewable;
+import ch.interlis.ili2c.metamodel.ViewableAggregate;
+import ch.interlis.ili2c.metamodel.ViewableAlias;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
@@ -177,10 +188,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						ExistenceConstraint existenceConstraintObj=(ExistenceConstraint) objA;
 						validateExistenceConstraint(iomObj, existenceConstraintObj);
 					}
-//					if(objA instanceof MandatoryConstraint){
-//						MandatoryConstraint mandatoryConstraintObj=(MandatoryConstraint) objA;
-//						validateMandatoryConstraint(iomObj, mandatoryConstraintObj);
-//					}
+					// mandatory constraint
+					if(objA instanceof MandatoryConstraint){
+						MandatoryConstraint mandatoryConstraintObj=(MandatoryConstraint) objA;
+						validateMandatoryConstraint(iomObj, mandatoryConstraintObj);
+					}
 				}
 				Iterator<ViewableTransferElement> attrIterator=currentClass.getAttributesAndRoles2();
 				while (attrIterator.hasNext()) {
@@ -208,121 +220,244 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-//	private void validateMandatoryConstraint(IomObject iomObj, MandatoryConstraint mandatoryConstraintObj) {
-//		if (iomObj.getattrcount() == 0){
-//			return;
-//		}
-//		Evaluable evaluable = (Evaluable) mandatoryConstraintObj.getCondition();
-//		// expression
-//		if(evaluable instanceof Expression){
-//			Expression expression = (Expression) evaluable;
-//			
-//			String attrName1 = iomObj.getattrname(1);
-//			String attrName2 = iomObj.getattrname(0);
-//			String attrValue1 = iomObj.getattrvalue(attrName1);
-//			String attrValue2 = iomObj.getattrvalue(attrName2);
-//			
-//			// Falls Klammern definiert sind, müssen die attribute in der Klammer zuerst validiert werden.
-//			
-//			// Das Resultat muss dann gespeichert werden.
-//			
-//			// Danach kann das nächste Element auf das Klammerresultat verglichen werden.
-//			
-//			if (!(validateMandatoryExpression(iomObj, expression))){
-//				errs.addEvent(errFact.logErrorMsg("{0}:{1} {5} {3}:{4} is not valid in {2}.",attrName1,attrValue1, iomObj.getobjecttag(), attrName2, attrValue2, evaluable.getClass().getSimpleName()));
-//			}
-//		// constant
-//		} else if(evaluable instanceof Constant){
-//			Constant constant = (Constant) evaluable;
-//		}
-//	}
+	private void validateMandatoryConstraint(IomObject iomObj, MandatoryConstraint mandatoryConstraintObj) {
+		Evaluable condition = (Evaluable) mandatoryConstraintObj.getCondition();
+		Value conditionValue = evaluateExpression(iomObj, condition);
+		if (conditionValue.isTrue()){
+			// ok
+		} else {
+			errs.addEvent(errFact.logErrorMsg("Mandatory Constraint {0} is not true.", mandatoryConstraintObj.getName()));
+		}
+	}
 
-//	private boolean validateMandatoryExpression(IomObject iomObj, Expression expression) {
-//		int attrLeftValue;
-//		int attrRightValue;
-//		if(expression instanceof Conjunction){
-//			// AND
-////			if(attrLeftValue && attrRightValue){
-////				
-////			}
-//		} else if(expression instanceof DefinedCheck){
-//			// DEFINED
-//			String definedAttr = ((DefinedCheck) expression).getArgument().toString();
-//			String attrValue = iomObj.getattrvalue(definedAttr);
-//			if(attrValue == null){
-//				return false;
+	private Value evaluateExpression(IomObject iomObj, Evaluable expression) {
+		if(expression instanceof Equality){
+			// ==
+			Equality equality = (Equality) expression;
+			Evaluable leftExpression = (Evaluable) equality.getLeft();
+			Evaluable rightExpression = (Evaluable) equality.getRight();
+			Value leftValue=evaluateExpression(iomObj,leftExpression);
+			// if leftValue is false, skip the evaluation.
+			if (leftValue.skipEvaluation()){
+				return Value.createSkipEvaluation();
+			}
+			Value rightValue=evaluateExpression(iomObj,rightExpression);
+			if (rightValue.skipEvaluation()){
+				return Value.createSkipEvaluation();
+			}
+			if (leftValue.equals(rightValue)){
+				return new Value(true);
+			} else {
+				return new Value(false);
+			}
+		} else if(expression instanceof GreaterThan){
+			// >
+			GreaterThan greaterThan = (GreaterThan) expression;
+			Evaluable leftExpression = (Evaluable) greaterThan.getLeft();
+			Value leftValue=evaluateExpression(iomObj,leftExpression);
+			if (leftValue.skipEvaluation()){				
+				return Value.createSkipEvaluation();
+			}
+			Evaluable rightExpression = (Evaluable) greaterThan.getRight();
+			Value rightValue=evaluateExpression(iomObj,rightExpression);
+			if (rightValue.skipEvaluation()){
+				return Value.createSkipEvaluation();
+			}
+//			if (leftValue > rightValue.){
+//				return new Value(true);
+//			} else {
+//				return new Value(false);
 //			}
-//		} else if(expression instanceof Disjunction){
-//			// OR
-////			if(attrLeftValue || attrRightValue){
-////				
-////			}
-//		} else if(expression instanceof Equality){
-//			ObjectPath attrLeftName = (ObjectPath) ((Equality) expression).getLeft();
-//			ObjectPath attrRightName = (ObjectPath) ((Equality) expression).getRight();
-//			attrLeftValue = Integer.parseInt(iomObj.getattrvalue(attrLeftName.getLastPathEl().getName()));
-//			attrRightValue = Integer.parseInt(iomObj.getattrvalue(attrRightName.getLastPathEl().getName()));
-//			if(!(attrLeftValue == attrRightValue)){
-//				return false;
+		} else if(expression instanceof GreaterThanOrEqual){
+			// >=
+			GreaterThanOrEqual greaterThanOrEqual = (GreaterThanOrEqual) expression;
+			Evaluable leftExpression = (Evaluable) greaterThanOrEqual.getLeft();
+			Value leftValue=evaluateExpression(iomObj,leftExpression);
+			if (leftValue.skipEvaluation()){				
+				return Value.createSkipEvaluation();
+			}
+			Evaluable rightExpression = (Evaluable) greaterThanOrEqual.getRight();
+			Value rightValue=evaluateExpression(iomObj,rightExpression);
+			if (rightValue.skipEvaluation()){
+				return Value.createSkipEvaluation();
+			}
+//			if (leftValue > rightValue.){
+//				return new Value(true);
+//			} else {
+//				return new Value(false);
 //			}
-//		} else if(expression instanceof GreaterThan){
-//			ObjectPath attrLeftName = (ObjectPath) ((GreaterThan) expression).getLeft();
-//			ObjectPath attrRightName = (ObjectPath) ((GreaterThan) expression).getRight();
-//			attrLeftValue = Integer.parseInt(iomObj.getattrvalue(attrLeftName.getLastPathEl().getName()));
-//			attrRightValue = Integer.parseInt(iomObj.getattrvalue(attrRightName.getLastPathEl().getName()));
-//			if(!(attrLeftValue > attrRightValue)){
-//				return false;
+		} else if(expression instanceof Inequality){
+			// !=
+			Inequality inequality = (Inequality) expression;
+			Evaluable leftExpression = (Evaluable) inequality.getLeft();
+			Value leftValue=evaluateExpression(iomObj,leftExpression);
+			if (leftValue.skipEvaluation()){				
+				return Value.createSkipEvaluation();
+			}
+			Evaluable rightExpression = (Evaluable) inequality.getRight();
+			Value rightValue=evaluateExpression(iomObj,rightExpression);
+			if (rightValue.skipEvaluation()){
+				return Value.createSkipEvaluation();
+			}
+			if (!leftValue.equals(rightValue)){
+				return new Value(true);
+			} else {
+				return new Value(false);
+			}
+		} else if(expression instanceof LessThan){
+			// <
+			LessThan lessThan = (LessThan) expression;
+			Evaluable leftExpression = (Evaluable) lessThan.getLeft();
+			Value leftValue=evaluateExpression(iomObj,leftExpression);
+			if (leftValue.skipEvaluation()){				
+				return Value.createSkipEvaluation();
+			}
+			Evaluable rightExpression = (Evaluable) lessThan.getRight();
+			Value rightValue=evaluateExpression(iomObj,rightExpression);
+			if (rightValue.skipEvaluation()){
+				return Value.createSkipEvaluation();
+			}
+//			if (leftValue > rightValue){
+//				return new Value(true);
+//			} else {
+//				return new Value(false);
 //			}
-//		} else if(expression instanceof GreaterThanOrEqual){
-//			ObjectPath attrLeftName = (ObjectPath) ((GreaterThanOrEqual) expression).getLeft();
-//			ObjectPath attrRightName = (ObjectPath) ((GreaterThanOrEqual) expression).getRight();
-//			
-//			PathEl ref = (PathEl) attrLeftName.getLastPathEl();
-//			LocalAttribute aa = (LocalAttribute) ref.getViewable().getAttributesAndRoles2();
-//			
-//			
-//			// Bedingungen je nach Typ anders --> Seite 62 Ref2.
-//			
-//			
-//			attrLeftValue = Integer.parseInt(iomObj.getattrvalue(attrLeftName.getLastPathEl().getName()));
-//			attrRightValue = Integer.parseInt(iomObj.getattrvalue(attrRightName.getLastPathEl().getName()));
-//			if(!(attrLeftValue >= attrRightValue)){
-//				return false;
+		} else if(expression instanceof LessThanOrEqual){
+			// <=
+			LessThanOrEqual lessThanOrEqual = (LessThanOrEqual) expression;
+			Evaluable leftExpression = (Evaluable) lessThanOrEqual.getLeft();
+			Value leftValue=evaluateExpression(iomObj,leftExpression);
+			if (leftValue.skipEvaluation()){				
+				return Value.createSkipEvaluation();
+			}
+			Evaluable rightExpression = (Evaluable) lessThanOrEqual.getRight();
+			Value rightValue=evaluateExpression(iomObj,rightExpression);
+			if (rightValue.skipEvaluation()){
+				return Value.createSkipEvaluation();
+			}
+//			if (leftValue > rightValue.){
+//				return new Value(true);
+//			} else {
+//				return new Value(false);
 //			}
-//		} else if(expression instanceof Inequality){
-//			ObjectPath attrLeftName = (ObjectPath) ((Inequality) expression).getLeft();
-//			ObjectPath attrRightName = (ObjectPath) ((Inequality) expression).getRight();
-//			attrLeftValue = Integer.parseInt(iomObj.getattrvalue(attrLeftName.getLastPathEl().getName()));
-//			attrRightValue = Integer.parseInt(iomObj.getattrvalue(attrRightName.getLastPathEl().getName()));
-//			if(!(attrLeftValue != attrRightValue)){
-//				return false;
-//			}
-//		} else if(expression instanceof LessThan){
-//			ObjectPath attrLeftName = (ObjectPath) ((LessThan) expression).getLeft();
-//			ObjectPath attrRightName = (ObjectPath) ((LessThan) expression).getRight();
-//			attrLeftValue = Integer.parseInt(iomObj.getattrvalue(attrLeftName.getLastPathEl().getName()));
-//			attrRightValue = Integer.parseInt(iomObj.getattrvalue(attrRightName.getLastPathEl().getName()));
-//			if(!(attrLeftValue < attrRightValue)){
-//				return false;
-//			}
-//		} else if(expression instanceof LessThanOrEqual){
-//			ObjectPath attrLeftName = (ObjectPath) ((LessThanOrEqual) expression).getLeft();
-//			ObjectPath attrRightName = (ObjectPath) ((LessThanOrEqual) expression).getRight();
-//			attrLeftValue = Integer.parseInt(iomObj.getattrvalue(attrLeftName.getLastPathEl().getName()));
-//			attrRightValue = Integer.parseInt(iomObj.getattrvalue(attrRightName.getLastPathEl().getName()));
-//			if(!(attrLeftValue <= attrRightValue)){
-//				return false;
-//			}
-//		} else if(expression instanceof Negation){
-//			// NOT
-//			String negatedAttr = ((Negation) expression).getNegated().toString();
-//			String attrValue = iomObj.getattrvalue(negatedAttr);
-//			if(negatedAttr == attrValue){
-//				return false;
-//			}
-//		}
-//		return true;
-//	}
+		} else if(expression instanceof Negation){
+			// NOT
+			Negation negation = (Negation) expression;				
+			Value arg=evaluateExpression(iomObj,negation.getNegated());
+			if(arg.isTrue()){
+				return new Value(false);
+			} else {
+				return new Value(true);
+			}
+		} else if(expression instanceof Conjunction){
+			// AND
+			Conjunction conjunction = (Conjunction) expression;
+			Evaluable[] conjunctionArray = (Evaluable[]) conjunction.getConjoined();
+			for (int i=0;i<conjunctionArray.length;i++){
+				Value arg=evaluateExpression(iomObj,conjunctionArray[i]);
+				if(!arg.isTrue()){
+					return new Value(false);
+				}
+			}
+			return new Value(true);
+		} else if(expression instanceof DefinedCheck){
+			// DEFINED
+			DefinedCheck defined = (DefinedCheck) expression;
+			Value arg=evaluateExpression(iomObj,defined.getArgument());
+			if(arg != null){
+				return new Value(true);
+			} else {
+				return new Value(false);
+			}
+		} else if(expression instanceof Disjunction){
+			// OR
+			Disjunction disjunction = (Disjunction) expression;
+			Evaluable[] disjunctionArray = (Evaluable[]) disjunction.getDisjoined();
+			for (int i=0;i<disjunctionArray.length;i++){
+				Value arg=evaluateExpression(iomObj,disjunctionArray[i]);
+				if(arg.isTrue()){
+					return new Value(true);
+				}
+			}
+			return new Value(false);
+		} else if(expression instanceof Constant){
+			// constant
+			Constant constantObj = (Constant) expression;
+			if (constantObj instanceof Constant.EnumConstOrRange){
+				Constant.EnumConstOrRange enumConstOrRange = (Constant.EnumConstOrRange) constantObj;
+				// enumConstOrRange
+				if(enumConstOrRange instanceof Enumeration){
+					// enumeration
+					Enumeration enumObj = (Enumeration) enumConstOrRange;
+					String[] value = enumObj.getValue();
+					if (value[0].equals("true")){
+						return new Value(true);
+					} else if (value[0].equals("false")){
+						return new Value(false);
+					}
+				} else if (enumConstOrRange instanceof EnumerationRange){
+					// constant.enumerationRange
+				}
+			} else if (constantObj instanceof Constant.AttributePath){
+				// attribute path
+			} else if (constantObj instanceof Constant.Class){
+				// class
+			} else if (constantObj instanceof Constant.Numeric){
+				// numeric
+			} else if (constantObj instanceof Constant.ReferenceToMetaObject){
+				// reference to meta object
+			} else if (constantObj instanceof Constant.Structured){
+				// structured
+			} else if (constantObj instanceof Constant.Text){
+				// text
+			} else if (constantObj instanceof Constant.Undefined){
+				// undefined
+			}
+		} else if(expression instanceof ConditionalExpression){
+			// conditional expression	
+			ConditionalExpression conditionalExpressionObj = (ConditionalExpression) expression;
+			
+		} else if(expression instanceof FunctionCall){
+			// function call	
+			FunctionCall functionCallObj = (FunctionCall) expression;
+			
+		} else if(expression instanceof InspectionFactor){
+			// inspection factor	
+			InspectionFactor inspectionFactorObj = (InspectionFactor) expression;
+			
+		} else if(expression instanceof LengthOfReferencedText){
+			// length of referenced text	
+			LengthOfReferencedText lengthOfReferencedTextObj = (LengthOfReferencedText) expression;
+			
+		} else if(expression instanceof ObjectPath){
+			// object path	
+			ObjectPath objectPathObj = (ObjectPath) expression;
+			String attrName = objectPathObj.getLastPathEl().getName();
+			String objValue = iomObj.getattrvalue(attrName);
+			if (objValue.equals("true")){
+				return new Value(true);
+			} else if (objValue.equals("false")){
+				return new Value(false);
+			}
+		} else if(expression instanceof Objects){
+			// objects
+			Objects objectsObj = (Objects) expression;
+			
+		} else if(expression instanceof ParameterValue){
+			// parameter value
+			ParameterValue parameterValueObj = (ParameterValue) expression;
+			
+		} else if(expression instanceof ViewableAggregate){
+			// viewable aggregate	
+			ViewableAggregate viewableAggregateObj = (ViewableAggregate) expression;
+			
+		} else if(expression instanceof ViewableAlias){
+			// viewable alias
+			ViewableAlias viewableAliasObj = (ViewableAlias) expression;
+		}
+		return null;
+	}
+	
 
 	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {
 		int nrOfTargetObjs=linkPool.getTargetObjectCount(iomObj,role);
@@ -750,12 +885,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	// Declaration of the uniqueness of Oid's.
 	String uniquenessOfOid = null;
-	// Declaration of the previous used class to validate in unique constraint, if there is a new class to validate.
-	String previousClassName = null;
 	// HashMap of unique constraints.
-	HashMap<AttributeArray, String> seenValues = new HashMap<AttributeArray, String>();
-	// List of all arrayLists of unique attributes.
-	ArrayList<ArrayList<String>> listOfUniqueAttrsLists = new ArrayList<ArrayList<String>>();
+	HashMap<ArrayList<String>, HashSet<AttributeArray>> seenValues = new HashMap<ArrayList<String>, HashSet<AttributeArray>>();
+	// List of all arrayLists of unique attributes and classes.
+	ArrayList<ArrayList<String>> listOfUniqueObj = new ArrayList<ArrayList<String>>();
 	// List of all object Oid's and associated classPath's of uniqueness validate of Oid's.
 	Map<String , String> uniqueObjectIDs = new HashMap<String, String>();
 	
@@ -856,38 +989,30 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 		// Uniqueness
 		if(isObject){
-			
-			// get the current class name
-			String currentClassName = aclass1.getName().toString();
-			// if it is a new class, clear the lists with content of previous class
-//			if (previousClassName != null && !currentClassName.equals(previousClassName)){
-//				listOfUniqueAttrsLists.clear();
-//				seenValues.clear();
-//				
-//			} 
 			Iterator attrI=aclass1.iterator();
 			while (attrI.hasNext()) {
 				Object obj1 = attrI.next();
 				if(obj1 instanceof UniquenessConstraint){
 					UniquenessConstraint uniqueConstraint=(UniquenessConstraint) obj1;
 					StringBuilder contentUniqueAttrs = new StringBuilder();
-					ArrayList<String> uniqueAttrs=new ArrayList<String>();
+					ArrayList<String> uniqueConstraintAttrs=new ArrayList<String>();
+					// gets all constraint attribute-names.
 					Iterator iter = uniqueConstraint.getElements().iteratorAttribute();
-					while (iter.hasNext()) {
+					uniqueConstraintAttrs.add(aclass1.toString());
+					while (iter.hasNext()){
 						ObjectPath object = (ObjectPath)iter.next();
-						uniqueAttrs.add(object.getLastPathEl().getName());
+						uniqueConstraintAttrs.add(object.getLastPathEl().getName());
 						contentUniqueAttrs.append(object.getLastPathEl().getName());
 					}
-					// if list not contains the current unique attributes, add these to the list. list can be null.
-					if (!listOfUniqueAttrsLists.contains(uniqueAttrs)){
-						listOfUniqueAttrsLists.add(uniqueAttrs);
+					if (!listOfUniqueObj.contains(uniqueConstraintAttrs)){
+						listOfUniqueObj.add(uniqueConstraintAttrs);
 					}
-					AttributeArray returnValue = validateUnique(iomObj,uniqueAttrs);
-					previousClassName = aclass1.getName().toString();
+					AttributeArray returnValue = validateUnique(iomObj,uniqueConstraintAttrs);
+					
 					if (returnValue == null){
 						// ok
 					} else {
-						errs.addEvent(errFact.logErrorMsg("Unique is violated! Values {0} already exist in Object: {1}", returnValue.valuesAsString(), seenValues.get(returnValue)));
+						errs.addEvent(errFact.logErrorMsg("Unique is violated! Values {0} already exist in Object: {1}", returnValue.valuesAsString(), returnValue.getOid()));
 					}
 				}
 			}
@@ -1104,7 +1229,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private AttributeArray validateUnique(IomObject currentObject,ArrayList<String>uniqueAttrs) {
 		int sizeOfUniqueAttribute = uniqueAttrs.size();
 		ArrayList<String> accu = new ArrayList<String>();
-		for (int i=0;i<sizeOfUniqueAttribute;i++){
+		for (int i=1;i<sizeOfUniqueAttribute;i++){
 			String attrValue=currentObject.getattrvalue(uniqueAttrs.get(i));
 			if(attrValue==null){
 				IomObject refObj=currentObject.getattrobj(uniqueAttrs.get(i),0);
@@ -1117,11 +1242,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			accu.add(attrValue);
 		}
-		AttributeArray values=new AttributeArray(accu);
-		if (seenValues.containsKey(values)){
-			return values;
+		AttributeArray values=new AttributeArray(currentObject.getobjectoid(), accu);
+		HashSet<AttributeArray> allValues = new HashSet<AttributeArray>();
+		allValues.add(values);
+		if (seenValues.containsKey(uniqueAttrs)){
+			HashSet<AttributeArray> valuesOfKey = seenValues.get(uniqueAttrs);
+			if (valuesOfKey.equals(allValues)){
+				return values;
+			}
 		} else {
-			seenValues.put(values, currentObject.getobjectoid());
+			seenValues.put(uniqueAttrs, allValues);
 		}
 		return null;
 	}
