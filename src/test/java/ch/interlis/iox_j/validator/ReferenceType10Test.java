@@ -59,6 +59,7 @@ public class ReferenceType10Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(REFERENCETYPE10_TOPICA,BID1));
@@ -84,6 +85,7 @@ public class ReferenceType10Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(REFERENCETYPE10_TOPICA,BID1));
@@ -94,5 +96,6 @@ public class ReferenceType10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
+		assertEquals("OID o2 not found in target class ReferenceType10.TopicA.ClassA.", logger.getErrs().get(0).getEventMsg());
 	}
 }

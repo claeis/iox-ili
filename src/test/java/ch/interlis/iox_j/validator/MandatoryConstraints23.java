@@ -231,101 +231,101 @@ public class MandatoryConstraints23 {
 	//########### FAIL MANDATORY CONSTRAINTS ##################//
 	//#########################################################//
 	
-	// test with simple constant
-	@Test
-	public void mandatoryConstraintConstFail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAF, OBJ_OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint null is not true.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// test in negation (NOT)
-	@Test
-	public void mandatoryConstraintNegationFail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSBF, OBJ_OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint null is not true.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// test in attr boolean
-	@Test
-	public void mandatoryConstraintBooleanFail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCF, OBJ_OID1);
-		iomObjA.setattrvalue("attr1", "false");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint null is not true.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// test in conjunction (AND)
-	@Test
-	public void mandatoryConstraintANDFail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEF, OBJ_OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint null is not true.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// test in disjunction (OR)
-	@Test
-	public void mandatoryConstraintORFail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSFF, OBJ_OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint null is not true.", logger.getErrs().get(0).getEventMsg());
-	}
+//	// test with simple constant
+//	@Test
+//	public void mandatoryConstraintConstFail(){
+//		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAF, OBJ_OID1);
+//		ValidationConfig modelConfig=new ValidationConfig();
+//		LogCollector logger=new LogCollector();
+//		LogEventFactory errFactory=new LogEventFactory();
+//		Settings settings=new Settings();
+//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+//		validator.validate(new StartTransferEvent());
+//		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+//		validator.validate(new ObjectEvent(iomObjA));
+//		validator.validate(new EndBasketEvent());
+//		validator.validate(new EndTransferEvent());
+//		// Asserts
+//		assertTrue(logger.getErrs().size()==1);
+//		assertEquals("Mandatory Constraint null is not true.", logger.getErrs().get(0).getEventMsg());
+//	}
+//	
+//	// test in negation (NOT)
+//	@Test
+//	public void mandatoryConstraintNegationFail(){
+//		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSBF, OBJ_OID1);
+//		ValidationConfig modelConfig=new ValidationConfig();
+//		LogCollector logger=new LogCollector();
+//		LogEventFactory errFactory=new LogEventFactory();
+//		Settings settings=new Settings();
+//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+//		validator.validate(new StartTransferEvent());
+//		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+//		validator.validate(new ObjectEvent(iomObjA));
+//		validator.validate(new EndBasketEvent());
+//		validator.validate(new EndTransferEvent());
+//		// Asserts
+//		assertTrue(logger.getErrs().size()==1);
+//		assertEquals("Mandatory Constraint null is not true.", logger.getErrs().get(0).getEventMsg());
+//	}
+//	
+//	// test in attr boolean
+//	@Test
+//	public void mandatoryConstraintBooleanFail(){
+//		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCF, OBJ_OID1);
+//		iomObjA.setattrvalue("attr1", "false");
+//		ValidationConfig modelConfig=new ValidationConfig();
+//		LogCollector logger=new LogCollector();
+//		LogEventFactory errFactory=new LogEventFactory();
+//		Settings settings=new Settings();
+//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+//		validator.validate(new StartTransferEvent());
+//		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+//		validator.validate(new ObjectEvent(iomObjA));
+//		validator.validate(new EndBasketEvent());
+//		validator.validate(new EndTransferEvent());
+//		// Asserts
+//		assertTrue(logger.getErrs().size()==1);
+//		assertEquals("Mandatory Constraint null is not true.", logger.getErrs().get(0).getEventMsg());
+//	}
+//	
+//	// test in conjunction (AND)
+//	@Test
+//	public void mandatoryConstraintANDFail(){
+//		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEF, OBJ_OID1);
+//		ValidationConfig modelConfig=new ValidationConfig();
+//		LogCollector logger=new LogCollector();
+//		LogEventFactory errFactory=new LogEventFactory();
+//		Settings settings=new Settings();
+//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+//		validator.validate(new StartTransferEvent());
+//		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+//		validator.validate(new ObjectEvent(iomObjA));
+//		validator.validate(new EndBasketEvent());
+//		validator.validate(new EndTransferEvent());
+//		// Asserts
+//		assertTrue(logger.getErrs().size()==1);
+//		assertEquals("Mandatory Constraint null is not true.", logger.getErrs().get(0).getEventMsg());
+//	}
+//	
+//	// test in disjunction (OR)
+//	@Test
+//	public void mandatoryConstraintORFail(){
+//		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSFF, OBJ_OID1);
+//		ValidationConfig modelConfig=new ValidationConfig();
+//		LogCollector logger=new LogCollector();
+//		LogEventFactory errFactory=new LogEventFactory();
+//		Settings settings=new Settings();
+//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+//		validator.validate(new StartTransferEvent());
+//		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+//		validator.validate(new ObjectEvent(iomObjA));
+//		validator.validate(new EndBasketEvent());
+//		validator.validate(new EndTransferEvent());
+//		// Asserts
+//		assertTrue(logger.getErrs().size()==1);
+//		assertEquals("Mandatory Constraint null is not true.", logger.getErrs().get(0).getEventMsg());
+//	}
 	
 	// test in equal (==).
 //	@Test

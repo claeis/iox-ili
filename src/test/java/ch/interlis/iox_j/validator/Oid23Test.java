@@ -176,7 +176,6 @@ public class Oid23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
 	//#############################################################//
 	//######################### FAIL ##############################//
 	//#############################################################//
@@ -218,6 +217,7 @@ public class Oid23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
+		assertEquals("The OID b1 of object 'Oid23.Topic.ClassC oid b1 {}' already exists in CLASS Oid23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
 	public void undefinedOidFail(){

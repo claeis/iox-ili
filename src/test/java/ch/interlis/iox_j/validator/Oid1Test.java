@@ -63,26 +63,6 @@ public class Oid1Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	@Test
-	public void differentTableDuplicateOidOk() throws Exception {
-		Iom_jObject objB1=new Iom_jObject(OID1_CLASSB, OID1);
-		Iom_jObject objB2=new Iom_jObject(OID1_CLASSB, OID2);
-		Iom_jObject objC1=new Iom_jObject(OID1_CLASSC, OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(OID1_TOPIC,START_BASKET_EVENT));
-		validator.validate(new ObjectEvent(objB1));
-		validator.validate(new ObjectEvent(objB2));
-		validator.validate(new ObjectEvent(objC1));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
 	
 	//#########################################################//
 	//######################### FAIL ##########################//
@@ -105,5 +85,27 @@ public class Oid1Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("The OID o1 of object 'Oid1.Topic.ClassB oid o1 {}' already exists in CLASS Oid1.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void differentTableDuplicateOidOk() throws Exception {
+		Iom_jObject objB1=new Iom_jObject(OID1_CLASSB, OID1);
+		Iom_jObject objB2=new Iom_jObject(OID1_CLASSB, OID2);
+		Iom_jObject objC1=new Iom_jObject(OID1_CLASSC, OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(OID1_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(objB1));
+		validator.validate(new ObjectEvent(objB2));
+		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("The OID o1 of object 'Oid1.Topic.ClassC oid o1 {}' already exists in CLASS Oid1.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
 	}
 }

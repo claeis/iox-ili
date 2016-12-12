@@ -103,12 +103,15 @@ import ch.interlis.models.IlisMeta07.ModelData.AttributeRefType;
 public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_DO_ITF_LINETABLES="ch.interlis.iox_j.validator.doItfLinetables";
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
+	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
+	public static final String CONFIG_DO_ITF_OIDPERTABLE_DO="doItfOidPerTable";
 	
 	private ch.interlis.iox.IoxValidationConfig validationConfig=null;
 	private IoxLogging errs=null;
 	private LogEventFactory errFact=null;
 	private TransferDescription td=null;
 	private boolean doItfLineTables=false;
+	private boolean doItfOidPerTable=false;
 	private Settings config=null;
 	private boolean validationOff=false;
 
@@ -121,6 +124,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		this.errFact = errFact;
 		this.config=config;
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
+		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(config.getValue(CONFIG_DO_ITF_OIDPERTABLE));
 		if(doItfLineTables){
 			tag2class=ch.interlis.iom_j.itf.ModelUtilities.getTagMap(td);
 		}else{
@@ -189,10 +193,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						validateExistenceConstraint(iomObj, existenceConstraintObj);
 					}
 					// mandatory constraint
-					if(objA instanceof MandatoryConstraint){
-						MandatoryConstraint mandatoryConstraintObj=(MandatoryConstraint) objA;
-						validateMandatoryConstraint(iomObj, mandatoryConstraintObj);
-					}
+//					if(objA instanceof MandatoryConstraint){
+//						MandatoryConstraint mandatoryConstraintObj=(MandatoryConstraint) objA;
+//						validateMandatoryConstraint(iomObj, mandatoryConstraintObj);
+//					}
 				}
 				Iterator<ViewableTransferElement> attrIterator=currentClass.getAttributesAndRoles2();
 				while (attrIterator.hasNext()) {
@@ -220,252 +224,252 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private void validateMandatoryConstraint(IomObject iomObj, MandatoryConstraint mandatoryConstraintObj) {
-		Evaluable condition = (Evaluable) mandatoryConstraintObj.getCondition();
-		Value conditionValue = evaluateExpression(iomObj, condition);
-		if (conditionValue.isTrue()){
-			// ok
-		} else {
-			errs.addEvent(errFact.logErrorMsg("Mandatory Constraint {0} is not true.", mandatoryConstraintObj.getName()));
-		}
-	}
+//	private void validateMandatoryConstraint(IomObject iomObj, MandatoryConstraint mandatoryConstraintObj) {
+//		Evaluable condition = (Evaluable) mandatoryConstraintObj.getCondition();
+//		Value conditionValue = evaluateExpression(iomObj, condition);
+//		if (conditionValue.isTrue()){
+//			// ok
+//		} else {
+//			errs.addEvent(errFact.logErrorMsg("Mandatory Constraint {0} is not true.", mandatoryConstraintObj.getName()));
+//		}
+//	}
 
-	private Value evaluateExpression(IomObject iomObj, Evaluable expression) {
-		if(expression instanceof Equality){
-			// ==
-			Equality equality = (Equality) expression;
-			Evaluable leftExpression = (Evaluable) equality.getLeft();
-			Evaluable rightExpression = (Evaluable) equality.getRight();
-			Value leftValue=evaluateExpression(iomObj,leftExpression);
-			// if leftValue is false, skip the evaluation.
-			if (leftValue.skipEvaluation()){
-				return Value.createSkipEvaluation(); // return false
-			} else {
-				Value.safeLeftValue();
-			}
-			Value rightValue=evaluateExpression(iomObj,rightExpression);
-			if (rightValue.skipEvaluation()){
-				return Value.createSkipEvaluation();
-			} else {
-				Value.safeRightValue();
-			}
-			if (Value.getLeftValue().equals(Value.getRightValue())){
-				return new Value(true);
-			} else {
-				return new Value(false);
-			}
-		} else if(expression instanceof GreaterThan){
-			// >
-			GreaterThan greaterThan = (GreaterThan) expression;
-			Evaluable leftExpression = (Evaluable) greaterThan.getLeft();
-			Value leftValue=evaluateExpression(iomObj,leftExpression);
-			if (leftValue.skipEvaluation()){				
-				return Value.createSkipEvaluation();
-			}
-			Evaluable rightExpression = (Evaluable) greaterThan.getRight();
-			Value rightValue=evaluateExpression(iomObj,rightExpression);
-			if (rightValue.skipEvaluation()){
-				return Value.createSkipEvaluation();
-			}
-//			if (leftValue > rightValue.){
+//	private Value evaluateExpression(IomObject iomObj, Evaluable expression) {
+//		if(expression instanceof Equality){
+//			// ==
+//			Equality equality = (Equality) expression;
+//			Evaluable leftExpression = (Evaluable) equality.getLeft();
+//			Evaluable rightExpression = (Evaluable) equality.getRight();
+//			Value leftValue=evaluateExpression(iomObj,leftExpression);
+//			// if leftValue is false, skip the evaluation.
+//			if (leftValue.skipEvaluation()){
+//				return Value.createSkipEvaluation(); // return false
+//			} else {
+//				Value.safeLeftValue();
+//			}
+//			Value rightValue=evaluateExpression(iomObj,rightExpression);
+//			if (rightValue.skipEvaluation()){
+//				return Value.createSkipEvaluation();
+//			} else {
+//				Value.safeRightValue();
+//			}
+//			if (Value.getLeftValue().equals(Value.getRightValue())){
 //				return new Value(true);
 //			} else {
 //				return new Value(false);
 //			}
-		} else if(expression instanceof GreaterThanOrEqual){
-			// >=
-			GreaterThanOrEqual greaterThanOrEqual = (GreaterThanOrEqual) expression;
-			Evaluable leftExpression = (Evaluable) greaterThanOrEqual.getLeft();
-			Value leftValue=evaluateExpression(iomObj,leftExpression);
-			if (leftValue.skipEvaluation()){				
-				return Value.createSkipEvaluation();
-			}
-			Evaluable rightExpression = (Evaluable) greaterThanOrEqual.getRight();
-			Value rightValue=evaluateExpression(iomObj,rightExpression);
-			if (rightValue.skipEvaluation()){
-				return Value.createSkipEvaluation();
-			}
-//			if (leftValue > rightValue.){
+//		} else if(expression instanceof GreaterThan){
+//			// >
+//			GreaterThan greaterThan = (GreaterThan) expression;
+//			Evaluable leftExpression = (Evaluable) greaterThan.getLeft();
+//			Value leftValue=evaluateExpression(iomObj,leftExpression);
+//			if (leftValue.skipEvaluation()){				
+//				return Value.createSkipEvaluation();
+//			}
+//			Evaluable rightExpression = (Evaluable) greaterThan.getRight();
+//			Value rightValue=evaluateExpression(iomObj,rightExpression);
+//			if (rightValue.skipEvaluation()){
+//				return Value.createSkipEvaluation();
+//			}
+////			if (leftValue > rightValue.){
+////				return new Value(true);
+////			} else {
+////				return new Value(false);
+////			}
+//		} else if(expression instanceof GreaterThanOrEqual){
+//			// >=
+//			GreaterThanOrEqual greaterThanOrEqual = (GreaterThanOrEqual) expression;
+//			Evaluable leftExpression = (Evaluable) greaterThanOrEqual.getLeft();
+//			Value leftValue=evaluateExpression(iomObj,leftExpression);
+//			if (leftValue.skipEvaluation()){				
+//				return Value.createSkipEvaluation();
+//			}
+//			Evaluable rightExpression = (Evaluable) greaterThanOrEqual.getRight();
+//			Value rightValue=evaluateExpression(iomObj,rightExpression);
+//			if (rightValue.skipEvaluation()){
+//				return Value.createSkipEvaluation();
+//			}
+////			if (leftValue > rightValue.){
+////				return new Value(true);
+////			} else {
+////				return new Value(false);
+////			}
+//		} else if(expression instanceof Inequality){
+//			// != or <>
+//			Inequality inequality = (Inequality) expression;
+//			Evaluable leftExpression = (Evaluable) inequality.getLeft();
+//			Evaluable rightExpression = (Evaluable) inequality.getRight();
+//			Value leftValue=evaluateExpression(iomObj,leftExpression);
+//			// if leftValue is false, skip the evaluation.
+//			if (leftValue.skipEvaluation()){
+//				return Value.createSkipEvaluation(); // return false
+//			} else {
+//				Value.safeLeftValue();
+//			}
+//			Value rightValue=evaluateExpression(iomObj,rightExpression);
+//			if (rightValue.skipEvaluation()){
+//				return Value.createSkipEvaluation();
+//			} else {
+//				Value.safeRightValue();
+//			}
+//			if (!Value.getLeftValue().equals(Value.getRightValue())){
 //				return new Value(true);
 //			} else {
 //				return new Value(false);
 //			}
-		} else if(expression instanceof Inequality){
-			// != or <>
-			Inequality inequality = (Inequality) expression;
-			Evaluable leftExpression = (Evaluable) inequality.getLeft();
-			Evaluable rightExpression = (Evaluable) inequality.getRight();
-			Value leftValue=evaluateExpression(iomObj,leftExpression);
-			// if leftValue is false, skip the evaluation.
-			if (leftValue.skipEvaluation()){
-				return Value.createSkipEvaluation(); // return false
-			} else {
-				Value.safeLeftValue();
-			}
-			Value rightValue=evaluateExpression(iomObj,rightExpression);
-			if (rightValue.skipEvaluation()){
-				return Value.createSkipEvaluation();
-			} else {
-				Value.safeRightValue();
-			}
-			if (!Value.getLeftValue().equals(Value.getRightValue())){
-				return new Value(true);
-			} else {
-				return new Value(false);
-			}
-		} else if(expression instanceof LessThan){
-			// <
-			LessThan lessThan = (LessThan) expression;
-			Evaluable leftExpression = (Evaluable) lessThan.getLeft();
-			Value leftValue=evaluateExpression(iomObj,leftExpression);
-			if (leftValue.skipEvaluation()){				
-				return Value.createSkipEvaluation();
-			}
-			Evaluable rightExpression = (Evaluable) lessThan.getRight();
-			Value rightValue=evaluateExpression(iomObj,rightExpression);
-			if (rightValue.skipEvaluation()){
-				return Value.createSkipEvaluation();
-			}
-//			if (leftValue > rightValue){
+//		} else if(expression instanceof LessThan){
+//			// <
+//			LessThan lessThan = (LessThan) expression;
+//			Evaluable leftExpression = (Evaluable) lessThan.getLeft();
+//			Value leftValue=evaluateExpression(iomObj,leftExpression);
+//			if (leftValue.skipEvaluation()){				
+//				return Value.createSkipEvaluation();
+//			}
+//			Evaluable rightExpression = (Evaluable) lessThan.getRight();
+//			Value rightValue=evaluateExpression(iomObj,rightExpression);
+//			if (rightValue.skipEvaluation()){
+//				return Value.createSkipEvaluation();
+//			}
+////			if (leftValue > rightValue){
+////				return new Value(true);
+////			} else {
+////				return new Value(false);
+////			}
+//		} else if(expression instanceof LessThanOrEqual){
+//			// <=
+//			LessThanOrEqual lessThanOrEqual = (LessThanOrEqual) expression;
+//			Evaluable leftExpression = (Evaluable) lessThanOrEqual.getLeft();
+//			Value leftValue=evaluateExpression(iomObj,leftExpression);
+//			if (leftValue.skipEvaluation()){				
+//				return Value.createSkipEvaluation();
+//			}
+//			Evaluable rightExpression = (Evaluable) lessThanOrEqual.getRight();
+//			Value rightValue=evaluateExpression(iomObj,rightExpression);
+//			if (rightValue.skipEvaluation()){
+//				return Value.createSkipEvaluation();
+//			}
+////			if (leftValue > rightValue.){
+////				return new Value(true);
+////			} else {
+////				return new Value(false);
+////			}
+//		} else if(expression instanceof Negation){
+//			// NOT
+//			Negation negation = (Negation) expression;				
+//			Value arg=evaluateExpression(iomObj,negation.getNegated());
+//			if(arg.isTrue()){
+//				return new Value(false);
+//			} else {
+//				return new Value(true);
+//			}
+//		} else if(expression instanceof Conjunction){
+//			// AND
+//			Conjunction conjunction = (Conjunction) expression;
+//			Evaluable[] conjunctionArray = (Evaluable[]) conjunction.getConjoined();
+//			for (int i=0;i<conjunctionArray.length;i++){
+//				Value arg=evaluateExpression(iomObj,conjunctionArray[i]);
+//				if(!arg.isTrue()){
+//					return new Value(false);
+//				}
+//			}
+//			return new Value(true);
+//		} else if(expression instanceof DefinedCheck){
+//			// DEFINED
+//			DefinedCheck defined = (DefinedCheck) expression;
+//			Value arg=evaluateExpression(iomObj,defined.getArgument());
+//			if(arg != null){
 //				return new Value(true);
 //			} else {
 //				return new Value(false);
 //			}
-		} else if(expression instanceof LessThanOrEqual){
-			// <=
-			LessThanOrEqual lessThanOrEqual = (LessThanOrEqual) expression;
-			Evaluable leftExpression = (Evaluable) lessThanOrEqual.getLeft();
-			Value leftValue=evaluateExpression(iomObj,leftExpression);
-			if (leftValue.skipEvaluation()){				
-				return Value.createSkipEvaluation();
-			}
-			Evaluable rightExpression = (Evaluable) lessThanOrEqual.getRight();
-			Value rightValue=evaluateExpression(iomObj,rightExpression);
-			if (rightValue.skipEvaluation()){
-				return Value.createSkipEvaluation();
-			}
-//			if (leftValue > rightValue.){
+//		} else if(expression instanceof Disjunction){
+//			// OR
+//			Disjunction disjunction = (Disjunction) expression;
+//			Evaluable[] disjunctionArray = (Evaluable[]) disjunction.getDisjoined();
+//			for (int i=0;i<disjunctionArray.length;i++){
+//				Value arg=evaluateExpression(iomObj,disjunctionArray[i]);
+//				if(arg.isTrue()){
+//					return new Value(true);
+//				}
+//			}
+//			return new Value(false);
+//		} else if(expression instanceof Constant){
+//			// constant
+//			Constant constantObj = (Constant) expression;
+//			if (constantObj instanceof Constant.EnumConstOrRange){
+//				Constant.EnumConstOrRange enumConstOrRange = (Constant.EnumConstOrRange) constantObj;
+//				// enumConstOrRange
+//				if(enumConstOrRange instanceof Enumeration){
+//					// enumeration
+//					Enumeration enumObj = (Enumeration) enumConstOrRange;
+//					String[] value = enumObj.getValue();
+//					if (value[0].equals("true")){
+//						return new Value(true);
+//					} else if (value[0].equals("false")){
+//						return new Value(false);
+//					}
+//				} else if (enumConstOrRange instanceof EnumerationRange){
+//					// constant.enumerationRange
+//				}
+//			} else if (constantObj instanceof Constant.AttributePath){
+//				// attribute path
+//			} else if (constantObj instanceof Constant.Class){
+//				// class
+//			} else if (constantObj instanceof Constant.Numeric){
+//				// numeric
+//			} else if (constantObj instanceof Constant.ReferenceToMetaObject){
+//				// reference to meta object
+//			} else if (constantObj instanceof Constant.Structured){
+//				// structured
+//			} else if (constantObj instanceof Constant.Text){
+//				// text
+//			} else if (constantObj instanceof Constant.Undefined){
+//				// undefined
+//			}
+//		} else if(expression instanceof ConditionalExpression){
+//			// conditional expression	
+//			ConditionalExpression conditionalExpressionObj = (ConditionalExpression) expression;
+//			
+//		} else if(expression instanceof FunctionCall){
+//			// function call	
+//			FunctionCall functionCallObj = (FunctionCall) expression;
+//			
+//		} else if(expression instanceof InspectionFactor){
+//			// inspection factor	
+//			InspectionFactor inspectionFactorObj = (InspectionFactor) expression;
+//			
+//		} else if(expression instanceof LengthOfReferencedText){
+//			// length of referenced text	
+//			LengthOfReferencedText lengthOfReferencedTextObj = (LengthOfReferencedText) expression;
+//			
+//		} else if(expression instanceof ObjectPath){
+//			// object path	
+//			ObjectPath objectPathObj = (ObjectPath) expression;
+//			String attrName = objectPathObj.getLastPathEl().getName();
+//			String objValue = iomObj.getattrvalue(attrName);
+//			if (objValue.equals("true")){
 //				return new Value(true);
-//			} else {
+//			} else if (objValue.equals("false")){
 //				return new Value(false);
 //			}
-		} else if(expression instanceof Negation){
-			// NOT
-			Negation negation = (Negation) expression;				
-			Value arg=evaluateExpression(iomObj,negation.getNegated());
-			if(arg.isTrue()){
-				return new Value(false);
-			} else {
-				return new Value(true);
-			}
-		} else if(expression instanceof Conjunction){
-			// AND
-			Conjunction conjunction = (Conjunction) expression;
-			Evaluable[] conjunctionArray = (Evaluable[]) conjunction.getConjoined();
-			for (int i=0;i<conjunctionArray.length;i++){
-				Value arg=evaluateExpression(iomObj,conjunctionArray[i]);
-				if(!arg.isTrue()){
-					return new Value(false);
-				}
-			}
-			return new Value(true);
-		} else if(expression instanceof DefinedCheck){
-			// DEFINED
-			DefinedCheck defined = (DefinedCheck) expression;
-			Value arg=evaluateExpression(iomObj,defined.getArgument());
-			if(arg != null){
-				return new Value(true);
-			} else {
-				return new Value(false);
-			}
-		} else if(expression instanceof Disjunction){
-			// OR
-			Disjunction disjunction = (Disjunction) expression;
-			Evaluable[] disjunctionArray = (Evaluable[]) disjunction.getDisjoined();
-			for (int i=0;i<disjunctionArray.length;i++){
-				Value arg=evaluateExpression(iomObj,disjunctionArray[i]);
-				if(arg.isTrue()){
-					return new Value(true);
-				}
-			}
-			return new Value(false);
-		} else if(expression instanceof Constant){
-			// constant
-			Constant constantObj = (Constant) expression;
-			if (constantObj instanceof Constant.EnumConstOrRange){
-				Constant.EnumConstOrRange enumConstOrRange = (Constant.EnumConstOrRange) constantObj;
-				// enumConstOrRange
-				if(enumConstOrRange instanceof Enumeration){
-					// enumeration
-					Enumeration enumObj = (Enumeration) enumConstOrRange;
-					String[] value = enumObj.getValue();
-					if (value[0].equals("true")){
-						return new Value(true);
-					} else if (value[0].equals("false")){
-						return new Value(false);
-					}
-				} else if (enumConstOrRange instanceof EnumerationRange){
-					// constant.enumerationRange
-				}
-			} else if (constantObj instanceof Constant.AttributePath){
-				// attribute path
-			} else if (constantObj instanceof Constant.Class){
-				// class
-			} else if (constantObj instanceof Constant.Numeric){
-				// numeric
-			} else if (constantObj instanceof Constant.ReferenceToMetaObject){
-				// reference to meta object
-			} else if (constantObj instanceof Constant.Structured){
-				// structured
-			} else if (constantObj instanceof Constant.Text){
-				// text
-			} else if (constantObj instanceof Constant.Undefined){
-				// undefined
-			}
-		} else if(expression instanceof ConditionalExpression){
-			// conditional expression	
-			ConditionalExpression conditionalExpressionObj = (ConditionalExpression) expression;
-			
-		} else if(expression instanceof FunctionCall){
-			// function call	
-			FunctionCall functionCallObj = (FunctionCall) expression;
-			
-		} else if(expression instanceof InspectionFactor){
-			// inspection factor	
-			InspectionFactor inspectionFactorObj = (InspectionFactor) expression;
-			
-		} else if(expression instanceof LengthOfReferencedText){
-			// length of referenced text	
-			LengthOfReferencedText lengthOfReferencedTextObj = (LengthOfReferencedText) expression;
-			
-		} else if(expression instanceof ObjectPath){
-			// object path	
-			ObjectPath objectPathObj = (ObjectPath) expression;
-			String attrName = objectPathObj.getLastPathEl().getName();
-			String objValue = iomObj.getattrvalue(attrName);
-			if (objValue.equals("true")){
-				return new Value(true);
-			} else if (objValue.equals("false")){
-				return new Value(false);
-			}
-		} else if(expression instanceof Objects){
-			// objects
-			Objects objectsObj = (Objects) expression;
-			
-		} else if(expression instanceof ParameterValue){
-			// parameter value
-			ParameterValue parameterValueObj = (ParameterValue) expression;
-			
-		} else if(expression instanceof ViewableAggregate){
-			// viewable aggregate	
-			ViewableAggregate viewableAggregateObj = (ViewableAggregate) expression;
-			
-		} else if(expression instanceof ViewableAlias){
-			// viewable alias
-			ViewableAlias viewableAliasObj = (ViewableAlias) expression;
-		}
-		return null;
-	}
+//		} else if(expression instanceof Objects){
+//			// objects
+//			Objects objectsObj = (Objects) expression;
+//			
+//		} else if(expression instanceof ParameterValue){
+//			// parameter value
+//			ParameterValue parameterValueObj = (ParameterValue) expression;
+//			
+//		} else if(expression instanceof ViewableAggregate){
+//			// viewable aggregate	
+//			ViewableAggregate viewableAggregateObj = (ViewableAggregate) expression;
+//			
+//		} else if(expression instanceof ViewableAlias){
+//			// viewable alias
+//			ViewableAlias viewableAliasObj = (ViewableAlias) expression;
+//		}
+//		return null;
+//	}
 	
 
 	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {
@@ -490,34 +494,63 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(targetOid==null){
 			return;
 		}
-		
-		// find target object
-		for (IomObject targetObj:allObjects){
-			String targetObjOid = targetObj.getobjectoid();
-			if(targetObjOid!=null && targetObjOid.equals(targetOid)){
+		// OID has to be unique in each table (ili 1.0)
+		if(doItfOidPerTable){
+			StringBuffer possibleTargetClasses=new StringBuffer();
+			for (IomObject targetObj:allObjects){
 				// validate target class
+				String targetObjOid = targetObj.getobjectoid();
+				String targetObjClassname = targetObj.getobjecttag();
+				Viewable targetObjClass=(Viewable) tag2class.get(targetObjClassname);
+				Iterator<AbstractClassDef> targetIterator = role.iteratorDestination();
+				String sep="";
+				while (targetIterator.hasNext()){
+					Viewable targetClass = (Viewable) targetIterator.next();
+					if(targetClass.equals(targetObjClass)){
+						if(targetObjOid!=null){
+							if(targetObjOid.equals(targetOid)){
+								// target ok
+								return;
+							}
+						}
+						possibleTargetClasses.append(sep);
+						sep=",";
+						possibleTargetClasses.append(targetClass.getScopedName(null));
+					}
+				}
+			}
+			// no object with this oid found
+			errs.addEvent(errFact.logErrorMsg("OID {0} not found in target class {1}.", targetOid, possibleTargetClasses.toString()));
+		} else {
+			// OID has to be unique in the whole file (ili 2.3)
+			// find target object
+			for (IomObject targetObj:allObjects){
+				// validate target class
+				String targetObjOid = targetObj.getobjectoid();
 				String targetObjClassname = targetObj.getobjecttag();
 				Viewable targetObjClass=(Viewable) tag2class.get(targetObjClassname);
 				Iterator<AbstractClassDef> targetIterator = role.iteratorDestination();
 				StringBuffer possibleTargetClasses=new StringBuffer();
 				String sep="";
-				while (targetIterator.hasNext()){
-					Viewable targetClass = (Viewable) targetIterator.next();
-					if(targetObjClass.isExtending(targetClass)){
-						// target is ok
-						return;
+				if(targetObjOid!=null && targetObjOid.equals(targetOid)){
+					while (targetIterator.hasNext()){
+						Viewable targetClass = (Viewable) targetIterator.next();
+						if(targetObjClass.isExtending(targetClass)){
+							// target is ok
+							return;
+						}
+						possibleTargetClasses.append(sep);
+						sep=",";
+						possibleTargetClasses.append(targetClass.getScopedName(null));
 					}
-					possibleTargetClasses.append(sep);
-					sep=",";
-					possibleTargetClasses.append(targetClass.getScopedName(null));
+					// object found, but wrong class
+					errs.addEvent(errFact.logErrorMsg("Object {1} with OID {0} must be of {2}", targetOid,targetObjClassname,possibleTargetClasses.toString()));
+					return;
 				}
-				// object found, but wrong class
-				errs.addEvent(errFact.logErrorMsg("Object {1} with OID {0} must be of {2}", targetOid,targetObjClassname,possibleTargetClasses.toString()));
-				return;
 			}
+			// no object with this oid found
+			errs.addEvent(errFact.logErrorMsg("No object found with OID {0}.", targetOid));
 		}
-		// no object with this oid found
-		errs.addEvent(errFact.logErrorMsg("No object found with OID {0}.", targetOid));
 	}
 	
 	LinkPool linkPool=new LinkPool();
@@ -574,7 +607,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									}
 									return;
 								}
-							} 
+							}
 						}
 						errs.addEvent(errFact.logErrorMsg("attribute {1} references an inexistent object with OID {0}.", targetOid,refAttrName));
 					}
@@ -907,7 +940,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(isObject){
 			errFact.setDataObj(iomObj);
 		}
-		
 		// validate uniqueness of existing objects on OID and className
 		if(isObject){
 			Object modelElementToCompare = tag2class.get(iomObj.getobjecttag());
@@ -920,8 +952,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					Object modelElementOfObject=tag2class.get(objValue.getobjecttag());
 					Viewable classValueOfModelElement= (Viewable) modelElementOfObject;
 					String objOidOfObjValue = objValue.getobjectoid();
-					if (classValueToCompare != null && classValueOfModelElement != null){
-						compareOidAndClassOfObjects(classValueToCompare, objOidToCompare, classValueOfModelElement, objOidOfObjValue, iomObj);
+					// OID has to be unique in each table (ili 1.0)
+					if (doItfOidPerTable){
+						if (classValueToCompare != null && classValueOfModelElement != null){
+							compareOidAndClassOfObjects(classValueToCompare, objOidToCompare, classValueOfModelElement, objOidOfObjValue, iomObj);
+						}
+					// OID has to be unique in the whole file (ili 2.3)
+					} else {
+						if (classValueOfModelElement != null){
+							compareOidOfObject(objOidToCompare, classValueOfModelElement, objOidOfObjValue, iomObj);
+						}
 					}
 				}
 			}
@@ -1017,7 +1057,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						listOfUniqueObj.add(uniqueConstraintAttrs);
 					}
 					AttributeArray returnValue = validateUnique(iomObj,uniqueConstraintAttrs);
-					
 					if (returnValue == null){
 						// ok
 					} else {
@@ -1126,6 +1165,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 	
+	private void compareOidOfObject(String objOidToCompare, Viewable classValueOfModelElement, String objOidOfObjValue, IomObject iomObj) {
+		if (objOidOfObjValue != null && objOidToCompare != null){
+			if (objOidOfObjValue.equals(objOidToCompare)){
+				errs.addEvent(errFact.logErrorMsg("The OID {0} of object '{1}' already exists in {2}.", objOidToCompare, iomObj.toString(), classValueOfModelElement.toString()));
+				return;
+			}
+		}
+	}
+
 	private void compareOidAndClassOfObjects(Viewable classValueToCompare, String objOidToCompare, Viewable classValueOfModelElement, String objOidOfObjValue, IomObject iomObj) {
 		// compare consistency of classes
 		if (classValueOfModelElement.equals(classValueToCompare)){
