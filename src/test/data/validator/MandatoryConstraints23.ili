@@ -44,13 +44,13 @@ MODEL MandatoryConstraints23
 		!! equal (==)
 		CLASS ClassG =
 			MANDATORY CONSTRAINT
-			(#true == #false) == (#true == (#true == (#true)));
+			(#true AND #true) == (#true AND #true);
 		END ClassG;
 		
 		!! not equal (!=)
 		CLASS ClassH =
 			MANDATORY CONSTRAINT
-			(#true != #true) != (#true != (#true != (#false)));
+			(#true AND #true) != (#true AND #false); !! ?? wie kann ich denn den Vergleich machen, wenn bei false abgebrochen wird.
 		END ClassH;
 		
 		!! not equal (<>)

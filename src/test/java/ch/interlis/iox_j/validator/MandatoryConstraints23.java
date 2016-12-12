@@ -174,22 +174,22 @@ public class MandatoryConstraints23 {
 	}
 	
 	// test in equal (==).
-//	@Test
-//	public void mandatoryConstraintEqualOk(){
-//		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSG, OBJ_OID1);
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
-//		validator.validate(new ObjectEvent(iomObjA));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==0);
-//	}
+	@Test
+	public void mandatoryConstraintEqualOk(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSG, OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 	
 	// test in not equal (!=).
 //	@Test
@@ -208,7 +208,7 @@ public class MandatoryConstraints23 {
 //		// Asserts
 //		assertTrue(logger.getErrs().size()==0);
 //	}
-//	
+	
 //	// test in not equal (<>).
 //	@Test
 //	public void mandatoryConstraintNotEqual2Ok(){

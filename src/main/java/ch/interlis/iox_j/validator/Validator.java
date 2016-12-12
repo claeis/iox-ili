@@ -239,13 +239,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Value leftValue=evaluateExpression(iomObj,leftExpression);
 			// if leftValue is false, skip the evaluation.
 			if (leftValue.skipEvaluation()){
-				return Value.createSkipEvaluation();
+				return Value.createSkipEvaluation(); // return false
+			} else {
+				Value.safeLeftValue();
 			}
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			if (rightValue.skipEvaluation()){
 				return Value.createSkipEvaluation();
+			} else {
+				Value.safeRightValue();
 			}
-			if (leftValue.equals(rightValue)){
+			if (Value.getLeftValue().equals(Value.getRightValue())){
 				return new Value(true);
 			} else {
 				return new Value(false);
@@ -287,19 +291,24 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 //				return new Value(false);
 //			}
 		} else if(expression instanceof Inequality){
-			// !=
+			// != or <>
 			Inequality inequality = (Inequality) expression;
 			Evaluable leftExpression = (Evaluable) inequality.getLeft();
-			Value leftValue=evaluateExpression(iomObj,leftExpression);
-			if (leftValue.skipEvaluation()){				
-				return Value.createSkipEvaluation();
-			}
 			Evaluable rightExpression = (Evaluable) inequality.getRight();
+			Value leftValue=evaluateExpression(iomObj,leftExpression);
+			// if leftValue is false, skip the evaluation.
+			if (leftValue.skipEvaluation()){
+				return Value.createSkipEvaluation(); // return false
+			} else {
+				Value.safeLeftValue();
+			}
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			if (rightValue.skipEvaluation()){
 				return Value.createSkipEvaluation();
+			} else {
+				Value.safeRightValue();
 			}
-			if (!leftValue.equals(rightValue)){
+			if (!Value.getLeftValue().equals(Value.getRightValue())){
 				return new Value(true);
 			} else {
 				return new Value(false);

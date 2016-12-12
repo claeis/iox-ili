@@ -4,9 +4,11 @@ import ch.interlis.iom.IomObject;
 
 public class Value {
 	
-	private boolean booleanValue;
+	private static boolean booleanValue;
 	private static Value stringValue;
 	private static IomObject iomObj;
+	private static String left;
+	private static String right;
 	
 	public Value(boolean booleanValue) {
 		this.booleanValue = booleanValue;
@@ -21,20 +23,35 @@ public class Value {
 	}
 	
 	public static Value createSkipEvaluation(){
-		// TODO
-		return null;
+		return new Value(false);
 	}
 	
 	public boolean isTrue(){
 		return booleanValue;
 	}
 	
-	// if boolean is false skip this evaluation.
+	// if boolean is false, return true. --> left boolean is false, so skip the evaluation.
 	public boolean skipEvaluation(){
 		if (booleanValue == false){
-			return false;
-		} else {
 			return true;
+		} else {
+			return false;
 		}
+	}
+
+	public static void safeLeftValue() {
+		left = "true";
+	}
+
+	public static void safeRightValue() {
+		right = "true";
+	}
+	
+	public static String getLeftValue(){
+		return left;
+	}
+	
+	public static String getRightValue(){
+		return right;
 	}
 }
