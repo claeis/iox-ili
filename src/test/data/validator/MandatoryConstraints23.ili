@@ -3,110 +3,339 @@ INTERLIS 2.3;
 MODEL MandatoryConstraints23
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
 	TOPIC Topic=
+		DOMAIN
+			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					        70000.000 .. 310000.000 [INTERLIS.m],
+						   ROTATION 2 -> 1;
+			Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					        70000.000 .. 310000.000 [INTERLIS.m],
+					              0.000 .. 5000.000 [INTERLIS.m];
+			enumeration = (null, eins, zwei, drei, mehr (vier));
+			enumerationOrdered = (null, eins, zwei, drei, mehr (vier)) ORDERED;
 		
-		!! simple constant
-		CLASS ClassA =
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		!!!!!!!!!!!!!! CONSTANT !!!!!!!!!!!!!
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!		
+		
+		!! constant is true
+		CLASS ClassConstantA =
 			MANDATORY CONSTRAINT
 			#true;
-		END ClassA;
+		END ClassConstantA;
 		
-		!! negation (NOT)
-		CLASS ClassB =
+		!! constant negation (NOT)
+		CLASS ClassConstantB =
 			MANDATORY CONSTRAINT
 			NOT(#false);
-		END ClassB;
+		END ClassConstantB;
 		
-		!! boolean
-		CLASS ClassC =
-			attr1 : BOOLEAN;
-			MANDATORY CONSTRAINT
-			attr1;
-		END ClassC;
-		
-		!! defined
-		CLASS ClassD =
+		!! constant defined
+		CLASS ClassConstantD =
 			MANDATORY CONSTRAINT
 			DEFINED(#true);
-		END ClassD;
+		END ClassConstantD;
 		
-		!! conjunction (AND)
-		CLASS ClassE =
+		!! constant conjunction (AND)
+		CLASS ClassConstantE =
 			MANDATORY CONSTRAINT
 			(#true AND (#true AND (#true AND (#true)))) AND #true AND (#true AND (#true));
-		END ClassE;
+		END ClassConstantE;
 		
-		!! disjunction (OR)
-		CLASS ClassF =
+		!! constant disjunction (OR)
+		CLASS ClassConstantF =
 			MANDATORY CONSTRAINT
 			#false OR #false OR #false OR(#false OR (#false OR (#false OR (#true))));
-		END ClassF;
+		END ClassConstantF;
 		
-		!! equal (==)
-		CLASS ClassG =
+		!! constant equal (==)
+		CLASS ClassConstantG =
 			MANDATORY CONSTRAINT
-			(#true AND #true) == (#true AND #true);
-		END ClassG;
+			(#true == #true) == (#true == #true);
+		END ClassConstantG;
 		
-		!! not equal (!=)
-		CLASS ClassH =
+		!! constant not equal (!=)
+		CLASS ClassConstantH =
 			MANDATORY CONSTRAINT
-			(#true AND #true) != (#true AND #false); !! ?? wie kann ich denn den Vergleich machen, wenn bei false abgebrochen wird.
-		END ClassH;
+			(#true AND #true) != (#true AND #false);
+		END ClassConstantH;
 		
-		!! not equal (<>)
-		CLASS ClassI =
+		!! constant not equal (<>)
+		CLASS ClassConstantI =
 			MANDATORY CONSTRAINT
 			(#true <> #true) <> (#true <> (#true <> (#false)));
-		END ClassI;
+		END ClassConstantI;
 		
-		!! simple constant fail
-		CLASS ClassAF =
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		!!!!!!!!!!!!!!! EQUAL !!!!!!!!!!!!!!!
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		
+		!! equal line straightsArcs, arcsStraights (==)
+		CLASS ClassEqualationA =
+			straightsarcs1 : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
+			arcsstraights2 : POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Hkoord;
 			MANDATORY CONSTRAINT
-			#false;
-		END ClassAF;
+		   straightsarcs1 == arcsstraights2;
+		END ClassEqualationA;
 		
-		!! negation (NOT) fail
-		CLASS ClassBF =
+		!! equal surface (==)
+		CLASS ClassEqualationB =
+			surface1 : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			surface2 : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 			MANDATORY CONSTRAINT
-			NOT(#true);
-		END ClassBF;
+		    surface1 == surface2;
+		END ClassEqualationB;
 		
-		!! boolean fail
-		CLASS ClassCF =
+		!! equal area (==)
+		CLASS ClassEqualationC =
+			area1 : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			area2 : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT
+		    area1 == area2;
+		END ClassEqualationC;
+		
+		!! equal line straights, arcs (==)
+		CLASS ClassEqualationD =
+		   straights2d1 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		   straights2d2 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		   arcs2d1 : POLYLINE WITH (ARCS) VERTEX Lkoord;
+		   arcs2d2 : POLYLINE WITH (ARCS) VERTEX Lkoord;
+		   MANDATORY CONSTRAINT
+		   (straights2d1 == straights2d2) == (arcs2d1 == arcs2d2);
+		END ClassEqualationD;
+		
+		!! equal coord (==)
+		CLASS ClassEqualationE =
+			attr1 : Lkoord;
+			attr2 : Lkoord;
+			attr3 : Lkoord;
+			attr4 : Lkoord;
+			MANDATORY CONSTRAINT
+			(attr1 == attr2) == (attr3 == attr4);
+		END ClassEqualationE;
+		
+		!! equal numeric (==)
+		CLASS ClassEqualationF =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			MANDATORY CONSTRAINT
+			attr1 == attr2;
+		END ClassEqualationF;
+		
+		!! equal text (==)
+		CLASS ClassEqualationG =
+			attr1 : TEXT*10;
+			attr2 : TEXT*10;
+			MANDATORY CONSTRAINT
+			attr1 == attr2;
+		END ClassEqualationG;
+		
+		!! equal enumeration (==)
+		CLASS ClassEqualationH =
+			aufzaehlung1 : enumeration;
+			aufzaehlung2 : enumeration;
+			MANDATORY CONSTRAINT
+			aufzaehlung1 == aufzaehlung2;
+		END ClassEqualationH;
+		
+		!! equal boolean
+		CLASS ClassEqualationI =
 			attr1 : BOOLEAN;
+			attr2 : BOOLEAN;
 			MANDATORY CONSTRAINT
-			attr1;
-		END ClassCF;
+			attr1 == attr2;
+		END ClassEqualationI;
 		
-		!! conjunction (AND) fail
-		CLASS ClassEF =
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		!!!!!!!!!!!!! INEQUAL !!!!!!!!!!!!!!!
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		
+		!! inequal text (!=)
+		CLASS ClassInEqualationA =
+			attr1 : TEXT*10;
+			attr2 : TEXT*10;
 			MANDATORY CONSTRAINT
-			(#true AND (#true AND (#true AND (#true)))) AND #true AND (#true AND (#false));
-		END ClassEF;
-		
-		!! disjunction (OR) fail
-		CLASS ClassFF =
+			attr1 != attr2;
+		END ClassInEqualationA;
+				
+		!! inequal numeric (!=)
+		CLASS ClassInEqualationB =
+			attr1 : 0..10;
+			attr2 : 0..10;
 			MANDATORY CONSTRAINT
-			#false OR #false OR #false OR(#false OR (#false OR (#false OR (#false))));
-		END ClassFF;
+			attr1 != attr2;
+		END ClassInEqualationB;
 		
-		!! equal (==) fail
-		CLASS ClassGF =
+		!! inequal enumeration (!=)
+		CLASS ClassInEqualationC =
+			aufzaehlung1 : enumeration;
+			aufzaehlung2 : enumeration;
 			MANDATORY CONSTRAINT
-			(#true == #false) == (#true == (#true == (#false)));
-		END ClassGF;
+			aufzaehlung1 != aufzaehlung2;
+		END ClassInEqualationC;
 		
-		!! not equal (!=) fail
-		CLASS ClassHF =
+		!! inequal coord (!=)
+		CLASS ClassInEqualationD =
+			attr1 : Lkoord;
+			attr2 : Lkoord;
+			attr3 : Lkoord;
+			attr4 : Lkoord;
 			MANDATORY CONSTRAINT
-			(#true != #true);
-		END ClassHF;
+			(attr1 == attr2) != (attr3 == attr4);
+		END ClassInEqualationD;
 		
-		!! not equal (<>) fail
-		CLASS ClassIF =
+		!! inequal line straights, arcs (!=)
+		CLASS ClassInEqualationE =
+		   straights2d1 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		   straights2d2 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		   arcs2d1 : POLYLINE WITH (ARCS) VERTEX Lkoord;
+		   arcs2d2 : POLYLINE WITH (ARCS) VERTEX Lkoord;
+		   MANDATORY CONSTRAINT
+		   (straights2d1 == straights2d2) != (arcs2d1 == arcs2d2);
+		END ClassInEqualationE;
+		
+		!! inequal line straightsArcs, arcsStraights (!=)
+		CLASS ClassInEqualationF =
+			straightsarcs1 : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
+			arcsstraights2 : POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Hkoord;
 			MANDATORY CONSTRAINT
-			(#true <> #true);
-		END ClassIF;
+		   straightsarcs1 != arcsstraights2;
+		END ClassInEqualationF;
 		
+		!! inequal surface (!=)
+		CLASS ClassInEqualationG =
+			surface1 : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			surface2 : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT
+		    surface1 != surface2;
+		END ClassInEqualationG;
+		
+		!! inequal area (!=)
+		CLASS ClassInEqualationH =
+			area1 : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			area2 : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT
+		    area1 != area2;
+		END ClassInEqualationH;
+		
+		!! inequal boolean (!=)
+		CLASS ClassInEqualationI =
+			attr1 : BOOLEAN;
+			attr2 : BOOLEAN;
+			MANDATORY CONSTRAINT
+			attr1 <> attr2;
+		END ClassInEqualationI;
+		
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		!!!!!!!!!!! GREATER THAN !!!!!!!!!!!!
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!		
+				
+		!! greater than numeric (>)
+		CLASS ClassGreaterThanA =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			MANDATORY CONSTRAINT
+			attr1 > attr2;
+		END ClassGreaterThanA;
+		
+		!! greater than enumeration (>) if ordered
+		CLASS ClassGreaterThanB =
+			aufzaehlung1 : enumerationOrdered;
+			aufzaehlung2 : enumerationOrdered;
+			MANDATORY CONSTRAINT
+			aufzaehlung1 > aufzaehlung2;
+		END ClassGreaterThanB;
+		
+		!! greater than text (>)
+		CLASS ClassGreaterThanC =
+			attr1 : TEXT*10;
+			attr2 : TEXT*10;
+			MANDATORY CONSTRAINT
+			attr1 > attr2;
+		END ClassGreaterThanC;
+		
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		!!!!!!!!!!! LESS THAN !!!!!!!!!!!!!!!
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!		
+				
+		!! less than numeric (<)
+		CLASS ClassLessThanA =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			MANDATORY CONSTRAINT
+			attr1 < attr2;
+		END ClassLessThanA;
+		
+		!! less than enumeration (<) if ordered
+		CLASS ClassLessThanB =
+			aufzaehlung1 : enumerationOrdered;
+			aufzaehlung2 : enumerationOrdered;
+			MANDATORY CONSTRAINT
+			aufzaehlung1 < aufzaehlung2;
+		END ClassLessThanB;
+		
+		!! less than text (<)
+		CLASS ClassLessThanC =
+			attr1 : TEXT*10;
+			attr2 : TEXT*10;
+			MANDATORY CONSTRAINT
+			attr1 < attr2;
+		END ClassLessThanC;
+		
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		!!!!!!!!!!! GREATER THAN OR EQUAL !!!
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!		
+				
+		!! greater than or equal numeric (>=)
+		CLASS ClassGreaterThanOrEqualA =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			MANDATORY CONSTRAINT
+			attr1 >= attr2;
+		END ClassGreaterThanOrEqualA;
+		
+		!! greater than or equal enumeration (>=) if ordered
+		CLASS ClassGreaterThanOrEqualB =
+			aufzaehlung1 : enumerationOrdered;
+			aufzaehlung2 : enumerationOrdered;
+			MANDATORY CONSTRAINT
+			aufzaehlung1 >= aufzaehlung2;
+		END ClassGreaterThanOrEqualB;
+		
+		!! greater than or equal text (>=)
+		CLASS ClassGreaterThanOrEqualC =
+			attr1 : TEXT*10;
+			attr2 : TEXT*10;
+			MANDATORY CONSTRAINT
+			attr1 >= attr2;
+		END ClassGreaterThanOrEqualC;
+		
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		!!!!!!!!!!! LESS THAN OR EQUAL !!!!!!
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!		
+				
+		!! less than or equal numeric (<=)
+		CLASS ClassLessThanOrEqualA =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			MANDATORY CONSTRAINT
+			attr1 <= attr2;
+		END ClassLessThanOrEqualA;
+		
+		!! less than or equal enumeration (<=) if ordered
+		CLASS ClassLessThanOrEqualB =
+			aufzaehlung1 : enumerationOrdered;
+			aufzaehlung2 : enumerationOrdered;
+			MANDATORY CONSTRAINT
+			aufzaehlung1 <= aufzaehlung2;
+		END ClassLessThanOrEqualB;
+		
+		!! less than or equal text (<=)
+		CLASS ClassLessThanOrEqualC =
+			attr1 : TEXT*10;
+			attr2 : TEXT*10;
+			MANDATORY CONSTRAINT
+			attr1 <= attr2;
+		END ClassLessThanOrEqualC;
+				
 	END Topic;
 END MandatoryConstraints23.

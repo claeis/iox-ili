@@ -193,10 +193,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						validateExistenceConstraint(iomObj, existenceConstraintObj);
 					}
 					// mandatory constraint
-//					if(objA instanceof MandatoryConstraint){
-//						MandatoryConstraint mandatoryConstraintObj=(MandatoryConstraint) objA;
-//						validateMandatoryConstraint(iomObj, mandatoryConstraintObj);
-//					}
+					if(objA instanceof MandatoryConstraint){
+						MandatoryConstraint mandatoryConstraintObj=(MandatoryConstraint) objA;
+						validateMandatoryConstraint(iomObj, mandatoryConstraintObj);
+					}
 				}
 				Iterator<ViewableTransferElement> attrIterator=currentClass.getAttributesAndRoles2();
 				while (attrIterator.hasNext()) {
@@ -224,253 +224,257 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-//	private void validateMandatoryConstraint(IomObject iomObj, MandatoryConstraint mandatoryConstraintObj) {
-//		Evaluable condition = (Evaluable) mandatoryConstraintObj.getCondition();
-//		Value conditionValue = evaluateExpression(iomObj, condition);
-//		if (conditionValue.isTrue()){
-//			// ok
-//		} else {
-//			errs.addEvent(errFact.logErrorMsg("Mandatory Constraint {0} is not true.", mandatoryConstraintObj.getName()));
-//		}
-//	}
+	private void validateMandatoryConstraint(IomObject iomObj, MandatoryConstraint mandatoryConstraintObj) {
+		Evaluable condition = (Evaluable) mandatoryConstraintObj.getCondition();
+		Value conditionValue = evaluateExpression(iomObj, condition);
+		if (!conditionValue.isError()){
+			if (conditionValue.isTrue()){
+				// ok
+			} else {
+				errs.addEvent(errFact.logErrorMsg("Mandatory Constraint {0} is not true.", mandatoryConstraintObj.getName()));
+			}
+		}
+	}
 
-//	private Value evaluateExpression(IomObject iomObj, Evaluable expression) {
-//		if(expression instanceof Equality){
-//			// ==
-//			Equality equality = (Equality) expression;
-//			Evaluable leftExpression = (Evaluable) equality.getLeft();
-//			Evaluable rightExpression = (Evaluable) equality.getRight();
-//			Value leftValue=evaluateExpression(iomObj,leftExpression);
-//			// if leftValue is false, skip the evaluation.
-//			if (leftValue.skipEvaluation()){
-//				return Value.createSkipEvaluation(); // return false
-//			} else {
-//				Value.safeLeftValue();
-//			}
-//			Value rightValue=evaluateExpression(iomObj,rightExpression);
-//			if (rightValue.skipEvaluation()){
-//				return Value.createSkipEvaluation();
-//			} else {
-//				Value.safeRightValue();
-//			}
-//			if (Value.getLeftValue().equals(Value.getRightValue())){
-//				return new Value(true);
-//			} else {
-//				return new Value(false);
-//			}
-//		} else if(expression instanceof GreaterThan){
-//			// >
-//			GreaterThan greaterThan = (GreaterThan) expression;
-//			Evaluable leftExpression = (Evaluable) greaterThan.getLeft();
-//			Value leftValue=evaluateExpression(iomObj,leftExpression);
-//			if (leftValue.skipEvaluation()){				
-//				return Value.createSkipEvaluation();
-//			}
-//			Evaluable rightExpression = (Evaluable) greaterThan.getRight();
-//			Value rightValue=evaluateExpression(iomObj,rightExpression);
-//			if (rightValue.skipEvaluation()){
-//				return Value.createSkipEvaluation();
-//			}
-////			if (leftValue > rightValue.){
-////				return new Value(true);
-////			} else {
-////				return new Value(false);
-////			}
-//		} else if(expression instanceof GreaterThanOrEqual){
-//			// >=
-//			GreaterThanOrEqual greaterThanOrEqual = (GreaterThanOrEqual) expression;
-//			Evaluable leftExpression = (Evaluable) greaterThanOrEqual.getLeft();
-//			Value leftValue=evaluateExpression(iomObj,leftExpression);
-//			if (leftValue.skipEvaluation()){				
-//				return Value.createSkipEvaluation();
-//			}
-//			Evaluable rightExpression = (Evaluable) greaterThanOrEqual.getRight();
-//			Value rightValue=evaluateExpression(iomObj,rightExpression);
-//			if (rightValue.skipEvaluation()){
-//				return Value.createSkipEvaluation();
-//			}
-////			if (leftValue > rightValue.){
-////				return new Value(true);
-////			} else {
-////				return new Value(false);
-////			}
-//		} else if(expression instanceof Inequality){
-//			// != or <>
-//			Inequality inequality = (Inequality) expression;
-//			Evaluable leftExpression = (Evaluable) inequality.getLeft();
-//			Evaluable rightExpression = (Evaluable) inequality.getRight();
-//			Value leftValue=evaluateExpression(iomObj,leftExpression);
-//			// if leftValue is false, skip the evaluation.
-//			if (leftValue.skipEvaluation()){
-//				return Value.createSkipEvaluation(); // return false
-//			} else {
-//				Value.safeLeftValue();
-//			}
-//			Value rightValue=evaluateExpression(iomObj,rightExpression);
-//			if (rightValue.skipEvaluation()){
-//				return Value.createSkipEvaluation();
-//			} else {
-//				Value.safeRightValue();
-//			}
-//			if (!Value.getLeftValue().equals(Value.getRightValue())){
-//				return new Value(true);
-//			} else {
-//				return new Value(false);
-//			}
-//		} else if(expression instanceof LessThan){
-//			// <
-//			LessThan lessThan = (LessThan) expression;
-//			Evaluable leftExpression = (Evaluable) lessThan.getLeft();
-//			Value leftValue=evaluateExpression(iomObj,leftExpression);
-//			if (leftValue.skipEvaluation()){				
-//				return Value.createSkipEvaluation();
-//			}
-//			Evaluable rightExpression = (Evaluable) lessThan.getRight();
-//			Value rightValue=evaluateExpression(iomObj,rightExpression);
-//			if (rightValue.skipEvaluation()){
-//				return Value.createSkipEvaluation();
-//			}
-////			if (leftValue > rightValue){
-////				return new Value(true);
-////			} else {
-////				return new Value(false);
-////			}
-//		} else if(expression instanceof LessThanOrEqual){
-//			// <=
-//			LessThanOrEqual lessThanOrEqual = (LessThanOrEqual) expression;
-//			Evaluable leftExpression = (Evaluable) lessThanOrEqual.getLeft();
-//			Value leftValue=evaluateExpression(iomObj,leftExpression);
-//			if (leftValue.skipEvaluation()){				
-//				return Value.createSkipEvaluation();
-//			}
-//			Evaluable rightExpression = (Evaluable) lessThanOrEqual.getRight();
-//			Value rightValue=evaluateExpression(iomObj,rightExpression);
-//			if (rightValue.skipEvaluation()){
-//				return Value.createSkipEvaluation();
-//			}
-////			if (leftValue > rightValue.){
-////				return new Value(true);
-////			} else {
-////				return new Value(false);
-////			}
-//		} else if(expression instanceof Negation){
-//			// NOT
-//			Negation negation = (Negation) expression;				
-//			Value arg=evaluateExpression(iomObj,negation.getNegated());
-//			if(arg.isTrue()){
-//				return new Value(false);
-//			} else {
-//				return new Value(true);
-//			}
-//		} else if(expression instanceof Conjunction){
-//			// AND
-//			Conjunction conjunction = (Conjunction) expression;
-//			Evaluable[] conjunctionArray = (Evaluable[]) conjunction.getConjoined();
-//			for (int i=0;i<conjunctionArray.length;i++){
-//				Value arg=evaluateExpression(iomObj,conjunctionArray[i]);
-//				if(!arg.isTrue()){
-//					return new Value(false);
-//				}
-//			}
-//			return new Value(true);
-//		} else if(expression instanceof DefinedCheck){
-//			// DEFINED
-//			DefinedCheck defined = (DefinedCheck) expression;
-//			Value arg=evaluateExpression(iomObj,defined.getArgument());
-//			if(arg != null){
-//				return new Value(true);
-//			} else {
-//				return new Value(false);
-//			}
-//		} else if(expression instanceof Disjunction){
-//			// OR
-//			Disjunction disjunction = (Disjunction) expression;
-//			Evaluable[] disjunctionArray = (Evaluable[]) disjunction.getDisjoined();
-//			for (int i=0;i<disjunctionArray.length;i++){
-//				Value arg=evaluateExpression(iomObj,disjunctionArray[i]);
-//				if(arg.isTrue()){
-//					return new Value(true);
-//				}
-//			}
-//			return new Value(false);
-//		} else if(expression instanceof Constant){
-//			// constant
-//			Constant constantObj = (Constant) expression;
-//			if (constantObj instanceof Constant.EnumConstOrRange){
-//				Constant.EnumConstOrRange enumConstOrRange = (Constant.EnumConstOrRange) constantObj;
-//				// enumConstOrRange
-//				if(enumConstOrRange instanceof Enumeration){
-//					// enumeration
-//					Enumeration enumObj = (Enumeration) enumConstOrRange;
-//					String[] value = enumObj.getValue();
-//					if (value[0].equals("true")){
-//						return new Value(true);
-//					} else if (value[0].equals("false")){
-//						return new Value(false);
-//					}
-//				} else if (enumConstOrRange instanceof EnumerationRange){
-//					// constant.enumerationRange
-//				}
-//			} else if (constantObj instanceof Constant.AttributePath){
-//				// attribute path
-//			} else if (constantObj instanceof Constant.Class){
-//				// class
-//			} else if (constantObj instanceof Constant.Numeric){
-//				// numeric
-//			} else if (constantObj instanceof Constant.ReferenceToMetaObject){
-//				// reference to meta object
-//			} else if (constantObj instanceof Constant.Structured){
-//				// structured
-//			} else if (constantObj instanceof Constant.Text){
-//				// text
-//			} else if (constantObj instanceof Constant.Undefined){
-//				// undefined
-//			}
-//		} else if(expression instanceof ConditionalExpression){
-//			// conditional expression	
-//			ConditionalExpression conditionalExpressionObj = (ConditionalExpression) expression;
-//			
-//		} else if(expression instanceof FunctionCall){
-//			// function call	
-//			FunctionCall functionCallObj = (FunctionCall) expression;
-//			
-//		} else if(expression instanceof InspectionFactor){
-//			// inspection factor	
-//			InspectionFactor inspectionFactorObj = (InspectionFactor) expression;
-//			
-//		} else if(expression instanceof LengthOfReferencedText){
-//			// length of referenced text	
-//			LengthOfReferencedText lengthOfReferencedTextObj = (LengthOfReferencedText) expression;
-//			
-//		} else if(expression instanceof ObjectPath){
-//			// object path	
-//			ObjectPath objectPathObj = (ObjectPath) expression;
-//			String attrName = objectPathObj.getLastPathEl().getName();
-//			String objValue = iomObj.getattrvalue(attrName);
-//			if (objValue.equals("true")){
-//				return new Value(true);
-//			} else if (objValue.equals("false")){
-//				return new Value(false);
-//			}
-//		} else if(expression instanceof Objects){
-//			// objects
-//			Objects objectsObj = (Objects) expression;
-//			
-//		} else if(expression instanceof ParameterValue){
-//			// parameter value
-//			ParameterValue parameterValueObj = (ParameterValue) expression;
-//			
-//		} else if(expression instanceof ViewableAggregate){
-//			// viewable aggregate	
-//			ViewableAggregate viewableAggregateObj = (ViewableAggregate) expression;
-//			
-//		} else if(expression instanceof ViewableAlias){
-//			// viewable alias
-//			ViewableAlias viewableAliasObj = (ViewableAlias) expression;
-//		}
-//		return null;
-//	}
-	
+	private Value evaluateExpression(IomObject iomObj, Evaluable expression) {
+		if(expression instanceof Equality){
+			// ==
+			Equality equality = (Equality) expression;
+			Evaluable leftExpression = (Evaluable) equality.getLeft();
+			Evaluable rightExpression = (Evaluable) equality.getRight();
+			Value leftValue=evaluateExpression(iomObj,leftExpression);
+			// if isError, return error.
+			if (leftValue.isError()){
+				return leftValue;
+			}
+			Value rightValue=evaluateExpression(iomObj,rightExpression);
+			// if isError, return error.
+			if (rightValue.isError()){
+				return rightValue;
+			}
+			// if left and right value not errors, compare values.
+			if (leftValue.compareTo(rightValue)==0){
+				return new Value(true);
+			} else {
+				return new Value(false);
+			}
+		} else if(expression instanceof GreaterThan){
+			// >
+			GreaterThan greaterThan = (GreaterThan) expression;
+			Evaluable leftExpression = (Evaluable) greaterThan.getLeft();
+			Evaluable rightExpression = (Evaluable) greaterThan.getRight();
+			Value leftValue=evaluateExpression(iomObj,leftExpression);
+			// if isError, return error.
+			if (leftValue.isError()){
+				return leftValue;
+			}
+			Value rightValue=evaluateExpression(iomObj,rightExpression);
+			// if isError, return error.
+			if (rightValue.isError()){
+				return rightValue;
+			}
+			// if left and right value not errors, compare values.
+			if (leftValue.compareTo(rightValue)>0){
+				return new Value(true);
+			} else {
+				return new Value(false);
+			}
+		} else if(expression instanceof GreaterThanOrEqual){
+			// >=
+			GreaterThanOrEqual greaterThanOrEqual = (GreaterThanOrEqual) expression;
+			Evaluable leftExpression = (Evaluable) greaterThanOrEqual.getLeft();
+			Evaluable rightExpression = (Evaluable) greaterThanOrEqual.getRight();
+			Value leftValue=evaluateExpression(iomObj,leftExpression);
+			// if isError, return error.
+			if (leftValue.isError()){
+				return leftValue;
+			}
+			Value rightValue=evaluateExpression(iomObj,rightExpression);
+			// if isError, return error.
+			if (rightValue.isError()){
+				return rightValue;
+			}
+			// if left and right value not errors, compare values.
+			if (leftValue.compareTo(rightValue)>=0){
+				return new Value(true);
+			} else {
+				return new Value(false);
+			}
+		} else if(expression instanceof Inequality){
+			// != or <>
+			Inequality inEquality = (Inequality) expression;
+			Evaluable leftExpression = (Evaluable) inEquality.getLeft();
+			Evaluable rightExpression = (Evaluable) inEquality.getRight();
+			Value leftValue=evaluateExpression(iomObj,leftExpression);
+			// if isError, return error.
+			if (leftValue.isError()){
+				return leftValue;
+			}
+			Value rightValue=evaluateExpression(iomObj,rightExpression);
+			// if isError, return error.
+			if (rightValue.isError()){
+				return rightValue;
+			}
+			// if left and right value not errors, compare values.
+			if (leftValue.compareTo(rightValue)!=0){
+				return new Value(true);
+			} else {
+				return new Value(false);
+			}
+		} else if(expression instanceof LessThan){
+			// <
+			LessThan lessThan = (LessThan) expression;
+			Evaluable leftExpression = (Evaluable) lessThan.getLeft();
+			Evaluable rightExpression = (Evaluable) lessThan.getRight();
+			Value leftValue=evaluateExpression(iomObj,leftExpression);
+			// if isError, return error.
+			if (leftValue.isError()){
+				return leftValue;
+			}
+			Value rightValue=evaluateExpression(iomObj,rightExpression);
+			// if isError, return error.
+			if (rightValue.isError()){
+				return rightValue;
+			}
+			// if left and right value not errors, compare values.
+			if (leftValue.compareTo(rightValue)<0){
+				return new Value(true);
+			} else {
+				return new Value(false);
+			}
+		} else if(expression instanceof LessThanOrEqual){
+			// <=
+			LessThanOrEqual lessThanOrEqual = (LessThanOrEqual) expression;
+			Evaluable leftExpression = (Evaluable) lessThanOrEqual.getLeft();
+			Evaluable rightExpression = (Evaluable) lessThanOrEqual.getRight();
+			Value leftValue=evaluateExpression(iomObj,leftExpression);
+			// if isError, return error.
+			if (leftValue.isError()){
+				return leftValue;
+			}
+			Value rightValue=evaluateExpression(iomObj,rightExpression);
+			// if isError, return error.
+			if (rightValue.isError()){
+				return rightValue;
+			}
+			// if left and right value not errors, compare values.
+			if (leftValue.compareTo(rightValue)<=0){
+				return new Value(true);
+			} else {
+				return new Value(false);
+			}
+		} else if(expression instanceof Negation){
+			// NOT
+			Negation negation = (Negation) expression;				
+			Value arg=evaluateExpression(iomObj,negation.getNegated());
+			if(arg.isTrue()){
+				return new Value(false);
+			} else {
+				return new Value(true);
+			}
+		} else if(expression instanceof Conjunction){
+			// AND
+			Conjunction conjunction = (Conjunction) expression;
+			Evaluable[] conjunctionArray = (Evaluable[]) conjunction.getConjoined();
+			for (int i=0;i<conjunctionArray.length;i++){
+				Value arg=evaluateExpression(iomObj,conjunctionArray[i]);
+				if(!arg.isTrue()){
+					return new Value(false);
+				}
+			}
+			return new Value(true);
+		} else if(expression instanceof DefinedCheck){
+			// DEFINED
+			DefinedCheck defined = (DefinedCheck) expression;
+			Value arg=evaluateExpression(iomObj,defined.getArgument());
+			if(arg != null){
+				return new Value(true);
+			} else {
+				return new Value(false);
+			}
+		} else if(expression instanceof Disjunction){
+			// OR
+			Disjunction disjunction = (Disjunction) expression;
+			Evaluable[] disjunctionArray = (Evaluable[]) disjunction.getDisjoined();
+			for (int i=0;i<disjunctionArray.length;i++){
+				Value arg=evaluateExpression(iomObj,disjunctionArray[i]);
+				if(arg.isTrue()){
+					return new Value(true);
+				}
+			}
+			return new Value(false);
+		} else if(expression instanceof Constant){
+			// constant
+			Constant constantObj = (Constant) expression;
+			if (constantObj instanceof Constant.EnumConstOrRange){
+				Constant.EnumConstOrRange enumConstOrRange = (Constant.EnumConstOrRange) constantObj;
+				// enumConstOrRange
+				if(enumConstOrRange instanceof Enumeration){
+					// enumeration
+					Enumeration enumObj = (Enumeration) enumConstOrRange;
+					String[] value = enumObj.getValue();
+					if (value[0].equals("true")){
+						return new Value(true);
+					} else if (value[0].equals("false")){
+						return new Value(false);
+					}
+				} else if (enumConstOrRange instanceof EnumerationRange){
+					// constant.enumerationRange
+				}
+			}
+		} else if(expression instanceof ConditionalExpression){
+			// conditional expression	
+			ConditionalExpression conditionalExpressionObj = (ConditionalExpression) expression;
+			
+		} else if(expression instanceof FunctionCall){
+			// function call	
+			FunctionCall functionCallObj = (FunctionCall) expression;
+			
+		} else if(expression instanceof InspectionFactor){
+			// inspection factor	
+			InspectionFactor inspectionFactorObj = (InspectionFactor) expression;
+			
+		} else if(expression instanceof LengthOfReferencedText){
+			// length of referenced text	
+			LengthOfReferencedText lengthOfReferencedTextObj = (LengthOfReferencedText) expression;
+		} else if(expression instanceof ObjectPath){
+			// object path	
+			ObjectPath objectPathObj = (ObjectPath) expression;
+			PathEl pathEl = (PathEl) objectPathObj.getLastPathEl();
+			AttributeRef attrRef = (AttributeRef) pathEl;
+			Type type = attrRef.getAttr().getDomain();
+			String attrName = objectPathObj.getLastPathEl().getName();
+			String objValue = iomObj.getattrvalue(attrName);
+			if(objValue != null){
+				if (objValue.equals("true")){
+					return new Value(true);
+				} else if (objValue.equals("false")){
+					return new Value(false);
+					// if null, then complex value.
+				} else {
+					return new Value(type, objValue);
+				}
+			} else {
+				return new Value(iomObj.getattrobj(attrName, 0)); //TODO iomObj.getattrobj(attrName)
+			}
+		} else if(expression instanceof Objects){
+			// objects
+			Objects objectsObj = (Objects) expression;
+			
+		} else if(expression instanceof ParameterValue){
+			// parameter value
+			ParameterValue parameterValueObj = (ParameterValue) expression;
+			
+		} else if(expression instanceof ViewableAggregate){
+			// viewable aggregate	
+			ViewableAggregate viewableAggregateObj = (ViewableAggregate) expression;
+			
+		} else if(expression instanceof ViewableAlias){
+			// viewable alias
+			ViewableAlias viewableAliasObj = (ViewableAlias) expression;
+		}
+		return null;
+	}
 
 	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {
 		int nrOfTargetObjs=linkPool.getTargetObjectCount(iomObj,role);
@@ -480,7 +484,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			// valid
 		}else{
 			// not valid
-    		errs.addEvent(errFact.logErrorMsg(role.getName()+" should associate "+cardMin+" to "+cardMax+" target objects (instead of "+nrOfTargetObjs+")"));
+			if(role.getCardinality().getMaximum() == Cardinality.UNBOUND){
+				String cardMaxStr = "*";
+				errs.addEvent(errFact.logErrorMsg(role.getName()+" should associate "+cardMin+" to "+cardMaxStr+" target objects (instead of "+nrOfTargetObjs+")"));
+			} else {
+				errs.addEvent(errFact.logErrorMsg(role.getName()+" should associate "+cardMin+" to "+cardMax+" target objects (instead of "+nrOfTargetObjs+")"));
+			}
 		}
 	}
 

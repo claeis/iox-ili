@@ -497,6 +497,28 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Object Association23.Topic.ClassD with OID o1 must be of Association23.Topic.ClassA", logger.getErrs().get(0).getEventMsg());
 	}
+	
+	@Test
+	public void wrongTargetClass1toNCardinalityFail(){
+		Iom_jObject iomObjF=new Iom_jObject("Association23.Topic.ClassF", OBJ_OID2);
+		Iom_jObject iomObjAp=new Iom_jObject("Association23.Topic.zz1", null);
+		iomObjAp.addattrobj("z9", "REF").setobjectrefoid(OBJ_OID1);
+		iomObjAp.addattrobj("y9", "REF").setobjectrefoid(OBJ_OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(iomObjF));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("z9 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
+	}
+	
 	// classB with OID b1 associate to classA with OID a1
 	// OID a1 of classA, associated by classB with OID b1, does not exist
 	@Test

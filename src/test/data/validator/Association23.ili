@@ -19,6 +19,14 @@ MODEL Association23
 		   attrD1 : TEXT*10;
 		END ClassD;
 		
+		CLASS ClassE =
+		   attrE1 : TEXT*10;
+		END ClassE;
+		
+		CLASS ClassF =
+		   attrF1 : TEXT*10;
+		END ClassF;
+		
 		CLASS ClassAp EXTENDS ClassA =
 		END ClassAp;
 		
@@ -46,6 +54,11 @@ MODEL Association23
 		  a2 -- {0..*} ClassA;
 		  b2 -- {0..*} ClassB;
 		END ab2;
+		
+		ASSOCIATION zz1 =
+		  z9 -- {1..*} ClassE;
+		  y9 -- {1..*} ClassF;
+		END zz1;
 		
 		ASSOCIATION ab3 =
 		  a3 -- {0..1} ClassA;
