@@ -12,6 +12,7 @@ MODEL MandatoryConstraints23
 					              0.000 .. 5000.000 [INTERLIS.m];
 			enumeration = (null, eins, zwei, drei, mehr (vier));
 			enumerationOrdered = (null, eins, zwei, drei, mehr (vier)) ORDERED;
+			attrRef1 = TEXT*12;
 		
 		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		!!!!!!!!!!!!!! CONSTANT !!!!!!!!!!!!!
@@ -336,6 +337,35 @@ MODEL MandatoryConstraints23
 			MANDATORY CONSTRAINT
 			attr1 <= attr2;
 		END ClassLessThanOrEqualC;
+		
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		!!!!!!!!!!! UN/DEFINED !!!!!!!!!!!!!!
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				
+		!! line is defined (DEFINED) Object defined.
+		CLASS ClassDefinedA =
+			straightsarcs1 : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
+			MANDATORY CONSTRAINT
+			DEFINED(straightsarcs1);
+		END ClassDefinedA;
+		
+		!! attrpath is undefined (UNDEFINED)
+		CLASS ClassDefinedB =
+			attr1 : attrRef1;
+			MANDATORY CONSTRAINT
+			DEFINED(attr1);
+		END ClassDefinedB;
+		
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		!!!!!!!!!!! FORMATTED TYPE !!!!!!!!!!
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		
+		CLASS ClassFormattedTypeA =
+			attr1: FORMAT INTERLIS.XMLDateTime "2000-01-01T00:00:00.000" ..	"2005-12-31T23:59:59.999";
+			attr2: FORMAT INTERLIS.XMLDateTime "2000-01-01T00:00:00.000" ..	"2005-12-31T23:59:59.999";
+			MANDATORY CONSTRAINT
+			attr1 == attr2;
+		END ClassFormattedTypeA;
+		
 	END Topic;
 END MandatoryConstraints23.

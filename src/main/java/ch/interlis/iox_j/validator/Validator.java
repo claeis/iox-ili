@@ -387,7 +387,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			// DEFINED
 			DefinedCheck defined = (DefinedCheck) expression;
 			Value arg=evaluateExpression(iomObj,defined.getArgument());
-			if(arg != null){
+			if(arg.getComplexValue() != null || arg.getValue() != null || arg.isTrue()){
 				return new Value(true);
 			} else {
 				return new Value(false);
@@ -452,10 +452,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					return new Value(false);
 					// if null, then complex value.
 				} else {
+					if (type instanceof TypeAlias){
+						TypeAlias typeAlias = (TypeAlias) type;
+						Type aliasType = typeAlias.getAliasing().getType();
+						return new Value(aliasType, objValue);
+					}
 					return new Value(type, objValue);
 				}
 			} else {
-				return new Value(iomObj.getattrobj(attrName, 0)); //TODO iomObj.getattrobj(attrName)
+				return new Value(iomObj.getattrobj(attrName, 0));
 			}
 		} else if(expression instanceof Objects){
 			// objects

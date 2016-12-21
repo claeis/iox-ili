@@ -69,6 +69,11 @@ public class MandatoryConstraints23 {
 	private final static String ILI_CLASSLESSTHANOREQUALA=ILI_TOPIC+".ClassLessThanOrEqualA";
 	private final static String ILI_CLASSLESSTHANOREQUALB=ILI_TOPIC+".ClassLessThanOrEqualB";
 	private final static String ILI_CLASSLESSTHANOREQUALC=ILI_TOPIC+".ClassLessThanOrEqualC";
+	// ATTRIBUTES GREATER OR EQUAL THAN (<=) SUCCESS AND FAIL
+	private final static String ILI_CLASSDEFINEDA=ILI_TOPIC+".ClassDefinedA";
+	private final static String ILI_CLASSDEFINEDB=ILI_TOPIC+".ClassDefinedB";
+	// ATTRIBUTES FORMATTED TYPE EQUAL (==) SUCCESS AND FAIL
+	private final static String ILI_CLASSFORMATTEDTYPEA=ILI_TOPIC+".ClassFormattedTypeA";
 	// START BASKET EVENT
 	private final static String START_BASKET_EVENT="b1";
 	
@@ -1312,6 +1317,45 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}	
 	
+	// test in defined (defined)
+	@Test
+	public void mandatoryConstraintDefinedPolylineTypeStraights2dOk(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSDEFINEDA, OBJ_OID1);
+		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs1", "POLYLINE");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// test in formattedtype defined (defined)
+	@Test
+	public void mandatoryConstraintEqualationFormattedTypeOk(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSFORMATTEDTYPEA, OBJ_OID1);
+		objStraightsSuccess.setattrvalue("attr1", "2005-12-31T23:59:59.999");
+		objStraightsSuccess.setattrvalue("attr2", "2005-12-31T23:59:59.999");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
 	//#########################################################//
 	//########### FAIL MANDATORY CONSTRAINTS ##################//
 	//#########################################################//
@@ -2423,4 +2467,45 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Mandatory Constraint null is not true.", logger.getErrs().get(0).getEventMsg());
 	}
+	
+	// test in formattedtype defined (defined)
+	@Test
+	public void mandatoryConstraintEqualationFormattedTypeFail(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSFORMATTEDTYPEA, OBJ_OID1);
+		objStraightsSuccess.setattrvalue("attr1", "2005-12-31T23:59:59.999");
+		objStraightsSuccess.setattrvalue("attr2", "2005-12-31T23:59:59.888");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Mandatory Constraint null is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// test in undefined (undefined)
+	@Test
+	public void mandatoryConstraintUnDefinedAttrInPathOk(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSDEFINEDB, OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Mandatory Constraint null is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
 }

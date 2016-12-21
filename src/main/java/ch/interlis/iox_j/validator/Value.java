@@ -1,13 +1,10 @@
 package ch.interlis.iox_j.validator;
 
-import java.util.Iterator;
-import java.util.List;
-
 import ch.interlis.ili2c.metamodel.EnumerationType;
+import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.TextType;
 import ch.interlis.ili2c.metamodel.Type;
-import ch.interlis.ili2c.metamodel.TypeAlias;
 import ch.interlis.iom.IomObject;
 
 public class Value {
@@ -16,7 +13,6 @@ public class Value {
 	private String value=null;
 	private IomObject complexValue=null;
 	private Type type=null;
-	private String attrName=null;
 	
 	public Value(boolean booleanValue) {
 		this.booleanValue = booleanValue;
@@ -91,23 +87,22 @@ public class Value {
 			// intercept text
 			if(type instanceof TextType){
 				return value.compareTo(other.value);
+			// intercept formatted type
+			} else if(type instanceof FormattedType){
+				return value.compareTo(other.value);
 			// intercept numeric
 			} else if(type instanceof NumericType){
 				return Integer.compare(Integer.parseInt(value), Integer.parseInt(other.value));
-			} else if(type instanceof TypeAlias){
-				TypeAlias typeAlias = (TypeAlias) type;
-				Type type = typeAlias.getAliasing().getType();
-				if(type instanceof EnumerationType){
-					EnumerationType enumeration = (EnumerationType) type;
-					// if ordered = true (>,<,>=,<=)
-					if(enumeration.isOrdered() && !enumeration.isCircular()){
-						int thisIndex = enumeration.getValues().indexOf(this.value);
-						int otherIndex = enumeration.getValues().indexOf(other.value);
-						return Integer.compare(thisIndex, otherIndex);
-					} else {
-						// if ordered = false (==, !=, <>)
-						return this.value.compareTo(other.value);
-					}
+			} else if(type instanceof EnumerationType){
+				EnumerationType enumeration = (EnumerationType) type;
+				// if ordered = true (>,<,>=,<=)
+				if(enumeration.isOrdered() && !enumeration.isCircular()){
+					int thisIndex = enumeration.getValues().indexOf(this.value);
+					int otherIndex = enumeration.getValues().indexOf(other.value);
+					return Integer.compare(thisIndex, otherIndex);
+				} else {
+					// if ordered = false (==, !=, <>)
+					return this.value.compareTo(other.value);
 				}
 			}
 		// intercept boolean
