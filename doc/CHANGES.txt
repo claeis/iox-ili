@@ -2,6 +2,12 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili-1.13.6-feature/validator1 (2016-12-21)
+----------------------------------------------
+- validator: fixed if cardinality is N, show "*" (UNBOUND) is error message 
+- validator: validate mandatory constraint in NOT, OR, AND, DEFINED, UNDEFINED
+- validator: validate mandatory constraint in ==, !=, <>, <, <=, >, >= of attribute and attribute path
+
 iox-ili-1.13.5-feature/validator1 (2016-12-12)
 ----------------------------------------------
 - validator: fixed OID uniqueness per table in ITF
