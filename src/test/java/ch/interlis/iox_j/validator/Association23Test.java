@@ -354,10 +354,9 @@ public class Association23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
+		assertTrue(logger.getErrs().size()==2);
 		assertEquals("The OID o2 of object 'Association23.Topic.ClassB oid o2 {a3 -> o1 REF {}}' already exists in CLASS Association23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
 		assertEquals("a3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(1).getEventMsg());
-		assertEquals("a3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	// abp1 --> ap1
@@ -406,10 +405,9 @@ public class Association23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
+		assertTrue(logger.getErrs().size()==2);
 		assertEquals("The OID o2 of object 'Association23.Topic.ClassBp oid o2 {ap3 -> o1 REF {}}' already exists in CLASS Association23.Topic.ClassBp.", logger.getErrs().get(0).getEventMsg());
 		assertEquals("ap3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(1).getEventMsg());
-		assertEquals("ap3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	// abd1 --> ad1
@@ -466,10 +464,9 @@ public class Association23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
+		assertTrue(logger.getErrs().size()==2);
 		assertEquals("The OID o2 of object 'Association23.Topic.ClassB oid o2 {ad3 -> o1 REF {}}' already exists in CLASS Association23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
 		assertEquals("ad3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(1).getEventMsg());
-		assertEquals("ad3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(2).getEventMsg());
 	}
 		
 	//#########################################################//
