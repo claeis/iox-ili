@@ -3022,6 +3022,38 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("unexpected COORD", logger.getErrs().get(0).getEventMsg());
 	}
+	@Test
+	public void polylineTypeStraights2WithIntersectionFail(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
+		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2dWithoutOverlaps", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject coord=null;
+		coord=segments.addattrobj("segment", "COORD");
+		coord.setattrvalue("C1", "480000.000");
+		coord.setattrvalue("C2", "70000.000");
+		coord=segments.addattrobj("segment", "COORD");
+		coord.setattrvalue("C1", "480010.000");
+		coord.setattrvalue("C2", "70000.000");
+		coord=segments.addattrobj("segment", "COORD");
+		coord.setattrvalue("C1", "480010.000");
+		coord.setattrvalue("C2", "70010.000");
+		coord=segments.addattrobj("segment", "COORD");
+		coord.setattrvalue("C1", "480005.000");
+		coord.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1,logger.getErrs().size());
+		assertEquals("Attribute straights2dWithoutOverlaps has an invalid self-intersection at (480005.0, 70000.0)", logger.getErrs().get(0).getEventMsg());
+	}
 	///////////////////////////////// END POLYLINE /////////////////////////////////////////
 	///////////////////////////////// START SURFACE ////////////////////////////////////////	
 	@Test
