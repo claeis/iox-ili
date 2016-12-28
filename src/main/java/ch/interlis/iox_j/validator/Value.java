@@ -92,14 +92,14 @@ public class Value {
 				return value.compareTo(other.value);
 			// intercept numeric
 			} else if(type instanceof NumericType){
-				return Integer.compare(Integer.parseInt(value), Integer.parseInt(other.value));
+				return compareInteger(Integer.parseInt(value), Integer.parseInt(other.value));
 			} else if(type instanceof EnumerationType){
 				EnumerationType enumeration = (EnumerationType) type;
 				// if ordered = true (>,<,>=,<=)
 				if(enumeration.isOrdered() && !enumeration.isCircular()){
 					int thisIndex = enumeration.getValues().indexOf(this.value);
 					int otherIndex = enumeration.getValues().indexOf(other.value);
-					return Integer.compare(thisIndex, otherIndex);
+					return compareInteger(thisIndex, otherIndex);
 				} else {
 					// if ordered = false (==, !=, <>)
 					return this.value.compareTo(other.value);
@@ -107,12 +107,20 @@ public class Value {
 			}
 		// intercept boolean
 		} else if(this.value==null && other.value==null){
-			return Boolean.compare(this.booleanValue, other.booleanValue);
+			return compareBoolean(this.booleanValue, other.booleanValue);
 		}
 		// incompatible type
 		throw new IllegalArgumentException("incompatible values");
 	}
 	
+	private int compareBoolean(boolean thisValue, boolean otherValue) {
+		return (otherValue == thisValue ? 0 : (thisValue ? 1 : -1));
+	}
+
+	private int compareInteger(int thisVal, int anotherVal) {
+		return (thisVal<anotherVal ? -1 : (thisVal==anotherVal ? 0 : 1));
+	}
+
 	private int compareSurfaceOrAreaTo(IomObject complexValue2, Value other) {
 		for(int l=0;l<complexValue2.getattrvaluecount("surface");l++){
 			IomObject thisSurfaceValue=complexValue2.getattrobj("surface",l);
