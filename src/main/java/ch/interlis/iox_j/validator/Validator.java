@@ -106,6 +106,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE_DO="doItfOidPerTable";
 	
+	private ObjectPool objectPool = null;
 	private ch.interlis.iox.IoxValidationConfig validationConfig=null;
 	private IoxLogging errs=null;
 	private LogEventFactory errFact=null;
@@ -132,6 +133,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		unknownTypev=new HashSet<String>();
 		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
+		objectPool=new ObjectPool(doItfOidPerTable);
 	}
 
 	/** mappings from xml-tags to Viewable|AttributeDef
@@ -172,19 +174,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 	
-	// HashSet of all Objects which where tested in the first run.
-	HashMap<HashMap<String, Viewable>, IomObject> allIli1Objects = new HashMap<HashMap<String, Viewable>, IomObject>();
-	HashMap<String, IomObject> allIli2Objects = new HashMap<String, IomObject>();
 	
 	private void iterateThroughAllObjects(){
-		if (allIli2Objects != null || allIli1Objects != null){
+		if (!objectPool.getAllObjects().isEmpty()){
 			// iterate through iomObjects
-			Iterator<IomObject> objectIterator;
-			if(doItfOidPerTable){
-				objectIterator = allIli1Objects.values().iterator();
-			} else {
-				objectIterator = allIli2Objects.values().iterator();
-			}
+			Iterator<IomObject> objectIterator = objectPool.getAllObjects().values().iterator();
 			while (objectIterator.hasNext()){
 				IomObject iomObj = objectIterator.next();
 				errFact.setDataObj(iomObj);
@@ -514,61 +508,35 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(targetOid==null){
 			return;
 		}
-		// OID has to be unique in each table (ili 1.0)
-		if(doItfOidPerTable == true){
-			// oid of referenced object
-			Iterator<AbstractClassDef> targetIterator = role.iteratorDestination();
-			StringBuffer possibleTargetClasses=new StringBuffer();
-			String sep="";
-			Viewable targetClass = null;
-			while (targetIterator.hasNext()){
-				// finde nun die referenced klassen.
-				targetClass = (Viewable) targetIterator.next();
-				// suche in allObjects die Klasse und vergleiche die oid.
-				Set<HashMap<String, Viewable>> keySet = allIli1Objects.keySet();
-				Iterator iteratorValue = keySet.iterator();
-				// HashSet wird mit dem Iterator durchlaufen
-				while (iteratorValue.hasNext()){
-			        HashMap<String, Viewable> keyOfAllObjects = (HashMap<String, Viewable>) iteratorValue.next();
-			        if(keyOfAllObjects.containsValue(targetClass)){
-			        	if(keyOfAllObjects.containsKey(targetOid)){
-			        		// target ok
-			        		return;
-			        	}
-			        	possibleTargetClasses.append(sep);
-			        	sep=",";
-			        	possibleTargetClasses.append(targetClass.getScopedName(null));
-			        }
-				}
-			}
-			// no object with this oid found
-			errs.addEvent(errFact.logErrorMsg("OID {0} not found in target class {1}.", targetOid, possibleTargetClasses.toString()));	
-		} else {
-			// OID has to be unique in the whole file (ili 2.3)	
-			Iterator<AbstractClassDef> targetIterator = role.iteratorDestination();
-			StringBuffer possibleTargetClasses=new StringBuffer();
-			String sep="";
-			if(allIli2Objects.containsKey(targetOid)){
-				IomObject targetObj = allIli2Objects.get(targetOid);
-				Object modelElement=tag2class.get(targetObj.getobjecttag());
-				Viewable targetObjClass = (Viewable) modelElement;
-				while (targetIterator.hasNext()){
-					Viewable targetClass = (Viewable) targetIterator.next();
-					if(targetObjClass.isExtending(targetClass)){
-						// target is ok
-						return;
-					}
-					possibleTargetClasses.append(sep);
-					sep=",";
-					possibleTargetClasses.append(targetClass.getScopedName(null));
-				}
-				// object found, but wrong class
-				errs.addEvent(errFact.logErrorMsg("Object {1} with OID {0} must be of {2}", targetOid,targetObj.getobjecttag(),possibleTargetClasses.toString()));
-				return;
-			}
-			// no object with this oid found
-			errs.addEvent(errFact.logErrorMsg("No object found with OID {0}.", targetOid));
+	 	// OID has to be unique in each table (ili 1.0)
+		// OID has to be unique in the whole file (ili 2.3)	
+		Iterator<AbstractClassDef> targetClassIterator = role.iteratorDestination();
+		ArrayList<Viewable> targetClasses = new ArrayList<Viewable>();
+		StringBuffer possibleTargetClasses=new StringBuffer();
+		String sep="";
+		while(targetClassIterator.hasNext()){
+			Viewable targetClass = (Viewable) targetClassIterator.next();
+			targetClasses.add(targetClass);
+			possibleTargetClasses.append(sep);
+			sep=",";
+			possibleTargetClasses.append(targetClass.getScopedName(null));
 		}
+		IomObject targetObj = (IomObject) objectPool.getObject(targetOid, targetClasses);
+		if(targetObj != null){
+			Object modelElement=tag2class.get(targetObj.getobjecttag());
+			Viewable targetObjClass = (Viewable) modelElement;
+			for(Viewable targetClass : targetClasses){
+				if(targetObjClass.isExtending(targetClass)){
+					// target is ok
+					return;
+				}
+			}
+			// object found, but wrong class
+			errs.addEvent(errFact.logErrorMsg("Object {1} with OID {0} must be of {2}", targetOid,targetObj.getobjecttag(),possibleTargetClasses.toString()));
+			return;
+		}
+		// no object with this oid found
+		errs.addEvent(errFact.logErrorMsg("No object found with OID {0}.", targetOid));
 	}
 	
 	LinkPool linkPool=new LinkPool();
@@ -589,7 +557,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						String targetOid = refAttrValue.getobjectrefoid();
 						String targetObjOid = null;
 						String targetObjClassStr = null;
-						IomObject iomObj = allIli2Objects.get(targetOid);
+						IomObject iomObj = (IomObject) objectPool.getAllObjects().get(targetOid);
 						if(iomObj != null){
 							Object modelElement=tag2class.get(iomObj.getobjecttag());
 							Table targetObjClass = (Table) modelElement;
@@ -658,7 +626,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			ObjectPath attrName = (ObjectPath)requiredInIterator.next();
 			otherClass = (Table) attrName.getRoot();
 			String otherAttrName = attrName.toString();
-			for (IomObject otherIomObj:allIli2Objects.values() ){
+			String attrValueThisObj = iomObj.getattrvalue(otherAttrName);
+			Iterator<IomObject> objectIterator = objectPool.getAllObjects().values().iterator();
+			while (objectIterator.hasNext()){
+				IomObject otherIomObj = objectIterator.next();
 				if (otherIomObj.getattrcount() == 0){
 					// do not validate.
 				} else {
@@ -967,12 +938,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Object modelElementToCompare = tag2class.get(iomObj.getobjecttag());
 			Viewable classValueToCompare= (Viewable) modelElementToCompare;
 			String objOidToCompare = iomObj.getobjectoid();
-			Iterator<IomObject> objectIterator;
-			if(doItfOidPerTable){
-				objectIterator = allIli1Objects.values().iterator();
-			} else {
-				objectIterator = allIli2Objects.values().iterator();
-			}
+			Iterator<IomObject> objectIterator = objectPool.getAllObjects().values().iterator();
 			if (objectIterator != null){
 				while (objectIterator.hasNext()){
 					IomObject objValue = objectIterator.next();
@@ -1094,12 +1060,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		
 		if(isObject){
-			ObjectKeyPool objectKeyPool = new ObjectKeyPool(iomObj, tag2class);
-			if(doItfOidPerTable == true){
-				allIli1Objects.put(objectKeyPool.getKeyMapOfObjects(), iomObj);
-			} else {
-				allIli2Objects.put(objectKeyPool.getOid(), iomObj);
-			}
+			objectPool.addObject(iomObj, tag2class);
 		}
 		
 		HashSet<String> propNames=new HashSet<String>();
@@ -1129,8 +1090,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									.getContainer();
 							if (roleOwner.getDerivedFrom() == null) {
 								// not just a link?
-								IomObject structvalue = iomObj.getattrobj(
-										roleName, 0);
+								IomObject structvalue = iomObj.getattrobj(roleName, 0);
 								propNames.add(roleName);
 								if (roleOwner.getAttributes().hasNext()
 										|| roleOwner
@@ -1158,8 +1118,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								}
 							}
 						} else {
-							IomObject structvalue = iomObj.getattrobj(
-									roleName, 0);
+							IomObject structvalue = iomObj.getattrobj(roleName, 0);
 							propNames.add(roleName);
 							refoid = structvalue.getobjectrefoid();
 							long orderPos = structvalue

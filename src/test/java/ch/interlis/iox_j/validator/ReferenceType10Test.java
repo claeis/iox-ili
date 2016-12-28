@@ -23,6 +23,8 @@ public class ReferenceType10Test {
 	private final static String OID1="o1";
 	private final static String OID2="o2";
 	private final static String OID3="o3";
+	private final static String OID4="o4";
+	private final static String OID5="o5";
 	// MODEL.TOPIC
 	private final static String REFERENCETYPE10_TOPICA="ReferenceType10.TopicA";
 	// CLASS
@@ -48,8 +50,9 @@ public class ReferenceType10Test {
 	//#########################################################//
 	//####################### SUCCESS #########################//
 	//#########################################################//
+	// 1*ClassA, 1*ClassB, 1*ClassC->(REF-c1) to ClassA. && (REF-c2) to ClassB.
 	@Test
-	public void referenceOk() throws Exception {
+	public void oneObjectFromEachClassOk() throws Exception {
 		Iom_jObject objA1=new Iom_jObject(REFERENCETYPE10_CLASSA, OID1);
 		Iom_jObject objB1=new Iom_jObject(REFERENCETYPE10_CLASSB, OID1);
 		Iom_jObject objC1=new Iom_jObject(REFERENCETYPE10_CLASSC, OID1);
@@ -72,9 +75,94 @@ public class ReferenceType10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// 2*ClassA, 3*ClassC->(REF-c1) to ClassA.
+	@Test
+	public void threeClassCReferencesToOneClassAOk() throws Exception {
+		Iom_jObject objA1=new Iom_jObject(REFERENCETYPE10_CLASSA, OID1);
+		Iom_jObject objC1=new Iom_jObject(REFERENCETYPE10_CLASSC, OID1);
+		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
+		Iom_jObject objC2=new Iom_jObject(REFERENCETYPE10_CLASSC, OID2);
+		objC2.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
+		Iom_jObject objC3=new Iom_jObject(REFERENCETYPE10_CLASSC, OID4);
+		objC3.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(REFERENCETYPE10_TOPICA,BID1));
+		validator.validate(new ObjectEvent(objA1));
+		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new ObjectEvent(objC2));
+		validator.validate(new ObjectEvent(objC3));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// 3*ClassA, 1*ClassC->(REF-c1) to ClassA.
+	@Test
+	public void oneClassCReferencesTothreeClassAOk() throws Exception {
+		Iom_jObject objA1=new Iom_jObject(REFERENCETYPE10_CLASSA, OID1);
+		Iom_jObject objA2=new Iom_jObject(REFERENCETYPE10_CLASSA, OID2);
+		Iom_jObject objA3=new Iom_jObject(REFERENCETYPE10_CLASSA, OID3);
+		Iom_jObject objC1=new Iom_jObject(REFERENCETYPE10_CLASSC, OID1);
+		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
+		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID2);
+		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID3);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(REFERENCETYPE10_TOPICA,BID1));
+		validator.validate(new ObjectEvent(objA1));
+		validator.validate(new ObjectEvent(objA2));
+		validator.validate(new ObjectEvent(objA3));
+		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+
 	//#########################################################//
 	//######################### FAIL ##########################//
 	//#########################################################//
+	// 3*ClassB, 1*ClassC->(REF-c1) to ClassA.
+	@Test
+	public void oneClassCReferencesTothreeClassBFail() throws Exception {
+		Iom_jObject objB1=new Iom_jObject(REFERENCETYPE10_CLASSB, OID1);
+		Iom_jObject objB2=new Iom_jObject(REFERENCETYPE10_CLASSB, OID2);
+		Iom_jObject objB3=new Iom_jObject(REFERENCETYPE10_CLASSB, OID3);
+		Iom_jObject objC1=new Iom_jObject(REFERENCETYPE10_CLASSC, OID1);
+		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
+		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID2);
+		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID3);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(REFERENCETYPE10_TOPICA,BID1));
+		validator.validate(new ObjectEvent(objB1));
+		validator.validate(new ObjectEvent(objB2));
+		validator.validate(new ObjectEvent(objB3));
+		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1, logger.getErrs().size());
+		assertEquals("No object found with OID o1.", logger.getErrs().get(0).getEventMsg());
+	}
+	
 	@Test
 	public void danglingReferenceFail() throws Exception {
 		Iom_jObject objA1=new Iom_jObject(REFERENCETYPE10_CLASSA, OID1);
@@ -95,7 +183,28 @@ public class ReferenceType10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("OID o2 not found in target class ReferenceType10.TopicA.ClassA.", logger.getErrs().get(0).getEventMsg());
+		assertEquals(1, logger.getErrs().size());
+		assertEquals("No object found with OID o2.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void Fail() throws Exception {
+		Iom_jObject objA1=new Iom_jObject(REFERENCETYPE10_CLASSA, OID1);
+		Iom_jObject objC1=new Iom_jObject(REFERENCETYPE10_CLASSC, OID3);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(REFERENCETYPE10_TOPICA,BID1));
+		validator.validate(new ObjectEvent(objA1));
+		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1, logger.getErrs().size());
+		assertEquals("attrC1 should associate 1 to 1 target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
 	}
 }

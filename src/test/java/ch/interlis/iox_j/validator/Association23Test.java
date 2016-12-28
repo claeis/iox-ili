@@ -39,6 +39,8 @@ public class Association23Test {
 	private final static String ILI_CLASSB=ILI_TOPIC+".ClassB";
 	private final static String ILI_CLASSC=ILI_TOPIC+".ClassC";
 	private final static String ILI_CLASSD=ILI_TOPIC+".ClassD";
+	private final static String ILI_CLASSG=ILI_TOPIC+".ClassG";
+	private final static String ILI_CLASSH=ILI_TOPIC+".ClassH";
 	// CLASS EXTEND
 	private final static String ILI_CLASSAP=ILI_TOPIC+".ClassAp";
 	private final static String ILI_CLASSBP=ILI_TOPIC+".ClassBp";
@@ -606,5 +608,38 @@ public class Association23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void oneGObjectAnd5HObjectsInCard1To1Fail(){
+		Iom_jObject iomObjG=new Iom_jObject(ILI_CLASSG, OBJ_OID1);
+		Iom_jObject iomObjH1=new Iom_jObject(ILI_CLASSH, OBJ_OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		Iom_jObject iomObjH2=new Iom_jObject(ILI_CLASSH, OBJ_OID3);
+		iomObjH2.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		Iom_jObject iomObjH3=new Iom_jObject(ILI_CLASSH, OBJ_OID4);
+		iomObjH3.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		Iom_jObject iomObjH4=new Iom_jObject(ILI_CLASSH, OBJ_OID5);
+		iomObjH4.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		Iom_jObject iomObjH5=new Iom_jObject(ILI_CLASSH, OBJ_OID6);
+		iomObjH5.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(iomObjG));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new ObjectEvent(iomObjH2));
+		validator.validate(new ObjectEvent(iomObjH3));
+		validator.validate(new ObjectEvent(iomObjH4));
+		validator.validate(new ObjectEvent(iomObjH5));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("h1 should associate 1 to 1 target objects (instead of 5)", logger.getErrs().get(0).getEventMsg());
 	}
 }

@@ -15,7 +15,9 @@ public class LinkPool {
 	
 	// returns the number of referenced objects consisting of OID and role-name.
 	public int getTargetObjectCount(IomObject iomObj, RoleDef role) {
+		
 		Integer ret=collectionOfReferenceObj.get(new LinkPoolKey(iomObj.getobjectoid(), role.getName()));
+		
 		if(ret==null){
 			return 0;
 		}
@@ -41,7 +43,7 @@ public class LinkPool {
 	}
 
 	private void increaseCounter(String oid, String roleName) {
-		LinkPoolKey key=new LinkPoolKey(oid,roleName);
+		LinkPoolKey key=new LinkPoolKey(oid, roleName);
 		if(collectionOfReferenceObj.containsKey(key)){
 			int counter=collectionOfReferenceObj.get(key);
 			counter+=1;
