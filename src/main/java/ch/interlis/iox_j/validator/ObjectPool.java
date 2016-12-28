@@ -2,7 +2,6 @@ package ch.interlis.iox_j.validator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.iom.IomObject;

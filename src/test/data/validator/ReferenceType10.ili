@@ -22,7 +22,6 @@ MODEL ReferenceType10
 		   attrC1 : -> ClassA;
 		NO IDENT
 		END ClassD;
-
 	END TopicA.
 END ReferenceType10.
 

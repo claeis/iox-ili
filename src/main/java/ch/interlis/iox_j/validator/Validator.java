@@ -482,7 +482,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {
-		int nrOfTargetObjs=linkPool.getTargetObjectCount(iomObj,role);
+		int nrOfTargetObjs=linkPool.getTargetObjectCount(iomObj,role, doItfOidPerTable);
 		long cardMin=role.getCardinality().getMinimum();
 		long cardMax=role.getCardinality().getMaximum();
 		if((nrOfTargetObjs>=cardMin && nrOfTargetObjs<=cardMax)){
@@ -1136,7 +1136,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						String targetClass = null;
 						if (refoid != null) {
 							// TODO validate target opbject
-							linkPool.addLink(iomObj,role,refoid);
+							linkPool.addLink(iomObj,role,refoid, doItfOidPerTable);
 						}
 				}
 			 }

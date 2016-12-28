@@ -52,8 +52,9 @@ public class ReferenceType10Test {
 	//####################### SUCCESS #########################//
 	//#########################################################//
 	// 1*ClassA, 1*ClassB, 1*ClassC->(REF-c1) to ClassA. && (REF-c2) to ClassB.
+	// 1*ClassD (REF-c1) to ClassA.
 	@Test
-	public void oneObjectFromEachClassOk() throws Exception {
+	public void twoObjectsWithSameReferenceClassOk() throws Exception {
 		Iom_jObject objA1=new Iom_jObject(REFERENCETYPE10_CLASSA, OID1);
 		Iom_jObject objB1=new Iom_jObject(REFERENCETYPE10_CLASSB, OID1);
 		Iom_jObject objC1=new Iom_jObject(REFERENCETYPE10_CLASSC, OID1);
@@ -189,26 +190,5 @@ public class ReferenceType10Test {
 		// Asserts
 		assertEquals(1, logger.getErrs().size());
 		assertEquals("No object found with OID o2.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	@Test
-	public void Fail() throws Exception {
-		Iom_jObject objA1=new Iom_jObject(REFERENCETYPE10_CLASSA, OID1);
-		Iom_jObject objC1=new Iom_jObject(REFERENCETYPE10_CLASSC, OID3);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(REFERENCETYPE10_TOPICA,BID1));
-		validator.validate(new ObjectEvent(objA1));
-		validator.validate(new ObjectEvent(objC1));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertEquals(1, logger.getErrs().size());
-		assertEquals("attrC1 should associate 1 to 1 target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
 	}
 }
