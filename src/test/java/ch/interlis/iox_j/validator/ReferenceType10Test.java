@@ -31,6 +31,7 @@ public class ReferenceType10Test {
 	private final static String REFERENCETYPE10_CLASSA=REFERENCETYPE10_TOPICA+".ClassA";
 	private final static String REFERENCETYPE10_CLASSB=REFERENCETYPE10_TOPICA+".ClassB";
 	private final static String REFERENCETYPE10_CLASSC=REFERENCETYPE10_TOPICA+".ClassC";
+	private final static String REFERENCETYPE10_CLASSD=REFERENCETYPE10_TOPICA+".ClassD";
 	private final static String ATTR_C1="attrC1";
 	private final static String ATTR_C2="attrC2";
 	// BID
@@ -58,6 +59,8 @@ public class ReferenceType10Test {
 		Iom_jObject objC1=new Iom_jObject(REFERENCETYPE10_CLASSC, OID1);
 		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
 		objC1.addattrobj(ATTR_C2, "REF").setobjectrefoid(OID1);
+		Iom_jObject objD1=new Iom_jObject(REFERENCETYPE10_CLASSD, OID1);
+		objD1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -69,6 +72,7 @@ public class ReferenceType10Test {
 		validator.validate(new ObjectEvent(objA1));
 		validator.validate(new ObjectEvent(objB1));
 		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new ObjectEvent(objD1));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
