@@ -2,6 +2,12 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili-1.13.7-feature/validator1 (2016-12-29)
+----------------------------------------------
+- validator: fixed cardinality fault if ili1.0
+- validator: validate POLYLINE topology
+- validator: optimized object pool
+
 iox-ili-1.13.6-feature/validator1 (2016-12-21)
 ----------------------------------------------
 - validator: fixed if cardinality is N, show "*" (UNBOUND) is error message 
