@@ -91,7 +91,7 @@ MODEL Datatypes23
 		   straightsarcs3d : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
 		   arcsstraights2d : POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Lkoord;
 		   !! Linientyp (without overlaps is optional for polyline)
-		   !!straights2dWithoutOverlaps : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   straights2dWithoutOverlaps : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 		   !!straights3dWithoutOverlaps : POLYLINE WITH (STRAIGHTS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
 		   !!arcs2dWithoutOverlaps : POLYLINE WITH (ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 		   !!arcs3dWithoutOverlaps : POLYLINE WITH (ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
