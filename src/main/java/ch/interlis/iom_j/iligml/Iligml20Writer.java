@@ -95,6 +95,7 @@ import java.util.Map;
     	private String currentTopic=null;
     	private TransferDescription td=null;
     	private IoxFactoryCollection factory=new  ch.interlis.iox_j.DefaultIoxFactoryCollection();
+    	private String defaultCrs="EPSG:21781";
         
     	public static final String INTERNAL_T_ID="_t_id";
         public static final String iligmlBase=Iligml20Generator.ILIGML_XMLNSBASE;
@@ -531,7 +532,7 @@ import java.util.Map;
 							{
 								// COORD
 								xout.writeStartElement(xmlns_attr,attrName);
-								writeCoord(child,"EPSG:21781");
+								writeCoord(child,getDefaultCrs());
 								xout.writeEndElement(/*attr*/);
 								if (valueCount > 1)
 								{
@@ -546,7 +547,7 @@ import java.util.Map;
 								}else{
 									xout.writeStartElement(xmlns_attr,attrName);
 								}
-								writePolyline(child, false,"EPSG:21781");
+								writePolyline(child, false,getDefaultCrs());
 								xout.writeEndElement(/*attr*/);
 								if (valueCount > 1)
 								{
@@ -557,7 +558,7 @@ import java.util.Map;
 							{
 								// MULTISURFACE
 								xout.writeStartElement(xmlns_attr,attrName);
-								writeSurface(child,"EPSG:21781");
+								writeSurface(child,getDefaultCrs());
 								xout.writeEndElement(/*attr*/);
 								if (valueCount > 1)
 								{
@@ -676,7 +677,7 @@ import java.util.Map;
 				throw new IoxException(ex);
 			}
         }
-        /** writes a coord value or a coord segment.
+		/** writes a coord value or a coord segment.
          */
         private void writeCoord(IomObject obj,String srs)
 		throws IoxException
@@ -1086,6 +1087,12 @@ import java.util.Map;
 				throw new IoxException("unknown event type "+event.getClass().getName());
 			}
 			
+		}
+		public void setDefaultCrs(String defaultCrs) {
+			this.defaultCrs = defaultCrs;
+		}
+        public String getDefaultCrs() {
+			return defaultCrs;
 		}
         
     }

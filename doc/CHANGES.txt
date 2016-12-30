@@ -6,6 +6,7 @@ iox-ili 1.14.0 (2016-12-30)
 -----------------------------
 - ili2c-4.6.0
 - Iligml20Writer: added
+- Iligml10Writer.defaultCrs added
 
 iox-ili 1.13.6 (2016-11-25)
 -----------------------------
