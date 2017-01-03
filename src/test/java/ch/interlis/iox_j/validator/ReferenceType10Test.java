@@ -307,4 +307,45 @@ public class ReferenceType10Test {
 		// Asserts
 		assertEquals(0, logger.getErrs().size());
 	}
+	
+	@Test
+	public void configTargetWARNING_ReferencedNoClassFoundFail() throws Exception {
+		Iom_jObject objC1=new Iom_jObject(REFERENCETYPE10_CLASSC, OID1);
+		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("ReferenceType10.TopicA.ClassCattrC1.attrC1", ValidationConfig.TARGET,ValidationConfig.WARNING);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(REFERENCETYPE10_TOPICA,BID1));
+		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1, logger.getWarn().size());
+		assertEquals("No object found with OID o1.", logger.getWarn().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void configMultiplicityWARNING_TwoReferencedClassesFail() throws Exception {
+		Iom_jObject iomObjJ=new Iom_jObject(REFERENCETYPE10_CLASSD,OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("ReferenceType10.TopicA.ClassDattrC1.attrC1", ValidationConfig.MULTIPLICITY,ValidationConfig.WARNING);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(REFERENCETYPE10_TOPICA,BID1));
+		validator.validate(new ObjectEvent(iomObjJ));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1, logger.getWarn().size());
+		assertEquals("attrC1 should associate 1 to 1 target objects (instead of 0)", logger.getWarn().get(0).getEventMsg());
+	}
 }

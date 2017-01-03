@@ -3579,4 +3579,24 @@ public class Datatypes23Test {
 		assertEquals("value <undecided> is not a BOOLEAN", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	@Test
+	public void booleanTestConfigWARNINGFail(){
+		Iom_jObject objTrue=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objTrue.setattrvalue("aBoolean", "undecided");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Datatypes23.Topic.ClassA.aBoolean", ValidationConfig.TYPE,ValidationConfig.WARNING);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objTrue));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getWarn().size()==1);
+		assertEquals("value <undecided> is not a BOOLEAN", logger.getWarn().get(0).getEventMsg());
+	}
+	
 }

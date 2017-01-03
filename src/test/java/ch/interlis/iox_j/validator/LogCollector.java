@@ -17,9 +17,9 @@ public class LogCollector implements ch.interlis.iox.IoxLogging {
 	@Override
 	public void addEvent(IoxLogEvent event) {
 		EhiLogger.getInstance().logEvent((LogEvent) event);
-		if(event.getEventKind()==7){
+		if(event.getEventKind()==IoxLogEvent.ERROR){
 			errs.add(event);
-		} else if(event.getEventKind()==6){
+		}else{
 			warn.add(event);
 		}
 	}

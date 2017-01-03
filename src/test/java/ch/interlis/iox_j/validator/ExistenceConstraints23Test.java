@@ -2103,4 +2103,168 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute area3d of ExistenceConstraints23Coords.Topic.ClassArea3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	////////////////// END SURFACE AREA ////////////////////////////
+	
+	@Test
+	public void configOFFExistenceConstraintFalseInSameModelFail() throws Exception{
+		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", "o1");
+		objBedingung.setattrvalue("attr1", "other");
+		Iom_jObject objA=new Iom_jObject("ExistenceConstraints23.Topic.ClassA", "o2");
+		objA.setattrvalue("attr5", "lars");
+		objA.setattrvalue("attr2", "20");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassA.Constraint1", ValidationConfig.CHECK,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic","b1"));
+		validator.validate(new ObjectEvent(objBedingung));
+		validator.validate(new ObjectEvent(objA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void configWARNINGExistenceConstraintFalseInSameModelFail() throws Exception{
+		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", "o1");
+		objBedingung.setattrvalue("attr1", "other");
+		Iom_jObject objA=new Iom_jObject("ExistenceConstraints23.Topic.ClassA", "o2");
+		objA.setattrvalue("attr5", "lars");
+		objA.setattrvalue("attr2", "20");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassA.Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic","b1"));
+		validator.validate(new ObjectEvent(objBedingung));
+		validator.validate(new ObjectEvent(objA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getWarn().size()==1);
+		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void confingOFFExistenceConstraintInOtherModelFail() throws Exception {
+		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClass", "o1");
+		objBedingung.setattrvalue("attr1", "lars");
+		Iom_jObject objB=new Iom_jObject("ExistenceConstraints23.Topic.ClassB", "o2");
+		objB.setattrvalue("attr1", "ben");
+		objB.setattrvalue("attr2", "20");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassB.Constraint1", ValidationConfig.CHECK,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b1"));
+		validator.validate(new ObjectEvent(objBedingung));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic","b2"));
+		validator.validate(new ObjectEvent(objB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void confingWARNINGExistenceConstraintInOtherModelFail() throws Exception {
+		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClass", "o1");
+		objBedingung.setattrvalue("attr1", "lars");
+		Iom_jObject objB=new Iom_jObject("ExistenceConstraints23.Topic.ClassB", "o2");
+		objB.setattrvalue("attr1", "ben");
+		objB.setattrvalue("attr2", "20");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassB.Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b1"));
+		validator.validate(new ObjectEvent(objBedingung));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic","b2"));
+		validator.validate(new ObjectEvent(objB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getWarn().size()==1);
+		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void configOFFExistenceConstraintFourRefToTwoDiffClassesFail() throws Exception{
+		Iom_jObject objCondition=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", "o1");
+		objCondition.setattrvalue("attr1", "other");
+		Iom_jObject objCondition2=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass2", "o2");
+		objCondition2.setattrvalue("attr1", "other");
+		Iom_jObject objC=new Iom_jObject("ExistenceConstraints23.Topic.ClassC", "o3");
+		objC.setattrvalue("attr1", "this");
+		objC.setattrvalue("attr2", "this");
+		objC.setattrvalue("attr3", "this");
+		objC.setattrvalue("attr4", "this");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC.Constraint1", ValidationConfig.CHECK,ValidationConfig.OFF);
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC.Constraint2", ValidationConfig.CHECK,ValidationConfig.OFF);
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC.Constraint3", ValidationConfig.CHECK,ValidationConfig.OFF);
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC.Constraint4", ValidationConfig.CHECK,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic","b1"));
+		validator.validate(new ObjectEvent(objCondition));
+		validator.validate(new ObjectEvent(objCondition2));
+		validator.validate(new ObjectEvent(objC));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void configWARNINGExistenceConstraintFourRefToTwoDiffClassesFail() throws Exception{
+		Iom_jObject objCondition=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", "o1");
+		objCondition.setattrvalue("attr1", "other");
+		Iom_jObject objCondition2=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass2", "o2");
+		objCondition2.setattrvalue("attr1", "other");
+		Iom_jObject objC=new Iom_jObject("ExistenceConstraints23.Topic.ClassC", "o3");
+		objC.setattrvalue("attr1", "this");
+		objC.setattrvalue("attr2", "this");
+		objC.setattrvalue("attr3", "this");
+		objC.setattrvalue("attr4", "this");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC.Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC.Constraint2", ValidationConfig.CHECK,ValidationConfig.WARNING);
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC.Constraint3", ValidationConfig.CHECK,ValidationConfig.WARNING);
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC.Constraint4", ValidationConfig.CHECK,ValidationConfig.WARNING);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic","b1"));
+		validator.validate(new ObjectEvent(objCondition));
+		validator.validate(new ObjectEvent(objCondition2));
+		validator.validate(new ObjectEvent(objC));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getWarn().size()==4);
+		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassC was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
+		assertEquals("The value of the attribute attr2 of ExistenceConstraints23.Topic.ClassC was not found in the condition class.", logger.getWarn().get(1).getEventMsg());
+		assertEquals("The value of the attribute attr3 of ExistenceConstraints23.Topic.ClassC was not found in the condition class.", logger.getWarn().get(2).getEventMsg());
+		assertEquals("The value of the attribute attr4 of ExistenceConstraints23.Topic.ClassC was not found in the condition class.", logger.getWarn().get(3).getEventMsg());
+	}
 }

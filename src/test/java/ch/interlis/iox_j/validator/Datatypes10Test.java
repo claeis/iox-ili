@@ -2580,6 +2580,45 @@ public class Datatypes10Test {
 		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 	}
+	
+	@Test
+	public void configOFFtextTextIsNotANumberOk(){
+		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+		objTest.setattrvalue("grads", "1.5 5.2");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Datatypes10.Topic.Table.grads", ValidationConfig.TYPE,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+		validator.validate(new ObjectEvent(objTest));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void configWARNINGtextTextIsNotANumberFail(){
+		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+		objTest.setattrvalue("grads", "1.5 5.2");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Datatypes10.Topic.Table.grads", ValidationConfig.TYPE,ValidationConfig.WARNING);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+		validator.validate(new ObjectEvent(objTest));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getWarn().size()==1);
+		assertEquals("value <1.5 5.2> is not a number", logger.getWarn().get(0).getEventMsg());
+	}
 	////////////////// END FlaechentypSurface /////////////////////	
 	////////////////// START FlaechentypSurfaceWithoutOverlap /////
 	

@@ -32,6 +32,17 @@ MODEL ExistenceConstraints23
 			EXISTENCE CONSTRAINT attr1 REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClass : attr1;
 		END ClassB;
 		
+		CLASS ClassC =
+			attr1 : TEXT*10;
+			attr2 : TEXT*10;
+			attr3 : TEXT*10;
+			attr4 : TEXT*10;
+			EXISTENCE CONSTRAINT attr1 REQUIRED IN ExistenceConstraints23.Topic.ConditionClass : attr1;
+			EXISTENCE CONSTRAINT attr2 REQUIRED IN ExistenceConstraints23.Topic.ConditionClass : attr1;
+			EXISTENCE CONSTRAINT attr3 REQUIRED IN ExistenceConstraints23.Topic.ConditionClass2 : attr1;
+			EXISTENCE CONSTRAINT attr4 REQUIRED IN ExistenceConstraints23.Topic.ConditionClass2 : attr1;
+		END ClassC;
+		
 		CLASS ClassStructureOtherModel =
 			attr1 : ExistenceConstraints23Condition.structure;
 			!!attr2 : TEXT*15;

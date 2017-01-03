@@ -241,7 +241,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if (conditionValue.isTrue()){
 					// ok
 				} else {
-//					errs.addEvent(errFact.logErrorMsg("Mandatory Constraint {0} is not true.", mandatoryConstraintObj.getName()));
 					logMsg(checkConstraint,"Mandatory Constraint {0} is not true.", mandatoryConstraintObj.getName());				
 				}
 			}
@@ -641,67 +640,71 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(iomObj.getattrvaluecount(restrictedAttrName)==0){
 			return;
 		}
-		
-		
-		
-		Type type = existenceConstraint.getRestrictedAttribute().getType();
-		// if type of alias, cast type to TypeAlias
-		if (type instanceof TypeAlias){
-			TypeAlias aliasType = (TypeAlias) type;
-			Domain domainAliasing = (Domain) aliasType.getAliasing();
-			type = (Type) domainAliasing.getType();
-		}
-		Iterator<ObjectPath> requiredInIterator = existenceConstraint.iteratorRequiredIn();
-		boolean valueExists = false;
-		Table classA = null;
-		Table otherClass = null;
-		while (requiredInIterator.hasNext()) {
-			classA = null;
-			ObjectPath attrName = (ObjectPath)requiredInIterator.next();
-			otherClass = (Table) attrName.getRoot();
-			String otherAttrName = attrName.toString();
-			String attrValueThisObj = iomObj.getattrvalue(otherAttrName);
-			Iterator<IomObject> objectIterator = objectPool.getAllObjects().values().iterator();
-			while (objectIterator.hasNext()){
-				IomObject otherIomObj = objectIterator.next();
-				if (otherIomObj.getattrcount() == 0){
-					// do not validate.
-				} else {
-					Object modelElement=tag2class.get(otherIomObj.getobjecttag());
-					classA= (Table) modelElement;
-					// otherAttr defined?
-					if(otherIomObj.getattrvaluecount(otherAttrName)>0){
-						// validate if otherClass is extending by classA
-						if (classA.isExtending(otherClass)){
-							// if type is type of alias, validate instance of
-							if(type instanceof ReferenceType){
-								ReferenceType referenceType = (ReferenceType) type;
-								valueExists = equalsReferenceValue(iomObj, referenceType, otherIomObj, otherAttrName, restrictedAttrName);
-							} else if (type instanceof CoordType){
-								CoordType coordType = (CoordType) type;
-								valueExists = equalsCoordValue(iomObj, coordType, otherIomObj, otherAttrName, restrictedAttrName);
-							} else if (type instanceof PolylineType){
-								PolylineType polylineType = (PolylineType) type;
-								valueExists = equalsPolylineValue(iomObj, polylineType, otherIomObj, otherAttrName, restrictedAttrName);
-							} else if (type instanceof SurfaceOrAreaType){
-								SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
-								valueExists = equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, otherAttrName, restrictedAttrName);
-							} else if (type instanceof CompositionType){
-								CompositionType compositionType = (CompositionType) type;
-								valueExists = equalsCompositionValue(iomObj, compositionType, otherIomObj, otherAttrName, restrictedAttrName);
-							} else {
-								// if type is not type of alias, validate attribute names
-								if(otherIomObj.getattrvalue(otherAttrName).equals(iomObj.getattrvalue(restrictedAttrName))){
-									valueExists = true;
+		String check = existenceConstraint.getContainer().getScopedName(null)+"."+existenceConstraint.getName();
+		String checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
+		if(ValidationConfig.OFF.equals(checkConstraint)){
+			// skip it
+		}else{
+			Type type = existenceConstraint.getRestrictedAttribute().getType();
+			// if type of alias, cast type to TypeAlias
+			if (type instanceof TypeAlias){
+				TypeAlias aliasType = (TypeAlias) type;
+				Domain domainAliasing = (Domain) aliasType.getAliasing();
+				type = (Type) domainAliasing.getType();
+			}
+			Iterator<ObjectPath> requiredInIterator = existenceConstraint.iteratorRequiredIn();
+			boolean valueExists = false;
+			Table classA = null;
+			Table otherClass = null;
+			while (requiredInIterator.hasNext()) {
+				classA = null;
+				ObjectPath attrName = (ObjectPath)requiredInIterator.next();
+				otherClass = (Table) attrName.getRoot();
+				String otherAttrName = attrName.toString();
+				String attrValueThisObj = iomObj.getattrvalue(otherAttrName);
+				Iterator<IomObject> objectIterator = objectPool.getAllObjects().values().iterator();
+				while (objectIterator.hasNext()){
+					IomObject otherIomObj = objectIterator.next();
+					if (otherIomObj.getattrcount() == 0){
+						// do not validate.
+					} else {
+						Object modelElement=tag2class.get(otherIomObj.getobjecttag());
+						classA= (Table) modelElement;
+						// otherAttr defined?
+						if(otherIomObj.getattrvaluecount(otherAttrName)>0){
+							// validate if otherClass is extending by classA
+							if (classA.isExtending(otherClass)){
+								// if type is type of alias, validate instance of
+								if(type instanceof ReferenceType){
+									ReferenceType referenceType = (ReferenceType) type;
+									valueExists = equalsReferenceValue(iomObj, referenceType, otherIomObj, otherAttrName, restrictedAttrName);
+								} else if (type instanceof CoordType){
+									CoordType coordType = (CoordType) type;
+									valueExists = equalsCoordValue(iomObj, coordType, otherIomObj, otherAttrName, restrictedAttrName);
+								} else if (type instanceof PolylineType){
+									PolylineType polylineType = (PolylineType) type;
+									valueExists = equalsPolylineValue(iomObj, polylineType, otherIomObj, otherAttrName, restrictedAttrName);
+								} else if (type instanceof SurfaceOrAreaType){
+									SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
+									valueExists = equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, otherAttrName, restrictedAttrName);
+								} else if (type instanceof CompositionType){
+									CompositionType compositionType = (CompositionType) type;
+									valueExists = equalsCompositionValue(iomObj, compositionType, otherIomObj, otherAttrName, restrictedAttrName);
+								} else {
+									// if type is not type of alias, validate attribute names
+									if(otherIomObj.getattrvalue(otherAttrName).equals(iomObj.getattrvalue(restrictedAttrName))){
+										valueExists = true;
+									}
 								}
 							}
 						}
 					}
 				}
 			}
-		}
-		if (!valueExists){
-			errs.addEvent(errFact.logErrorMsg("The value of the attribute {0} of {1} was not found in the condition class.", restrictedAttrName.toString(), iomObj.getobjecttag().toString()));
+			if (!valueExists){
+//				errs.addEvent(errFact.logErrorMsg("The value of the attribute {0} of {1} was not found in the condition class.", restrictedAttrName.toString(), iomObj.getobjecttag().toString()));
+				logMsg(checkConstraint,"The value of the attribute {0} of {1} was not found in the condition class.", restrictedAttrName.toString(), iomObj.getobjecttag().toString());
+			}
 		}
 	}
 	
