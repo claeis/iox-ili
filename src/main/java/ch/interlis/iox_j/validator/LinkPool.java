@@ -39,9 +39,13 @@ public class LinkPool {
 		}else{
 			// stand-alone
 			// addLink() is called twice per association; once for each end
+			if(doItfOidPerTable!=false){
+				// standalone association is only possible with ili2
+				throw new IllegalArgumentException("doItfOidPerTable!=false");
+			}
 			RoleDef oppRole=role.getOppEnd();
-			String sourceOid=iomObj.getattrvalue(oppRole.getName());
-			increaseCounter(sourceOid, iomObj.getobjecttag(), role.getName(), doItfOidPerTable);
+			String sourceOid=iomObj.getattrobj(oppRole.getName(),0).getobjectrefoid();
+			increaseCounter(sourceOid, null, role.getName(), false);
 		}
 	}
 

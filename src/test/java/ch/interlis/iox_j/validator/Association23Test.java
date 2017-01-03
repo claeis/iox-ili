@@ -34,11 +34,14 @@ public class Association23Test {
 	private final static String OBJ_OID7 ="o7";
 	// MODEL.TOPIC
 	private final static String ILI_TOPIC="Association23.Topic";
+	private final static String ILI_TOPICB="Association23.TopicB";
 	// CLASS
 	private final static String ILI_CLASSA=ILI_TOPIC+".ClassA";
 	private final static String ILI_CLASSB=ILI_TOPIC+".ClassB";
 	private final static String ILI_CLASSC=ILI_TOPIC+".ClassC";
 	private final static String ILI_CLASSD=ILI_TOPIC+".ClassD";
+	private final static String ILI_CLASSE=ILI_TOPIC+".ClassE";
+	private final static String ILI_CLASSF=ILI_TOPIC+".ClassF";
 	private final static String ILI_CLASSG=ILI_TOPIC+".ClassG";
 	private final static String ILI_CLASSH=ILI_TOPIC+".ClassH";
 	private final static String ILI_CLASSI=ILI_TOPIC+".ClassI";
@@ -78,12 +81,26 @@ public class Association23Test {
 	private final static String ILI_ASSOC_ABD3_AD3="ad3";
 	private final static String ILI_ASSOC_ABD3_BD3="bd3";
 	
+	private final static String ILI_ASSOC_EF1_E1="e1";
+	private final static String ILI_ASSOC_EF1_F1="f1";
+	
 	// ASSOCIATION CLASS
 	private final static String ILI_ASSOC_AB2=ILI_TOPIC+".ab2";
 	private final static String ILI_ASSOC_ABP2=ILI_TOPIC+".abp2";
 	private final static String ILI_ASSOC_ABD2=ILI_TOPIC+".abd2";
+	private final static String ILI_ASSOC_EF1=ILI_TOPIC+".ef1";
+	
+	private final static String ILI_TOPICB_CLASSE=ILI_TOPICB+".ClassE";
+	private final static String ILI_TOPICB_CLASSF=ILI_TOPICB+".ClassF";
+	private final static String ILI_TOPICB_CLASSG=ILI_TOPICB+".ClassG";
+	private final static String ILI_TOPICB_CLASSH=ILI_TOPICB+".ClassH";
+	private final static String ILI_TOPICB_ASSOC_EF1=ILI_TOPICB+".ef1";
+	private final static String ILI_TOPICB_ASSOC_EF1_E1="e1";
+	private final static String ILI_TOPICB_ASSOC_EF1_F1="f1";
+	
 	// START BASKET EVENT
-	private final static String START_BASKET_EVENT="b1";
+	private final static String BASKET_ID1="b1";
+	private final static String BASKET_ID2="b2";
 	
 	@Before
 	public void setUp() throws Exception {
@@ -112,7 +129,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
@@ -133,7 +150,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
@@ -154,7 +171,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
@@ -175,7 +192,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
@@ -199,7 +216,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new ObjectEvent(iomObjB2));
@@ -224,7 +241,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new ObjectEvent(iomObjD));
@@ -232,6 +249,46 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void oneBasketExternalGObjectAnd5HObjectsInCard1To1Ok(){
+		Iom_jObject iomObjG=new Iom_jObject(ILI_TOPICB_CLASSG, OBJ_OID1);
+		Iom_jObject iomObjH1=new Iom_jObject(ILI_TOPICB_CLASSH, OBJ_OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjG));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
+		//assertEquals("h1 should associate 1 to 1 target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
+	}
+	@Test
+	public void oneFileExternalGObjectAndHObjectsInCard1To1Ok(){
+		Iom_jObject iomObjH1=new Iom_jObject(ILI_TOPICB_CLASSH, OBJ_OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
 	}
 	
 	//#########################################################//
@@ -252,7 +309,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new ObjectEvent(iomObjAB));
@@ -260,6 +317,94 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
+	}
+	@Test
+	public void standAlone_ASSOC_NtoN_Ok(){
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OBJ_OID1);
+		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OBJ_OID2);
+		Iom_jObject iomLinkEF=new Iom_jObject(ILI_ASSOC_EF1, null);
+		iomLinkEF.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
+		iomLinkEF.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new ObjectEvent(iomObjF));
+		validator.validate(new ObjectEvent(iomLinkEF));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
+	}
+	@Test
+	public void standAlone_ExternalASSOC_NtoN_Ok(){
+		Iom_jObject iomObjE=new Iom_jObject(ILI_TOPICB_CLASSE, OBJ_OID1);
+		Iom_jObject iomObjF=new Iom_jObject(ILI_TOPICB_CLASSF, OBJ_OID2);
+		Iom_jObject iomLinkEF=new Iom_jObject(ILI_TOPICB_ASSOC_EF1, null);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new ObjectEvent(iomObjF));
+		validator.validate(new ObjectEvent(iomLinkEF));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
+	}
+	@Test
+	public void standAlone_BasketExternalASSOC_NtoN_Ok(){
+		Iom_jObject iomObjE=new Iom_jObject(ILI_TOPICB_CLASSE, OBJ_OID1);
+		Iom_jObject iomObjF=new Iom_jObject(ILI_TOPICB_CLASSF, OBJ_OID2);
+		Iom_jObject iomLinkEF=new Iom_jObject(ILI_TOPICB_ASSOC_EF1, null);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjF));
+		validator.validate(new ObjectEvent(iomLinkEF));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
+	}
+	@Test
+	public void standAlone_FileExternalASSOC_NtoN_Ok(){
+		Iom_jObject iomObjF=new Iom_jObject(ILI_TOPICB_CLASSF, OBJ_OID2);
+		Iom_jObject iomLinkEF=new Iom_jObject(ILI_TOPICB_ASSOC_EF1, null);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjF));
+		validator.validate(new ObjectEvent(iomLinkEF));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
 	}
 	
 	// abp2 --> ap2, bp2
@@ -276,7 +421,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjAp));
 		validator.validate(new ObjectEvent(iomObjBp));
 		validator.validate(new ObjectEvent(iomObjABP));
@@ -300,7 +445,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new ObjectEvent(iomObjAB));
@@ -329,7 +474,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB1));
 		validator.validate(new ObjectEvent(iomObjB2));
@@ -354,7 +499,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB1));
 		validator.validate(new ObjectEvent(iomObjB2));
@@ -380,7 +525,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB1));
 		validator.validate(new ObjectEvent(iomObjB2));
@@ -405,7 +550,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB1));
 		validator.validate(new ObjectEvent(iomObjB2));
@@ -435,7 +580,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjD));
 		validator.validate(new ObjectEvent(iomObjC));
@@ -464,7 +609,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA1));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new ObjectEvent(iomObjB2));
@@ -492,7 +637,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjD));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
@@ -503,24 +648,23 @@ public class Association23Test {
 	}
 	
 	@Test
-	public void wrongTargetClass1toNCardinalityFail(){
-		Iom_jObject iomObjF=new Iom_jObject("Association23.Topic.ClassF", OBJ_OID2);
-		Iom_jObject iomObjAp=new Iom_jObject("Association23.Topic.zz1", null);
-		iomObjAp.addattrobj("z9", "REF").setobjectrefoid(OBJ_OID1);
-		iomObjAp.addattrobj("y9", "REF").setobjectrefoid(OBJ_OID2);
+	public void standAlone1toNCardinalityFail(){
+		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OBJ_OID2);
+		Iom_jObject iomObjAp=new Iom_jObject(ILI_ASSOC_EF1, null);
+		iomObjAp.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjF));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("z9 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
+		assertEquals("e1 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// classB with OID b1 associate to classA with OID a1
@@ -536,7 +680,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
@@ -558,7 +702,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjC));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
@@ -580,7 +724,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
@@ -589,6 +733,32 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
 	}
+	@Test
+	public void standAlone_ASSOC_NtoNexternal_Fail(){
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OBJ_OID1);
+		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OBJ_OID2);
+		Iom_jObject iomLinkEF=new Iom_jObject(ILI_ASSOC_EF1, null);
+		iomLinkEF.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
+		iomLinkEF.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjF));
+		validator.validate(new ObjectEvent(iomLinkEF));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1,logger.getErrs().size());
+		assertEquals("No object found with OID o1.", logger.getErrs().get(0).getEventMsg());
+	}
+	
 	// classBp extends to classB with OID b1, associate to classA with OID a1, with a restriction to classAp, which extends classA
 	// OID z1 of classA, associated by classB with OID b1, does not exist
 	@Test
@@ -604,7 +774,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new ObjectEvent(iomObjAp));
@@ -634,7 +804,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjG));
 		validator.validate(new ObjectEvent(iomObjH1));
 		validator.validate(new ObjectEvent(iomObjH2));
@@ -646,6 +816,28 @@ public class Association23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("h1 should associate 1 to 1 target objects (instead of 5)", logger.getErrs().get(0).getEventMsg());
+	}
+	@Test
+	public void oneExternalGObjectAndHObjectsInCard1To1Fail(){
+		Iom_jObject iomObjG=new Iom_jObject(ILI_CLASSG, OBJ_OID1);
+		Iom_jObject iomObjH1=new Iom_jObject(ILI_CLASSH, OBJ_OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjG));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1,logger.getErrs().size());
+		assertEquals("h1 should associate 1 to 1 target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	//#########################################################//
@@ -663,7 +855,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjI));
 		validator.validate(new ObjectEvent(iomObjJ));
 		validator.validate(new EndBasketEvent());
@@ -685,7 +877,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
@@ -706,7 +898,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjD));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
@@ -734,7 +926,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjD));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB1));
@@ -762,7 +954,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjI));
 		validator.validate(new ObjectEvent(iomObjJ));
 		validator.validate(new EndBasketEvent());
@@ -783,7 +975,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
@@ -804,7 +996,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjD));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
@@ -831,7 +1023,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjD));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB2));
@@ -854,7 +1046,7 @@ public class Association23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjI));
 		validator.validate(new ObjectEvent(iomObjJ));
 		validator.validate(new EndBasketEvent());
