@@ -35,6 +35,14 @@ MODEL Association23
 		   attrH1 : TEXT*10;
 		END ClassH;
 		
+		CLASS ClassI =
+		   attrI1 : TEXT*10;
+		END ClassI;
+		
+		CLASS ClassJ =
+		   attrJ1 : TEXT*10;
+		END ClassJ;
+		
 		CLASS ClassAp EXTENDS ClassA =
 		END ClassAp;
 		
@@ -77,6 +85,11 @@ MODEL Association23
 		  a3 -- {0..1} ClassA;
 		  b3 -- {0..*} ClassB;
 		END ab3;
+		
+		ASSOCIATION ab4 =
+		  a4 -- {1..5} ClassI;
+		  b4 -- {0..1} ClassJ;
+		END ab4;
 		
 		ASSOCIATION abp1 =
 		  ap1 -- {0..1} ClassA RESTRICTION(ClassAp);

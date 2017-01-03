@@ -14,23 +14,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-
 import com.sun.xml.internal.fastinfoset.util.StringArray;
 import com.vividsolutions.jts.algorithm.Angle;
-
-
-
-
-
-
-
-
-
-
-
-
 import com.vividsolutions.jts.geom.Coordinate;
-
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
@@ -236,7 +222,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					Iterator<RoleDef> targetRoleIterator=((AbstractClassDef) currentClass).getOpposideRoles();
 					while(targetRoleIterator.hasNext()){
 						RoleDef role=targetRoleIterator.next();
-						validateRoleCardinality(role, iomObj);						
+						validateRoleCardinality(role, iomObj);
 					}
 				}
 			}
@@ -246,11 +232,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void validateMandatoryConstraint(IomObject iomObj, MandatoryConstraint mandatoryConstraintObj) {
 		Evaluable condition = (Evaluable) mandatoryConstraintObj.getCondition();
 		Value conditionValue = evaluateExpression(iomObj, condition);
-		if (!conditionValue.isError()){
-			if (conditionValue.isTrue()){
-				// ok
-			} else {
-				errs.addEvent(errFact.logErrorMsg("Mandatory Constraint {0} is not true.", mandatoryConstraintObj.getName()));
+		String check = mandatoryConstraintObj.getContainer().getScopedName(null)+"."+mandatoryConstraintObj.getName();
+		String checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
+		if(ValidationConfig.OFF.equals(checkConstraint)){
+			// skip it
+		}else{
+			if (!conditionValue.isError()){
+				if (conditionValue.isTrue()){
+					// ok
+				} else {
+//					errs.addEvent(errFact.logErrorMsg("Mandatory Constraint {0} is not true.", mandatoryConstraintObj.getName()));
+					logMsg(checkConstraint,"Mandatory Constraint {0} is not true.", mandatoryConstraintObj.getName());				
+				}
 			}
 		}
 	}
@@ -501,18 +494,24 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {
-		int nrOfTargetObjs=linkPool.getTargetObjectCount(iomObj,role, doItfOidPerTable);
-		long cardMin=role.getCardinality().getMinimum();
-		long cardMax=role.getCardinality().getMaximum();
-		if((nrOfTargetObjs>=cardMin && nrOfTargetObjs<=cardMax)){
-			// valid
+		String roleQName = role.getContainer().getScopedName(null)+"."+role.getName();
+		String multiplicity=validationConfig.getConfigValue(roleQName, ValidationConfig.MULTIPLICITY);
+		if(multiplicity !=null && ValidationConfig.OFF.equals(multiplicity)){
+			// skip it
 		}else{
-			// not valid
-			if(role.getCardinality().getMaximum() == Cardinality.UNBOUND){
-				String cardMaxStr = "*";
-				errs.addEvent(errFact.logErrorMsg(role.getName()+" should associate "+cardMin+" to "+cardMaxStr+" target objects (instead of "+nrOfTargetObjs+")"));
-			} else {
-				errs.addEvent(errFact.logErrorMsg(role.getName()+" should associate "+cardMin+" to "+cardMax+" target objects (instead of "+nrOfTargetObjs+")"));
+			int nrOfTargetObjs=linkPool.getTargetObjectCount(iomObj,role,doItfOidPerTable);
+			long cardMin=role.getCardinality().getMinimum();
+			long cardMax=role.getCardinality().getMaximum();
+			if((nrOfTargetObjs>=cardMin && nrOfTargetObjs<=cardMax)){
+				// valid
+			}else{
+				// not valid
+				if(role.getCardinality().getMaximum() == Cardinality.UNBOUND){
+					String cardMaxStr = "*";
+					logMsg(multiplicity,"{0} should associate {1} to {2} target objects (instead of {3})", role.getName(), String.valueOf(cardMin), cardMaxStr, String.valueOf(nrOfTargetObjs));
+				} else {
+					logMsg(multiplicity,"{0} should associate {1} to {2} target objects (instead of {3})", role.getName(), String.valueOf(cardMin), String.valueOf(cardMax), String.valueOf(nrOfTargetObjs));
+				}
 			}
 		}
 	}
@@ -527,35 +526,46 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(targetOid==null){
 			return;
 		}
-	 	// OID has to be unique in each table (ili 1.0)
-		// OID has to be unique in the whole file (ili 2.3)	
-		Iterator<AbstractClassDef> targetClassIterator = role.iteratorDestination();
-		ArrayList<Viewable> targetClasses = new ArrayList<Viewable>();
-		StringBuffer possibleTargetClasses=new StringBuffer();
-		String sep="";
-		while(targetClassIterator.hasNext()){
-			Viewable targetClass = (Viewable) targetClassIterator.next();
-			targetClasses.add(targetClass);
-			possibleTargetClasses.append(sep);
-			sep=",";
-			possibleTargetClasses.append(targetClass.getScopedName(null));
-		}
-		IomObject targetObj = (IomObject) objectPool.getObject(targetOid, targetClasses);
-		if(targetObj != null){
-			Object modelElement=tag2class.get(targetObj.getobjecttag());
-			Viewable targetObjClass = (Viewable) modelElement;
-			for(Viewable targetClass : targetClasses){
-				if(targetObjClass.isExtending(targetClass)){
-					// target is ok
-					return;
-				}
+		String roleQName = role.getContainer().getScopedName(null)+"."+role.getName();
+		String validateTarget=validationConfig.getConfigValue(roleQName, ValidationConfig.TARGET);
+		if(ValidationConfig.OFF.equals(validateTarget)){
+			// skip it
+		}else{
+		 	// OID has to be unique in each table (ili 1.0)
+			// OID has to be unique in the whole file (ili 2.3)	
+			Iterator<AbstractClassDef> targetClassIterator = role.iteratorDestination();
+			ArrayList<Viewable> destinationClasses = new ArrayList<Viewable>();
+			StringBuffer possibleTargetClasses=new StringBuffer();
+			String sep="";
+			while(targetClassIterator.hasNext()){
+				Viewable roleDestinationClass = (Viewable) targetClassIterator.next();
+				destinationClasses.add(roleDestinationClass);
+				possibleTargetClasses.append(sep);
+				sep=",";
+				possibleTargetClasses.append(roleDestinationClass.getScopedName(null));
 			}
-			// object found, but wrong class
-			errs.addEvent(errFact.logErrorMsg("Object {1} with OID {0} must be of {2}", targetOid,targetObj.getobjecttag(),possibleTargetClasses.toString()));
-			return;
+			IomObject targetObj = (IomObject) objectPool.getObject(targetOid, destinationClasses);
+			if(targetObj != null){
+				Object modelElement=tag2class.get(targetObj.getobjecttag());
+				Viewable targetObjClass = (Viewable) modelElement;
+				for(Viewable destinationClass : destinationClasses){
+					if(targetObjClass.equals(destinationClass)){
+						// target is ok
+						return;
+					} else if(targetObjClass.getExtending() != null){
+						if(targetObjClass.isExtending(destinationClass)){
+							// target is ok
+							return;
+						}
+					}
+				}
+				// object found, but wrong class
+				logMsg(validateTarget,"Object {1} with OID {0} must be of {2}", targetOid,targetObj.getobjecttag(),possibleTargetClasses.toString());
+				return;
+			}
+			// no object with this oid found
+			logMsg(validateTarget,"No object found with OID {0}.", targetOid);
 		}
-		// no object with this oid found
-		errs.addEvent(errFact.logErrorMsg("No object found with OID {0}.", targetOid));
 	}
 	
 	LinkPool linkPool=new LinkPool();
@@ -568,15 +578,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				Type type = ((LocalAttribute)refAttrO).getDomain();
 				// ReferenceType validation
 				if (type instanceof ReferenceType){
+					// targettype
 					ReferenceType refAttrType = (ReferenceType) type;
 					AbstractClassDef targetClass = refAttrType.getReferred();
+					Viewable targetViewable = (Viewable) targetClass;
 					String refAttrName = ((Element) refAttrO).getName();
 					IomObject refAttrValue = structValue.getattrobj(refAttrName, 0);
 					if (refAttrValue != null){
 						String targetOid = refAttrValue.getobjectrefoid();
 						String targetObjOid = null;
 						String targetObjClassStr = null;
-						IomObject iomObj = (IomObject) objectPool.getAllObjects().get(targetOid);
+						IomObject iomObj = (IomObject) objectPool.getObject(targetOid, targetViewable);
 						if(iomObj != null){
 							Object modelElement=tag2class.get(iomObj.getobjecttag());
 							Table targetObjClass = (Table) modelElement;
@@ -601,14 +613,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									classNames.append(targetClass.getScopedName(null));
 									sep=", ";
 								}
-								errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,classNames.toString(),refAttrName ));
+								errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,classNames.toString(),refAttrName));
 								return;
 							}else{
 								// compare class
 								if (targetObjClass.isExtending(targetClass)){
 									// ok
 								} else {
-									errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,targetClass.getScopedName(null),refAttrName ));
+									errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,targetClass.getScopedName(null),refAttrName));
 								}
 								return;
 							}
@@ -629,6 +641,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(iomObj.getattrvaluecount(restrictedAttrName)==0){
 			return;
 		}
+		
+		
+		
 		Type type = existenceConstraint.getRestrictedAttribute().getType();
 		// if type of alias, cast type to TypeAlias
 		if (type instanceof TypeAlias){
@@ -1152,10 +1167,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								// ret.setStringAttribute(roleName, refoid);
 							}
 						}
-						String targetClass = null;
 						if (refoid != null) {
 							// TODO validate target opbject
-							linkPool.addLink(iomObj,role,refoid, doItfOidPerTable);
+							linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
 						}
 				}
 			 }
@@ -1342,7 +1356,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}else{
 						 Cardinality card = ((CompositionType)type).getCardinality();
 						 if(structc<card.getMinimum() || structc>card.getMaximum()){
-							 logMsg(validateMultiplicity,"Attribute {0} has wrong number of values", attrPath);
+							logMsg(validateMultiplicity,"Attribute {0} has wrong number of values", attrPath);
 						 }
 					}
 				 for(int structi=0;structi<structc;structi++){

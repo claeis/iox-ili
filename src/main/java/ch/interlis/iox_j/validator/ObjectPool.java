@@ -2,15 +2,17 @@ package ch.interlis.iox_j.validator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
+import ch.interlis.ili2c.metamodel.AssociationDef;
+import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.iom.IomObject;
 
 public class ObjectPool {
 	
-	private HashMap<HashMap<String, Viewable>, IomObject> ili10Objects = new HashMap<HashMap<String, Viewable>, IomObject>();
-	private HashMap<String, IomObject> ili23Objects = new HashMap<String, IomObject>();
 	private boolean doItfOidPerTable;
+	Map<ObjectPoolKey, IomObject> collectionOfObjects = new HashMap<ObjectPoolKey, IomObject>();
 	
 	
 	public ObjectPool(boolean doItfOidPerTable){
@@ -19,44 +21,58 @@ public class ObjectPool {
 
 	public void addObject(IomObject iomObj, HashMap<String,Object> tag2class){
 		String oid = iomObj.getobjectoid();
+		Object modelEle = tag2class.get(iomObj.getobjecttag());
+		Viewable classValue = (Viewable) modelEle;
+		ObjectPoolKey key = null;
 		if(doItfOidPerTable){
-			HashMap<String, Viewable> keyOfIli10Objects = new HashMap<String, Viewable>();
-			Object modelElement=tag2class.get(iomObj.getobjecttag());
-			Viewable classValue= (Viewable) modelElement;
-			keyOfIli10Objects.put(oid, classValue);
-			if(!ili10Objects.containsKey(keyOfIli10Objects)){
-				ili10Objects.put(keyOfIli10Objects, iomObj);
+			key=new ObjectPoolKey(oid, classValue);
+		} else {
+			key=new ObjectPoolKey(oid, null);
+		}
+		if(!collectionOfObjects.containsKey(key)){
+			collectionOfObjects.put(key,iomObj);
+		}
+	}
+	
+	public Map getAllObjects(){
+		return collectionOfObjects;
+	}
+	
+	
+	public IomObject getObject(String oid, Viewable classValue){
+		IomObject key = null;
+		if(doItfOidPerTable){			
+			IomObject objectPoolKey = collectionOfObjects.get(new ObjectPoolKey(oid, classValue));
+			if(objectPoolKey != null){
+				key = objectPoolKey;
 			}
 		} else {
-			if(!ili23Objects.containsKey(oid)){
-				ili23Objects.put(oid, iomObj);
-			}	
+			IomObject objectPoolKey = collectionOfObjects.get(new ObjectPoolKey(oid, null));
+			if(objectPoolKey != null){
+				key = objectPoolKey;
+			}
 		}
+		return key;
 	}
 	
-	public HashMap getAllObjects(){
-		if(doItfOidPerTable){
-			return ili10Objects;
-		} else {
-			return ili23Objects;
-		}
-	}
 	
-
 	public IomObject getObject(String oid, ArrayList<Viewable> classes) {
-		
-		if(doItfOidPerTable) {
-			for(Viewable aClass : classes){
-				HashMap<String, Viewable> keyOfIli10Objects = new HashMap<String, Viewable>();
-				keyOfIli10Objects.put(oid, aClass);
-				if(ili10Objects.containsKey(keyOfIli10Objects)){
-					return ili10Objects.get(keyOfIli10Objects);
+		IomObject key = null;
+		if(doItfOidPerTable){
+			for(Viewable aClass : classes){				
+				IomObject objectPoolKey = collectionOfObjects.get(new ObjectPoolKey(oid, aClass));
+				if(objectPoolKey != null){
+					key = objectPoolKey;
 				}
 			}
-			return null;
 		} else {
-			return ili23Objects.get(oid);
+			for(Viewable aClass : classes){				
+				IomObject objectPoolKey = collectionOfObjects.get(new ObjectPoolKey(oid, null));
+				if(objectPoolKey != null){
+					key = objectPoolKey;
+				}
+			}
 		}
-		
+		return key;
 	}
 }

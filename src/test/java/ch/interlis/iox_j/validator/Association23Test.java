@@ -41,6 +41,8 @@ public class Association23Test {
 	private final static String ILI_CLASSD=ILI_TOPIC+".ClassD";
 	private final static String ILI_CLASSG=ILI_TOPIC+".ClassG";
 	private final static String ILI_CLASSH=ILI_TOPIC+".ClassH";
+	private final static String ILI_CLASSI=ILI_TOPIC+".ClassI";
+	private final static String ILI_CLASSJ=ILI_TOPIC+".ClassJ";
 	// CLASS EXTEND
 	private final static String ILI_CLASSAP=ILI_TOPIC+".ClassAp";
 	private final static String ILI_CLASSBP=ILI_TOPIC+".ClassBp";
@@ -54,6 +56,9 @@ public class Association23Test {
 	
 	private final static String ILI_ASSOC_AB3_A3="a3";
 	private final static String ILI_ASSOC_AB3_B3="b3";
+	
+	private final static String ILI_ASSOC_AB4_A4="a4";
+	private final static String ILI_ASSOC_AB4_B4="b4";
 	
 	private final static String ILI_ASSOC_ABP1_AP1="ap1";
 	private final static String ILI_ASSOC_ABP1_BP1="bp1";
@@ -641,5 +646,221 @@ public class Association23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("h1 should associate 1 to 1 target objects (instead of 5)", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	//#########################################################//
+	//################# CONFIG ON/OFF TEST ####################//
+	//#########################################################//
+	
+	@Test
+	public void configMultiplicityON_AssociationRefFail(){
+		Iom_jObject iomObjI=new Iom_jObject(ILI_CLASSI, OBJ_OID1);
+		Iom_jObject iomObjJ=new Iom_jObject(ILI_CLASSJ, OBJ_OID2);
+		iomObjJ.addattrobj(ILI_ASSOC_AB4_A4, "REF").setobjectrefoid(OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(iomObjI));
+		validator.validate(new ObjectEvent(iomObjJ));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("unknown property <a4>", logger.getErrs().get(0).getEventMsg());
+		assertEquals("a4 should associate 1 to 5 target objects (instead of 0)", logger.getErrs().get(1).getEventMsg());
+	}
+	
+	@Test
+	public void configTargetON_NoTargetObject1toNFail(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
+		iomObjB.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID3);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void configTargetON_WrongTargetClass1to1Fail(){
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
+		iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Object Association23.Topic.ClassD with OID o1 must be of Association23.Topic.ClassA", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void configTargetAndMultiplicityON_Embedded_CLASSBassociatetoClassA_ab3_0to1_Fail(){
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID2);
+		Iom_jObject iomObjB1=new Iom_jObject(ILI_CLASSB, OBJ_OID3);
+		iomObjB1.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID2);
+		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OBJ_OID3);
+		iomObjB2.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID2);
+		Iom_jObject iomObjB3=new Iom_jObject(ILI_CLASSB, OBJ_OID5);
+		iomObjB3.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID6);
+		Iom_jObject iomObjB4=new Iom_jObject(ILI_CLASSB, OBJ_OID7);
+		iomObjB4.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB1));
+		validator.validate(new ObjectEvent(iomObjB2));
+		validator.validate(new ObjectEvent(iomObjB3));
+		validator.validate(new ObjectEvent(iomObjB4));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==4);
+		assertEquals("The OID o3 of object 'Association23.Topic.ClassB oid o3 {a3 -> o2 REF {}}' already exists in CLASS Association23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("a3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(1).getEventMsg());
+		assertEquals("No object found with OID o6.", logger.getErrs().get(2).getEventMsg());
+		assertEquals("Object Association23.Topic.ClassD with OID o1 must be of Association23.Topic.ClassA", logger.getErrs().get(3).getEventMsg());
+	}
+	
+	@Test
+	public void configMultiplicityOFF_AssociationRefFail(){
+		Iom_jObject iomObjI=new Iom_jObject(ILI_CLASSI, OBJ_OID1);
+		Iom_jObject iomObjJ=new Iom_jObject(ILI_CLASSJ, OBJ_OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Association23.Topic.ab4.a4", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(iomObjI));
+		validator.validate(new ObjectEvent(iomObjJ));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void configTargetOFF_NoTargetObject1toNOk(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
+		iomObjB.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID3);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Association23.Topic.ab3.a3", ValidationConfig.TARGET,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void configTargetOFF_WrongTargetClass1to1Ok(){
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
+		iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Association23.Topic.ab1.a1", ValidationConfig.TARGET,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void configTargetAndMultiplicityOFF_Embedded_CLASSBassociatetoClassA_ab3_0to1_Fail(){
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID2);
+		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OBJ_OID3);
+		iomObjB2.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID2);
+		Iom_jObject iomObjB3=new Iom_jObject(ILI_CLASSB, OBJ_OID5);
+		iomObjB3.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID6);
+		Iom_jObject iomObjB4=new Iom_jObject(ILI_CLASSB, OBJ_OID7);
+		iomObjB4.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Association23.Topic.ab3.a3", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
+		modelConfig.setConfigValue("Association23.Topic.ab3.a3", ValidationConfig.TARGET,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB2));
+		validator.validate(new ObjectEvent(iomObjB3));
+		validator.validate(new ObjectEvent(iomObjB4));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void configMultiplicityWARNING_AssociationRefFail(){
+		Iom_jObject iomObjI=new Iom_jObject(ILI_CLASSI, OBJ_OID1);
+		Iom_jObject iomObjJ=new Iom_jObject(ILI_CLASSJ, OBJ_OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Association23.Topic.ab4.a4", ValidationConfig.MULTIPLICITY,ValidationConfig.WARNING);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(iomObjI));
+		validator.validate(new ObjectEvent(iomObjJ));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getWarn().size()==1);
+		assertEquals("a4 should associate 1 to 5 target objects (instead of 0)", logger.getWarn().get(0).getEventMsg());
 	}
 }

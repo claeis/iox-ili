@@ -1711,6 +1711,8 @@ public class MandatoryConstraints23 {
 		iomObjA.setattrvalue("attr1", "Bernhard");
 		iomObjA.setattrvalue("attr2", "Bernhard");
 		ValidationConfig modelConfig=new ValidationConfig();
+//		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassInEqualationA.attr1", ValidationConfig.CHECK,ValidationConfig.OFF);
+//		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassInEqualationA.attr2", ValidationConfig.CHECK,ValidationConfig.OFF);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();

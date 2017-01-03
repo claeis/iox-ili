@@ -135,7 +135,7 @@ public class ReferenceType10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-
+	
 	//#########################################################//
 	//######################### FAIL ##########################//
 	//#########################################################//
@@ -190,5 +190,121 @@ public class ReferenceType10Test {
 		// Asserts
 		assertEquals(1, logger.getErrs().size());
 		assertEquals("No object found with OID o2.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	//#########################################################//
+	//################## CONFIG ON/OFF TEST ###################//
+	//#########################################################//	
+	
+	@Test
+	public void configTargetON_ReferencedNoClassFoundFail() throws Exception {
+		Iom_jObject objC1=new Iom_jObject(REFERENCETYPE10_CLASSC, OID1);
+		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(REFERENCETYPE10_TOPICA,BID1));
+		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1, logger.getErrs().size());
+		assertEquals("No object found with OID o1.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	@Test
+	public void configMultiplicityON_TwoReferencedClassesWithSameOidFail() throws Exception {
+		Iom_jObject iomObjI=new Iom_jObject(REFERENCETYPE10_CLASSA, OID1);
+		Iom_jObject iomObjJ=new Iom_jObject(REFERENCETYPE10_CLASSC,OID2);
+		iomObjJ.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjJ2=new Iom_jObject(REFERENCETYPE10_CLASSC,OID2);
+		iomObjJ2.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(REFERENCETYPE10_TOPICA,BID1));
+		validator.validate(new ObjectEvent(iomObjI));
+		validator.validate(new ObjectEvent(iomObjJ));
+		validator.validate(new ObjectEvent(iomObjJ2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(2, logger.getErrs().size());
+		assertEquals("The OID o2 of object 'ReferenceType10.TopicA.ClassC oid o2 {attrC1 -> o1 REF {}}' already exists in CLASS ReferenceType10.TopicA.ClassC.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("attrC1 should associate 1 to 1 target objects (instead of 2)", logger.getErrs().get(1).getEventMsg());
+	}
+	
+	@Test
+	public void configTAndMultiplicityON_TwoReferencedClassesWithSameOidFail() throws Exception {
+		Iom_jObject iomObjI=new Iom_jObject(REFERENCETYPE10_CLASSA, OID3);
+		Iom_jObject iomObjJ=new Iom_jObject(REFERENCETYPE10_CLASSC,OID2);
+		iomObjJ.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjJ2=new Iom_jObject(REFERENCETYPE10_CLASSC,OID2);
+		iomObjJ2.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(REFERENCETYPE10_TOPICA,BID1));
+		validator.validate(new ObjectEvent(iomObjI));
+		validator.validate(new ObjectEvent(iomObjJ));
+		validator.validate(new ObjectEvent(iomObjJ2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(3, logger.getErrs().size());
+		assertEquals("The OID o2 of object 'ReferenceType10.TopicA.ClassC oid o2 {attrC1 -> o1 REF {}}' already exists in CLASS ReferenceType10.TopicA.ClassC.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("No object found with OID o1.", logger.getErrs().get(1).getEventMsg());
+		assertEquals("attrC1 should associate 1 to 1 target objects (instead of 2)", logger.getErrs().get(2).getEventMsg());
+	}
+	
+	@Test
+	public void configTargetOFF_ReferencedNoClassFoundFail() throws Exception {
+		Iom_jObject objC1=new Iom_jObject(REFERENCETYPE10_CLASSC, OID1);
+		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("ReferenceType10.TopicA.ClassCattrC1.attrC1", ValidationConfig.TARGET,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(REFERENCETYPE10_TOPICA,BID1));
+		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0, logger.getErrs().size());
+	}
+	
+	@Test
+	public void configMultiplicityOFF_TwoReferencedClassesFail() throws Exception {
+		Iom_jObject iomObjJ=new Iom_jObject(REFERENCETYPE10_CLASSD,OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("ReferenceType10.TopicA.ClassDattrC1.attrC1", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(REFERENCETYPE10_TOPICA,BID1));
+		validator.validate(new ObjectEvent(iomObjJ));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0, logger.getErrs().size());
 	}
 }

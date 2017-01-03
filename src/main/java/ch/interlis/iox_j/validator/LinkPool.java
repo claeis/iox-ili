@@ -17,9 +17,9 @@ public class LinkPool {
 	public int getTargetObjectCount(IomObject iomObj, RoleDef role, boolean doItfOidPerTable) {
 		Integer ret = null;
 		if(doItfOidPerTable){
-			ret=collectionOfReferenceObj.get(new LinkPoolKey(iomObj.getobjectoid(), iomObj.getobjecttag(), role.getName(), doItfOidPerTable));
+			ret=collectionOfReferenceObj.get(new LinkPoolKey(iomObj.getobjectoid(), iomObj.getobjecttag(), role.getName()));
 		} else {
-			ret=collectionOfReferenceObj.get(new LinkPoolKey(iomObj.getobjectoid(), role.getName(), doItfOidPerTable));
+			ret=collectionOfReferenceObj.get(new LinkPoolKey(iomObj.getobjectoid(), null, role.getName()));
 		}
 		if(ret==null){
 			return 0;
@@ -27,7 +27,7 @@ public class LinkPool {
 		return ret;
 	}
 
-	public void addLink(IomObject iomObj, RoleDef role, String targetOid, boolean doItfOidPerTable) {
+	public void addLink(IomObject iomObj, RoleDef role, String targetOid, boolean doItfOidPerTable){
 		String oid = iomObj.getobjectoid();
 		String roleName = role.getName();
 		// if embedded
@@ -45,12 +45,12 @@ public class LinkPool {
 		}
 	}
 
-	private void increaseCounter(String oid, String className, String roleName, boolean doItfOidPerTable) {
+	private void increaseCounter(String oid, String className, String roleName, boolean doItfOidPerTable){
 		LinkPoolKey key = null;
 		if(doItfOidPerTable){
-			key=new LinkPoolKey(oid, className, roleName, doItfOidPerTable);
+			key=new LinkPoolKey(oid, className, roleName);
 		} else {
-			key=new LinkPoolKey(oid, roleName, doItfOidPerTable);
+			key=new LinkPoolKey(oid, null, roleName);
 		}
 		if(collectionOfReferenceObj.containsKey(key)){
 			int counter=collectionOfReferenceObj.get(key);
