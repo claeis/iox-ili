@@ -109,6 +109,7 @@ public class ViewableProperties
      */
     public void addAll(ViewableProperties other){
     	classv.putAll(other.classv);
+    	xtf24nameMapping.putAll(other.getXtf24nameMapping());
     }
     static void Main(String[] args)
 	{

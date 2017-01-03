@@ -46,6 +46,9 @@ public class LineSet {
 		String currentBoundaryTid=null;
 		for(String line_tid:lines.keySet()){
 			IomObject polyline=lines.get(line_tid).getattrobj(helperTableGeomAttrName, 0);
+			if(polyline==null){
+				throw new IoxException("undefined polyline");
+			}
 			com.vividsolutions.jts.geom.Coordinate currentSegmentStartpoint=null;
 			{
 				IomObject sequence=polyline.getattrobj("sequence",0);
@@ -173,7 +176,7 @@ public class LineSet {
 				}
 			}
 		}
-		if(currentBoundary.size()>0){
+		if(currentBoundary!=null && currentBoundary.size()>0){
 			boundaries.add(currentBoundary);
 			boundaryTids.add(currentBoundaryTid);
 		}

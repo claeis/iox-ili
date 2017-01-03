@@ -25,6 +25,10 @@ package ch.interlis.iom_j.xtf.impl;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.*;
 import javax.xml.namespace.QName;
 
@@ -92,6 +96,10 @@ public class MyHandler
 	private int BD_BOUNDARY=100;
 	private int BD_AFTER_POLYLINE=101;
 	private int BD_AFTER_BOUNDARY=102;
+	// BlackboxValue
+	private int BB_BINBLBOX=110;
+	private int BB_XMLBLBOX=111;
+	
 	// StructValue
 	private int ST_BEFORE_PROPERTY=125;
 	private int ST_AFTER_STRUCTVALUE=126;
@@ -101,6 +109,8 @@ public class MyHandler
 	private int ST_AFTER_POLYLINE=130;
 	private int ST_AFTER_SURFACE=131;
 	private int ST_AFTER_OID=132;
+	private int ST_AFTER_BINBLBOX=133;
+	private int ST_AFTER_XMLBLBOX=134;
 	// HeaderSection
 	private int HS_HEADERSECTION=1000;
 	private int HS_MODELS=1010;
@@ -120,8 +130,13 @@ public class MyHandler
 	
 	
 	private StringBuilder propertyValue=null;
+	private XMLEventWriter propertyXml=null;
+	private java.io.StringWriter propertyXmlString=null;
+	private XMLOutputFactory xmlOf=XMLOutputFactory.newFactory();
+	private XMLEventFactory eventOf=XMLEventFactory.newFactory();
 	private int state=BEFORE_TRANSFER;
 	private int skip=0;
+	private int collectXml=0;
 	/** current element level
 	 */
 	private int level=0;
@@ -151,6 +166,15 @@ public class MyHandler
     	level++;
     	if(skip>0){
     		skip++;
+    		return;
+    	}
+    	if(collectXml>0){
+    		collectXml++;
+    		try {
+				propertyXml.add(event);
+			} catch (XMLStreamException e) {
+				throw new IoxException(e);
+			}
     		return;
     	}
     	String name=event.getName().getLocalPart();
@@ -559,6 +583,27 @@ public class MyHandler
 			object=newIomObject("COORD",null);
 			return;
 		}
+		
+		//BlackboxValue
+		if(state==ST_BEFORE_CHARACTERS && name.equals("XMLBLBOX")){
+			state=BB_XMLBLBOX;
+			// collect xml
+			collectXml=1;
+			propertyXmlString=new java.io.StringWriter();
+			try {
+				propertyXml=xmlOf.createXMLEventWriter(propertyXmlString);
+				propertyXml.add(eventOf.createStartDocument());
+			} catch (XMLStreamException e) {
+				throw new IoxException(e);
+			}
+			return;
+		}
+		if(state==ST_BEFORE_CHARACTERS && name.equals("BINBLBOX")){
+			state=BB_BINBLBOX;
+			// ensure we save collected characters only inside BINBLBOX
+			propertyValue=null;
+			return;
+		}
 
     	if(state==BEFORE_OBJECT || state==ST_AFTER_STRUCTVALUE || state==ST_BEFORE_CHARACTERS || state==ST_BEFORE_EMBASSOC){
 
@@ -688,6 +733,17 @@ public class MyHandler
 			skip--;
 			return;
 		}
+		if(collectXml>0){
+			collectXml--;
+			if(collectXml>0){
+	    		try {
+					propertyXml.add(event);
+				} catch (XMLStreamException e) {
+					throw new IoxException(e);
+				}
+	    		return;
+			}
+		}
 		
 		/* DATASECTION
 		 */
@@ -778,7 +834,36 @@ public class MyHandler
 			parser_addAttrValue(object,"C3",propertyValue.toString());
 			propertyValue=null;
 			state=CV_AFTER_C3;
-			
+		// BlackboxValue
+		}else if(state==BB_BINBLBOX){
+			Element ele=objStack.remove(0);
+			String value=null;
+			if(propertyValue!=null){
+				value=propertyValue.toString();
+			}
+			parser_addAttrValue(ele.object,ele.propertyName,value);			
+			object=ele.object;
+			propertyValue=null;
+			state=ST_AFTER_BINBLBOX;
+		}else if(state==BB_XMLBLBOX){
+			Element ele=objStack.remove(0);
+			String value=null;
+			if(propertyXmlString!=null){
+				try {
+					propertyXml.add(eventOf.createEndDocument());
+					propertyXml.flush();
+				} catch (XMLStreamException e) {
+					throw new IoxException(e);
+				}
+				value=propertyXmlString.toString();
+			}
+			parser_addAttrValue(ele.object,ele.propertyName,value);			
+			object=ele.object;
+			propertyXml=null;
+			propertyXmlString=null;
+			state=ST_AFTER_XMLBLBOX;
+		}else if(state==ST_AFTER_BINBLBOX || state==ST_AFTER_XMLBLBOX){
+			state=ST_BEFORE_PROPERTY;
 		// StructValue
 		}else if(state==ST_AFTER_STRUCTVALUE 
 				|| state==ST_BEFORE_CHARACTERS
@@ -924,11 +1009,22 @@ public class MyHandler
     		stopParser=true;
     	}
     }
-	public void characters(Characters event) {
+	public void characters(Characters event) throws IoxException {
+		if(collectXml>0){
+			if(collectXml>1){
+	    		try {
+					propertyXml.add(event);
+				} catch (XMLStreamException e) {
+					throw new IoxException(e);
+				}
+			}
+    		return;
+		}
 		if(state==ST_BEFORE_CHARACTERS
 				|| state==CV_C1
 				|| state==CV_C2
 				|| state==CV_C3
+				|| state==BB_BINBLBOX
 				|| state==HS_COMMENT
 				){
 			if(propertyValue==null){
@@ -936,6 +1032,19 @@ public class MyHandler
 			}
 			propertyValue.append(event.getData());
 		}
+	}
+	public void otherEvents(XMLEvent event) throws IoxException {
+		if(collectXml>0){
+			if(event.getEventType()==XMLEvent.START_DOCUMENT || event.getEventType()==XMLEvent.END_DOCUMENT){
+				// skip it
+			}else{
+	    		try {
+					propertyXml.add(event);
+				} catch (XMLStreamException e) {
+					throw new IoxException(e);
+				}
+			}
+    	}
 	}
 	String stripX(String oid){
 		if(oid==null){

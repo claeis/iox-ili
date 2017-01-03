@@ -2,19 +2,34 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
-iox-ili-1.13.7-feature/validator1 (2016-12-29)
+iox-ili 1.14.0 (2016-12-30)
+-----------------------------
+- ili2c-4.6.0
+- Iligml20Writer: added
+- Iligml10Writer.defaultCrs added
+
+iox-ili 1.13.6 (2016-11-25)
+-----------------------------
+- ItfReader2: fixed NullPointerException if empty line in line table
+
+iox-ili 1.13.5 (2016-11-02)
+-----------------------------
+- XtfWriter: fixed BLACKBOX output
+- XtfReader: fixed BLACKBOX parser
+
+iox-ili-1.13.4-feature/validator1 (2016-12-29)
 ----------------------------------------------
 - validator: fixed cardinality fault if ili1.0
 - validator: validate POLYLINE topology
 - validator: optimized object pool
 
-iox-ili-1.13.6-feature/validator1 (2016-12-21)
+iox-ili-1.13.4-feature/validator1 (2016-12-21)
 ----------------------------------------------
 - validator: fixed if cardinality is N, show "*" (UNBOUND) is error message 
 - validator: validate mandatory constraint in NOT, OR, AND, DEFINED, UNDEFINED
 - validator: validate mandatory constraint in ==, !=, <>, <, <=, >, >= of attribute and attribute path
 
-iox-ili-1.13.5-feature/validator1 (2016-12-12)
+iox-ili-1.13.4-feature/validator1 (2016-12-12)
 ----------------------------------------------
 - validator: fixed OID uniqueness per table in ITF
 
