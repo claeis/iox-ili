@@ -71,7 +71,6 @@ import java.util.Map;
 	 */
     public class Iligml10Writer implements ch.interlis.iox.IoxWriter
     {
-        private static final String defaultCrs = "EPSG:21781";
 		private XMLStreamWriter xout=null;
     	private ObjectPoolManager recman = null;
         private ViewableProperties mapping = null;
