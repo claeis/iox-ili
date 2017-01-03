@@ -76,10 +76,10 @@ MODEL Association23
 		  b2 -- {0..*} ClassB;
 		END ab2;
 		
-		ASSOCIATION zz1 =
-		  z9 -- {1..*} ClassE;
-		  y9 -- {1..*} ClassF;
-		END zz1;
+		ASSOCIATION ef1 =
+		  e1 -- {1..*} ClassE;
+		  f1 -- {1..*} ClassF;
+		END ef1;
 		
 		ASSOCIATION ab3 =
 		  a3 -- {0..1} ClassA;
@@ -122,4 +122,35 @@ MODEL Association23
 		END abd3;
 		
 	END Topic;
+
+	TOPIC TopicB=
+		
+		CLASS ClassE =
+		   attrE1 : TEXT*10;
+		END ClassE;
+		
+		CLASS ClassF =
+		   attrF1 : TEXT*10;
+		END ClassF;
+		
+		CLASS ClassG =
+		   attrG1 : TEXT*10;
+		END ClassG;
+		
+		CLASS ClassH =
+		   attrH1 : TEXT*10;
+		END ClassH;
+				
+		ASSOCIATION gh1 =
+		  g1 (EXTERNAL) -- {1..1} ClassG;
+		  h1 (EXTERNAL) -- {1..1} ClassH;
+		END gh1;
+
+		ASSOCIATION ef1 =
+		  e1 (EXTERNAL) -- {1..*} ClassE;
+		  f1 (EXTERNAL) -- {1..*} ClassF;
+		END ef1;
+		
+	END TopicB;
+
 END Association23.
