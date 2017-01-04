@@ -35,6 +35,10 @@ public class ReferenceType23Test {
 	private final static String ILI_STRUCTE=ILI_TOPIC+".StructE";
 	private final static String ILI_CLASSF=ILI_TOPIC+".ClassF";
 	private static final String ILI_CLASSF_ATTRF2 = "attrF2";
+	private final static String ILI_STRUCTG=ILI_TOPIC+".StructG";
+	private static final String ILI_STRUCTG_ATTRG2 = "attrG2";
+	private final static String ILI_CLASSH=ILI_TOPIC+".ClassH";
+	private static final String ILI_CLASSH_ATTRH2 = "attrH2";
 	
 	@Before
 	public void setUp() throws Exception {
@@ -70,7 +74,55 @@ public class ReferenceType23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertEquals(0,logger.getErrs().size());
+	}
+	@Test
+	public void referenceTypeBasketExternalOk(){
+		String objTargetId="o1";
+		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, objTargetId);
+		Iom_jObject o1Ref=new Iom_jObject("REF", null);
+		o1Ref.setobjectrefoid(objTargetId);
+		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTG, null);
+		iomStruct.addattrobj(ILI_STRUCTG_ATTRG2, o1Ref);
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSH, "o2");
+		iomObj.addattrobj(ILI_CLASSH_ATTRH2, iomStruct);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new ObjectEvent(iomObjtarget));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,"b2"));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
+	}
+	@Test
+	public void referenceTypeFileExternalOk(){
+		String objTargetId="o1";
+		Iom_jObject o1Ref=new Iom_jObject("REF", null);
+		o1Ref.setobjectrefoid(objTargetId);
+		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTG, null);
+		iomStruct.addattrobj(ILI_STRUCTG_ATTRG2, o1Ref);
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSH, "o2");
+		iomObj.addattrobj(ILI_CLASSH_ATTRH2, iomStruct);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,"b2"));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
 	}
 	
 	@Test
@@ -187,6 +239,32 @@ public class ReferenceType23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Attribute attrE2 requires a value", logger.getErrs().get(0).getEventMsg());
+	}
+	@Test
+	public void referenceTypeDifferentBasketFail(){
+		String objTargetId="o1";
+		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, objTargetId);
+		Iom_jObject o1Ref=new Iom_jObject("REF", null);
+		o1Ref.setobjectrefoid(objTargetId);
+		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTC, null);
+		iomStruct.addattrobj(ILI_STRUCTC_ATTRC2, o1Ref);
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSD, "o2");
+		iomObj.addattrobj(ILI_CLASSD_ATTRD2, iomStruct);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new ObjectEvent(iomObjtarget));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,"b2"));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1,logger.getErrs().size());
 	}
 	
 	@Test
