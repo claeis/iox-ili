@@ -42,5 +42,16 @@ MODEL ReferenceType23
 		   attrF1 : 0.0 .. 10.0;
 		   attrF2 : BAG {0..*} OF StructE;
 		END ClassF;	
+
+		STRUCTURE StructG =
+		   attrG1 : 0.0 .. 10.0;
+		   attrG2 : MANDATORY REFERENCE TO (EXTERNAL) ClassA;
+		END StructG;
+
+		CLASS ClassH =
+		   attrH1 : 0.0 .. 10.0;
+		   attrH2 : BAG {0..*} OF StructG;
+		END ClassH;	
+
 	END Topic;
 END ReferenceType23.
