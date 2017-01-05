@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.ws.Holder;
+
 import com.sun.xml.internal.fastinfoset.util.StringArray;
 import com.vividsolutions.jts.algorithm.Angle;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -98,11 +101,13 @@ import ch.interlis.iox.IoxLogEvent;
 import ch.interlis.iox.IoxLogging;
 import ch.interlis.iox.IoxValidationConfig;
 import ch.interlis.iox_j.IoxInvalidDataException;
+import ch.interlis.iox_j.StartBasketEvent;
 import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.jts.Jtsext2iox;
 import ch.interlis.iox_j.logging.LogEventFactory;
 import ch.interlis.models.INTERLIS.*;
 import ch.interlis.models.IlisMeta07.ModelData.AttributeRefType;
+import ch.interlis.iox_j.StartBasketEvent;
 
 
 public class Validator implements ch.interlis.iox.IoxValidator {
@@ -120,7 +125,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private boolean doItfOidPerTable=false;
 	private Settings config=null;
 	private boolean validationOff=false;
-
+	private String currentBasketId = null;
+	private String previousBasketId = null;
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
 			IoxLogging errs, LogEventFactory errFact, Settings config) {
 		super();
@@ -139,6 +145,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		unknownTypev=new HashSet<String>();
 		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
 		objectPool=new ObjectPool(doItfOidPerTable);
+		currentBasketId = new String();
 	}
 
 	/** mappings from xml-tags to Viewable|AttributeDef
@@ -171,15 +178,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(validationOff){
 			return;
 		}
-		if(event instanceof ch.interlis.iox.ObjectEvent){
+		if (event instanceof ch.interlis.iox.StartTransferEvent){
+		} else if (event instanceof ch.interlis.iox.StartBasketEvent){
+			currentBasketId = ((ch.interlis.iox.StartBasketEvent) event).getBid();
+		}else if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=((ch.interlis.iox.ObjectEvent)event).getIomObject();
 			validateObject(iomObj,null);
-		} else if (event instanceof ch.interlis.iox.EndTransferEvent){
+		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
 			iterateThroughAllObjects();
+			previousBasketId = currentBasketId;
+		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
+			
 		}
 	}
-	
-	
+
 	private void iterateThroughAllObjects(){
 		if (!objectPool.getAllObjects().isEmpty()){
 			// iterate through iomObjects
@@ -502,17 +514,50 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			long cardMin=role.getCardinality().getMinimum();
 			long cardMax=role.getCardinality().getMaximum();
 			if((nrOfTargetObjs>=cardMin && nrOfTargetObjs<=cardMax)){
-				// valid
-			}else{
-				// not valid
-				if(role.getCardinality().getMaximum() == Cardinality.UNBOUND){
-					String cardMaxStr = "*";
-					logMsg(multiplicity,"{0} should associate {1} to {2} target objects (instead of {3})", role.getName(), String.valueOf(cardMin), cardMaxStr, String.valueOf(nrOfTargetObjs));
-				} else {
-					logMsg(multiplicity,"{0} should associate {1} to {2} target objects (instead of {3})", role.getName(), String.valueOf(cardMin), String.valueOf(cardMax), String.valueOf(nrOfTargetObjs));
+				// is valid
+			} else {
+				if(authorizedError(role)){
+					// not valid
+					if(role.getCardinality().getMaximum() == Cardinality.UNBOUND){
+						String cardMaxStr = "*";
+						logMsg(multiplicity,"{0} should associate {1} to {2} target objects (instead of {3})", role.getName(), String.valueOf(cardMin), cardMaxStr, String.valueOf(nrOfTargetObjs));
+					} else {
+						logMsg(multiplicity,"{0} should associate {1} to {2} target objects (instead of {3})", role.getName(), String.valueOf(cardMin), String.valueOf(cardMax), String.valueOf(nrOfTargetObjs));
+					}
 				}
 			}
 		}
+	}
+
+	private boolean authorizedError(RoleDef role) {
+		if(role.isExternal()){
+			return false;
+		}
+		if(!role.isExternal()){
+			if(previousBasketId==null){
+				// previous is NULL
+				return true;
+			} else {
+				// previous FULL
+				if(currentBasketId.equals(previousBasketId)){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private boolean authorizedError() {
+		if(previousBasketId==null){
+			// previous is NULL
+			return true;
+		} else {
+			// previous FULL
+			if(currentBasketId.equals(previousBasketId)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void validateRoleReference(RoleDef role, IomObject iomObj) {
@@ -543,7 +588,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				sep=",";
 				possibleTargetClasses.append(roleDestinationClass.getScopedName(null));
 			}
-			IomObject targetObj = (IomObject) objectPool.getObject(targetOid, destinationClasses);
+			Holder<String> bid = new Holder<String>();
+			bid.value=currentBasketId;
+			IomObject targetObj = (IomObject) objectPool.getObject(targetOid, destinationClasses, bid);
 			if(targetObj != null){
 				Object modelElement=tag2class.get(targetObj.getobjecttag());
 				Viewable targetObjClass = (Viewable) modelElement;
@@ -558,12 +605,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 					}
 				}
-				// object found, but wrong class
-				logMsg(validateTarget,"Object {1} with OID {0} must be of {2}", targetOid,targetObj.getobjecttag(),possibleTargetClasses.toString());
-				return;
+				if(authorizedError(role)){
+					// object found, but wrong class
+					logMsg(validateTarget,"Object {1} with OID {0} must be of {2}", targetOid,targetObj.getobjecttag(),possibleTargetClasses.toString());
+					return;
+				}
 			}
-			// no object with this oid found
-			logMsg(validateTarget,"No object found with OID {0}.", targetOid);
+			if(authorizedError(role)){
+				// no object with this oid found
+				logMsg(validateTarget,"No object found with OID {0}.", targetOid);
+			}
 		}
 	}
 	
@@ -587,7 +638,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						String targetOid = refAttrValue.getobjectrefoid();
 						String targetObjOid = null;
 						String targetObjClassStr = null;
-						IomObject iomObj = (IomObject) objectPool.getObject(targetOid, targetViewable);
+						Holder<String> bid = new Holder<String>();
+						bid.value=currentBasketId;
+						IomObject iomObj = (IomObject) objectPool.getObject(targetOid, targetViewable, bid);
 						if(iomObj != null){
 							Object modelElement=tag2class.get(iomObj.getobjecttag());
 							Table targetObjClass = (Table) modelElement;
@@ -612,19 +665,25 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									classNames.append(targetClass.getScopedName(null));
 									sep=", ";
 								}
-								errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,classNames.toString(),refAttrName));
-								return;
+								if(authorizedError()){
+									errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,classNames.toString(),refAttrName));
+									return;
+								}
 							}else{
 								// compare class
 								if (targetObjClass.isExtending(targetClass)){
 									// ok
 								} else {
-									errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,targetClass.getScopedName(null),refAttrName));
+									if(authorizedError()){
+										errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,targetClass.getScopedName(null),refAttrName));
+									}
 								}
 								return;
 							}
 						} else {
-							errs.addEvent(errFact.logErrorMsg("attribute {1} references an inexistent object with OID {0}.", targetOid,refAttrName));
+							if(authorizedError()){
+								errs.addEvent(errFact.logErrorMsg("attribute {1} references an inexistent object with OID {0}.", targetOid,refAttrName));
+							}
 						}
 					}
 				}
@@ -975,7 +1034,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Object modelElementToCompare = tag2class.get(iomObj.getobjecttag());
 			Viewable classValueToCompare= (Viewable) modelElementToCompare;
 			String objOidToCompare = iomObj.getobjectoid();
-			Iterator<IomObject> objectIterator = objectPool.getAllObjects().values().iterator();
+			Iterator<IomObject> objectIterator = null;
+			if(!objectPool.collectionOfBaskets.values().isEmpty()){
+				objectIterator = objectPool.getAllObjects().values().iterator();
+			}
 			if (objectIterator != null){
 				while (objectIterator.hasNext()){
 					IomObject objValue = objectIterator.next();
@@ -1097,7 +1159,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		
 		if(isObject){
-			objectPool.addObject(iomObj, tag2class);
+			objectPool.addObject(iomObj, tag2class, currentBasketId);
 		}
 		
 		HashSet<String> propNames=new HashSet<String>();
@@ -1171,7 +1233,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							}
 						}
 						if (refoid != null) {
-							// TODO validate target opbject
 							linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
 						}
 				}

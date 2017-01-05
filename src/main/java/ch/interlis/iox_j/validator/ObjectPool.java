@@ -3,76 +3,93 @@ package ch.interlis.iox_j.validator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import ch.interlis.ili2c.metamodel.AssociationDef;
-import ch.interlis.ili2c.metamodel.RoleDef;
+import javax.xml.ws.Holder;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.iom.IomObject;
 
 public class ObjectPool {
 	
 	private boolean doItfOidPerTable;
-	Map<ObjectPoolKey, IomObject> collectionOfObjects = new HashMap<ObjectPoolKey, IomObject>();
-	
+	Map<String, Map<ObjectPoolKey, IomObject>> collectionOfBaskets = new HashMap<String, Map<ObjectPoolKey, IomObject>>();
 	
 	public ObjectPool(boolean doItfOidPerTable){
 		this.doItfOidPerTable = doItfOidPerTable;
 	}
 
-	public void addObject(IomObject iomObj, HashMap<String,Object> tag2class){
+	public void addObject(IomObject iomObj, HashMap<String,Object> tag2class, String basketId){
 		String oid = iomObj.getobjectoid();
 		Object modelEle = tag2class.get(iomObj.getobjecttag());
 		Viewable classValue = (Viewable) modelEle;
 		ObjectPoolKey key = null;
 		if(doItfOidPerTable){
-			key=new ObjectPoolKey(oid, classValue);
+			key=new ObjectPoolKey(oid, classValue, basketId);
 		} else {
-			key=new ObjectPoolKey(oid, null);
+			key=new ObjectPoolKey(oid, null, basketId);
+		}
+		Map<ObjectPoolKey, IomObject> collectionOfObjects =null;
+		if(collectionOfBaskets.containsKey(basketId)){
+			collectionOfObjects=collectionOfBaskets.get(basketId);
+		} else {
+			collectionOfObjects=new HashMap<ObjectPoolKey, IomObject>();
+			collectionOfBaskets.put(basketId, collectionOfObjects);
 		}
 		if(!collectionOfObjects.containsKey(key)){
 			collectionOfObjects.put(key,iomObj);
 		}
+		
 	}
 	
 	public Map getAllObjects(){
-		return collectionOfObjects;
-	}
-	
-	
-	public IomObject getObject(String oid, Viewable classValue){
-		IomObject key = null;
-		if(doItfOidPerTable){			
-			IomObject objectPoolKey = collectionOfObjects.get(new ObjectPoolKey(oid, classValue));
-			if(objectPoolKey != null){
-				key = objectPoolKey;
-			}
-		} else {
-			IomObject objectPoolKey = collectionOfObjects.get(new ObjectPoolKey(oid, null));
-			if(objectPoolKey != null){
-				key = objectPoolKey;
-			}
+		Map<ObjectPoolKey, IomObject> collection = new HashMap<ObjectPoolKey, IomObject>();
+		for (Map<ObjectPoolKey, IomObject> hashMap : collectionOfBaskets.values()){
+			collection.putAll(hashMap);
 		}
-		return key;
+		return collection;
 	}
 	
-	
-	public IomObject getObject(String oid, ArrayList<Viewable> classes) {
-		IomObject key = null;
-		if(doItfOidPerTable){
-			for(Viewable aClass : classes){				
-				IomObject objectPoolKey = collectionOfObjects.get(new ObjectPoolKey(oid, aClass));
-				if(objectPoolKey != null){
-					key = objectPoolKey;
+	public IomObject getObject(String oid, Viewable aClass, Holder<String> retBasketId){
+		for(String basketId : collectionOfBaskets.keySet()){
+			Map<ObjectPoolKey, IomObject> collectionOfObjects = collectionOfBaskets.get(basketId);
+			if(doItfOidPerTable){			
+				IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, aClass, basketId));
+				if(object != null){
+					retBasketId.value=basketId;
+					return object;
 				}
-			}
-		} else {
-			for(Viewable aClass : classes){				
-				IomObject objectPoolKey = collectionOfObjects.get(new ObjectPoolKey(oid, null));
-				if(objectPoolKey != null){
-					key = objectPoolKey;
+			} else {
+				IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, null, basketId));
+				if(object != null){
+					retBasketId.value=basketId;
+					return object;
 				}
 			}
 		}
-		return key;
+		retBasketId.value=null;
+		return null;
+	}
+
+	public IomObject getObject(String oid, ArrayList<Viewable> classes, Holder<String> retBasketId) {
+		for(String basketId : collectionOfBaskets.keySet()){
+			Map<ObjectPoolKey, IomObject> collectionOfObjects = collectionOfBaskets.get(basketId);
+			if(doItfOidPerTable){
+				for(Viewable aClass : classes){
+					IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, aClass, basketId));
+					if(object != null){
+						retBasketId.value=basketId;
+						return object;
+					}
+				}
+			} else {
+				for(Viewable aClass : classes){		
+					IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, null, basketId));
+					if(object != null){
+						retBasketId.value=basketId;
+						return object;
+					}
+				}
+			}
+		}
+		retBasketId.value=null;
+		return null;
 	}
 }

@@ -1,5 +1,7 @@
 package ch.interlis.iox_j.validator;
 
+import ch.interlis.ili2c.metamodel.RoleDef;
+
 public class LinkPoolKey {
 	
 	private String oid;

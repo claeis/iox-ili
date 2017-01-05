@@ -32,6 +32,7 @@ public class Association23Test {
 	private final static String OBJ_OID5 ="o5";
 	private final static String OBJ_OID6 ="o6";
 	private final static String OBJ_OID7 ="o7";
+	private final static String OBJ_OID8 ="o8";
 	// MODEL.TOPIC
 	private final static String ILI_TOPIC="Association23.Topic";
 	private final static String ILI_TOPICB="Association23.TopicB";
@@ -271,10 +272,10 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(0,logger.getErrs().size());
-		//assertEquals("h1 should associate 1 to 1 target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
 	public void oneFileExternalGObjectAndHObjectsInCard1To1Ok(){
+		Iom_jObject iomObjG1=new Iom_jObject(ILI_TOPICB_CLASSG, OBJ_OID1);
 		Iom_jObject iomObjH1=new Iom_jObject(ILI_TOPICB_CLASSH, OBJ_OID2);
 		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -284,6 +285,7 @@ public class Association23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjG1));
 		validator.validate(new ObjectEvent(iomObjH1));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -756,7 +758,7 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("No object found with OID o1.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("f1 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// classBp extends to classB with OID b1, associate to classA with OID a1, with a restriction to classAp, which extends classA
@@ -938,9 +940,9 @@ public class Association23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==4);
 		assertEquals("The OID o3 of object 'Association23.Topic.ClassB oid o3 {a3 -> o2 REF {}}' already exists in CLASS Association23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
-		assertEquals("a3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(1).getEventMsg());
-		assertEquals("No object found with OID o6.", logger.getErrs().get(2).getEventMsg());
-		assertEquals("Object Association23.Topic.ClassD with OID o1 must be of Association23.Topic.ClassA", logger.getErrs().get(3).getEventMsg());
+		assertEquals("No object found with OID o6.", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Object Association23.Topic.ClassD with OID o1 must be of Association23.Topic.ClassA", logger.getErrs().get(2).getEventMsg());
+		assertEquals("a3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(3).getEventMsg());
 	}
 	
 	@Test

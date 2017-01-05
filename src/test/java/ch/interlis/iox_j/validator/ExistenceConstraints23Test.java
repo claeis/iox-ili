@@ -170,8 +170,6 @@ public class ExistenceConstraints23Test {
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic","b2"));
 		validator.validate(new ObjectEvent(objB));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b1"));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1246,8 +1244,9 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
+		assertTrue(logger.getErrs().size()==2);
 		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the condition class.", logger.getErrs().get(1).getEventMsg());
 	}
 	////////////////// END CONDITIONCLASS + CLASSB ///////////////
 	//////////////////// START STRUCTURE /////////////////////////

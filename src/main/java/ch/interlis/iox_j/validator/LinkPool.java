@@ -1,13 +1,11 @@
 package ch.interlis.iox_j.validator;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.RoleDef;
-import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iox_j.StartBasketEvent;
 
 public class LinkPool {
 
@@ -28,14 +26,12 @@ public class LinkPool {
 	}
 
 	public void addLink(IomObject iomObj, RoleDef role, String targetOid, boolean doItfOidPerTable){
-		String oid = iomObj.getobjectoid();
-		String roleName = role.getName();
 		// if embedded
 		if(((AssociationDef) role.getContainer()).isLightweight()){
 			// addLink() is called once per association; once for the embedded end
-			increaseCounter(iomObj.getobjectoid(), iomObj.getobjecttag(), role.getName(), doItfOidPerTable);
+			increaseCounter(iomObj.getobjectoid(), iomObj.getobjecttag(), role, doItfOidPerTable);
 			RoleDef oppRole=role.getOppEnd();
-			increaseCounter(targetOid, iomObj.getobjecttag(),oppRole.getName(), doItfOidPerTable);
+			increaseCounter(targetOid, iomObj.getobjecttag(),oppRole, doItfOidPerTable);
 		}else{
 			// stand-alone
 			// addLink() is called twice per association; once for each end
@@ -45,16 +41,16 @@ public class LinkPool {
 			}
 			RoleDef oppRole=role.getOppEnd();
 			String sourceOid=iomObj.getattrobj(oppRole.getName(),0).getobjectrefoid();
-			increaseCounter(sourceOid, null, role.getName(), false);
+			increaseCounter(sourceOid, null, role, false);
 		}
 	}
 
-	private void increaseCounter(String oid, String className, String roleName, boolean doItfOidPerTable){
+	private void increaseCounter(String oid, String className, RoleDef role, boolean doItfOidPerTable){
 		LinkPoolKey key = null;
 		if(doItfOidPerTable){
-			key=new LinkPoolKey(oid, className, roleName);
+			key=new LinkPoolKey(oid, className, role.getName());
 		} else {
-			key=new LinkPoolKey(oid, null, roleName);
+			key=new LinkPoolKey(oid, null, role.getName());
 		}
 		if(collectionOfReferenceObj.containsKey(key)){
 			int counter=collectionOfReferenceObj.get(key);
