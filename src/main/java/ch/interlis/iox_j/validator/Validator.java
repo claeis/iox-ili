@@ -145,7 +145,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		unknownTypev=new HashSet<String>();
 		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
 		objectPool=new ObjectPool(doItfOidPerTable);
-		currentBasketId = new String();
 	}
 
 	/** mappings from xml-tags to Viewable|AttributeDef
@@ -453,6 +452,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			// function call	
 			FunctionCall functionCallObj = (FunctionCall) expression;
 			
+			
 		} else if(expression instanceof InspectionFactor){
 			// inspection factor	
 			InspectionFactor inspectionFactorObj = (InspectionFactor) expression;
@@ -516,7 +516,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if((nrOfTargetObjs>=cardMin && nrOfTargetObjs<=cardMax)){
 				// is valid
 			} else {
-				if(authorizedError(role)){
+				if(internalBasketRoleCheck(role)){
 					// not valid
 					if(role.getCardinality().getMaximum() == Cardinality.UNBOUND){
 						String cardMaxStr = "*";
@@ -529,16 +529,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private boolean authorizedError(RoleDef role) {
+	private boolean internalBasketRoleCheck(RoleDef role) {
 		if(role.isExternal()){
 			return false;
 		}
 		if(!role.isExternal()){
 			if(previousBasketId==null){
-				// previous is NULL
 				return true;
 			} else {
-				// previous FULL
 				if(currentBasketId.equals(previousBasketId)){
 					return true;
 				}
@@ -547,14 +545,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return false;
 	}
 	
-	private boolean authorizedError() {
-		if(previousBasketId==null){
-			// previous is NULL
-			return true;
-		} else {
-			// previous FULL
-			if(currentBasketId.equals(previousBasketId)){
+	private boolean internalBasketReferenceCheck(ReferenceType refAttrType ) {
+		if(refAttrType.isExternal()){
+			return false;
+		}
+		if(!refAttrType.isExternal()){
+			if(previousBasketId==null){
 				return true;
+			} else {
+				if(currentBasketId.equals(previousBasketId)){
+					return true;
+				}
 			}
 		}
 		return false;
@@ -605,13 +606,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 					}
 				}
-				if(authorizedError(role)){
+				if(internalBasketRoleCheck(role)){
 					// object found, but wrong class
 					logMsg(validateTarget,"Object {1} with OID {0} must be of {2}", targetOid,targetObj.getobjecttag(),possibleTargetClasses.toString());
 					return;
 				}
 			}
-			if(authorizedError(role)){
+			if(internalBasketRoleCheck(role)){
 				// no object with this oid found
 				logMsg(validateTarget,"No object found with OID {0}.", targetOid);
 			}
@@ -665,7 +666,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									classNames.append(targetClass.getScopedName(null));
 									sep=", ";
 								}
-								if(authorizedError()){
+								if(internalBasketReferenceCheck(refAttrType)){
 									errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,classNames.toString(),refAttrName));
 									return;
 								}
@@ -674,14 +675,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								if (targetObjClass.isExtending(targetClass)){
 									// ok
 								} else {
-									if(authorizedError()){
+									if(internalBasketReferenceCheck(refAttrType)){
 										errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,targetClass.getScopedName(null),refAttrName));
 									}
 								}
 								return;
 							}
 						} else {
-							if(authorizedError()){
+							if(internalBasketReferenceCheck(refAttrType)){
 								errs.addEvent(errFact.logErrorMsg("attribute {1} references an inexistent object with OID {0}.", targetOid,refAttrName));
 							}
 						}
@@ -761,7 +762,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 			if (!valueExists){
-//				errs.addEvent(errFact.logErrorMsg("The value of the attribute {0} of {1} was not found in the condition class.", restrictedAttrName.toString(), iomObj.getobjecttag().toString()));
 				logMsg(checkConstraint,"The value of the attribute {0} of {1} was not found in the condition class.", restrictedAttrName.toString(), iomObj.getobjecttag().toString());
 			}
 		}

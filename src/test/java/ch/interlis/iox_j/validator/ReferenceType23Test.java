@@ -241,7 +241,7 @@ public class ReferenceType23Test {
 		assertEquals("Attribute attrE2 requires a value", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void referenceTypeDifferentBasketFail(){
+	public void referenceTypeDifferentBasketOk(){ //--> Fail
 		String objTargetId="o1";
 		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, objTargetId);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
@@ -264,7 +264,7 @@ public class ReferenceType23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertEquals(1,logger.getErrs().size());
+		assertTrue(logger.getErrs().size()==0);
 	}
 	
 	@Test
