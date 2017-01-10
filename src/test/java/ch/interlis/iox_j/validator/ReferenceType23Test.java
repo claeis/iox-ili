@@ -1,10 +1,8 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -222,7 +220,7 @@ public class ReferenceType23Test {
 	//################ FAIL TESTS ################################
 	//############################################################	
 	@Test
-	public void referenceTypeMandatoryUndefinedFaild(){
+	public void referenceTypeMandatoryUndefinedFail(){
 		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTE, null);
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSF, "o2");
 		iomObj.addattrobj(ILI_CLASSF_ATTRF2, iomStruct);

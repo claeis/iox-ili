@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -270,7 +269,7 @@ public class ReferenceType10Test {
 	}
 	
 	@Test
-	public void configTargetOFF_ReferencedNoClassFoundFail() throws Exception {
+	public void configTargetOFF_ReferencedNoClassFoundOk() throws Exception {
 		Iom_jObject objC1=new Iom_jObject(REFERENCETYPE10_CLASSC, OID1);
 		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -290,7 +289,7 @@ public class ReferenceType10Test {
 	}
 	
 	@Test
-	public void configMultiplicityOFF_TwoReferencedClassesFail() throws Exception {
+	public void configMultiplicityOFF_TwoReferencedClassesOk() throws Exception {
 		Iom_jObject iomObjJ=new Iom_jObject(REFERENCETYPE10_CLASSD,OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue("ReferenceType10.TopicA.ClassDattrC1.attrC1", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);

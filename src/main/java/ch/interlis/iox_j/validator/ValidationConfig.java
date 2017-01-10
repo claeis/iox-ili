@@ -8,18 +8,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.HashMap;
-
 import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.Constraint;
 import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.Element;
-import ch.interlis.ili2c.metamodel.Model;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.TransferDescription;
-
 import com.moandjiezana.toml.Toml;
-
 
 public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	private HashMap<String,HashMap<String,String>> data=new HashMap<String,HashMap<String,String>>();
@@ -105,8 +101,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 							}
 						}
 				  }
-				}
-			
+			}
 		}finally{
 			if(in!=null){
 				try {
@@ -116,7 +111,6 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 				in=null;
 			}
 		}
-		
 	}
 	static public ValidationConfig readFromConfigFile(java.io.File file) throws FileNotFoundException
 	{
@@ -171,5 +165,4 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 		}
 		modelele.put(configParam, value);
 	}
-
 }

@@ -5,10 +5,8 @@ import java.util.Map;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.iom.IomObject;
-import ch.interlis.iox_j.StartBasketEvent;
 
 public class LinkPool {
-
 	Map<LinkPoolKey, Integer> collectionOfReferenceObj = new HashMap<LinkPoolKey, Integer>();
 	
 	// returns the number of referenced objects consisting of OID and role-name.

@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 public class AttributeArray {
 	private String[] values;
-	
 	private String oid;
 	
 	@Override

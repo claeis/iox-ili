@@ -1,41 +1,25 @@
 package ch.interlis.iox_j.validator;
 
-import java.beans.beancontext.BeanContextChildSupport;
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-
 import javax.xml.ws.Holder;
-
-import com.sun.xml.internal.fastinfoset.util.StringArray;
-import com.vividsolutions.jts.algorithm.Angle;
 import com.vividsolutions.jts.geom.Coordinate;
-import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
-import ch.interlis.ili2c.metamodel.AbstractLeafElement;
 import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.AttributeRef;
 import ch.interlis.ili2c.metamodel.Cardinality;
-import ch.interlis.ili2c.metamodel.ClassType;
 import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.ConditionalExpression;
 import ch.interlis.ili2c.metamodel.Constant;
 import ch.interlis.ili2c.metamodel.Constant.Enumeration;
 import ch.interlis.ili2c.metamodel.Constant.EnumerationRange;
-import ch.interlis.ili2c.metamodel.Constant.Text;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.Domain;
 import ch.interlis.ili2c.metamodel.Element;
@@ -43,7 +27,6 @@ import ch.interlis.ili2c.metamodel.EnumTreeValueType;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.Evaluable;
 import ch.interlis.ili2c.metamodel.ExistenceConstraint;
-import ch.interlis.ili2c.metamodel.Expression;
 import ch.interlis.ili2c.metamodel.Expression.Conjunction;
 import ch.interlis.ili2c.metamodel.Expression.DefinedCheck;
 import ch.interlis.ili2c.metamodel.Expression.Disjunction;
@@ -69,17 +52,13 @@ import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.Objects;
 import ch.interlis.ili2c.metamodel.ParameterValue;
 import ch.interlis.ili2c.metamodel.PathEl;
-import ch.interlis.ili2c.metamodel.PathElAbstractClassRole;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
 import ch.interlis.ili2c.metamodel.ReferenceType;
 import ch.interlis.ili2c.metamodel.RoleDef;
-import ch.interlis.ili2c.metamodel.StructuredUnit;
-import ch.interlis.ili2c.metamodel.StructuredUnitType;
 import ch.interlis.ili2c.metamodel.SurfaceOrAreaType;
 import ch.interlis.ili2c.metamodel.SurfaceType;
 import ch.interlis.ili2c.metamodel.Table;
-import ch.interlis.ili2c.metamodel.TextOIDType;
 import ch.interlis.ili2c.metamodel.TextType;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.Type;
@@ -91,32 +70,23 @@ import ch.interlis.ili2c.metamodel.ViewableAlias;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
-import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 import ch.interlis.iox.IoxException;
-import ch.interlis.iox.IoxLogEvent;
 import ch.interlis.iox.IoxLogging;
 import ch.interlis.iox.IoxValidationConfig;
-import ch.interlis.iox_j.IoxInvalidDataException;
-import ch.interlis.iox_j.StartBasketEvent;
 import ch.interlis.iox_j.jts.Iox2jtsext;
-import ch.interlis.iox_j.jts.Jtsext2iox;
 import ch.interlis.iox_j.logging.LogEventFactory;
-import ch.interlis.models.INTERLIS.*;
-import ch.interlis.models.IlisMeta07.ModelData.AttributeRefType;
-import ch.interlis.iox_j.StartBasketEvent;
-
 
 public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_DO_ITF_LINETABLES="ch.interlis.iox_j.validator.doItfLinetables";
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE_DO="doItfOidPerTable";
-	
 	private ObjectPool objectPool = null;
+	private LinkPool linkPool;
 	private ch.interlis.iox.IoxValidationConfig validationConfig=null;
 	private IoxLogging errs=null;
 	private LogEventFactory errFact=null;
@@ -126,7 +96,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private Settings config=null;
 	private boolean validationOff=false;
 	private String currentBasketId = null;
-	private String previousBasketId = null;
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
 			IoxLogging errs, LogEventFactory errFact, Settings config) {
 		super();
@@ -144,9 +113,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		unknownTypev=new HashSet<String>();
 		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
-		objectPool=new ObjectPool(doItfOidPerTable);
+		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class);
+		linkPool=new LinkPool();
 	}
-
 	/** mappings from xml-tags to Viewable|AttributeDef
 	 */
 	private HashMap<String,Object> tag2class=null;
@@ -171,7 +140,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public void setLoggingHandler(IoxLogging handler) {
 		errs=handler;
 	}
-
 	@Override
 	public void validate(ch.interlis.iox.IoxEvent event) {
 		if(validationOff){
@@ -184,17 +152,30 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			IomObject iomObj=((ch.interlis.iox.ObjectEvent)event).getIomObject();
 			validateObject(iomObj,null);
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
-			iterateThroughAllObjects();
-			previousBasketId = currentBasketId;
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
-			
+			iterateThroughAllObjects();
 		}
+	}
+	
+	private boolean isBasketSame(RoleDef role, ReferenceType ref,String bidOfTargetObject){
+		if(!currentBasketId.equals(bidOfTargetObject)){
+			if(role != null){
+				if(role.isExternal()){
+					return false;
+				}
+			} else if(ref != null){
+				if(ref.isExternal()){
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	private void iterateThroughAllObjects(){
-		if (!objectPool.getAllObjects().isEmpty()){
+		for (String basketId : objectPool.getBasketIds()){
 			// iterate through iomObjects
-			Iterator<IomObject> objectIterator = objectPool.getAllObjects().values().iterator();
+			Iterator<IomObject> objectIterator = objectPool.getObjectsOfBasketId(basketId).values().iterator();
 			while (objectIterator.hasNext()){
 				IomObject iomObj = objectIterator.next();
 				errFact.setDataObj(iomObj);
@@ -516,49 +497,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if((nrOfTargetObjs>=cardMin && nrOfTargetObjs<=cardMax)){
 				// is valid
 			} else {
-				if(internalBasketRoleCheck(role)){
-					// not valid
-					if(role.getCardinality().getMaximum() == Cardinality.UNBOUND){
-						String cardMaxStr = "*";
-						logMsg(multiplicity,"{0} should associate {1} to {2} target objects (instead of {3})", role.getName(), String.valueOf(cardMin), cardMaxStr, String.valueOf(nrOfTargetObjs));
-					} else {
-						logMsg(multiplicity,"{0} should associate {1} to {2} target objects (instead of {3})", role.getName(), String.valueOf(cardMin), String.valueOf(cardMax), String.valueOf(nrOfTargetObjs));
-					}
+				if(role.getCardinality().getMaximum() == Cardinality.UNBOUND){
+					String cardMaxStr = "*";
+					logMsg(multiplicity,"{0} should associate {1} to {2} target objects (instead of {3})", role.getName(), String.valueOf(cardMin), cardMaxStr, String.valueOf(nrOfTargetObjs));
+				} else {
+					logMsg(multiplicity,"{0} should associate {1} to {2} target objects (instead of {3})", role.getName(), String.valueOf(cardMin), String.valueOf(cardMax), String.valueOf(nrOfTargetObjs));
 				}
 			}
 		}
-	}
-
-	private boolean internalBasketRoleCheck(RoleDef role) {
-		if(role.isExternal()){
-			return false;
-		}
-		if(!role.isExternal()){
-			if(previousBasketId==null){
-				return true;
-			} else {
-				if(currentBasketId.equals(previousBasketId)){
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	private boolean internalBasketReferenceCheck(ReferenceType refAttrType ) {
-		if(refAttrType.isExternal()){
-			return false;
-		}
-		if(!refAttrType.isExternal()){
-			if(previousBasketId==null){
-				return true;
-			} else {
-				if(currentBasketId.equals(previousBasketId)){
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	private void validateRoleReference(RoleDef role, IomObject iomObj) {
@@ -590,7 +536,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				possibleTargetClasses.append(roleDestinationClass.getScopedName(null));
 			}
 			Holder<String> bid = new Holder<String>();
-			bid.value=currentBasketId;
 			IomObject targetObj = (IomObject) objectPool.getObject(targetOid, destinationClasses, bid);
 			if(targetObj != null){
 				Object modelElement=tag2class.get(targetObj.getobjecttag());
@@ -606,20 +551,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 					}
 				}
-				if(internalBasketRoleCheck(role)){
+				if(isBasketSame(role, null,bid.value)){
 					// object found, but wrong class
 					logMsg(validateTarget,"Object {1} with OID {0} must be of {2}", targetOid,targetObj.getobjecttag(),possibleTargetClasses.toString());
 					return;
 				}
 			}
-			if(internalBasketRoleCheck(role)){
+			if(isBasketSame(role, null,bid.value)){
 				// no object with this oid found
 				logMsg(validateTarget,"No object found with OID {0}.", targetOid);
 			}
 		}
 	}
-	
-	LinkPool linkPool=new LinkPool();
 	
 	private void validateReferenceAttrs(IomObject structValue, Table structure) {
 		Iterator attrIter=structure.getAttributesAndRoles();
@@ -633,6 +576,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					ReferenceType refAttrType = (ReferenceType) type;
 					AbstractClassDef targetClass = refAttrType.getReferred();
 					Viewable targetViewable = (Viewable) targetClass;
+					ArrayList<Viewable> destinationClasses = new ArrayList<Viewable>();
+					destinationClasses.add(targetViewable);
 					String refAttrName = ((Element) refAttrO).getName();
 					IomObject refAttrValue = structValue.getattrobj(refAttrName, 0);
 					if (refAttrValue != null){
@@ -640,8 +585,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						String targetObjOid = null;
 						String targetObjClassStr = null;
 						Holder<String> bid = new Holder<String>();
-						bid.value=currentBasketId;
-						IomObject iomObj = (IomObject) objectPool.getObject(targetOid, targetViewable, bid);
+						IomObject iomObj = (IomObject) objectPool.getObject(targetOid, destinationClasses, bid);
 						if(iomObj != null){
 							Object modelElement=tag2class.get(iomObj.getobjecttag());
 							Table targetObjClass = (Table) modelElement;
@@ -666,7 +610,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									classNames.append(targetClass.getScopedName(null));
 									sep=", ";
 								}
-								if(internalBasketReferenceCheck(refAttrType)){
+								if(isBasketSame(null, refAttrType,bid.value)){
 									errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,classNames.toString(),refAttrName));
 									return;
 								}
@@ -675,14 +619,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								if (targetObjClass.isExtending(targetClass)){
 									// ok
 								} else {
-									if(internalBasketReferenceCheck(refAttrType)){
+									if(isBasketSame(null, refAttrType,bid.value)){
 										errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,targetClass.getScopedName(null),refAttrName));
 									}
 								}
 								return;
 							}
 						} else {
-							if(internalBasketReferenceCheck(refAttrType)){
+							if(isBasketSame(null, refAttrType,bid.value)){
 								errs.addEvent(errFact.logErrorMsg("attribute {1} references an inexistent object with OID {0}.", targetOid,refAttrName));
 							}
 						}
@@ -691,7 +635,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 	}
-
+	
 	private void validateExistenceConstraint(IomObject iomObj, ExistenceConstraint existenceConstraint){
 		if (iomObj.getattrcount() == 0){
 			return;
@@ -722,38 +666,41 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				otherClass = (Table) attrName.getRoot();
 				String otherAttrName = attrName.toString();
 				String attrValueThisObj = iomObj.getattrvalue(otherAttrName);
-				Iterator<IomObject> objectIterator = objectPool.getAllObjects().values().iterator();
-				while (objectIterator.hasNext()){
-					IomObject otherIomObj = objectIterator.next();
-					if (otherIomObj.getattrcount() == 0){
+				for (String basketId : objectPool.getBasketIds()){
+					// iterate through iomObjects
+					Iterator<IomObject> objectIterator = objectPool.getObjectsOfBasketId(basketId).values().iterator();
+					while (objectIterator.hasNext()){
+						IomObject otherIomObj = objectIterator.next();
+						if (otherIomObj.getattrcount() == 0){
 						// do not validate.
-					} else {
-						Object modelElement=tag2class.get(otherIomObj.getobjecttag());
-						classA= (Table) modelElement;
-						// otherAttr defined?
-						if(otherIomObj.getattrvaluecount(otherAttrName)>0){
-							// validate if otherClass is extending by classA
-							if (classA.isExtending(otherClass)){
-								// if type is type of alias, validate instance of
-								if(type instanceof ReferenceType){
-									ReferenceType referenceType = (ReferenceType) type;
-									valueExists = equalsReferenceValue(iomObj, referenceType, otherIomObj, otherAttrName, restrictedAttrName);
-								} else if (type instanceof CoordType){
-									CoordType coordType = (CoordType) type;
-									valueExists = equalsCoordValue(iomObj, coordType, otherIomObj, otherAttrName, restrictedAttrName);
-								} else if (type instanceof PolylineType){
-									PolylineType polylineType = (PolylineType) type;
-									valueExists = equalsPolylineValue(iomObj, polylineType, otherIomObj, otherAttrName, restrictedAttrName);
-								} else if (type instanceof SurfaceOrAreaType){
-									SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
-									valueExists = equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, otherAttrName, restrictedAttrName);
-								} else if (type instanceof CompositionType){
-									CompositionType compositionType = (CompositionType) type;
-									valueExists = equalsCompositionValue(iomObj, compositionType, otherIomObj, otherAttrName, restrictedAttrName);
-								} else {
-									// if type is not type of alias, validate attribute names
-									if(otherIomObj.getattrvalue(otherAttrName).equals(iomObj.getattrvalue(restrictedAttrName))){
-										valueExists = true;
+						} else {
+							Object modelElement=tag2class.get(otherIomObj.getobjecttag());
+							classA= (Table) modelElement;
+							// otherAttr defined?
+							if(otherIomObj.getattrvaluecount(otherAttrName)>0){
+								// validate if otherClass is extending by classA
+								if (classA.isExtending(otherClass)){
+									// if type is type of alias, validate instance of
+									if(type instanceof ReferenceType){
+										ReferenceType referenceType = (ReferenceType) type;
+										valueExists = equalsReferenceValue(iomObj, referenceType, otherIomObj, otherAttrName, restrictedAttrName);
+									} else if (type instanceof CoordType){
+										CoordType coordType = (CoordType) type;
+										valueExists = equalsCoordValue(iomObj, coordType, otherIomObj, otherAttrName, restrictedAttrName);
+									} else if (type instanceof PolylineType){
+										PolylineType polylineType = (PolylineType) type;
+										valueExists = equalsPolylineValue(iomObj, polylineType, otherIomObj, otherAttrName, restrictedAttrName);
+									} else if (type instanceof SurfaceOrAreaType){
+										SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
+										valueExists = equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, otherAttrName, restrictedAttrName);
+									} else if (type instanceof CompositionType){
+										CompositionType compositionType = (CompositionType) type;
+										valueExists = equalsCompositionValue(iomObj, compositionType, otherIomObj, otherAttrName, restrictedAttrName);
+									} else {
+										// if type is not type of alias, validate attribute names
+										if(otherIomObj.getattrvalue(otherAttrName).equals(iomObj.getattrvalue(restrictedAttrName))){
+											valueExists = true;
+										}
 									}
 								}
 							}
@@ -885,7 +832,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		return true;
 	}
-	
+
 	private boolean equalsPolylineValue(IomObject iomObj, PolylineType polylineType, IomObject otherIomObj, String otherAttrName, String restrictedAttrName) {
 		IomObject objA = iomObj.getattrobj(restrictedAttrName, 0);
 		IomObject objB = otherIomObj.getattrobj(otherAttrName, 0);
@@ -1029,35 +976,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(isObject){
 			errFact.setDataObj(iomObj);
 		}
-		// validate uniqueness of existing objects on OID and className
-		if(isObject){
-			Object modelElementToCompare = tag2class.get(iomObj.getobjecttag());
-			Viewable classValueToCompare= (Viewable) modelElementToCompare;
-			String objOidToCompare = iomObj.getobjectoid();
-			Iterator<IomObject> objectIterator = null;
-			if(!objectPool.collectionOfBaskets.values().isEmpty()){
-				objectIterator = objectPool.getAllObjects().values().iterator();
-			}
-			if (objectIterator != null){
-				while (objectIterator.hasNext()){
-					IomObject objValue = objectIterator.next();
-					Object modelElementOfObject=tag2class.get(objValue.getobjecttag());
-					Viewable classValueOfModelElement= (Viewable) modelElementOfObject;
-					String objOidOfObjValue = objValue.getobjectoid();
-					// OID has to be unique in each table (ili 1.0)
-					if (doItfOidPerTable){
-						if (classValueToCompare != null && classValueOfModelElement != null){
-							compareOidAndClassOfObjects(classValueToCompare, objOidToCompare, classValueOfModelElement, objOidOfObjValue, iomObj);
-						}
-					// OID has to be unique in the whole file (ili 2.3)
-					} else {
-						if (classValueOfModelElement != null){
-							compareOidOfObject(objOidToCompare, classValueOfModelElement, objOidOfObjValue, iomObj);
-						}
-					}
-				}
-			}
-		}
 		// validate class, structure and association on existence of OID
 		if (isObject){
 			Object modelElementOidValidate = tag2class.get(iomObj.getobjecttag());
@@ -1114,7 +1032,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			if(aclass1 instanceof AbstractClassDef){
 				Domain oidType=((AbstractClassDef) aclass1).getOid();
-				
 				if(oidType!=null && oidType==td.INTERLIS.UUIDOID){
 					String oid=iomObj.getobjectoid();
 					if(oid != null && !isValidUuid(oid)){
@@ -1181,60 +1098,60 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if (isObject && obj.obj instanceof RoleDef) {
 				RoleDef role = (RoleDef) obj.obj;
 				if (role.getExtending() == null) {
-						String refoid = null;
-						String roleName = role.getName();
-						// a role of an embedded association?
-						if (obj.embedded) {
-							AssociationDef roleOwner = (AssociationDef) role
-									.getContainer();
-							if (roleOwner.getDerivedFrom() == null) {
-								// not just a link?
-								IomObject structvalue = iomObj.getattrobj(roleName, 0);
-								propNames.add(roleName);
-								if (roleOwner.getAttributes().hasNext()
-										|| roleOwner
-												.getLightweightAssociations()
-												.iterator().hasNext()) {
-									// TODO handle attributes of link
-								}
-								if (structvalue != null) {
-									refoid = structvalue.getobjectrefoid();
-									long orderPos = structvalue
-											.getobjectreforderpos();
-									if (orderPos != 0) {
-										// refoid,orderPos
-										// ret.setStringAttribute(roleName,
-										// refoid);
-										// ret.setStringAttribute(roleName+".orderPos",
-										// Long.toString(orderPos));
-									} else {
-										// refoid
-										// ret.setStringAttribute(roleName,
-										// refoid);
-									}
-								} else {
-									refoid = null;
-								}
-							}
-						} else {
+					String refoid = null;
+					String roleName = role.getName();
+					// a role of an embedded association?
+					if (obj.embedded) {
+						AssociationDef roleOwner = (AssociationDef) role
+								.getContainer();
+						if (roleOwner.getDerivedFrom() == null) {
+							// not just a link?
 							IomObject structvalue = iomObj.getattrobj(roleName, 0);
 							propNames.add(roleName);
-							refoid = structvalue.getobjectrefoid();
-							long orderPos = structvalue
-									.getobjectreforderpos();
-							if (orderPos != 0) {
-								// refoid,orderPos
-								// ret.setStringAttribute(roleName, refoid);
-								// ret.setStringAttribute(roleName+".orderPos",
-								// Long.toString(orderPos));
+							if (roleOwner.getAttributes().hasNext()
+									|| roleOwner
+											.getLightweightAssociations()
+											.iterator().hasNext()) {
+							// TODO handle attributes of link
+							}
+							if (structvalue != null) {
+								refoid = structvalue.getobjectrefoid();
+								long orderPos = structvalue
+										.getobjectreforderpos();
+								if (orderPos != 0) {
+									// refoid,orderPos
+									// ret.setStringAttribute(roleName,
+									// refoid);
+									// ret.setStringAttribute(roleName+".orderPos",
+									// Long.toString(orderPos));
+								} else {
+									// refoid
+									// ret.setStringAttribute(roleName,
+									// refoid);
+								}
 							} else {
-								// refoid
-								// ret.setStringAttribute(roleName, refoid);
+								refoid = null;
 							}
 						}
-						if (refoid != null) {
-							linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
+					} else {
+						IomObject structvalue = iomObj.getattrobj(roleName, 0);
+						propNames.add(roleName);
+						refoid = structvalue.getobjectrefoid();
+						long orderPos = structvalue
+								.getobjectreforderpos();
+						if (orderPos != 0) {
+							// refoid,orderPos
+							// ret.setStringAttribute(roleName, refoid);
+							// ret.setStringAttribute(roleName+".orderPos",
+							// Long.toString(orderPos));
+						} else {
+							// refoid
+							// ret.setStringAttribute(roleName, refoid);
 						}
+					}
+					if (refoid != null) {
+						linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
+					}
 				}
 			 }
 		}
@@ -1247,28 +1164,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}else{
 				if(!propNames.contains(propName)){
 					errs.addEvent(errFact.logErrorMsg("unknown property <{0}>",propName));
-				}
-			}
-		}
-	}
-	
-	private void compareOidOfObject(String objOidToCompare, Viewable classValueOfModelElement, String objOidOfObjValue, IomObject iomObj) {
-		if (objOidOfObjValue != null && objOidToCompare != null){
-			if (objOidOfObjValue.equals(objOidToCompare)){
-				errs.addEvent(errFact.logErrorMsg("The OID {0} of object '{1}' already exists in {2}.", objOidToCompare, iomObj.toString(), classValueOfModelElement.toString()));
-				return;
-			}
-		}
-	}
-
-	private void compareOidAndClassOfObjects(Viewable classValueToCompare, String objOidToCompare, Viewable classValueOfModelElement, String objOidOfObjValue, IomObject iomObj) {
-		// compare consistency of classes
-		if (classValueOfModelElement.equals(classValueToCompare)){
-			// compare consistency of OID's
-			if (objOidOfObjValue != null && objOidToCompare != null){
-				if (objOidOfObjValue.equals(objOidToCompare)){
-					errs.addEvent(errFact.logErrorMsg("The OID {0} of object '{1}' already exists in {2}.", objOidToCompare, iomObj.toString(), classValueOfModelElement.toString()));
-					return;
 				}
 			}
 		}
@@ -1350,7 +1245,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								return coord;
 							}
 						}
-						
 					}
 				}
 			}
@@ -1410,228 +1304,223 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		 }
 		 String validateMultiplicity=validationConfig.getConfigValue(attrQName, ValidationConfig.MULTIPLICITY);
 		 String validateType=validationConfig.getConfigValue(attrQName, ValidationConfig.TYPE);
-		 
-			Type type0 = attr.getDomain();
-			Type type = attr.getDomainResolvingAliases();
-			if (type instanceof CompositionType){
-				 int structc=iomObj.getattrvaluecount(attrName);
-					if(ValidationConfig.OFF.equals(validateMultiplicity)){
-						// skip it
-					}else{
-						 Cardinality card = ((CompositionType)type).getCardinality();
-						 if(structc<card.getMinimum() || structc>card.getMaximum()){
-							logMsg(validateMultiplicity,"Attribute {0} has wrong number of values", attrPath);
-						 }
-					}
-				 for(int structi=0;structi<structc;structi++){
-					 IomObject structEle=iomObj.getattrobj(attrName, structi);
-						if(ValidationConfig.OFF.equals(validateType)){
-							// skip it
-						}else{
-							String tag=structEle.getobjecttag();
-							Object modelele=tag2class.get(tag);
-							if(modelele==null){
-								if(!unknownTypev.contains(tag)){
-									errs.addEvent(errFact.logErrorMsg("unknown class <{0}>",tag));
-								}
-							}else{
-								Viewable structEleClass=(Viewable) modelele;
-								Table requiredClass=((CompositionType)type).getComponentType();
-								if(!structEleClass.isExtending(requiredClass)){
-									 logMsg(validateType,"Attribute {0} requires a structure {1}", attrPath,requiredClass.getScopedName(null));
-								}
-								if(structEleClass.isAbstract()){
-									// validate that object is instance of concrete class
-									 logMsg(validateType,"Attribute {0} requires a non-abstract structure", attrPath);
-								}
-							}
-						}
-					 validateObject(structEle, attrPath+"["+structi+"]");
-				 }
-			}else{
+		Type type0 = attr.getDomain();
+		Type type = attr.getDomainResolvingAliases();
+		if (type instanceof CompositionType){
+			 int structc=iomObj.getattrvaluecount(attrName);
 				if(ValidationConfig.OFF.equals(validateMultiplicity)){
-					// skip multiplicity validation
+					// skip it
 				}else{
-					 int structc=iomObj.getattrvaluecount(attrName);
-					 if(attr.getDomain().isMandatoryConsideringAliases() && structc==0){
-						 if(doItfLineTables && type instanceof SurfaceType){
-							 // SURFACE; no attrValue in maintable
-						 }else{
-							 logMsg(validateMultiplicity,"Attribute {0} requires a value", attrPath);
-						 }
+					 Cardinality card = ((CompositionType)type).getCardinality();
+					 if(structc<card.getMinimum() || structc>card.getMaximum()){
+						logMsg(validateMultiplicity,"Attribute {0} has wrong number of values", attrPath);
 					 }
 				}
-				if(ValidationConfig.OFF.equals(validateType)){
-					// skip type validation
-				}else{
-					if (attr.isDomainIli1Date()) {
-						String valueStr = iomObj.getattrvalue(attrName);
-						// Value has to be not null and exactly 8 numbers long
-						if (valueStr == null){
-							// no value, skip test
-						}else if(valueStr.length() == 8) {
-							// Value has to be a number
-							try {
-								int year = Integer.parseInt(valueStr.substring(0, 4));
-								int month = Integer.parseInt(valueStr.substring(4, 6));
-								int day = Integer.parseInt(valueStr.substring(6, 8));
-								// Substring value: year, month and day has to be in valid range
-								if (year >= 1582 && year <= 2999 && month >= 01 && month <= 12
-										&& day >= 01 && day <= 31) {
-								} else {
-									logMsg(validateType, "value <{0}> is not in range", valueStr);
-								}
-							} catch (NumberFormatException numberformatexception) {
-								logMsg(validateType, "value <{0}> is not a valid Date", valueStr);
+			 for(int structi=0;structi<structc;structi++){
+				 IomObject structEle=iomObj.getattrobj(attrName, structi);
+					if(ValidationConfig.OFF.equals(validateType)){
+						// skip it
+					}else{
+						String tag=structEle.getobjecttag();
+						Object modelele=tag2class.get(tag);
+						if(modelele==null){
+							if(!unknownTypev.contains(tag)){
+								errs.addEvent(errFact.logErrorMsg("unknown class <{0}>",tag));
 							}
-						} else {
+						}else{
+							Viewable structEleClass=(Viewable) modelele;
+							Table requiredClass=((CompositionType)type).getComponentType();
+							if(!structEleClass.isExtending(requiredClass)){
+								 logMsg(validateType,"Attribute {0} requires a structure {1}", attrPath,requiredClass.getScopedName(null));
+							}
+							if(structEleClass.isAbstract()){
+								// validate that object is instance of concrete class
+								 logMsg(validateType,"Attribute {0} requires a non-abstract structure", attrPath);
+							}
+						}
+					}
+				 validateObject(structEle, attrPath+"["+structi+"]");
+			 }
+		}else{
+			if(ValidationConfig.OFF.equals(validateMultiplicity)){
+				// skip multiplicity validation
+			}else{
+				 int structc=iomObj.getattrvaluecount(attrName);
+				 if(attr.getDomain().isMandatoryConsideringAliases() && structc==0){
+					 if(doItfLineTables && type instanceof SurfaceType){
+						 // SURFACE; no attrValue in maintable
+					 }else{
+						 logMsg(validateMultiplicity,"Attribute {0} requires a value", attrPath);
+					 }
+				 }
+			}
+			if(ValidationConfig.OFF.equals(validateType)){
+				// skip type validation
+			}else{
+				if (attr.isDomainIli1Date()) {
+					String valueStr = iomObj.getattrvalue(attrName);
+					// Value has to be not null and exactly 8 numbers long
+					if (valueStr == null){
+						// no value, skip test
+					}else if(valueStr.length() == 8) {
+						// Value has to be a number
+						try {
+							int year = Integer.parseInt(valueStr.substring(0, 4));
+							int month = Integer.parseInt(valueStr.substring(4, 6));
+							int day = Integer.parseInt(valueStr.substring(6, 8));
+							// Substring value: year, month and day has to be in valid range
+							if (year >= 1582 && year <= 2999 && month >= 01 && month <= 12
+									&& day >= 01 && day <= 31) {
+							} else {
+								logMsg(validateType, "value <{0}> is not in range", valueStr);
+							}
+						} catch (NumberFormatException numberformatexception) {
 							logMsg(validateType, "value <{0}> is not a valid Date", valueStr);
 						}
-					} else if (attr.isDomainBoolean()) {
-						// Value has to be not null and ("true" or "false")
-						String valueStr = iomObj.getattrvalue(attrName);
-						if (valueStr == null || valueStr.matches("^(true|false)$")) {
-							// Value okay, skip it
-						} else {
-							logMsg(validateType, "value <{0}> is not a BOOLEAN", valueStr);
-						}
-					} else if (attr.isDomainIliUuid()) {
-						// Value is exactly 36 chars long and matches the regex
-						String valueStr = iomObj.getattrvalue(attrName);
-						if (valueStr == null || isValidUuid(valueStr)) {
-								// Value ok, Skip it
-						} else {
-							logMsg(validateType, "value <{0}> is not a valid UUID", valueStr);
-						}
-					} else if (attr.isDomainIli2Date()) {
-						// Value matches regex and is not null and is in range of type.
-						String valueStr = iomObj.getattrvalue(attrName);
-						FormattedType subType = (FormattedType) type;
-						if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr)) {
-							// Value okay, skip it
-						} else {
-							logMsg(validateType, "value <{0}> is not a valid Date", valueStr);
-						}
-					} else if (attr.isDomainIli2Time()) {
-						// Value is not null and matches 0:0:0.000-23:59:59.999
-						String valueStr = iomObj.getattrvalue(attrName);
-						FormattedType subType = (FormattedType) type;
-						// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
-						if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr) && valueStr.length() >= 9 && valueStr.length() <= 12) {
-							// Value okay, skip it
-						} else {
-							logMsg(validateType, "value <{0}> is not a valid Time", valueStr);
-						}
-					} else if (attr.isDomainIli2DateTime()) {
-						// Value is not null
-						String valueStr = iomObj.getattrvalue(attrName);
-						FormattedType subType = (FormattedType) type;
-						// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
-						if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr) && valueStr.length() >= 18 && valueStr.length() <= 23) {
-							// Value okay, skip it
-						} else {
-							logMsg(validateType, "value <{0}> is not a valid DateTime", valueStr);
-						}
-					}else if (type instanceof PolylineType){
-						PolylineType polylineType=(PolylineType)type;
-						IomObject polylineValue=iomObj.getattrobj(attrName, 0);
-						if (polylineValue != null){
-							validatePolyline(validateType, polylineType, polylineValue);
-							validatePolylineTopology(attrPath,validateType, polylineType, polylineValue);
-						}
-					}else if(type instanceof SurfaceOrAreaType){
-						 if(doItfLineTables){
-							 if(type instanceof SurfaceType){
-								 // SURFACE; no attributeValue in mainTable
-							 }else{
-								 // AREA
-								 // validate coord
-							 }
+					} else {
+						logMsg(validateType, "value <{0}> is not a valid Date", valueStr);
+					}
+				} else if (attr.isDomainBoolean()) {
+					// Value has to be not null and ("true" or "false")
+					String valueStr = iomObj.getattrvalue(attrName);
+					if (valueStr == null || valueStr.matches("^(true|false)$")) {
+						// Value okay, skip it
+					} else {
+						logMsg(validateType, "value <{0}> is not a BOOLEAN", valueStr);
+					}
+				} else if (attr.isDomainIliUuid()) {
+					// Value is exactly 36 chars long and matches the regex
+					String valueStr = iomObj.getattrvalue(attrName);
+					if (valueStr == null || isValidUuid(valueStr)) {
+							// Value ok, Skip it
+					} else {
+						logMsg(validateType, "value <{0}> is not a valid UUID", valueStr);
+					}
+				} else if (attr.isDomainIli2Date()) {
+					// Value matches regex and is not null and is in range of type.
+					String valueStr = iomObj.getattrvalue(attrName);
+					FormattedType subType = (FormattedType) type;
+					if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr)) {
+						// Value okay, skip it
+					} else {
+						logMsg(validateType, "value <{0}> is not a valid Date", valueStr);
+					}
+				} else if (attr.isDomainIli2Time()) {
+					// Value is not null and matches 0:0:0.000-23:59:59.999
+					String valueStr = iomObj.getattrvalue(attrName);
+					FormattedType subType = (FormattedType) type;
+					// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
+					if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr) && valueStr.length() >= 9 && valueStr.length() <= 12) {
+						// Value okay, skip it
+					} else {
+						logMsg(validateType, "value <{0}> is not a valid Time", valueStr);
+					}
+				} else if (attr.isDomainIli2DateTime()) {
+					// Value is not null
+					String valueStr = iomObj.getattrvalue(attrName);
+					FormattedType subType = (FormattedType) type;
+					// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
+					if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr) && valueStr.length() >= 18 && valueStr.length() <= 23) {
+						// Value okay, skip it
+					} else {
+						logMsg(validateType, "value <{0}> is not a valid DateTime", valueStr);
+					}
+				}else if (type instanceof PolylineType){
+					PolylineType polylineType=(PolylineType)type;
+					IomObject polylineValue=iomObj.getattrobj(attrName, 0);
+					if (polylineValue != null){
+						validatePolyline(validateType, polylineType, polylineValue);
+						validatePolylineTopology(attrPath,validateType, polylineType, polylineValue);
+					}
+				}else if(type instanceof SurfaceOrAreaType){
+					 if(doItfLineTables){
+						 if(type instanceof SurfaceType){
+							 // SURFACE; no attributeValue in mainTable
 						 }else{
-							 // validate polygon
-							SurfaceOrAreaType surfaceOrAreaType=(SurfaceOrAreaType)type;
-							IomObject surfaceValue=iomObj.getattrobj(attrName,0);
-							if (surfaceValue != null){
-								validatePolygon(validateType,surfaceOrAreaType, surfaceValue);
-								if(surfaceOrAreaType instanceof SurfaceType){
-									validateSurfaceTopology(validateType,(SurfaceType)surfaceOrAreaType, surfaceValue);
-								}else{
-									validateAreaTopology(validateType,(AreaType)surfaceOrAreaType, surfaceValue);
-								}
-							}
+							 // AREA
+							 // validate coord
 						 }
-					}else if(type instanceof CoordType){
-						IomObject coord=iomObj.getattrobj(attrName, 0);
-						if (coord!=null){
-							validateCoordType(validateType, (CoordType)type, coord);
-						}
-					}else if(type instanceof NumericType){
-						String valueStr=iomObj.getattrvalue(attrName);
-						if(valueStr!=null){
-							validateNumericType(validateType, (NumericType)type, valueStr);							
-						}else{
-							IomObject structValue=iomObj.getattrobj(attrName, 0);
-							if(structValue!=null){
-								logMsg(validateType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
+					 }else{
+						 // validate polygon
+						SurfaceOrAreaType surfaceOrAreaType=(SurfaceOrAreaType)type;
+						IomObject surfaceValue=iomObj.getattrobj(attrName,0);
+						if (surfaceValue != null){
+							validatePolygon(validateType,surfaceOrAreaType, surfaceValue);
+							if(surfaceOrAreaType instanceof SurfaceType){
+								validateSurfaceTopology(validateType,(SurfaceType)surfaceOrAreaType, surfaceValue);
+							}else{
+								validateAreaTopology(validateType,(AreaType)surfaceOrAreaType, surfaceValue);
 							}
 						}
-					}else if(type instanceof EnumerationType){
-						String value=iomObj.getattrvalue(attrName);
-						if(value!=null){
-							if(!((EnumerationType) type).getValues().contains(value)){
-								 logMsg(validateType,"value {0} is not a member of the enumeration", value);
-							}
-						}else{
-							IomObject structValue=iomObj.getattrobj(attrName, 0);
-							if(structValue!=null){
-								logMsg(validateType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
+					 }
+				}else if(type instanceof CoordType){
+					IomObject coord=iomObj.getattrobj(attrName, 0);
+					if (coord!=null){
+						validateCoordType(validateType, (CoordType)type, coord);
+					}
+				}else if(type instanceof NumericType){
+					String valueStr=iomObj.getattrvalue(attrName);
+					if(valueStr!=null){
+						validateNumericType(validateType, (NumericType)type, valueStr);							
+					}else{
+						IomObject structValue=iomObj.getattrobj(attrName, 0);
+						if(structValue!=null){
+							logMsg(validateType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
+						}
+					}
+				}else if(type instanceof EnumerationType){
+					String value=iomObj.getattrvalue(attrName);
+					if(value!=null){
+						if(!((EnumerationType) type).getValues().contains(value)){
+							 logMsg(validateType,"value {0} is not a member of the enumeration", value);
+						}
+					}else{
+						IomObject structValue=iomObj.getattrobj(attrName, 0);
+						if(structValue!=null){
+							logMsg(validateType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
+						}
+					}
+				}else if(type instanceof EnumTreeValueType){
+					EnumTreeValueType enumTreeValueType = (EnumTreeValueType) type;
+					String attri = iomObj.getattrname(0).toString();
+					String attrv = iomObj.getattrvalue(attri);
+					String value=iomObj.getattrvalue(attrName);
+				}else if(type instanceof ReferenceType){
+				}else if(type instanceof TextType){
+					String value=iomObj.getattrvalue(attrName);
+					if(value!=null){
+						int maxLength=((TextType) type).getMaxLength();
+						TextType textType = (TextType) type;
+						if(maxLength!=-1){
+							if(value.length()>maxLength){
+								 logMsg(validateType,"Attribute {0} is length restricted to {1}", attrPath,Integer.toString(maxLength));
 							}
 						}
-					}else if(type instanceof EnumTreeValueType){
-						EnumTreeValueType enumTreeValueType = (EnumTreeValueType) type;
-						String attri = iomObj.getattrname(0).toString();
-						String attrv = iomObj.getattrvalue(attri);
-						String value=iomObj.getattrvalue(attrName);
-					}else if(type instanceof ReferenceType){
-					}else if(type instanceof TextType){
-						String value=iomObj.getattrvalue(attrName);
-						if(value!=null){
-							int maxLength=((TextType) type).getMaxLength();
-							TextType textType = (TextType) type;
-							if(maxLength!=-1){
-								if(value.length()>maxLength){
-									 logMsg(validateType,"Attribute {0} is length restricted to {1}", attrPath,Integer.toString(maxLength));
-								}
+						if(((TextType) type).isNormalized()){
+							if(value.indexOf('\n')>=0 || value.indexOf('\r')>=0 || value.indexOf('\t')>=0){
+								 logMsg(validateType,"Attribute {0} must not contain control characters", attrPath);
 							}
-							if(((TextType) type).isNormalized()){
-								if(value.indexOf('\n')>=0 || value.indexOf('\r')>=0 || value.indexOf('\t')>=0){
-									 logMsg(validateType,"Attribute {0} must not contain control characters", attrPath);
-								}
-							}
-						}else{
-							IomObject structValue=iomObj.getattrobj(attrName, 0);
-							if(structValue!=null){
-								logMsg(validateType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
-							}
+						}
+					}else{
+						IomObject structValue=iomObj.getattrobj(attrName, 0);
+						if(structValue!=null){
+							logMsg(validateType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
 						}
 					}
 				}
 			}
+		}
 	}
 
-	private void validateAreaTopology(String validateType,
-			AreaType type, IomObject iomValue) {
-		
-		
-	}
-
-	private void validateSurfaceTopology(String validateType,
-			SurfaceType type, IomObject iomValue) {
+	private void validateAreaTopology(String validateType, AreaType type, IomObject iomValue) {
 		// TODO Auto-generated method stub
-		
 	}
-	private void validatePolylineTopology(String attrPath,String validateType,
-			PolylineType type, IomObject iomValue) {
+
+	private void validateSurfaceTopology(String validateType, SurfaceType type, IomObject iomValue) {
+		// TODO Auto-generated method stub
+	}
+	
+	private void validatePolylineTopology(String attrPath,String validateType, PolylineType type, IomObject iomValue) {
 		PrecisionDecimal overlapDef=type.getMaxOverlap();
 		if(overlapDef!=null){
 			double newVertexOffset=0.0;
@@ -1660,9 +1549,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					logMsg(validateType, "Attribute {0} has an invalid self-intersection at {1}",attrPath,"" + coordToString(pt[0])+(pt.length==2?(", coord2 "+coordToString(pt[1])):""));
 				}
 			}
-			
 		}
-		
 	}
 
 	private String coordToString(Coordinate coord) {
@@ -1875,7 +1762,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			 errs.addEvent(errFact.logErrorMsg(msg, args));
 		 }
 	}
-
+	
 	private void validateItfLineTableObject(IomObject iomObj, AttributeDef modelele) {
 		// validate if line table object
 	}

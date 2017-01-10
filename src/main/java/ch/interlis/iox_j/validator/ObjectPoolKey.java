@@ -76,6 +76,4 @@ public class ObjectPoolKey {
 	private void setBasketId(String basketId) {
 		this.basketId = basketId;
 	}
-	
-	
 }
