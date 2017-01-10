@@ -26,6 +26,8 @@ package ch.interlis.iom_j.itf;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.iox_j.*;
+import ch.interlis.iox_j.logging.LogEventFactory;
+import ch.interlis.iox.IoxDataPool;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
@@ -54,6 +56,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 	private ObjectPoolManager objPool=null;
 	private ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
 	private boolean ignorePolygonBuildingErrors=false;
+	private IoxDataPool ioxDataPool=null;
 	/** Creates a new reader.
 	 * @param in Input stream to read from.
 	 * @throws IoxException
@@ -64,6 +67,12 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 		rawReader=new ItfReader(in);
 		init(ignorePolygonBuildingErrors1);
 	}
+	public ItfReader2(java.io.InputStream in,LogEventFactory errFact,boolean ignorePolygonBuildingErrors1)
+	throws IoxException
+	{
+		rawReader=new ItfReader(in,errFact);
+		init(ignorePolygonBuildingErrors1);
+	}
 	/** Creates a new reader.
 	 * @param in File to read from.
 	 * @throws IoxException
@@ -72,6 +81,12 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 	throws IoxException
 	{
 		rawReader=new ItfReader(in);
+		init(ignorePolygonBuildingErrors1);
+	}
+	public ItfReader2(java.io.File in,LogEventFactory errFact,boolean ignorePolygonBuildingErrors1)
+	throws IoxException
+	{
+		rawReader=new ItfReader(in,errFact);
 		init(ignorePolygonBuildingErrors1);
 	}
 	private void init(boolean ignorePolygonBuildingErrors1){
@@ -475,5 +490,11 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 	public void clearDataErrs()
 	{
 		dataerrs.clear();
+	}
+	public IoxDataPool getIoxDataPool() {
+		return ioxDataPool;
+	}
+	public void setIoxDataPool(IoxDataPool ioxDataPool) {
+		this.ioxDataPool = ioxDataPool;
 	}
 }
