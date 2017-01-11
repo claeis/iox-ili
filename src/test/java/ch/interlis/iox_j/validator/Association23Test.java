@@ -933,8 +933,8 @@ public class Association23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==4);
 		assertEquals("The OID o3 of object 'Association23.Topic.ClassB oid o3 {a3 -> o2 REF {}}' already exists in CLASS Association23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
-		assertEquals("No object found with OID o6.", logger.getErrs().get(1).getEventMsg());
-		assertEquals("Object Association23.Topic.ClassD with OID o1 must be of Association23.Topic.ClassA", logger.getErrs().get(2).getEventMsg());
+		assertEquals("Object Association23.Topic.ClassD with OID o1 must be of Association23.Topic.ClassA", logger.getErrs().get(1).getEventMsg());
+		assertEquals("No object found with OID o6.", logger.getErrs().get(2).getEventMsg());
 		assertEquals("a3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(3).getEventMsg());
 	}
 	
