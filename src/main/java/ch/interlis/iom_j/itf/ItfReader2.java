@@ -26,6 +26,7 @@ package ch.interlis.iom_j.itf;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.iox_j.*;
+import ch.interlis.iox_j.logging.Log2EhiLogger;
 import ch.interlis.iox_j.logging.LogEventFactory;
 import ch.interlis.iox.IoxDataPool;
 import ch.interlis.iox.IoxEvent;
@@ -57,6 +58,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 	private ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
 	private boolean ignorePolygonBuildingErrors=false;
 	private IoxDataPool ioxDataPool=null;
+	private LogEventFactory errFact=null;
 	/** Creates a new reader.
 	 * @param in Input stream to read from.
 	 * @throws IoxException
@@ -64,12 +66,14 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 	public ItfReader2(java.io.InputStream in,boolean ignorePolygonBuildingErrors1)
 	throws IoxException
 	{
-		rawReader=new ItfReader(in);
+		initErrFact(null);
+		rawReader=new ItfReader(in,errFact);
 		init(ignorePolygonBuildingErrors1);
 	}
-	public ItfReader2(java.io.InputStream in,LogEventFactory errFact,boolean ignorePolygonBuildingErrors1)
+	public ItfReader2(java.io.InputStream in,LogEventFactory errFact1,boolean ignorePolygonBuildingErrors1)
 	throws IoxException
 	{
+		initErrFact(errFact1);
 		rawReader=new ItfReader(in,errFact);
 		init(ignorePolygonBuildingErrors1);
 	}
@@ -80,18 +84,31 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 	public ItfReader2(java.io.File in,boolean ignorePolygonBuildingErrors1)
 	throws IoxException
 	{
-		rawReader=new ItfReader(in);
+		initErrFact(null);
+		rawReader=new ItfReader(in,errFact);
 		init(ignorePolygonBuildingErrors1);
 	}
-	public ItfReader2(java.io.File in,LogEventFactory errFact,boolean ignorePolygonBuildingErrors1)
+	public ItfReader2(java.io.File in,LogEventFactory errFact1,boolean ignorePolygonBuildingErrors1)
 	throws IoxException
 	{
+		initErrFact(errFact1);
 		rawReader=new ItfReader(in,errFact);
 		init(ignorePolygonBuildingErrors1);
 	}
 	private void init(boolean ignorePolygonBuildingErrors1){
 		objPool=new ObjectPoolManager();
 		ignorePolygonBuildingErrors=ignorePolygonBuildingErrors1;
+	}
+	private void initErrFact(LogEventFactory errFact) {
+		if(errFact==null){
+			this.errFact=new LogEventFactory();
+			this.errFact.setLogger(new Log2EhiLogger());
+		}else{
+			this.errFact=errFact;
+			if(errFact.getLogger()==null){
+				this.errFact.setLogger(new Log2EhiLogger());
+			}
+		}
 	}
 	@Override
 	public void close() throws IoxException {
@@ -355,7 +372,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 		}else if(rawEvent instanceof EndTransferEvent){
 			if(dataerrs.size()>0){
         		for(IoxInvalidDataException dataerr:dataerrs){
-        			EhiLogger.logError(dataerr);
+        			errFact.addEvent(errFact.logError(dataerr));
         		}
 				throw new IoxInvalidDataException("failed to build polygons");
 			}

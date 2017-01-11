@@ -22,15 +22,27 @@ import ch.interlis.iom_j.itf.ItfReader2;
 import ch.interlis.iox.*;
 import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.jts.Iox2jtsException;
+import ch.interlis.iox_j.logging.LogEventImpl;
 
 public class ItfReader2Test {
 
 	private TransferDescription td=null;
 	private LogCollector errs=null;
-	private void assertError(String expected)
+	private void assertError(String expected,String tid)
 	{
+		LogEvent foundErr=null;
 		for(LogEvent err:errs.getErrs()){
-			if(expected.equals(err.getEventMsg()) || expected.equals(err.getException().getMessage())){
+			if(expected.equals(err.getEventMsg())){
+				foundErr=err;
+				break;
+			}
+			if(err.getException()!=null && expected.equals(err.getException().getMessage())){
+				foundErr=err;
+				break;
+			}
+		}
+		if(foundErr!=null && foundErr instanceof LogEventImpl){
+			if(tid!=null && tid.equals(((LogEventImpl) foundErr).getSourceObjectXtfId())){
 				return;
 			}
 		}
@@ -116,7 +128,7 @@ public class ItfReader2Test {
 			 }while(!(event instanceof EndTransferEvent));
 			 fail();
 		}catch(IoxInvalidDataException ex){
-			 assertError("Test1.TopicA.TableA_Form: empty line (tid 1)");
+			 assertError("empty line","1");
 		}
 	}
 
@@ -186,7 +198,7 @@ public class ItfReader2Test {
 			 }while(!(event instanceof EndTransferEvent));
 			 fail();
 		}catch(IoxInvalidDataException ex){
-			 assertError("Test1.TopicB.TableB_Form: empty line (tid 1)");
+			 assertError("empty line","1");
 		}
 	}
 	@Test

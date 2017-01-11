@@ -5,6 +5,7 @@ import java.util.Date;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxLogEvent;
 import ch.interlis.iox.IoxLogging;
+import ch.interlis.iox_j.IoxInvalidDataException;
 
 public class LogEventFactory {
 	private String dataSource=null;
@@ -60,6 +61,36 @@ public class LogEventFactory {
 			return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessageId(eventId,dataObj,args),null,dataObj.getobjectline(),dataObj.getobjecttag(),getObjectTechId(dataObj),getObjectUsrId(dataObj),dataObj.getobjectoid(),null,coordX,coordY,coordZ,getCallerOrigin());
 		}
 		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessageId(eventId,null,args),null,null,null,null,null,null,null,coordX,coordY,coordZ,getCallerOrigin());
+	}
+	public IoxLogEvent logError(IoxInvalidDataException ex) {
+		String eventId="codeInternal";
+		String msg=ex.getRawMessage();
+		Integer lineNumber=null;
+		if(ex.getLineNumber()!=-1){
+			lineNumber=ex.getLineNumber();
+		}else{
+			lineNumber=null;
+		}
+		String tid=ex.getTid();
+		Double coordX=null;
+		Double coordY=null;
+		Double coordZ=null;
+		IomObject geom=ex.getGeom();
+		if(geom!=null && geom.getobjecttag().equals("COORD")){
+			String c1=geom.getattrvalue("C1");
+			String c2=geom.getattrvalue("C2");
+			String c3=geom.getattrvalue("C3");
+			if(c1!=null && c2!=null){
+				coordX=Double.valueOf(c1);
+				coordY=Double.valueOf(c2);
+				if(c3!=null){
+					coordZ=Double.valueOf(c3);
+				}
+			}
+		}
+		String iliqName=ex.getIliqname();
+		
+		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,msg,ex.getCause(),lineNumber,iliqName,null,null,tid,null,coordX,coordY,coordZ,getCallerOrigin());
 	}
 	private String getObjectUsrId(IomObject iomObj) {
 		// TODO Auto-generated method stub

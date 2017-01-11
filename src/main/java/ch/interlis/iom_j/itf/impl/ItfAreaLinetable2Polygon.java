@@ -133,7 +133,7 @@ public class ItfAreaLinetable2Polygon {
 		}
 		IomObject polyline=iomObj.getattrobj(helperTableGeomAttrName, 0);
 		if(polyline==null){
-			dataerrs.add(new IoxInvalidDataException("empty line",linetableIliqname,new String[]{iomObj.getobjectoid()},iomObj));
+			dataerrs.add(new IoxInvalidDataException("empty line",linetableIliqname,iomObj.getobjectoid(),iomObj));
 		}else{
 			lines.put(iomObj.getobjectoid(),iomObj);
 		}
@@ -224,9 +224,9 @@ public class ItfAreaLinetable2Polygon {
 							String []tids=new String[2];
 							tids[0]=(String) is.getCurve1().getUserData();
 							tids[1]=(String) is.getCurve2().getUserData();
-							dataerrs.add(new IoxInvalidDataException("intersection",linetableIliqname,tids,Jtsext2iox.JTS2coord(is.getPt()[0])));
+							dataerrs.add(new IoxInvalidDataException("intersection "+IoxInvalidDataException.formatTids(tids),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
 							if(is.getPt().length==2){
-								dataerrs.add(new IoxInvalidDataException("intersection",linetableIliqname,tids,Jtsext2iox.JTS2coord(is.getPt()[1])));
+								dataerrs.add(new IoxInvalidDataException("intersection "+IoxInvalidDataException.formatTids(tids),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[1])));
 							}
 							hasIntersections=true;
 						}
@@ -250,7 +250,7 @@ public class ItfAreaLinetable2Polygon {
 			if(!cutEdges.isEmpty()){
 				for(Object edge:cutEdges){
 					try {
-						dataerrs.add(new IoxInvalidDataException("cut edge",linetableIliqname,((CompoundCurve) edge).getSegmentTids(),Jtsext2iox.JTS2polyline((CompoundCurve)edge)));
+						dataerrs.add(new IoxInvalidDataException("cut edge "+IoxInvalidDataException.formatTids(((CompoundCurve) edge).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)edge)));
 					} catch (Iox2jtsException e) {
 						throw new IllegalStateException(e);
 					}
@@ -263,7 +263,7 @@ public class ItfAreaLinetable2Polygon {
 			if(!dangles.isEmpty()){
 				for(Object dangle:dangles){
 						try {
-							dataerrs.add(new IoxInvalidDataException("dangle",linetableIliqname,((CompoundCurve) dangle).getSegmentTids(),Jtsext2iox.JTS2polyline((CompoundCurve)dangle)));
+							dataerrs.add(new IoxInvalidDataException("dangle "+IoxInvalidDataException.formatTids(((CompoundCurve) dangle).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)dangle)));
 						} catch (Iox2jtsException e) {
 							throw new IllegalStateException(e);
 						}
@@ -276,7 +276,7 @@ public class ItfAreaLinetable2Polygon {
 			if(!invalidRingLines.isEmpty()){
 				for(Object invalidRingLine:invalidRingLines){
 					try {
-						dataerrs.add(new IoxInvalidDataException("invald ring line",linetableIliqname,((CompoundCurve) invalidRingLine).getSegmentTids(),Jtsext2iox.JTS2polyline((CompoundCurve)invalidRingLine)));
+						dataerrs.add(new IoxInvalidDataException("invald ring line "+IoxInvalidDataException.formatTids(((CompoundCurve) invalidRingLine).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)invalidRingLine)));
 					} catch (Iox2jtsException e) {
 						throw new IllegalStateException(e);
 					}
@@ -319,9 +319,7 @@ public class ItfAreaLinetable2Polygon {
 					}
 				}
 				if(hit==null){
-					String tids[]=new String[1];
-					tids[0]=tid;
-					IoxInvalidDataException ex=new IoxInvalidDataException("no polygon for tid",geomattrIliqname,tids,Jtsext2iox.JTS2coord(coord));
+					IoxInvalidDataException ex=new IoxInvalidDataException("no polygon for tid "+tid,geomattrIliqname,tid,Jtsext2iox.JTS2coord(coord));
 					if(ignorePolygonBuildingErrors){
 						dataerrs.add(ex);
 					}else{
@@ -340,7 +338,7 @@ public class ItfAreaLinetable2Polygon {
 						tids[1]=tid2;
 						IoxInvalidDataException ex=null;
 						try {
-							ex=new IoxInvalidDataException("multiple area-refs to polygon",geomattrIliqname,tids,Jtsext2iox.JTS2surface(hit));
+							ex=new IoxInvalidDataException("multiple area-refs to polygon "+IoxInvalidDataException.formatTids(tids),geomattrIliqname,null,Jtsext2iox.JTS2surface(hit));
 						} catch (Iox2jtsException e) {
 							throw new IllegalStateException(e);
 						}

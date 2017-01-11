@@ -223,7 +223,7 @@ public class ItfSurfaceLinetable2Polygon {
 			for(IomObject line:lines1){
 				IomObject polyline=line.getattrobj(helperTableGeomAttrName, 0);
 				if(polyline==null){
-					dataerrs.add(new IoxInvalidDataException("empty line",linetableIliqname,new String[]{line.getobjectoid()},line));
+					dataerrs.add(new IoxInvalidDataException("empty line",linetableIliqname,line.getobjectoid(),line));
 				}else{
 					lines.put(line.getobjectoid(), line);
 				}
@@ -272,9 +272,9 @@ public class ItfSurfaceLinetable2Polygon {
 						String []tids=new String[2];
 						tids[0]=(String) is.getCurve1().getUserData();
 						tids[1]=(String) is.getCurve2().getUserData();
-						dataerrs.add(new IoxInvalidDataException("intersection",linetableIliqname,tids,Jtsext2iox.JTS2coord(is.getPt()[0])));
+						dataerrs.add(new IoxInvalidDataException("intersection "+IoxInvalidDataException.formatTids(tids),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
 						if(is.getPt().length==2){
-							dataerrs.add(new IoxInvalidDataException("intersection",linetableIliqname,tids,Jtsext2iox.JTS2coord(is.getPt()[1])));
+							dataerrs.add(new IoxInvalidDataException("intersection "+IoxInvalidDataException.formatTids(tids),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[1])));
 						}
 						hasIntersections=true;
 					}
@@ -294,7 +294,7 @@ public class ItfSurfaceLinetable2Polygon {
 			if(!cutEdges.isEmpty()){
 				for(Object edge:cutEdges){
 					try {
-						dataerrs.add(new IoxInvalidDataException("cut edge",linetableIliqname,((CompoundCurve) edge).getSegmentTids(),Jtsext2iox.JTS2polyline((CompoundCurve)edge)));
+						dataerrs.add(new IoxInvalidDataException("cut edge "+IoxInvalidDataException.formatTids(((CompoundCurve) edge).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)edge)));
 					} catch (Iox2jtsException e) {
 						throw new IllegalStateException(e);
 					}
@@ -307,7 +307,7 @@ public class ItfSurfaceLinetable2Polygon {
 			if(!dangles.isEmpty()){
 				for(Object dangle:dangles){
 					try {
-						dataerrs.add(new IoxInvalidDataException("dangle",linetableIliqname,((CompoundCurve) dangle).getSegmentTids(),Jtsext2iox.JTS2polyline((CompoundCurve)dangle)));
+						dataerrs.add(new IoxInvalidDataException("dangle "+IoxInvalidDataException.formatTids(((CompoundCurve) dangle).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)dangle)));
 					} catch (Iox2jtsException e) {
 						throw new IllegalStateException(e);
 					}
@@ -320,7 +320,7 @@ public class ItfSurfaceLinetable2Polygon {
 			if(!invalidRingLines.isEmpty()){
 				for(Object invalidRingLine:invalidRingLines){
 					try {
-						dataerrs.add(new IoxInvalidDataException("invald ring line",linetableIliqname,((CompoundCurve) invalidRingLine).getSegmentTids(),Jtsext2iox.JTS2polyline((CompoundCurve)invalidRingLine)));
+						dataerrs.add(new IoxInvalidDataException("invald ring line"+IoxInvalidDataException.formatTids(((CompoundCurve) invalidRingLine).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)invalidRingLine)));
 					} catch (Iox2jtsException e) {
 						throw new IllegalStateException(e);
 					}
@@ -357,9 +357,7 @@ public class ItfSurfaceLinetable2Polygon {
 					}else{
 						isDisconnected=true;
 						try {
-							String tids[]=new String[1];
-							tids[0]=mainTid;
-							dataerrs.add(new IoxInvalidDataException("multipolygon",geomattrIliqname,tids,Jtsext2iox.JTS2surface(holePoly)));
+							dataerrs.add(new IoxInvalidDataException("multipolygon",geomattrIliqname,mainTid,Jtsext2iox.JTS2surface(holePoly)));
 						} catch (Iox2jtsException e) {
 							throw new IllegalStateException(e);
 						}
