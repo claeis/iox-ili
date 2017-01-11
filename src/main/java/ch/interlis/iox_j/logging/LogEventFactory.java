@@ -4,10 +4,12 @@ import java.util.Date;
 
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxLogEvent;
+import ch.interlis.iox.IoxLogging;
 
 public class LogEventFactory {
 	private String dataSource=null;
 	private IomObject dataObj=null;
+	private IoxLogging logger=null;
 	private Double coordX=null;
 	private Double coordY=null;
 	private Double coordZ=null;
@@ -120,5 +122,18 @@ public class LogEventFactory {
 			return st;
 		}
 		return null;
+	}
+	public void addEvent(IoxLogEvent ex)
+	{
+		if(logger==null){
+			throw new IllegalStateException("logger must not be null");
+		}
+		logger.addEvent(ex);
+	}
+	public IoxLogging getLogger() {
+		return logger;
+	}
+	public void setLogger(IoxLogging logger) {
+		this.logger = logger;
 	}
 }

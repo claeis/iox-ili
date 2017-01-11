@@ -25,6 +25,8 @@ package ch.interlis.iom_j.itf;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.iox_j.*;
+import ch.interlis.iox_j.logging.LogEventFactory;
+import ch.interlis.iox.IoxDataPool;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
 import ch.interlis.iom_j.itf.impl.ItfLineCursor;
@@ -56,6 +58,7 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 	private boolean readEnumValAsItfCode=false;
 	private boolean renumberTids=false;
 	private HashMap tid2tid=null; // map<String oldTid,String newTid>
+	private IoxDataPool ioxDataPool=null;
 
 	/** Creates a new reader.
 	 * @param in Input stream to read from.
@@ -74,11 +77,42 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 		itfLine=new ItfLineCursor();
 		state=10;
 	}
+	public ItfReader(java.io.InputStream in,LogEventFactory errFact)
+	throws IoxException
+	{
+		try{
+			scanner=new ItfScanner(in);
+		}catch(java.io.UnsupportedEncodingException ex){
+			throw new IoxException(ex);
+		}catch(java.io.IOException ex){
+			throw new IoxException(ex);
+		}
+		itfLine=new ItfLineCursor();
+		state=10;
+	}
 	/** Creates a new reader.
 	 * @param inFile File to read from.
 	 * @throws IoxException
 	 */
 	public ItfReader(java.io.File inFile)
+	throws IoxException
+	{
+		try{
+			inStream=new java.io.FileInputStream(inFile);
+		}catch(java.io.FileNotFoundException ex){
+			throw new IoxException(ex);
+		}
+		try{
+			scanner=new ItfScanner(inStream);
+		}catch(java.io.UnsupportedEncodingException ex){
+			throw new IoxException(ex);
+		}catch(java.io.IOException ex){
+			throw new IoxException(ex);
+		}
+		itfLine=new ItfLineCursor();
+		state=10;
+	}
+	public ItfReader(java.io.File inFile,LogEventFactory errFact)
 	throws IoxException
 	{
 		try{
@@ -710,5 +744,11 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 	public Object mapIliQName2Class(String iliQName)
 	{
 		return tag2class.get(iliQName);
+	}
+	public IoxDataPool getIoxDataPool() {
+		return ioxDataPool;
+	}
+	public void setIoxDataPool(IoxDataPool ioxDataPool) {
+		this.ioxDataPool = ioxDataPool;
 	}
 }
