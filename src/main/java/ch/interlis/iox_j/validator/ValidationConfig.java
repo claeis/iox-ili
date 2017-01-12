@@ -21,6 +21,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	private HashMap<String,HashMap<String,String>> data=new HashMap<String,HashMap<String,String>>();
 	public static final String MULTIPLICITY="multiplicity";
 	public static final String TYPE="type";
+	public static final String TOPOLOGY="topology";
 	public static final String TARGET="target";
 	public static final String WARNING="warning";
 	public static final String OFF="off";

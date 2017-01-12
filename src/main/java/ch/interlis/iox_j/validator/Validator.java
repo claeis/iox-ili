@@ -6,8 +6,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+
 import javax.xml.ws.Holder;
+
 import com.vividsolutions.jts.geom.Coordinate;
+
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AreaType;
@@ -77,6 +80,7 @@ import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxLogging;
 import ch.interlis.iox.IoxValidationConfig;
+import ch.interlis.iox_j.PipelinePool;
 import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.logging.LogEventFactory;
 
@@ -88,6 +92,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private ObjectPool objectPool = null;
 	private LinkPool linkPool;
 	private ch.interlis.iox.IoxValidationConfig validationConfig=null;
+	private ch.interlis.iox.IoxDataPool pipelinePool=null;
 	private IoxLogging errs=null;
 	private LogEventFactory errFact=null;
 	private TransferDescription td=null;
@@ -96,14 +101,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private Settings config=null;
 	private boolean validationOff=false;
 	private String currentBasketId = null;
-	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
+	@Deprecated
+	protected Validator(TransferDescription td, IoxValidationConfig validationConfig,
 			IoxLogging errs, LogEventFactory errFact, Settings config) {
+		this(td, validationConfig,errs, errFact, new PipelinePool(),config);
+	}
+	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
+			IoxLogging errs, LogEventFactory errFact, ch.interlis.iox.IoxDataPool pipelinePool,Settings config) {
 		super();
 		this.td = td;
 		this.validationConfig = validationConfig;
 		this.errs = errs;
 		this.errFact = errFact;
 		this.config=config;
+		this.pipelinePool=pipelinePool;
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(config.getValue(CONFIG_DO_ITF_OIDPERTABLE));
 		if(doItfLineTables){
@@ -128,7 +139,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	@Override
-	public ch.interlis.iox.IoxValidationDataPool getDataPool() {
+	public ch.interlis.iox.IoxDataPool getDataPool() {
 		return null;
 	}
 
@@ -1446,10 +1457,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						IomObject surfaceValue=iomObj.getattrobj(attrName,0);
 						if (surfaceValue != null){
 							validatePolygon(validateType,surfaceOrAreaType, surfaceValue);
-							if(surfaceOrAreaType instanceof SurfaceType){
-								validateSurfaceTopology(validateType,(SurfaceType)surfaceOrAreaType, surfaceValue);
-							}else{
-								validateAreaTopology(validateType,(AreaType)surfaceOrAreaType, surfaceValue);
+							Object attrValidator=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
+							if(attrValidator==null){
+								attrValidator=this;
+								pipelinePool.setIntermediateValue(attr, ValidationConfig.TOPOLOGY,this);
+							}
+							if(attrValidator==this){
+								if(surfaceOrAreaType instanceof SurfaceType){
+									validateSurfaceTopology(validateType,(SurfaceType)surfaceOrAreaType, surfaceValue);
+								}else{
+									validateAreaTopology(validateType,(AreaType)surfaceOrAreaType, surfaceValue);
+								}
 							}
 						}
 					 }

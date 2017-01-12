@@ -28,6 +28,7 @@ import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.iox_j.*;
 import ch.interlis.iox_j.logging.Log2EhiLogger;
 import ch.interlis.iox_j.logging.LogEventFactory;
+import ch.interlis.iox_j.validator.ValidationConfig;
 import ch.interlis.iox.IoxDataPool;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
@@ -327,6 +328,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 				// FOR all area attrs: polygonize and add polygon to main object
 				for(AttributeDef areaAttr : currentAreaAttrs.keySet()){
 					String areaAttrName=areaAttr.getName();
+					setTopologyValidationDone(areaAttr);
 					ItfAreaLinetable2Polygon polygonizer=currentAreaAttrs.get(areaAttr);
 					try {
 						polygonizer.buildSurfaces();
@@ -340,6 +342,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 				// FOR all surface attrs: polygonize and add polygon to main object
 				for(AttributeDef surfaceAttr : currentSurfaceAttrs.keySet()){
 					String surfaceAttrName=surfaceAttr.getName();
+					setTopologyValidationDone(surfaceAttr);
 					ItfSurfaceLinetable2Polygon polygonizer=currentSurfaceAttrs.get(surfaceAttr);
 					try {
 						polygonizer.buildSurfaces();
@@ -378,6 +381,11 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 			}
 		}
 		return rawEvent;
+	}
+	private void setTopologyValidationDone(AttributeDef attr) {
+		if(ioxDataPool!=null){
+			ioxDataPool.setIntermediateValue(attr, ValidationConfig.TOPOLOGY, this);
+		}
 	}
 	private void closePolygonizers() {
 		if(currentAreaAttrs!=null){
