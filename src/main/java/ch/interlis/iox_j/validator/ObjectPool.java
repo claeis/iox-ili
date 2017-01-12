@@ -26,6 +26,9 @@ public class ObjectPool {
 
 	public void addObject(IomObject iomObj, HashMap<String,Object> tag2class, String currentBasketId){
 		String oid = iomObj.getobjectoid();
+		if(oid==null){
+			return;
+		}
 		Object modelEle = tag2class.get(iomObj.getobjecttag());
 		Viewable classValue = (Viewable) modelEle;
 		ObjectPoolKey key = null;
