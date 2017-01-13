@@ -517,7 +517,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			// viewable alias
 			ViewableAlias viewableAliasObj = (ViewableAlias) expression;
 		}
-		return null;
+		return Value.createError(); // skip further evaluation
 	}
 
 	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {
