@@ -13,9 +13,11 @@ public class Value {
 	private String value=null;
 	private IomObject complexValue=null;
 	private Type type=null;
+	private boolean booleanIsDefined = false;
 	
 	public Value(boolean booleanValue) {
 		this.booleanValue = booleanValue;
+		booleanIsDefined = true;
 	}
 	
 	public Value(Type type,String valueStr){
@@ -53,10 +55,11 @@ public class Value {
 	}
 	
 	public static Value createUndefined(){
-		return new Value(null); // TODO improve representation of UNDEFINED
+		return new Value(null);
 	}
+	
 	public boolean isUndefined(){
-		return !(getComplexValue() != null || getValue() != null);
+		return !(getComplexValue() != null || getValue() != null || booleanIsDefined);
 	}
 	public static Value createError(){
 		return new Value();

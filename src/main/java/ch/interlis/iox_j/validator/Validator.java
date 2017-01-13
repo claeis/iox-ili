@@ -477,9 +477,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				return arg;
 			}
 			if(arg.isUndefined()){
-				return new Value(true);
-			} else {
 				return new Value(false);
+			} else {
+				return new Value(true);
 			}
 		} else if(expression instanceof Disjunction){
 			// OR
@@ -1073,9 +1073,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			setCurrentMainObj(iomObj);
 		}
 		// validate class, structure and association on existence of OID
+		boolean addToPool = true;
 		if (isObject){
 			Object modelElementOidValidate = tag2class.get(iomObj.getobjecttag());
 			Viewable classValueOidValidate = (Viewable) modelElementOidValidate;
+			
 			// association
 			if (modelElementOidValidate instanceof AssociationDef){
 				AssociationDef modelAssociationDef = (AssociationDef) modelElementOidValidate;
@@ -1083,6 +1085,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if (modelAssociationDef.isIdentifiable() || oidType!=null){
 					if (iomObj.getobjectoid() == null){
 						errs.addEvent(errFact.logErrorMsg("Association {0} has to have an OID", iomObj.getobjecttag()));
+						addToPool = false;
 					}
 				} 
 			} else if (classValueOidValidate instanceof Table){
@@ -1091,9 +1094,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if (classValueTable.isIdentifiable()){
 					if (iomObj.getobjectoid() == null){
 						errs.addEvent(errFact.logErrorMsg("Class {0} has to have an OID", iomObj.getobjecttag()));
+						addToPool = false;
 					}
 				// structure	
 				} else {
+					addToPool = false;
 					if (iomObj.getobjectoid() != null){
 						errs.addEvent(errFact.logErrorMsg("Structure {0} has not to have an OID", iomObj.getobjecttag()));
 					}
@@ -1172,7 +1177,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		
 		if(isObject){
-			objectPool.addObject(iomObj, tag2class, currentBasketId);
+			if(addToPool){
+				objectPool.addObject(iomObj, tag2class, currentBasketId);
+			}
 		}
 		
 		HashSet<String> propNames=new HashSet<String>();
