@@ -58,7 +58,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 	private ObjectPoolManager objPool=null;
 	private ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
 	private boolean ignorePolygonBuildingErrors=false;
-	private IoxDataPool ioxDataPool=null;
+	private PipelinePool ioxDataPool=null;
 	private LogEventFactory errFact=null;
 	/** Creates a new reader.
 	 * @param in Input stream to read from.
@@ -520,6 +520,6 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 		return ioxDataPool;
 	}
 	public void setIoxDataPool(IoxDataPool ioxDataPool) {
-		this.ioxDataPool = ioxDataPool;
+		this.ioxDataPool = (PipelinePool)ioxDataPool;
 	}
 }

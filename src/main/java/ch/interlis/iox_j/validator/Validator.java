@@ -73,6 +73,7 @@ import ch.interlis.ili2c.metamodel.ViewableAlias;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.itf.impl.ItfAreaPolygon2Linetable;
 import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
@@ -80,6 +81,7 @@ import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxLogging;
 import ch.interlis.iox.IoxValidationConfig;
+import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.PipelinePool;
 import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.logging.LogEventFactory;
@@ -92,7 +94,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private ObjectPool objectPool = null;
 	private LinkPool linkPool;
 	private ch.interlis.iox.IoxValidationConfig validationConfig=null;
-	private ch.interlis.iox.IoxDataPool pipelinePool=null;
+	//private ch.interlis.iox.IoxDataPool pipelinePool=null;
+	private PipelinePool pipelinePool=null;
 	private IoxLogging errs=null;
 	private LogEventFactory errFact=null;
 	private TransferDescription td=null;
@@ -101,13 +104,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private Settings config=null;
 	private boolean validationOff=false;
 	private String currentBasketId = null;
+	private String currentMainOid=null;
+	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
+	
 	@Deprecated
 	protected Validator(TransferDescription td, IoxValidationConfig validationConfig,
 			IoxLogging errs, LogEventFactory errFact, Settings config) {
 		this(td, validationConfig,errs, errFact, new PipelinePool(),config);
 	}
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
-			IoxLogging errs, LogEventFactory errFact, ch.interlis.iox.IoxDataPool pipelinePool,Settings config) {
+			IoxLogging errs, LogEventFactory errFact, PipelinePool pipelinePool,Settings config) {
 		super();
 		this.td = td;
 		this.validationConfig = validationConfig;
@@ -139,7 +145,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	@Override
-	public ch.interlis.iox.IoxDataPool getDataPool() {
+	public ch.interlis.iox.IoxValidationDataPool getDataPool() {
 		return null;
 	}
 
@@ -161,13 +167,31 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			currentBasketId = ((ch.interlis.iox.StartBasketEvent) event).getBid();
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=((ch.interlis.iox.ObjectEvent)event).getIomObject();
-			validateObject(iomObj,null);
+			try {
+				validateObject(iomObj,null);
+			} catch (IoxException e) {
+				errs.addEvent(errFact.logErrorMsg("failed to validate object {0}", iomObj.toString()));
+			}
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
 			iterateThroughAllObjects();
+			validateAllAreas();
 		}
 	}
 	
+	private void validateAllAreas() {
+		for(AttributeDef attr:areaAttrs.keySet()){
+			ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
+			try {
+				allLines.getLines();
+			} catch (IoxException e) {
+				errs.addEvent(errFact.logErrorMsg("failed to validate AREA {0}", getScopedName(attr)));
+			}
+		}
+	}
+	private String getScopedName(AttributeDef attr) {
+		return attr.getContainer().getScopedName(null)+"."+attr.getName();
+	}
 	private boolean isBasketSame(RoleDef role, ReferenceType ref,String bidOfTargetObject){
 		if(!currentBasketId.equals(bidOfTargetObject)){
 			if(role != null){
@@ -189,7 +213,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Iterator<IomObject> objectIterator = objectPool.getObjectsOfBasketId(basketId).values().iterator();
 			while (objectIterator.hasNext()){
 				IomObject iomObj = objectIterator.next();
-				errFact.setDataObj(iomObj);
+				setCurrentMainObj(iomObj);
 				Object modelElement=tag2class.get(iomObj.getobjecttag());
 				Viewable currentClass= (Viewable) modelElement;
 				Iterator constraintIterator=currentClass.iterator();
@@ -981,11 +1005,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	// List of all object Oid's and associated classPath's of uniqueness validate of Oid's.
 	Map<String , String> uniqueObjectIDs = new HashMap<String, String>();
 	
-	private void validateObject(IomObject iomObj,String attrPath) {
+	private void validateObject(IomObject iomObj,String attrPath) throws IoxException {
 		// validate if object is null
 		boolean isObject = attrPath==null;
 		if(isObject){
-			errFact.setDataObj(iomObj);
+			setCurrentMainObj(iomObj);
 		}
 		// validate class, structure and association on existence of OID
 		if (isObject){
@@ -1179,6 +1203,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 	}
+	private void setCurrentMainObj(IomObject iomObj) {
+		errFact.setDataObj(iomObj);
+		currentMainOid=iomObj.getobjectoid();
+	}
 
 	private IomObject getDefaultCoord(IomObject iomObj) {
 		String tag=iomObj.getobjecttag();
@@ -1305,7 +1333,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return null;
 	}
 
-	private void validateAttrValue(IomObject iomObj, AttributeDef attr,String attrPath) {
+	private void validateAttrValue(IomObject iomObj, AttributeDef attr,String attrPath) throws IoxException {
 		 String attrName=attr.getName();
 		 String attrQName=attr.getContainer().getScopedName(null)+"."+attrName;
 		 if(attrPath==null){
@@ -1464,9 +1492,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							}
 							if(attrValidator==this){
 								if(surfaceOrAreaType instanceof SurfaceType){
-									validateSurfaceTopology(validateType,(SurfaceType)surfaceOrAreaType, surfaceValue);
+									validateSurfaceTopology(validateType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
 								}else{
-									validateAreaTopology(validateType,(AreaType)surfaceOrAreaType, surfaceValue);
+									validateSurfaceTopology(validateType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
+									ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
+									if(allLines==null){
+										allLines=new ItfAreaPolygon2Linetable(); 
+										areaAttrs.put(attr,allLines);
+									}
+									validateAreaTopology(validateType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
 								}
 							}
 						}
@@ -1530,12 +1564,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private void validateAreaTopology(String validateType, AreaType type, IomObject iomValue) {
-		// TODO Auto-generated method stub
+	private void validateAreaTopology(String validateType, ItfAreaPolygon2Linetable allLines,AreaType type, String mainObjTid,String internalTid,IomObject iomPolygon) throws IoxException {
+		// get lines
+		ArrayList<IomObject> lines=ItfAreaPolygon2Linetable.getLinesFromPolygon(iomPolygon);
+		allLines.addLines(mainObjTid,internalTid,lines);
 	}
 
-	private void validateSurfaceTopology(String validateType, SurfaceType type, IomObject iomValue) {
-		// TODO Auto-generated method stub
+	private void validateSurfaceTopology(String validateType, AttributeDef attr,SurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
+		ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
+		try {
+			ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, dataerrs);
+			addAllIoxExceptions(validateType,dataerrs);
+		} catch (IoxException e) {
+			addAllIoxExceptions(validateType,dataerrs);
+			errs.addEvent(errFact.logErrorMsg(e,"failed to validate polygon"));
+		}
 	}
 	
 	private void validatePolylineTopology(String attrPath,String validateType, PolylineType type, IomObject iomValue) {
@@ -1780,6 +1823,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			 errs.addEvent(errFact.logErrorMsg(msg, args));
 		 }
 	}
+	private void addAllIoxExceptions(String validateKind,ArrayList<IoxInvalidDataException> errs) {
+		 if(ValidationConfig.WARNING.equals(validateKind)){
+				for(IoxInvalidDataException err:errs){
+					this.errs.addEvent(errFact.logWarning(err));
+				}
+		 }else{
+				for(IoxInvalidDataException err:errs){
+					this.errs.addEvent(errFact.logError(err));
+				}
+		 }
+	}
+	
 	
 	private void validateItfLineTableObject(IomObject iomObj, AttributeDef modelele) {
 		// validate if line table object

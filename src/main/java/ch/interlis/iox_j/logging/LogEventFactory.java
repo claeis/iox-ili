@@ -49,6 +49,13 @@ public class LogEventFactory {
 		}
 		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessage(msg,null),null,null,null,null,null,null,null,coordX,coordY,coordZ,getCallerOrigin());
 	}
+	public IoxLogEvent logErrorMsg(Throwable ex,String msg,String... args){
+		String eventId="codeInternal";
+		if(dataObj!=null){
+			return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessage(msg,dataObj,args),ex,dataObj.getobjectline(),dataObj.getobjecttag(),getObjectTechId(dataObj),getObjectUsrId(dataObj),dataObj.getobjectoid(),null,coordX,coordY,coordZ,getCallerOrigin());
+		}
+		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessage(msg,null),ex,null,null,null,null,null,null,coordX,coordY,coordZ,getCallerOrigin());
+	}
 	public IoxLogEvent logWarningMsg(String msg,String... args){
 		String eventId="codeInternal";
 		if(dataObj!=null){
@@ -63,6 +70,12 @@ public class LogEventFactory {
 		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessageId(eventId,null,args),null,null,null,null,null,null,null,coordX,coordY,coordZ,getCallerOrigin());
 	}
 	public IoxLogEvent logError(IoxInvalidDataException ex) {
+		return logError(IoxLogEvent.ERROR,ex);
+	}
+	public IoxLogEvent logWarning(IoxInvalidDataException ex) {
+		return logError(IoxLogEvent.WARNING,ex);
+	}
+	private IoxLogEvent logError(int eventKind,IoxInvalidDataException ex) {
 		String eventId="codeInternal";
 		String msg=ex.getRawMessage();
 		Integer lineNumber=null;
@@ -90,7 +103,7 @@ public class LogEventFactory {
 		}
 		String iliqName=ex.getIliqname();
 		
-		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,msg,ex.getCause(),lineNumber,iliqName,null,null,tid,null,coordX,coordY,coordZ,getCallerOrigin());
+		return new LogEventImpl(dataSource,new Date(),eventId,eventKind,msg,ex.getCause(),lineNumber,iliqName,null,null,tid,null,coordX,coordY,coordZ,getCallerOrigin());
 	}
 	private String getObjectUsrId(IomObject iomObj) {
 		// TODO Auto-generated method stub

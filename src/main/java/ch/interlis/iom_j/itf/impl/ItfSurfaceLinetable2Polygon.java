@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.ws.Holder;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -22,6 +24,7 @@ import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
+import ch.interlis.ili2c.metamodel.SurfaceOrAreaType;
 import ch.interlis.ili2c.metamodel.SurfaceType;
 import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.iom.IomConstants;
@@ -30,6 +33,7 @@ import ch.interlis.iom_j.itf.impl.jtsext.algorithm.CurveSegmentIntersector;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurveRing;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CurvePolygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
@@ -231,148 +235,201 @@ public class ItfSurfaceLinetable2Polygon {
 			LineSet lineset=new LineSet(true,linattrTab,helperTableGeomAttrName);
 			
 			ArrayList<CompoundCurve> segv=lineset.buildBoundaries(lines,jtsFact);
-			for(CompoundCurve seg : segv){
-				removeValidSelfIntersections(seg,maxOverlaps,newVertexOffset);
-			}
-			
-			// ASSERT: segv might contain rings, but not nested rings
-			CompoundCurveNoder validator=new CompoundCurveNoder(segv,false);
-			if(!validator.isValid()){
-				boolean hasIntersections=false;
-				for(Intersection is:validator.getIntersections()){
-					CompoundCurve e0=is.getCurve1();
-					CompoundCurve e1=is.getCurve2();
-					CurveSegment seg0=is.getSegment1();
-					CurveSegment seg1=is.getSegment2();
-					int segIndex0=e0.getSegments().indexOf(is.getSegment1());
-					int segIndex1=e1.getSegments().indexOf(is.getSegment2());
-					Coordinate p00;
-					Coordinate p01;
-					Coordinate p10;
-					Coordinate p11;
-					p00 = e0.getSegments().get(segIndex0).getStartPoint();
-					p01 = e0.getSegments().get(segIndex0).getEndPoint();
-					p10 = e1.getSegments().get(segIndex1).getStartPoint();
-					p11 = e1.getSegments().get(segIndex1).getEndPoint();
-					if(e0!=e1 &&
-							(segIndex0==0 || segIndex0==e0.getSegments().size()-1) 
-							&& (segIndex1==0 || segIndex1==e1.getSegments().size()-1) 
-							&& is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
-						// Ende- bzw. Anfangs-Segment verschiedener Linien
-						// valid overlap, ignore for now, will be removed later in IoxPolygonizer
-					}else if(e0==e1 && (
-								  Math.abs(segIndex0-segIndex1)==1 
-								  || Math.abs(segIndex0-segIndex1)==e0.getNumSegments()-1  ) // bei Ring: letztes Segment und Erstes Segment
-								  && (is.isIntersection(p00) || is.isIntersection(p01))
-								  && (is.isIntersection(p10) || is.isIntersection(p11))
-								  && is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
-							// aufeinanderfolgende Segmente der selben Linie
-						throw new IllegalStateException("unexpected overlap; should have been removed before;"+is);
-					}else{
-						String []tids=new String[2];
-						tids[0]=(String) is.getCurve1().getUserData();
-						tids[1]=(String) is.getCurve2().getUserData();
-						dataerrs.add(new IoxInvalidDataException("intersection "+IoxInvalidDataException.formatTids(tids),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
-						if(is.getPt().length==2){
-							dataerrs.add(new IoxInvalidDataException("intersection "+IoxInvalidDataException.formatTids(tids),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[1])));
-						}
-						hasIntersections=true;
-					}
-				}
-				if(hasIntersections){
-					throw new IoxInvalidDataException("intersections");
-				}
-			}
-			IoxPolygonizer polygonizer=new IoxPolygonizer(newVertexOffset);
-			//com.vividsolutions.jts.operation.polygonize.Polygonizer polygonizer=new com.vividsolutions.jts.operation.polygonize.Polygonizer();
-			//for(CompoundCurve boundary:segv){
-			for(CompoundCurve boundary:validator.getNodedSubstrings()){
-				//System.out.println(boundary);
-				polygonizer.add(boundary);
-			}
-			Collection cutEdges = polygonizer.getCutEdges();
-			if(!cutEdges.isEmpty()){
-				for(Object edge:cutEdges){
-					try {
-						dataerrs.add(new IoxInvalidDataException("cut edge "+IoxInvalidDataException.formatTids(((CompoundCurve) edge).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)edge)));
-					} catch (Iox2jtsException e) {
-						throw new IllegalStateException(e);
-					}
-				}
-				if(!ignorePolygonBuildingErrors){
-					throw new IoxInvalidDataException("cut edges");
-				}
-			}
-			Collection dangles=polygonizer.getDangles();
-			if(!dangles.isEmpty()){
-				for(Object dangle:dangles){
-					try {
-						dataerrs.add(new IoxInvalidDataException("dangle "+IoxInvalidDataException.formatTids(((CompoundCurve) dangle).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)dangle)));
-					} catch (Iox2jtsException e) {
-						throw new IllegalStateException(e);
-					}
-				}
-				if(!ignorePolygonBuildingErrors){
-					throw new IoxInvalidDataException("dangles");
-				}
-			}
-			Collection invalidRingLines=polygonizer.getInvalidRingLines();
-			if(!invalidRingLines.isEmpty()){
-				for(Object invalidRingLine:invalidRingLines){
-					try {
-						dataerrs.add(new IoxInvalidDataException("invald ring line"+IoxInvalidDataException.formatTids(((CompoundCurve) invalidRingLine).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)invalidRingLine)));
-					} catch (Iox2jtsException e) {
-						throw new IllegalStateException(e);
-					}
-				}
-				if(!ignorePolygonBuildingErrors){
-					throw new IoxInvalidDataException("invalid ring lines");
-				}
-			}
-			Collection<Polygon> polys = polygonizer.getPolygons();
-			if(polys.isEmpty()){
-				throw new IoxInvalidDataException("no polygon");
-			}
-			Polygon poly=null;
-			if(polys.size()>1){
-				Iterator<Polygon> pi=polys.iterator();
-				poly=pi.next();
-				Envelope shell=poly.getEnvelopeInternal();
-				while(pi.hasNext()){
-					Polygon nextPoly=pi.next();
-					Envelope nextEnv=nextPoly.getEnvelopeInternal();
-					if(nextEnv.contains(shell)){
-						poly=nextPoly;
-						shell=nextEnv;
-					}
-				}
-				pi=polys.iterator();
-				while(pi.hasNext()){
-					Polygon holePoly=pi.next();
-					if(holePoly==poly){
-						continue;
-					}
-					Envelope holeEnv=holePoly.getEnvelopeInternal();
-					if(shell.contains(holeEnv) && !shell.equals(holeEnv)){
-					}else{
-						isDisconnected=true;
-						try {
-							dataerrs.add(new IoxInvalidDataException("multipolygon",geomattrIliqname,mainTid,Jtsext2iox.JTS2surface(holePoly)));
-						} catch (Iox2jtsException e) {
-							throw new IllegalStateException(e);
-						}
-					}
-				}
-				
-			}else{
-				poly=polys.iterator().next();
-			}
-			poly.normalize();
-			polygons.put(mainTid, poly);
+			Holder<Polygon> poly=new Holder<Polygon>();
+			isDisconnected |= createPolygon(mainTid, segv,maxOverlaps,newVertexOffset,dataerrs,linetableIliqname,ignorePolygonBuildingErrors,geomattrIliqname,poly);
+			polygons.put(mainTid, poly.value);
 		}
 		if(isDisconnected){
 			throw new IoxInvalidDataException("multipolygon detected");
 		}
+	}
+	public static void validatePolygon(String mainTid,AttributeDef surfaceAttr,IomObject polygon,ArrayList<IoxInvalidDataException> dataerrs) 
+			throws IoxException
+	{
+		String linetableIliqname=surfaceAttr.getContainer().getScopedName(null)+"."+surfaceAttr.getName();
+		boolean ignorePolygonBuildingErrors=false;
+		double maxOverlaps=0.0;
+		double newVertexOffset=0.0;
+		PrecisionDecimal overlapDef=((SurfaceOrAreaType)surfaceAttr.getDomainResolvingAliases()).getMaxOverlap();
+		if(overlapDef!=null){
+			maxOverlaps=overlapDef.doubleValue();
+			if(maxOverlaps>0){
+			    NumericalType[] dimensions = ((CoordType) ((SurfaceOrAreaType)surfaceAttr.getDomainResolvingAliases()).getControlPointDomain().getType()).getDimensions();
+				double size=((NumericType)dimensions[0]).getMinimum().getAccuracy();
+				if(size>0){
+					newVertexOffset=2*Math.pow(10, -size);
+				}
+			}
+		}
+		
+		JtsextGeometryFactory jtsFact=new JtsextGeometryFactory();
+		ArrayList<CompoundCurve> segv=createLineset(polygon);
+		
+		Holder<Polygon> poly=new Holder<Polygon>();
+		createPolygon(mainTid, segv,maxOverlaps,newVertexOffset,dataerrs,linetableIliqname,ignorePolygonBuildingErrors,null,poly);
+	}
+	private static ArrayList<CompoundCurve> createLineset(IomObject iomPolygon) throws IoxException {
+		ArrayList<CompoundCurve> segv=new ArrayList<CompoundCurve>();
+		CurvePolygon poly=(CurvePolygon) Iox2jtsext.surface2JTS(iomPolygon, 0.0);
+		// shell
+		com.vividsolutions.jts.geom.LineString shell=poly.getExteriorRing();
+		for(CompoundCurve line:((CompoundCurveRing) shell).getLines()){
+			segv.add(line);
+		}
+		int holec=poly.getNumInteriorRing();
+		for(int holei=0;holei<holec;holei++){
+			com.vividsolutions.jts.geom.LineString hole=poly.getInteriorRingN(holei);
+			for(CompoundCurve line:((CompoundCurveRing) hole).getLines()){
+				segv.add(line);
+			}
+		}
+		return segv;
+	}
+	private static boolean createPolygon(String mainTid,
+			ArrayList<CompoundCurve> segv,double maxOverlaps,double newVertexOffset,ArrayList<IoxInvalidDataException> dataerrs,
+			String linetableIliqname,boolean ignorePolygonBuildingErrors,String geomattrIliqname,Holder<Polygon> returnPolygon) 
+					throws IoxInvalidDataException 
+	{
+		boolean isDisconnected=false;
+		for(CompoundCurve seg : segv){
+			removeValidSelfIntersections(seg,maxOverlaps,newVertexOffset);
+		}
+		
+		// ASSERT: segv might contain rings, but not nested rings
+		CompoundCurveNoder validator=new CompoundCurveNoder(segv,false);
+		if(!validator.isValid()){
+			boolean hasIntersections=false;
+			for(Intersection is:validator.getIntersections()){
+				CompoundCurve e0=is.getCurve1();
+				CompoundCurve e1=is.getCurve2();
+				CurveSegment seg0=is.getSegment1();
+				CurveSegment seg1=is.getSegment2();
+				int segIndex0=e0.getSegments().indexOf(is.getSegment1());
+				int segIndex1=e1.getSegments().indexOf(is.getSegment2());
+				Coordinate p00;
+				Coordinate p01;
+				Coordinate p10;
+				Coordinate p11;
+				p00 = e0.getSegments().get(segIndex0).getStartPoint();
+				p01 = e0.getSegments().get(segIndex0).getEndPoint();
+				p10 = e1.getSegments().get(segIndex1).getStartPoint();
+				p11 = e1.getSegments().get(segIndex1).getEndPoint();
+				if(e0!=e1 &&
+						(segIndex0==0 || segIndex0==e0.getSegments().size()-1) 
+						&& (segIndex1==0 || segIndex1==e1.getSegments().size()-1) 
+						&& is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
+					// Ende- bzw. Anfangs-Segment verschiedener Linien
+					// valid overlap, ignore for now, will be removed later in IoxPolygonizer
+				}else if(e0==e1 && (
+							  Math.abs(segIndex0-segIndex1)==1 
+							  || Math.abs(segIndex0-segIndex1)==e0.getNumSegments()-1  ) // bei Ring: letztes Segment und Erstes Segment
+							  && (is.isIntersection(p00) || is.isIntersection(p01))
+							  && (is.isIntersection(p10) || is.isIntersection(p11))
+							  && is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
+						// aufeinanderfolgende Segmente der selben Linie
+					throw new IllegalStateException("unexpected overlap; should have been removed before;"+is);
+				}else{
+					String []tids=new String[2];
+					tids[0]=(String) is.getCurve1().getUserData();
+					tids[1]=(String) is.getCurve2().getUserData();
+					dataerrs.add(new IoxInvalidDataException("intersection "+IoxInvalidDataException.formatTids(tids),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
+					if(is.getPt().length==2){
+						dataerrs.add(new IoxInvalidDataException("intersection "+IoxInvalidDataException.formatTids(tids),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[1])));
+					}
+					hasIntersections=true;
+				}
+			}
+			if(hasIntersections){
+				throw new IoxInvalidDataException("intersections");
+			}
+		}
+		IoxPolygonizer polygonizer=new IoxPolygonizer(newVertexOffset);
+		//com.vividsolutions.jts.operation.polygonize.Polygonizer polygonizer=new com.vividsolutions.jts.operation.polygonize.Polygonizer();
+		//for(CompoundCurve boundary:segv){
+		for(CompoundCurve boundary:validator.getNodedSubstrings()){
+			//System.out.println(boundary);
+			polygonizer.add(boundary);
+		}
+		Collection cutEdges = polygonizer.getCutEdges();
+		if(!cutEdges.isEmpty()){
+			for(Object edge:cutEdges){
+				try {
+					dataerrs.add(new IoxInvalidDataException("cut edge "+IoxInvalidDataException.formatTids(((CompoundCurve) edge).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)edge)));
+				} catch (Iox2jtsException e) {
+					throw new IllegalStateException(e);
+				}
+			}
+			if(!ignorePolygonBuildingErrors){
+				throw new IoxInvalidDataException("cut edges");
+			}
+		}
+		Collection dangles=polygonizer.getDangles();
+		if(!dangles.isEmpty()){
+			for(Object dangle:dangles){
+				try {
+					dataerrs.add(new IoxInvalidDataException("dangle "+IoxInvalidDataException.formatTids(((CompoundCurve) dangle).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)dangle)));
+				} catch (Iox2jtsException e) {
+					throw new IllegalStateException(e);
+				}
+			}
+			if(!ignorePolygonBuildingErrors){
+				throw new IoxInvalidDataException("dangles");
+			}
+		}
+		Collection invalidRingLines=polygonizer.getInvalidRingLines();
+		if(!invalidRingLines.isEmpty()){
+			for(Object invalidRingLine:invalidRingLines){
+				try {
+					dataerrs.add(new IoxInvalidDataException("invald ring line"+IoxInvalidDataException.formatTids(((CompoundCurve) invalidRingLine).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)invalidRingLine)));
+				} catch (Iox2jtsException e) {
+					throw new IllegalStateException(e);
+				}
+			}
+			if(!ignorePolygonBuildingErrors){
+				throw new IoxInvalidDataException("invalid ring lines");
+			}
+		}
+		Collection<Polygon> polys = polygonizer.getPolygons();
+		if(polys.isEmpty()){
+			throw new IoxInvalidDataException("no polygon");
+		}
+		Polygon poly=null;
+		if(polys.size()>1){
+			Iterator<Polygon> pi=polys.iterator();
+			poly=pi.next();
+			Envelope shell=poly.getEnvelopeInternal();
+			while(pi.hasNext()){
+				Polygon nextPoly=pi.next();
+				Envelope nextEnv=nextPoly.getEnvelopeInternal();
+				if(nextEnv.contains(shell)){
+					poly=nextPoly;
+					shell=nextEnv;
+				}
+			}
+			pi=polys.iterator();
+			while(pi.hasNext()){
+				Polygon holePoly=pi.next();
+				if(holePoly==poly){
+					continue;
+				}
+				Envelope holeEnv=holePoly.getEnvelopeInternal();
+				if(shell.contains(holeEnv) && !shell.equals(holeEnv)){
+				}else{
+					isDisconnected=true;
+					try {
+						dataerrs.add(new IoxInvalidDataException("multipolygon",geomattrIliqname,mainTid,Jtsext2iox.JTS2surface(holePoly)));
+					} catch (Iox2jtsException e) {
+						throw new IllegalStateException(e);
+					}
+				}
+			}
+			
+		}else{
+			poly=polys.iterator().next();
+		}
+		poly.normalize();
+		returnPolygon.value=poly;
+		return isDisconnected;
 	}
 	public static void removeValidSelfIntersections(CompoundCurve seg,double maxOverlaps, double newVertexOffset) {
 

@@ -14,11 +14,15 @@ import ch.interlis.iox.IoxException;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.jts.Jtsext2iox;
+import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class ItfAreaPolygon2Linetable {
 
 	private Collection<? extends CompoundCurve> lines=new ArrayList<CompoundCurve>();
 	private ArrayList<IomObject> ioxlines=null;
+	public ItfAreaPolygon2Linetable(){
+		
+	}
 	public void addLines(String mainObjTid,String internalTid,ArrayList<IomObject> ioxlines) throws IoxException {
 		for(IomObject ioxline:ioxlines){
 			CompoundCurve line=Iox2jtsext.polyline2JTS(ioxline, false, 0.0);
