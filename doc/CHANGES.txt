@@ -4,8 +4,12 @@ ideas/open issues
 
 iox-ili 1.14.0-feature/validator1 (2017-01-13)
 -----------------------------
-- validator: optimize unique TID/OID check
+- validator: optimized unique TID/OID check
+- validator: optimized performance
 - validator: added AREA/SURFACE topology validation
+- validator: added switch off existence constraints and mandatory constraints and return warning instead of an alert
+- validator: added switch off attribute cardinality and return warning instead of an alert
+- validator: added role handling if role is EXTERNAL
 
 iox-ili 1.14.0 (2016-12-30)
 -----------------------------
