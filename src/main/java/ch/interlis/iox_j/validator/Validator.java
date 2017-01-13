@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.ws.Holder;
@@ -41,6 +42,7 @@ import ch.interlis.ili2c.metamodel.Expression.LessThan;
 import ch.interlis.ili2c.metamodel.Expression.LessThanOrEqual;
 import ch.interlis.ili2c.metamodel.Expression.Negation;
 import ch.interlis.ili2c.metamodel.FormattedType;
+import ch.interlis.ili2c.metamodel.Function;
 import ch.interlis.ili2c.metamodel.FunctionCall;
 import ch.interlis.ili2c.metamodel.InspectionFactor;
 import ch.interlis.ili2c.metamodel.LengthOfReferencedText;
@@ -524,8 +526,93 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		} else if(expression instanceof FunctionCall){
 			// function call	
 			FunctionCall functionCallObj = (FunctionCall) expression;
-			
-			
+			Function function = functionCallObj.getFunction();
+			if(function.getScopedName(null).equals("INTERLIS.len") || function.getScopedName(null).equals("INTERLIS.lenM")){
+				Evaluable[] args = functionCallObj.getArguments();
+				if(args.length==1){
+					for(Evaluable arg : args){
+						String attrValue = iomObj.getattrvalue(arg.toString());
+						if(attrValue!=null){
+							int lengthOfAttr = attrValue.length();
+							NumericType numericType = new NumericType();
+							return new Value(numericType, String.valueOf(lengthOfAttr));
+						} else {
+							// skip evaluation.
+						}
+					}
+				}
+			} else if(function.getScopedName(null).equals("INTERLIS.trim") || function.getScopedName(null).equals("INTERLIS.trimM")){
+				Evaluable[] args = functionCallObj.getArguments();
+				for(Evaluable arg : args){
+					String attrValue = iomObj.getattrvalue(arg.toString());
+					if(attrValue!=null){
+						Type type = function.getDomain();
+						return new Value(type, attrValue.trim());
+					} else {
+						// skip evaluation.
+					}
+				}
+			} else if (function.getScopedName(null).equals("INTERLIS.isEnumSubVal")){
+				String subValValue = iomObj.getattrvalue(iomObj.getattrname(0));
+				String nodeValValue = iomObj.getattrvalue(iomObj.getattrname(1));
+				if(subValValue.startsWith(nodeValValue)){
+					return new Value(true);
+				} else {
+					return new Value(false);
+				}
+			} else if (function.getScopedName(null).equals("INTERLIS.inEnumRange")){
+				String enumerationNameOfEnum = null;
+				String enumerationNameOfMinEnum = null;
+				String enumerationNameOfMaxEnum = null;
+				List<String> enumeration = null;
+				FunctionCall functionCall = (FunctionCall) expression;
+				Evaluable[] args = (Evaluable[]) functionCall.getArguments();
+				for(Evaluable enumArg : args){
+					ObjectPath objectPath = (ObjectPath) enumArg;
+					PathEl pathEl = objectPath.getLastPathEl();
+					AttributeRef attrRef = (AttributeRef) pathEl;
+					LocalAttribute localAttr = (LocalAttribute) attrRef.getAttr();
+					// wenn subelements
+					if(localAttr.getDomain() instanceof TypeAlias){
+						TypeAlias typeAlias = (TypeAlias) localAttr.getDomain();
+						Domain domain =(Domain) typeAlias.getAliasing();
+						EnumerationType enumerationType = (EnumerationType) domain.getType();
+						// enumeration has to be ordered
+						if(enumerationType.isOrdered()){
+							enumeration = enumerationType.getValues();
+							if(enumArg.toString().equals(iomObj.getattrname(1))){
+								enumerationNameOfEnum = domain.getName();
+							}else if(enumArg.toString().equals(iomObj.getattrname(0))){
+								enumerationNameOfMinEnum = domain.getName();
+							}else if(enumArg.toString().equals(iomObj.getattrname(2))){
+								enumerationNameOfMaxEnum = domain.getName();
+							}
+						}
+					}
+				}
+				// minVal and maxVal are on same enumeration like enumVal
+				if(enumerationNameOfEnum!=null && enumerationNameOfMinEnum!=null && enumerationNameOfMaxEnum!=null){
+					if(enumerationNameOfEnum.equals(enumerationNameOfMinEnum) && enumerationNameOfMinEnum.equals(enumerationNameOfMaxEnum)){
+						int minEnumIndex = 0;
+						int enumIndex = 0;
+						int maxEnumIndex = 0;
+						for(int i=0; i<enumeration.size();i++){
+							if(enumeration.get(i).toString().equals(iomObj.getattrvalue(iomObj.getattrname(1)))){
+								enumIndex = i;
+							} else if(enumeration.get(i).toString().equals(iomObj.getattrvalue(iomObj.getattrname(0)))){
+								minEnumIndex = i;
+							} else if(enumeration.get(i).toString().equals(iomObj.getattrvalue(iomObj.getattrname(2)))){
+								maxEnumIndex = i;
+							}
+						}
+						// enumVal has to be between minVal and maxVal (Inc. sub-elements)
+						if((enumIndex > minEnumIndex) && (enumIndex < maxEnumIndex)){
+							return new Value(true);
+						}
+					}
+				}
+				return new Value(false);
+			}
 		} else if(expression instanceof InspectionFactor){
 			// inspection factor	
 			InspectionFactor inspectionFactorObj = (InspectionFactor) expression;
@@ -1555,23 +1642,25 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						SurfaceOrAreaType surfaceOrAreaType=(SurfaceOrAreaType)type;
 						IomObject surfaceValue=iomObj.getattrobj(attrName,0);
 						if (surfaceValue != null){
-							validatePolygon(validateType,surfaceOrAreaType, surfaceValue);
-							Object attrValidator=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
-							if(attrValidator==null){
-								attrValidator=this;
-								pipelinePool.setIntermediateValue(attr, ValidationConfig.TOPOLOGY,this);
-							}
-							if(attrValidator==this){
-								if(surfaceOrAreaType instanceof SurfaceType){
-									validateSurfaceTopology(validateType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
-								}else{
-									validateSurfaceTopology(validateType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
-									ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
-									if(allLines==null){
-										allLines=new ItfAreaPolygon2Linetable(); 
-										areaAttrs.put(attr,allLines);
+							boolean isValid = validatePolygon(validateType,surfaceOrAreaType, surfaceValue);
+							if(isValid){
+								Object attrValidator=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
+								if(attrValidator==null){
+									attrValidator=this;
+									pipelinePool.setIntermediateValue(attr, ValidationConfig.TOPOLOGY,this);
+								}
+								if(attrValidator==this){
+									if(surfaceOrAreaType instanceof SurfaceType){
+										validateSurfaceTopology(validateType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
+									}else{
+										validateSurfaceTopology(validateType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
+										ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
+										if(allLines==null){
+											allLines=new ItfAreaPolygon2Linetable(); 
+											areaAttrs.put(attr,allLines);
+										}
+										validateAreaTopology(validateType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
 									}
-									validateAreaTopology(validateType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
 								}
 							}
 						}
@@ -1688,14 +1777,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return "(" + coord.x + ", " + coord.y  + ")";
 	}
 
-	private void validatePolygon(String validateType,
-			SurfaceOrAreaType surfaceOrAreaType, IomObject surfaceValue) {
+	private boolean validatePolygon(String validateType, SurfaceOrAreaType surfaceOrAreaType, IomObject surfaceValue) {
 		if (surfaceValue.getobjecttag().equals("MULTISURFACE")){
 			boolean clipped = surfaceValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
 			for(int surfacei=0;surfacei< surfaceValue.getattrvaluecount("surface");surfacei++){
 				if(!clipped && surfacei>0){
 					// unclipped surface with multi 'surface' elements
 					logMsg(validateType,"invalid number of surfaces in COMPLETE basket");
+					return false;
 				}
 				IomObject surface= surfaceValue.getattrobj("surface",surfacei);
 				int boundaryc=surface.getattrvaluecount("boundary");
@@ -1716,7 +1805,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		} else {
 			logMsg(validateType, "unexpected Type "+surfaceValue.getobjecttag()+"; MULTISURFACE expected");
+			return false;
 		}
+		return true;
 	}
 
 	private void validatePolyline(String validateType, LineType polylineType, IomObject polylineValue) {
