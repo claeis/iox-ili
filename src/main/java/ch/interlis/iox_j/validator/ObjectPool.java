@@ -2,10 +2,16 @@ package ch.interlis.iox_j.validator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import javax.xml.ws.Holder;
+
+import ch.interlis.ili2c.metamodel.AssociationDef;
+import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.Viewable;
+import ch.interlis.ili2c.metamodel.ViewableTransferElement;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxLogging;
 import ch.interlis.iox_j.logging.LogEventFactory;
@@ -23,13 +29,41 @@ public class ObjectPool {
 		this.errs = errs;
 		this.tag2class = tag2class;
 	}
+	public static String getAssociationId(IomObject iomObj, AssociationDef assocDef) {
+		if(assocDef==null){
+			throw new IllegalArgumentException("assocDef==null");
+		}
+		String tag=assocDef.getScopedName(null);
+		String tid=null;
+		Iterator<ViewableTransferElement> rolei=assocDef.getAttributesAndRoles2();
+		String sep="";
+		tid="";
+		while(rolei.hasNext()){
+			ViewableTransferElement prop=rolei.next();
+			if(prop.obj instanceof RoleDef && !prop.embedded){
+				String roleName=((RoleDef) prop.obj).getName();
+				IomObject refObj=iomObj.getattrobj(roleName, 0);
+				String ref=null;
+				if(refObj!=null){
+					ref=refObj.getobjectrefoid();
+				}
+				if(ref!=null){
+					tid=tid+sep+ref;
+					sep=":";
+				}else{
+			 		throw new IllegalStateException("REF required ("+tag+"/"+roleName+")");
+				}
+			}
+		}
+		return tid;
+	}
 
 	public void addObject(IomObject iomObj, HashMap<String,Object> tag2class, String currentBasketId){
 		String oid = iomObj.getobjectoid();
-		if(oid==null){
-			return;
-		}
 		Object modelEle = tag2class.get(iomObj.getobjecttag());
+		if(oid==null){
+			oid=getAssociationId(iomObj, (AssociationDef)modelEle);
+		}
 		Viewable classValue = (Viewable) modelEle;
 		ObjectPoolKey key = null;
 		if(doItfOidPerTable){
