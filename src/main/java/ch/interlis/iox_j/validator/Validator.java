@@ -477,9 +477,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				return arg;
 			}
 			if(arg.isUndefined()){
-				return new Value(true);
-			} else {
 				return new Value(false);
+			} else {
+				return new Value(true);
 			}
 		} else if(expression instanceof Disjunction){
 			// OR
