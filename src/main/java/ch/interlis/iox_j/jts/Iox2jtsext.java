@@ -247,7 +247,15 @@ public class Iox2jtsext {
 		if(clipped){
 			throw new IoxException("clipped surface not supported");
 		}
-		for(int surfacei=0;surfacei<obj.getattrvaluecount("surface");surfacei++){
+		String tag=obj.getobjecttag();
+		if(!"MULTISURFACE".equals(tag)){
+			throw new IoxException("unexpected Type "+tag+"; MULTISURFACE expected");
+		}
+		int surfacec=obj.getattrvaluecount("surface");
+		if(surfacec==0){
+			throw new IoxException("at least one element surface expected");
+		}
+		for(int surfacei=0;surfacei<surfacec;surfacei++){
 			if(clipped){
 				//out.startElement("CLIPPED",0,0);
 			}else{
