@@ -227,10 +227,11 @@ public class Association23Test {
 	@Test
 	public void embedded_CLASSBassociatetoClassAorClassD_abd3_0to1_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
+		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
+		iomObjB2.addattrobj(ILI_ASSOC_ABD3_AD3, "REF").setobjectrefoid(OBJ_OID1);
 		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID3);
-		iomObjB.addattrobj(ILI_ASSOC_ABD3_AD3, "REF").setobjectrefoid(OBJ_OID1);
-		iomObjB.addattrobj(ILI_ASSOC_ABD3_AD3, "REF").setobjectrefoid(OBJ_OID3);
+		Iom_jObject iomObjB4=new Iom_jObject(ILI_CLASSB, OBJ_OID4);
+		iomObjB4.addattrobj(ILI_ASSOC_ABD3_AD3, "REF").setobjectrefoid(OBJ_OID3);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -239,8 +240,9 @@ public class Association23Test {
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new ObjectEvent(iomObjB2));
 		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjB4));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
@@ -607,12 +609,8 @@ public class Association23Test {
 	@Test
 	public void embedded_CLASSBassociatetoClassAorClassD_abd1_0to1_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		Iom_jObject iomObjC=new Iom_jObject(ILI_CLASSC, OBJ_OID6);
 		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID4);
-		Iom_jObject iomObjB1=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		iomObjB1.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(OBJ_OID1);
-		iomObjB1.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(OBJ_OID4);
-		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OBJ_OID3);
+		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
 		iomObjB2.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(OBJ_OID1);
 		iomObjB2.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(OBJ_OID4);
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -624,14 +622,12 @@ public class Association23Test {
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjD));
-		validator.validate(new ObjectEvent(iomObjC));
-		validator.validate(new ObjectEvent(iomObjB1));
 		validator.validate(new ObjectEvent(iomObjB2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("bd1 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(0).getEventMsg());
+		assertEquals("ad1 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// abd3 --> ad3
@@ -905,16 +901,11 @@ public class Association23Test {
 	
 	@Test
 	public void configTargetAndMultiplicityON_Embedded_CLASSBassociatetoClassA_ab3_0to1_Fail(){
-		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID2);
-		Iom_jObject iomObjB1=new Iom_jObject(ILI_CLASSB, OBJ_OID3);
-		iomObjB1.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID2);
-		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OBJ_OID3);
-		iomObjB2.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID2);
-		Iom_jObject iomObjB3=new Iom_jObject(ILI_CLASSB, OBJ_OID5);
-		iomObjB3.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID6);
-		Iom_jObject iomObjB4=new Iom_jObject(ILI_CLASSB, OBJ_OID7);
+		Iom_jObject iomObjA1=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
+		Iom_jObject iomObjA2=new Iom_jObject(ILI_CLASSA, OBJ_OID2);
+		Iom_jObject iomObjB4=new Iom_jObject(ILI_CLASSB, OBJ_OID4);
 		iomObjB4.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID1);
+		iomObjB4.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -922,20 +913,14 @@ public class Association23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjD));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new ObjectEvent(iomObjB1));
-		validator.validate(new ObjectEvent(iomObjB2));
-		validator.validate(new ObjectEvent(iomObjB3));
+		validator.validate(new ObjectEvent(iomObjA1));
+		validator.validate(new ObjectEvent(iomObjA2));
 		validator.validate(new ObjectEvent(iomObjB4));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==4);
-		assertEquals("The OID o3 of object 'Association23.Topic.ClassB oid o3 {a3 -> o2 REF {}}' already exists in CLASS Association23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Object Association23.Topic.ClassD with OID o1 must be of Association23.Topic.ClassA", logger.getErrs().get(1).getEventMsg());
-		assertEquals("No object found with OID o6.", logger.getErrs().get(2).getEventMsg());
-		assertEquals("a3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(3).getEventMsg());
+		assertEquals(1,logger.getErrs().size());
+		assertEquals("a3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test

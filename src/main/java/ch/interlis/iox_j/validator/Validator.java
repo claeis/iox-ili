@@ -1136,56 +1136,59 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					String refoid = null;
 					String roleName = role.getName();
 					// a role of an embedded association?
-					if (obj.embedded) {
-						AssociationDef roleOwner = (AssociationDef) role
-								.getContainer();
-						if (roleOwner.getDerivedFrom() == null) {
-							// not just a link?
-							IomObject structvalue = iomObj.getattrobj(roleName, 0);
-							propNames.add(roleName);
-							if (roleOwner.getAttributes().hasNext()
-									|| roleOwner
-											.getLightweightAssociations()
-											.iterator().hasNext()) {
-							// TODO handle attributes of link
-							}
-							if (structvalue != null) {
-								refoid = structvalue.getobjectrefoid();
-								long orderPos = structvalue
-										.getobjectreforderpos();
-								if (orderPos != 0) {
-									// refoid,orderPos
-									// ret.setStringAttribute(roleName,
-									// refoid);
-									// ret.setStringAttribute(roleName+".orderPos",
-									// Long.toString(orderPos));
-								} else {
-									// refoid
-									// ret.setStringAttribute(roleName,
-									// refoid);
+					int propc=iomObj.getattrvaluecount(roleName);
+					for(int propi=0;propi<propc;propi++){
+						if (obj.embedded) {
+							AssociationDef roleOwner = (AssociationDef) role
+									.getContainer();
+							if (roleOwner.getDerivedFrom() == null) {
+								// not just a link?
+								IomObject structvalue = iomObj.getattrobj(roleName, propi);
+								propNames.add(roleName);
+								if (roleOwner.getAttributes().hasNext()
+										|| roleOwner
+												.getLightweightAssociations()
+												.iterator().hasNext()) {
+								// TODO handle attributes of link
 								}
+								if (structvalue != null) {
+									refoid = structvalue.getobjectrefoid();
+									long orderPos = structvalue
+											.getobjectreforderpos();
+									if (orderPos != 0) {
+										// refoid,orderPos
+										// ret.setStringAttribute(roleName,
+										// refoid);
+										// ret.setStringAttribute(roleName+".orderPos",
+										// Long.toString(orderPos));
+									} else {
+										// refoid
+										// ret.setStringAttribute(roleName,
+										// refoid);
+									}
+								} else {
+									refoid = null;
+								}
+							}
+						} else {
+							IomObject structvalue = iomObj.getattrobj(roleName, propi);
+							propNames.add(roleName);
+							refoid = structvalue.getobjectrefoid();
+							long orderPos = structvalue
+									.getobjectreforderpos();
+							if (orderPos != 0) {
+								// refoid,orderPos
+								// ret.setStringAttribute(roleName, refoid);
+								// ret.setStringAttribute(roleName+".orderPos",
+								// Long.toString(orderPos));
 							} else {
-								refoid = null;
+								// refoid
+								// ret.setStringAttribute(roleName, refoid);
 							}
 						}
-					} else {
-						IomObject structvalue = iomObj.getattrobj(roleName, 0);
-						propNames.add(roleName);
-						refoid = structvalue.getobjectrefoid();
-						long orderPos = structvalue
-								.getobjectreforderpos();
-						if (orderPos != 0) {
-							// refoid,orderPos
-							// ret.setStringAttribute(roleName, refoid);
-							// ret.setStringAttribute(roleName+".orderPos",
-							// Long.toString(orderPos));
-						} else {
-							// refoid
-							// ret.setStringAttribute(roleName, refoid);
+						if (refoid != null) {
+							linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
 						}
-					}
-					if (refoid != null) {
-						linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
 					}
 				}
 			 }
