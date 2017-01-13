@@ -52,6 +52,12 @@ public class Value {
 		return complexValue;
 	}
 	
+	public static Value createUndefined(){
+		return new Value(null); // TODO improve representation of UNDEFINED
+	}
+	public boolean isUndefined(){
+		return !(getComplexValue() != null || getValue() != null);
+	}
 	public static Value createError(){
 		return new Value();
 	}
