@@ -71,7 +71,7 @@ public class IoxInvalidDataException extends IoxException {
 	}
 	public static String formatTids(String tids[]) {
 		StringBuilder ret=new StringBuilder();
-		if(tids!=null){
+		if(tids!=null && tids.length>0){
 			if(tids.length>1){
 				ret.append("tids ");
 			}else{
