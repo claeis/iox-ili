@@ -316,9 +316,11 @@ public class CompoundCurve extends LineString {
 	public String[] getSegmentTids() {
 		java.util.HashSet<String> uniqueTids=new java.util.HashSet<String>();
 		for(CurveSegment seg:getSegments()){
-			String tid=seg.getUserData().toString();
-			if(!uniqueTids.contains(tid)){
-				uniqueTids.add(tid);
+			if(seg.getUserData()!=null){
+				String tid=seg.getUserData().toString();
+				if(!uniqueTids.contains(tid)){
+					uniqueTids.add(tid);
+				}
 			}
 		}
 		return uniqueTids.toArray(new String[uniqueTids.size()]);
