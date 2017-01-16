@@ -2,6 +2,10 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.14.0-feature/validator1 (2017-01-16)
+-----------------------------
+
+
 iox-ili 1.14.0-feature/validator1 (2017-01-13)
 -----------------------------
 - validator: optimized unique TID/OID check
