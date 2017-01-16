@@ -188,10 +188,8 @@ MODEL MandatoryConstraints23
 		CLASS ClassInEqualationE =
 		   straights2d1 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
 		   straights2d2 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
-		   arcs2d1 : POLYLINE WITH (ARCS) VERTEX Lkoord;
-		   arcs2d2 : POLYLINE WITH (ARCS) VERTEX Lkoord;
 		   MANDATORY CONSTRAINT
-		   (straights2d1 == straights2d2) != (arcs2d1 == arcs2d2);
+		   (straights2d1 != straights2d2);
 		END ClassInEqualationE;
 		
 		!! inequal line straightsArcs, arcsStraights (!=)

@@ -422,68 +422,68 @@ public class MandatoryConstraints23 {
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONB, OBJ_OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface1", "MULTISURFACE");
-		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		// polyline 1
-		IomObject polylineValue1 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments1.addattrobj("segment", "COORD");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments1.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480001.000");
-		endSegment.setattrvalue("C2", "70001.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "500000.000");
+		endSegment.setattrvalue("C2", "80000.000");
 		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "480000.000");
-		startSegment2.setattrvalue("C2", "70000.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "480001.000");
-		endSegment2.setattrvalue("C2", "70001.000");
-		// polyline 3
+		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
+		startSegment11.setattrvalue("C1", "500000.000");
+		startSegment11.setattrvalue("C2", "80000.000");
+		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
+		endSegment11.setattrvalue("C1", "520000.000");
+		endSegment11.setattrvalue("C2", "85000.000");
+		// arc 1
 		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "480000.000");
-		startSegment3.setattrvalue("C2", "70000.000");
+		startSegment3.setattrvalue("C1", "520000.000");
+		startSegment3.setattrvalue("C2", "85000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480001.000");
-		endSegment3.setattrvalue("C2", "70001.000");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
 		// surface 2
 		IomObject multisurfaceValue2=objSurfaceSuccess.addattrobj("surface2", "MULTISURFACE");
-		multisurfaceValue2.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue2 = multisurfaceValue2.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary2 = surfaceValue2.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue21 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments21=polylineValue21.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment21=segments21.addattrobj("segment", "COORD");
-		startSegment21.setattrvalue("C1", "480000.000");
-		startSegment21.setattrvalue("C2", "70000.000");
-		IomObject endSegment21=segments21.addattrobj("segment", "COORD");
-		endSegment21.setattrvalue("C1", "480001.000");
-		endSegment21.setattrvalue("C2", "70001.000");
-		// polyline 2
-		IomObject polylineValue22 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments22=polylineValue22.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment22=segments22.addattrobj("segment", "COORD");
-		startSegment22.setattrvalue("C1", "480000.000");
-		startSegment22.setattrvalue("C2", "70000.000");
-		IomObject endSegment22=segments22.addattrobj("segment", "COORD");
-		endSegment22.setattrvalue("C1", "480001.000");
-		endSegment22.setattrvalue("C2", "70001.000");
-		// polyline 3
-		IomObject polylineValue23 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments23=polylineValue23.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment23=segments23.addattrobj("segment", "COORD");
-		startSegment23.setattrvalue("C1", "480000.000");
-		startSegment23.setattrvalue("C2", "70000.000");
-		IomObject endSegment23=segments23.addattrobj("segment", "COORD");
-		endSegment23.setattrvalue("C1", "480001.000");
-		endSegment23.setattrvalue("C2", "70001.000");
+		// 1. polyline
+		IomObject polylineValue1 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment1=segments1.addattrobj("segment", "COORD");
+		startSegment1.setattrvalue("C1", "480000.000");
+		startSegment1.setattrvalue("C2", "70000.000");
+		IomObject endSegment1=segments1.addattrobj("segment", "COORD");
+		endSegment1.setattrvalue("C1", "500000.000");
+		endSegment1.setattrvalue("C2", "80000.000");
+		// 2. polyline
+		IomObject polylineValue12 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments12=polylineValue12.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment12=segments12.addattrobj("segment", "COORD");
+		startSegment12.setattrvalue("C1", "500000.000");
+		startSegment12.setattrvalue("C2", "80000.000");
+		IomObject endSegment12=segments12.addattrobj("segment", "COORD");
+		endSegment12.setattrvalue("C1", "520000.000");
+		endSegment12.setattrvalue("C2", "85000.000");
+		// arc 1
+		IomObject arcValue=outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject arcSegments2=arcValue.addattrobj("sequence", "SEGMENTS");
+		IomObject arcStartSegment2=arcSegments2.addattrobj("segment", "COORD");
+		arcStartSegment2.setattrvalue("C1", "520000.000");
+		arcStartSegment2.setattrvalue("C2", "85000.000");
+		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
+		arcSegment2.setattrvalue("A1", "480000.000");
+		arcSegment2.setattrvalue("A2", "70000.000");
+		arcSegment2.setattrvalue("C1", "480000.000");
+		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -504,68 +504,70 @@ public class MandatoryConstraints23 {
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONC, OBJ_OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area1", "MULTISURFACE");
-		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		// polyline 1
-		IomObject polylineValue1 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments1.addattrobj("segment", "COORD");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments1.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480001.000");
-		endSegment.setattrvalue("C2", "70001.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "500000.000");
+		endSegment.setattrvalue("C2", "80000.000");
 		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "480000.000");
-		startSegment2.setattrvalue("C2", "70000.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "480001.000");
-		endSegment2.setattrvalue("C2", "70001.000");
-		// polyline 3
+		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
+		startSegment11.setattrvalue("C1", "500000.000");
+		startSegment11.setattrvalue("C2", "80000.000");
+		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
+		endSegment11.setattrvalue("C1", "520000.000");
+		endSegment11.setattrvalue("C2", "85000.000");
+		// arc 1
 		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "480000.000");
-		startSegment3.setattrvalue("C2", "70000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480001.000");
-		endSegment3.setattrvalue("C2", "70001.000");
+		startSegment3.setattrvalue("C1", "520000.000");
+		startSegment3.setattrvalue("C2", "85000.000");
+		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
+		endSegment3.setattrvalue("A1", "480000.000");
+		endSegment3.setattrvalue("A2", "70000.000");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
 		// surface 2
 		IomObject multisurfaceValue2=objSurfaceSuccess.addattrobj("area2", "MULTISURFACE");
-		multisurfaceValue2.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue2 = multisurfaceValue2.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary2 = surfaceValue2.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue21 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments21=polylineValue21.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment21=segments21.addattrobj("segment", "COORD");
-		startSegment21.setattrvalue("C1", "480000.000");
-		startSegment21.setattrvalue("C2", "70000.000");
-		IomObject endSegment21=segments21.addattrobj("segment", "COORD");
-		endSegment21.setattrvalue("C1", "480001.000");
-		endSegment21.setattrvalue("C2", "70001.000");
-		// polyline 2
-		IomObject polylineValue22 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments22=polylineValue22.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment22=segments22.addattrobj("segment", "COORD");
-		startSegment22.setattrvalue("C1", "480000.000");
-		startSegment22.setattrvalue("C2", "70000.000");
-		IomObject endSegment22=segments22.addattrobj("segment", "COORD");
-		endSegment22.setattrvalue("C1", "480001.000");
-		endSegment22.setattrvalue("C2", "70001.000");
-		// polyline 3
-		IomObject polylineValue23 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments23=polylineValue23.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment23=segments23.addattrobj("segment", "COORD");
-		startSegment23.setattrvalue("C1", "480000.000");
-		startSegment23.setattrvalue("C2", "70000.000");
-		IomObject endSegment23=segments23.addattrobj("segment", "COORD");
-		endSegment23.setattrvalue("C1", "480001.000");
-		endSegment23.setattrvalue("C2", "70001.000");
+		// 1. polyline
+		IomObject polylineValue1 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment1=segments1.addattrobj("segment", "COORD");
+		startSegment1.setattrvalue("C1", "480000.000");
+		startSegment1.setattrvalue("C2", "70000.000");
+		IomObject endSegment1=segments1.addattrobj("segment", "COORD");
+		endSegment1.setattrvalue("C1", "500000.000");
+		endSegment1.setattrvalue("C2", "80000.000");
+		// 2. polyline
+		IomObject polylineValue12 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments12=polylineValue12.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment12=segments12.addattrobj("segment", "COORD");
+		startSegment12.setattrvalue("C1", "500000.000");
+		startSegment12.setattrvalue("C2", "80000.000");
+		IomObject endSegment12=segments12.addattrobj("segment", "COORD");
+		endSegment12.setattrvalue("C1", "520000.000");
+		endSegment12.setattrvalue("C2", "85000.000");
+		// arc 1
+		IomObject arcValue=outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject arcSegments2=arcValue.addattrobj("sequence", "SEGMENTS");
+		IomObject arcStartSegment2=arcSegments2.addattrobj("segment", "COORD");
+		arcStartSegment2.setattrvalue("C1", "520000.000");
+		arcStartSegment2.setattrvalue("C2", "85000.000");
+		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
+		arcSegment2.setattrvalue("A1", "480000.000");
+		arcSegment2.setattrvalue("A2", "70000.000");
+		arcSegment2.setattrvalue("C1", "480000.000");
+		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -706,10 +708,10 @@ public class MandatoryConstraints23 {
 		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
 		IomObject coordStart2=segments2.addattrobj("segment", "COORD");
 		IomObject coordEnd2=segments2.addattrobj("segment", "COORD");
-		coordStart2.setattrvalue("C1", "480000.000");
-		coordStart2.setattrvalue("C2", "70000.000");
+		coordStart2.setattrvalue("C1", "490000.000");
+		coordStart2.setattrvalue("C2", "80000.000");
 		coordEnd2.setattrvalue("C1", "480000.000");
-		coordEnd2.setattrvalue("C2", "88888.000");
+		coordEnd2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -780,68 +782,66 @@ public class MandatoryConstraints23 {
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONG, OBJ_OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface1", "MULTISURFACE");
-		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		// polyline 1
-		IomObject polylineValue1 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments1.addattrobj("segment", "COORD");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments1.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480001.000");
-		endSegment.setattrvalue("C2", "70001.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "550000.000");
+		endSegment.setattrvalue("C2", "80000.000");
 		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "480000.000");
-		startSegment2.setattrvalue("C2", "70000.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "480001.000");
-		endSegment2.setattrvalue("C2", "70001.000");
-		// polyline 3
+		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
+		startSegment11.setattrvalue("C1", "550000.000");
+		startSegment11.setattrvalue("C2", "80000.000");
+		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
+		endSegment11.setattrvalue("C1", "520000.000");
+		endSegment11.setattrvalue("C2", "85000.000");
+		// arc 1
 		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "480000.000");
-		startSegment3.setattrvalue("C2", "70000.000");
+		startSegment3.setattrvalue("C1", "520000.000");
+		startSegment3.setattrvalue("C2", "85000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480001.000");
-		endSegment3.setattrvalue("C2", "70001.000");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
 		// surface 2
 		IomObject multisurfaceValue2=objSurfaceSuccess.addattrobj("surface2", "MULTISURFACE");
-		multisurfaceValue2.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue2 = multisurfaceValue2.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary2 = surfaceValue2.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue21 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments21=polylineValue21.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment21=segments21.addattrobj("segment", "COORD");
-		startSegment21.setattrvalue("C1", "480000.000");
-		startSegment21.setattrvalue("C2", "70000.000");
-		IomObject endSegment21=segments21.addattrobj("segment", "COORD");
-		endSegment21.setattrvalue("C1", "480001.000");
-		endSegment21.setattrvalue("C2", "70001.000");
-		// polyline 2
-		IomObject polylineValue22 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments22=polylineValue22.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment22=segments22.addattrobj("segment", "COORD");
-		startSegment22.setattrvalue("C1", "480000.000");
-		startSegment22.setattrvalue("C2", "70000.000");
-		IomObject endSegment22=segments22.addattrobj("segment", "COORD");
-		endSegment22.setattrvalue("C1", "480001.000");
-		endSegment22.setattrvalue("C2", "70001.000");
-		// polyline 3
-		IomObject polylineValue23 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments23=polylineValue23.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment23=segments23.addattrobj("segment", "COORD");
-		startSegment23.setattrvalue("C1", "480000.000");
-		startSegment23.setattrvalue("C2", "70000.000");
-		IomObject endSegment23=segments23.addattrobj("segment", "COORD");
-		endSegment23.setattrvalue("C1", "480001.000");
-		endSegment23.setattrvalue("C2", "88888.000");
+		// 1. polyline
+		IomObject polylineValue1 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment1=segments1.addattrobj("segment", "COORD");
+		startSegment1.setattrvalue("C1", "480000.000");
+		startSegment1.setattrvalue("C2", "70000.000");
+		IomObject endSegment1=segments1.addattrobj("segment", "COORD");
+		endSegment1.setattrvalue("C1", "500000.000");
+		endSegment1.setattrvalue("C2", "80000.000");
+		// 2. polyline
+		IomObject polylineValue12 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments12=polylineValue12.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment12=segments12.addattrobj("segment", "COORD");
+		startSegment12.setattrvalue("C1", "500000.000");
+		startSegment12.setattrvalue("C2", "80000.000");
+		IomObject endSegment12=segments12.addattrobj("segment", "COORD");
+		endSegment12.setattrvalue("C1", "520000.000");
+		endSegment12.setattrvalue("C2", "85000.000");
+		// arc 1
+		IomObject arcValue=outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject arcSegments2=arcValue.addattrobj("sequence", "SEGMENTS");
+		IomObject arcStartSegment2=arcSegments2.addattrobj("segment", "COORD");
+		arcStartSegment2.setattrvalue("C1", "520000.000");
+		arcStartSegment2.setattrvalue("C2", "85000.000");
+		IomObject arcSegment2=arcSegments2.addattrobj("segment", "COORD");
+		arcSegment2.setattrvalue("C1", "480000.000");
+		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -861,68 +861,66 @@ public class MandatoryConstraints23 {
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONH, OBJ_OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area1", "MULTISURFACE");
-		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		// polyline 1
-		IomObject polylineValue1 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments1.addattrobj("segment", "COORD");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments1.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480001.000");
-		endSegment.setattrvalue("C2", "70001.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "550000.000");
+		endSegment.setattrvalue("C2", "80000.000");
 		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "480000.000");
-		startSegment2.setattrvalue("C2", "70000.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "480001.000");
-		endSegment2.setattrvalue("C2", "70001.000");
-		// polyline 3
+		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
+		startSegment11.setattrvalue("C1", "550000.000");
+		startSegment11.setattrvalue("C2", "80000.000");
+		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
+		endSegment11.setattrvalue("C1", "520000.000");
+		endSegment11.setattrvalue("C2", "85000.000");
+		// arc 1
 		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "480000.000");
-		startSegment3.setattrvalue("C2", "70000.000");
+		startSegment3.setattrvalue("C1", "520000.000");
+		startSegment3.setattrvalue("C2", "85000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480001.000");
-		endSegment3.setattrvalue("C2", "70001.000");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
 		// surface 2
 		IomObject multisurfaceValue2=objSurfaceSuccess.addattrobj("area2", "MULTISURFACE");
-		multisurfaceValue2.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue2 = multisurfaceValue2.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary2 = surfaceValue2.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue21 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments21=polylineValue21.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment21=segments21.addattrobj("segment", "COORD");
-		startSegment21.setattrvalue("C1", "480000.000");
-		startSegment21.setattrvalue("C2", "70000.000");
-		IomObject endSegment21=segments21.addattrobj("segment", "COORD");
-		endSegment21.setattrvalue("C1", "480001.000");
-		endSegment21.setattrvalue("C2", "70001.000");
-		// polyline 2
-		IomObject polylineValue22 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments22=polylineValue22.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment22=segments22.addattrobj("segment", "COORD");
-		startSegment22.setattrvalue("C1", "480000.000");
-		startSegment22.setattrvalue("C2", "70000.000");
-		IomObject endSegment22=segments22.addattrobj("segment", "COORD");
-		endSegment22.setattrvalue("C1", "480001.000");
-		endSegment22.setattrvalue("C2", "70001.000");
-		// polyline 3
-		IomObject polylineValue23 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments23=polylineValue23.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment23=segments23.addattrobj("segment", "COORD");
-		startSegment23.setattrvalue("C1", "480000.000");
-		startSegment23.setattrvalue("C2", "70000.000");
-		IomObject endSegment23=segments23.addattrobj("segment", "COORD");
-		endSegment23.setattrvalue("C1", "480001.000");
-		endSegment23.setattrvalue("C2", "88888.000");
+		// 1. polyline
+		IomObject polylineValue1 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment1=segments1.addattrobj("segment", "COORD");
+		startSegment1.setattrvalue("C1", "480000.000");
+		startSegment1.setattrvalue("C2", "70000.000");
+		IomObject endSegment1=segments1.addattrobj("segment", "COORD");
+		endSegment1.setattrvalue("C1", "500000.000");
+		endSegment1.setattrvalue("C2", "80000.000");
+		// 2. polyline
+		IomObject polylineValue12 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments12=polylineValue12.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment12=segments12.addattrobj("segment", "COORD");
+		startSegment12.setattrvalue("C1", "500000.000");
+		startSegment12.setattrvalue("C2", "80000.000");
+		IomObject endSegment12=segments12.addattrobj("segment", "COORD");
+		endSegment12.setattrvalue("C1", "520000.000");
+		endSegment12.setattrvalue("C2", "85000.000");
+		// arc 1
+		IomObject arcValue=outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject arcSegments2=arcValue.addattrobj("sequence", "SEGMENTS");
+		IomObject arcStartSegment2=arcSegments2.addattrobj("segment", "COORD");
+		arcStartSegment2.setattrvalue("C1", "520000.000");
+		arcStartSegment2.setattrvalue("C2", "85000.000");
+		IomObject arcSegment2=arcSegments2.addattrobj("segment", "COORD");
+		arcSegment2.setattrvalue("C1", "480000.000");
+		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1455,24 +1453,48 @@ public class MandatoryConstraints23 {
 	}
 	
 	@Test
-	public void mandatoryConstraintEqualationPolyline2Straights2dFalse(){
+	public void mandatoryConstraintEqualationPolyline2dFalse(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIOND, OBJ_OID1);
+		// polyline 1
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject coordStart=segments.addattrobj("segment", "COORD");
-		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordStart.setattrvalue("C1", "480000.000");
-		coordStart.setattrvalue("C2", "70000.000");
-		coordEnd.setattrvalue("C1", "480000.000");
-		coordEnd.setattrvalue("C2", "70000.000");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "500000.000");
+		startSegment.setattrvalue("C2", "80000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "550000.000");
+		endSegment.setattrvalue("C2", "90000.000");
+		// polyline 2
 		IomObject polylineValue2=objStraightsSuccess.addattrobj("straights2d2", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject coordStart2=segments2.addattrobj("segment", "COORD");
-		IomObject coordEnd2=segments2.addattrobj("segment", "COORD");
-		coordStart2.setattrvalue("C1", "480000.000");
-		coordStart2.setattrvalue("C2", "70000.000");
-		coordEnd2.setattrvalue("C1", "480000.000");
-		coordEnd2.setattrvalue("C2", "88888.888");
+		IomObject segments1=polylineValue2.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment1=segments1.addattrobj("segment", "COORD");
+		startSegment1.setattrvalue("C1", "480000.000");
+		startSegment1.setattrvalue("C2", "70000.000");
+		IomObject endSegment1=segments1.addattrobj("segment", "COORD");
+		endSegment1.setattrvalue("C1", "500000.000");
+		endSegment1.setattrvalue("C2", "80000.000");
+		// arc 1
+		IomObject arcValue=objStraightsSuccess.addattrobj("arcs2d1", "POLYLINE");
+		IomObject segments2=arcValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+		startSegment2.setattrvalue("C1", "500000.000");
+		startSegment2.setattrvalue("C2", "80000.000");
+		IomObject endSegment2=segments2.addattrobj("segment", "ARC");
+		endSegment2.setattrvalue("A1", "550000.000");
+		endSegment2.setattrvalue("A2", "90000.000");
+		endSegment2.setattrvalue("C1", "550000.000");
+		endSegment2.setattrvalue("C2", "90000.000");
+		// arc 1
+		IomObject arcValue2=objStraightsSuccess.addattrobj("arcs2d2", "POLYLINE");
+		IomObject segments3=arcValue2.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
+		startSegment3.setattrvalue("C1", "500000.000");
+		startSegment3.setattrvalue("C2", "80000.000");
+		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
+		endSegment3.setattrvalue("A1", "550000.000");
+		endSegment3.setattrvalue("A2", "90000.000");
+		endSegment3.setattrvalue("C1", "550000.000");
+		endSegment3.setattrvalue("C2", "90000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1541,72 +1563,70 @@ public class MandatoryConstraints23 {
 	}
 	
 	@Test
-	public void mandatoryConstraintEqualation2DSurface2Polyline3False(){
+	public void mandatoryConstraintEqualation2DSurfaceFalse(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONB, OBJ_OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface1", "MULTISURFACE");
-		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		// polyline 1
-		IomObject polylineValue1 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments1.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "490000.000");
 		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments1.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480001.000");
-		endSegment.setattrvalue("C2", "70001.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "550000.000");
+		endSegment.setattrvalue("C2", "80000.000");
 		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "480000.000");
-		startSegment2.setattrvalue("C2", "70000.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "480001.000");
-		endSegment2.setattrvalue("C2", "70001.000");
-		// polyline 3
+		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
+		startSegment11.setattrvalue("C1", "550000.000");
+		startSegment11.setattrvalue("C2", "80000.000");
+		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
+		endSegment11.setattrvalue("C1", "520000.000");
+		endSegment11.setattrvalue("C2", "85000.000");
+		// arc 1
 		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "480000.000");
-		startSegment3.setattrvalue("C2", "70000.000");
+		startSegment3.setattrvalue("C1", "520000.000");
+		startSegment3.setattrvalue("C2", "85000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480001.000");
-		endSegment3.setattrvalue("C2", "70001.000");
+		endSegment3.setattrvalue("C1", "490000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
 		// surface 2
 		IomObject multisurfaceValue2=objSurfaceSuccess.addattrobj("surface2", "MULTISURFACE");
-		multisurfaceValue2.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue2 = multisurfaceValue2.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary2 = surfaceValue2.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue21 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments21=polylineValue21.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment21=segments21.addattrobj("segment", "COORD");
-		startSegment21.setattrvalue("C1", "480000.000");
-		startSegment21.setattrvalue("C2", "70000.000");
-		IomObject endSegment21=segments21.addattrobj("segment", "COORD");
-		endSegment21.setattrvalue("C1", "480001.000");
-		endSegment21.setattrvalue("C2", "70001.000");
-		// polyline 2
-		IomObject polylineValue22 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments22=polylineValue22.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment22=segments22.addattrobj("segment", "COORD");
-		startSegment22.setattrvalue("C1", "480000.000");
-		startSegment22.setattrvalue("C2", "70000.000");
-		IomObject endSegment22=segments22.addattrobj("segment", "COORD");
-		endSegment22.setattrvalue("C1", "480001.000");
-		endSegment22.setattrvalue("C2", "70001.000");
-		// polyline 3
-		IomObject polylineValue23 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments23=polylineValue23.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment23=segments23.addattrobj("segment", "COORD");
-		startSegment23.setattrvalue("C1", "480000.000");
-		startSegment23.setattrvalue("C2", "70000.000");
-		IomObject endSegment23=segments23.addattrobj("segment", "COORD");
-		endSegment23.setattrvalue("C1", "480001.000");
-		endSegment23.setattrvalue("C2", "88888.888");
+		// 1. polyline
+		IomObject polylineValue1 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment1=segments1.addattrobj("segment", "COORD");
+		startSegment1.setattrvalue("C1", "480000.000");
+		startSegment1.setattrvalue("C2", "70000.000");
+		IomObject endSegment1=segments1.addattrobj("segment", "COORD");
+		endSegment1.setattrvalue("C1", "500000.000");
+		endSegment1.setattrvalue("C2", "80000.000");
+		// 2. polyline
+		IomObject polylineValue12 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments12=polylineValue12.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment12=segments12.addattrobj("segment", "COORD");
+		startSegment12.setattrvalue("C1", "500000.000");
+		startSegment12.setattrvalue("C2", "80000.000");
+		IomObject endSegment12=segments12.addattrobj("segment", "COORD");
+		endSegment12.setattrvalue("C1", "520000.000");
+		endSegment12.setattrvalue("C2", "85000.000");
+		// arc 1
+		IomObject arcValue=outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject arcSegments2=arcValue.addattrobj("sequence", "SEGMENTS");
+		IomObject arcStartSegment2=arcSegments2.addattrobj("segment", "COORD");
+		arcStartSegment2.setattrvalue("C1", "520000.000");
+		arcStartSegment2.setattrvalue("C2", "85000.000");
+		IomObject arcSegment2=arcSegments2.addattrobj("segment", "COORD");
+		arcSegment2.setattrvalue("C1", "480000.000");
+		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1627,68 +1647,70 @@ public class MandatoryConstraints23 {
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONC, OBJ_OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area1", "MULTISURFACE");
-		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		// polyline 1
-		IomObject polylineValue1 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments1.addattrobj("segment", "COORD");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments1.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480001.000");
-		endSegment.setattrvalue("C2", "70001.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "510000.000");
+		endSegment.setattrvalue("C2", "81000.000");
 		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "480000.000");
-		startSegment2.setattrvalue("C2", "70000.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "480001.000");
-		endSegment2.setattrvalue("C2", "70001.000");
-		// polyline 3
+		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
+		startSegment11.setattrvalue("C1", "510000.000");
+		startSegment11.setattrvalue("C2", "81000.000");
+		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
+		endSegment11.setattrvalue("C1", "520000.000");
+		endSegment11.setattrvalue("C2", "85000.000");
+		// arc 1
 		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "480000.000");
-		startSegment3.setattrvalue("C2", "70000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480001.000");
-		endSegment3.setattrvalue("C2", "70001.000");
+		startSegment3.setattrvalue("C1", "520000.000");
+		startSegment3.setattrvalue("C2", "85000.000");
+		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
+		endSegment3.setattrvalue("A1", "480000.000");
+		endSegment3.setattrvalue("A2", "70000.000");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
 		// surface 2
 		IomObject multisurfaceValue2=objSurfaceSuccess.addattrobj("area2", "MULTISURFACE");
-		multisurfaceValue2.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue2 = multisurfaceValue2.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary2 = surfaceValue2.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue21 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments21=polylineValue21.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment21=segments21.addattrobj("segment", "COORD");
-		startSegment21.setattrvalue("C1", "480000.000");
-		startSegment21.setattrvalue("C2", "70000.000");
-		IomObject endSegment21=segments21.addattrobj("segment", "COORD");
-		endSegment21.setattrvalue("C1", "480001.000");
-		endSegment21.setattrvalue("C2", "70001.000");
-		// polyline 2
-		IomObject polylineValue22 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments22=polylineValue22.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment22=segments22.addattrobj("segment", "COORD");
-		startSegment22.setattrvalue("C1", "480000.000");
-		startSegment22.setattrvalue("C2", "70000.000");
-		IomObject endSegment22=segments22.addattrobj("segment", "COORD");
-		endSegment22.setattrvalue("C1", "480001.000");
-		endSegment22.setattrvalue("C2", "70001.000");
-		// polyline 3
-		IomObject polylineValue23 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments23=polylineValue23.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment23=segments23.addattrobj("segment", "COORD");
-		startSegment23.setattrvalue("C1", "480000.000");
-		startSegment23.setattrvalue("C2", "70000.000");
-		IomObject endSegment23=segments23.addattrobj("segment", "COORD");
-		endSegment23.setattrvalue("C1", "480001.000");
-		endSegment23.setattrvalue("C2", "88888.888");
+		// 1. polyline
+		IomObject polylineValue1 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment1=segments1.addattrobj("segment", "COORD");
+		startSegment1.setattrvalue("C1", "480000.000");
+		startSegment1.setattrvalue("C2", "70000.000");
+		IomObject endSegment1=segments1.addattrobj("segment", "COORD");
+		endSegment1.setattrvalue("C1", "500000.000");
+		endSegment1.setattrvalue("C2", "80000.000");
+		// 2. polyline
+		IomObject polylineValue12 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments12=polylineValue12.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment12=segments12.addattrobj("segment", "COORD");
+		startSegment12.setattrvalue("C1", "500000.000");
+		startSegment12.setattrvalue("C2", "80000.000");
+		IomObject endSegment12=segments12.addattrobj("segment", "COORD");
+		endSegment12.setattrvalue("C1", "520000.000");
+		endSegment12.setattrvalue("C2", "85000.000");
+		// arc 1
+		IomObject arcValue=outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject arcSegments2=arcValue.addattrobj("sequence", "SEGMENTS");
+		IomObject arcStartSegment2=arcSegments2.addattrobj("segment", "COORD");
+		arcStartSegment2.setattrvalue("C1", "520000.000");
+		arcStartSegment2.setattrvalue("C2", "85000.000");
+		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
+		arcSegment2.setattrvalue("A1", "480000.000");
+		arcSegment2.setattrvalue("A2", "70000.000");
+		arcSegment2.setattrvalue("C1", "480000.000");
+		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1824,22 +1846,24 @@ public class MandatoryConstraints23 {
 	@Test
 	public void mandatoryConstraintInEqualationPolylineTypeStraights2dFalse(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONE, OBJ_OID1);
+		// polyline 1
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject coordStart=segments.addattrobj("segment", "COORD");
-		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordStart.setattrvalue("C1", "480000.000");
-		coordStart.setattrvalue("C2", "70000.000");
-		coordEnd.setattrvalue("C1", "480000.000");
-		coordEnd.setattrvalue("C2", "70000.000");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "500000.000");
+		endSegment.setattrvalue("C2", "80000.000");
+		// polyline 1
 		IomObject polylineValue2=objStraightsSuccess.addattrobj("straights2d2", "POLYLINE");
 		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject coordStart2=segments2.addattrobj("segment", "COORD");
-		IomObject coordEnd2=segments2.addattrobj("segment", "COORD");
-		coordStart2.setattrvalue("C1", "480000.000");
-		coordStart2.setattrvalue("C2", "70000.000");
-		coordEnd2.setattrvalue("C1", "480000.000");
-		coordEnd2.setattrvalue("C2", "70000.000");
+		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+		startSegment2.setattrvalue("C1", "480000.000");
+		startSegment2.setattrvalue("C2", "70000.000");
+		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+		endSegment2.setattrvalue("C1", "500000.000");
+		endSegment2.setattrvalue("C2", "80000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1912,68 +1936,70 @@ public class MandatoryConstraints23 {
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONG, OBJ_OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface1", "MULTISURFACE");
-		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		// polyline 1
-		IomObject polylineValue1 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments1.addattrobj("segment", "COORD");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments1.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480001.000");
-		endSegment.setattrvalue("C2", "70001.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "500000.000");
+		endSegment.setattrvalue("C2", "80000.000");
 		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "480000.000");
-		startSegment2.setattrvalue("C2", "70000.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "480001.000");
-		endSegment2.setattrvalue("C2", "70001.000");
-		// polyline 3
+		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
+		startSegment11.setattrvalue("C1", "500000.000");
+		startSegment11.setattrvalue("C2", "80000.000");
+		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
+		endSegment11.setattrvalue("C1", "520000.000");
+		endSegment11.setattrvalue("C2", "85000.000");
+		// arc 1
 		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "480000.000");
-		startSegment3.setattrvalue("C2", "70000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480001.000");
-		endSegment3.setattrvalue("C2", "70001.000");
+		startSegment3.setattrvalue("C1", "520000.000");
+		startSegment3.setattrvalue("C2", "85000.000");
+		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
+		endSegment3.setattrvalue("A1", "480000.000");
+		endSegment3.setattrvalue("A2", "70000.000");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
 		// surface 2
 		IomObject multisurfaceValue2=objSurfaceSuccess.addattrobj("surface2", "MULTISURFACE");
-		multisurfaceValue2.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue2 = multisurfaceValue2.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary2 = surfaceValue2.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue21 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments21=polylineValue21.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment21=segments21.addattrobj("segment", "COORD");
-		startSegment21.setattrvalue("C1", "480000.000");
-		startSegment21.setattrvalue("C2", "70000.000");
-		IomObject endSegment21=segments21.addattrobj("segment", "COORD");
-		endSegment21.setattrvalue("C1", "480001.000");
-		endSegment21.setattrvalue("C2", "70001.000");
-		// polyline 2
-		IomObject polylineValue22 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments22=polylineValue22.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment22=segments22.addattrobj("segment", "COORD");
-		startSegment22.setattrvalue("C1", "480000.000");
-		startSegment22.setattrvalue("C2", "70000.000");
-		IomObject endSegment22=segments22.addattrobj("segment", "COORD");
-		endSegment22.setattrvalue("C1", "480001.000");
-		endSegment22.setattrvalue("C2", "70001.000");
-		// polyline 3
-		IomObject polylineValue23 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments23=polylineValue23.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment23=segments23.addattrobj("segment", "COORD");
-		startSegment23.setattrvalue("C1", "480000.000");
-		startSegment23.setattrvalue("C2", "70000.000");
-		IomObject endSegment23=segments23.addattrobj("segment", "COORD");
-		endSegment23.setattrvalue("C1", "480001.000");
-		endSegment23.setattrvalue("C2", "70001.000");
+		// 1. polyline
+		IomObject polylineValue1 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment1=segments1.addattrobj("segment", "COORD");
+		startSegment1.setattrvalue("C1", "480000.000");
+		startSegment1.setattrvalue("C2", "70000.000");
+		IomObject endSegment1=segments1.addattrobj("segment", "COORD");
+		endSegment1.setattrvalue("C1", "500000.000");
+		endSegment1.setattrvalue("C2", "80000.000");
+		// 2. polyline
+		IomObject polylineValue12 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments12=polylineValue12.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment12=segments12.addattrobj("segment", "COORD");
+		startSegment12.setattrvalue("C1", "500000.000");
+		startSegment12.setattrvalue("C2", "80000.000");
+		IomObject endSegment12=segments12.addattrobj("segment", "COORD");
+		endSegment12.setattrvalue("C1", "520000.000");
+		endSegment12.setattrvalue("C2", "85000.000");
+		// arc 1
+		IomObject arcValue=outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject arcSegments2=arcValue.addattrobj("sequence", "SEGMENTS");
+		IomObject arcStartSegment2=arcSegments2.addattrobj("segment", "COORD");
+		arcStartSegment2.setattrvalue("C1", "520000.000");
+		arcStartSegment2.setattrvalue("C2", "85000.000");
+		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
+		arcSegment2.setattrvalue("A1", "480000.000");
+		arcSegment2.setattrvalue("A2", "70000.000");
+		arcSegment2.setattrvalue("C1", "480000.000");
+		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1994,68 +2020,70 @@ public class MandatoryConstraints23 {
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONH, OBJ_OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area1", "MULTISURFACE");
-		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		// polyline 1
-		IomObject polylineValue1 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments1.addattrobj("segment", "COORD");
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments1.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480001.000");
-		endSegment.setattrvalue("C2", "70001.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "500000.000");
+		endSegment.setattrvalue("C2", "80000.000");
 		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "480000.000");
-		startSegment2.setattrvalue("C2", "70000.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "480001.000");
-		endSegment2.setattrvalue("C2", "70001.000");
-		// polyline 3
+		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
+		startSegment11.setattrvalue("C1", "500000.000");
+		startSegment11.setattrvalue("C2", "80000.000");
+		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
+		endSegment11.setattrvalue("C1", "520000.000");
+		endSegment11.setattrvalue("C2", "85000.000");
+		// arc 1
 		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "480000.000");
-		startSegment3.setattrvalue("C2", "70000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480001.000");
-		endSegment3.setattrvalue("C2", "70001.000");
+		startSegment3.setattrvalue("C1", "520000.000");
+		startSegment3.setattrvalue("C2", "85000.000");
+		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
+		endSegment3.setattrvalue("A1", "480000.000");
+		endSegment3.setattrvalue("A2", "70000.000");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
 		// surface 2
 		IomObject multisurfaceValue2=objSurfaceSuccess.addattrobj("area2", "MULTISURFACE");
-		multisurfaceValue2.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
 		IomObject surfaceValue2 = multisurfaceValue2.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary2 = surfaceValue2.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue21 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments21=polylineValue21.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment21=segments21.addattrobj("segment", "COORD");
-		startSegment21.setattrvalue("C1", "480000.000");
-		startSegment21.setattrvalue("C2", "70000.000");
-		IomObject endSegment21=segments21.addattrobj("segment", "COORD");
-		endSegment21.setattrvalue("C1", "480001.000");
-		endSegment21.setattrvalue("C2", "70001.000");
-		// polyline 2
-		IomObject polylineValue22 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments22=polylineValue22.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment22=segments22.addattrobj("segment", "COORD");
-		startSegment22.setattrvalue("C1", "480000.000");
-		startSegment22.setattrvalue("C2", "70000.000");
-		IomObject endSegment22=segments22.addattrobj("segment", "COORD");
-		endSegment22.setattrvalue("C1", "480001.000");
-		endSegment22.setattrvalue("C2", "70001.000");
-		// polyline 3
-		IomObject polylineValue23 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments23=polylineValue23.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment23=segments23.addattrobj("segment", "COORD");
-		startSegment23.setattrvalue("C1", "480000.000");
-		startSegment23.setattrvalue("C2", "70000.000");
-		IomObject endSegment23=segments23.addattrobj("segment", "COORD");
-		endSegment23.setattrvalue("C1", "480001.000");
-		endSegment23.setattrvalue("C2", "70001.000");
+		// 1. polyline
+		IomObject polylineValue1 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments1=polylineValue1.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment1=segments1.addattrobj("segment", "COORD");
+		startSegment1.setattrvalue("C1", "480000.000");
+		startSegment1.setattrvalue("C2", "70000.000");
+		IomObject endSegment1=segments1.addattrobj("segment", "COORD");
+		endSegment1.setattrvalue("C1", "500000.000");
+		endSegment1.setattrvalue("C2", "80000.000");
+		// 2. polyline
+		IomObject polylineValue12 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments12=polylineValue12.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment12=segments12.addattrobj("segment", "COORD");
+		startSegment12.setattrvalue("C1", "500000.000");
+		startSegment12.setattrvalue("C2", "80000.000");
+		IomObject endSegment12=segments12.addattrobj("segment", "COORD");
+		endSegment12.setattrvalue("C1", "520000.000");
+		endSegment12.setattrvalue("C2", "85000.000");
+		// arc 1
+		IomObject arcValue=outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject arcSegments2=arcValue.addattrobj("sequence", "SEGMENTS");
+		IomObject arcStartSegment2=arcSegments2.addattrobj("segment", "COORD");
+		arcStartSegment2.setattrvalue("C1", "520000.000");
+		arcStartSegment2.setattrvalue("C2", "85000.000");
+		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
+		arcSegment2.setattrvalue("A1", "480000.000");
+		arcSegment2.setattrvalue("A2", "70000.000");
+		arcSegment2.setattrvalue("C1", "480000.000");
+		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
