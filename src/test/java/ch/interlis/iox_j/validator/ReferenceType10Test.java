@@ -81,7 +81,7 @@ public class ReferenceType10Test {
 	
 	// 2*ClassA, 3*ClassC->(REF-c1) to ClassA.
 	@Test
-	public void threeClassCReferencesToOneClassAOk() throws Exception {
+	public void threeReferencesTo1ClassOk() throws Exception {
 		Iom_jObject objA1=new Iom_jObject(REFERENCETYPE10_CLASSA, OID1);
 		Iom_jObject objC1=new Iom_jObject(REFERENCETYPE10_CLASSC, OID1);
 		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
@@ -159,7 +159,7 @@ public class ReferenceType10Test {
 	
 	// 3*ClassA, 1*ClassC->(REF-c1) to ClassA.
 	@Test
-	public void oneClassCReferencesTothreeClassAFail() throws Exception {
+	public void oneReferencesTo3ClassAFail() throws Exception {
 		Iom_jObject objA1=new Iom_jObject(REFERENCETYPE10_CLASSA, OID1);
 		Iom_jObject objA2=new Iom_jObject(REFERENCETYPE10_CLASSA, OID2);
 		Iom_jObject objA3=new Iom_jObject(REFERENCETYPE10_CLASSA, OID3);
@@ -191,7 +191,7 @@ public class ReferenceType10Test {
 	//#########################################################//	
 	
 	@Test
-	public void configTargetON_ReferencedNoClassFoundFail() throws Exception {
+	public void configTargetON_NoClassFoundInRefFail() throws Exception {
 		Iom_jObject objC1=new Iom_jObject(REFERENCETYPE10_CLASSC, OID1);
 		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();

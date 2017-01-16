@@ -132,7 +132,7 @@ public class UniqueConstraints10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	@Test
-	public void valueFail(){
+	public void valueAlreadyExistFail(){
 		Iom_jObject objA1=new Iom_jObject("UniqueConstraints10.Topic.TableA", "oida1");
 		objA1.setattrvalue("a1", "Anna");
 		Iom_jObject objA2=new Iom_jObject("UniqueConstraints10.Topic.TableA", "oida2");
@@ -151,9 +151,10 @@ public class UniqueConstraints10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Unique is violated! Values Anna already exist in Object: oida2",logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void refFail(){
+	public void refAlreadyExistFail(){
 		Iom_jObject objA1=new Iom_jObject("UniqueConstraints10.Topic.TableA", "oida1");
 		objA1.setattrvalue("a1", "Anna");
 		Iom_jObject objA2=new Iom_jObject("UniqueConstraints10.Topic.TableA", "oida2");
@@ -178,5 +179,6 @@ public class UniqueConstraints10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Unique is violated! Values oida1 already exist in Object: oidb2",logger.getErrs().get(0).getEventMsg());
 	}
 }

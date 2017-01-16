@@ -220,7 +220,7 @@ public class ReferenceType23Test {
 	//################ FAIL TESTS ################################
 	//############################################################	
 	@Test
-	public void referenceTypeMandatoryUndefinedFail(){
+	public void mandatoryAttributeUndefinedFail(){
 		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTE, null);
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSF, "o2");
 		iomObj.addattrobj(ILI_CLASSF_ATTRF2, iomStruct);
@@ -239,7 +239,7 @@ public class ReferenceType23Test {
 		assertEquals("Attribute attrE2 requires a value", logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
-	public void referenceTypeDifferentBasketOk(){ //--> Fail
+	public void differentBasketOk(){ //--> Fail
 		String objTargetId="o1";
 		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, objTargetId);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
@@ -266,7 +266,7 @@ public class ReferenceType23Test {
 	}
 	
 	@Test
-	public void referenceTypeOidNotEqualFail(){
+	public void attrReferencesToInexistentObjectFail(){
 		String objTargetId="o1";
 		String objTargetId2="o5";
 		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, objTargetId2);
