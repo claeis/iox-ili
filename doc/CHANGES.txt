@@ -4,7 +4,7 @@ ideas/open issues
 
 iox-ili 1.14.0-feature/validator1 (2017-01-16)
 -----------------------------
-
+- validator: optimized unique TID/OID check
 
 iox-ili 1.14.0-feature/validator1 (2017-01-13)
 -----------------------------

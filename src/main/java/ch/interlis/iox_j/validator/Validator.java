@@ -132,7 +132,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		unknownTypev=new HashSet<String>();
 		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
-		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class);
+		objectPool=new ObjectPool(doItfOidPerTable, tag2class);
 		linkPool=new LinkPool();
 	}
 	/** mappings from xml-tags to Viewable|AttributeDef
@@ -1265,7 +1265,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 		if(isObject){
 			if(addToPool){
-				objectPool.addObject(iomObj, tag2class, currentBasketId);
+				IomObject objectValue = objectPool.addObject(iomObj, tag2class, currentBasketId);
+				if (objectValue != null){
+					Object modelElement=tag2class.get(objectValue.getobjecttag());
+					Viewable classValueOfKey= (Viewable) modelElement;
+					errs.addEvent(errFact.logErrorMsg("The OID {0} of object '{1}' already exists in {2}.", objectValue.getobjectoid(), iomObj.toString(), classValueOfKey.toString()));
+				}
 			}
 		}
 		
