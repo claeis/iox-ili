@@ -449,7 +449,7 @@ public class ItfSurfaceLinetable2Polygon {
 				if(li.getIntersectionNum()==2){ 
 					if(seg.getNumSegments()==2 && seg0.getStartPoint().equals2D(seg1.getEndPoint())){
 						// Ring als eine Linie, zwei Segmente
-					}else if(li.getOverlap()<maxOverlaps){
+					}else if(li.getOverlap()!=null && li.getOverlap()<maxOverlaps){
 						// aufeinanderfolgende Segmente der selben Linie
 						Intersection is = new Intersection(
 								li.getIntersection(0), li.getIntersection(1),
