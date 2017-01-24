@@ -5,7 +5,7 @@ ideas/open issues
 iox-ili 1.14.0-feature/validator1 (2017-01-24)
 -----------------------------
 - validator: optimized unique TID/OID check
-- validator: added functions len, lenM, trim, trimM, isEnumSubVal, inEnumRange, objectCount(ALL)
+- validator: added functions len, lenM, trim, trimM, isEnumSubVal, inEnumRange, objectCount(ALL), objectCount(Role), elementCount
 - validator: added handling if function is not yet implemented
 
 iox-ili 1.14.0-feature/validator1 (2017-01-13)

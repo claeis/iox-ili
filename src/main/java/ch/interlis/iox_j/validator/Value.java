@@ -2,27 +2,39 @@ package ch.interlis.iox_j.validator;
 
 import java.util.Collection;
 import java.util.List;
+
+import ch.interlis.ili2c.metamodel.Constant.Numeric;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.NumericType;
+import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.TextType;
 import ch.interlis.ili2c.metamodel.Type;
 import ch.interlis.iom.IomObject;
 
 public class Value {
+	private static boolean notYetImplemented=false;
 	private boolean error=false;
-	private static boolean notYetImplemented = false;
-	private boolean booleanIsDefined = false;
+	private boolean booleanIsDefined=false;
 	private boolean booleanValue;
 	private IomObject complexValue=null;
 	private String refTypeName;
 	private String value=null;
 	private List<IomObject> values;
+	private RoleDef role=null;
+	private int numeric=0;
+	private boolean numericIsDefined=false;
+	
 	private Type type=null;
 	
 	public Value(boolean booleanValue) {
 		this.booleanValue = booleanValue;
 		booleanIsDefined = true;
+	}
+	
+	public Value(int numeric){
+		this.numeric = numeric;
+		numericIsDefined = true;
 	}
 	
 	public Value(Type type,String valueStr){
@@ -36,6 +48,10 @@ public class Value {
 	
 	public Value(IomObject value){
 		this.complexValue = value;
+	}
+	
+	public Value(RoleDef role){
+		this.role = role;
 	}
 	
 	Value(){
@@ -76,6 +92,20 @@ public class Value {
 		return value;
 	}
 	
+	public int getNumeric(){
+		if(skipEvaluation()){
+			throw new IllegalArgumentException();
+		}
+		return numeric;
+	}
+	
+	public RoleDef getRole(){
+		if(skipEvaluation()){
+			throw new IllegalArgumentException();
+		}
+		return role;
+	}
+	
 	public IomObject getComplexValue(){
 		if(skipEvaluation()){
 			throw new IllegalArgumentException();
@@ -95,7 +125,7 @@ public class Value {
 	}
 	
 	public boolean isUndefined(){
-		return !(getComplexValue() != null || getValue() != null || getValues() != null || booleanIsDefined);
+		return !(getComplexValue() != null || getValue() != null || getValues() != null || booleanIsDefined || getRole() != null || numericIsDefined);
 	}
 	
 	public static Value createSkipEvaluation(){
@@ -138,15 +168,15 @@ public class Value {
 		}
 		// intercept value
 		if(this.value!=null && other.value!=null){
+			if(type instanceof NumericType){
+				return Integer.valueOf(value).compareTo(Integer.valueOf(other.value));
 			// intercept text
-			if(type instanceof TextType){
+			} else if(type instanceof TextType){
 				return value.compareTo(other.value);
 			// intercept formatted type
 			} else if(type instanceof FormattedType){
 				return value.compareTo(other.value);
-			// intercept numeric
-			} else if(type instanceof NumericType){
-				return compareInteger(Integer.parseInt(value), Integer.parseInt(other.value));
+			// enumeration type
 			} else if(type instanceof EnumerationType){
 				EnumerationType enumeration = (EnumerationType) type;
 				// if ordered = true (>,<,>=,<=)
@@ -159,8 +189,14 @@ public class Value {
 					return this.value.compareTo(other.value);
 				}
 			}
-		// intercept boolean
-		} else if(this.value==null && other.value==null){
+		// intercept numeric
+		} else if(this.numericIsDefined && other.numericIsDefined){
+			return compareInteger(numeric, other.numeric);
+		} else if(this.numericIsDefined && other.value!=null){
+			return compareInteger(numeric, Integer.valueOf(other.value));
+		} else if(this.value!=null && other.numericIsDefined){
+			return compareInteger(Integer.valueOf(this.value), other.numeric);
+		}else if(this.value==null && other.value==null){
 			return compareBoolean(this.booleanValue, other.booleanValue);
 		}
 		// incompatible type

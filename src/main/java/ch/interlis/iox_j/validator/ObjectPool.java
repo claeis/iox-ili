@@ -21,8 +21,6 @@ import ch.interlis.iom.IomObject;
 //   - return objects of given BasketId
 //   - return keys of collection
 //   - return tid of association
-//   - return number of objects of specific class
-//   - return number of objects which used specific roleName
 
 public class ObjectPool {
 	private boolean doItfOidPerTable;

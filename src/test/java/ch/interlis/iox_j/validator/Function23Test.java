@@ -371,107 +371,107 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-//	@Test
-//	public void elementCount3_Ok(){
-//		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjM2=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjM3=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjN=new Iom_jObject(ILI_CLASSN, OBJ_OID2);
-//		iomObjN.addattrobj("attrbag1", iomObjM);
-//		iomObjN.addattrobj("attrbag1", iomObjM2);
-//		iomObjN.addattrobj("attrbag1", iomObjM3);
-//		iomObjN.setattrvalue("attr2", "3");
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
-//		validator.validate(new ObjectEvent(iomObjM));
-//		validator.validate(new ObjectEvent(iomObjM2));
-//		validator.validate(new ObjectEvent(iomObjM3));
-//		validator.validate(new ObjectEvent(iomObjN));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==0);
-//	}
+	@Test
+	public void elementCount3_Ok(){
+		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjM2=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjM3=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjN=new Iom_jObject(ILI_CLASSN, OBJ_OID2);
+		iomObjN.addattrobj("attrbag1", iomObjM);
+		iomObjN.addattrobj("attrbag1", iomObjM2);
+		iomObjN.addattrobj("attrbag1", iomObjM3);
+		iomObjN.setattrvalue("attr2", "3");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new ObjectEvent(iomObjM));
+		validator.validate(new ObjectEvent(iomObjM2));
+		validator.validate(new ObjectEvent(iomObjM3));
+		validator.validate(new ObjectEvent(iomObjN));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 	
-//	@Test
-//	public void elementCount_Ok(){
-//		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjN=new Iom_jObject(ILI_CLASSN, OBJ_OID2);
-//		iomObjN.addattrobj("attrbag1", iomObjM);
-//		iomObjN.setattrvalue("attr2", "1");
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
-//		validator.validate(new ObjectEvent(iomObjM));
-//		validator.validate(new ObjectEvent(iomObjN));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==0);
-//	}
+	@Test
+	public void elementCount_Ok(){
+		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjN=new Iom_jObject(ILI_CLASSN, OBJ_OID2);
+		iomObjN.addattrobj("attrbag1", iomObjM);
+		iomObjN.setattrvalue("attr2", "1");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new ObjectEvent(iomObjM));
+		validator.validate(new ObjectEvent(iomObjN));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 	
-//	@Test
-//	public void elementCount5Lists_Ok(){
-//		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjM2=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjM3=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjM4=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjM5=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjO=new Iom_jObject(ILI_CLASSO, OBJ_OID2);
-//		iomObjO.addattrobj("attrlist1", iomObjM);
-//		iomObjO.addattrobj("attrlist1", iomObjM2);
-//		iomObjO.addattrobj("attrlist1", iomObjM3);
-//		iomObjO.addattrobj("attrlist1", iomObjM4);
-//		iomObjO.addattrobj("attrlist1", iomObjM5);
-//		iomObjO.setattrvalue("attr2", "5");
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
-//		validator.validate(new ObjectEvent(iomObjM));
-//		validator.validate(new ObjectEvent(iomObjM2));
-//		validator.validate(new ObjectEvent(iomObjM3));
-//		validator.validate(new ObjectEvent(iomObjM4));
-//		validator.validate(new ObjectEvent(iomObjM5));
-//		validator.validate(new ObjectEvent(iomObjO));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==0);
-//	}
+	@Test
+	public void elementCount5Lists_Ok(){
+		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjM2=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjM3=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjM4=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjM5=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjO=new Iom_jObject(ILI_CLASSO, OBJ_OID2);
+		iomObjO.addattrobj("attrlist1", iomObjM);
+		iomObjO.addattrobj("attrlist1", iomObjM2);
+		iomObjO.addattrobj("attrlist1", iomObjM3);
+		iomObjO.addattrobj("attrlist1", iomObjM4);
+		iomObjO.addattrobj("attrlist1", iomObjM5);
+		iomObjO.setattrvalue("attr2", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new ObjectEvent(iomObjM));
+		validator.validate(new ObjectEvent(iomObjM2));
+		validator.validate(new ObjectEvent(iomObjM3));
+		validator.validate(new ObjectEvent(iomObjM4));
+		validator.validate(new ObjectEvent(iomObjM5));
+		validator.validate(new ObjectEvent(iomObjO));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 	
-//	@Test
-//	public void elementCountList_Ok(){
-//		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjO=new Iom_jObject(ILI_CLASSO, OBJ_OID2);
-//		iomObjO.addattrobj("attrlist1", iomObjM);
-//		iomObjO.setattrvalue("attr2", "1");
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
-//		validator.validate(new ObjectEvent(iomObjM));
-//		validator.validate(new ObjectEvent(iomObjO));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==0);
-//	}
+	@Test
+	public void elementCountList_Ok(){
+		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjO=new Iom_jObject(ILI_CLASSO, OBJ_OID2);
+		iomObjO.addattrobj("attrlist1", iomObjM);
+		iomObjO.setattrvalue("attr2", "1");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new ObjectEvent(iomObjM));
+		validator.validate(new ObjectEvent(iomObjO));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 	
 	@Test
 	public void objectCountALL_Ok(){
@@ -520,20 +520,15 @@ public class Function23Test {
 //		assertTrue(logger.getErrs().size()==0);
 //	}
 	
+//	// abp1 --> ap1 (+bp1)
 //	@Test
-//	public void objectCountRole_Ok(){
-//		// erstes S->T
-//		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
-//		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, OBJ_OID3);
-//		Iom_jObject iomObjST1=new Iom_jObject(ILI_ASSOC_ST1, null);
-//		iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID1);
-//		iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID3);
-//		// zweites S->T
-//		Iom_jObject iomObjS2=new Iom_jObject(ILI_CLASSS, OBJ_OID2);
-//		Iom_jObject iomObjT2=new Iom_jObject(ILI_CLASST, OBJ_OID4);
-//		Iom_jObject iomObjST2=new Iom_jObject(ILI_ASSOC_ST1, null);
-//		iomObjST2.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID2);
-//		iomObjST2.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID4);
+//	public void embedded_CLASSBPassociatetoClassAP_abp1_0to1_Ok(){
+//		Iom_jObject iomObjV=new Iom_jObject(ILI_CLASSV, OBJ_OID1);
+//		Iom_jObject iomObjV2=new Iom_jObject(ILI_CLASSV, OBJ_OID2);
+//		Iom_jObject iomObjW=new Iom_jObject(ILI_CLASSW, OBJ_OID3);
+//		iomObjW.addattrobj("v1", "REF").setobjectrefoid(OBJ_OID1);
+//		Iom_jObject iomObjW2=new Iom_jObject(ILI_CLASSW, OBJ_OID4);
+//		iomObjW2.addattrobj("v1", "REF").setobjectrefoid(OBJ_OID2);
 //		ValidationConfig modelConfig=new ValidationConfig();
 //		LogCollector logger=new LogCollector();
 //		LogEventFactory errFactory=new LogEventFactory();
@@ -541,17 +536,48 @@ public class Function23Test {
 //		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 //		validator.validate(new StartTransferEvent());
 //		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
-//		validator.validate(new ObjectEvent(iomObjS1));
-//		validator.validate(new ObjectEvent(iomObjS2));
-//		validator.validate(new ObjectEvent(iomObjT1));
-//		validator.validate(new ObjectEvent(iomObjT2));
-//		validator.validate(new ObjectEvent(iomObjST1));
-//		validator.validate(new ObjectEvent(iomObjST2));
+//		validator.validate(new ObjectEvent(iomObjV));
+//		validator.validate(new ObjectEvent(iomObjV2));
+//		validator.validate(new ObjectEvent(iomObjW));
+//		validator.validate(new ObjectEvent(iomObjW2));
 //		validator.validate(new EndBasketEvent());
 //		validator.validate(new EndTransferEvent());
 //		// Asserts
-//		assertTrue(logger.getErrs().size()==1);
+//		assertTrue(logger.getErrs().size()==0);
 //	}
+	
+	@Test
+	public void objectCountRole_Ok(){
+		// erstes S->T
+		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
+		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, OBJ_OID3);
+		Iom_jObject iomObjST1=new Iom_jObject(ILI_ASSOC_ST1, null);
+		iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID1);
+		iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID3);
+		// zweites S->T
+		Iom_jObject iomObjS2=new Iom_jObject(ILI_CLASSS, OBJ_OID2);
+		Iom_jObject iomObjT2=new Iom_jObject(ILI_CLASST, OBJ_OID4);
+		Iom_jObject iomObjST2=new Iom_jObject(ILI_ASSOC_ST1, null);
+		iomObjST2.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID2);
+		iomObjST2.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID4);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new ObjectEvent(iomObjS1));
+		validator.validate(new ObjectEvent(iomObjS2));
+		validator.validate(new ObjectEvent(iomObjT1));
+		validator.validate(new ObjectEvent(iomObjT2));
+		validator.validate(new ObjectEvent(iomObjST1));
+		validator.validate(new ObjectEvent(iomObjST2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 	
 	//#########################################################//
 	//######## FAIL FUNCTIONS #################################//
@@ -896,67 +922,67 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-//	@Test
-//	public void elementCount_CountOfBagNotEqual_Fail(){
-//		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjM2=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjM3=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjN=new Iom_jObject(ILI_CLASSN, OBJ_OID2);
-//		iomObjN.addattrobj("attrbag1", iomObjM);
-//		iomObjN.addattrobj("attrbag1", iomObjM2);
-//		iomObjN.addattrobj("attrbag1", iomObjM3);
-//		iomObjN.setattrvalue("attr2", "5");
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
-//		validator.validate(new ObjectEvent(iomObjM));
-//		validator.validate(new ObjectEvent(iomObjM2));
-//		validator.validate(new ObjectEvent(iomObjM3));
-//		validator.validate(new ObjectEvent(iomObjN));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==1);
-//		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-//	}
+	@Test
+	public void elementCount_CountOfBagNotEqual_Fail(){
+		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjM2=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjM3=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjN=new Iom_jObject(ILI_CLASSN, OBJ_OID2);
+		iomObjN.addattrobj("attrbag1", iomObjM);
+		iomObjN.addattrobj("attrbag1", iomObjM2);
+		iomObjN.addattrobj("attrbag1", iomObjM3);
+		iomObjN.setattrvalue("attr2", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new ObjectEvent(iomObjM));
+		validator.validate(new ObjectEvent(iomObjM2));
+		validator.validate(new ObjectEvent(iomObjM3));
+		validator.validate(new ObjectEvent(iomObjN));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
 	
-//	@Test
-//	public void elementCount_ListCountNotEqual_Fail(){
-//		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjM2=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjM3=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjM4=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjM5=new Iom_jObject(ILI_STRUCTM, null);
-//		Iom_jObject iomObjO=new Iom_jObject(ILI_CLASSO, OBJ_OID2);
-//		iomObjO.addattrobj("attrlist1", iomObjM);
-//		iomObjO.addattrobj("attrlist1", iomObjM2);
-//		iomObjO.addattrobj("attrlist1", iomObjM3);
-//		iomObjO.addattrobj("attrlist1", iomObjM4);
-//		iomObjO.addattrobj("attrlist1", iomObjM5);
-//		iomObjO.setattrvalue("attr2", "6");
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
-//		validator.validate(new ObjectEvent(iomObjM));
-//		validator.validate(new ObjectEvent(iomObjM2));
-//		validator.validate(new ObjectEvent(iomObjM3));
-//		validator.validate(new ObjectEvent(iomObjM4));
-//		validator.validate(new ObjectEvent(iomObjM5));
-//		validator.validate(new ObjectEvent(iomObjO));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==1);
-//		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-//	}
+	@Test
+	public void elementCount_ListCountNotEqual_Fail(){
+		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjM2=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjM3=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjM4=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjM5=new Iom_jObject(ILI_STRUCTM, null);
+		Iom_jObject iomObjO=new Iom_jObject(ILI_CLASSO, OBJ_OID2);
+		iomObjO.addattrobj("attrlist1", iomObjM);
+		iomObjO.addattrobj("attrlist1", iomObjM2);
+		iomObjO.addattrobj("attrlist1", iomObjM3);
+		iomObjO.addattrobj("attrlist1", iomObjM4);
+		iomObjO.addattrobj("attrlist1", iomObjM5);
+		iomObjO.setattrvalue("attr2", "6");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new ObjectEvent(iomObjM));
+		validator.validate(new ObjectEvent(iomObjM2));
+		validator.validate(new ObjectEvent(iomObjM3));
+		validator.validate(new ObjectEvent(iomObjM4));
+		validator.validate(new ObjectEvent(iomObjM5));
+		validator.validate(new ObjectEvent(iomObjO));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
 	
 	@Test
 	public void objectCountALL_ObjectCountNotEqual_Fail(){
@@ -978,30 +1004,30 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-//	@Test
-//	public void objectCountRole_RoleCountNotEqual_Fail(){
-//		// erstes S->T
-//		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
-//		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, OBJ_OID3);
-//		Iom_jObject iomObjST1=new Iom_jObject(ILI_ASSOC_ST1, null);
-//		iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID1);
-//		iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID3);
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
-//		validator.validate(new ObjectEvent(iomObjS1));
-//		validator.validate(new ObjectEvent(iomObjT1));
-//		validator.validate(new ObjectEvent(iomObjST1));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==1);
-//		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-//	}
+	@Test
+	public void objectCountRole_RoleCountNotEqual_Fail(){
+		// erstes S->T
+		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
+		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, OBJ_OID3);
+		Iom_jObject iomObjST1=new Iom_jObject(ILI_ASSOC_ST1, null);
+		iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID1);
+		iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID3);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new ObjectEvent(iomObjS1));
+		validator.validate(new ObjectEvent(iomObjT1));
+		validator.validate(new ObjectEvent(iomObjST1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
 	
 	@Test
 	public void isOfClass_NotYetImplemented_Fail(){

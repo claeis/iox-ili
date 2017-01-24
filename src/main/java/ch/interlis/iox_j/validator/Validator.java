@@ -542,8 +542,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			} else if (constantObj instanceof Constant.Numeric){
 				Constant.Numeric numericConstant = (Constant.Numeric) constantObj;
 				if(numericConstant!=null){
-					NumericType numericType = new NumericType();
-					return new Value(numericType, numericConstant.getValue().toString());
+					return new Value(Integer.valueOf(numericConstant.getValue().toString()));
 				}
 			}
 		//TODO instance of ConditionalExpression
@@ -562,8 +561,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 					if(arg.getValue()!=null){
 						int lengthOfArgument = arg.getValue().length();
-						NumericType numeric = new NumericType();
-						return new Value(numeric, String.valueOf(lengthOfArgument));
+						
+						return new Value(lengthOfArgument);
 					}
 				}
 				return new Value(false);
@@ -645,7 +644,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = (Evaluable[]) functionCall.getArguments();
 				Evaluable anArgument = (Evaluable) arguments[0];
-				NumericType numeric = new NumericType();
 				if(anArgument instanceof Objects){
 					Value value=evaluateExpression(iomObj, anArgument);
 					if (value.skipEvaluation()){
@@ -654,17 +652,46 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if (value.isUndefined()){
 						return Value.createSkipEvaluation();
 					}
-					return new Value(numeric, String.valueOf(value.getValues().size()));
+					return new Value(value.getValues().size());
+				} else if (anArgument instanceof ObjectPath){
+					Value value=evaluateExpression(iomObj, anArgument);
+					if (value.skipEvaluation()){
+						return value;
+					}
+					if (value.isUndefined()){
+						return Value.createSkipEvaluation();
+					}
+					Object aModelElement=tag2class.get(iomObj.getobjecttag());
+					Viewable classOfConstraint = (Viewable) aModelElement;
+					// through all objects
+					Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).values().iterator();
+					int counter = 0;
+					while(objectIterator.hasNext()){
+						IomObject aIomObj = (IomObject) objectIterator.next();
+						if(aIomObj!=null){
+							Object modelElement=tag2class.get(aIomObj.getobjecttag());
+							Viewable anObjectClass = (Viewable) modelElement;
+							if(classOfConstraint.equals(anObjectClass)){
+								int nrOfTargetObjs=linkPool.getTargetObjectCount(aIomObj,value.getRole(),doItfOidPerTable);
+								counter+=1;
+							}
+						}
+					}
+					return new Value(counter);
 				}
+			} else if (function.getScopedName(null).equals("INTERLIS.elementCount")){
+				FunctionCall functionCall = (FunctionCall) expression;
+				Evaluable[] arguments = (Evaluable[]) functionCall.getArguments();
+				Evaluable anArgument = (Evaluable) arguments[0];
+				int elementCount = iomObj.getattrvaluecount(anArgument.toString());
+				return new Value(elementCount);
 			} else {
 				Value.createNotYetImplemented(true);
 			}
-			//TODO INTERLIS.objectCount(Role)
+			//TODO INTERLIS.isOfClass
 			
 			//TODO INTERLIS.myClass
 			//TODO INTERLIS.isSubClass
-			//TODO INTERLIS.isOfClass
-			//TODO INTERLIS.elementCount
 			//TODO INTERLIS.convertUnit
 			//TODO INTERLIS.areAreas
 			//TODO instance of InspectionFactor
@@ -677,8 +704,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				PathElAbstractClassRole abstractClassRole = (PathElAbstractClassRole) pathEl;
 				if(abstractClassRole.getRole() instanceof RoleDef){
 					RoleDef role = (RoleDef) abstractClassRole.getRole();
-					TextType text = new TextType();
-					return new Value(text, role.getName());
+					return new Value(role);
 				}
 			}else if(pathEl instanceof AttributeRef){
 				AttributeRef attrRef = (AttributeRef) pathEl;
@@ -704,6 +730,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								}
 								return new Value(aliasType, objValue);
 							}
+							
 							return new Value(type, objValue);
 						}
 					} else {

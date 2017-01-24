@@ -172,7 +172,7 @@ MODEL Function23
 		CLASS ClassR =
 		END ClassR;
 		
-		!! (object Count role: t1)
+		!! (object Count role: t1 STAND ALONE Association)
 		CLASS ClassS =
 		END ClassS;
 		
