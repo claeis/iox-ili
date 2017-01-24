@@ -1,5 +1,7 @@
 package ch.interlis.iox_j.validator;
 
+import java.util.Collection;
+import java.util.List;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.NumericType;
@@ -9,11 +11,14 @@ import ch.interlis.iom.IomObject;
 
 public class Value {
 	private boolean error=false;
-	private boolean booleanValue;
-	private String value=null;
-	private IomObject complexValue=null;
-	private Type type=null;
+	private static boolean notYetImplemented = false;
 	private boolean booleanIsDefined = false;
+	private boolean booleanValue;
+	private IomObject complexValue=null;
+	private String refTypeName;
+	private String value=null;
+	private List<IomObject> values;
+	private Type type=null;
 	
 	public Value(boolean booleanValue) {
 		this.booleanValue = booleanValue;
@@ -25,54 +30,94 @@ public class Value {
 		this.type=type;
 	}
 	
+	public Value(List<IomObject> values){
+		this.values = values;
+	}
+	
 	public Value(IomObject value){
 		this.complexValue = value;
 	}
 	
-	private Value() {
+	Value(){
 		error=true;
 	}
 	
+	public Value(Type type, String valueStr, String refTypeName) {
+		this.value = valueStr;
+		this.type=type;
+		this.refTypeName = refTypeName;
+	}
+
 	public boolean isTrue(){
-		if(isError()){
+		if(skipEvaluation()){
 			throw new IllegalArgumentException();
 		}
 		return booleanValue;
 	}
 	
+	public String getRefTypeName(){
+		if(skipEvaluation()){
+			throw new IllegalArgumentException();
+		}
+		return refTypeName;
+	}
+	
+	public Type getType(){
+		if(skipEvaluation()){
+			throw new IllegalArgumentException();
+		}
+		return type;
+	}
+	
 	public String getValue(){
-		if(isError()){
+		if(skipEvaluation()){
 			throw new IllegalArgumentException();
 		}
 		return value;
 	}
 	
 	public IomObject getComplexValue(){
-		if(isError()){
+		if(skipEvaluation()){
 			throw new IllegalArgumentException();
 		}
 		return complexValue;
 	}
 	
+	public Collection<IomObject> getValues(){
+		if(skipEvaluation()){
+			throw new IllegalArgumentException();
+		}
+		return values;
+	}
+	
 	public static Value createUndefined(){
-		return new Value(null);
+		return new Value((IomObject) null);
 	}
 	
 	public boolean isUndefined(){
-		return !(getComplexValue() != null || getValue() != null || booleanIsDefined);
+		return !(getComplexValue() != null || getValue() != null || getValues() != null || booleanIsDefined);
 	}
-	public static Value createError(){
+	
+	public static Value createSkipEvaluation(){
 		return new Value();
 	}
 	
-	public boolean isError(){
+	public static boolean isNotYetImplemented(){
+		return notYetImplemented;
+	}
+	
+	public static void createNotYetImplemented(boolean notYetImpl) {
+		notYetImplemented = notYetImpl;
+	}
+	
+	public boolean skipEvaluation(){
 		return error;
 	}
 	
 	// compare in appropriate type.
 	public int compareTo(Value other){
 		// if value is error, return exception.
-		if(isError() || other.isError()){
+		if(skipEvaluation() || other.skipEvaluation()){
 			throw new IllegalArgumentException();
 		}
 		// intercept complex value

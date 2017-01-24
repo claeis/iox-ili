@@ -2,6 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -24,6 +25,8 @@ import ch.interlis.ili2c.metamodel.ConditionalExpression;
 import ch.interlis.ili2c.metamodel.Constant;
 import ch.interlis.ili2c.metamodel.Constant.Enumeration;
 import ch.interlis.ili2c.metamodel.Constant.EnumerationRange;
+import ch.interlis.ili2c.metamodel.Constant.Numeric;
+import ch.interlis.ili2c.metamodel.Constant.Text;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.Domain;
 import ch.interlis.ili2c.metamodel.Element;
@@ -41,6 +44,8 @@ import ch.interlis.ili2c.metamodel.Expression.Inequality;
 import ch.interlis.ili2c.metamodel.Expression.LessThan;
 import ch.interlis.ili2c.metamodel.Expression.LessThanOrEqual;
 import ch.interlis.ili2c.metamodel.Expression.Negation;
+import ch.interlis.ili2c.metamodel.Extendable;
+import ch.interlis.ili2c.metamodel.FormalArgument;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.Function;
 import ch.interlis.ili2c.metamodel.FunctionCall;
@@ -57,6 +62,8 @@ import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.Objects;
 import ch.interlis.ili2c.metamodel.ParameterValue;
 import ch.interlis.ili2c.metamodel.PathEl;
+import ch.interlis.ili2c.metamodel.PathElAbstractClassRole;
+import ch.interlis.ili2c.metamodel.PathElAssocRole;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
 import ch.interlis.ili2c.metamodel.ReferenceType;
@@ -108,6 +115,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String currentBasketId = null;
 	private String currentMainOid=null;
 	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
+	
 	
 	@Deprecated
 	protected Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -266,16 +274,23 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(ValidationConfig.OFF.equals(checkConstraint)){
 			// skip it
 		}else{
-			if (!conditionValue.isError()){
-				if (conditionValue.isTrue()){
-					// ok
-				} else {
-					logMsg(checkConstraint,"Mandatory Constraint {0} is not true.", mandatoryConstraintObj.getName());				
+			if (!conditionValue.isNotYetImplemented()){
+				if (!conditionValue.skipEvaluation()){
+					if (conditionValue.isTrue()){
+						// ok
+					} else {
+						logMsg(checkConstraint,"Mandatory Constraint {0} is not true.", mandatoryConstraintObj.getName());
+					}
 				}
+			} else {
+				FunctionCall functionCall = (FunctionCall) mandatoryConstraintObj.getCondition();
+				String functionName = functionCall.getFunction().getName();
+				logMsg(checkConstraint,"Function {0} is not yet implemented.", functionName);
+				Value.createNotYetImplemented(false);
 			}
 		}
 	}
-
+	
 	private Value evaluateExpression(IomObject iomObj, Evaluable expression) {
 		if(expression instanceof Equality){
 			// ==
@@ -284,20 +299,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable rightExpression = (Evaluable) equality.getRight();
 			Value leftValue=evaluateExpression(iomObj,leftExpression);
 			// if isError, return error.
-			if (leftValue.isError()){
+			if (leftValue.skipEvaluation()){
 				return leftValue;
 			}
 			if (leftValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			// if isError, return error.
-			if (rightValue.isError()){
+			if (rightValue.skipEvaluation()){
 				return rightValue;
 			}
 			if (rightValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
+			
 			// if left and right value not errors, compare values.
 			if (leftValue.compareTo(rightValue)==0){
 				return new Value(true);
@@ -311,19 +327,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable rightExpression = (Evaluable) greaterThan.getRight();
 			Value leftValue=evaluateExpression(iomObj,leftExpression);
 			// if isError, return error.
-			if (leftValue.isError()){
+			if (leftValue.skipEvaluation()){
 				return leftValue;
 			}
 			if (leftValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			// if isError, return error.
-			if (rightValue.isError()){
+			if (rightValue.skipEvaluation()){
 				return rightValue;
 			}
 			if (rightValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			// if left and right value not errors, compare values.
 			if (leftValue.compareTo(rightValue)>0){
@@ -338,19 +354,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable rightExpression = (Evaluable) greaterThanOrEqual.getRight();
 			Value leftValue=evaluateExpression(iomObj,leftExpression);
 			// if isError, return error.
-			if (leftValue.isError()){
+			if (leftValue.skipEvaluation()){
 				return leftValue;
 			}
 			if (leftValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			// if isError, return error.
-			if (rightValue.isError()){
+			if (rightValue.skipEvaluation()){
 				return rightValue;
 			}
 			if (rightValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			// if left and right value not errors, compare values.
 			if (leftValue.compareTo(rightValue)>=0){
@@ -365,19 +381,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable rightExpression = (Evaluable) inEquality.getRight();
 			Value leftValue=evaluateExpression(iomObj,leftExpression);
 			// if isError, return error.
-			if (leftValue.isError()){
+			if (leftValue.skipEvaluation()){
 				return leftValue;
 			}
 			if (leftValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			// if isError, return error.
-			if (rightValue.isError()){
+			if (rightValue.skipEvaluation()){
 				return rightValue;
 			}
 			if (rightValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			// if left and right value not errors, compare values.
 			if (leftValue.compareTo(rightValue)!=0){
@@ -392,19 +408,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable rightExpression = (Evaluable) lessThan.getRight();
 			Value leftValue=evaluateExpression(iomObj,leftExpression);
 			// if isError, return error.
-			if (leftValue.isError()){
+			if (leftValue.skipEvaluation()){
 				return leftValue;
 			}
 			if (leftValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			// if isError, return error.
-			if (rightValue.isError()){
+			if (rightValue.skipEvaluation()){
 				return rightValue;
 			}
 			if (rightValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			// if left and right value not errors, compare values.
 			if (leftValue.compareTo(rightValue)<0){
@@ -419,19 +435,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable rightExpression = (Evaluable) lessThanOrEqual.getRight();
 			Value leftValue=evaluateExpression(iomObj,leftExpression);
 			// if isError, return error.
-			if (leftValue.isError()){
+			if (leftValue.skipEvaluation()){
 				return leftValue;
 			}
 			if (leftValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			// if isError, return error.
-			if (rightValue.isError()){
+			if (rightValue.skipEvaluation()){
 				return rightValue;
 			}
 			if (rightValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			// if left and right value not errors, compare values.
 			if (leftValue.compareTo(rightValue)<=0){
@@ -443,11 +459,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			// NOT
 			Negation negation = (Negation) expression;				
 			Value arg=evaluateExpression(iomObj,negation.getNegated());
-			if (arg.isError()){
+			if (arg.skipEvaluation()){
 				return arg;
 			}
 			if (arg.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			if(arg.isTrue()){
 				return new Value(false);
@@ -460,11 +476,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable[] conjunctionArray = (Evaluable[]) conjunction.getConjoined();
 			for (int i=0;i<conjunctionArray.length;i++){
 				Value arg=evaluateExpression(iomObj,conjunctionArray[i]);
-				if (arg.isError()){
+				if (arg.skipEvaluation()){
 					return arg;
 				}
 				if (arg.isUndefined()){
-					return Value.createError();
+					return Value.createSkipEvaluation();
 				}
 				if(!arg.isTrue()){
 					return new Value(false);
@@ -475,7 +491,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			// DEFINED
 			DefinedCheck defined = (DefinedCheck) expression;
 			Value arg=evaluateExpression(iomObj,defined.getArgument());
-			if(arg.isError()){
+			if(arg.skipEvaluation()){
 				return arg;
 			}
 			if(arg.isUndefined()){
@@ -489,11 +505,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable[] disjunctionArray = (Evaluable[]) disjunction.getDisjoined();
 			for (int i=0;i<disjunctionArray.length;i++){
 				Value arg=evaluateExpression(iomObj,disjunctionArray[i]);
-				if (arg.isError()){
+				if (arg.skipEvaluation()){
 					return arg;
 				}
 				if (arg.isUndefined()){
-					return Value.createError();
+					return Value.createSkipEvaluation();
 				}
 				if(arg.isTrue()){
 					return new Value(true);
@@ -511,161 +527,211 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					Enumeration enumObj = (Enumeration) enumConstOrRange;
 					String[] value = enumObj.getValue();
 					if (value[0].equals("true")){
-						return new Value(true);  // FIXME create boolean true only, if EnumerationType is INTERLIS.BOOLEAN
+						return new Value(true);
 					} else if (value[0].equals("false")){
 						return new Value(false);
 					}
-				} else if (enumConstOrRange instanceof EnumerationRange){
-					// constant.enumerationRange
+				} 
+			// TODO instance of EnumerationRange
+			} else if (constantObj instanceof Constant.Text){
+				Constant.Text textConstant = (Constant.Text) constantObj;
+				if(textConstant!=null){
+					TextType texttype = new TextType();
+					return new Value(texttype, textConstant.getValue());
+				}
+			} else if (constantObj instanceof Constant.Numeric){
+				Constant.Numeric numericConstant = (Constant.Numeric) constantObj;
+				if(numericConstant!=null){
+					NumericType numericType = new NumericType();
+					return new Value(numericType, numericConstant.getValue().toString());
 				}
 			}
-		} else if(expression instanceof ConditionalExpression){
-			// conditional expression	
-			ConditionalExpression conditionalExpressionObj = (ConditionalExpression) expression;
-			
-		} else if(expression instanceof FunctionCall){
-			// function call	
+		//TODO instance of ConditionalExpression
+		} else if(expression instanceof FunctionCall){	
 			FunctionCall functionCallObj = (FunctionCall) expression;
 			Function function = functionCallObj.getFunction();
 			if(function.getScopedName(null).equals("INTERLIS.len") || function.getScopedName(null).equals("INTERLIS.lenM")){
-				Evaluable[] args = functionCallObj.getArguments();
-				if(args.length==1){
-					for(Evaluable arg : args){
-						String attrValue = iomObj.getattrvalue(arg.toString());
-						if(attrValue!=null){
-							int lengthOfAttr = attrValue.length();
-							NumericType numericType = new NumericType();
-							return new Value(numericType, String.valueOf(lengthOfAttr));
-						} else {
-							// skip evaluation.
-						}
+				Evaluable[] arguments = functionCallObj.getArguments();
+				for(Evaluable anArgument : arguments){
+					Value arg=evaluateExpression(iomObj,anArgument);
+					if (arg.skipEvaluation()){
+						return arg;
+					}
+					if (arg.isUndefined()){
+						return Value.createSkipEvaluation();
+					}
+					if(arg.getValue()!=null){
+						int lengthOfArgument = arg.getValue().length();
+						NumericType numeric = new NumericType();
+						return new Value(numeric, String.valueOf(lengthOfArgument));
 					}
 				}
+				return new Value(false);
 			} else if(function.getScopedName(null).equals("INTERLIS.trim") || function.getScopedName(null).equals("INTERLIS.trimM")){
-				Evaluable[] args = functionCallObj.getArguments();
-				for(Evaluable arg : args){
-					String attrValue = iomObj.getattrvalue(arg.toString());
-					if(attrValue!=null){
-						Type type = function.getDomain();
-						return new Value(type, attrValue.trim());
-					} else {
-						// skip evaluation.
+				Evaluable[] arguments = functionCallObj.getArguments();
+				for(Evaluable anArgument : arguments){
+					Value arg=evaluateExpression(iomObj,anArgument);
+					if (arg.skipEvaluation()){
+						return arg;
 					}
+					if (arg.isUndefined()){
+						return Value.createSkipEvaluation();
+					}
+					TextType type = new TextType();
+					return new Value(type, arg.getValue().trim());
 				}
 			} else if (function.getScopedName(null).equals("INTERLIS.isEnumSubVal")){
-				String subValValue = iomObj.getattrvalue(iomObj.getattrname(0));
-				String nodeValValue = iomObj.getattrvalue(iomObj.getattrname(1));
-				if(subValValue.startsWith(nodeValValue)){
+				Evaluable[] arguments = functionCallObj.getArguments();
+				Value subEnum=evaluateExpression(iomObj,arguments[0]);
+				if (subEnum.skipEvaluation()){
+					return subEnum;
+				}
+				if (subEnum.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				Value nodeEnum=evaluateExpression(iomObj,arguments[1]);
+				if (nodeEnum.skipEvaluation()){
+					return nodeEnum;
+				}
+				if (nodeEnum.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				if(subEnum.getValue().toString().startsWith(nodeEnum.getValue().toString())){
 					return new Value(true);
 				} else {
 					return new Value(false);
 				}
 			} else if (function.getScopedName(null).equals("INTERLIS.inEnumRange")){
-				String enumerationNameOfEnum = null;
-				String enumerationNameOfMinEnum = null;
-				String enumerationNameOfMaxEnum = null;
-				List<String> enumeration = null;
-				FunctionCall functionCall = (FunctionCall) expression;
-				Evaluable[] args = (Evaluable[]) functionCall.getArguments();
-				for(Evaluable enumArg : args){
-					ObjectPath objectPath = (ObjectPath) enumArg;
-					PathEl pathEl = objectPath.getLastPathEl();
-					AttributeRef attrRef = (AttributeRef) pathEl;
-					LocalAttribute localAttr = (LocalAttribute) attrRef.getAttr();
-					// wenn subelements
-					if(localAttr.getDomain() instanceof TypeAlias){
-						TypeAlias typeAlias = (TypeAlias) localAttr.getDomain();
-						Domain domain =(Domain) typeAlias.getAliasing();
-						EnumerationType enumerationType = (EnumerationType) domain.getType();
-						// enumeration has to be ordered
-						if(enumerationType.isOrdered()){
-							enumeration = enumerationType.getValues();
-							if(enumArg.toString().equals(iomObj.getattrname(1))){
-								enumerationNameOfEnum = domain.getName();
-							}else if(enumArg.toString().equals(iomObj.getattrname(0))){
-								enumerationNameOfMinEnum = domain.getName();
-							}else if(enumArg.toString().equals(iomObj.getattrname(2))){
-								enumerationNameOfMaxEnum = domain.getName();
-							}
-						}
-					}
+				Evaluable[] arguments = functionCallObj.getArguments();
+				Value enumToCompare=evaluateExpression(iomObj,arguments[0]);
+				if (enumToCompare.skipEvaluation()){
+					return enumToCompare;
 				}
-				// minVal and maxVal are on same enumeration like enumVal
-				if(enumerationNameOfEnum!=null && enumerationNameOfMinEnum!=null && enumerationNameOfMaxEnum!=null){
-					if(enumerationNameOfEnum.equals(enumerationNameOfMinEnum) && enumerationNameOfMinEnum.equals(enumerationNameOfMaxEnum)){
-						int minEnumIndex = 0;
-						int enumIndex = 0;
-						int maxEnumIndex = 0;
-						for(int i=0; i<enumeration.size();i++){
-							if(enumeration.get(i).toString().equals(iomObj.getattrvalue(iomObj.getattrname(1)))){
-								enumIndex = i;
-							} else if(enumeration.get(i).toString().equals(iomObj.getattrvalue(iomObj.getattrname(0)))){
-								minEnumIndex = i;
-							} else if(enumeration.get(i).toString().equals(iomObj.getattrvalue(iomObj.getattrname(2)))){
-								maxEnumIndex = i;
+				if (enumToCompare.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				Value minEnum=evaluateExpression(iomObj,arguments[1]);
+				if (minEnum.skipEvaluation()){
+					return minEnum;
+				}
+				if (minEnum.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				Value maxEnum=evaluateExpression(iomObj,arguments[2]);
+				if (maxEnum.skipEvaluation()){
+					return maxEnum;
+				}
+				if (maxEnum.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				if (enumToCompare.getType() instanceof EnumerationType){
+					EnumerationType enumerationType = (EnumerationType) enumToCompare.getType();
+					// enumeration has to be ordered
+					if(enumerationType.isOrdered()){
+						// enumerations from same enumeration
+						if(enumToCompare.getRefTypeName().equals(minEnum.getRefTypeName()) && (enumToCompare.getRefTypeName().equals(maxEnum.getRefTypeName()))){
+							int indexOfEnumToCompare = enumerationType.getValues().indexOf(enumToCompare.getValue());
+							int indexOfMinEnumValue = enumerationType.getValues().indexOf(minEnum.getValue());
+							int indexOfMaxEnumValue = enumerationType.getValues().indexOf(maxEnum.getValue());
+							// enum is between min and max
+							if(indexOfEnumToCompare > indexOfMinEnumValue && indexOfEnumToCompare < indexOfMaxEnumValue){
+								return new Value(true);
 							}
-						}
-						// enumVal has to be between minVal and maxVal (Inc. sub-elements)
-						if((enumIndex > minEnumIndex) && (enumIndex < maxEnumIndex)){
-							return new Value(true);
 						}
 					}
 				}
 				return new Value(false);
+			} else if (function.getScopedName(null).equals("INTERLIS.objectCount")){
+				FunctionCall functionCall = (FunctionCall) expression;
+				Evaluable[] arguments = (Evaluable[]) functionCall.getArguments();
+				Evaluable anArgument = (Evaluable) arguments[0];
+				NumericType numeric = new NumericType();
+				if(anArgument instanceof Objects){
+					Value value=evaluateExpression(iomObj, anArgument);
+					if (value.skipEvaluation()){
+						return value;
+					}
+					if (value.isUndefined()){
+						return Value.createSkipEvaluation();
+					}
+					return new Value(numeric, String.valueOf(value.getValues().size()));
+				}
+			} else {
+				Value.createNotYetImplemented(true);
 			}
-		} else if(expression instanceof InspectionFactor){
-			// inspection factor	
-			InspectionFactor inspectionFactorObj = (InspectionFactor) expression;
+			//TODO INTERLIS.objectCount(Role)
 			
-		} else if(expression instanceof LengthOfReferencedText){
-			// length of referenced text	
-			LengthOfReferencedText lengthOfReferencedTextObj = (LengthOfReferencedText) expression;
+			//TODO INTERLIS.myClass
+			//TODO INTERLIS.isSubClass
+			//TODO INTERLIS.isOfClass
+			//TODO INTERLIS.elementCount
+			//TODO INTERLIS.convertUnit
+			//TODO INTERLIS.areAreas
+			//TODO instance of InspectionFactor
+			//TODO instance of LengthOfReferencedText
 		} else if(expression instanceof ObjectPath){
 			// object path	
 			ObjectPath objectPathObj = (ObjectPath) expression;
 			PathEl pathEl = (PathEl) objectPathObj.getLastPathEl();
-			AttributeRef attrRef = (AttributeRef) pathEl;
-			Type type = attrRef.getAttr().getDomain();
-			String attrName = objectPathObj.getLastPathEl().getName();
-			if(iomObj.getattrvaluecount(attrName)==0){
-				return Value.createUndefined();
-			}else{
-				String objValue = iomObj.getattrvalue(attrName);
-				if(objValue != null){
-					if (objValue.equals("true")){
-						return new Value(true);
-					} else if (objValue.equals("false")){
-						return new Value(false);
-						// if null, then complex value.
-					} else {
-						if (type instanceof TypeAlias){
-							TypeAlias typeAlias = (TypeAlias) type;
-							Type aliasType = typeAlias.getAliasing().getType();
-							return new Value(aliasType, objValue);
+			if(pathEl instanceof PathElAbstractClassRole){
+				PathElAbstractClassRole abstractClassRole = (PathElAbstractClassRole) pathEl;
+				if(abstractClassRole.getRole() instanceof RoleDef){
+					RoleDef role = (RoleDef) abstractClassRole.getRole();
+					TextType text = new TextType();
+					return new Value(text, role.getName());
+				}
+			}else if(pathEl instanceof AttributeRef){
+				AttributeRef attrRef = (AttributeRef) pathEl;
+				Type type = attrRef.getAttr().getDomain();
+				String attrName = objectPathObj.getLastPathEl().getName();
+				if(iomObj.getattrvaluecount(attrName)==0){
+					return Value.createUndefined();
+				}else{
+					String objValue = iomObj.getattrvalue(attrName);
+					if(objValue != null){
+						if (objValue.equals("true")){
+							return new Value(true);
+						} else if (objValue.equals("false")){
+							return new Value(false);
+							// if null, then complex value.
+						} else {
+							if (type instanceof TypeAlias){
+								TypeAlias typeAlias = (TypeAlias) type;
+								Type aliasType = typeAlias.getAliasing().getType();
+								if (aliasType instanceof EnumerationType){
+									String refTypeName = typeAlias.getAliasing().getName();
+									return new Value(aliasType, objValue, refTypeName);
+								}
+								return new Value(aliasType, objValue);
+							}
+							return new Value(type, objValue);
 						}
-						return new Value(type, objValue);
+					} else {
+						return new Value(iomObj.getattrobj(attrName, 0));
 					}
-				} else {
-					return new Value(iomObj.getattrobj(attrName, 0)); // TODO handle multivalue
 				}
 			}
 		} else if(expression instanceof Objects){
 			// objects
-			Objects objectsObj = (Objects) expression;
-			
-		} else if(expression instanceof ParameterValue){
-			// parameter value
-			ParameterValue parameterValueObj = (ParameterValue) expression;
-			
-		} else if(expression instanceof ViewableAggregate){
-			// viewable aggregate	
-			ViewableAggregate viewableAggregateObj = (ViewableAggregate) expression;
-			
-		} else if(expression instanceof ViewableAlias){
-			// viewable alias
-			ViewableAlias viewableAliasObj = (ViewableAlias) expression;
+			Viewable viewableOfExpression = ((Objects) expression).getContext();
+			Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).values().iterator();
+			List<IomObject> listOfIomObjects = new ArrayList<IomObject>();
+			while(objectIterator.hasNext()){
+				IomObject aIomObj = (IomObject) objectIterator.next();
+				if(aIomObj!=null){
+					Object modelElement=tag2class.get(aIomObj.getobjecttag());
+					Viewable objectClass = (Viewable) modelElement;
+					if(viewableOfExpression.equals(objectClass)){
+						listOfIomObjects.add(aIomObj);
+					}
+				}
+			}
+			return new Value(listOfIomObjects);
 		}
-		return Value.createError(); // skip further evaluation
+		return Value.createSkipEvaluation(); // skip further evaluation
+		//TODO instance of ParameterValue
+		//TODO instance of ViewableAggregate
+		//TODO instance of ViewableAlias
 	}
 
 	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {

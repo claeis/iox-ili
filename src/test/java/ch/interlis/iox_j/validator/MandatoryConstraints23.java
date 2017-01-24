@@ -1751,7 +1751,7 @@ public class MandatoryConstraints23 {
 
 	// test in (!=), (<>).
 	@Test
-	public void mandatoryConstraintInEqualationNumericFalse(){
+	public void unequalNumbersEXP_SameNumbersACT_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OBJ_OID1);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "5");
@@ -2521,7 +2521,7 @@ public class MandatoryConstraints23 {
 	
 	// test in undefined (undefined)
 	@Test
-	public void mandatoryConstraintUnDefinedAttrInPathOk(){
+	public void unDefinedAttrEXP_DefinedAttrACT_Ok(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSDEFINEDB, OBJ_OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();

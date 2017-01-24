@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.xml.ws.Holder;
+
+import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.Viewable;
@@ -19,6 +21,8 @@ import ch.interlis.iom.IomObject;
 //   - return objects of given BasketId
 //   - return keys of collection
 //   - return tid of association
+//   - return number of objects of specific class
+//   - return number of objects which used specific roleName
 
 public class ObjectPool {
 	private boolean doItfOidPerTable;
