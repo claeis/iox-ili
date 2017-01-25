@@ -68,6 +68,7 @@ import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
 import ch.interlis.ili2c.metamodel.ReferenceType;
 import ch.interlis.ili2c.metamodel.RoleDef;
+import ch.interlis.ili2c.metamodel.StructAttributeRef;
 import ch.interlis.ili2c.metamodel.SurfaceOrAreaType;
 import ch.interlis.ili2c.metamodel.SurfaceType;
 import ch.interlis.ili2c.metamodel.Table;
@@ -544,6 +545,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(numericConstant!=null){
 					return new Value(Integer.valueOf(numericConstant.getValue().toString()));
 				}
+			} else if (constantObj instanceof Constant.Class){
+				Constant.Class classConstant = (Constant.Class) constantObj;
+				if(classConstant!=null){
+					if(classConstant.getValue() instanceof Viewable){
+						Viewable classValue = (Viewable) classConstant.getValue();
+						while(classValue.getExtending()!=null){
+							classValue = (Viewable) classValue.getExtending();
+						}
+						return new Value(classValue);
+					}
+					return new Value(classConstant.getValue());
+				}
 			}
 		//TODO instance of ConditionalExpression
 		} else if(expression instanceof FunctionCall){	
@@ -685,13 +698,68 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				Evaluable anArgument = (Evaluable) arguments[0];
 				int elementCount = iomObj.getattrvaluecount(anArgument.toString());
 				return new Value(elementCount);
+			} else if (function.getScopedName(null).equals("INTERLIS.isOfClass")){
+				FunctionCall functionCall = (FunctionCall) expression;
+				Evaluable[] arguments = functionCall.getArguments();
+				Value childViewable=evaluateExpression(iomObj,arguments[0]);
+				if (childViewable.skipEvaluation()){
+					return childViewable;
+				}
+				if (childViewable.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				Value parentViewable=evaluateExpression(iomObj,arguments[1]);
+				if (parentViewable.skipEvaluation()){
+					return parentViewable;
+				}
+				if (parentViewable.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				if(childViewable.getViewable().equals(parentViewable.getViewable())){
+					return new Value(true);
+				}
+				if(parentViewable.getViewable().isExtending(childViewable.getViewable())){
+					return new Value(true);					
+				}
+				return new Value(false);
+			} else if (function.getScopedName(null).equals("INTERLIS.isSubClass")){
+				FunctionCall functionCall = (FunctionCall) expression;
+				Evaluable[] arguments = functionCall.getArguments();
+				Value subViewable=evaluateExpression(iomObj,arguments[0]);
+				if (subViewable.skipEvaluation()){
+					return subViewable;
+				}
+				if (subViewable.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				Value superViewable=evaluateExpression(iomObj,arguments[1]);
+				if (superViewable.skipEvaluation()){
+					return superViewable;
+				}
+				if (superViewable.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				if(subViewable.getViewable().equals(superViewable.getViewable())){
+					return new Value(true);
+				}
+				if(superViewable.getViewable().isExtending(subViewable.getViewable())){ //TODO do not getExtending class in constant.
+					return new Value(true);					
+				}
+				return new Value(false);
+			} else if (function.getScopedName(null).equals("INTERLIS.myClass")){
+				FunctionCall functionCall = (FunctionCall) expression;
+				Evaluable[] arguments = functionCall.getArguments();
+				Value targetViewable=evaluateExpression(iomObj,arguments[0]);
+				if (targetViewable.skipEvaluation()){
+					return targetViewable;
+				}
+				if (targetViewable.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				return new Value(targetViewable.getViewable());
 			} else {
 				Value.createNotYetImplemented(true);
 			}
-			//TODO INTERLIS.isOfClass
-			
-			//TODO INTERLIS.myClass
-			//TODO INTERLIS.isSubClass
 			//TODO INTERLIS.convertUnit
 			//TODO INTERLIS.areAreas
 			//TODO instance of InspectionFactor
@@ -706,7 +774,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					RoleDef role = (RoleDef) abstractClassRole.getRole();
 					return new Value(role);
 				}
-			}else if(pathEl instanceof AttributeRef){
+			} else if(pathEl instanceof StructAttributeRef){
+				StructAttributeRef structAttributeRefValue = (StructAttributeRef) pathEl;
+				if(structAttributeRefValue.getAttr() instanceof LocalAttribute){
+					LocalAttribute localAttributeValue = (LocalAttribute) structAttributeRefValue.getAttr();
+					if(localAttributeValue.getDomain() instanceof CompositionType){
+						CompositionType compositionValue = (CompositionType) localAttributeValue.getDomain();
+						if(compositionValue.getComponentType() instanceof Viewable){
+							Viewable tableValue = (Viewable) compositionValue.getComponentType();
+							return new Value(tableValue);
+						}
+					}
+				}
+			} else if(pathEl instanceof AttributeRef){
 				AttributeRef attrRef = (AttributeRef) pathEl;
 				Type type = attrRef.getAttr().getDomain();
 				String attrName = objectPathObj.getLastPathEl().getName();

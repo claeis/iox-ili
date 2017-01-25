@@ -10,6 +10,7 @@ import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.TextType;
 import ch.interlis.ili2c.metamodel.Type;
+import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.iom.IomObject;
 
 public class Value {
@@ -24,6 +25,7 @@ public class Value {
 	private RoleDef role=null;
 	private int numeric=0;
 	private boolean numericIsDefined=false;
+	private Viewable viewable=null;
 	
 	private Type type=null;
 	
@@ -35,6 +37,10 @@ public class Value {
 	public Value(int numeric){
 		this.numeric = numeric;
 		numericIsDefined = true;
+	}
+	
+	public Value(Viewable viewable){
+		this.viewable = viewable;
 	}
 	
 	public Value(Type type,String valueStr){
@@ -76,6 +82,13 @@ public class Value {
 			throw new IllegalArgumentException();
 		}
 		return refTypeName;
+	}
+	
+	public Viewable getViewable(){
+		if(skipEvaluation()){
+			throw new IllegalArgumentException();
+		}
+		return viewable;
 	}
 	
 	public Type getType(){
@@ -125,7 +138,13 @@ public class Value {
 	}
 	
 	public boolean isUndefined(){
-		return !(getComplexValue() != null || getValue() != null || getValues() != null || booleanIsDefined || getRole() != null || numericIsDefined);
+		return !(getComplexValue() != null ||
+						getValue() != null ||
+						getValues() != null ||
+						booleanIsDefined ||
+						getRole() != null ||
+						numericIsDefined ||
+						getViewable() != null);
 	}
 	
 	public static Value createSkipEvaluation(){
@@ -196,13 +215,19 @@ public class Value {
 			return compareInteger(numeric, Integer.valueOf(other.value));
 		} else if(this.value!=null && other.numericIsDefined){
 			return compareInteger(Integer.valueOf(this.value), other.numeric);
+		} else if(this.viewable!=null && other.viewable!=null){
+			return compareViewable(this.viewable, other.viewable);
 		}else if(this.value==null && other.value==null){
 			return compareBoolean(this.booleanValue, other.booleanValue);
 		}
 		// incompatible type
 		throw new IllegalArgumentException("incompatible values");
 	}
-	
+
+	private int compareViewable(Viewable viewable2, Viewable viewable3) {
+		return (viewable3.equals(viewable2) ? 0 : (!viewable3.equals(viewable2) ? 1 : -1));
+	}
+
 	private int compareBoolean(boolean thisValue, boolean otherValue) {
 		return (otherValue == thisValue ? 0 : (thisValue ? 1 : -1));
 	}
