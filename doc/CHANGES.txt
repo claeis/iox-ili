@@ -2,12 +2,13 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
-iox-ili 1.14.0-feature/validator1 (2017-01-25)
+iox-ili 1.14.0-feature/validator1 (2017-01-27)
 -----------------------------
 - validator: optimized unique TID/OID check
 - validator: added functions len, lenM, trim, trimM, isEnumSubVal, inEnumRange, objectCount(ALL),
-			 objectCount(Role), elementCount, myClass, isOfClass, isSubClass
+			 objectCount(Role), elementCount, myClass, isOfClass, isSubClass, areArea
 - validator: added handling if function is not yet implemented
+- validator: added set constraints
 
 iox-ili 1.14.0-feature/validator1 (2017-01-13)
 -----------------------------

@@ -3,6 +3,9 @@ MODEL Function23
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
 	TOPIC Topic=
 		DOMAIN
+			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					    70000.000 .. 310000.000 [INTERLIS.m],
+						ROTATION 2 -> 1;
 			Enumeration = (eins, mehr);																	!! node=mehr
 			Enumeration2 EXTENDS Enumeration = (mehr(vier, fuenf));										!! sub=mehr.vier
 			Enumeration3 = (eins, zwei, drei, vier, fuenf) ORDERED;										!! enum=drei, min=zwei, max=vier
@@ -201,6 +204,12 @@ MODEL Function23
            MANDATORY CONSTRAINT INTERLIS.isOfClass(attrU1[1],>StructAp);
         END ClassU;
         
+        !! (isOfClass with myClass)
+        CLASS ClassUA =
+           attrU1 : BAG {1..*} OF StructA;
+           MANDATORY CONSTRAINT INTERLIS.isOfClass(INTERLIS.myClass(attrU1[1]),>StructAp);
+        END ClassUA;
+        
 		!! (isOfClass fail)
         STRUCTURE StructB =
         END StructB;
@@ -246,5 +255,13 @@ MODEL Function23
            attrZ1 : BAG {1..*} OF StructB;
            MANDATORY CONSTRAINT INTERLIS.myClass(attrZ1[1]) == >StructAp;
         END ClassZ;
+        
+        !! (areAreas)
+        CLASS ClassZA =
+			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie);
+			!!MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZA, UNDEFINED, >> Geometrie);
+		END ClassZA;
+        
 	END Topic;
 END Function23.

@@ -8,6 +8,7 @@ import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
+import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
@@ -53,6 +54,7 @@ public class Function23Test {
 	private final static String ILI_CLASSS=ILI_TOPIC+".ClassS";
 	private final static String ILI_CLASST=ILI_TOPIC+".ClassT";
 	private final static String ILI_CLASSU=ILI_TOPIC+".ClassU";
+	private final static String ILI_CLASSUA=ILI_TOPIC+".ClassUA";
 	private final static String ILI_CLASSV=ILI_TOPIC+".ClassV";
 	private final static String ILI_CLASSW=ILI_TOPIC+".ClassW";
 	private final static String ILI_CLASSWA=ILI_TOPIC+".ClassWA";
@@ -60,6 +62,7 @@ public class Function23Test {
 	private final static String ILI_CLASSX=ILI_TOPIC+".ClassX";
 	private final static String ILI_CLASSY=ILI_TOPIC+".ClassY";
 	private final static String ILI_CLASSZ=ILI_TOPIC+".ClassZ";
+	private final static String ILI_CLASSZA=ILI_TOPIC+".ClassZA";
 	// STRUCTURE
 	private final static String ILI_STRUCTA=ILI_TOPIC+".StructA";
 	private final static String ILI_STRUCTB=ILI_TOPIC+".StructB";
@@ -530,6 +533,28 @@ public class Function23Test {
 	}
 	
 	@Test
+	public void isOfClassWithRefAndMyClass_Ok(){
+		String objTargetId=OBJ_OID1;
+		Iom_jObject iomObjAP=new Iom_jObject(ILI_STRUCTAP, objTargetId);
+		Iom_jObject o1Ref=new Iom_jObject("REF", null);
+		o1Ref.setobjectrefoid(objTargetId);
+		Iom_jObject iomObjU=new Iom_jObject(ILI_CLASSUA, OBJ_OID1);
+		iomObjU.addattrobj("attrU1", iomObjAP);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new ObjectEvent(iomObjU));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
 	public void isSubClassConstants_Ok(){
 		Iom_jObject iomObjW=new Iom_jObject(ILI_CLASSW, OBJ_OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -567,7 +592,7 @@ public class Function23Test {
 	}
 	
 	@Test
-	public void isOfClassWithRefAndMyClass_Ok(){
+	public void isSubClassWithRefAndMyClass_Ok(){
 		String objTargetId=OBJ_OID1;
 		Iom_jObject iomObjS1=new Iom_jObject(ILI_STRUCTB, null);
 		Iom_jObject iomObjAP=new Iom_jObject(ILI_STRUCTBP, objTargetId);
@@ -617,6 +642,53 @@ public class Function23Test {
 		validator.validate(new ObjectEvent(iomObjT2));
 		validator.validate(new ObjectEvent(iomObjST1));
 		validator.validate(new ObjectEvent(iomObjST2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void areArea_WithSetConstraint_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSZA, OBJ_OID1);
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("Geometrie", "MULTISURFACE");
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "500000.000");
+		endSegment.setattrvalue("C2", "80000.000");
+		// polyline 2
+		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+		startSegment2.setattrvalue("C1", "500000.000");
+		startSegment2.setattrvalue("C2", "80000.000");
+		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+		endSegment2.setattrvalue("C1", "550000.000");
+		endSegment2.setattrvalue("C2", "90000.000");
+		// polyline 3
+		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
+		startSegment3.setattrvalue("C1", "550000.000");
+		startSegment3.setattrvalue("C2", "90000.000");
+		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
@@ -1186,4 +1258,86 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
+	
+//	@Test
+//	public void areArea_IntersectionOfAreas_Fail(){
+//		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSZA, OBJ_OID1);
+//		// Geometrie 1
+//		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("Geometrie", "MULTISURFACE");
+//		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+//		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+//		// polyline
+//		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+//		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+//		IomObject startSegment=segments.addattrobj("segment", "COORD");
+//		startSegment.setattrvalue("C1", "480000.000");
+//		startSegment.setattrvalue("C2", "70000.000");
+//		IomObject endSegment=segments.addattrobj("segment", "COORD");
+//		endSegment.setattrvalue("C1", "483000.000");
+//		endSegment.setattrvalue("C2", "70000.000");
+//		// polyline 2
+//		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
+//		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
+//		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+//		startSegment2.setattrvalue("C1", "483000.000");
+//		startSegment2.setattrvalue("C2", "70000.000");
+//		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+//		endSegment2.setattrvalue("C1", "480000.000");
+//		endSegment2.setattrvalue("C2", "73000.000");
+//		// polyline 3
+//		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
+//		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
+//		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
+//		startSegment3.setattrvalue("C1", "480000.000");
+//		startSegment3.setattrvalue("C2", "73000.000");
+//		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
+//		endSegment3.setattrvalue("C1", "480000.000");
+//		endSegment3.setattrvalue("C2", "70000.000");
+//		// Geometrie 2
+//		Iom_jObject objSurfaceSuccess2=new Iom_jObject(ILI_CLASSZA, OBJ_OID2);
+//		IomObject multisurfaceValue2=objSurfaceSuccess2.addattrobj("Geometrie", "MULTISURFACE");
+//		IomObject surfaceValue2 = multisurfaceValue2.addattrobj("surface", "SURFACE");
+//		IomObject outerBoundary2 = surfaceValue2.addattrobj("boundary", "BOUNDARY");
+//		// polyline
+//		IomObject polylineValue5 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+//		IomObject segments5=polylineValue5.addattrobj("sequence", "SEGMENTS");
+//		IomObject startSegment5=segments5.addattrobj("segment", "COORD");
+//		startSegment5.setattrvalue("C1", "484000.000");
+//		startSegment5.setattrvalue("C2", "70000.000");
+//		IomObject endSegment5=segments5.addattrobj("segment", "COORD");
+//		endSegment5.setattrvalue("C1", "484000.000");
+//		endSegment5.setattrvalue("C2", "72500.000");
+//		// polyline 2
+//		IomObject polylineValue4 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+//		IomObject segments4=polylineValue4.addattrobj("sequence", "SEGMENTS");
+//		IomObject startSegment4=segments4.addattrobj("segment", "COORD");
+//		startSegment4.setattrvalue("C1", "484000.000");
+//		startSegment4.setattrvalue("C2", "72500.000");
+//		IomObject endSegment4=segments4.addattrobj("segment", "COORD");
+//		endSegment4.setattrvalue("C1", "480500.000");
+//		endSegment4.setattrvalue("C2", "70500.000");
+//		// polyline 3
+//		IomObject polylineValue6 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+//		IomObject segments6=polylineValue6.addattrobj("sequence", "SEGMENTS");
+//		IomObject startSegment6=segments6.addattrobj("segment", "COORD");
+//		startSegment6.setattrvalue("C1", "480500.000");
+//		startSegment6.setattrvalue("C2", "70500.000");
+//		IomObject endSegment6=segments6.addattrobj("segment", "COORD");
+//		endSegment6.setattrvalue("C1", "484000.000");
+//		endSegment6.setattrvalue("C2", "70000.000");
+//		ValidationConfig modelConfig=new ValidationConfig();
+//		LogCollector logger=new LogCollector();
+//		LogEventFactory errFactory=new LogEventFactory();
+//		Settings settings=new Settings();
+//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+//		validator.validate(new StartTransferEvent());
+//		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+//		validator.validate(new ObjectEvent(objSurfaceSuccess));
+//		validator.validate(new ObjectEvent(objSurfaceSuccess2));
+//		validator.validate(new EndBasketEvent());
+//		validator.validate(new EndTransferEvent());
+//		// Asserts
+//		assertTrue(logger.getErrs().size()==1);
+//		assertEquals("Set Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+//	}
 }
