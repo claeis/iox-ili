@@ -252,7 +252,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						// set constraint
 						if(objA instanceof SetConstraint){
 							SetConstraint setConstraintObj=(SetConstraint) objA;
-							validateSetConstraint(iomObj, setConstraintObj);
+							setConstraint(iomObj, setConstraintObj);
 						}
 					}
 				}
@@ -282,25 +282,25 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private void validateSetConstraint(IomObject iomObj, SetConstraint setConstraintObj) {
-		Evaluable condition = null;
-		Value conditionValue = null;
-		boolean preCondition = true;
+	private void setConstraint(IomObject iomObj, SetConstraint setConstraintObj) {
+		Evaluable condition = (Evaluable) setConstraintObj.getCondition();
 		if(setConstraintObj.getPreCondition() != null){
-			// pre condition handling
-			condition = (Evaluable) setConstraintObj.getPreCondition();
-			conditionValue = evaluateExpression(iomObj, condition);
-			preCondition = setConstraint(condition, conditionValue, iomObj);
+			Evaluable preCondition = (Evaluable) setConstraintObj.getPreCondition();
+			boolean conditionSuccessful = validateSetConstraint(iomObj, preCondition, setConstraintObj);
+			if(conditionSuccessful){
+				validateSetConstraint(iomObj, condition, setConstraintObj);
+			}
+		} else {
+			validateSetConstraint(iomObj, condition, setConstraintObj);
 		}
-		if(preCondition == true && setConstraintObj instanceof SetConstraint){
-			// next condition handling
-			condition = (Evaluable) setConstraintObj.getCondition();
-			conditionValue = evaluateExpression(iomObj, condition);
-			setConstraint(condition, conditionValue, iomObj);
-		}
+	}
+	
+	private boolean validateSetConstraint(IomObject iomObj, Evaluable condition, SetConstraint setConstraintObj){
+		Value conditionValue = evaluateExpression(iomObj, condition);
 		if (!conditionValue.isNotYetImplemented()){
 			if (!conditionValue.skipEvaluation()){
 				if (conditionValue.isTrue()){
+					return true;
 					// ok
 				} else {
 					logMsg(checkConstraint,"Set Constraint {0} is not true.", setConstraintObj.getName());
@@ -311,14 +311,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			String functionName = functionCall.getFunction().getName();
 			logMsg(checkConstraint,"Function {0} is not yet implemented.", functionName);
 			Value.createNotYetImplemented(false);
-		}
-	}
-	
-	private boolean setConstraint(Evaluable condition, Value conditionValue, IomObject iomObj){
-		if (!conditionValue.skipEvaluation()){
-			if (conditionValue.isTrue()){
-				return true;
-			}
 		}
 		return false;
 	}

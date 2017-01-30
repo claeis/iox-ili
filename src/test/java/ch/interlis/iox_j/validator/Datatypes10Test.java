@@ -3414,5 +3414,5 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
-	}	
+	}
 }

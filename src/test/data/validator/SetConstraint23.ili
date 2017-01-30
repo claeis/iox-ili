@@ -28,5 +28,15 @@ MODEL SetConstraint23
 			SET CONSTRAINT INTERLIS.objectCount(Numbers) == 2;
 		END ClassC;
 		
+		STRUCTURE StructD =
+			Surface: SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END StructD;
+		
+		CLASS ClassD =
+			Numbers: BAG {1..*} OF StructD;
+			Art: (a, b, c);
+			SET CONSTRAINT WHERE Art == #a :
+				INTERLIS.areAreas(ALL, >> Numbers, >> StructD->Surface);
+		END ClassD;
 	END Topic;
 END SetConstraint23.

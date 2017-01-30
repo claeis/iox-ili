@@ -69,8 +69,9 @@ MODEL Datatypes10
 			   	areaWithoutOverlaps3d : OPTIONAL AREA WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
 			NO IDENT
 			END FlaechenTable;
+			
 			TABLE OtherTable =
-				!! BezAttribut
+				!! Bezug Attribut
 				main : -> Table;
 			NO IDENT
 			END OtherTable;
