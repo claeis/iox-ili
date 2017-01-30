@@ -256,12 +256,57 @@ MODEL Function23
            MANDATORY CONSTRAINT INTERLIS.myClass(attrZ1[1]) == >StructAp;
         END ClassZ;
         
-        !! (areAreas)
+        !! (areAreas ALL)
         CLASS ClassZA =
 			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 			MANDATORY CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie);
-			!!MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZA, UNDEFINED, >> Geometrie);
 		END ClassZA;
+		
+		!! (areAreas class)
+        CLASS ClassZB =
+			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZB, UNDEFINED, >> Geometrie);
+		END ClassZB;
+		
+		!! (areAreas defined class in Objects --ClassZA--> not valid)
+        CLASS ClassZC =
+			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZA, UNDEFINED, >> Geometrie);
+		END ClassZC;
+		
+		!! (areAreas second mandatory: wrong class 'ClassZA' in Objects = fail)
+        CLASS ClassZD =
+			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZD, UNDEFINED, >> Geometrie);
+			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZA, UNDEFINED, >> Geometrie);
+		END ClassZD;
+		
+		!! (areAreas first mandatory: wrong class 'ClassZB' in Objects = fail)
+        CLASS ClassZE =
+			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZB, UNDEFINED, >> Geometrie);
+			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZE, UNDEFINED, >> Geometrie);
+		END ClassZE;
         
+        !! (areAreas surfaceBAG = Numbers, surfaceAttr = Surface of struct)
+        STRUCTURE StructF =
+			Surface: SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END StructF;
+		
+		CLASS ClassZF =
+			Numbers: BAG {1..*} OF StructF;
+			MANDATORY CONSTRAINT INTERLIS.areAreas(ALL, >> Numbers, >> StructF->Surface);
+		END ClassZF;
+		
+		CLASS ClassZG =
+			Numbers: BAG {1..*} OF StructF;
+			MANDATORY CONSTRAINT INTERLIS.areAreas(ALL, >> Numbers, >> StructF->Surface);
+		END ClassZG;
+		
+		!! (function notYetImplemented)	
+		CLASS ClassZH =
+			MANDATORY CONSTRAINT
+				INTERLIS.convertUnit(5);
+		END ClassZH;
 	END Topic;
 END Function23.

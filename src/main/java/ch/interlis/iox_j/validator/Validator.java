@@ -607,11 +607,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 						return new Value(classValue);
 					}
-					return new Value(classConstant.getValue());
 				}
 			} else if (constantObj instanceof Constant.Undefined){
-				TextType text = new TextType();
-				return new Value(text, constantObj.toString());
+				return Value.createUndefined();
 			} else if (constantObj instanceof Constant.AttributePath){
 				Constant.AttributePath attrPath = (Constant.AttributePath) constantObj;
 				if(attrPath.getValue() instanceof LocalAttribute){
@@ -826,10 +824,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 				return new Value(targetViewable.getViewable());
 			} else if (function.getScopedName(null).equals("INTERLIS.areAreas")){
-				List<Viewable> classes = new ArrayList<Viewable>();
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = functionCall.getArguments();
-				// through all objects to compare
+				// founded objects (list<IomObjects)
 				Value objects=evaluateExpression(iomObj,arguments[0]);
 				if (objects.skipEvaluation()){
 					return objects;
@@ -837,38 +834,66 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if (objects.isUndefined()){
 					return Value.createSkipEvaluation();
 				}
+				// count of objects condition returns attrName of BAG / undefined=(numericIsDefined=false)
 				Value surfaceBag=evaluateExpression(iomObj,arguments[1]);
 				if (surfaceBag.skipEvaluation()){
 					return surfaceBag;
 				}
+				// name of surface (textType)
 				Value surfaceAttr=evaluateExpression(iomObj,arguments[2]);
 				if (surfaceAttr.skipEvaluation()){
 					return surfaceAttr;
 				}
 				if (surfaceAttr.isUndefined()){
 					return Value.createSkipEvaluation();
-				}
+				} // if surfaceBag is undefined
 				if(surfaceBag.isUndefined()){
-					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable();
-					Iterator iterIomObjects = objects.getValues().iterator();
-					while(iterIomObjects.hasNext()){
-						IomObject anObject = (IomObject) iterIomObjects.next();
-						IomObject polygon = anObject.getattrobj(surfaceAttr.getValue(), 0);
-						if(polygon!=null){
-							try {
-								polygonPool.addLines(anObject.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
-							} catch (IoxException e) {
-								
+					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(); // create new pool of polygons
+					if(objects.getViewable()!=null){
+						Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).values().iterator();
+						while(objectIterator.hasNext()){
+							IomObject aIomObj = (IomObject) objectIterator.next();
+							if(aIomObj!=null){
+								Object modelElement=tag2class.get(aIomObj.getobjecttag());
+								Viewable anObjectClass = (Viewable) modelElement;
+								if(objects.getViewable().equals(anObjectClass)){
+									IomObject polygon = aIomObj.getattrobj(surfaceAttr.getValue(), 0); // get polygon of current object
+									if(polygon!=null){ // if value of Argument[2] equals object attribute
+										try { // add polylines to polygonPool.
+											polygonPool.addLines(aIomObj.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
+										} catch (IoxException e) {
+											// else catch no exception --> next attribute
+										}
+									}
+								}
+							}
+						}
+					} else {
+						Iterator iterIomObjects = objects.getValues().iterator(); // iterate through all objects of Argument[0] 
+						while(iterIomObjects.hasNext()){
+							IomObject anObject = (IomObject) iterIomObjects.next();
+							IomObject polygon = anObject.getattrobj(surfaceAttr.getValue(), 0); // get polygon of current object
+							if(polygon!=null){ // if value of Argument[2] equals object attribute
+								try { // add polylines to polygonPool.
+									polygonPool.addLines(anObject.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
+								} catch (IoxException e) {
+									// else catch no exception --> next attribute
+								}
 							}
 						}
 					}
 					try {
-						polygonPool.getLines();
+						if(polygonPool.getLines().size()==0){
+							return new Value(false);
+						} else {
+							polygonPool.getLines(); // get all lines in polygonPool
+						}
 					} catch (IoxException e) {
-						return new Value(false);
+						return new Value(false); // if lines are empty, return false
 					}
-					return new Value(true);
+					return new Value(true); // if there where some lines, return true
 				} else {
+					// if surfaceBag is defined
 					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable();
 					Iterator iterIomObjects = objects.getValues().iterator();
 					while(iterIomObjects.hasNext()){
@@ -883,6 +908,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								} catch (IoxException e) {
 									
 								}
+							} else {
+								// there is no area to compare. --> area not false and not true.
 							}
 						}
 					}

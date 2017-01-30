@@ -26,7 +26,6 @@ public class Value {
 	private int numeric=0;
 	private boolean numericIsDefined=false;
 	private Viewable viewable=null;
-	
 	private Type type=null;
 	
 	public Value(boolean booleanValue) {
