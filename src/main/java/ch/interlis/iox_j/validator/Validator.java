@@ -727,19 +727,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if (value.isUndefined()){
 						return Value.createSkipEvaluation();
 					}
-					Object aModelElement=tag2class.get(iomObj.getobjecttag());
-					Viewable classOfConstraint = (Viewable) aModelElement;
 					// through all objects
 					Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).values().iterator();
 					int counter = 0;
-					if(value.getRole()!=null){
+					if(value.getViewable()!=null){
 						while(objectIterator.hasNext()){
 							IomObject aIomObj = (IomObject) objectIterator.next();
 							if(aIomObj!=null){
 								Object modelElement=tag2class.get(aIomObj.getobjecttag());
 								Viewable anObjectClass = (Viewable) modelElement;
-								if(classOfConstraint.equals(anObjectClass)){
-									int nrOfTargetObjs=linkPool.getTargetObjectCount(aIomObj,value.getRole(),doItfOidPerTable);
+								if(value.getViewable().equals(anObjectClass)){
 									counter+=1;
 								}
 							}
@@ -800,7 +797,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(subViewable.getViewable().equals(superViewable.getViewable())){
 					return new Value(true);
 				}
-				if(superViewable.getViewable().isExtending(subViewable.getViewable())){ //TODO do not getExtending class in constant.
+				if(superViewable.getViewable().isExtending(subViewable.getViewable())){
 					return new Value(true);					
 				}
 				return new Value(false);
@@ -887,21 +884,46 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				} else {
 					// if surfaceBag is defined
 					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable();
-					Iterator iterIomObjects = objects.getValues().iterator();
-					while(iterIomObjects.hasNext()){
-						IomObject anObject = (IomObject) iterIomObjects.next();
-						int countOfSurfaceBagValues = anObject.getattrvaluecount(surfaceBag.getValue());
-						for(int i=0; i<countOfSurfaceBagValues; i++){
-							IomObject surfaceBagObj = anObject.getattrobj(surfaceBag.getValue(), i);
-							IomObject polygon = surfaceBagObj.getattrobj(surfaceAttr.getValue(), 0);
-							if(polygon!=null){
-								try {
-									polygonPool.addLines(anObject.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
-								} catch (IoxException e) {
-									
+					if(objects.getViewable()!=null){
+						Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).values().iterator();
+						while(objectIterator.hasNext()){
+							IomObject aIomObj = (IomObject) objectIterator.next();
+							if(aIomObj!=null){
+								Object modelElement=tag2class.get(aIomObj.getobjecttag());
+								Viewable anObjectClass = (Viewable) modelElement;
+								if(objects.getViewable().equals(anObjectClass)){
+									int countOfSurfaceBagValues = aIomObj.getattrvaluecount(surfaceBag.getValue());
+									for(int i=0; i<countOfSurfaceBagValues; i++){
+										IomObject surfaceBagObj = aIomObj.getattrobj(surfaceBag.getValue(), i);
+										IomObject polygon = surfaceBagObj.getattrobj(surfaceAttr.getValue(), 0);
+										if(polygon!=null){ // if value of Argument[2] equals object attribute
+											try { // add polylines to polygonPool.
+												polygonPool.addLines(aIomObj.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
+											} catch (IoxException e) {
+												// else catch no exception --> next attribute
+											}
+										}
+									}
 								}
-							} else {
-								// there is no area to compare. --> area not false and not true.
+							}
+						}
+					} else {
+						Iterator iterIomObjects = objects.getValues().iterator();
+						while(iterIomObjects.hasNext()){
+							IomObject anObject = (IomObject) iterIomObjects.next();
+							int countOfSurfaceBagValues = anObject.getattrvaluecount(surfaceBag.getValue());
+							for(int i=0; i<countOfSurfaceBagValues; i++){
+								IomObject surfaceBagObj = anObject.getattrobj(surfaceBag.getValue(), i);
+								IomObject polygon = surfaceBagObj.getattrobj(surfaceAttr.getValue(), 0);
+								if(polygon!=null){
+									try {
+										polygonPool.addLines(anObject.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
+									} catch (IoxException e) {
+										
+									}
+								} else {
+									// there is no area to compare. --> area not false and not true.
+								}
 							}
 						}
 					}
@@ -924,17 +946,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			PathEl pathEl = (PathEl) objectPathObj.getLastPathEl();
 			if(pathEl instanceof PathElAbstractClassRole){
 				PathElAbstractClassRole abstractClassRole = (PathElAbstractClassRole) pathEl;
-				if(abstractClassRole.getRole() instanceof RoleDef){
-					RoleDef role = (RoleDef) abstractClassRole.getRole();
-					return new Value(role);
-				} else if (abstractClassRole.getViewable() instanceof Viewable){
+				if (abstractClassRole.getRole()!=null){
 					RoleDef role = (RoleDef) abstractClassRole.getRole();
 					AbstractClassDef destinationClass = role.getDestination();
 					while(destinationClass.getExtending()!=null){
 						destinationClass.getExtending();
 					}
-					Viewable destClass = (Viewable) destinationClass;
-					return new Value(destClass);
+					Viewable pathElementOfClassRole = (Viewable) destinationClass;
+					return new Value(pathElementOfClassRole);
 				}
 			} else if(pathEl instanceof StructAttributeRef){
 				StructAttributeRef structAttributeRefValue = (StructAttributeRef) pathEl;
@@ -943,8 +962,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(localAttributeValue.getDomain() instanceof CompositionType){
 						CompositionType compositionValue = (CompositionType) localAttributeValue.getDomain();
 						if(compositionValue.getComponentType() instanceof Viewable){
-							Viewable tableValue = (Viewable) compositionValue.getComponentType();
-							return new Value(tableValue);
+							Viewable referredStructOfAttr = (Viewable) compositionValue.getComponentType();
+							return new Value(referredStructOfAttr);
 						}
 					}
 				}
