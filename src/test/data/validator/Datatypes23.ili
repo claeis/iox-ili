@@ -90,33 +90,7 @@ MODEL Datatypes23
 		   straightsarcs2d : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Lkoord;
 		   straightsarcs3d : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
 		   arcsstraights2d : POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Lkoord;
-		   !! Linientyp (without overlaps is optional for polyline)
-		   straights2dWithoutOverlaps : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-		   !!straights3dWithoutOverlaps : POLYLINE WITH (STRAIGHTS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
-		   !!arcs2dWithoutOverlaps : POLYLINE WITH (ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-		   !!arcs3dWithoutOverlaps : POLYLINE WITH (ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
-		   !!straightsarcs2dWithoutOverlaps : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-		   !!straightsarcs3dWithoutOverlaps : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
-		   !!arcsstraights2dWithoutOverlaps : POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 		END ClassB;
-		CLASS ClassBDirected =
-		   !! Linientyp directed polyline
-		   !!straights2d : DIRECTED POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
-		   !!straights3d : DIRECTED POLYLINE WITH (STRAIGHTS) VERTEX Hkoord;
-		   !!arcs2d : DIRECTED POLYLINE WITH (ARCS) VERTEX Lkoord;
-		   !!arcs3d : DIRECTED POLYLINE WITH (ARCS) VERTEX Hkoord;
-		   !!straightsarcs2d : DIRECTED POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Lkoord;
-		   !!straightsarcs3d : DIRECTED POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
-		   !!arcsstraights2d : DIRECTED POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Lkoord;
-		   !! Linientyp directed polyline (without overlaps is optional for directed polyline)
-		   !!straights2dWithoutOverlaps : DIRECTED POLYLINE WITH (STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-		   !!straights3dWithoutOverlaps : DIRECTED POLYLINE WITH (STRAIGHTS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
-		   !!arcs2dWithoutOverlaps : DIRECTED POLYLINE WITH (ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-		   !!arcs3dWithoutOverlaps : DIRECTED POLYLINE WITH (ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
-		   !!straightsarcs2dWithoutOverlaps : DIRECTED POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-		   !!straightsarcs3dWithoutOverlaps : DIRECTED POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
-		   !!arcsstraights2dWithoutOverlaps : DIRECTED POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-		END ClassBDirected;
 		CLASS ClassC =
 		   !! Surfacetype (without overlaps is obligatory for individual surfaces)
 		   surface2d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;

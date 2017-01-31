@@ -1,0 +1,32 @@
+TRANSFER Ili1FmtTest;
+MODEL SurfaceOverlabTest10
+		DOMAIN Lkoord = COORD2 480000.000 70000.000 850000.000 310000.000;
+			   Hkoord = COORD3 480000.000 70000.000 0.000 850000.000 310000.000 5000.000;
+		TOPIC Topic=
+			TABLE LineTable =
+				!!Linientyp Gerade without overlaps
+				lineWithoutOverlaps2d : OPTIONAL POLYLINE WITH (STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
+				lineWithoutOverlaps3d : OPTIONAL POLYLINE WITH (STRAIGHTS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
+				!!Linientyp Kreisbogen without overlaps
+				lineWithoutOverlaps2dArc : OPTIONAL POLYLINE WITH (ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
+				lineWithoutOverlaps3dArc : OPTIONAL POLYLINE WITH (ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
+				!!Linientyp Gerade und Kreisbogen without overlaps
+				lineWithoutOverlaps2dArcStraights : OPTIONAL POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
+				lineWithoutOverlaps3dArcStraights : OPTIONAL POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
+			NO IDENT
+			END LineTable;	
+			TABLE FlaechenTable =	
+			   	!! Flaechentyp surface without overlaps
+				surfaceWithoutOverlaps2d : OPTIONAL SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
+			   	surfaceWithoutOverlaps3d : OPTIONAL SURFACE WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
+			   	!! Flaechentyp area without overlaps
+				areaWithoutOverlaps2d : OPTIONAL AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
+			   	areaWithoutOverlaps3d : OPTIONAL AREA WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
+			NO IDENT
+			END FlaechenTable;
+		END Topic.
+END SurfaceOverlabTest10.
+FORMAT FREE;
+CODE BLANK = DEFAULT, UNDEFINED = DEFAULT, CONTINUE = DEFAULT;
+TID = ANY;
+END.

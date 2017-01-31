@@ -71,6 +71,8 @@ public class Function23Test {
 	private final static String ILI_CLASSZG=ILI_TOPIC+".ClassZG";
 	private final static String ILI_CLASSZH=ILI_TOPIC+".ClassZH";
 	private final static String ILI_CLASSZI=ILI_TOPIC+".ClassZI";
+	private final static String ILI_CLASSXA=ILI_TOPIC+".ClassXA";
+	private final static String ILI_CLASSXB=ILI_TOPIC+".ClassXB";
 	// STRUCTURE
 	private final static String ILI_STRUCTA=ILI_TOPIC+".StructA";
 	private final static String ILI_STRUCTB=ILI_TOPIC+".StructB";

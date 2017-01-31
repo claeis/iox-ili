@@ -40,33 +40,19 @@ MODEL Datatypes10
 				!!Linientyp Gerade
 				straights2d : OPTIONAL POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
 				straights3d : OPTIONAL POLYLINE WITH (STRAIGHTS) VERTEX Hkoord;
-				!!Linientyp Gerade without overlaps
-				lineWithoutOverlaps2d : OPTIONAL POLYLINE WITH (STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
-				lineWithoutOverlaps3d : OPTIONAL POLYLINE WITH (STRAIGHTS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
 				!!Linientyp Kreisbogen
 				arcs2d : OPTIONAL POLYLINE WITH (ARCS) VERTEX Lkoord;
 				arcs3d : OPTIONAL POLYLINE WITH (ARCS) VERTEX Hkoord;
-				!!Linientyp Kreisbogen without overlaps
-				lineWithoutOverlaps2d : OPTIONAL POLYLINE WITH (ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
-				lineWithoutOverlaps3d : OPTIONAL POLYLINE WITH (ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
 				!!Linientyp Gerade und Kreisbogen
 				straightsarcs2d : OPTIONAL POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Lkoord;
 				straightsarcs3d : OPTIONAL POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Hkoord;
-				!!Linientyp Gerade und Kreisbogen without overlaps
-				lineWithoutOverlaps2d : OPTIONAL POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
-				lineWithoutOverlaps3d : OPTIONAL POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
 			NO IDENT
-			END LineTable;	
+			END LineTable;
+				
 			TABLE FlaechenTable =	
 				!! Flaechentyp surface
 				surface2d : OPTIONAL SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord;
 			   	surface3d : OPTIONAL SURFACE WITH (STRAIGHTS,ARCS) VERTEX Hkoord;
-			   	!! Flaechentyp surface without overlaps
-				surfaceWithoutOverlaps2d : OPTIONAL SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
-			   	surfaceWithoutOverlaps3d : OPTIONAL SURFACE WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
-			   	!! Flaechentyp area without overlaps
-				areaWithoutOverlaps2d : OPTIONAL AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
-			   	areaWithoutOverlaps3d : OPTIONAL AREA WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
 			NO IDENT
 			END FlaechenTable;
 			
