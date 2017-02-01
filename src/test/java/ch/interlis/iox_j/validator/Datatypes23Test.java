@@ -3223,7 +3223,7 @@ public class Datatypes23Test {
 	}
 	
 	@Test
-	public void polylineTypeUnexpectedCOORDFail(){
+	public void polylineTypeUnexpectedCOORD_Fail(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes23.Topic.ClassB", "o1");
 		IomObject polylineValue=objStraightsSuccess.addattrobj("arcs2d", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");

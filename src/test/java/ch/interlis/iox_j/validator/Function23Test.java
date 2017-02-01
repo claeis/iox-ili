@@ -1997,6 +1997,6 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Function convertUnit is not yet implemented.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Function is not yet implemented.", logger.getErrs().get(0).getEventMsg());
 	}
 }

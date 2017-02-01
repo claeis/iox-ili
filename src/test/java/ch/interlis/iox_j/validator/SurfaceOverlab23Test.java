@@ -21,7 +21,18 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class SurfaceOverlab23Test {
 
-private TransferDescription td=null;
+	private TransferDescription td=null;
+	// OID
+	private final static String OBJ_OID1 ="o1";
+	// MODEL.TOPIC
+	private final static String ILI_TOPIC="SurfaceOverlapTest23.Topic";
+	// CLASS
+	private final static String ILI_CLASSBDIRECTED=ILI_TOPIC+".ClassBDirected";
+	private final static String ILI_CLASSB=ILI_TOPIC+".ClassB";
+	private final static String ILI_CLASSC=ILI_TOPIC+".ClassC";
+	private final static String ILI_CLASSD=ILI_TOPIC+".ClassD";
+	// START BASKET EVENT
+	private final static String BASKET_ID1="b1";
 	
 	@Before
 	public void setUp() throws Exception {
@@ -38,7 +49,7 @@ private TransferDescription td=null;
 	
 	@Test
 	public void lines2D_polylineTypeStraights_Ok(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassB", "o1");
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2dWithoutOverlaps", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
 		IomObject coord=null;
@@ -60,7 +71,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -70,7 +81,7 @@ private TransferDescription td=null;
 	
 //	@Test
 //	public void lines3D_polylineTypeStraights_Ok(){
-//		Iom_jObject objStraightsSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassB", "o1");
+//		Iom_jObject objStraightsSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassB", OBJ_OID1);
 //		IomObject polylineValue=objStraightsSuccess.addattrobj("straights3dWithoutOverlaps", "POLYLINE");
 //		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
 //		IomObject coord=null;
@@ -96,7 +107,7 @@ private TransferDescription td=null;
 //		Settings settings=new Settings();
 //		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 //		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+//		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 //		validator.validate(new ObjectEvent(objStraightsSuccess));
 //		validator.validate(new EndBasketEvent());
 //		validator.validate(new EndTransferEvent());
@@ -107,7 +118,7 @@ private TransferDescription td=null;
 	// 1 point of innerboundary touch the outerboundary. Expected ok.
 	@Test
 	public void surface2D_Oberlabed1PointTogether_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassC", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -174,7 +185,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -185,7 +196,7 @@ private TransferDescription td=null;
 	// there are 2 innerboundaries which dont touch each other. Expected: ok.
 	@Test
 	public void surface2D_noOverlabOfInnerboundaries_Expexted_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassC", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -281,7 +292,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -292,7 +303,7 @@ private TransferDescription td=null;
 	// there are 2 innerboundaries which touch each other on 1 point. Expected: ok.
 	@Test
 	public void surface2D_touchOfInnerboundariesOn1Point_Expexted_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassC", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -388,7 +399,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -396,22 +407,10 @@ private TransferDescription td=null;
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	// 1 point of innerboundary touch the outerboundary. Expected ok.
 	@Test
 	public void surface3D_Oberlabed1PointTogether_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassC", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -490,7 +489,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -501,7 +500,7 @@ private TransferDescription td=null;
 	// there are 2 innerboundaries which dont touch each other. Expected: ok.
 	@Test
 	public void surface3D_noOverlabOfInnerboundaries_Expexted_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassC", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -615,7 +614,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -626,7 +625,7 @@ private TransferDescription td=null;
 	// there are 2 innerboundaries which touch each other on 1 point. Expected: ok.
 	@Test
 	public void surface3D_touchOfInnerboundariesOn1Point_Expexted_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassC", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -740,7 +739,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -751,7 +750,7 @@ private TransferDescription td=null;
 	// 1 point of innerboundary touch the outerboundary. Expected ok.
 	@Test
 	public void area2D_Oberlabed1PointTogether_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassD", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -818,7 +817,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -829,7 +828,7 @@ private TransferDescription td=null;
 	// there are 2 innerboundaries which dont touch each other. Expected: ok.
 	@Test
 	public void area2D_noOverlabOfInnerboundaries_Expexted_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassD", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -925,7 +924,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -936,7 +935,7 @@ private TransferDescription td=null;
 	// there are 2 innerboundaries which touch each other on 1 point. Expected: ok.
 	@Test
 	public void area2D_touchOfInnerboundariesOn1Point_Expexted_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassD", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1032,7 +1031,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1043,7 +1042,7 @@ private TransferDescription td=null;
 	// 1 point of innerboundary touch the outerboundary. Expected ok.
 	@Test
 	public void area3D_Oberlabed1PointTogether_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassD", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1122,7 +1121,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1133,7 +1132,7 @@ private TransferDescription td=null;
 	// there are 2 innerboundaries which dont touch each other. Expected: ok.
 	@Test
 	public void area3D_noOverlabOfInnerboundaries_Expexted_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassD", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1247,7 +1246,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1258,7 +1257,7 @@ private TransferDescription td=null;
 	// there are 2 innerboundaries which touch each other on 1 point. Expected: ok.
 	@Test
 	public void area3D_touchOfInnerboundariesOn1Point_Expexted_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassD", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1372,7 +1371,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1386,7 +1385,7 @@ private TransferDescription td=null;
 	
 	@Test
 	public void lines2D_polylineTypeStraights2WithIntersection_Fail(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassB", "o1");
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2dWithoutOverlaps", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
 		IomObject coord=null;
@@ -1408,7 +1407,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1445,7 +1444,7 @@ private TransferDescription td=null;
 //		Settings settings=new Settings();
 //		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 //		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+//		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 //		validator.validate(new ObjectEvent(objStraightsSuccess));
 //		validator.validate(new EndBasketEvent());
 //		validator.validate(new EndTransferEvent());
@@ -1457,7 +1456,7 @@ private TransferDescription td=null;
 	// 4 edges are cut. Expected: Errs(failed to validate polygon).
 	@Test
 	public void surface2D_ExpectedFailToValidatePolygon_BecauseOverlabOf2Lines_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassC", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1524,7 +1523,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1536,7 +1535,7 @@ private TransferDescription td=null;
 	// intersection of the 2 innerboundaries. Expected: failed to validate polygon - invalid ring lines.
 	@Test
 	public void surface2D_oberlabOfInnerboundariesFail_ExpextedInvalidRingLines_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassC", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1632,7 +1631,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1645,7 +1644,7 @@ private TransferDescription td=null;
 	// intersection of 2 innerboundary and outboundary. Expected: Errs(failed to validate polygon - intersections)
 	@Test
 	public void surface2D_ExpectedIntersectionErrs_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassC", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1712,7 +1711,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1725,7 +1724,7 @@ private TransferDescription td=null;
 	// 4 edges are cut. Expected: Errs(failed to validate polygon).
 	@Test
 	public void surface3D_ExpectedFailToValidatePolygon_BecauseOverlabOf2Lines_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassC", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1804,7 +1803,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1816,7 +1815,7 @@ private TransferDescription td=null;
 	// intersection of the 2 innerboundaries. Expected: failed to validate polygon - invalid ring lines.
 	@Test
 	public void surface3D_oberlabOfInnerboundariesFail_ExpextedInvalidRingLines_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassC", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1930,7 +1929,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1943,7 +1942,7 @@ private TransferDescription td=null;
 	// intersection of 2 innerboundary and outboundary. Expected: Errs(failed to validate polygon - intersections)
 	@Test
 	public void surface3D_ExpectedIntersectionErrs_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassC", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -2022,7 +2021,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2035,7 +2034,7 @@ private TransferDescription td=null;
 	// 4 edges are cut. Expected: Errs(failed to validate polygon).
 	@Test
 	public void area2D_ExpectedFailToValidatePolygon_BecauseOverlabOf2Lines_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassD", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -2102,7 +2101,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2114,7 +2113,7 @@ private TransferDescription td=null;
 	// intersection of the 2 innerboundaries. Expected: failed to validate polygon - invalid ring lines.
 	@Test
 	public void area2D_oberlabOfInnerboundariesFail_ExpextedInvalidRingLines_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassD", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -2210,7 +2209,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2223,7 +2222,7 @@ private TransferDescription td=null;
 	// 4 edges are cut. Expected: Errs(failed to validate polygon).
 	@Test
 	public void area3D_ExpectedFailToValidatePolygon_BecauseOverlabOf2Lines_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassD", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -2302,7 +2301,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2314,7 +2313,7 @@ private TransferDescription td=null;
 	// intersection of the 2 innerboundaries. Expected: failed to validate polygon - invalid ring lines.
 	@Test
 	public void area3D_oberlabOfInnerboundariesFail_ExpextedInvalidRingLines_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassD", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -2428,7 +2427,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2441,7 +2440,7 @@ private TransferDescription td=null;
 	// intersection of 2 innerboundary and outboundary.
 	@Test
 	public void area3D_IntersectionOfBoundaries_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassD", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -2520,7 +2519,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2532,7 +2531,7 @@ private TransferDescription td=null;
 	// intersection of 2 innerboundary and outboundary.
 	@Test
 	public void area2D_IntersectionOfBoundaries_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("SurfaceOverlapTest23.Topic.ClassD", "o1");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -2599,7 +2598,7 @@ private TransferDescription td=null;
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("SurfaceOverlapTest23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
