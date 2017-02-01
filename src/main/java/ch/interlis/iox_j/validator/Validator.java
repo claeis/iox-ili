@@ -121,6 +121,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
 	private String checkConstraint=null;
 	private String validateType=null;
+	private HashMap<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	
 	@Deprecated
 	protected Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -307,10 +308,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 		} else {
-			FunctionCall functionCall = (FunctionCall) setConstraintObj.getCondition();
-			String functionName = functionCall.getFunction().getName();
-			logMsg(checkConstraint,"Function {0} is not yet implemented.", functionName);
-			Value.createNotYetImplemented(false);
+			logMsg(checkConstraint,"Function is not yet implemented.");
+			Value.createNotYetImplemented();
 		}
 		return false;
 	}
@@ -327,10 +326,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 		} else {
-			FunctionCall functionCall = (FunctionCall) mandatoryConstraintObj.getCondition();
-			String functionName = functionCall.getFunction().getName();
-			logMsg(checkConstraint,"Function {0} is not yet implemented.", functionName);
-			Value.createNotYetImplemented(false);
+			logMsg(checkConstraint,"Function is not yet implemented.");
+			Value.createNotYetImplemented();
 		}
 	}
 	
@@ -348,6 +345,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if (leftValue.isUndefined()){
 				return Value.createSkipEvaluation();
 			}
+			
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			// if isError, return error.
 			if (rightValue.skipEvaluation()){
@@ -851,7 +849,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 										try { // add polylines to polygonPool.
 											polygonPool.addLines(aIomObj.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
 										} catch (IoxException e) {
-											// else catch no exception --> next attribute
+											e.getStackTrace();
 										}
 									}
 								}
@@ -866,7 +864,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								try { // add polylines to polygonPool.
 									polygonPool.addLines(anObject.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
 								} catch (IoxException e) {
-									// else catch no exception --> next attribute
+									e.getStackTrace();
 								}
 							}
 						}
@@ -899,8 +897,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 										if(polygon!=null){ // if value of Argument[2] equals object attribute
 											try { // add polylines to polygonPool.
 												polygonPool.addLines(aIomObj.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
+											} catch (IllegalStateException e) {
+												throw new IllegalStateException(e);
 											} catch (IoxException e) {
-												// else catch no exception --> next attribute
+												e.getStackTrace();
 											}
 										}
 									}
@@ -919,7 +919,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									try {
 										polygonPool.addLines(anObject.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
 									} catch (IoxException e) {
-										
+										e.getStackTrace();
 									}
 								} else {
 									// there is no area to compare. --> area not false and not true.
@@ -935,7 +935,47 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					return new Value(true);
 				}
 			} else {
-				Value.createNotYetImplemented(true);
+				String functionQname=function.getScopedName(null);
+				Class functionTargetClass=customFunctions.get(functionQname);
+				if(functionTargetClass==null){
+					String javaClassname=validationConfig.getConfigValue(functionQname, ValidationConfig.IMPL_JAVA);
+					if(javaClassname==null){
+	 					customFunctions.put(functionQname, null);
+						return Value.createNotYetImplemented();
+					}else{
+						try {
+							functionTargetClass=Class.forName(javaClassname);
+						} catch (ClassNotFoundException e) {
+		 					customFunctions.put(functionQname, null);
+							return Value.createNotYetImplemented();
+						}
+	 					customFunctions.put(functionQname, functionTargetClass);
+					}
+				}
+				// get values for all actual arguments
+				FunctionCall functionCall = (FunctionCall) expression;
+				Evaluable[] arguments = functionCall.getArguments();
+				int argumentCount = functionCall.getArguments().length;
+				Value[] actualArguments=new Value[argumentCount];
+				for(int i=0; i<argumentCount;i++){
+					Value anObject=evaluateExpression(iomObj,arguments[i]);
+					if (anObject.skipEvaluation()){
+						return anObject;
+					}
+					actualArguments[i]=anObject;
+				}
+				// init function
+				InterlisFunction functionTarget=null;
+				try {
+					functionTarget = (InterlisFunction) functionTargetClass.newInstance();
+				} catch (InstantiationException e) {
+					throw new IllegalStateException(e);
+				} catch (IllegalAccessException e) {
+					throw new IllegalStateException(e);
+				}
+				functionTarget.init(td, (FunctionCall)expression,config,validationConfig);
+				functionTarget.addObject(iomObj, actualArguments);
+				return functionTarget.evaluate();
 			}
 			//TODO INTERLIS.convertUnit
 			//TODO instance of InspectionFactor

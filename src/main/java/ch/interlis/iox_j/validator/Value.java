@@ -14,7 +14,7 @@ import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.iom.IomObject;
 
 public class Value {
-	private static boolean notYetImplemented=false;
+	private boolean notYetImplemented=false;
 	private boolean error=false;
 	private boolean booleanIsDefined=false;
 	private boolean booleanValue;
@@ -27,6 +27,7 @@ public class Value {
 	private boolean numericIsDefined=false;
 	private Viewable viewable=null;
 	private Type type=null;
+	private String functionName=null;
 	
 	public Value(boolean booleanValue) {
 		this.booleanValue = booleanValue;
@@ -59,8 +60,7 @@ public class Value {
 		this.role = role;
 	}
 	
-	Value(){
-		error=true;
+	private Value(){
 	}
 	
 	public Value(Type type, String valueStr, String refTypeName) {
@@ -147,19 +147,27 @@ public class Value {
 	}
 	
 	public static Value createSkipEvaluation(){
-		return new Value();
+		Value ret=new Value();
+		ret.error = true;
+		return ret;
 	}
 	
-	public static boolean isNotYetImplemented(){
+	public boolean isNotYetImplemented(){
 		return notYetImplemented;
 	}
 	
-	public static void createNotYetImplemented(boolean notYetImpl) {
-		notYetImplemented = notYetImpl;
+	public static Value createNotYetImplemented() {
+		Value ret=new Value();
+		ret.notYetImplemented = true;
+		return ret;
 	}
 	
 	public boolean skipEvaluation(){
-		return error;
+		if(notYetImplemented==true){
+			return notYetImplemented;
+		} else {
+			return error;
+		}
 	}
 	
 	// compare in appropriate type.
