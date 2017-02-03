@@ -27,7 +27,7 @@ MODEL MandatoryConstraints23
 		!! constant negation (NOT)
 		CLASS ClassConstantB =
 			MANDATORY CONSTRAINT
-			NOT(#false);
+			NOT(# false);
 		END ClassConstantB;
 		
 		!! constant defined
@@ -364,6 +364,17 @@ MODEL MandatoryConstraints23
 			MANDATORY CONSTRAINT
 			attr1 == attr2;
 		END ClassFormattedTypeA;
+		
+		CLASS ClassDiffExpressions =
+			Geometrie_Punkt : BOOLEAN;
+			Geometrie_Linie : BOOLEAN;
+			Geometrie_Polygon : BOOLEAN;
+			MANDATORY CONSTRAINT
+			!! 1.Fall Ok, 2.Fall Ok, 3.Fall Ok.
+			(DEFINED(Geometrie_Punkt) AND NOT (DEFINED(Geometrie_Linie)) AND NOT (DEFINED(Geometrie_Polygon))) OR
+            (DEFINED(Geometrie_Linie) AND NOT (DEFINED(Geometrie_Punkt)) AND NOT (DEFINED(Geometrie_Polygon))) OR
+            (DEFINED(Geometrie_Polygon) AND NOT (DEFINED(Geometrie_Punkt)) AND NOT (DEFINED(Geometrie_Linie)));
+		END ClassDiffExpressions;
 		
 	END Topic;
 END MandatoryConstraints23.

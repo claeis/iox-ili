@@ -19,7 +19,7 @@ public class LogCollector implements ch.interlis.iox.IoxLogging {
 		EhiLogger.getInstance().logEvent((LogEvent) event);
 		if(event.getEventKind()==IoxLogEvent.ERROR){
 			errs.add(event);
-		}else{
+		}else if(event.getEventKind()==IoxLogEvent.WARNING){
 			warn.add(event);
 		}
 	}

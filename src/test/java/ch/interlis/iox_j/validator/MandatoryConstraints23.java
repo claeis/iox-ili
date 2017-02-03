@@ -1354,6 +1354,26 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	@Test
+	public void mandatoryConstraintSomeDifferentExpressions_Ok(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_TOPIC+".ClassDiffExpressions", OBJ_OID1);
+		//objStraightsSuccess.setattrvalue("Geometrie_Punkt", "true");
+		objStraightsSuccess.setattrvalue("Geometrie_Polygon", "true");
+		//objStraightsSuccess.setattrvalue("Geometrie_Linie", "true");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
 	//#########################################################//
 	//########### FAIL MANDATORY CONSTRAINTS ##################//
 	//#########################################################//
