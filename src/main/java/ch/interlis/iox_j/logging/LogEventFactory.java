@@ -47,21 +47,29 @@ public class LogEventFactory {
 		if(dataObj!=null){
 			return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessage(msg,dataObj,args),null,dataObj.getobjectline(),dataObj.getobjecttag(),getObjectTechId(dataObj),getObjectUsrId(dataObj),dataObj.getobjectoid(),null,coordX,coordY,coordZ,getCallerOrigin());
 		}
-		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessage(msg,null),null,null,null,null,null,null,null,coordX,coordY,coordZ,getCallerOrigin());
+		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessage(msg,null,args),null,null,null,null,null,null,null,coordX,coordY,coordZ,getCallerOrigin());
 	}
 	public IoxLogEvent logErrorMsg(Throwable ex,String msg,String... args){
 		String eventId="codeInternal";
 		if(dataObj!=null){
 			return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessage(msg,dataObj,args),ex,dataObj.getobjectline(),dataObj.getobjecttag(),getObjectTechId(dataObj),getObjectUsrId(dataObj),dataObj.getobjectoid(),null,coordX,coordY,coordZ,getCallerOrigin());
 		}
-		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessage(msg,null),ex,null,null,null,null,null,null,coordX,coordY,coordZ,getCallerOrigin());
+		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessage(msg,null,args),ex,null,null,null,null,null,null,coordX,coordY,coordZ,getCallerOrigin());
 	}
 	public IoxLogEvent logWarningMsg(String msg,String... args){
 		String eventId="codeInternal";
 		if(dataObj!=null){
 			return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.WARNING,formatMessage(msg,dataObj,args),null,dataObj.getobjectline(),dataObj.getobjecttag(),getObjectTechId(dataObj),getObjectUsrId(dataObj),dataObj.getobjectoid(),null,coordX,coordY,coordZ,getCallerOrigin());
 		}
-		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.WARNING,formatMessage(msg,null),null,null,null,null,null,null,null,coordX,coordY,coordZ,getCallerOrigin());
+		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.WARNING,formatMessage(msg,null,args),null,null,null,null,null,null,null,coordX,coordY,coordZ,getCallerOrigin());
+	}
+	public IoxLogEvent logInfoMsg(String msg,String... args){
+		String eventId="codeInternal";
+		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.INFO,formatMessage(msg,null,args),null,null,null,null,null,null,null,null,null,null,getCallerOrigin());
+	}
+	public IoxLogEvent logDetailInfoMsg(String msg,String... args){
+		String eventId="codeInternal";
+		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.DETAIL_INFO,formatMessage(msg,null,args),null,null,null,null,null,null,null,null,null,null,getCallerOrigin());
 	}
 	public IoxLogEvent logErrorById(String eventId,String... args){
 		if(dataObj!=null){
@@ -134,7 +142,9 @@ public class LogEventFactory {
 					// resolve param
 					try{
 						int argi=Integer.parseInt(param.toString());
-						msg.append(args[argi]);
+						if(args!=null && argi<args.length){
+							msg.append(args[argi]);
+						}
 					}catch(NumberFormatException e){
 						String value=iomObj.getattrvalue(param.toString());
 						if(value!=null){

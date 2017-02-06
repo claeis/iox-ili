@@ -1,23 +1,46 @@
 package ch.interlis.iox_j.validator;
 
+import java.util.Collection;
+import java.util.List;
+
+import ch.interlis.ili2c.metamodel.Constant.Numeric;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.NumericType;
+import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.TextType;
 import ch.interlis.ili2c.metamodel.Type;
+import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.iom.IomObject;
 
 public class Value {
+	private boolean notYetImplemented=false;
 	private boolean error=false;
+	private boolean booleanIsDefined=false;
 	private boolean booleanValue;
-	private String value=null;
 	private IomObject complexValue=null;
+	private String refTypeName;
+	private String value=null;
+	private List<IomObject> values;
+	private RoleDef role=null;
+	private int numeric=0;
+	private boolean numericIsDefined=false;
+	private Viewable viewable=null;
 	private Type type=null;
-	private boolean booleanIsDefined = false;
+	private String functionName=null;
 	
 	public Value(boolean booleanValue) {
 		this.booleanValue = booleanValue;
 		booleanIsDefined = true;
+	}
+	
+	public Value(int numeric){
+		this.numeric = numeric;
+		numericIsDefined = true;
+	}
+	
+	public Value(Viewable viewable){
+		this.viewable = viewable;
 	}
 	
 	public Value(Type type,String valueStr){
@@ -25,54 +48,132 @@ public class Value {
 		this.type=type;
 	}
 	
+	public Value(List<IomObject> values){
+		this.values = values;
+	}
+	
 	public Value(IomObject value){
 		this.complexValue = value;
 	}
 	
-	private Value() {
-		error=true;
+	public Value(RoleDef role){
+		this.role = role;
 	}
 	
+	private Value(){
+	}
+	
+	public Value(Type type, String valueStr, String refTypeName) {
+		this.value = valueStr;
+		this.type=type;
+		this.refTypeName = refTypeName;
+	}
+
 	public boolean isTrue(){
-		if(isError()){
+		if(skipEvaluation()){
 			throw new IllegalArgumentException();
 		}
 		return booleanValue;
 	}
 	
+	public String getRefTypeName(){
+		if(skipEvaluation()){
+			throw new IllegalArgumentException();
+		}
+		return refTypeName;
+	}
+	
+	public Viewable getViewable(){
+		if(skipEvaluation()){
+			throw new IllegalArgumentException();
+		}
+		return viewable;
+	}
+	
+	public Type getType(){
+		if(skipEvaluation()){
+			throw new IllegalArgumentException();
+		}
+		return type;
+	}
+	
 	public String getValue(){
-		if(isError()){
+		if(skipEvaluation()){
 			throw new IllegalArgumentException();
 		}
 		return value;
 	}
 	
+	public int getNumeric(){
+		if(skipEvaluation()){
+			throw new IllegalArgumentException();
+		}
+		return numeric;
+	}
+	
+	public RoleDef getRole(){
+		if(skipEvaluation()){
+			throw new IllegalArgumentException();
+		}
+		return role;
+	}
+	
 	public IomObject getComplexValue(){
-		if(isError()){
+		if(skipEvaluation()){
 			throw new IllegalArgumentException();
 		}
 		return complexValue;
 	}
 	
+	public Collection<IomObject> getValues(){
+		if(skipEvaluation()){
+			throw new IllegalArgumentException();
+		}
+		return values;
+	}
+	
 	public static Value createUndefined(){
-		return new Value(null);
+		return new Value((IomObject) null);
 	}
 	
 	public boolean isUndefined(){
-		return !(getComplexValue() != null || getValue() != null || booleanIsDefined);
-	}
-	public static Value createError(){
-		return new Value();
+		return !(getComplexValue() != null ||
+						getValue() != null ||
+						getValues() != null ||
+						booleanIsDefined ||
+						getRole() != null ||
+						numericIsDefined ||
+						getViewable() != null);
 	}
 	
-	public boolean isError(){
-		return error;
+	public static Value createSkipEvaluation(){
+		Value ret=new Value();
+		ret.error = true;
+		return ret;
+	}
+	
+	public boolean isNotYetImplemented(){
+		return notYetImplemented;
+	}
+	
+	public static Value createNotYetImplemented() {
+		Value ret=new Value();
+		ret.notYetImplemented = true;
+		return ret;
+	}
+	
+	public boolean skipEvaluation(){
+		if(notYetImplemented==true){
+			return notYetImplemented;
+		} else {
+			return error;
+		}
 	}
 	
 	// compare in appropriate type.
 	public int compareTo(Value other){
 		// if value is error, return exception.
-		if(isError() || other.isError()){
+		if(skipEvaluation() || other.skipEvaluation()){
 			throw new IllegalArgumentException();
 		}
 		// intercept complex value
@@ -93,15 +194,15 @@ public class Value {
 		}
 		// intercept value
 		if(this.value!=null && other.value!=null){
+			if(type instanceof NumericType){
+				return Integer.valueOf(value).compareTo(Integer.valueOf(other.value));
 			// intercept text
-			if(type instanceof TextType){
+			} else if(type instanceof TextType){
 				return value.compareTo(other.value);
 			// intercept formatted type
 			} else if(type instanceof FormattedType){
 				return value.compareTo(other.value);
-			// intercept numeric
-			} else if(type instanceof NumericType){
-				return compareInteger(Integer.parseInt(value), Integer.parseInt(other.value));
+			// enumeration type
 			} else if(type instanceof EnumerationType){
 				EnumerationType enumeration = (EnumerationType) type;
 				// if ordered = true (>,<,>=,<=)
@@ -114,14 +215,26 @@ public class Value {
 					return this.value.compareTo(other.value);
 				}
 			}
-		// intercept boolean
-		} else if(this.value==null && other.value==null){
+		// intercept numeric
+		} else if(this.numericIsDefined && other.numericIsDefined){
+			return compareInteger(numeric, other.numeric);
+		} else if(this.numericIsDefined && other.value!=null){
+			return compareInteger(numeric, Integer.valueOf(other.value));
+		} else if(this.value!=null && other.numericIsDefined){
+			return compareInteger(Integer.valueOf(this.value), other.numeric);
+		} else if(this.viewable!=null && other.viewable!=null){
+			return compareViewable(this.viewable, other.viewable);
+		}else if(this.value==null && other.value==null){
 			return compareBoolean(this.booleanValue, other.booleanValue);
 		}
 		// incompatible type
 		throw new IllegalArgumentException("incompatible values");
 	}
-	
+
+	private int compareViewable(Viewable viewable2, Viewable viewable3) {
+		return (viewable3.equals(viewable2) ? 0 : (!viewable3.equals(viewable2) ? 1 : -1));
+	}
+
 	private int compareBoolean(boolean thisValue, boolean otherValue) {
 		return (otherValue == thisValue ? 0 : (thisValue ? 1 : -1));
 	}

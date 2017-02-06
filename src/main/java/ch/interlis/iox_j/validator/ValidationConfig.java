@@ -29,6 +29,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	public static final String ILI_METAATTR_PREFIX="ilivalid.";
 	public static final String PARAMETER = "PARAMETER";
 	public static final String VALIDATION = "validation";
+	public static final String IMPL_JAVA="impl.java";
 	public void mergeIliMetaAttrs(TransferDescription td){
 		mergeIliMetaAttrsHelper(td);
 	}

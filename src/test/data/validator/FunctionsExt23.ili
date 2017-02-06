@@ -1,0 +1,37 @@
+INTERLIS 2.3;
+CONTRACTED MODEL FunctionsExt23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
+    !!@ilivalid.impl.java=ch.interlis.iox_j.validator.SubText
+  	FUNCTION subText (text: TEXT; from: NUMERIC; to: NUMERIC): TEXT;
+  	!!@ilivalid.impl.java=ch.interlis.iox_j.validator.SuperText
+  	FUNCTION superText (text: TEXT; from: NUMERIC; to: NUMERIC): TEXT;
+  	FUNCTION noText (text: TEXT; from: NUMERIC; to: NUMERIC): TEXT;
+	TOPIC Topic=
+		!! exists
+		CLASS ClassA =
+			text : TEXT;
+			from : 0..10;
+			to : 0..10;
+			attr2 : TEXT;
+			MANDATORY CONSTRAINT subText(text,from,to) == attr2;
+		END ClassA;
+		
+		!! supertext class does not exist
+		CLASS ClassB =
+			text : TEXT;
+			from : 0..10;
+			to : 0..10;
+			attr2 : TEXT;
+			MANDATORY CONSTRAINT superText(text,from,to) == attr2;
+		END ClassB;
+		
+		!! class is not defined
+		CLASS ClassC =
+			text : TEXT;
+			from : 0..10;
+			to : 0..10;
+			attr2 : TEXT;
+			MANDATORY CONSTRAINT noText(text,from,to) == attr2;
+		END ClassC;
+	END Topic;
+END FunctionsExt23.

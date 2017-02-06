@@ -10,10 +10,10 @@ import ch.ehi.iox.objpool.ObjectPoolManager;
 public class FileBasedCollection<E> implements List<E> {
 	private int size=0;
 	private ObjectPoolManager recman=null;
-	private ObjPoolImpl pool=null;
-	public FileBasedCollection(ObjectPoolManager objectPoolManager) {
+	private ObjPoolImpl2 pool=null;
+	public FileBasedCollection(ObjectPoolManager objectPoolManager,Serializer<E> serializer) {
 		recman=objectPoolManager;
-		pool=(ObjPoolImpl) recman.newObjectPool();
+		pool=(ObjPoolImpl2) recman.newObjectPoolImpl2(serializer);
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class FileBasedCollection<E> implements List<E> {
 
 			@Override
 			public E next() {
-				return (E)pool.get(i);
+				return (E)pool.get(i++);
 			}
 
 			@Override

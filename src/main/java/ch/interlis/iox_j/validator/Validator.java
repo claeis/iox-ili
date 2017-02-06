@@ -2,6 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -12,9 +13,11 @@ import javax.xml.ws.Holder;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
+import ch.interlis.ili2c.metamodel.AbstractLeafElement;
 import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.AttributeDef;
@@ -23,8 +26,12 @@ import ch.interlis.ili2c.metamodel.Cardinality;
 import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.ConditionalExpression;
 import ch.interlis.ili2c.metamodel.Constant;
+import ch.interlis.ili2c.metamodel.Constant.AttributePath;
 import ch.interlis.ili2c.metamodel.Constant.Enumeration;
 import ch.interlis.ili2c.metamodel.Constant.EnumerationRange;
+import ch.interlis.ili2c.metamodel.Constant.Numeric;
+import ch.interlis.ili2c.metamodel.Constant.Text;
+import ch.interlis.ili2c.metamodel.Constraint;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.Domain;
 import ch.interlis.ili2c.metamodel.Element;
@@ -42,6 +49,8 @@ import ch.interlis.ili2c.metamodel.Expression.Inequality;
 import ch.interlis.ili2c.metamodel.Expression.LessThan;
 import ch.interlis.ili2c.metamodel.Expression.LessThanOrEqual;
 import ch.interlis.ili2c.metamodel.Expression.Negation;
+import ch.interlis.ili2c.metamodel.Extendable;
+import ch.interlis.ili2c.metamodel.FormalArgument;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.Function;
 import ch.interlis.ili2c.metamodel.FunctionCall;
@@ -58,10 +67,14 @@ import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.Objects;
 import ch.interlis.ili2c.metamodel.ParameterValue;
 import ch.interlis.ili2c.metamodel.PathEl;
+import ch.interlis.ili2c.metamodel.PathElAbstractClassRole;
+import ch.interlis.ili2c.metamodel.PathElAssocRole;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
 import ch.interlis.ili2c.metamodel.ReferenceType;
 import ch.interlis.ili2c.metamodel.RoleDef;
+import ch.interlis.ili2c.metamodel.SetConstraint;
+import ch.interlis.ili2c.metamodel.StructAttributeRef;
 import ch.interlis.ili2c.metamodel.SurfaceOrAreaType;
 import ch.interlis.ili2c.metamodel.SurfaceType;
 import ch.interlis.ili2c.metamodel.Table;
@@ -110,6 +123,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String currentBasketId = null;
 	private String currentMainOid=null;
 	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
+	private String checkConstraint=null;
+	private String validateType=null;
+	private HashMap<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	
 	@Deprecated
 	protected Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -172,6 +188,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			return;
 		}
 		if (event instanceof ch.interlis.iox.StartTransferEvent){
+			errs.addEvent(errFact.logInfoMsg("first validation pass..."));
 		} else if (event instanceof ch.interlis.iox.StartBasketEvent){
 			currentBasketId = ((ch.interlis.iox.StartBasketEvent) event).getBid();
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
@@ -179,7 +196,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			try {
 				validateObject(iomObj,null);
 			} catch (IoxException e) {
-				errs.addEvent(errFact.logErrorMsg("failed to validate object {0}", iomObj.toString()));
+				errs.addEvent(errFact.logInfoMsg("failed to validate object {0}", iomObj.toString()));
 			}
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
@@ -217,6 +234,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	private void iterateThroughAllObjects(){
+		errs.addEvent(errFact.logInfoMsg("second validation pass..."));
+		HashSet<Constraint> constraints=new HashSet<Constraint>();
+		HashSet<Type> types=new HashSet<Type>();
+		HashSet<Viewable> viewables=new HashSet<Viewable>();
+		HashSet<AbstractLeafElement> abstractLeafElement=new HashSet<AbstractLeafElement>();
 		for (String basketId : objectPool.getBasketIds()){
 			// iterate through iomObjects
 			Iterator<IomObject> objectIterator = ((ch.ehi.iox.objpool.impl.ObjPoolImpl) objectPool.getObjectsOfBasketId(basketId)).valueIterator();
@@ -225,18 +247,41 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				setCurrentMainObj(iomObj);
 				Object modelElement=tag2class.get(iomObj.getobjecttag());
 				Viewable currentClass= (Viewable) modelElement;
+				String check = currentClass.getContainer().getScopedName(null)+"."+currentClass.getName();
+				checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
+				if(ValidationConfig.OFF.equals(checkConstraint)){
+					 // skip it
+				}else{
 				Iterator constraintIterator=currentClass.iterator();
 				while (constraintIterator.hasNext()) {
-					Object objA = constraintIterator.next();
+						Object constraintObj = constraintIterator.next();
 					// existence constraint
-					if(objA instanceof ExistenceConstraint){
-						ExistenceConstraint existenceConstraintObj=(ExistenceConstraint) objA;
-						validateExistenceConstraint(iomObj, existenceConstraintObj);
+						if(constraintObj instanceof ExistenceConstraint){
+							ExistenceConstraint existenceConstraint=(ExistenceConstraint) constraintObj;
+							if(!constraints.contains(existenceConstraint)){
+								errs.addEvent(errFact.logInfoMsg("validate existence constraint {0}...",existenceConstraint.getScopedName(null)));
+								constraints.add(existenceConstraint);
 					}
+							validateExistenceConstraint(iomObj, existenceConstraint);
+						}
 					// mandatory constraint
-					if(objA instanceof MandatoryConstraint){
-						MandatoryConstraint mandatoryConstraintObj=(MandatoryConstraint) objA;
-						validateMandatoryConstraint(iomObj, mandatoryConstraintObj);
+						if(constraintObj instanceof MandatoryConstraint){
+							MandatoryConstraint mandatoryConstraint=(MandatoryConstraint) constraintObj;
+							if(!constraints.contains(mandatoryConstraint)){
+								errs.addEvent(errFact.logInfoMsg("validate mandatory constraint {0}...",mandatoryConstraint.getScopedName(null)));
+								constraints.add(mandatoryConstraint);
+					}
+							validateMandatoryConstraint(iomObj, mandatoryConstraint);
+				}
+						// set constraint
+						if(constraintObj instanceof SetConstraint){
+							SetConstraint setConstraint=(SetConstraint) constraintObj;
+							if(!constraints.contains(setConstraint)){
+								errs.addEvent(errFact.logInfoMsg("validate set constraint {0}...",setConstraint.getScopedName(null)));
+								constraints.add(setConstraint);
+							}
+							setConstraint(iomObj, setConstraint);
+						}
 					}
 				}
 				Iterator<ViewableTransferElement> attrIterator=currentClass.getAttributesAndRoles2();
@@ -247,15 +292,30 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						// composition
 						if (type instanceof CompositionType){
 							IomObject structValue = iomObj.getattrobj(iomObj.getattrname(0), 0);
-							Table structure = ((CompositionType)type).getComponentType();
+							CompositionType compositionType = (CompositionType) type;
+							if(!types.contains(compositionType)){
+								errs.addEvent(errFact.logInfoMsg("validate reference attributes {0}...",compositionType.getScopedName(null)));
+								types.add(compositionType);
+							}
+							Table structure = compositionType.getComponentType();
 							validateReferenceAttrs(structValue, structure);
 						}
 					}else if(objA.obj instanceof RoleDef){
-						validateRoleReference((RoleDef)objA.obj, iomObj);
+						RoleDef roleDef = (RoleDef) objA.obj;
+						if(!abstractLeafElement.contains(roleDef)){
+							errs.addEvent(errFact.logInfoMsg("validate role reference {0}...",roleDef.getScopedName(null)));
+							abstractLeafElement.add(roleDef);
 					}
+						validateRoleReference(roleDef, iomObj);
+				}
 				}
 				if(currentClass instanceof AbstractClassDef){
-					Iterator<RoleDef> targetRoleIterator=((AbstractClassDef) currentClass).getOpposideRoles();
+					AbstractClassDef abstractClassDef = (AbstractClassDef) currentClass;
+					if(!viewables.contains(abstractClassDef)){
+						errs.addEvent(errFact.logInfoMsg("validate role reference {0}...",abstractClassDef.getScopedName(null)));
+						viewables.add(abstractClassDef);
+					}
+					Iterator<RoleDef> targetRoleIterator=abstractClassDef.getOpposideRoles();
 					while(targetRoleIterator.hasNext()){
 						RoleDef role=targetRoleIterator.next();
 						validateRoleCardinality(role, iomObj);
@@ -265,21 +325,51 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
+	private void setConstraint(IomObject iomObj, SetConstraint setConstraintObj) {
+		Evaluable condition = (Evaluable) setConstraintObj.getCondition();
+		if(setConstraintObj.getPreCondition() != null){
+			Evaluable preCondition = (Evaluable) setConstraintObj.getPreCondition();
+			boolean conditionSuccessful = validateSetConstraint(iomObj, preCondition, setConstraintObj);
+			if(conditionSuccessful){
+				validateSetConstraint(iomObj, condition, setConstraintObj);
+			}
+		} else {
+			validateSetConstraint(iomObj, condition, setConstraintObj);
+		}
+	}
+	
+	private boolean validateSetConstraint(IomObject iomObj, Evaluable condition, SetConstraint setConstraintObj){
+		Value conditionValue = evaluateExpression(iomObj, condition);
+		if (!conditionValue.isNotYetImplemented()){
+			if (!conditionValue.skipEvaluation()){
+				if (conditionValue.isTrue()){
+					return true;
+					// ok
+				} else {
+					logMsg(checkConstraint,"Set Constraint {0} is not true.", setConstraintObj.getName());
+				}
+			}
+		} else {
+			logMsg(checkConstraint,"Function is not yet implemented.");
+			Value.createNotYetImplemented();
+		}
+		return false;
+	}
+	
 	private void validateMandatoryConstraint(IomObject iomObj, MandatoryConstraint mandatoryConstraintObj) {
 		Evaluable condition = (Evaluable) mandatoryConstraintObj.getCondition();
 		Value conditionValue = evaluateExpression(iomObj, condition);
-		String check = mandatoryConstraintObj.getContainer().getScopedName(null)+"."+mandatoryConstraintObj.getName();
-		String checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
-		if(ValidationConfig.OFF.equals(checkConstraint)){
-			// skip it
-		}else{
-			if (!conditionValue.isError()){
+		if (!conditionValue.isNotYetImplemented()){
+			if (!conditionValue.skipEvaluation()){
 				if (conditionValue.isTrue()){
 					// ok
 				} else {
 					logMsg(checkConstraint,"Mandatory Constraint {0} is not true.", mandatoryConstraintObj.getName());				
 				}
 			}
+		} else {
+			logMsg(checkConstraint,"Function is not yet implemented.");
+			Value.createNotYetImplemented();
 		}
 	}
 
@@ -291,20 +381,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable rightExpression = (Evaluable) equality.getRight();
 			Value leftValue=evaluateExpression(iomObj,leftExpression);
 			// if isError, return error.
-			if (leftValue.isError()){
+			if (leftValue.skipEvaluation()){
 				return leftValue;
 			}
 			if (leftValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
+			
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			// if isError, return error.
-			if (rightValue.isError()){
+			if (rightValue.skipEvaluation()){
 				return rightValue;
 			}
 			if (rightValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
+			
 			// if left and right value not errors, compare values.
 			if (leftValue.compareTo(rightValue)==0){
 				return new Value(true);
@@ -318,19 +410,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable rightExpression = (Evaluable) greaterThan.getRight();
 			Value leftValue=evaluateExpression(iomObj,leftExpression);
 			// if isError, return error.
-			if (leftValue.isError()){
+			if (leftValue.skipEvaluation()){
 				return leftValue;
 			}
 			if (leftValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			// if isError, return error.
-			if (rightValue.isError()){
+			if (rightValue.skipEvaluation()){
 				return rightValue;
 			}
 			if (rightValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			// if left and right value not errors, compare values.
 			if (leftValue.compareTo(rightValue)>0){
@@ -345,19 +437,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable rightExpression = (Evaluable) greaterThanOrEqual.getRight();
 			Value leftValue=evaluateExpression(iomObj,leftExpression);
 			// if isError, return error.
-			if (leftValue.isError()){
+			if (leftValue.skipEvaluation()){
 				return leftValue;
 			}
 			if (leftValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			// if isError, return error.
-			if (rightValue.isError()){
+			if (rightValue.skipEvaluation()){
 				return rightValue;
 			}
 			if (rightValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			// if left and right value not errors, compare values.
 			if (leftValue.compareTo(rightValue)>=0){
@@ -372,19 +464,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable rightExpression = (Evaluable) inEquality.getRight();
 			Value leftValue=evaluateExpression(iomObj,leftExpression);
 			// if isError, return error.
-			if (leftValue.isError()){
+			if (leftValue.skipEvaluation()){
 				return leftValue;
 			}
 			if (leftValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			// if isError, return error.
-			if (rightValue.isError()){
+			if (rightValue.skipEvaluation()){
 				return rightValue;
 			}
 			if (rightValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			// if left and right value not errors, compare values.
 			if (leftValue.compareTo(rightValue)!=0){
@@ -399,19 +491,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable rightExpression = (Evaluable) lessThan.getRight();
 			Value leftValue=evaluateExpression(iomObj,leftExpression);
 			// if isError, return error.
-			if (leftValue.isError()){
+			if (leftValue.skipEvaluation()){
 				return leftValue;
 			}
 			if (leftValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			// if isError, return error.
-			if (rightValue.isError()){
+			if (rightValue.skipEvaluation()){
 				return rightValue;
 			}
 			if (rightValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			// if left and right value not errors, compare values.
 			if (leftValue.compareTo(rightValue)<0){
@@ -426,19 +518,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable rightExpression = (Evaluable) lessThanOrEqual.getRight();
 			Value leftValue=evaluateExpression(iomObj,leftExpression);
 			// if isError, return error.
-			if (leftValue.isError()){
+			if (leftValue.skipEvaluation()){
 				return leftValue;
 			}
 			if (leftValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			Value rightValue=evaluateExpression(iomObj,rightExpression);
 			// if isError, return error.
-			if (rightValue.isError()){
+			if (rightValue.skipEvaluation()){
 				return rightValue;
 			}
 			if (rightValue.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			// if left and right value not errors, compare values.
 			if (leftValue.compareTo(rightValue)<=0){
@@ -450,11 +542,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			// NOT
 			Negation negation = (Negation) expression;				
 			Value arg=evaluateExpression(iomObj,negation.getNegated());
-			if (arg.isError()){
+			if (arg.skipEvaluation()){
 				return arg;
 			}
 			if (arg.isUndefined()){
-				return Value.createError();
+				return Value.createSkipEvaluation();
 			}
 			if(arg.isTrue()){
 				return new Value(false);
@@ -467,11 +559,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable[] conjunctionArray = (Evaluable[]) conjunction.getConjoined();
 			for (int i=0;i<conjunctionArray.length;i++){
 				Value arg=evaluateExpression(iomObj,conjunctionArray[i]);
-				if (arg.isError()){
+				if (arg.skipEvaluation()){
 					return arg;
 				}
 				if (arg.isUndefined()){
-					return Value.createError();
+					return Value.createSkipEvaluation();
 				}
 				if(!arg.isTrue()){
 					return new Value(false);
@@ -482,7 +574,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			// DEFINED
 			DefinedCheck defined = (DefinedCheck) expression;
 			Value arg=evaluateExpression(iomObj,defined.getArgument());
-			if(arg.isError()){
+			if(arg.skipEvaluation()){
 				return arg;
 			}
 			if(arg.isUndefined()){
@@ -496,11 +588,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Evaluable[] disjunctionArray = (Evaluable[]) disjunction.getDisjoined();
 			for (int i=0;i<disjunctionArray.length;i++){
 				Value arg=evaluateExpression(iomObj,disjunctionArray[i]);
-				if (arg.isError()){
+				if (arg.skipEvaluation()){
 					return arg;
 				}
 				if (arg.isUndefined()){
-					return Value.createError();
+					return Value.createSkipEvaluation();
 				}
 				if(arg.isTrue()){
 					return new Value(true);
@@ -518,119 +610,446 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					Enumeration enumObj = (Enumeration) enumConstOrRange;
 					String[] value = enumObj.getValue();
 					if (value[0].equals("true")){
-						return new Value(true);  // FIXME create boolean true only, if EnumerationType is INTERLIS.BOOLEAN
+						return new Value(true);
 					} else if (value[0].equals("false")){
 						return new Value(false);
 					}
-				} else if (enumConstOrRange instanceof EnumerationRange){
-					// constant.enumerationRange
+					TextType texttype = new TextType();
+					return new Value(texttype, value[0]);
+				}
+			// TODO instance of EnumerationRange
+			} else if (constantObj instanceof Constant.Text){
+				Constant.Text textConstant = (Constant.Text) constantObj;
+				if(textConstant!=null){
+					TextType texttype = new TextType();
+					return new Value(texttype, textConstant.getValue());
+			}
+			} else if (constantObj instanceof Constant.Numeric){
+				Constant.Numeric numericConstant = (Constant.Numeric) constantObj;
+				if(numericConstant!=null){
+					return new Value(Integer.valueOf(numericConstant.getValue().toString()));
+				}
+			} else if (constantObj instanceof Constant.Class){
+				Constant.Class classConstant = (Constant.Class) constantObj;
+				if(classConstant!=null){
+					if(classConstant.getValue() instanceof Viewable){
+						Viewable classValue = (Viewable) classConstant.getValue();
+						while(classValue.getExtending()!=null){
+							classValue = (Viewable) classValue.getExtending();
+						}
+						return new Value(classValue);
+					}
+				}
+			} else if (constantObj instanceof Constant.Undefined){
+				return Value.createUndefined();
+			} else if (constantObj instanceof Constant.AttributePath){
+				Constant.AttributePath attrPath = (Constant.AttributePath) constantObj;
+				if(attrPath.getValue() instanceof LocalAttribute){
+					LocalAttribute attrLocal = (LocalAttribute) attrPath.getValue();
+					String attrName = attrLocal.getName();
+					TextType text = new TextType();
+					return new Value(text, attrName);
 				}
 			}
-		} else if(expression instanceof ConditionalExpression){
-			// conditional expression	
-			ConditionalExpression conditionalExpressionObj = (ConditionalExpression) expression;
-			
+		//TODO instance of ConditionalExpression
 		} else if(expression instanceof FunctionCall){
-			// function call	
 			FunctionCall functionCallObj = (FunctionCall) expression;
 			Function function = functionCallObj.getFunction();
 			if(function.getScopedName(null).equals("INTERLIS.len") || function.getScopedName(null).equals("INTERLIS.lenM")){
-				Evaluable[] args = functionCallObj.getArguments();
-				if(args.length==1){
-					for(Evaluable arg : args){
-						String attrValue = iomObj.getattrvalue(arg.toString());
-						if(attrValue!=null){
-							int lengthOfAttr = attrValue.length();
-							NumericType numericType = new NumericType();
-							return new Value(numericType, String.valueOf(lengthOfAttr));
-						} else {
-							// skip evaluation.
+				Evaluable[] arguments = functionCallObj.getArguments();
+				for(Evaluable anArgument : arguments){
+					Value arg=evaluateExpression(iomObj,anArgument);
+					if (arg.skipEvaluation()){
+						return arg;
 						}
+					if (arg.isUndefined()){
+						return Value.createSkipEvaluation();
 					}
+					if(arg.getValue()!=null){
+						int lengthOfArgument = arg.getValue().length();
+						
+						return new Value(lengthOfArgument);
 				}
+				}
+				return new Value(false);
 			} else if(function.getScopedName(null).equals("INTERLIS.trim") || function.getScopedName(null).equals("INTERLIS.trimM")){
-				Evaluable[] args = functionCallObj.getArguments();
-				for(Evaluable arg : args){
-					String attrValue = iomObj.getattrvalue(arg.toString());
-					if(attrValue!=null){
-						Type type = function.getDomain();
-						return new Value(type, attrValue.trim());
-					} else {
-						// skip evaluation.
+				Evaluable[] arguments = functionCallObj.getArguments();
+				for(Evaluable anArgument : arguments){
+					Value arg=evaluateExpression(iomObj,anArgument);
+					if (arg.skipEvaluation()){
+						return arg;
 					}
+					if (arg.isUndefined()){
+						return Value.createSkipEvaluation();
+				}
+					TextType type = new TextType();
+					return new Value(type, arg.getValue().trim());
 				}
 			} else if (function.getScopedName(null).equals("INTERLIS.isEnumSubVal")){
-				String subValValue = iomObj.getattrvalue(iomObj.getattrname(0));
-				String nodeValValue = iomObj.getattrvalue(iomObj.getattrname(1));
-				if(subValValue.startsWith(nodeValValue)){
+				Evaluable[] arguments = functionCallObj.getArguments();
+				Value subEnum=evaluateExpression(iomObj,arguments[0]);
+				if (subEnum.skipEvaluation()){
+					return subEnum;
+				}
+				if (subEnum.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				Value nodeEnum=evaluateExpression(iomObj,arguments[1]);
+				if (nodeEnum.skipEvaluation()){
+					return nodeEnum;
+				}
+				if (nodeEnum.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				if(subEnum.getValue().toString().startsWith(nodeEnum.getValue().toString())){
 					return new Value(true);
 				} else {
 					return new Value(false);
 				}
 			} else if (function.getScopedName(null).equals("INTERLIS.inEnumRange")){
-				String enumerationNameOfEnum = null;
-				String enumerationNameOfMinEnum = null;
-				String enumerationNameOfMaxEnum = null;
-				List<String> enumeration = null;
-				FunctionCall functionCall = (FunctionCall) expression;
-				Evaluable[] args = (Evaluable[]) functionCall.getArguments();
-				for(Evaluable enumArg : args){
-					ObjectPath objectPath = (ObjectPath) enumArg;
-					PathEl pathEl = objectPath.getLastPathEl();
-					AttributeRef attrRef = (AttributeRef) pathEl;
-					LocalAttribute localAttr = (LocalAttribute) attrRef.getAttr();
-					// wenn subelements
-					if(localAttr.getDomain() instanceof TypeAlias){
-						TypeAlias typeAlias = (TypeAlias) localAttr.getDomain();
-						Domain domain =(Domain) typeAlias.getAliasing();
-						EnumerationType enumerationType = (EnumerationType) domain.getType();
+				Evaluable[] arguments = functionCallObj.getArguments();
+				Value enumToCompare=evaluateExpression(iomObj,arguments[0]);
+				if (enumToCompare.skipEvaluation()){
+					return enumToCompare;
+				}
+				if (enumToCompare.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				Value minEnum=evaluateExpression(iomObj,arguments[1]);
+				if (minEnum.skipEvaluation()){
+					return minEnum;
+				}
+				if (minEnum.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				Value maxEnum=evaluateExpression(iomObj,arguments[2]);
+				if (maxEnum.skipEvaluation()){
+					return maxEnum;
+				}
+				if (maxEnum.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				if (enumToCompare.getType() instanceof EnumerationType){
+					EnumerationType enumerationType = (EnumerationType) enumToCompare.getType();
 						// enumeration has to be ordered
 						if(enumerationType.isOrdered()){
-							enumeration = enumerationType.getValues();
-							if(enumArg.toString().equals(iomObj.getattrname(1))){
-								enumerationNameOfEnum = domain.getName();
-							}else if(enumArg.toString().equals(iomObj.getattrname(0))){
-								enumerationNameOfMinEnum = domain.getName();
-							}else if(enumArg.toString().equals(iomObj.getattrname(2))){
-								enumerationNameOfMaxEnum = domain.getName();
+						// enumerations from same enumeration
+						if(enumToCompare.getRefTypeName().equals(minEnum.getRefTypeName()) && (enumToCompare.getRefTypeName().equals(maxEnum.getRefTypeName()))){
+							int indexOfEnumToCompare = enumerationType.getValues().indexOf(enumToCompare.getValue());
+							int indexOfMinEnumValue = enumerationType.getValues().indexOf(minEnum.getValue());
+							int indexOfMaxEnumValue = enumerationType.getValues().indexOf(maxEnum.getValue());
+							// enum is between min and max
+							if(indexOfEnumToCompare > indexOfMinEnumValue && indexOfEnumToCompare < indexOfMaxEnumValue){
+								return new Value(true);
 							}
-						}
-					}
-				}
-				// minVal and maxVal are on same enumeration like enumVal
-				if(enumerationNameOfEnum!=null && enumerationNameOfMinEnum!=null && enumerationNameOfMaxEnum!=null){
-					if(enumerationNameOfEnum.equals(enumerationNameOfMinEnum) && enumerationNameOfMinEnum.equals(enumerationNameOfMaxEnum)){
-						int minEnumIndex = 0;
-						int enumIndex = 0;
-						int maxEnumIndex = 0;
-						for(int i=0; i<enumeration.size();i++){
-							if(enumeration.get(i).toString().equals(iomObj.getattrvalue(iomObj.getattrname(1)))){
-								enumIndex = i;
-							} else if(enumeration.get(i).toString().equals(iomObj.getattrvalue(iomObj.getattrname(0)))){
-								minEnumIndex = i;
-							} else if(enumeration.get(i).toString().equals(iomObj.getattrvalue(iomObj.getattrname(2)))){
-								maxEnumIndex = i;
-							}
-						}
-						// enumVal has to be between minVal and maxVal (Inc. sub-elements)
-						if((enumIndex > minEnumIndex) && (enumIndex < maxEnumIndex)){
-							return new Value(true);
 						}
 					}
 				}
 				return new Value(false);
+			} else if (function.getScopedName(null).equals("INTERLIS.objectCount")){
+				FunctionCall functionCall = (FunctionCall) expression;
+				Evaluable[] arguments = (Evaluable[]) functionCall.getArguments();
+				Evaluable anArgument = (Evaluable) arguments[0];
+				if(anArgument instanceof Objects){
+					Value value=evaluateExpression(iomObj, anArgument);
+					if (value.skipEvaluation()){
+						return value;
+							}
+					if (value.isUndefined()){
+						return Value.createSkipEvaluation();
+						}
+					return new Value(value.getValues().size());
+				} else if (anArgument instanceof ObjectPath){
+					Value value=evaluateExpression(iomObj, anArgument);
+					if (value.skipEvaluation()){
+						return value;
+					}
+					if (value.isUndefined()){
+						return Value.createSkipEvaluation();
+					}
+					// through all objects
+					Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).values().iterator();
+					int counter = 0;
+					if(value.getViewable()!=null){
+						while(objectIterator.hasNext()){
+							IomObject aIomObj = (IomObject) objectIterator.next();
+							if(aIomObj!=null){
+								Object modelElement=tag2class.get(aIomObj.getobjecttag());
+								Viewable anObjectClass = (Viewable) modelElement;
+								if(value.getViewable().equals(anObjectClass)){
+									counter+=1;
+								}
+							}
+						}
+						return new Value(counter);
+					} else if (value.getComplexValue()!=null){
+						int countOfObjects = iomObj.getattrvaluecount(anArgument.toString());
+						return new Value(countOfObjects);
+					}
+				}
+			} else if (function.getScopedName(null).equals("INTERLIS.elementCount")){
+				FunctionCall functionCall = (FunctionCall) expression;
+				Evaluable[] arguments = (Evaluable[]) functionCall.getArguments();
+				Evaluable anArgument = (Evaluable) arguments[0];
+				int elementCount = iomObj.getattrvaluecount(anArgument.toString());
+				return new Value(elementCount);
+			} else if (function.getScopedName(null).equals("INTERLIS.isOfClass")){
+				FunctionCall functionCall = (FunctionCall) expression;
+				Evaluable[] arguments = functionCall.getArguments();
+				Value childViewable=evaluateExpression(iomObj,arguments[0]);
+				if (childViewable.skipEvaluation()){
+					return childViewable;
+				}
+				if (childViewable.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				Value parentViewable=evaluateExpression(iomObj,arguments[1]);
+				if (parentViewable.skipEvaluation()){
+					return parentViewable;
+				}
+				if (parentViewable.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				if(childViewable.getViewable().equals(parentViewable.getViewable())){
+							return new Value(true);
+						}
+				if(parentViewable.getViewable().isExtending(childViewable.getViewable())){
+					return new Value(true);					
+					}
+				return new Value(false);
+			} else if (function.getScopedName(null).equals("INTERLIS.isSubClass")){
+				FunctionCall functionCall = (FunctionCall) expression;
+				Evaluable[] arguments = functionCall.getArguments();
+				Value subViewable=evaluateExpression(iomObj,arguments[0]);
+				if (subViewable.skipEvaluation()){
+					return subViewable;
+				}
+				if (subViewable.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				Value superViewable=evaluateExpression(iomObj,arguments[1]);
+				if (superViewable.skipEvaluation()){
+					return superViewable;
+				}
+				if (superViewable.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				if(subViewable.getViewable().equals(superViewable.getViewable())){
+					return new Value(true);
+				}
+				if(superViewable.getViewable().isExtending(subViewable.getViewable())){
+					return new Value(true);					
+				}
+				return new Value(false);
+			} else if (function.getScopedName(null).equals("INTERLIS.myClass")){
+				FunctionCall functionCall = (FunctionCall) expression;
+				Evaluable[] arguments = functionCall.getArguments();
+				Value targetViewable=evaluateExpression(iomObj,arguments[0]);
+				if (targetViewable.skipEvaluation()){
+					return targetViewable;
 			}
-		} else if(expression instanceof InspectionFactor){
-			// inspection factor	
-			InspectionFactor inspectionFactorObj = (InspectionFactor) expression;
-			
-		} else if(expression instanceof LengthOfReferencedText){
-			// length of referenced text	
-			LengthOfReferencedText lengthOfReferencedTextObj = (LengthOfReferencedText) expression;
+				if (targetViewable.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				return new Value(targetViewable.getViewable());
+			} else if (function.getScopedName(null).equals("INTERLIS.areAreas")){
+				FunctionCall functionCall = (FunctionCall) expression;
+				Evaluable[] arguments = functionCall.getArguments();
+				// founded objects (list<IomObjects)
+				Value objects=evaluateExpression(iomObj,arguments[0]);
+				if (objects.skipEvaluation()){
+					return objects;
+				}
+				if (objects.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				// count of objects condition returns attrName of BAG / undefined=(numericIsDefined=false)
+				Value surfaceBag=evaluateExpression(iomObj,arguments[1]);
+				if (surfaceBag.skipEvaluation()){
+					return surfaceBag;
+				}
+				// name of surface (textType)
+				Value surfaceAttr=evaluateExpression(iomObj,arguments[2]);
+				if (surfaceAttr.skipEvaluation()){
+					return surfaceAttr;
+				}
+				if (surfaceAttr.isUndefined()){
+					return Value.createSkipEvaluation();
+				} // if surfaceBag is undefined
+				if(surfaceBag.isUndefined()){
+					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(); // create new pool of polygons
+					if(objects.getViewable()!=null){
+						Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).values().iterator();
+						while(objectIterator.hasNext()){
+							IomObject aIomObj = (IomObject) objectIterator.next();
+							if(aIomObj!=null){
+								Object modelElement=tag2class.get(aIomObj.getobjecttag());
+								Viewable anObjectClass = (Viewable) modelElement;
+								if(objects.getViewable().equals(anObjectClass)){
+									IomObject polygon = aIomObj.getattrobj(surfaceAttr.getValue(), 0); // get polygon of current object
+									if(polygon!=null){ // if value of Argument[2] equals object attribute
+										try { // add polylines to polygonPool.
+											polygonPool.addLines(aIomObj.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
+										} catch (IoxException e) {
+											e.getStackTrace();
+										}
+									}
+								}
+							}
+						}
+					} else {
+						Iterator iterIomObjects = objects.getValues().iterator(); // iterate through all objects of Argument[0] 
+						while(iterIomObjects.hasNext()){
+							IomObject anObject = (IomObject) iterIomObjects.next();
+							IomObject polygon = anObject.getattrobj(surfaceAttr.getValue(), 0); // get polygon of current object
+							if(polygon!=null){ // if value of Argument[2] equals object attribute
+								try { // add polylines to polygonPool.
+									polygonPool.addLines(anObject.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
+								} catch (IoxException e) {
+									e.getStackTrace();
+								}
+							}
+						}
+					}
+					try {
+						if(polygonPool.getLines().size()==0){
+							return new Value(false);
+						} else {
+							polygonPool.getLines(); // get all lines in polygonPool
+						}
+					} catch (IoxException e) {
+						return new Value(false); // if lines are empty, return false
+					}
+					return new Value(true); // if there where some lines, return true
+				} else {
+					// if surfaceBag is defined
+					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable();
+					if(objects.getViewable()!=null){
+						Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).values().iterator();
+						while(objectIterator.hasNext()){
+							IomObject aIomObj = (IomObject) objectIterator.next();
+							if(aIomObj!=null){
+								Object modelElement=tag2class.get(aIomObj.getobjecttag());
+								Viewable anObjectClass = (Viewable) modelElement;
+								if(objects.getViewable().equals(anObjectClass)){
+									int countOfSurfaceBagValues = aIomObj.getattrvaluecount(surfaceBag.getValue());
+									for(int i=0; i<countOfSurfaceBagValues; i++){
+										IomObject surfaceBagObj = aIomObj.getattrobj(surfaceBag.getValue(), i);
+										IomObject polygon = surfaceBagObj.getattrobj(surfaceAttr.getValue(), 0);
+										if(polygon!=null){ // if value of Argument[2] equals object attribute
+											try { // add polylines to polygonPool.
+												polygonPool.addLines(aIomObj.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
+											} catch (IllegalStateException e) {
+												throw new IllegalStateException(e);
+											} catch (IoxException e) {
+												e.getStackTrace();
+											}
+										}
+									}
+								}
+							}
+						}
+					} else {
+						Iterator iterIomObjects = objects.getValues().iterator();
+						while(iterIomObjects.hasNext()){
+							IomObject anObject = (IomObject) iterIomObjects.next();
+							int countOfSurfaceBagValues = anObject.getattrvaluecount(surfaceBag.getValue());
+							for(int i=0; i<countOfSurfaceBagValues; i++){
+								IomObject surfaceBagObj = anObject.getattrobj(surfaceBag.getValue(), i);
+								IomObject polygon = surfaceBagObj.getattrobj(surfaceAttr.getValue(), 0);
+								if(polygon!=null){
+									try {
+										polygonPool.addLines(anObject.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
+									} catch (IoxException e) {
+										e.getStackTrace();
+									}
+								} else {
+									// there is no area to compare. --> area not false and not true.
+								}
+							}
+						}
+					}
+					try {
+						polygonPool.getLines();
+					} catch (IoxException e) {
+						return new Value(false);
+					}
+					return new Value(true);
+				}
+			} else {
+				String functionQname=function.getScopedName(null);
+				Class functionTargetClass=customFunctions.get(functionQname);
+				if(functionTargetClass==null){
+					String javaClassname=validationConfig.getConfigValue(functionQname, ValidationConfig.IMPL_JAVA);
+					if(javaClassname==null){
+	 					customFunctions.put(functionQname, null);
+						return Value.createNotYetImplemented();
+					}else{
+						try {
+							functionTargetClass=Class.forName(javaClassname);
+						} catch (ClassNotFoundException e) {
+		 					customFunctions.put(functionQname, null);
+							return Value.createNotYetImplemented();
+						}
+	 					customFunctions.put(functionQname, functionTargetClass);
+					}
+				}
+				// get values for all actual arguments
+				FunctionCall functionCall = (FunctionCall) expression;
+				Evaluable[] arguments = functionCall.getArguments();
+				int argumentCount = functionCall.getArguments().length;
+				Value[] actualArguments=new Value[argumentCount];
+				for(int i=0; i<argumentCount;i++){
+					Value anObject=evaluateExpression(iomObj,arguments[i]);
+					if (anObject.skipEvaluation()){
+						return anObject;
+					}
+					actualArguments[i]=anObject;
+				}
+				// init function
+				InterlisFunction functionTarget=null;
+				try {
+					functionTarget = (InterlisFunction) functionTargetClass.newInstance();
+				} catch (InstantiationException e) {
+					throw new IllegalStateException(e);
+				} catch (IllegalAccessException e) {
+					throw new IllegalStateException(e);
+				}
+				functionTarget.init(td, (FunctionCall)expression,config,validationConfig);
+				functionTarget.addObject(iomObj, actualArguments);
+				return functionTarget.evaluate();
+			}
+			//TODO INTERLIS.convertUnit
+			//TODO instance of InspectionFactor
+			//TODO instance of LengthOfReferencedText
 		} else if(expression instanceof ObjectPath){
 			// object path	
 			ObjectPath objectPathObj = (ObjectPath) expression;
 			PathEl pathEl = (PathEl) objectPathObj.getLastPathEl();
+			if(pathEl instanceof PathElAbstractClassRole){
+				PathElAbstractClassRole abstractClassRole = (PathElAbstractClassRole) pathEl;
+				if (abstractClassRole.getRole()!=null){
+					RoleDef role = (RoleDef) abstractClassRole.getRole();
+					AbstractClassDef destinationClass = role.getDestination();
+					while(destinationClass.getExtending()!=null){
+						destinationClass.getExtending();
+					}
+					Viewable pathElementOfClassRole = (Viewable) destinationClass;
+					return new Value(pathElementOfClassRole);
+				}
+			} else if(pathEl instanceof StructAttributeRef){
+				StructAttributeRef structAttributeRefValue = (StructAttributeRef) pathEl;
+				if(structAttributeRefValue.getAttr() instanceof LocalAttribute){
+					LocalAttribute localAttributeValue = (LocalAttribute) structAttributeRefValue.getAttr();
+					if(localAttributeValue.getDomain() instanceof CompositionType){
+						CompositionType compositionValue = (CompositionType) localAttributeValue.getDomain();
+						if(compositionValue.getComponentType() instanceof Viewable){
+							Viewable referredStructOfAttr = (Viewable) compositionValue.getComponentType();
+							return new Value(referredStructOfAttr);
+						}
+					}
+				}
+			} else if(pathEl instanceof AttributeRef){
 			AttributeRef attrRef = (AttributeRef) pathEl;
 			Type type = attrRef.getAttr().getDomain();
 			String attrName = objectPathObj.getLastPathEl().getName();
@@ -645,34 +1064,46 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						return new Value(false);
 						// if null, then complex value.
 					} else {
+							Type aliasType=null;
 						if (type instanceof TypeAlias){
 							TypeAlias typeAlias = (TypeAlias) type;
-							Type aliasType = typeAlias.getAliasing().getType();
-							return new Value(aliasType, objValue);
+								aliasType = typeAlias.getAliasing().getType();
+								if (aliasType instanceof EnumerationType){
+									String refTypeName = typeAlias.getAliasing().getName();
+									return new Value(aliasType, objValue, refTypeName);
 						}
+							}
+							if (type instanceof EnumerationType){
 						return new Value(type, objValue);
 					}
+						}
+						return new Value(type, objValue);
 				} else {
-					return new Value(iomObj.getattrobj(attrName, 0)); // TODO handle multivalue
+						return new Value(iomObj.getattrobj(attrName, 0));
 				}
+			}
 			}
 		} else if(expression instanceof Objects){
 			// objects
-			Objects objectsObj = (Objects) expression;
-			
-		} else if(expression instanceof ParameterValue){
-			// parameter value
-			ParameterValue parameterValueObj = (ParameterValue) expression;
-			
-		} else if(expression instanceof ViewableAggregate){
-			// viewable aggregate	
-			ViewableAggregate viewableAggregateObj = (ViewableAggregate) expression;
-			
-		} else if(expression instanceof ViewableAlias){
-			// viewable alias
-			ViewableAlias viewableAliasObj = (ViewableAlias) expression;
+			Viewable viewableOfExpression = ((Objects) expression).getContext();
+			Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).values().iterator();
+			List<IomObject> listOfIomObjects = new ArrayList<IomObject>();
+			while(objectIterator.hasNext()){
+				IomObject aIomObj = (IomObject) objectIterator.next();
+				if(aIomObj!=null){
+					Object modelElement=tag2class.get(aIomObj.getobjecttag());
+					Viewable objectClass = (Viewable) modelElement;
+					if(viewableOfExpression.equals(objectClass)){
+						listOfIomObjects.add(aIomObj);
 		}
-		return Value.createError(); // skip further evaluation
+	}
+			}
+			return new Value(listOfIomObjects);
+		}
+		return Value.createSkipEvaluation(); // skip further evaluation
+		//TODO instance of ParameterValue
+		//TODO instance of ViewableAggregate
+		//TODO instance of ViewableAlias
 	}
 
 	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {
@@ -834,11 +1265,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(iomObj.getattrvaluecount(restrictedAttrName)==0){
 			return;
 		}
-		String check = existenceConstraint.getContainer().getScopedName(null)+"."+existenceConstraint.getName();
-		String checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
-		if(ValidationConfig.OFF.equals(checkConstraint)){
-			// skip it
-		}else{
 			Type type = existenceConstraint.getRestrictedAttribute().getType();
 			// if type of alias, cast type to TypeAlias
 			if (type instanceof TypeAlias){
@@ -902,7 +1328,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				logMsg(checkConstraint,"The value of the attribute {0} of {1} was not found in the condition class.", restrictedAttrName.toString(), iomObj.getobjecttag().toString());
 			}
 		}
-	}
 	
 	private boolean equalsCompositionValue(IomObject iomObjectA, CompositionType compositionType, IomObject otherIomObj, String otherAttrName, String restrictedAttrName) {
 		IomObject compositionValueRestricted=iomObjectA.getattrobj(restrictedAttrName, 0);
@@ -1161,6 +1586,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	Map<String , String> uniqueObjectIDs = new HashMap<String, String>();
 	
 	private void validateObject(IomObject iomObj,String attrPath) throws IoxException {
+		HashSet<Object> objectTypes=new HashSet<Object>();
 		// validate if object is null
 		boolean isObject = attrPath==null;
 		if(isObject){
@@ -1247,6 +1673,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				Object obj1 = attrI.next();
 				if(obj1 instanceof UniquenessConstraint){
 					UniquenessConstraint uniqueConstraint=(UniquenessConstraint) obj1;
+					if(!objectTypes.contains(uniqueConstraint)){
+						errs.addEvent(errFact.logInfoMsg("validate unique constraint {0}...",uniqueConstraint.getScopedName(null)));
+						objectTypes.add(uniqueConstraint);
+					}
 					StringBuilder contentUniqueAttrs = new StringBuilder();
 					ArrayList<String> uniqueConstraintAttrs=new ArrayList<String>();
 					// gets all constraint attribute-names.
@@ -1272,8 +1702,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 		if(isObject){
 			if(addToPool){
-				objectPool.addObject(iomObj,currentBasketId);
+				IomObject objectValue = objectPool.addObject(iomObj,currentBasketId);
+				if (objectValue != null){
+					Object modelElement=tag2class.get(objectValue.getobjecttag());
+					Viewable classValueOfKey= (Viewable) modelElement;
+					errs.addEvent(errFact.logErrorMsg("The OID {0} of object '{1}' already exists in {2}.", objectValue.getobjectoid(), iomObj.toString(), classValueOfKey.toString()));
 			}
+		}
 		}
 		
 		HashSet<String> propNames=new HashSet<String>();
@@ -1390,9 +1825,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(proxyType!=null && (proxyType instanceof ObjectType)){
 						// skip implicit particles (base-viewables) of views
 					}else{
+						HashSet<Type> dataTypes=new HashSet<Type>();
 						Type type=attr.getDomainResolvingAliases();
 						String attrName=attr.getName();
 						if (type instanceof CompositionType){
+							CompositionType compositionType = (CompositionType) type;
+							if(!dataTypes.contains(compositionType)){
+								errs.addEvent(errFact.logDetailInfoMsg("validate composition type {0}...",compositionType.getScopedName(null)));
+								dataTypes.add(compositionType);
+							}
 							 int structc=iomObj.getattrvaluecount(attrName);
 							 for(int structi=0;structi<structc;structi++){
 								 IomObject structEle=iomObj.getattrobj(attrName, structi);
@@ -1403,6 +1844,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							 }
 						}else if (type instanceof PolylineType){
 							PolylineType polylineType=(PolylineType)type;
+							if(!dataTypes.contains(polylineType)){
+								errs.addEvent(errFact.logDetailInfoMsg("validate polyline type {0}...",polylineType.getScopedName(null)));
+								dataTypes.add(polylineType);
+							}
 							IomObject polylineValue=iomObj.getattrobj(attrName, 0);
 							if (polylineValue != null){
 								IomObject coord=getFirstCoordFromPolyline(polylineValue);
@@ -1413,8 +1858,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}else if(type instanceof SurfaceOrAreaType){
 							 if(doItfLineTables){
 								 if(type instanceof SurfaceType){
+									 SurfaceType surfaceType = (SurfaceType) type;
+									 if(!dataTypes.contains(surfaceType)){
+											errs.addEvent(errFact.logDetailInfoMsg("validate surface type {0}...",surfaceType.getScopedName(null)));
+											dataTypes.add(surfaceType);
+									 }
 									 // SURFACE; no attributeValue in mainTable
 								 }else{
+									 AreaType areaType = (AreaType) type;
+									 if(!dataTypes.contains(areaType)){
+											errs.addEvent(errFact.logDetailInfoMsg("validate area type {0}...",areaType.getScopedName(null)));
+											dataTypes.add(areaType);
+									}
 									// AREA
 									// coord
 									IomObject coord=iomObj.getattrobj(attrName, 0);
@@ -1444,6 +1899,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								}
 							 }
 						}else if(type instanceof CoordType){
+							CoordType coordType = (CoordType) type;
+							if(!dataTypes.contains(coordType)){
+								errs.addEvent(errFact.logDetailInfoMsg("validate coord type {0}...",coordType.getScopedName(null)));
+								dataTypes.add(coordType);
+							}
 							IomObject coord=iomObj.getattrobj(attrName, 0);
 							if (coord!=null){
 								return coord;
@@ -1469,6 +1929,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	// viewable aClass
 	private AttributeArray validateUnique(IomObject currentObject,ArrayList<String>uniqueAttrs) {
+		
 		int sizeOfUniqueAttribute = uniqueAttrs.size();
 		ArrayList<String> accu = new ArrayList<String>();
 		for (int i=1;i<sizeOfUniqueAttribute;i++){
@@ -1507,7 +1968,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			 attrPath=attrPath+"/"+attrName;
 		 }
 		 String validateMultiplicity=validationConfig.getConfigValue(attrQName, ValidationConfig.MULTIPLICITY);
-		 String validateType=validationConfig.getConfigValue(attrQName, ValidationConfig.TYPE);
+		 validateType=validationConfig.getConfigValue(attrQName, ValidationConfig.TYPE);
 		Type type0 = attr.getDomain();
 		Type type = attr.getDomainResolvingAliases();
 		if (type instanceof CompositionType){

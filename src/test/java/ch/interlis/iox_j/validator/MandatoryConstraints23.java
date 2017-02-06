@@ -1354,6 +1354,26 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	@Test
+	public void mandatoryConstraintSomeDifferentExpressions_Ok(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_TOPIC+".ClassDiffExpressions", OBJ_OID1);
+		//objStraightsSuccess.setattrvalue("Geometrie_Punkt", "true");
+		objStraightsSuccess.setattrvalue("Geometrie_Polygon", "true");
+		//objStraightsSuccess.setattrvalue("Geometrie_Linie", "true");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(objStraightsSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
 	//#########################################################//
 	//########### FAIL MANDATORY CONSTRAINTS ##################//
 	//#########################################################//
@@ -1751,7 +1771,7 @@ public class MandatoryConstraints23 {
 
 	// test in (!=), (<>).
 	@Test
-	public void mandatoryConstraintInEqualationNumericFalse(){
+	public void unequalNumbersEXP_SameNumbersACT_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OBJ_OID1);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "5");
@@ -2521,7 +2541,7 @@ public class MandatoryConstraints23 {
 	
 	// test in undefined (undefined)
 	@Test
-	public void mandatoryConstraintUnDefinedAttrInPathOk(){
+	public void unDefinedAttrEXP_DefinedAttrACT_Ok(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSDEFINEDB, OBJ_OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -2544,7 +2564,7 @@ public class MandatoryConstraints23 {
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassEqualationI.Constraint1", ValidationConfig.CHECK,ValidationConfig.OFF);
+		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassEqualationI", ValidationConfig.CHECK,ValidationConfig.OFF);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -2564,7 +2584,7 @@ public class MandatoryConstraints23 {
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassEqualationI.Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
+		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassEqualationI", ValidationConfig.CHECK,ValidationConfig.WARNING);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();

@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.ehi.iox.objpool.impl.CompoundCurveSerializer;
 import ch.ehi.iox.objpool.impl.FileBasedCollection;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
@@ -28,7 +29,7 @@ public class ItfAreaPolygon2Linetable {
 		
 	}
 	public ItfAreaPolygon2Linetable(ObjectPoolManager recman1){
-		lines=new FileBasedCollection<CompoundCurve>(recman1);
+		lines=new FileBasedCollection<CompoundCurve>(recman1,new CompoundCurveSerializer());
 		recman=recman1;
 	}
 	public void addLines(String mainObjTid,String internalTid,ArrayList<IomObject> ioxlines) throws IoxException {

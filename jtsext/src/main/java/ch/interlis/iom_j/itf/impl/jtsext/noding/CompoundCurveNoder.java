@@ -5,6 +5,7 @@ import java.util.*;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.CompoundCurveSerializer;
+import ch.ehi.iox.objpool.impl.FileBasedCollection;
 import ch.ehi.iox.objpool.impl.SortedSetIntegerSerializer;
 import ch.interlis.iom_j.itf.impl.jtsext.algorithm.CurveSegmentIntersector;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
@@ -23,10 +24,10 @@ public class CompoundCurveNoder
 	private CurveSegmentIntersector li = new CurveSegmentIntersector();
 
   private List<? extends CompoundCurve> segStrings;
-  private List<? extends CompoundCurve> nodedStrings;
+  private List<CompoundCurve> nodedStrings;
   private List<Intersection> segInt=null;
   private Map<CompoundCurve,SortedSet<Integer>> nodes=null;
-
+  private boolean isNoded=false;
   private boolean validateOnly=false;
   
   /**
@@ -40,12 +41,14 @@ public class CompoundCurveNoder
     this.segStrings = segStrings;
     this.validateOnly=validateOnly;
     nodes=new HashMap<CompoundCurve,SortedSet<Integer>>();
+	nodedStrings=new java.util.ArrayList<CompoundCurve>();
   }
   public CompoundCurveNoder(ObjectPoolManager objPoolManager,List segStrings,boolean validateOnly)
   {
     this.segStrings = segStrings;
     this.validateOnly=validateOnly;
     nodes=objPoolManager.newObjectPool2(new CompoundCurveSerializer(),new SortedSetIntegerSerializer());
+	nodedStrings=new FileBasedCollection<CompoundCurve>(objPoolManager,new CompoundCurveSerializer());
   }
   
   public List<Intersection> getIntersections()
@@ -99,29 +102,28 @@ public class CompoundCurveNoder
 
   public Collection<? extends CompoundCurve> getNodedSubstrings()
   {
-	  if(nodedStrings!=null){
+	  if(isNoded){
 		  return nodedStrings;
 	  }
-	  java.util.ArrayList<CompoundCurve> ret=new java.util.ArrayList<CompoundCurve>();
 	  for(CompoundCurve line:segStrings){
 		  if(!nodes.containsKey(line)){
-			  ret.add(line);
+			  nodedStrings.add(line);
 		  }else{
 			  int startSeg=0;
 			  JtsextGeometryFactory fact=(JtsextGeometryFactory) line.getFactory();
 			  for(int endSeg:nodes.get(line)){
 				  CompoundCurve newLine=null;
 					newLine = fact.createCompoundCurve(line.getSegments().subList(startSeg, endSeg));
-				  ret.add(newLine);
+					nodedStrings.add(newLine);
 				  startSeg=endSeg;
 			  }
 			  CompoundCurve newLine=null;
 				newLine = fact.createCompoundCurve(line.getSegments().subList(startSeg, line.getNumSegments()));
-			  ret.add(newLine);
+				nodedStrings.add(newLine);
 		  }
 	  }
-	  nodedStrings=ret;
-	  return ret;
+	  isNoded=true;
+	  return nodedStrings;
   }
 private void computeIntersects(int ss0Idx,CompoundCurve ss0, int ss1Idx,CompoundCurve ss1) {
     Coordinate[] endPts1=new Coordinate[2];

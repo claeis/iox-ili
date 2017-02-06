@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.xml.ws.Holder;
 
 import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.Viewable;
@@ -17,9 +18,15 @@ import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxLogging;
 import ch.interlis.iox_j.logging.LogEventFactory;
 
+// the ObjectPool manages all objects
+//   - check If Object Is Unique
+//   - add object into map
+//   - check object version on BasketId and iliVersion 1.0 / 2.3
+//   - return objects of given BasketId
+//   - return keys of collection
+//   - return tid of association
+
 public class ObjectPool {
-	private IoxLogging errs=null;
-	private LogEventFactory errFact=null;
 	private boolean doItfOidPerTable;
 	private HashMap<String,Object> tag2class;
 	private ObjectPoolManager objPoolManager=null;
@@ -27,8 +34,6 @@ public class ObjectPool {
 	
 	public ObjectPool(boolean doItfOidPerTable, IoxLogging errs, LogEventFactory errFact, HashMap<String,Object> tag2class,ObjectPoolManager objPoolManager){
 		this.doItfOidPerTable = doItfOidPerTable;
-		this.errFact = errFact;
-		this.errs = errs;
 		this.tag2class = tag2class;
 		this.objPoolManager=objPoolManager;
 	}
@@ -61,7 +66,7 @@ public class ObjectPool {
 		return tid;
 	}
 
-	public void addObject(IomObject iomObj, String currentBasketId){
+	public IomObject addObject(IomObject iomObj, String currentBasketId){
 		String oid = iomObj.getobjectoid();
 		Object modelEle = tag2class.get(iomObj.getobjecttag());
 		if(oid==null){
@@ -82,13 +87,10 @@ public class ObjectPool {
 			collectionOfBaskets.put(currentBasketId, collectionOfObjects);
 		}
 		if(collectionOfObjects.containsKey(key)){
-			IomObject objectValue = collectionOfObjects.get(key);
-			Object modelElement=tag2class.get(objectValue.getobjecttag());
-			Viewable classValueOfKey= (Viewable) modelElement;
-			errs.addEvent(errFact.logErrorMsg("The OID {0} of object '{1}' already exists in {2}.", oid, iomObj.toString(), classValueOfKey.toString()));
-		} else {
-			collectionOfObjects.put(key,iomObj);
+			return collectionOfObjects.get(key);
 		}
+			collectionOfObjects.put(key,iomObj);
+		return null;
 	}
 	
 	public Map getObjectsOfBasketId(String basketId){
