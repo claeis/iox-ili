@@ -13,6 +13,7 @@ import javax.xml.ws.Holder;
 import com.vividsolutions.jts.geom.Coordinate;
 
 import ch.ehi.basics.settings.Settings;
+import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.AssociationDef;
@@ -93,6 +94,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE_DO="doItfOidPerTable";
+	private ObjectPoolManager objPoolManager=null;
 	private ObjectPool objectPool = null;
 	private LinkPool linkPool;
 	private ch.interlis.iox.IoxValidationConfig validationConfig=null;
@@ -123,6 +125,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		this.errFact = errFact;
 		this.config=config;
 		this.pipelinePool=pipelinePool;
+		objPoolManager=new ObjectPoolManager();
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(config.getValue(CONFIG_DO_ITF_OIDPERTABLE));
 		if(doItfLineTables){
@@ -132,7 +135,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		unknownTypev=new HashSet<String>();
 		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
-		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class);
+		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class,objPoolManager);
 		linkPool=new LinkPool();
 	}
 	/** mappings from xml-tags to Viewable|AttributeDef
@@ -144,6 +147,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	
 	@Override
 	public void close() {
+		if(objPoolManager!=null){
+			objPoolManager.close();
+			objPoolManager=null;
+		}
 	}
 
 	@Override
@@ -212,7 +219,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void iterateThroughAllObjects(){
 		for (String basketId : objectPool.getBasketIds()){
 			// iterate through iomObjects
-			Iterator<IomObject> objectIterator = objectPool.getObjectsOfBasketId(basketId).values().iterator();
+			Iterator<IomObject> objectIterator = ((ch.ehi.iox.objpool.impl.ObjPoolImpl) objectPool.getObjectsOfBasketId(basketId)).valueIterator();
 			while (objectIterator.hasNext()){
 				IomObject iomObj = objectIterator.next();
 				setCurrentMainObj(iomObj);
@@ -851,7 +858,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				String attrValueThisObj = iomObj.getattrvalue(otherAttrName);
 				for (String basketId : objectPool.getBasketIds()){
 					// iterate through iomObjects
-					Iterator<IomObject> objectIterator = objectPool.getObjectsOfBasketId(basketId).values().iterator();
+					Iterator<IomObject> objectIterator = ((ch.ehi.iox.objpool.impl.ObjPoolImpl) objectPool.getObjectsOfBasketId(basketId)).valueIterator();
 					while (objectIterator.hasNext()){
 						IomObject otherIomObj = objectIterator.next();
 						if (otherIomObj.getattrcount() == 0){
@@ -1265,7 +1272,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 		if(isObject){
 			if(addToPool){
-				objectPool.addObject(iomObj, tag2class, currentBasketId);
+				objectPool.addObject(iomObj,currentBasketId);
 			}
 		}
 		
@@ -1656,7 +1663,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 										validateSurfaceTopology(validateType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
 										ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
 										if(allLines==null){
-											allLines=new ItfAreaPolygon2Linetable(); 
+											allLines=new ItfAreaPolygon2Linetable(objPoolManager); 
 											areaAttrs.put(attr,allLines);
 										}
 										validateAreaTopology(validateType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);

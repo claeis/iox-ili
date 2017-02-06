@@ -6,23 +6,32 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
 
+import ch.ehi.iox.objpool.impl.BTreeImpl;
 import ch.ehi.iox.objpool.impl.ObjPoolImpl;
+import ch.ehi.iox.objpool.impl.Serializer;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxException;
 
 public class ObjectPoolManager {
 
 	private ArrayList<ObjPoolImpl> maps=new ArrayList<ObjPoolImpl>(); 
+	private ArrayList<BTreeImpl> maps2=new ArrayList<BTreeImpl>(); 
 	public ObjectPoolManager() {
 	}
 
-	public <T> java.util.Map<String, T> newObjectPool() {
+	public <K,V> java.util.Map<K, V> newObjectPool() {
 		flushWriteQueues();
 		ObjPoolImpl m=null;
 		m = new ObjPoolImpl(this);
 		maps.add(m);
 		return m;
-
+	}
+	public <K,V> java.util.Map<K, V> newObjectPool2(Serializer keySerializer,Serializer valueSerializer) {
+		flushWriteQueues();
+		BTreeImpl<K,V> m=null;
+		m = new BTreeImpl<K,V>(keySerializer,valueSerializer);
+		maps2.add(m);
+		return m;
 	}
 
 	public void flushWriteQueues() {
@@ -36,6 +45,10 @@ public class ObjectPoolManager {
 			m.clear();
 		}
 		maps.clear();
+		for (BTreeImpl m: maps2) {
+			m.close();
+		}
+		maps2.clear();
 	}
 
 	static public String getCacheTmpFilename() {

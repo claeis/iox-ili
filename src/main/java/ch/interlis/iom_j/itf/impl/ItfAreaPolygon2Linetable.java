@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.ehi.iox.objpool.impl.FileBasedCollection;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
@@ -18,10 +20,16 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class ItfAreaPolygon2Linetable {
 
-	private Collection<? extends CompoundCurve> lines=new ArrayList<CompoundCurve>();
+	private Collection<? extends CompoundCurve> lines=null;
 	private ArrayList<IomObject> ioxlines=null;
+	private ObjectPoolManager recman=null;
 	public ItfAreaPolygon2Linetable(){
+		lines=new ArrayList<CompoundCurve>();
 		
+	}
+	public ItfAreaPolygon2Linetable(ObjectPoolManager recman1){
+		lines=new FileBasedCollection<CompoundCurve>(recman1);
+		recman=recman1;
 	}
 	public void addLines(String mainObjTid,String internalTid,ArrayList<IomObject> ioxlines) throws IoxException {
 		for(IomObject ioxline:ioxlines){
@@ -31,14 +39,14 @@ public class ItfAreaPolygon2Linetable {
 			}else{
 				line.setUserData(mainObjTid);
 			}
-			((ArrayList<CompoundCurve>)lines).add(line);
+			((Collection)lines).add(line);
 		}
 	}
 
 	public ArrayList<IomObject> getLines() throws IoxException {
 		if(ioxlines==null){
 			{
-				CompoundCurveNoder noder=new CompoundCurveNoder(lines,false);
+				CompoundCurveNoder noder=new CompoundCurveNoder(recman,(java.util.List)lines,false);
 				if(!noder.isValid()){
 					for(Intersection is:noder.getIntersections()){
 						EhiLogger.logError("intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
@@ -49,9 +57,9 @@ public class ItfAreaPolygon2Linetable {
 				lines=noder.getNodedSubstrings();
 				noder=null;
 			}
-			CompoundCurveDissolver dissolver=new CompoundCurveDissolver();
-			dissolver.dissolve(lines);
-			lines=dissolver.getDissolved();
+			//CompoundCurveDissolver dissolver=new CompoundCurveDissolver();
+			//dissolver.dissolve(lines);
+			//lines=dissolver.getDissolved();
 			ioxlines=new ArrayList<IomObject>();
 			for(CompoundCurve line:lines){
 				IomObject ioxline;

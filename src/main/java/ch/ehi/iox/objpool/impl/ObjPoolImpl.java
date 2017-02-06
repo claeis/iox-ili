@@ -9,6 +9,7 @@ import java.io.RandomAccessFile;
 import java.lang.ref.Reference;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -180,4 +181,25 @@ public class ObjPoolImpl implements Map {
 		throw new java.lang.UnsupportedOperationException();
 	}
 
+	public Iterator valueIterator()
+	{
+		Iterator ret=new Iterator() {
+			Iterator<Object> kevi=pool.keySet().iterator();
+			@Override
+			public void remove() {
+				throw new java.lang.UnsupportedOperationException();
+			}
+			
+			@Override
+			public Object next() {
+				return get(kevi.next());
+			}
+			
+			@Override
+			public boolean hasNext() {
+				return kevi.hasNext();
+			}
+		};
+		return ret;
+	}
 }

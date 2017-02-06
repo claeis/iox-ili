@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.xml.ws.Holder;
 
+import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.Viewable;
@@ -21,13 +22,15 @@ public class ObjectPool {
 	private LogEventFactory errFact=null;
 	private boolean doItfOidPerTable;
 	private HashMap<String,Object> tag2class;
+	private ObjectPoolManager objPoolManager=null;
 	Map<String, Map<ObjectPoolKey, IomObject>> collectionOfBaskets = new HashMap<String, Map<ObjectPoolKey, IomObject>>();
 	
-	public ObjectPool(boolean doItfOidPerTable, IoxLogging errs, LogEventFactory errFact, HashMap<String,Object> tag2class){
+	public ObjectPool(boolean doItfOidPerTable, IoxLogging errs, LogEventFactory errFact, HashMap<String,Object> tag2class,ObjectPoolManager objPoolManager){
 		this.doItfOidPerTable = doItfOidPerTable;
 		this.errFact = errFact;
 		this.errs = errs;
 		this.tag2class = tag2class;
+		this.objPoolManager=objPoolManager;
 	}
 	public static String getAssociationId(IomObject iomObj, AssociationDef assocDef) {
 		if(assocDef==null){
@@ -58,7 +61,7 @@ public class ObjectPool {
 		return tid;
 	}
 
-	public void addObject(IomObject iomObj, HashMap<String,Object> tag2class, String currentBasketId){
+	public void addObject(IomObject iomObj, String currentBasketId){
 		String oid = iomObj.getobjectoid();
 		Object modelEle = tag2class.get(iomObj.getobjecttag());
 		if(oid==null){
@@ -75,7 +78,7 @@ public class ObjectPool {
 		if(collectionOfBaskets.containsKey(currentBasketId)){
 			collectionOfObjects=collectionOfBaskets.get(currentBasketId);
 		} else {
-			collectionOfObjects=new HashMap<ObjectPoolKey, IomObject>();
+			collectionOfObjects=objPoolManager.newObjectPool(); // new HashMap<ObjectPoolKey, IomObject>();
 			collectionOfBaskets.put(currentBasketId, collectionOfObjects);
 		}
 		if(collectionOfObjects.containsKey(key)){
