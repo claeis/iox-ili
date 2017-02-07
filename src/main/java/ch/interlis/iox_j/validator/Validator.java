@@ -212,7 +212,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
 	private void iterateThroughAdditionalModels(){
-		// additional models
 		if(additionalModels==null){
 			return;
 		}
@@ -223,6 +222,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			// models
 			Iterator tdIterator = td.iterator();
+			boolean modelExists=false;
 			while(tdIterator.hasNext()){
 				Object modelObj = tdIterator.next();
 				if(!(modelObj instanceof DataModel)){
@@ -231,8 +231,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				// model
 				DataModel model = (DataModel) modelObj;
 				if(model.getName().equals(additionalModel)){
+					modelExists=true;
 					collectAdditionalConstraints(model);
 				}
+			}
+			if(!modelExists){
+				logMsg(checkConstraint,"Defined AdditionalModel {0} not exist.", additionalModel);
 			}
 		}
 	}
@@ -258,21 +262,28 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 				// view
 				Projection view = (Projection) topicObj;
-				Viewable viewable=null;
+				Viewable classValue=null;
 				if(view.getSelected().getAliasing()==null){
 					continue;
 				}
 				// class
-				viewable = view.getSelected().getAliasing();
-				// constraint								
-				Iterator iteratorOfViewConstraints=view.iterator();
-				while (iteratorOfViewConstraints.hasNext()){
-					Object constraintObj = iteratorOfViewConstraints.next();
-					if(!(constraintObj instanceof Constraint)){
-						continue;
+				classValue = view.getSelected().getAliasing();
+				// constraint off
+				String check = classValue.getContainer().getScopedName(null)+"."+classValue.getName();
+				checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
+				if(ValidationConfig.OFF.equals(checkConstraint)){
+					 // skip it
+				}else{
+					// constraint								
+					Iterator iteratorOfViewConstraints=view.iterator();
+					while (iteratorOfViewConstraints.hasNext()){
+						Object constraintObj = iteratorOfViewConstraints.next();
+						if(!(constraintObj instanceof Constraint)){
+							continue;
+						}
+						Constraint constraint = (Constraint) constraintObj;
+						additionalConstraints.put(constraint, classValue);
 					}
-					Constraint constraint = (Constraint) constraintObj;
-					additionalConstraints.put(constraint, viewable);
 				}
 			}
 		}
@@ -327,10 +338,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}else{
 					// additional constraint
 					if(!additionalConstraints.isEmpty()){
+						boolean classFound=false;
+						Viewable classValue=null;
 						for (Map.Entry<Constraint,Viewable> constraintValue : additionalConstraints.entrySet()) {
 							Constraint constraintObj = constraintValue.getKey();
-							Viewable classValue = constraintValue.getValue();
+							classValue = constraintValue.getValue();
 							if(classValue.equals(currentClass)){
+								classFound=true;
 								if(constraintObj instanceof ExistenceConstraint){
 									ExistenceConstraint existenceConstraint = (ExistenceConstraint) constraintObj;
 									validateExistenceConstraint(iomObj, existenceConstraint);
@@ -342,6 +356,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									setConstraint(iomObj, setConstraint);
 								}
 							}
+						}
+						if(!classFound){
+							logMsg(checkConstraint,"Referenced class {0} of additionalModels not found.", classValue.getName());
 						}
 					}
 					Iterator constraintIterator=currentClass.iterator();
