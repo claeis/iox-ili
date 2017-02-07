@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.ws.Holder;
 
@@ -32,6 +33,7 @@ import ch.interlis.ili2c.metamodel.Constant.Numeric;
 import ch.interlis.ili2c.metamodel.Constant.Text;
 import ch.interlis.ili2c.metamodel.Constraint;
 import ch.interlis.ili2c.metamodel.CoordType;
+import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Domain;
 import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.EnumTreeValueType;
@@ -70,6 +72,8 @@ import ch.interlis.ili2c.metamodel.PathElAbstractClassRole;
 import ch.interlis.ili2c.metamodel.PathElAssocRole;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
+import ch.interlis.ili2c.metamodel.PredefinedModel;
+import ch.interlis.ili2c.metamodel.Projection;
 import ch.interlis.ili2c.metamodel.ReferenceType;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.SetConstraint;
@@ -78,10 +82,12 @@ import ch.interlis.ili2c.metamodel.SurfaceOrAreaType;
 import ch.interlis.ili2c.metamodel.SurfaceType;
 import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.ili2c.metamodel.TextType;
+import ch.interlis.ili2c.metamodel.Topic;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.Type;
 import ch.interlis.ili2c.metamodel.TypeAlias;
 import ch.interlis.ili2c.metamodel.UniquenessConstraint;
+import ch.interlis.ili2c.metamodel.View;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableAggregate;
 import ch.interlis.ili2c.metamodel.ViewableAlias;
@@ -102,6 +108,7 @@ import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
+	public static final String CONFIG_ADDITIONAL_MODELS="ch.interlis.iox_j.validator.additionalModels";
 	public static final String CONFIG_DO_ITF_LINETABLES="ch.interlis.iox_j.validator.doItfLinetables";
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
@@ -124,6 +131,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String checkConstraint=null;
 	private String validateType=null;
 	private HashMap<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
+	private HashMap<Constraint,Viewable> additionalConstraints=new HashMap<Constraint,Viewable>();
+	private String[] additionalModels=null;
 	
 	@Deprecated
 	protected Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -150,6 +159,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
 		objectPool=new ObjectPool(doItfOidPerTable, tag2class);
 		linkPool=new LinkPool();
+		if(config.getValue(CONFIG_ADDITIONAL_MODELS)!=null){
+			additionalModels = config.getValue(CONFIG_ADDITIONAL_MODELS).split(";");
+		}
 	}
 	/** mappings from xml-tags to Viewable|AttributeDef
 	 */
@@ -193,8 +205,76 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
+			iterateThroughAdditionalModels();
 			iterateThroughAllObjects();
 			validateAllAreas();
+		}
+	}
+	
+	private void iterateThroughAdditionalModels(){
+		// additional models
+		if(additionalModels==null){
+			return;
+		}
+		for(int modelIndex=0;modelIndex<additionalModels.length;modelIndex++){
+			String additionalModel = additionalModels[modelIndex];
+			if(additionalModel==null){
+				continue;
+			}
+			// models
+			Iterator tdIterator = td.iterator();
+			while(tdIterator.hasNext()){
+				Object modelObj = tdIterator.next();
+				if(!(modelObj instanceof DataModel)){
+					continue;
+				}
+				// model
+				DataModel model = (DataModel) modelObj;
+				if(model.getName().equals(additionalModel)){
+					collectAdditionalConstraints(model);
+				}
+			}
+		}
+	}
+	
+	private void collectAdditionalConstraints(DataModel model){
+		Iterator modelIterator = model.iterator();
+		while(modelIterator.hasNext()){
+			Object modelObj = modelIterator.next();
+			// view topic
+			if(!(modelObj instanceof Topic)){
+				continue;
+			}
+			// topic
+			Topic topic = (Topic) modelObj;
+			if(!topic.isViewTopic()){
+				continue;
+			}
+			Iterator topicIterator = topic.iterator();
+			while(topicIterator.hasNext()){
+				Object topicObj = topicIterator.next();
+				if(!(topicObj instanceof Projection)){
+					continue;
+				}
+				// view
+				Projection view = (Projection) topicObj;
+				Viewable viewable=null;
+				if(view.getSelected().getAliasing()==null){
+					continue;
+				}
+				// class
+				viewable = view.getSelected().getAliasing();
+				// constraint								
+				Iterator iteratorOfViewConstraints=view.iterator();
+				while (iteratorOfViewConstraints.hasNext()){
+					Object constraintObj = iteratorOfViewConstraints.next();
+					if(!(constraintObj instanceof Constraint)){
+						continue;
+					}
+					Constraint constraint = (Constraint) constraintObj;
+					additionalConstraints.put(constraint, viewable);
+				}
+			}
 		}
 	}
 	
@@ -245,6 +325,25 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(ValidationConfig.OFF.equals(checkConstraint)){
 					 // skip it
 				}else{
+					// additional constraint
+					if(!additionalConstraints.isEmpty()){
+						for (Map.Entry<Constraint,Viewable> constraintValue : additionalConstraints.entrySet()) {
+							Constraint constraintObj = constraintValue.getKey();
+							Viewable classValue = constraintValue.getValue();
+							if(classValue.equals(currentClass)){
+								if(constraintObj instanceof ExistenceConstraint){
+									ExistenceConstraint existenceConstraint = (ExistenceConstraint) constraintObj;
+									validateExistenceConstraint(iomObj, existenceConstraint);
+								} else if(constraintObj instanceof MandatoryConstraint){
+									MandatoryConstraint mandatoryConstraint = (MandatoryConstraint) constraintObj;
+									validateMandatoryConstraint(iomObj, mandatoryConstraint);
+								} else if(constraintObj instanceof SetConstraint){
+									SetConstraint setConstraint = (SetConstraint) constraintObj;
+									setConstraint(iomObj, setConstraint);
+								}
+							}
+						}
+					}
 					Iterator constraintIterator=currentClass.iterator();
 					while (constraintIterator.hasNext()) {
 						Object constraintObj = constraintIterator.next();
@@ -305,7 +404,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(currentClass instanceof AbstractClassDef){
 					AbstractClassDef abstractClassDef = (AbstractClassDef) currentClass;
 					if(!viewables.contains(abstractClassDef)){
-						errs.addEvent(errFact.logInfoMsg("validate role reference {0}...",abstractClassDef.getScopedName(null)));
+						errs.addEvent(errFact.logInfoMsg("validate role cardinality {0}...",abstractClassDef.getScopedName(null)));
 						viewables.add(abstractClassDef);
 					}
 					Iterator<RoleDef> targetRoleIterator=abstractClassDef.getOpposideRoles();
@@ -1047,7 +1146,38 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				Type type = attrRef.getAttr().getDomain();
 				String attrName = objectPathObj.getLastPathEl().getName();
 				if(iomObj.getattrvaluecount(attrName)==0){
-					return Value.createUndefined();
+//					// basetype not null
+//					if(attrRef.getAttr() instanceof LocalAttribute){
+//					LocalAttribute localAttribute = (LocalAttribute) attrRef.getAttr();
+//					if(localAttribute.getBasePaths()!=null){
+//						Evaluable[] arguments = localAttribute.getBasePaths();
+//						Set<String> basketIds = objectPool.getBasketIds();
+//						Iterator basketIterator = basketIds.iterator();
+//						while(basketIterator.hasNext()){
+//							Object anBasket = basketIterator.next();
+//							Iterator objectIterator = objectPool.getObjectsOfBasketId(anBasket.toString()).values().iterator();
+//							while(objectIterator.hasNext()){
+//								IomObject aIomObj = (IomObject) objectIterator.next();
+//								if(aIomObj!=null){
+//									String attrValue = aIomObj.getattrvalue(arguments[0].toString());
+//									if(attrValue!=null){
+//										Value baseValue=evaluateExpression(aIomObj,arguments[0]);
+//										if (baseValue.skipEvaluation()){
+//											return baseValue;
+//										}
+//										if (baseValue.isUndefined()){
+//											return Value.createSkipEvaluation();
+//										}
+//										if(baseValue.getValue()!=null){
+//											return new Value(baseValue.getType(), baseValue.getValue());
+//										}
+//									}
+//								}
+//							}
+//						}
+//					}
+//				}
+				return Value.createUndefined();
 				}else{
 					String objValue = iomObj.getattrvalue(attrName);
 					if(objValue != null){
@@ -1590,7 +1720,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if (isObject){
 			Object modelElementOidValidate = tag2class.get(iomObj.getobjecttag());
 			Viewable classValueOidValidate = (Viewable) modelElementOidValidate;
-			
 			// association
 			if (modelElementOidValidate instanceof AssociationDef){
 				AssociationDef modelAssociationDef = (AssociationDef) modelElementOidValidate;

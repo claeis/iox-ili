@@ -1,0 +1,47 @@
+INTERLIS 2.3;
+
+CONTRACTED MODEL AdditionalConstraints23 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+  TOPIC Bodenbedeckung =
+	CLASS Gebaeude =
+		attr1 : 0..10; !!5
+		attr2 : 0..10;
+  	END Gebaeude;
+  END Bodenbedeckung;
+END AdditionalConstraints23.
+
+
+CONTRACTED MODEL AdditionalConstraints23Zusatz AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+  IMPORTS AdditionalConstraints23;
+  
+  VIEW TOPIC BodenbedeckungZusatz =
+  	DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+    
+    VIEW IndustrieGebaeude
+    	PROJECTION OF AdditionalConstraints23.Bodenbedeckung.Gebaeude;
+    	WHERE Gebaeude->attr1==5;
+    	=
+        ALL OF Gebaeude;
+        MANDATORY CONSTRAINT attr1 == attr2; !! R1.8
+    END IndustrieGebaeude;
+  END BodenbedeckungZusatz;
+
+END AdditionalConstraints23Zusatz.
+
+
+
+CONTRACTED MODEL AdditionalConstraints23Zusatz2 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+  IMPORTS AdditionalConstraints23;
+  
+  VIEW TOPIC BodenbedeckungZusatz =
+  	DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+    
+    VIEW IndustrieGebaeude
+    	PROJECTION OF AdditionalConstraints23.Bodenbedeckung.Gebaeude;
+    	WHERE Gebaeude->attr1==5;
+    	=
+        ALL OF Gebaeude;
+        MANDATORY CONSTRAINT attr1 == attr2; !! R1.8
+    END IndustrieGebaeude;
+  END BodenbedeckungZusatz;
+
+END AdditionalConstraints23Zusatz2.
