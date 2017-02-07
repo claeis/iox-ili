@@ -93,8 +93,8 @@ public class ObjectPool {
 		return null;
 	}
 	
-	public Map getObjectsOfBasketId(String basketId){
-		return collectionOfBaskets.get(basketId);
+	public ch.ehi.iox.objpool.impl.ObjPoolImpl getObjectsOfBasketId(String basketId){
+		return (ch.ehi.iox.objpool.impl.ObjPoolImpl)collectionOfBaskets.get(basketId);
 	}
 	
 	public Set<String> getBasketIds(){

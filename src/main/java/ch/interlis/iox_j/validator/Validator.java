@@ -768,7 +768,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						return Value.createSkipEvaluation();
 					}
 					// through all objects
-					Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).values().iterator();
+					Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
 					int counter = 0;
 					if(value.getViewable()!=null){
 						while(objectIterator.hasNext()){
@@ -877,9 +877,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					return Value.createSkipEvaluation();
 				} // if surfaceBag is undefined
 				if(surfaceBag.isUndefined()){
-					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(); // create new pool of polygons
+					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(objPoolManager); // create new pool of polygons
 					if(objects.getViewable()!=null){
-						Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).values().iterator();
+						Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
 						while(objectIterator.hasNext()){
 							IomObject aIomObj = (IomObject) objectIterator.next();
 							if(aIomObj!=null){
@@ -923,9 +923,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					return new Value(true); // if there where some lines, return true
 				} else {
 					// if surfaceBag is defined
-					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable();
+					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(objPoolManager);
 					if(objects.getViewable()!=null){
-						Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).values().iterator();
+						Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
 						while(objectIterator.hasNext()){
 							IomObject aIomObj = (IomObject) objectIterator.next();
 							if(aIomObj!=null){
@@ -1086,7 +1086,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		} else if(expression instanceof Objects){
 			// objects
 			Viewable viewableOfExpression = ((Objects) expression).getContext();
-			Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).values().iterator();
+			Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
 			List<IomObject> listOfIomObjects = new ArrayList<IomObject>();
 			while(objectIterator.hasNext()){
 				IomObject aIomObj = (IomObject) objectIterator.next();

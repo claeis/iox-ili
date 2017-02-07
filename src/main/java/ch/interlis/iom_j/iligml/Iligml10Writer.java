@@ -342,7 +342,7 @@ import java.util.Map;
 						String attrName=attr.getName();
 						String lineTableName=tableQName+"."+attrName;
 						EhiLogger.logState("build linetable "+lineTableName+"...");
-						ItfAreaPolygon2Linetable allLines=new ItfAreaPolygon2Linetable();
+						ItfAreaPolygon2Linetable allLines=new ItfAreaPolygon2Linetable(recman);
 						// FORALL main objects
 						java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
 						for(String poolId : pool.keySet()){

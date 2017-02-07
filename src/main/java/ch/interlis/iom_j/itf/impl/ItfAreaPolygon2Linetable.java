@@ -24,10 +24,6 @@ public class ItfAreaPolygon2Linetable {
 	private Collection<? extends CompoundCurve> lines=null;
 	private ArrayList<IomObject> ioxlines=null;
 	private ObjectPoolManager recman=null;
-	public ItfAreaPolygon2Linetable(){
-		lines=new ArrayList<CompoundCurve>();
-		
-	}
 	public ItfAreaPolygon2Linetable(ObjectPoolManager recman1){
 		lines=new FileBasedCollection<CompoundCurve>(recman1,new CompoundCurveSerializer());
 		recman=recman1;
