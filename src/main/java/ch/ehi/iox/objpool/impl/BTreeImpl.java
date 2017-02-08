@@ -8,18 +8,43 @@ import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.btree.BTree;
 import ch.ehi.iox.objpool.impl.btree.BTreeCursor;
+import ch.ehi.iox.objpool.impl.btree.NodeId;
 
 public class BTreeImpl<K,V> implements Map<K, V> {
 	
 	private BTree<K, Long> tree= null;
 	private RandomAccessFile outFile=null;
 	private Serializer valueSerializer=null;
+    private static int MAX_CACHE=32;
+    private final LinkedHashMap<Long,V> cache = new LinkedHashMap<Long,V>(MAX_CACHE,0.75f,true){
+    	@Override
+    	protected boolean removeEldestEntry(Map.Entry<Long, V> eldest) {
+    		if(true){
+        		if(size()<MAX_CACHE){
+        			return false;
+        		}
+        		long pos=eldest.getKey();
+        		V value=eldest.getValue();
+    			try {
+					writeValue(pos, value);
+				} catch (IOException e) {
+					throw new IllegalStateException(e);
+				}
+                return true; // remove eldest
+    		}
+    		return false;
+        }
+
+    };
+
+	
 	public BTreeImpl( Serializer keySerializer,Serializer valueSerializer1)
 	{
 		try{
@@ -82,6 +107,9 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 	}
 	private V readValue(Long pos) throws IOException {
 		if(pos!=null){
+			if(cache.containsKey(pos)){
+				return cache.get(pos);
+			}
 			outFile.seek(pos);
 			int size=outFile.readInt();
 			byte[] bytes=new byte[size];
@@ -95,6 +123,12 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 			return value;
 		}
 		return null;
+	}
+	private void writeValue(long pos, V value) throws IOException {
+		outFile.seek(pos);
+		byte[] bytes=valueSerializer.getBytes(value);
+		outFile.writeInt(bytes.length);
+		outFile.write(bytes);
 	}
 
 	@Override
@@ -112,10 +146,7 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 		try {
 			
 			long pos = outFile.length();
-			outFile.seek(pos);
-			byte[] bytes=valueSerializer.getBytes(value);
-			outFile.writeInt(bytes.length);
-			outFile.write(bytes);
+			cache.put(pos, value);
 			Long retPos=tree.get((K)key);
 			tree.put(key, pos);
 			return null;

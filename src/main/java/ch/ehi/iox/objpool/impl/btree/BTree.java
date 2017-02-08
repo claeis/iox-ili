@@ -20,7 +20,7 @@ import ch.ehi.iox.objpool.impl.Serializer;
 public class BTree<Key, Value>  {
     // max children per B-tree node = M-1
     // (must be even and greater than 2)
-    static final int M = 4;
+    static final int M = 16;
 
     private NodeId root;       // root of the B-tree
     private int height;      // height of the B-tree
@@ -30,9 +30,9 @@ public class BTree<Key, Value>  {
     private Serializer<Value> valueSerializer;
     java.util.Comparator<Key> keyComparator;
     private RandomAccessFile file;
-    public final static int BLOCK_SIZE=4096;
+    public final static int BLOCK_SIZE=8192;
     private int pageCount=0;
-    private static int MAX_CACHE=16;
+    private static int MAX_CACHE=32;
     private final LinkedHashMap<NodeId,Node> cache = new LinkedHashMap<NodeId,Node>(MAX_CACHE,0.75f,true){
     	@Override
     	protected boolean removeEldestEntry(Map.Entry<NodeId, Node> eldest) {
