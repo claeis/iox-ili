@@ -286,11 +286,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						// set constraint
 						if(constraintObj instanceof SetConstraint){
 							SetConstraint setConstraint=(SetConstraint) constraintObj;
-							if(!constraints.contains(setConstraint)){
-								errs.addEvent(errFact.logInfoMsg("validate set constraint {0}...",getScopedName(setConstraint)));
-								constraints.add(setConstraint);
-							}
-							setConstraint(iomObj, setConstraint);
+							collectSetConstraintObjs(iomObj, setConstraint);
 						}
 					}
 				}
@@ -329,37 +325,62 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 		}
-	}
-
-	private void setConstraint(IomObject iomObj, SetConstraint setConstraintObj) {
-		Evaluable condition = (Evaluable) setConstraintObj.getCondition();
-		if(setConstraintObj.getPreCondition() != null){
-			Evaluable preCondition = (Evaluable) setConstraintObj.getPreCondition();
-			boolean conditionSuccessful = validateSetConstraint(iomObj, preCondition, setConstraintObj);
-			if(conditionSuccessful){
-				validateSetConstraint(iomObj, condition, setConstraintObj);
-			}
-		} else {
-			validateSetConstraint(iomObj, condition, setConstraintObj);
+		for(SetConstraint setConstraint:setConstraints.keySet()){
+			errs.addEvent(errFact.logInfoMsg("validate set constraint {0}...",getScopedName(setConstraint)));
+			validateSetConstraint(setConstraint);
 		}
 	}
+
+	private HashMap<SetConstraint,Collection<String>> setConstraints=new HashMap<SetConstraint,Collection<String>>();
+	private Iterator<String> allObjIterator=null;
 	
-	private boolean validateSetConstraint(IomObject iomObj, Evaluable condition, SetConstraint setConstraintObj){
-		Value conditionValue = evaluateExpression(iomObj, condition);
-		if (!conditionValue.isNotYetImplemented()){
-			if (!conditionValue.skipEvaluation()){
-				if (conditionValue.isTrue()){
-					return true;
+	private void collectSetConstraintObjs(IomObject iomObj, SetConstraint setConstraintObj) {
+		Evaluable preCondition = (Evaluable) setConstraintObj.getPreCondition();
+		if(preCondition != null){
+			Value preConditionValue = evaluateExpression(iomObj, preCondition);
+			if (preConditionValue.isNotYetImplemented()){
+				logMsg(checkConstraint,"Function in set constraint {0} is not yet implemented.",getScopedName(setConstraintObj));
+				return;
+			}
+			if (preConditionValue.skipEvaluation()){
+				return;
+			}
+			if (!preConditionValue.isTrue()){
+				// ignore this object in set constraint
+				return;
+			}
+			// consider object in set constraint
+		}
+		// save object
+		Collection<String> objs=setConstraints.get(setConstraintObj);
+		if(objs==null){
+			objs=new HashSet<String>();
+			setConstraints.put(setConstraintObj,objs);
+		}
+		objs.add(iomObj.getobjectoid());
+	}
+	private void validateSetConstraint(SetConstraint setConstraintObj) {
+		Collection<String> objs=setConstraints.get(setConstraintObj);
+		if(objs!=null && objs.size()>0){
+			for(String oid:objs){
+				allObjIterator=objs.iterator();
+				IomObject iomObj=objectPool.getObject(oid, null, null);
+				Evaluable condition = (Evaluable) setConstraintObj.getCondition();
+				Value constraintValue = evaluateExpression(iomObj, condition);
+				if (constraintValue.isNotYetImplemented()){
+					logMsg(checkConstraint,"Function in set constraint {0} is not yet implemented.",getScopedName(setConstraintObj));
+					return;
+				}
+				if (constraintValue.skipEvaluation()){
+					return;
+				}
+				if (constraintValue.isTrue()){
 					// ok
 				} else {
 					logMsg(checkConstraint,"Set Constraint {0} is not true.", getScopedName(setConstraintObj));
 				}
 			}
-		} else {
-			logMsg(checkConstraint,"Function is not yet implemented.");
-			Value.createNotYetImplemented();
 		}
-		return false;
 	}
 	
 	private void validateMandatoryConstraint(IomObject iomObj, MandatoryConstraint mandatoryConstraintObj) {
@@ -1092,17 +1113,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		} else if(expression instanceof Objects){
 			// objects
 			Viewable viewableOfExpression = ((Objects) expression).getContext();
-			Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
+			Iterator<String> objectIterator = allObjIterator; //objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
 			List<IomObject> listOfIomObjects = new ArrayList<IomObject>();
 			while(objectIterator.hasNext()){
-				IomObject aIomObj = (IomObject) objectIterator.next();
+				String oid=objectIterator.next();
+				IomObject aIomObj = objectPool.getObject(oid, null, null);
 				if(aIomObj!=null){
 					Object modelElement=tag2class.get(aIomObj.getobjecttag());
 					Viewable objectClass = (Viewable) modelElement;
-					if(viewableOfExpression.equals(objectClass)){
-						listOfIomObjects.add(aIomObj);
-		}
-	}
+					listOfIomObjects.add(aIomObj);
+				}
 			}
 			return new Value(listOfIomObjects);
 		}

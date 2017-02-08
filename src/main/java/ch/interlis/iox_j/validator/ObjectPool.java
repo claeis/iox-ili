@@ -108,17 +108,19 @@ public class ObjectPool {
 				for(Viewable aClass : classes){
 					IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, aClass, basketId));
 					if(object != null){
-						retBasketId.value=basketId;
+						if(retBasketId!=null){
+							retBasketId.value=basketId;
+						}
 						return object;
 					}
 				}
 			} else {
-				for(Viewable aClass : classes){		
-					IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, null, basketId));
-					if(object != null){
+				IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, null, basketId));
+				if(object != null){
+					if(retBasketId!=null){
 						retBasketId.value=basketId;
-						return object;
 					}
+					return object;
 				}
 			}
 		}

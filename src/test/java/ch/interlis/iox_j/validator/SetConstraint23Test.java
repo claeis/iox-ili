@@ -60,6 +60,27 @@ public class SetConstraint23Test {
 	public void setConstraint_Ok(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
 		iomObj.setattrvalue("Art", "b");
+		Iom_jObject iomObj2=new Iom_jObject(ILI_CLASSA, OBJ_OID2);
+		iomObj2.setattrvalue("Art", "c");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new ObjectEvent(iomObj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void setConstraint_NoObjectInSet_Ok(){
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
+		iomObj.setattrvalue("Art", "a");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -215,24 +236,6 @@ public class SetConstraint23Test {
 	//#########################################################//
 	//######## FAIL FUNCTIONS #################################//
 	//#########################################################//
-	@Test
-	public void setConstraint_WrongValue_Fail(){
-		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		iomObj.setattrvalue("Art", "a");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Set Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-	}
 	
 	@Test
 	public void setConstraint_WrongNumberOfObjects_Fail(){
@@ -250,7 +253,7 @@ public class SetConstraint23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Set Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Set Constraint SetConstraint23.Topic.ClassB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -277,7 +280,7 @@ public class SetConstraint23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Set Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Set Constraint SetConstraint23.Topic.ClassC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -364,6 +367,6 @@ public class SetConstraint23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Set Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Set Constraint SetConstraint23.Topic.ClassD.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}	
 }
