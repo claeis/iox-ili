@@ -3,6 +3,8 @@ package ch.interlis.iom_j.itf.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.xml.ws.Holder;
+
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.CompoundCurveSerializer;
@@ -37,6 +39,20 @@ public class ItfAreaPolygon2Linetable {
 				line.setUserData(mainObjTid);
 			}
 			((Collection)lines).add(line);
+		}
+	}
+	public void addLines(String mainObjTid,String internalTid,ArrayList<IomObject> ioxlines,String validationType,LogEventFactory errs) throws IoxException {
+		for(IomObject ioxline:ioxlines){
+			Holder<Boolean> foundErrs=new Holder<Boolean>();
+			CompoundCurve line=Iox2jtsext.polyline2JTS(ioxline, false, 0.0,foundErrs,errs,0.0,validationType);
+			if(line!=null){
+				if(internalTid!=null){
+					line.setUserData(internalTid);
+				}else{
+					line.setUserData(mainObjTid);
+				}
+				((Collection)lines).add(line);
+			}
 		}
 	}
 

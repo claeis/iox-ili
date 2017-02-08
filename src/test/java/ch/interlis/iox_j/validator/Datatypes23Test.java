@@ -1156,7 +1156,7 @@ public class Datatypes23Test {
 		coordStart.setattrvalue("C2", "70000.000");
 		coordStart.setattrvalue("C3", "4000.000");
 		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordEnd.setattrvalue("C1", "480000.000");
+		coordEnd.setattrvalue("C1", "480001.000");
 		coordEnd.setattrvalue("C2", "70000.000");
 		coordEnd.setattrvalue("C3", "4000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1182,10 +1182,10 @@ public class Datatypes23Test {
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
 		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480000.000");
+		endSegment.setattrvalue("C1", "480001.000");
 		endSegment.setattrvalue("C2", "70000.000");
 		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A1", "480002.000");
 		arcSegment.setattrvalue("A2", "300000.000");
 		arcSegment.setattrvalue("C1", "480000.000");
 		arcSegment.setattrvalue("C2", "70000.000");
@@ -1213,11 +1213,11 @@ public class Datatypes23Test {
 		startSegment.setattrvalue("C2", "70000.000");
 		startSegment.setattrvalue("C3", "5000.000");
 		IomObject secondSegment=segments.addattrobj("segment", "COORD");
-		secondSegment.setattrvalue("C1", "480000.000");
+		secondSegment.setattrvalue("C1", "480001.000");
 		secondSegment.setattrvalue("C2", "70000.000");
 		secondSegment.setattrvalue("C3", "5000.000");
 		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A1", "480002.000");
 		arcSegment.setattrvalue("A2", "300000.000");
 		arcSegment.setattrvalue("C1", "480000.000");
 		arcSegment.setattrvalue("C2", "70000.000");
@@ -3179,6 +3179,7 @@ public class Datatypes23Test {
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
+		errFactory.setLogger(logger);
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
@@ -3370,7 +3371,7 @@ public class Datatypes23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()>1);
+		assertEquals(1,logger.getErrs().size());
 	}
 	@Test
 	public void surface2dWith3dImplementationFail(){

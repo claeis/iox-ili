@@ -139,6 +139,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		this.validationConfig = validationConfig;
 		this.errs = errs;
 		this.errFact = errFact;
+		if(errFact.getLogger()==null){
+			errFact.setLogger(errs);
+		}
 		this.config=config;
 		this.pipelinePool=pipelinePool;
 		objPoolManager=new ObjectPoolManager();
@@ -2094,8 +2097,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					PolylineType polylineType=(PolylineType)type;
 					IomObject polylineValue=iomObj.getattrobj(attrName, 0);
 					if (polylineValue != null){
-						validatePolyline(validateType, polylineType, polylineValue);
-						validatePolylineTopology(attrPath,validateType, polylineType, polylineValue);
+						boolean isValid=validatePolyline(validateType, polylineType, polylineValue);
+						if(isValid){
+							validatePolylineTopology(attrPath,validateType, polylineType, polylineValue);
+						}
 					}
 				}else if(type instanceof SurfaceOrAreaType){
 					 if(doItfLineTables){
@@ -2195,21 +2200,28 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void validateAreaTopology(String validateType, ItfAreaPolygon2Linetable allLines,AreaType type, String mainObjTid,String internalTid,IomObject iomPolygon) throws IoxException {
 		// get lines
 		ArrayList<IomObject> lines=ItfAreaPolygon2Linetable.getLinesFromPolygon(iomPolygon);
-		allLines.addLines(mainObjTid,internalTid,lines);
+		allLines.addLines(mainObjTid,internalTid,lines,validateType,errFact);
 	}
 
 	private void validateSurfaceTopology(String validateType, AttributeDef attr,SurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
-		ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
 		try {
-			ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, dataerrs);
-			addAllIoxExceptions(validateType,dataerrs);
+			ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, errFact,validateType);
 		} catch (IoxException e) {
-			addAllIoxExceptions(validateType,dataerrs);
 			errs.addEvent(errFact.logErrorMsg(e,"failed to validate polygon"));
 		}
 	}
 	
 	private void validatePolylineTopology(String attrPath,String validateType, PolylineType type, IomObject iomValue) {
+		CompoundCurve seg=null;
+		try {
+			Holder<Boolean> foundErrs=new Holder<Boolean>();
+			seg = Iox2jtsext.polyline2JTS(iomValue, false, 0.0,foundErrs,errFact,0.0,validateType);
+			if(seg==null || foundErrs.value){
+				return;
+			}
+		} catch (IoxException e) {
+			throw new IllegalStateException(e);
+		}
 		PrecisionDecimal overlapDef=type.getMaxOverlap();
 		if(overlapDef!=null){
 			double newVertexOffset=0.0;
@@ -2220,12 +2232,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(size>0){
 					newVertexOffset=2*Math.pow(10, -size);
 				}
-			}
-			CompoundCurve seg=null;
-			try {
-				seg = Iox2jtsext.polyline2JTS(iomValue, false, 0.0);
-			} catch (IoxException e) {
-				throw new IllegalStateException(e);
 			}
 			ItfSurfaceLinetable2Polygon.removeValidSelfIntersections(seg,maxOverlaps,newVertexOffset);
 			ArrayList<CompoundCurve> segv=new ArrayList<CompoundCurve>();
@@ -2245,6 +2251,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return "(" + coord.x + ", " + coord.y  + ")";
 	}
 
+	/* returns true, if polygon is valid
+	 * 
+	 */
 	private boolean validatePolygon(String validateType, SurfaceOrAreaType surfaceOrAreaType, IomObject surfaceValue) {
 		if (surfaceValue.getobjecttag().equals("MULTISURFACE")){
 			boolean clipped = surfaceValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
@@ -2278,13 +2287,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return true;
 	}
 
-	private void validatePolyline(String validateType, LineType polylineType, IomObject polylineValue) {
+	// returns true if valid
+	private boolean validatePolyline(String validateType, LineType polylineType, IomObject polylineValue) {
+		boolean foundErrs=false;
 		if (polylineValue.getobjecttag().equals("POLYLINE")){
 			boolean clipped = polylineValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
 			for(int sequencei=0;sequencei<polylineValue.getattrvaluecount("sequence");sequencei++){
 				if(!clipped && sequencei>0){
 					// an unclipped polyline should have only one sequence element
 					logMsg(validateType,"invalid number of sequences in COMPLETE basket");
+					foundErrs = foundErrs || true;
 				}
 				IomObject sequence=polylineValue.getattrobj("sequence",sequencei);
 				LineForm[] lineforms = polylineType.getLineForms();
@@ -2301,24 +2313,30 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								validateCoordType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment);
 							}else{
 								logMsg(validateType, "unexpected COORD");
+								foundErrs = foundErrs || true;
 							}
 						} else if (segment.getobjecttag().equals("ARC")){
 							if(lineformNames.contains("ARCS") && segmenti>0){
 								validateARCSType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment);
 							}else{
 								logMsg(validateType, "unexpected ARC");
+								foundErrs = foundErrs || true;
 							}
 						} else {
 							logMsg(validateType, "unexpected Type "+segment.getobjecttag());
+							foundErrs = foundErrs || true;
 						}
 					}
 				} else {
 					logMsg(validateType, "unexpected Type "+sequence.getobjecttag());
+					foundErrs = foundErrs || true;
 				}
 			}
 		} else {
 			logMsg(validateType, "unexpected Type "+polylineValue.getobjecttag()+"; POLYLINE expected");
+			foundErrs = foundErrs || true;
 		}
+		return !foundErrs;
 	}
 
 	private void validateCoordType(String validateType, CoordType coordType, IomObject coordValue) {
@@ -2453,19 +2471,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			 errs.addEvent(errFact.logErrorMsg(msg, args));
 		 }
 	}
-	private void addAllIoxExceptions(String validateKind,ArrayList<IoxInvalidDataException> errs) {
-		 if(ValidationConfig.WARNING.equals(validateKind)){
-				for(IoxInvalidDataException err:errs){
-					this.errs.addEvent(errFact.logWarning(err));
-				}
-		 }else{
-				for(IoxInvalidDataException err:errs){
-					this.errs.addEvent(errFact.logError(err));
-				}
-		 }
-	}
-	
-	
+		
 	private void validateItfLineTableObject(IomObject iomObj, AttributeDef modelele) {
 		// validate if line table object
 	}
