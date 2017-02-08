@@ -1,0 +1,133 @@
+INTERLIS 2.3;
+
+CONTRACTED MODEL AdditionalConstraints23 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+  TOPIC Bodenbedeckung =
+  	DOMAIN
+		Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					   70000.000 .. 310000.000 [INTERLIS.m],
+					ROTATION 2 -> 1;
+		Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					        70000.000 .. 310000.000 [INTERLIS.m],
+					              0.000 .. 5000.000 [INTERLIS.m];
+			enumerationOrdered = (null, eins, zwei, drei, mehr (vier)) ORDERED;
+			attrRef1 = TEXT*12;
+	
+	!! Mandatory Constraint
+	CLASS ManConClass =
+		attr1 : 0..10;
+		attr2 : 0..10;
+  	END ManConClass;
+  	
+  	!! Mandatory Constraint coords
+	CLASS ManConClassCoord =
+		attr3 : Hkoord;
+		attr4 : Hkoord;
+	END ManConClassCoord;
+	
+    !!CLASS ClassZA =
+	!!	Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+	!!END ClassZA;
+	
+	!! Set Constraint
+	STRUCTURE StructC =
+	END StructC;
+	
+	CLASS ClassC =
+		Numbers: BAG {1..*} OF StructC;
+	END ClassC;
+	
+	
+	!! Existence Constraint
+	CLASS ExConCondition =
+		superAttr : TEXT*10;
+	END ExConCondition;
+	
+	CLASS ExConClass =
+		subAttr : TEXT*10;
+	END ExConClass;
+	
+  END Bodenbedeckung;
+END AdditionalConstraints23.
+
+
+
+!! VIEW Existence Constraint
+CONTRACTED MODEL AddExConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS AdditionalConstraints23;
+	
+	VIEW TOPIC AddExConTopic =
+		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+		
+		VIEW AddExConView
+			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ExConClass;
+			=
+			ALL OF ExConClass;
+			EXISTENCE CONSTRAINT subAttr REQUIRED IN AdditionalConstraints23.Bodenbedeckung.ExConCondition : superAttr;
+		END AddExConView;
+	END AddExConTopic;
+END AddExConModel.
+
+
+!! VIEW Mandatory Constraint
+CONTRACTED MODEL AddManConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS AdditionalConstraints23;
+	
+	VIEW TOPIC AddManConTopic =
+		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+		
+		VIEW AddManConView
+			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ManConClass;
+			WHERE ManConClass->attr1==5;
+			=
+			ALL OF ManConClass;
+			MANDATORY CONSTRAINT attr1 == attr2;
+		END AddManConView;
+	END AddManConTopic;
+END AddManConModel.
+
+
+!! VIEW Mandatory Constraint Coords
+CONTRACTED MODEL AddManConCoordModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS AdditionalConstraints23;
+	
+	VIEW TOPIC AddManConCoordTopic =
+		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+		
+		VIEW AddManConCoordView
+			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ManConClassCoord;
+			=
+			ALL OF ManConClassCoord;
+			MANDATORY CONSTRAINT (attr3 != attr4);
+		END AddManConCoordView;
+	END AddManConCoordTopic;
+END AddManConCoordModel.
+
+
+
+!!CONTRACTED MODEL AdditionalConstraints23Zusatz3 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+!!  IMPORTS AdditionalConstraints23;
+!!  VIEW TOPIC BodenbedeckungZusatz =
+!!  	DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+!!        VIEW PrivatGebaeude
+!!   	PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ClassZA;
+!!    	=
+!!       ALL OF ClassZA;
+!!        MANDATORY CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie);
+!!    END PrivatGebaeude;
+!!  END BodenbedeckungZusatz;
+!!END AdditionalConstraints23Zusatz3.
+
+
+
+CONTRACTED MODEL AdditionalConstraints23Zusatz4 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+  IMPORTS AdditionalConstraints23;
+  VIEW TOPIC BodenbedeckungZusatz =
+  	DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+        VIEW PrivatGebaeude
+    	PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ClassC;
+    	=
+        ALL OF ClassC;
+        SET CONSTRAINT INTERLIS.objectCount(Numbers) == 2;
+    END PrivatGebaeude;
+  END BodenbedeckungZusatz;
+END AdditionalConstraints23Zusatz4.

@@ -340,7 +340,7 @@ public class MandatoryConstraints23 {
 		IomObject coordEnd=segments.addattrobj("segment", "COORD");
 		coordStart.setattrvalue("C1", "480000.000");
 		coordStart.setattrvalue("C2", "70000.000");
-		coordEnd.setattrvalue("C1", "480000.000");
+		coordEnd.setattrvalue("C1", "480010.000");
 		coordEnd.setattrvalue("C2", "70000.000");
 		IomObject polylineValue2=objStraightsSuccess.addattrobj("straights2d2", "POLYLINE");
 		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
@@ -348,7 +348,7 @@ public class MandatoryConstraints23 {
 		IomObject coordEnd2=segments2.addattrobj("segment", "COORD");
 		coordStart2.setattrvalue("C1", "480000.000");
 		coordStart2.setattrvalue("C2", "70000.000");
-		coordEnd2.setattrvalue("C1", "480000.000");
+		coordEnd2.setattrvalue("C1", "480010.000");
 		coordEnd2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -376,13 +376,13 @@ public class MandatoryConstraints23 {
 		startSegment.setattrvalue("C2", "70000.000");
 		startSegment.setattrvalue("C3", "5000.000");
 		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480000.000");
+		endSegment.setattrvalue("C1", "481000.000");
 		endSegment.setattrvalue("C2", "70000.000");
 		endSegment.setattrvalue("C3", "5000.000");
 		IomObject arcSegment=segments.addattrobj("segment", "ARC");
 		arcSegment.setattrvalue("A1", "480000.000");
 		arcSegment.setattrvalue("A2", "300000.000");
-		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C1", "482000.000");
 		arcSegment.setattrvalue("C2", "70000.000");
 		arcSegment.setattrvalue("C3", "5000.000");
 		// line 2
@@ -393,13 +393,13 @@ public class MandatoryConstraints23 {
 		startSegment2.setattrvalue("C2", "70000.000");
 		startSegment2.setattrvalue("C3", "5000.000");
 		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "480000.000");
+		endSegment2.setattrvalue("C1", "481000.000");
 		endSegment2.setattrvalue("C2", "70000.000");
 		endSegment2.setattrvalue("C3", "5000.000");
 		IomObject arcSegment2=segments2.addattrobj("segment", "ARC");
 		arcSegment2.setattrvalue("A1", "480000.000");
 		arcSegment2.setattrvalue("A2", "300000.000");
-		arcSegment2.setattrvalue("C1", "480000.000");
+		arcSegment2.setattrvalue("C1", "482000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
 		arcSegment2.setattrvalue("C3", "5000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -448,9 +448,11 @@ public class MandatoryConstraints23 {
 		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
 		startSegment3.setattrvalue("C1", "520000.000");
 		startSegment3.setattrvalue("C2", "85000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
+		IomObject arcSegment3=segments3.addattrobj("segment", "ARC");
+		arcSegment3.setattrvalue("A1", "485000.000");
+		arcSegment3.setattrvalue("A2", "70000.000");
+		arcSegment3.setattrvalue("C1", "480000.000");
+		arcSegment3.setattrvalue("C2", "70000.000");
 		// surface 2
 		IomObject multisurfaceValue2=objSurfaceSuccess.addattrobj("surface2", "MULTISURFACE");
 		IomObject surfaceValue2 = multisurfaceValue2.addattrobj("surface", "SURFACE");
@@ -480,7 +482,7 @@ public class MandatoryConstraints23 {
 		arcStartSegment2.setattrvalue("C1", "520000.000");
 		arcStartSegment2.setattrvalue("C2", "85000.000");
 		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
-		arcSegment2.setattrvalue("A1", "480000.000");
+		arcSegment2.setattrvalue("A1", "485000.000");
 		arcSegment2.setattrvalue("A2", "70000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
@@ -531,7 +533,7 @@ public class MandatoryConstraints23 {
 		startSegment3.setattrvalue("C1", "520000.000");
 		startSegment3.setattrvalue("C2", "85000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
-		endSegment3.setattrvalue("A1", "480000.000");
+		endSegment3.setattrvalue("A1", "485000.000");
 		endSegment3.setattrvalue("A2", "70000.000");
 		endSegment3.setattrvalue("C1", "480000.000");
 		endSegment3.setattrvalue("C2", "70000.000");
@@ -564,7 +566,7 @@ public class MandatoryConstraints23 {
 		arcStartSegment2.setattrvalue("C1", "520000.000");
 		arcStartSegment2.setattrvalue("C2", "85000.000");
 		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
-		arcSegment2.setattrvalue("A1", "480000.000");
+		arcSegment2.setattrvalue("A1", "485000.000");
 		arcSegment2.setattrvalue("A2", "70000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
@@ -702,7 +704,7 @@ public class MandatoryConstraints23 {
 		IomObject coordEnd=segments.addattrobj("segment", "COORD");
 		coordStart.setattrvalue("C1", "480000.000");
 		coordStart.setattrvalue("C2", "70000.000");
-		coordEnd.setattrvalue("C1", "480000.000");
+		coordEnd.setattrvalue("C1", "490000.000");
 		coordEnd.setattrvalue("C2", "70000.000");
 		IomObject polylineValue2=objStraightsSuccess.addattrobj("straights2d2", "POLYLINE");
 		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
@@ -737,11 +739,11 @@ public class MandatoryConstraints23 {
 		startSegment.setattrvalue("C2", "70000.000");
 		startSegment.setattrvalue("C3", "5000.000");
 		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480000.000");
+		endSegment.setattrvalue("C1", "481000.000");
 		endSegment.setattrvalue("C2", "70000.000");
 		endSegment.setattrvalue("C3", "5000.000");
 		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A1", "580000.000");
 		arcSegment.setattrvalue("A2", "300000.000");
 		arcSegment.setattrvalue("C1", "480000.000");
 		arcSegment.setattrvalue("C2", "70000.000");
@@ -754,11 +756,11 @@ public class MandatoryConstraints23 {
 		startSegment2.setattrvalue("C2", "70000.000");
 		startSegment2.setattrvalue("C3", "5000.000");
 		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "480000.000");
+		endSegment2.setattrvalue("C1", "481000.000");
 		endSegment2.setattrvalue("C2", "70000.000");
 		endSegment2.setattrvalue("C3", "5000.000");
 		IomObject arcSegment2=segments2.addattrobj("segment", "ARC");
-		arcSegment2.setattrvalue("A1", "480000.000");
+		arcSegment2.setattrvalue("A1", "580000.000");
 		arcSegment2.setattrvalue("A2", "300000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "88888.000");
@@ -1500,7 +1502,7 @@ public class MandatoryConstraints23 {
 		startSegment2.setattrvalue("C1", "500000.000");
 		startSegment2.setattrvalue("C2", "80000.000");
 		IomObject endSegment2=segments2.addattrobj("segment", "ARC");
-		endSegment2.setattrvalue("A1", "550000.000");
+		endSegment2.setattrvalue("A1", "530000.000");
 		endSegment2.setattrvalue("A2", "90000.000");
 		endSegment2.setattrvalue("C1", "550000.000");
 		endSegment2.setattrvalue("C2", "90000.000");
@@ -1511,7 +1513,7 @@ public class MandatoryConstraints23 {
 		startSegment3.setattrvalue("C1", "500000.000");
 		startSegment3.setattrvalue("C2", "80000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
-		endSegment3.setattrvalue("A1", "550000.000");
+		endSegment3.setattrvalue("A1", "530000.000");
 		endSegment3.setattrvalue("A2", "90000.000");
 		endSegment3.setattrvalue("C1", "550000.000");
 		endSegment3.setattrvalue("C2", "90000.000");
@@ -1541,11 +1543,11 @@ public class MandatoryConstraints23 {
 		startSegment.setattrvalue("C2", "70000.000");
 		startSegment.setattrvalue("C3", "5000.000");
 		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480000.000");
+		endSegment.setattrvalue("C1", "481000.000");
 		endSegment.setattrvalue("C2", "70000.000");
 		endSegment.setattrvalue("C3", "5000.000");
 		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A1", "580000.000");
 		arcSegment.setattrvalue("A2", "300000.000");
 		arcSegment.setattrvalue("C1", "480000.000");
 		arcSegment.setattrvalue("C2", "70000.000");
@@ -1558,11 +1560,11 @@ public class MandatoryConstraints23 {
 		startSegment2.setattrvalue("C2", "70000.000");
 		startSegment2.setattrvalue("C3", "5000.000");
 		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "480000.000");
+		endSegment2.setattrvalue("C1", "481000.000");
 		endSegment2.setattrvalue("C2", "70000.000");
 		endSegment2.setattrvalue("C3", "5000.000");
 		IomObject arcSegment2=segments2.addattrobj("segment", "ARC");
-		arcSegment2.setattrvalue("A1", "480000.000");
+		arcSegment2.setattrvalue("A1", "580000.000");
 		arcSegment2.setattrvalue("A2", "299999.999");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
@@ -1694,7 +1696,7 @@ public class MandatoryConstraints23 {
 		startSegment3.setattrvalue("C1", "520000.000");
 		startSegment3.setattrvalue("C2", "85000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
-		endSegment3.setattrvalue("A1", "480000.000");
+		endSegment3.setattrvalue("A1", "580000.000");
 		endSegment3.setattrvalue("A2", "70000.000");
 		endSegment3.setattrvalue("C1", "480000.000");
 		endSegment3.setattrvalue("C2", "70000.000");
@@ -1727,7 +1729,7 @@ public class MandatoryConstraints23 {
 		arcStartSegment2.setattrvalue("C1", "520000.000");
 		arcStartSegment2.setattrvalue("C2", "85000.000");
 		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
-		arcSegment2.setattrvalue("A1", "480000.000");
+		arcSegment2.setattrvalue("A1", "580000.000");
 		arcSegment2.setattrvalue("A2", "70000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
@@ -1910,11 +1912,11 @@ public class MandatoryConstraints23 {
 		startSegment.setattrvalue("C2", "70000.000");
 		startSegment.setattrvalue("C3", "5000.000");
 		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480000.000");
+		endSegment.setattrvalue("C1", "490000.000");
 		endSegment.setattrvalue("C2", "70000.000");
 		endSegment.setattrvalue("C3", "5000.000");
 		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A1", "500000.000");
 		arcSegment.setattrvalue("A2", "300000.000");
 		arcSegment.setattrvalue("C1", "480000.000");
 		arcSegment.setattrvalue("C2", "70000.000");
@@ -1927,11 +1929,11 @@ public class MandatoryConstraints23 {
 		startSegment2.setattrvalue("C2", "70000.000");
 		startSegment2.setattrvalue("C3", "5000.000");
 		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "480000.000");
+		endSegment2.setattrvalue("C1", "490000.000");
 		endSegment2.setattrvalue("C2", "70000.000");
 		endSegment2.setattrvalue("C3", "5000.000");
 		IomObject arcSegment2=segments2.addattrobj("segment", "ARC");
-		arcSegment2.setattrvalue("A1", "480000.000");
+		arcSegment2.setattrvalue("A1", "500000.000");
 		arcSegment2.setattrvalue("A2", "300000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
@@ -1983,7 +1985,7 @@ public class MandatoryConstraints23 {
 		startSegment3.setattrvalue("C1", "520000.000");
 		startSegment3.setattrvalue("C2", "85000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
-		endSegment3.setattrvalue("A1", "480000.000");
+		endSegment3.setattrvalue("A1", "580000.000");
 		endSegment3.setattrvalue("A2", "70000.000");
 		endSegment3.setattrvalue("C1", "480000.000");
 		endSegment3.setattrvalue("C2", "70000.000");
@@ -2016,7 +2018,7 @@ public class MandatoryConstraints23 {
 		arcStartSegment2.setattrvalue("C1", "520000.000");
 		arcStartSegment2.setattrvalue("C2", "85000.000");
 		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
-		arcSegment2.setattrvalue("A1", "480000.000");
+		arcSegment2.setattrvalue("A1", "580000.000");
 		arcSegment2.setattrvalue("A2", "70000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
@@ -2067,7 +2069,7 @@ public class MandatoryConstraints23 {
 		startSegment3.setattrvalue("C1", "520000.000");
 		startSegment3.setattrvalue("C2", "85000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
-		endSegment3.setattrvalue("A1", "480000.000");
+		endSegment3.setattrvalue("A1", "580000.000");
 		endSegment3.setattrvalue("A2", "70000.000");
 		endSegment3.setattrvalue("C1", "480000.000");
 		endSegment3.setattrvalue("C2", "70000.000");
@@ -2100,7 +2102,7 @@ public class MandatoryConstraints23 {
 		arcStartSegment2.setattrvalue("C1", "520000.000");
 		arcStartSegment2.setattrvalue("C2", "85000.000");
 		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
-		arcSegment2.setattrvalue("A1", "480000.000");
+		arcSegment2.setattrvalue("A1", "580000.000");
 		arcSegment2.setattrvalue("A2", "70000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");

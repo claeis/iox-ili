@@ -302,7 +302,7 @@ public class ExistenceConstraints23Test {
 		ConditionCoordStart.setattrvalue("C1", "480000.000");
 		ConditionCoordStart.setattrvalue("C2", "70000.000");
 		IomObject conditionCoordEnd=conditionSegment.addattrobj("segment", "COORD");
-		conditionCoordEnd.setattrvalue("C1", "480000.000");
+		conditionCoordEnd.setattrvalue("C1", "490000.000");
 		conditionCoordEnd.setattrvalue("C2", "70000.000");
 		// Polyline in Class
 		Iom_jObject obj=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassLine2d", "o2");
@@ -312,7 +312,7 @@ public class ExistenceConstraints23Test {
 		coordStart.setattrvalue("C1", "480000.000");
 		coordStart.setattrvalue("C2", "70000.000");
 		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordEnd.setattrvalue("C1", "480000.000");
+		coordEnd.setattrvalue("C1", "490000.000");
 		coordEnd.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -342,7 +342,7 @@ public class ExistenceConstraints23Test {
 		ConditionCoordStart.setattrvalue("C2", "70000.000");
 		ConditionCoordStart.setattrvalue("C3", "5000.000");
 		IomObject conditionCoordEnd=conditionSegment.addattrobj("segment", "COORD");
-		conditionCoordEnd.setattrvalue("C1", "480000.000");
+		conditionCoordEnd.setattrvalue("C1", "490000.000");
 		conditionCoordEnd.setattrvalue("C2", "70000.000");
 		conditionCoordEnd.setattrvalue("C3", "5000.000");
 		// Polyline in Class
@@ -354,7 +354,7 @@ public class ExistenceConstraints23Test {
 		coordStart.setattrvalue("C2", "70000.000");
 		coordStart.setattrvalue("C3", "5000.000");
 		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordEnd.setattrvalue("C1", "480000.000");
+		coordEnd.setattrvalue("C1", "490000.000");
 		coordEnd.setattrvalue("C2", "70000.000");
 		coordEnd.setattrvalue("C3", "5000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -470,13 +470,13 @@ public class ExistenceConstraints23Test {
 		startSegmentCondition.setattrvalue("C2", "70000.000");
 		startSegmentCondition.setattrvalue("C3", "4000.000");
 		IomObject endSegmentCondition=segmentsCondition.addattrobj("segment", "COORD");
-		endSegmentCondition.setattrvalue("C1", "480000.000");
+		endSegmentCondition.setattrvalue("C1", "490000.000");
 		endSegmentCondition.setattrvalue("C2", "70000.000");
 		endSegmentCondition.setattrvalue("C3", "4000.000");
 		IomObject arcSegmentCondition=segmentsCondition.addattrobj("segment", "ARC");
-		arcSegmentCondition.setattrvalue("A1", "480000.000");
+		arcSegmentCondition.setattrvalue("A1", "500000.000");
 		arcSegmentCondition.setattrvalue("A2", "300000.000");
-		arcSegmentCondition.setattrvalue("C1", "480000.000");
+		arcSegmentCondition.setattrvalue("C1", "550000.000");
 		arcSegmentCondition.setattrvalue("C2", "70000.000");
 		arcSegmentCondition.setattrvalue("C3", "4000.000");
 		Iom_jObject objStraights=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassLine3dArcsStraights", "o2");
@@ -487,13 +487,13 @@ public class ExistenceConstraints23Test {
 		startSegment.setattrvalue("C2", "70000.000");
 		startSegment.setattrvalue("C3", "4000.000");
 		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480000.000");
+		endSegment.setattrvalue("C1", "490000.000");
 		endSegment.setattrvalue("C2", "70000.000");
 		endSegment.setattrvalue("C3", "4000.000");
 		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A1", "500000.000");
 		arcSegment.setattrvalue("A2", "300000.000");
-		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C1", "550000.000");
 		arcSegment.setattrvalue("C2", "70000.000");
 		arcSegment.setattrvalue("C3", "4000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -522,12 +522,12 @@ public class ExistenceConstraints23Test {
 		startSegmentCondition.setattrvalue("C1", "480000.000");
 		startSegmentCondition.setattrvalue("C2", "70000.000");
 		IomObject endSegmentCondition=segmentsCondition.addattrobj("segment", "COORD");
-		endSegmentCondition.setattrvalue("C1", "480000.000");
+		endSegmentCondition.setattrvalue("C1", "490000.000");
 		endSegmentCondition.setattrvalue("C2", "70000.000");
 		IomObject arcSegmentCondition=segmentsCondition.addattrobj("segment", "ARC");
-		arcSegmentCondition.setattrvalue("A1", "480000.000");
+		arcSegmentCondition.setattrvalue("A1", "500000.000");
 		arcSegmentCondition.setattrvalue("A2", "300000.000");
-		arcSegmentCondition.setattrvalue("C1", "480000.000");
+		arcSegmentCondition.setattrvalue("C1", "550000.000");
 		arcSegmentCondition.setattrvalue("C2", "70000.000");
 		Iom_jObject objStraights=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassLine2dArcsStraights", "o2");
 		IomObject polylineValue=objStraights.addattrobj("arcsstraights2d", "POLYLINE");
@@ -536,12 +536,12 @@ public class ExistenceConstraints23Test {
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
 		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480000.000");
+		endSegment.setattrvalue("C1", "490000.000");
 		endSegment.setattrvalue("C2", "70000.000");
 		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A1", "500000.000");
 		arcSegment.setattrvalue("A2", "300000.000");
-		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C1", "550000.000");
 		arcSegment.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -593,7 +593,7 @@ public class ExistenceConstraints23Test {
 		startSegment3.setattrvalue("C2", "85000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
 		endSegment3.setattrvalue("A1", "480000.000");
-		endSegment3.setattrvalue("A2", "70000.000");
+		endSegment3.setattrvalue("A2", "80000.000");
 		endSegment3.setattrvalue("C1", "480000.000");
 		endSegment3.setattrvalue("C2", "70000.000");
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassSurface2d", "o2");
@@ -626,7 +626,7 @@ public class ExistenceConstraints23Test {
 		arcStartSegment2.setattrvalue("C2", "85000.000");
 		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
 		arcSegment2.setattrvalue("A1", "480000.000");
-		arcSegment2.setattrvalue("A2", "70000.000");
+		arcSegment2.setattrvalue("A2", "80000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -683,7 +683,7 @@ public class ExistenceConstraints23Test {
 		startSegment3.setattrvalue("C3", "1000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
 		endSegment3.setattrvalue("A1", "480000.000");
-		endSegment3.setattrvalue("A2", "70000.000");
+		endSegment3.setattrvalue("A2", "80000.000");
 		endSegment3.setattrvalue("C1", "480000.000");
 		endSegment3.setattrvalue("C2", "70000.000");
 		endSegment3.setattrvalue("C3", "1000.000");
@@ -722,7 +722,7 @@ public class ExistenceConstraints23Test {
 		arcStartSegment2.setattrvalue("C3", "1000.000");
 		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
 		arcSegment2.setattrvalue("A1", "480000.000");
-		arcSegment2.setattrvalue("A2", "70000.000");
+		arcSegment2.setattrvalue("A2", "80000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
 		arcSegment2.setattrvalue("C3", "1000.000");
@@ -775,7 +775,7 @@ public class ExistenceConstraints23Test {
 		startSegment3.setattrvalue("C2", "85000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
 		endSegment3.setattrvalue("A1", "480000.000");
-		endSegment3.setattrvalue("A2", "70000.000");
+		endSegment3.setattrvalue("A2", "80000.000");
 		endSegment3.setattrvalue("C1", "480000.000");
 		endSegment3.setattrvalue("C2", "70000.000");
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassArea2d", "o2");
@@ -808,7 +808,7 @@ public class ExistenceConstraints23Test {
 		arcStartSegment2.setattrvalue("C2", "85000.000");
 		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
 		arcSegment2.setattrvalue("A1", "480000.000");
-		arcSegment2.setattrvalue("A2", "70000.000");
+		arcSegment2.setattrvalue("A2", "80000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -865,7 +865,7 @@ public class ExistenceConstraints23Test {
 		startSegment3.setattrvalue("C3", "1000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
 		endSegment3.setattrvalue("A1", "480000.000");
-		endSegment3.setattrvalue("A2", "70000.000");
+		endSegment3.setattrvalue("A2", "80000.000");
 		endSegment3.setattrvalue("C1", "480000.000");
 		endSegment3.setattrvalue("C2", "70000.000");
 		endSegment3.setattrvalue("C3", "1000.000");
@@ -904,7 +904,7 @@ public class ExistenceConstraints23Test {
 		arcStartSegment2.setattrvalue("C3", "1000.000");
 		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
 		arcSegment2.setattrvalue("A1", "480000.000");
-		arcSegment2.setattrvalue("A2", "70000.000");
+		arcSegment2.setattrvalue("A2", "80000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
 		arcSegment2.setattrvalue("C3", "1000.000");
@@ -1290,7 +1290,7 @@ public class ExistenceConstraints23Test {
 		ConditionCoordStart.setattrvalue("C1", "480000.000");
 		ConditionCoordStart.setattrvalue("C2", "70000.000");
 		IomObject conditionCoordEnd=conditionSegment.addattrobj("segment", "COORD");
-		conditionCoordEnd.setattrvalue("C1", "480000.000");
+		conditionCoordEnd.setattrvalue("C1", "500000.000");
 		conditionCoordEnd.setattrvalue("C2", "70000.000");
 		// Polyline in Class
 		Iom_jObject obj=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassLine2d", "o2");
@@ -1300,7 +1300,7 @@ public class ExistenceConstraints23Test {
 		coordStart.setattrvalue("C1", "480000.000");
 		coordStart.setattrvalue("C2", "70000.000");
 		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordEnd.setattrvalue("C1", "480000.000");
+		coordEnd.setattrvalue("C1", "500000.000");
 		coordEnd.setattrvalue("C2", "70001.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1331,7 +1331,7 @@ public class ExistenceConstraints23Test {
 		ConditionCoordStart.setattrvalue("C2", "70000.000");
 		ConditionCoordStart.setattrvalue("C3", "5000.000");
 		IomObject conditionCoordEnd=conditionSegment.addattrobj("segment", "COORD");
-		conditionCoordEnd.setattrvalue("C1", "480000.000");
+		conditionCoordEnd.setattrvalue("C1", "500000.000");
 		conditionCoordEnd.setattrvalue("C2", "70000.000");
 		conditionCoordEnd.setattrvalue("C3", "4999.000");
 		// Polyline in Class
@@ -1343,7 +1343,7 @@ public class ExistenceConstraints23Test {
 		coordStart.setattrvalue("C2", "70000.000");
 		coordStart.setattrvalue("C3", "5000.000");
 		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordEnd.setattrvalue("C1", "480000.000");
+		coordEnd.setattrvalue("C1", "500000.000");
 		coordEnd.setattrvalue("C2", "70000.000");
 		coordEnd.setattrvalue("C3", "5000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1373,7 +1373,7 @@ public class ExistenceConstraints23Test {
 		startSegmentCondition.setattrvalue("C1", "480000.000");
 		startSegmentCondition.setattrvalue("C2", "70000.000");
 		IomObject arcSegmentCondition=segmentsCondition.addattrobj("segment", "ARC");
-		arcSegmentCondition.setattrvalue("A1", "480000.000");
+		arcSegmentCondition.setattrvalue("A1", "500000.000");
 		arcSegmentCondition.setattrvalue("A2", "300000.000");
 		arcSegmentCondition.setattrvalue("C1", "480000.000");
 		arcSegmentCondition.setattrvalue("C2", "70000.000");
@@ -1384,7 +1384,7 @@ public class ExistenceConstraints23Test {
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
 		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A1", "500000.000");
 		arcSegment.setattrvalue("A2", "300000.000");
 		arcSegment.setattrvalue("C1", "480000.000");
 		arcSegment.setattrvalue("C2", "71111.000");
@@ -1462,13 +1462,13 @@ public class ExistenceConstraints23Test {
 		startSegmentCondition.setattrvalue("C2", "70000.000");
 		startSegmentCondition.setattrvalue("C3", "4000.000");
 		IomObject endSegmentCondition=segmentsCondition.addattrobj("segment", "COORD");
-		endSegmentCondition.setattrvalue("C1", "480000.000");
+		endSegmentCondition.setattrvalue("C1", "490000.000");
 		endSegmentCondition.setattrvalue("C2", "70000.000");
 		endSegmentCondition.setattrvalue("C3", "4000.000");
 		IomObject arcSegmentCondition=segmentsCondition.addattrobj("segment", "ARC");
-		arcSegmentCondition.setattrvalue("A1", "480000.000");
+		arcSegmentCondition.setattrvalue("A1", "500000.000");
 		arcSegmentCondition.setattrvalue("A2", "300000.000");
-		arcSegmentCondition.setattrvalue("C1", "480000.000");
+		arcSegmentCondition.setattrvalue("C1", "550000.000");
 		arcSegmentCondition.setattrvalue("C2", "70000.000");
 		arcSegmentCondition.setattrvalue("C3", "4000.000");
 		Iom_jObject objStraights=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassLine3dArcsStraights", "o2");
@@ -1479,13 +1479,13 @@ public class ExistenceConstraints23Test {
 		startSegment.setattrvalue("C2", "70000.000");
 		startSegment.setattrvalue("C3", "4000.000");
 		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480000.000");
+		endSegment.setattrvalue("C1", "490000.000");
 		endSegment.setattrvalue("C2", "70000.000");
 		endSegment.setattrvalue("C3", "4000.000");
 		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A1", "500000.000");
 		arcSegment.setattrvalue("A2", "300000.000");
-		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C1", "550000.000");
 		arcSegment.setattrvalue("C2", "70000.000");
 		arcSegment.setattrvalue("C3", "4111.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1515,12 +1515,12 @@ public class ExistenceConstraints23Test {
 		startSegmentCondition.setattrvalue("C1", "480000.000");
 		startSegmentCondition.setattrvalue("C2", "70000.000");
 		IomObject endSegmentCondition=segmentsCondition.addattrobj("segment", "COORD");
-		endSegmentCondition.setattrvalue("C1", "480000.000");
+		endSegmentCondition.setattrvalue("C1", "490000.000");
 		endSegmentCondition.setattrvalue("C2", "70000.000");
 		IomObject arcSegmentCondition=segmentsCondition.addattrobj("segment", "ARC");
-		arcSegmentCondition.setattrvalue("A1", "480000.000");
+		arcSegmentCondition.setattrvalue("A1", "500000.000");
 		arcSegmentCondition.setattrvalue("A2", "300000.000");
-		arcSegmentCondition.setattrvalue("C1", "480000.000");
+		arcSegmentCondition.setattrvalue("C1", "550000.000");
 		arcSegmentCondition.setattrvalue("C2", "70000.000");
 		Iom_jObject objStraights=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassLine2dArcsStraights", "o2");
 		IomObject polylineValue=objStraights.addattrobj("arcsstraights2d", "POLYLINE");
@@ -1529,12 +1529,12 @@ public class ExistenceConstraints23Test {
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
 		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480000.000");
+		endSegment.setattrvalue("C1", "490000.000");
 		endSegment.setattrvalue("C2", "70000.000");
 		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A1", "500000.000");
 		arcSegment.setattrvalue("A2", "300000.000");
-		arcSegment.setattrvalue("C1", "480000.000");
+		arcSegment.setattrvalue("C1", "550000.000");
 		arcSegment.setattrvalue("C2", "71111.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1587,7 +1587,7 @@ public class ExistenceConstraints23Test {
 		startSegment3.setattrvalue("C2", "85000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
 		endSegment3.setattrvalue("A1", "480000.000");
-		endSegment3.setattrvalue("A2", "70000.000");
+		endSegment3.setattrvalue("A2", "80000.000");
 		endSegment3.setattrvalue("C1", "480000.000");
 		endSegment3.setattrvalue("C2", "70000.000");
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassSurface2d", "o2");
@@ -1620,7 +1620,7 @@ public class ExistenceConstraints23Test {
 		arcStartSegment2.setattrvalue("C2", "85000.000");
 		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
 		arcSegment2.setattrvalue("A1", "480000.000");
-		arcSegment2.setattrvalue("A2", "70000.000");
+		arcSegment2.setattrvalue("A2", "80000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1678,7 +1678,7 @@ public class ExistenceConstraints23Test {
 		startSegment3.setattrvalue("C3", "1000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
 		endSegment3.setattrvalue("A1", "480000.000");
-		endSegment3.setattrvalue("A2", "70000.000");
+		endSegment3.setattrvalue("A2", "80000.000");
 		endSegment3.setattrvalue("C1", "480000.000");
 		endSegment3.setattrvalue("C2", "70000.000");
 		endSegment3.setattrvalue("C3", "1000.000");
@@ -1717,7 +1717,7 @@ public class ExistenceConstraints23Test {
 		arcStartSegment2.setattrvalue("C3", "1000.000");
 		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
 		arcSegment2.setattrvalue("A1", "480000.000");
-		arcSegment2.setattrvalue("A2", "70000.000");
+		arcSegment2.setattrvalue("A2", "80000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
 		arcSegment2.setattrvalue("C3", "1000.000");
@@ -1771,7 +1771,7 @@ public class ExistenceConstraints23Test {
 		startSegment3.setattrvalue("C2", "85000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
 		endSegment3.setattrvalue("A1", "480000.000");
-		endSegment3.setattrvalue("A2", "70000.000");
+		endSegment3.setattrvalue("A2", "80000.000");
 		endSegment3.setattrvalue("C1", "480000.000");
 		endSegment3.setattrvalue("C2", "70000.000");
 		Iom_jObject objSurfaceSuccess=new Iom_jObject("ExistenceConstraints23Coords.Topic.ClassArea2d", "o2");
@@ -1804,7 +1804,7 @@ public class ExistenceConstraints23Test {
 		arcStartSegment2.setattrvalue("C2", "85000.000");
 		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
 		arcSegment2.setattrvalue("A1", "480000.000");
-		arcSegment2.setattrvalue("A2", "70000.000");
+		arcSegment2.setattrvalue("A2", "80000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1862,7 +1862,7 @@ public class ExistenceConstraints23Test {
 		startSegment3.setattrvalue("C3", "1000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "ARC");
 		endSegment3.setattrvalue("A1", "480000.000");
-		endSegment3.setattrvalue("A2", "70000.000");
+		endSegment3.setattrvalue("A2", "80000.000");
 		endSegment3.setattrvalue("C1", "480000.000");
 		endSegment3.setattrvalue("C2", "70000.000");
 		endSegment3.setattrvalue("C3", "1000.000");
@@ -1901,7 +1901,7 @@ public class ExistenceConstraints23Test {
 		arcStartSegment2.setattrvalue("C3", "1000.000");
 		IomObject arcSegment2=arcSegments2.addattrobj("segment", "ARC");
 		arcSegment2.setattrvalue("A1", "480000.000");
-		arcSegment2.setattrvalue("A2", "70000.000");
+		arcSegment2.setattrvalue("A2", "80000.000");
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
 		arcSegment2.setattrvalue("C3", "1000.000");
