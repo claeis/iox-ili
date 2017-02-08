@@ -2,13 +2,17 @@ package ch.interlis.iox_j.validator;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.ws.Holder;
+
 import com.vividsolutions.jts.geom.Coordinate;
+
 import ch.ehi.basics.settings.Settings;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
@@ -112,7 +116,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String validateType=null;
 	private HashMap<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	private HashMap<Constraint,Viewable> additionalConstraints=new HashMap<Constraint,Viewable>();
-	private String[] additionalModels=null;
 	
 	@Deprecated
 	protected Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -144,7 +147,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class,objPoolManager);
 		linkPool=new LinkPool();
 		if(config.getValue(CONFIG_ADDITIONAL_MODELS)!=null){
-			additionalModels = config.getValue(CONFIG_ADDITIONAL_MODELS).split(";");
+			String[] additionalModels = config.getValue(CONFIG_ADDITIONAL_MODELS).split(";");
+			iterateThroughAdditionalModels(additionalModels);
 	}
 	}
 	/** mappings from xml-tags to Viewable|AttributeDef
@@ -193,22 +197,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
-			iterateThroughAdditionalModels();
 			iterateThroughAllObjects();
 			validateAllAreas();
 		}
 	}
 	
-	private void iterateThroughAdditionalModels(){
+	private void iterateThroughAdditionalModels(String[] additionalModels){
 		if(additionalModels==null){
 			return;
 		}
-		errs.addEvent(errFact.logInfoMsg("iterate through additional models {0}", additionalModels.toString()));
 		for(int modelIndex=0;modelIndex<additionalModels.length;modelIndex++){
 			String additionalModel = additionalModels[modelIndex];
 			if(additionalModel==null){
 				continue;
 			}
+			errs.addEvent(errFact.logInfoMsg("iterate through additional model {0}", additionalModel));
 			// models
 			Iterator tdIterator = td.iterator();
 			boolean modelExists=false;
@@ -225,7 +228,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 			if(!modelExists){
-				logMsg(checkConstraint,"Defined AdditionalModel {0} not exist.", additionalModel);
+				logMsg(checkConstraint,"required additional model {0} not found", additionalModel);
 			}
 		}
 	}
@@ -320,7 +323,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		HashSet<Type> types=new HashSet<Type>();
 		HashSet<Viewable> viewables=new HashSet<Viewable>();
 		HashSet<AbstractLeafElement> abstractLeafElement=new HashSet<AbstractLeafElement>();
-		boolean classFound=false;
 		for (String basketId : objectPool.getBasketIds()){
 			// iterate through iomObjects
 			Iterator<IomObject> objectIterator = ((ch.ehi.iox.objpool.impl.ObjPoolImpl) objectPool.getObjectsOfBasketId(basketId)).valueIterator();
@@ -340,8 +342,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						for (Map.Entry<Constraint,Viewable> constraintValue : additionalConstraints.entrySet()) {
 							Constraint constraintObj = constraintValue.getKey();
 							classValue = constraintValue.getValue();
-							if(classValue.equals(currentClass)){
-								classFound=true;
+							if(currentClass.isExtending(classValue)){
 								if(constraintObj instanceof ExistenceConstraint){
 									ExistenceConstraint existenceConstraint = (ExistenceConstraint) constraintObj;
 									validateExistenceConstraint(iomObj, existenceConstraint);
@@ -350,12 +351,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									validateMandatoryConstraint(iomObj, mandatoryConstraint);
 								} else if(constraintObj instanceof SetConstraint){
 									SetConstraint setConstraint = (SetConstraint) constraintObj;
-									setConstraint(iomObj, setConstraint);
+									collectSetConstraintObjs(iomObj, setConstraint);
 								}
 							}
-						}
-						if(!classFound){
-							logMsg(checkConstraint,"Referenced class {0} of additionalModels not found.", classValue.getName());
 						}
 					}
 				Iterator constraintIterator=currentClass.iterator();
