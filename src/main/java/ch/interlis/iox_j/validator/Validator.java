@@ -2,19 +2,13 @@ package ch.interlis.iox_j.validator;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import javax.xml.ws.Holder;
-
 import com.vividsolutions.jts.geom.Coordinate;
-
-import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
@@ -25,13 +19,8 @@ import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.AttributeRef;
 import ch.interlis.ili2c.metamodel.Cardinality;
 import ch.interlis.ili2c.metamodel.CompositionType;
-import ch.interlis.ili2c.metamodel.ConditionalExpression;
 import ch.interlis.ili2c.metamodel.Constant;
-import ch.interlis.ili2c.metamodel.Constant.AttributePath;
 import ch.interlis.ili2c.metamodel.Constant.Enumeration;
-import ch.interlis.ili2c.metamodel.Constant.EnumerationRange;
-import ch.interlis.ili2c.metamodel.Constant.Numeric;
-import ch.interlis.ili2c.metamodel.Constant.Text;
 import ch.interlis.ili2c.metamodel.Constraint;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.DataModel;
@@ -51,13 +40,9 @@ import ch.interlis.ili2c.metamodel.Expression.Inequality;
 import ch.interlis.ili2c.metamodel.Expression.LessThan;
 import ch.interlis.ili2c.metamodel.Expression.LessThanOrEqual;
 import ch.interlis.ili2c.metamodel.Expression.Negation;
-import ch.interlis.ili2c.metamodel.Extendable;
-import ch.interlis.ili2c.metamodel.FormalArgument;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.Function;
 import ch.interlis.ili2c.metamodel.FunctionCall;
-import ch.interlis.ili2c.metamodel.InspectionFactor;
-import ch.interlis.ili2c.metamodel.LengthOfReferencedText;
 import ch.interlis.ili2c.metamodel.LineForm;
 import ch.interlis.ili2c.metamodel.LineType;
 import ch.interlis.ili2c.metamodel.LocalAttribute;
@@ -67,13 +52,10 @@ import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.ObjectPath;
 import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.Objects;
-import ch.interlis.ili2c.metamodel.ParameterValue;
 import ch.interlis.ili2c.metamodel.PathEl;
 import ch.interlis.ili2c.metamodel.PathElAbstractClassRole;
-import ch.interlis.ili2c.metamodel.PathElAssocRole;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
-import ch.interlis.ili2c.metamodel.PredefinedModel;
 import ch.interlis.ili2c.metamodel.Projection;
 import ch.interlis.ili2c.metamodel.ReferenceType;
 import ch.interlis.ili2c.metamodel.RoleDef;
@@ -88,10 +70,7 @@ import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.Type;
 import ch.interlis.ili2c.metamodel.TypeAlias;
 import ch.interlis.ili2c.metamodel.UniquenessConstraint;
-import ch.interlis.ili2c.metamodel.View;
 import ch.interlis.ili2c.metamodel.Viewable;
-import ch.interlis.ili2c.metamodel.ViewableAggregate;
-import ch.interlis.ili2c.metamodel.ViewableAlias;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
@@ -103,11 +82,9 @@ import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxLogging;
 import ch.interlis.iox.IoxValidationConfig;
-import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.PipelinePool;
 import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.logging.LogEventFactory;
-import ch.interlis.models.IlisMeta16.ModelData.UniqueConstraint;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_ADDITIONAL_MODELS="ch.interlis.iox_j.validator.additionalModels";
@@ -1176,38 +1153,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				Type type = attrRef.getAttr().getDomain();
 				String attrName = objectPathObj.getLastPathEl().getName();
 				if(iomObj.getattrvaluecount(attrName)==0){
-//					// basetype not null
-//					if(attrRef.getAttr() instanceof LocalAttribute){
-//					LocalAttribute localAttribute = (LocalAttribute) attrRef.getAttr();
-//					if(localAttribute.getBasePaths()!=null){
-//						Evaluable[] arguments = localAttribute.getBasePaths();
-//						Set<String> basketIds = objectPool.getBasketIds();
-//						Iterator basketIterator = basketIds.iterator();
-//						while(basketIterator.hasNext()){
-//							Object anBasket = basketIterator.next();
-//							Iterator objectIterator = objectPool.getObjectsOfBasketId(anBasket.toString()).values().iterator();
-//							while(objectIterator.hasNext()){
-//								IomObject aIomObj = (IomObject) objectIterator.next();
-//								if(aIomObj!=null){
-//									String attrValue = aIomObj.getattrvalue(arguments[0].toString());
-//									if(attrValue!=null){
-//										Value baseValue=evaluateExpression(aIomObj,arguments[0]);
-//										if (baseValue.skipEvaluation()){
-//											return baseValue;
-//										}
-//										if (baseValue.isUndefined()){
-//											return Value.createSkipEvaluation();
-//										}
-//										if(baseValue.getValue()!=null){
-//											return new Value(baseValue.getType(), baseValue.getValue());
-//										}
-//									}
-//								}
-//							}
-//						}
-//					}
-//				}
-				return Value.createUndefined();
+					return Value.createUndefined();
 				}else{
 					String objValue = iomObj.getattrvalue(attrName);
 					if(objValue != null){
