@@ -44,7 +44,9 @@ public class StdLogger extends AbstractFilteringListener {
 		
 		String objRef=null;
 		if(event instanceof IoxLogEvent){
-			ioxErrc++;
+			if(event.getEventKind()==IoxLogEvent.ERROR || event.getEventKind()==IoxLogEvent.WARNING){
+				ioxErrc++;
+			}
 			objRef="";
 			IoxLogEvent ioxEvent=(IoxLogEvent) event;
 			if(ioxEvent.getSourceLineNr()!=null){
@@ -72,7 +74,7 @@ public class StdLogger extends AbstractFilteringListener {
 			String msg=(String)msgi.next();
 			outputMsgLine(event.getEventKind(),event.getCustomLevel(),msgTimestamp+msgTag+objRef+msg);
 		}
-		if(event instanceof IoxLogEvent && logfile!=null){
+		if(event instanceof IoxLogEvent && logfile!=null && ioxErrc==1){
 			outputMsgLine(LogEvent.ADAPTION,0,msgTimestamp+INFO+": see <"+logfile+"> for more validation results");
 		}
 	}

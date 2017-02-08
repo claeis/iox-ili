@@ -210,6 +210,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	
 	private void validateAllAreas() {
 		for(AttributeDef attr:areaAttrs.keySet()){
+			errs.addEvent(errFact.logDetailInfoMsg("validate AREA {0}...", getScopedName(attr)));
 			ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
 			try {
 				allLines.getLines();
@@ -220,6 +221,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	private String getScopedName(AttributeDef attr) {
 		return attr.getContainer().getScopedName(null)+"."+attr.getName();
+	}
+	private String getScopedName(RoleDef roleDef) {
+		return roleDef.getContainer().getScopedName(null)+"."+roleDef.getName();
+	}
+	private String getScopedName(Constraint cnstr) {
+		return cnstr.getContainer().getScopedName(null)+"."+cnstr.getName();
 	}
 	private boolean isBasketSame(RoleDef role, ReferenceType ref,String bidOfTargetObject){
 		if(!currentBasketId.equals(bidOfTargetObject)){
@@ -262,7 +269,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						if(constraintObj instanceof ExistenceConstraint){
 							ExistenceConstraint existenceConstraint=(ExistenceConstraint) constraintObj;
 							if(!constraints.contains(existenceConstraint)){
-								errs.addEvent(errFact.logInfoMsg("validate existence constraint {0}...",existenceConstraint.getScopedName(null)));
+								errs.addEvent(errFact.logInfoMsg("validate existence constraint {0}...",getScopedName(existenceConstraint)));
 								constraints.add(existenceConstraint);
 					}
 							validateExistenceConstraint(iomObj, existenceConstraint);
@@ -271,7 +278,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						if(constraintObj instanceof MandatoryConstraint){
 							MandatoryConstraint mandatoryConstraint=(MandatoryConstraint) constraintObj;
 							if(!constraints.contains(mandatoryConstraint)){
-								errs.addEvent(errFact.logInfoMsg("validate mandatory constraint {0}...",mandatoryConstraint.getScopedName(null)));
+								errs.addEvent(errFact.logInfoMsg("validate mandatory constraint {0}...",getScopedName(mandatoryConstraint)));
 								constraints.add(mandatoryConstraint);
 					}
 							validateMandatoryConstraint(iomObj, mandatoryConstraint);
@@ -280,7 +287,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						if(constraintObj instanceof SetConstraint){
 							SetConstraint setConstraint=(SetConstraint) constraintObj;
 							if(!constraints.contains(setConstraint)){
-								errs.addEvent(errFact.logInfoMsg("validate set constraint {0}...",setConstraint.getScopedName(null)));
+								errs.addEvent(errFact.logInfoMsg("validate set constraint {0}...",getScopedName(setConstraint)));
 								constraints.add(setConstraint);
 							}
 							setConstraint(iomObj, setConstraint);
@@ -296,17 +303,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						if (type instanceof CompositionType){
 							IomObject structValue = iomObj.getattrobj(iomObj.getattrname(0), 0);
 							CompositionType compositionType = (CompositionType) type;
-							if(!types.contains(compositionType)){
-								errs.addEvent(errFact.logInfoMsg("validate reference attributes {0}...",compositionType.getScopedName(null)));
-								types.add(compositionType);
-							}
 							Table structure = compositionType.getComponentType();
 							validateReferenceAttrs(structValue, structure);
 						}
 					}else if(objA.obj instanceof RoleDef){
 						RoleDef roleDef = (RoleDef) objA.obj;
 						if(!abstractLeafElement.contains(roleDef)){
-							errs.addEvent(errFact.logInfoMsg("validate role reference {0}...",roleDef.getScopedName(null)));
+							errs.addEvent(errFact.logInfoMsg("validate role reference {0}...",getScopedName(roleDef)));
 							abstractLeafElement.add(roleDef);
 					}
 						validateRoleReference(roleDef, iomObj);
@@ -315,7 +318,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(currentClass instanceof AbstractClassDef){
 					AbstractClassDef abstractClassDef = (AbstractClassDef) currentClass;
 					if(!viewables.contains(abstractClassDef)){
-						errs.addEvent(errFact.logInfoMsg("validate role reference {0}...",abstractClassDef.getScopedName(null)));
+						errs.addEvent(errFact.logInfoMsg("validate role references of {0}...",abstractClassDef.getScopedName(null)));
 						viewables.add(abstractClassDef);
 					}
 					Iterator<RoleDef> targetRoleIterator=abstractClassDef.getOpposideRoles();
@@ -349,7 +352,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					return true;
 					// ok
 				} else {
-					logMsg(checkConstraint,"Set Constraint {0} is not true.", setConstraintObj.getName());
+					logMsg(checkConstraint,"Set Constraint {0} is not true.", getScopedName(setConstraintObj));
 				}
 			}
 		} else {
@@ -367,7 +370,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if (conditionValue.isTrue()){
 					// ok
 				} else {
-					logMsg(checkConstraint,"Mandatory Constraint {0} is not true.", mandatoryConstraintObj.getName());				
+					logMsg(checkConstraint,"Mandatory Constraint {0} is not true.", getScopedName(mandatoryConstraintObj));				
 				}
 			}
 		} else {
@@ -1677,7 +1680,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(obj1 instanceof UniquenessConstraint){
 					UniquenessConstraint uniqueConstraint=(UniquenessConstraint) obj1;
 					if(!objectTypes.contains(uniqueConstraint)){
-						errs.addEvent(errFact.logInfoMsg("validate unique constraint {0}...",uniqueConstraint.getScopedName(null)));
+						errs.addEvent(errFact.logInfoMsg("validate unique constraint {0}...",getScopedName(uniqueConstraint)));
 						objectTypes.add(uniqueConstraint);
 					}
 					StringBuilder contentUniqueAttrs = new StringBuilder();
@@ -1828,15 +1831,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(proxyType!=null && (proxyType instanceof ObjectType)){
 						// skip implicit particles (base-viewables) of views
 					}else{
-						HashSet<Type> dataTypes=new HashSet<Type>();
 						Type type=attr.getDomainResolvingAliases();
 						String attrName=attr.getName();
 						if (type instanceof CompositionType){
-							CompositionType compositionType = (CompositionType) type;
-							if(!dataTypes.contains(compositionType)){
-								errs.addEvent(errFact.logDetailInfoMsg("validate composition type {0}...",compositionType.getScopedName(null)));
-								dataTypes.add(compositionType);
-							}
 							 int structc=iomObj.getattrvaluecount(attrName);
 							 for(int structi=0;structi<structc;structi++){
 								 IomObject structEle=iomObj.getattrobj(attrName, structi);
@@ -1847,10 +1844,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							 }
 						}else if (type instanceof PolylineType){
 							PolylineType polylineType=(PolylineType)type;
-							if(!dataTypes.contains(polylineType)){
-								errs.addEvent(errFact.logDetailInfoMsg("validate polyline type {0}...",polylineType.getScopedName(null)));
-								dataTypes.add(polylineType);
-							}
 							IomObject polylineValue=iomObj.getattrobj(attrName, 0);
 							if (polylineValue != null){
 								IomObject coord=getFirstCoordFromPolyline(polylineValue);
@@ -1862,17 +1855,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							 if(doItfLineTables){
 								 if(type instanceof SurfaceType){
 									 SurfaceType surfaceType = (SurfaceType) type;
-									 if(!dataTypes.contains(surfaceType)){
-											errs.addEvent(errFact.logDetailInfoMsg("validate surface type {0}...",surfaceType.getScopedName(null)));
-											dataTypes.add(surfaceType);
-									 }
 									 // SURFACE; no attributeValue in mainTable
 								 }else{
 									 AreaType areaType = (AreaType) type;
-									 if(!dataTypes.contains(areaType)){
-											errs.addEvent(errFact.logDetailInfoMsg("validate area type {0}...",areaType.getScopedName(null)));
-											dataTypes.add(areaType);
-									}
 									// AREA
 									// coord
 									IomObject coord=iomObj.getattrobj(attrName, 0);
@@ -1903,10 +1888,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							 }
 						}else if(type instanceof CoordType){
 							CoordType coordType = (CoordType) type;
-							if(!dataTypes.contains(coordType)){
-								errs.addEvent(errFact.logDetailInfoMsg("validate coord type {0}...",coordType.getScopedName(null)));
-								dataTypes.add(coordType);
-							}
 							IomObject coord=iomObj.getattrobj(attrName, 0);
 							if (coord!=null){
 								return coord;
