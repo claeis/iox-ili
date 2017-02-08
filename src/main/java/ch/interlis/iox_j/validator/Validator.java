@@ -106,6 +106,7 @@ import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.PipelinePool;
 import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.logging.LogEventFactory;
+import ch.interlis.models.IlisMeta16.ModelData.UniqueConstraint;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_ADDITIONAL_MODELS="ch.interlis.iox_j.validator.additionalModels";
@@ -215,6 +216,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(additionalModels==null){
 			return;
 		}
+		errs.addEvent(errFact.logInfoMsg("iterate through additional models {0}", additionalModels.toString()));
 		for(int modelIndex=0;modelIndex<additionalModels.length;modelIndex++){
 			String additionalModel = additionalModels[modelIndex];
 			if(additionalModel==null){
@@ -278,6 +280,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					Iterator iteratorOfViewConstraints=view.iterator();
 					while (iteratorOfViewConstraints.hasNext()){
 						Object constraintObj = iteratorOfViewConstraints.next();
+						errs.addEvent(errFact.logInfoMsg("collect additional constraints {0}", constraintObj.toString()));
 						if(!(constraintObj instanceof Constraint)){
 							continue;
 						}
@@ -323,6 +326,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		HashSet<Type> types=new HashSet<Type>();
 		HashSet<Viewable> viewables=new HashSet<Viewable>();
 		HashSet<AbstractLeafElement> abstractLeafElement=new HashSet<AbstractLeafElement>();
+		boolean classFound=false;
 		for (String basketId : objectPool.getBasketIds()){
 			// iterate through iomObjects
 			Iterator<IomObject> objectIterator = objectPool.getObjectsOfBasketId(basketId).values().iterator();
@@ -338,7 +342,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}else{
 					// additional constraint
 					if(!additionalConstraints.isEmpty()){
-						boolean classFound=false;
 						Viewable classValue=null;
 						for (Map.Entry<Constraint,Viewable> constraintValue : additionalConstraints.entrySet()) {
 							Constraint constraintObj = constraintValue.getKey();

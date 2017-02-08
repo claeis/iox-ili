@@ -26,14 +26,14 @@ public class AdditionalConstraints23Test {
 	// MODEL.TOPIC
 	private final static String ILI_TOPIC="AdditionalConstraints23.Bodenbedeckung";
 	// CLASS
-	private final static String ILI_CLASSGEBAEUDE=ILI_TOPIC+".Gebaeude";
-	private final static String ILI_CLASSBANK=ILI_TOPIC+".Bank";
+	private final static String ILI_MANDATORYCONSTRAINT_CLASS=ILI_TOPIC+".ManConClass";
+	private final static String ILI_MANDATORYCONSTRAINT_COORDCLASS=ILI_TOPIC+".ManConClassCoord";
 	private final static String ILI_CLASSZA=ILI_TOPIC+".ClassZA";
 	private final static String ILI_STRUCTC=ILI_TOPIC+".StructC";
 	private final static String ILI_CLASSC=ILI_TOPIC+".ClassC";
 	private final static String ILI_CLASSA=ILI_TOPIC+".ClassA";
-	private final static String ILI_CLASSE=ILI_TOPIC+".ClassE";
-	private final static String ILI_CLASSCONDITION=ILI_TOPIC+".ConditionClass";
+	private final static String ILI_EXISTENCECONSTRAINT_CLASS=ILI_TOPIC+".ExConClass";
+	private final static String ILI_EXISTENCECONSTRAINT_CONDITION=ILI_TOPIC+".ExConCondition";
 	// START BASKET EVENT
 	private final static String BID="b1";
 	private final static String BID2="b2";
@@ -52,19 +52,19 @@ public class AdditionalConstraints23Test {
 	//######## SUCCESS ADDITIONAL CONSTRAINTS #################//
 	//#########################################################//	
 	@Test
-	public void mandatoryConstraintsInEqualation_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGEBAEUDE, OBJ_OID1);
-		iomObjA.setattrvalue("attr1", "5");
-		iomObjA.setattrvalue("attr2", "5");
+	public void mandatoryConstraint_Equalation_Ok(){
+		Iom_jObject obj1=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
+		obj1.setattrvalue("attr1", "5");
+		obj1.setattrvalue("attr2", "5");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz;");
+		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConModel;");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(obj1));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
@@ -73,8 +73,8 @@ public class AdditionalConstraints23Test {
 	
 	// test in (!=), (<>).
 	@Test
-	public void mandatoryConstraintInEqualationCoordTypeOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSBANK, OBJ_OID1);
+	public void mandatoryConstraint_InEqualation_Coord_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_MANDATORYCONSTRAINT_COORDCLASS, OBJ_OID1);
 		IomObject coordValue3=iomObjA.addattrobj("attr3", "COORD");
 		coordValue3.setattrvalue("C1", "480000.000");
 		coordValue3.setattrvalue("C2", "70000.000");
@@ -87,7 +87,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz2");
+		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConCoordModel");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -100,7 +100,7 @@ public class AdditionalConstraints23Test {
 	
 	@Test
 	public void mandatoryConstraint_2Models_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSBANK, OBJ_OID1);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_MANDATORYCONSTRAINT_COORDCLASS, OBJ_OID1);
 		IomObject coordValue3=iomObjA.addattrobj("attr3", "COORD");
 		coordValue3.setattrvalue("C1", "480000.000");
 		coordValue3.setattrvalue("C2", "70000.000");
@@ -109,14 +109,14 @@ public class AdditionalConstraints23Test {
 		coordValue4.setattrvalue("C1", "480000.000");
 		coordValue4.setattrvalue("C2", "88888.000");
 		coordValue4.setattrvalue("C3", "5000.000");
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSGEBAEUDE, OBJ_OID2);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID2);
 		iomObjB.setattrvalue("attr1", "5");
 		iomObjB.setattrvalue("attr2", "5");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz2;AdditionalConstraints23Zusatz");
+		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConCoordModel;AddManConModel");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -127,89 +127,6 @@ public class AdditionalConstraints23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
-	// 2 objects. Objects with Class implementation
-//	@Test
-//	public void mandatoryConstraint_FunctionAreArea_Ok(){
-//		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSZA, OBJ_OID1);
-//		// Geometrie 1
-//		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("Geometrie", "MULTISURFACE");
-//		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-//		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-//		// polyline
-//		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-//		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-//		IomObject startSegment=segments.addattrobj("segment", "COORD");
-//		startSegment.setattrvalue("C1", "480000.000");
-//		startSegment.setattrvalue("C2", "70000.000");
-//		IomObject endSegment=segments.addattrobj("segment", "COORD");
-//		endSegment.setattrvalue("C1", "483000.000");
-//		endSegment.setattrvalue("C2", "70000.000");
-//		// polyline 2
-//		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-//		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-//		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-//		startSegment2.setattrvalue("C1", "483000.000");
-//		startSegment2.setattrvalue("C2", "70000.000");
-//		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-//		endSegment2.setattrvalue("C1", "480000.000");
-//		endSegment2.setattrvalue("C2", "73000.000");
-//		// polyline 3
-//		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-//		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-//		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-//		startSegment3.setattrvalue("C1", "480000.000");
-//		startSegment3.setattrvalue("C2", "73000.000");
-//		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-//		endSegment3.setattrvalue("C1", "480000.000");
-//		endSegment3.setattrvalue("C2", "70000.000");
-//		// Geometrie 2
-//		Iom_jObject objSurfaceSuccess2=new Iom_jObject(ILI_CLASSZA, OBJ_OID2);
-//		IomObject multisurfaceValue2=objSurfaceSuccess2.addattrobj("Geometrie", "MULTISURFACE");
-//		IomObject surfaceValue2 = multisurfaceValue2.addattrobj("surface", "SURFACE");
-//		IomObject outerBoundary2 = surfaceValue2.addattrobj("boundary", "BOUNDARY");
-//		// polyline
-//		IomObject polylineValue5 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-//		IomObject segments5=polylineValue5.addattrobj("sequence", "SEGMENTS");
-//		IomObject startSegment5=segments5.addattrobj("segment", "COORD");
-//		startSegment5.setattrvalue("C1", "484000.000");
-//		startSegment5.setattrvalue("C2", "70000.000");
-//		IomObject endSegment5=segments5.addattrobj("segment", "COORD");
-//		endSegment5.setattrvalue("C1", "484000.000");
-//		endSegment5.setattrvalue("C2", "72500.000");
-//		// polyline 2
-//		IomObject polylineValue4 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-//		IomObject segments4=polylineValue4.addattrobj("sequence", "SEGMENTS");
-//		IomObject startSegment4=segments4.addattrobj("segment", "COORD");
-//		startSegment4.setattrvalue("C1", "484000.000");
-//		startSegment4.setattrvalue("C2", "72500.000");
-//		IomObject endSegment4=segments4.addattrobj("segment", "COORD");
-//		endSegment4.setattrvalue("C1", "488000.000");
-//		endSegment4.setattrvalue("C2", "70500.000");
-//		// polyline 3
-//		IomObject polylineValue6 = outerBoundary2.addattrobj("polyline", "POLYLINE");
-//		IomObject segments6=polylineValue6.addattrobj("sequence", "SEGMENTS");
-//		IomObject startSegment6=segments6.addattrobj("segment", "COORD");
-//		startSegment6.setattrvalue("C1", "488000.000");
-//		startSegment6.setattrvalue("C2", "70500.000");
-//		IomObject endSegment6=segments6.addattrobj("segment", "COORD");
-//		endSegment6.setattrvalue("C1", "484000.000");
-//		endSegment6.setattrvalue("C2", "70000.000");
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz3");
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-//		validator.validate(new ObjectEvent(objSurfaceSuccess));
-//		validator.validate(new ObjectEvent(objSurfaceSuccess2));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==0);
-//	}
 	
 	@Test
 	public void setConstraint_BagOfStruct_Ok(){
@@ -236,71 +153,44 @@ public class AdditionalConstraints23Test {
 	}	
 	
 	@Test
-	public void uniqueContraints_SameNumbersDifferentTextBOk(){
-		// Set object.
-		Iom_jObject obj1=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		obj1.setattrvalue("attr1", "Anna");
-		obj1.setattrvalue("attr2", "20");
-		Iom_jObject obj2=new Iom_jObject(ILI_CLASSA, OBJ_OID2);
-		obj2.setattrvalue("attr1", "Ralf");
-		obj2.setattrvalue("attr2", "20");
-		// Create and run validator.
+	public void existenceConstraintInSameModel_Ok() throws Exception{
+		Iom_jObject conditionObj=new Iom_jObject(ILI_EXISTENCECONSTRAINT_CONDITION, OBJ_OID1);
+		conditionObj.setattrvalue("superAttr", "lars");
+		Iom_jObject obj1=new Iom_jObject(ILI_EXISTENCECONSTRAINT_CLASS, OBJ_OID2);
+		obj1.setattrvalue("subAttr", "lars");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz5");
+		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddExConModel");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(conditionObj));
 		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
-		// Asserts.
+		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
-//	@Test
-//	public void existenceConstraintInSameModel_Ok() throws Exception{
-//		Iom_jObject objBedingung=new Iom_jObject(ILI_CLASSCONDITION, "o1");
-//		objBedingung.setattrvalue("attr1", "lars");
-//		Iom_jObject objA=new Iom_jObject(ILI_CLASSE, "o2");
-//		objA.setattrvalue("attr5", "lars");
-//		objA.setattrvalue("attr2", "20");
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz6");
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-//		validator.validate(new ObjectEvent(objBedingung));
-//		validator.validate(new ObjectEvent(objA));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==0);
-//	}
 	
 	//#########################################################//
 	//########### FAIL ADDITIONAL CONSTRAINTS #################//
 	//#########################################################//
 	@Test
-	public void mandatoryConstraint_NotEqual_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGEBAEUDE, OBJ_OID1);
-		iomObjA.setattrvalue("attr1", "5");
-		iomObjA.setattrvalue("attr2", "10");
+	public void mandatoryConstraint_NotEqualation_Fail(){
+		Iom_jObject obj1=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
+		obj1.setattrvalue("attr1", "5");
+		obj1.setattrvalue("attr2", "10");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz");
+		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConModel;");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(obj1));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
@@ -310,14 +200,14 @@ public class AdditionalConstraints23Test {
 	
 	@Test
 	public void mandatoryConstraint_WrongConfigConstraintModelName_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGEBAEUDE, OBJ_OID1);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "10");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz2");
+		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConCoordModel");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -326,12 +216,12 @@ public class AdditionalConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Referenced class Bank of additionalModels not found.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Referenced class ManConClassCoord of additionalModels not found.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
 	public void mandatoryConstraint_ConfigConstraintModelNameNotExist_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGEBAEUDE, OBJ_OID1);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "10");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -353,7 +243,7 @@ public class AdditionalConstraints23Test {
 	// test in (!=), (<>).
 	@Test
 	public void mandatoryConstraint_CoordsAreEqual_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSBANK, OBJ_OID1);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_MANDATORYCONSTRAINT_COORDCLASS, OBJ_OID1);
 		IomObject coordValue3=iomObjA.addattrobj("attr3", "COORD");
 		coordValue3.setattrvalue("C1", "480000.000");
 		coordValue3.setattrvalue("C2", "70000.000");
@@ -366,7 +256,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz2");
+		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConCoordModel");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -380,7 +270,7 @@ public class AdditionalConstraints23Test {
 	
 	@Test
 	public void mandatoryConstraint_2Models_CoordIsEqual_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSBANK, OBJ_OID1);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_MANDATORYCONSTRAINT_COORDCLASS, OBJ_OID1);
 		IomObject coordValue3=iomObjA.addattrobj("attr3", "COORD");
 		coordValue3.setattrvalue("C1", "480000.000");
 		coordValue3.setattrvalue("C2", "70000.000");
@@ -389,14 +279,14 @@ public class AdditionalConstraints23Test {
 		coordValue4.setattrvalue("C1", "480000.000");
 		coordValue4.setattrvalue("C2", "70000.000");
 		coordValue4.setattrvalue("C3", "5000.000");
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSGEBAEUDE, OBJ_OID2);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID2);
 		iomObjB.setattrvalue("attr1", "5");
 		iomObjB.setattrvalue("attr2", "5");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz;AdditionalConstraints23Zusatz2");
+		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConCoordModel;AddManConModel");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -437,32 +327,26 @@ public class AdditionalConstraints23Test {
 		assertEquals("Set Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-//	@Test
-//	public void uniqueContraints_SameNumbersSameText_False(){
-//		// Set object.
-//		Iom_jObject obj1=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-//		obj1.setattrvalue("attr1", "ruth");
-//		obj1.setattrvalue("attr2", "20");
-//		Iom_jObject obj2=new Iom_jObject(ILI_CLASSA, OBJ_OID2);
-//		obj2.setattrvalue("attr1", "Anna");
-//		obj2.setattrvalue("attr2", "15");
-//		// Create and run validator.
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz5");
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-//		validator.validate(new ObjectEvent(obj1));
-//		validator.validate(new ObjectEvent(obj2));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts.
-//		assertTrue(logger.getErrs().size()==1);
-//		assertEquals("UniqueConstraint is not true.", logger.getErrs().get(0).getEventMsg());
-//	}
-	
-	
+	@Test
+	public void existenceConstraint_AttrsNotEqual_Fail() throws Exception{
+		Iom_jObject conditionObj=new Iom_jObject(ILI_EXISTENCECONSTRAINT_CONDITION, OBJ_OID1);
+		conditionObj.setattrvalue("superAttr", "lars");
+		Iom_jObject obj1=new Iom_jObject(ILI_EXISTENCECONSTRAINT_CLASS, OBJ_OID2);
+		obj1.setattrvalue("subAttr", "Andreas");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddExConModel");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(conditionObj));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("The value of the attribute subAttr of AdditionalConstraints23.Bodenbedeckung.ExConClass was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+	}
 }

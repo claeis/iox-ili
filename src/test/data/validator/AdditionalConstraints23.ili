@@ -11,87 +11,113 @@ CONTRACTED MODEL AdditionalConstraints23 AT "mailto:ceis@localhost" VERSION "201
 					              0.000 .. 5000.000 [INTERLIS.m];
 			enumerationOrdered = (null, eins, zwei, drei, mehr (vier)) ORDERED;
 			attrRef1 = TEXT*12;
-		
-	CLASS Gebaeude =
-		attr1 : 0..10; !!5
+	
+	!! Mandatory Constraint
+	CLASS ManConClass =
+		attr1 : 0..10;
 		attr2 : 0..10;
-  	END Gebaeude;
+  	END ManConClass;
   	
-	CLASS Bank =
+  	!! Mandatory Constraint coords
+	CLASS ManConClassCoord =
 		attr3 : Hkoord;
 		attr4 : Hkoord;
-	END Bank;
+	END ManConClassCoord;
 	
-    CLASS ClassZA =
-		Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-	END ClassZA;
+    !!CLASS ClassZA =
+	!!	Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+	!!END ClassZA;
 	
+	!! Set Constraint
 	STRUCTURE StructC =
 	END StructC;
 	
 	CLASS ClassC =
 		Numbers: BAG {1..*} OF StructC;
 	END ClassC;
-  	
-  	CLASS ClassA =
-		attr1 : TEXT*10;
-		attr2 : 0 .. 100;
-	END ClassA;
 	
-	CLASS ConditionClass =
-		attr1 : TEXT*10;
-	END ConditionClass;
 	
-	CLASS ClassE =
-		attr5 : TEXT*10;
-		attr2 : 0 .. 100;
-	END ClassE;
-  	
+	!! Existence Constraint
+	CLASS ExConCondition =
+		superAttr : TEXT*10;
+	END ExConCondition;
+	
+	CLASS ExConClass =
+		subAttr : TEXT*10;
+	END ExConClass;
+	
   END Bodenbedeckung;
 END AdditionalConstraints23.
 
 
-CONTRACTED MODEL AdditionalConstraints23Zusatz AT "mailto:ceis@localhost" VERSION "2016-03-29" =
-  IMPORTS AdditionalConstraints23;
-  VIEW TOPIC BodenbedeckungZusatz =
-  	DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-    VIEW IndustrieGebaeude
-    	PROJECTION OF AdditionalConstraints23.Bodenbedeckung.Gebaeude;
-    	WHERE Gebaeude->attr1==5;
-    	=
-        ALL OF Gebaeude;
-        MANDATORY CONSTRAINT attr1 == attr2;
-    END IndustrieGebaeude;
-  END BodenbedeckungZusatz;
-END AdditionalConstraints23Zusatz.
+
+!! VIEW Existence Constraint
+CONTRACTED MODEL AddExConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS AdditionalConstraints23;
+	
+	VIEW TOPIC AddExConTopic =
+		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+		
+		VIEW AddExConView
+			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ExConClass;
+			=
+			ALL OF ExConClass;
+			EXISTENCE CONSTRAINT subAttr REQUIRED IN AdditionalConstraints23.Bodenbedeckung.ExConCondition : superAttr;
+		END AddExConView;
+	END AddExConTopic;
+END AddExConModel.
 
 
-CONTRACTED MODEL AdditionalConstraints23Zusatz2 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
-  IMPORTS AdditionalConstraints23;
-  VIEW TOPIC BodenbedeckungZusatz =
-  	DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-        VIEW PrivatGebaeude
-    	PROJECTION OF AdditionalConstraints23.Bodenbedeckung.Bank;
-    	=
-        ALL OF Bank;
-        MANDATORY CONSTRAINT (attr3 != attr4);
-    END PrivatGebaeude;
-  END BodenbedeckungZusatz;
-END AdditionalConstraints23Zusatz2.
+!! VIEW Mandatory Constraint
+CONTRACTED MODEL AddManConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS AdditionalConstraints23;
+	
+	VIEW TOPIC AddManConTopic =
+		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+		
+		VIEW AddManConView
+			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ManConClass;
+			WHERE ManConClass->attr1==5;
+			=
+			ALL OF ManConClass;
+			MANDATORY CONSTRAINT attr1 == attr2;
+		END AddManConView;
+	END AddManConTopic;
+END AddManConModel.
 
 
-CONTRACTED MODEL AdditionalConstraints23Zusatz3 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
-  IMPORTS AdditionalConstraints23;
-  VIEW TOPIC BodenbedeckungZusatz =
-  	DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-        VIEW PrivatGebaeude
-    	PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ClassZA;
-    	=
-        ALL OF ClassZA;
-        MANDATORY CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie);
-    END PrivatGebaeude;
-  END BodenbedeckungZusatz;
-END AdditionalConstraints23Zusatz3.
+!! VIEW Mandatory Constraint Coords
+CONTRACTED MODEL AddManConCoordModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS AdditionalConstraints23;
+	
+	VIEW TOPIC AddManConCoordTopic =
+		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+		
+		VIEW AddManConCoordView
+			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ManConClassCoord;
+			=
+			ALL OF ManConClassCoord;
+			MANDATORY CONSTRAINT (attr3 != attr4);
+		END AddManConCoordView;
+	END AddManConCoordTopic;
+END AddManConCoordModel.
+
+
+
+!!CONTRACTED MODEL AdditionalConstraints23Zusatz3 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+!!  IMPORTS AdditionalConstraints23;
+!!  VIEW TOPIC BodenbedeckungZusatz =
+!!  	DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+!!        VIEW PrivatGebaeude
+!!   	PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ClassZA;
+!!    	=
+!!       ALL OF ClassZA;
+!!        MANDATORY CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie);
+!!    END PrivatGebaeude;
+!!  END BodenbedeckungZusatz;
+!!END AdditionalConstraints23Zusatz3.
+
+
 
 CONTRACTED MODEL AdditionalConstraints23Zusatz4 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
   IMPORTS AdditionalConstraints23;
@@ -105,29 +131,3 @@ CONTRACTED MODEL AdditionalConstraints23Zusatz4 AT "mailto:ceis@localhost" VERSI
     END PrivatGebaeude;
   END BodenbedeckungZusatz;
 END AdditionalConstraints23Zusatz4.
-
-CONTRACTED MODEL AdditionalConstraints23Zusatz5 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
-  IMPORTS AdditionalConstraints23;
-  VIEW TOPIC BodenbedeckungZusatz =
-  	DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-        VIEW PrivatGebaeude
-    	PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ClassA;
-    	=
-        ALL OF ClassA;
-        UNIQUE attr1;
-    END PrivatGebaeude;
-  END BodenbedeckungZusatz;
-END AdditionalConstraints23Zusatz5.
-
-CONTRACTED MODEL AdditionalConstraints23Zusatz6 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
-  IMPORTS AdditionalConstraints23;
-  VIEW TOPIC BodenbedeckungZusatz =
-  	DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-        VIEW PrivatGebaeude
-    	PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ClassE;
-    	=
-        ALL OF ClassE;
-        EXISTENCE CONSTRAINT attr5 REQUIRED IN AdditionalConstraints23.Bodenbedeckung.ConditionClass : attr1;
-    END PrivatGebaeude;
-  END BodenbedeckungZusatz;
-END AdditionalConstraints23Zusatz6.
