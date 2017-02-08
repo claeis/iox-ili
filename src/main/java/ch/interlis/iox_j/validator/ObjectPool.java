@@ -5,14 +5,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import javax.xml.ws.Holder;
 
+import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iox.IoxLogging;
+import ch.interlis.iox_j.logging.LogEventFactory;
 
 // the ObjectPool manages all objects
 //   - check If Object Is Unique
@@ -25,11 +29,13 @@ import ch.interlis.iom.IomObject;
 public class ObjectPool {
 	private boolean doItfOidPerTable;
 	private HashMap<String,Object> tag2class;
-	private Map<String, Map<ObjectPoolKey, IomObject>> collectionOfBaskets = new HashMap<String, Map<ObjectPoolKey, IomObject>>();
+	private ObjectPoolManager objPoolManager=null;
+	Map<String, Map<ObjectPoolKey, IomObject>> collectionOfBaskets = new HashMap<String, Map<ObjectPoolKey, IomObject>>();
 	
-	public ObjectPool(boolean doItfOidPerTable, HashMap<String,Object> tag2class){
+	public ObjectPool(boolean doItfOidPerTable, IoxLogging errs, LogEventFactory errFact, HashMap<String,Object> tag2class,ObjectPoolManager objPoolManager){
 		this.doItfOidPerTable = doItfOidPerTable;
 		this.tag2class = tag2class;
+		this.objPoolManager=objPoolManager;
 	}
 	public static String getAssociationId(IomObject iomObj, AssociationDef assocDef) {
 		if(assocDef==null){
@@ -60,7 +66,7 @@ public class ObjectPool {
 		return tid;
 	}
 
-	public IomObject addObject(IomObject iomObj, HashMap<String,Object> tag2class, String currentBasketId){
+	public IomObject addObject(IomObject iomObj, String currentBasketId){
 		String oid = iomObj.getobjectoid();
 		Object modelEle = tag2class.get(iomObj.getobjecttag());
 		if(oid==null){
@@ -77,18 +83,18 @@ public class ObjectPool {
 		if(collectionOfBaskets.containsKey(currentBasketId)){
 			collectionOfObjects=collectionOfBaskets.get(currentBasketId);
 		} else {
-			collectionOfObjects=new HashMap<ObjectPoolKey, IomObject>();
+			collectionOfObjects=objPoolManager.newObjectPool(); // new HashMap<ObjectPoolKey, IomObject>();
 			collectionOfBaskets.put(currentBasketId, collectionOfObjects);
 		}
 		if(collectionOfObjects.containsKey(key)){
 			return collectionOfObjects.get(key);
 		}
-		collectionOfObjects.put(key, iomObj);
+			collectionOfObjects.put(key,iomObj);
 		return null;
 	}
 	
-	public Map getObjectsOfBasketId(String basketId){
-		return collectionOfBaskets.get(basketId);
+	public ch.ehi.iox.objpool.impl.ObjPoolImpl getObjectsOfBasketId(String basketId){
+		return (ch.ehi.iox.objpool.impl.ObjPoolImpl)collectionOfBaskets.get(basketId);
 	}
 	
 	public Set<String> getBasketIds(){

@@ -9,6 +9,7 @@ import java.io.RandomAccessFile;
 import java.lang.ref.Reference;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,8 +22,10 @@ public class ObjPoolImpl implements Map {
 	private RandomAccessFile outFile=null;
 	private String outFilename=null;
 	private ObjectPoolManager recman=null;
-	public ObjPoolImpl(ObjectPoolManager objectPoolManager) {
+	private Serializer serializer=null;
+	public ObjPoolImpl(ObjectPoolManager objectPoolManager,Serializer serializer) {
 		recman=objectPoolManager;
+		this.serializer=serializer;
 	}
 
 	@Override
@@ -80,16 +83,12 @@ public class ObjPoolImpl implements Map {
 	@Override
 	public Object put(Object key, Object value) {
 		// serialize value
-        ObjectOutputStream     objStream;
-        ByteArrayOutputStream  byteStream;
-        byteStream = new ByteArrayOutputStream();
-        try {
-	        objStream  = new ObjectOutputStream (byteStream);
-			objStream.writeObject (value);
+		ObjPoolEntry entry;
+		try {
+			entry = new ObjPoolEntry(serializer.getBytes(value),value,writeQueue);
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
-		ObjPoolEntry entry=new ObjPoolEntry(byteStream.toByteArray(),value,writeQueue);
 		// check for values to write
 		recman.flushWriteQueues();
 		return pool.put(key, entry);
@@ -157,10 +156,8 @@ public class ObjPoolImpl implements Map {
 				entry.refillBuffer(buffer);
 			}
 			// deserialize
-	        ByteArrayInputStream  byteStream= new ByteArrayInputStream(buffer);
-	        try {
-	        	ObjectInputStream objStream  = new ObjectInputStream (byteStream);
-				obj=objStream.readObject();
+			try {
+				obj=serializer.getObject(buffer);
 			} catch (IOException e) {
 				throw new IllegalStateException(e);
 			} catch (ClassNotFoundException e) {
@@ -180,4 +177,25 @@ public class ObjPoolImpl implements Map {
 		throw new java.lang.UnsupportedOperationException();
 	}
 
+	public Iterator valueIterator()
+	{
+		Iterator ret=new Iterator() {
+			Iterator<Object> kevi=pool.keySet().iterator();
+			@Override
+			public void remove() {
+				throw new java.lang.UnsupportedOperationException();
+			}
+			
+			@Override
+			public Object next() {
+				return get(kevi.next());
+			}
+			
+			@Override
+			public boolean hasNext() {
+				return kevi.hasNext();
+			}
+		};
+		return ret;
+	}
 }

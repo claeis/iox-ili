@@ -45,6 +45,8 @@ import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.jts.Jtsext2iox;
+import ch.interlis.iox_j.logging.LogEventFactory;
+import ch.interlis.iox_j.validator.ValidationConfig;
 
 
 /*
@@ -243,7 +245,7 @@ public class ItfSurfaceLinetable2Polygon {
 			throw new IoxInvalidDataException("multipolygon detected");
 		}
 	}
-	public static void validatePolygon(String mainTid,AttributeDef surfaceAttr,IomObject polygon,ArrayList<IoxInvalidDataException> dataerrs) 
+	public static void validatePolygon(String mainTid,AttributeDef surfaceAttr,IomObject polygon,LogEventFactory errFact,String validationType) 
 			throws IoxException
 	{
 		String linetableIliqname=surfaceAttr.getContainer().getScopedName(null)+"."+surfaceAttr.getName();
@@ -263,14 +265,31 @@ public class ItfSurfaceLinetable2Polygon {
 		}
 		
 		JtsextGeometryFactory jtsFact=new JtsextGeometryFactory();
-		ArrayList<CompoundCurve> segv=createLineset(polygon);
+		ArrayList<CompoundCurve> segv=createLineset(polygon,validationType,0.0,errFact);
+		if(segv==null){
+			return;
+		}
 		
 		Holder<Polygon> poly=new Holder<Polygon>();
+		ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
 		createPolygon(mainTid, segv,maxOverlaps,newVertexOffset,dataerrs,linetableIliqname,ignorePolygonBuildingErrors,null,poly);
+		 if(ValidationConfig.WARNING.equals(validationType)){
+				for(IoxInvalidDataException err:dataerrs){
+					errFact.addEvent(errFact.logWarning(err));
+				}
+		 }else{
+				for(IoxInvalidDataException err:dataerrs){
+					errFact.addEvent(errFact.logError(err));
+				}
+		 }
 	}
-	private static ArrayList<CompoundCurve> createLineset(IomObject iomPolygon) throws IoxException {
+	private static ArrayList<CompoundCurve> createLineset(IomObject iomPolygon,String validationType,double tolerance,LogEventFactory errFact) throws IoxException {
+		Holder<Boolean> foundErrs=new Holder<Boolean>();
+		CurvePolygon poly=(CurvePolygon) Iox2jtsext.surface2JTS(iomPolygon, 0.0,foundErrs,errFact,tolerance,validationType);
+		if(poly==null || foundErrs.value){
+			return null;
+		}
 		ArrayList<CompoundCurve> segv=new ArrayList<CompoundCurve>();
-		CurvePolygon poly=(CurvePolygon) Iox2jtsext.surface2JTS(iomPolygon, 0.0);
 		// shell
 		com.vividsolutions.jts.geom.LineString shell=poly.getExteriorRing();
 		for(CompoundCurve line:((CompoundCurveRing) shell).getLines()){
@@ -449,7 +468,7 @@ public class ItfSurfaceLinetable2Polygon {
 				if(li.getIntersectionNum()==2){ 
 					if(seg.getNumSegments()==2 && seg0.getStartPoint().equals2D(seg1.getEndPoint())){
 						// Ring als eine Linie, zwei Segmente
-					}else if(li.getOverlap()<maxOverlaps){
+					}else if(li.getOverlap()!=null && li.getOverlap()<maxOverlaps){
 						// aufeinanderfolgende Segmente der selben Linie
 						Intersection is = new Intersection(
 								li.getIntersection(0), li.getIntersection(1),

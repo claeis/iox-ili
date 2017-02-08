@@ -896,7 +896,7 @@ public class Datatypes10Test {
 		coordStart.setattrvalue("C2", "70000.000");
 		coordStart.setattrvalue("C3", "4000.000");
 		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordEnd.setattrvalue("C1", "480000.000");
+		coordEnd.setattrvalue("C1", "480001.000");
 		coordEnd.setattrvalue("C2", "70000.000");
 		coordEnd.setattrvalue("C3", "4000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -922,10 +922,10 @@ public class Datatypes10Test {
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
 		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480000.000");
+		endSegment.setattrvalue("C1", "480001.000");
 		endSegment.setattrvalue("C2", "70000.000");
 		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A1", "480002.000");
 		arcSegment.setattrvalue("A2", "300000.000");
 		arcSegment.setattrvalue("C1", "480000.000");
 		arcSegment.setattrvalue("C2", "70000.000");
@@ -953,11 +953,11 @@ public class Datatypes10Test {
 		startSegment.setattrvalue("C2", "70000.000");
 		startSegment.setattrvalue("C3", "5000.000");
 		IomObject secondSegment=segments.addattrobj("segment", "COORD");
-		secondSegment.setattrvalue("C1", "480000.000");
+		secondSegment.setattrvalue("C1", "480001.000");
 		secondSegment.setattrvalue("C2", "70000.000");
 		secondSegment.setattrvalue("C3", "5000.000");
 		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
+		arcSegment.setattrvalue("A1", "480002.000");
 		arcSegment.setattrvalue("A2", "300000.000");
 		arcSegment.setattrvalue("C1", "480000.000");
 		arcSegment.setattrvalue("C2", "70000.000");
@@ -1222,7 +1222,7 @@ public class Datatypes10Test {
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
 		IomObject endSegment=segments.addattrobj("segment", "ARC");
-		endSegment.setattrvalue("A1", "500000.000");
+		endSegment.setattrvalue("A1", "500001.000");
 		endSegment.setattrvalue("A2", "80000.000");
 		endSegment.setattrvalue("C1", "500000.000");
 		endSegment.setattrvalue("C2", "80000.000");
@@ -1467,7 +1467,7 @@ public class Datatypes10Test {
 		startSegment.setattrvalue("C2", "70000.000");
 		startSegment.setattrvalue("C3", "1000.000");
 		IomObject endSegment=segments.addattrobj("segment", "ARC");
-		endSegment.setattrvalue("A1", "500000.000");
+		endSegment.setattrvalue("A1", "500001.000");
 		endSegment.setattrvalue("A2", "80000.000");
 		endSegment.setattrvalue("C1", "500000.000");
 		endSegment.setattrvalue("C2", "80000.000");
