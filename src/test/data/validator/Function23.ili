@@ -168,8 +168,8 @@ MODEL Function23
 		
 		!! (object Count ALL)
 		CLASS ClassQ =
-		   MANDATORY CONSTRAINT
-		   		(INTERLIS.objectCount(ALL)) == 2;
+			Art: (a, b, c);
+			SET CONSTRAINT WHERE Art == #a : (INTERLIS.objectCount(ALL)) == 2;
 		END ClassQ;
 		
 		CLASS ClassR =
@@ -259,7 +259,8 @@ MODEL Function23
         !! (areAreas ALL)
         CLASS ClassZA =
 			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-			MANDATORY CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie);
+			Art: (a, b, c);
+			SET CONSTRAINT WHERE Art == #a : INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie);
 		END ClassZA;
 		
 		!! (areAreas class)
@@ -295,7 +296,8 @@ MODEL Function23
 		
 		CLASS ClassZF =
 			Numbers: BAG {1..*} OF StructF;
-			MANDATORY CONSTRAINT INTERLIS.areAreas(ALL, >> Numbers, >> StructF->Surface);
+			Art: (a, b, c);
+			SET CONSTRAINT WHERE Art == #a : INTERLIS.areAreas(ALL, >> Numbers, >> StructF->Surface);
 		END ClassZF;
 		
 		CLASS ClassZI =

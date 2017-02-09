@@ -38,5 +38,6 @@ MODEL SetConstraint23
 			SET CONSTRAINT WHERE Art == #a :
 				INTERLIS.areAreas(ALL, >> Numbers, >> StructD->Surface);
 		END ClassD;
+		
 	END Topic;
 END SetConstraint23.

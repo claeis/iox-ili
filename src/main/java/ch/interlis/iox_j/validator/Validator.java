@@ -1,5 +1,6 @@
 package ch.interlis.iox_j.validator;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.ws.Holder;
 
@@ -1192,29 +1194,29 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								if (aliasType instanceof EnumerationType){
 									String refTypeName = typeAlias.getAliasing().getName();
 									return new Value(aliasType, objValue, refTypeName);
-						}
+								}
 							}
 							if (type instanceof EnumerationType){
-						return new Value(type, objValue);
-					}
+								return new Value(type, objValue);
+							}
 						}
 						return new Value(type, objValue);
-				} else {
+					} else {
 						return new Value(iomObj.getattrobj(attrName, 0));
+					}
 				}
-			}
 			}
 		} else if(expression instanceof Objects){
 			// objects
-			Viewable viewableOfExpression = ((Objects) expression).getContext();
-			Iterator<String> objectIterator = allObjIterator; //objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
+			Iterator<String> objectIterator = allObjIterator;
 			List<IomObject> listOfIomObjects = new ArrayList<IomObject>();
+			if(allObjIterator==null){
+				 throw new IllegalStateException("allObjIterator==null");
+			}
 			while(objectIterator.hasNext()){
 				String oid=objectIterator.next();
 				IomObject aIomObj = objectPool.getObject(oid, null, null);
 				if(aIomObj!=null){
-					Object modelElement=tag2class.get(aIomObj.getobjecttag());
-					Viewable objectClass = (Viewable) modelElement;
 					listOfIomObjects.add(aIomObj);
 				}
 			}
