@@ -1376,6 +1376,26 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	@Test
+	public void configOFFMandatoryConstraintEqualationBooleanTrue_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OBJ_OID1);
+		iomObjA.setattrvalue("attr1", "true");
+		iomObjA.setattrvalue("attr2", "false");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassEqualationI", ValidationConfig.CHECK,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
 	//#########################################################//
 	//########### FAIL MANDATORY CONSTRAINTS ##################//
 	//#########################################################//
@@ -1398,7 +1418,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationI.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in equal (==).
@@ -1419,7 +1439,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationG.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in equal (==).
@@ -1440,7 +1460,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationF.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in attr boolean
@@ -1471,7 +1491,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationE.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1529,7 +1549,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationD.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1581,7 +1601,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1661,7 +1681,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1745,7 +1765,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (!=), (<>).
@@ -1768,7 +1788,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// test in (!=), (<>).
@@ -1789,7 +1809,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (!=), (<>).
@@ -1810,7 +1830,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (!=), (<>).
@@ -1831,7 +1851,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (!=), (<>).
@@ -1862,7 +1882,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationD.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	// test in (!=), (<>).
 	@Test
@@ -1898,7 +1918,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationE.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	// test in (!=), (<>).
 	@Test
@@ -1950,7 +1970,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationF.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	// test in (!=), (<>).
 	@Test
@@ -2034,7 +2054,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationG.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	// test in (!=), (<>).
 	@Test
@@ -2118,7 +2138,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationH.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in attr boolean
@@ -2139,7 +2159,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationI.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (>).
@@ -2160,7 +2180,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (>).
@@ -2181,7 +2201,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (>).
@@ -2202,7 +2222,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (>).
@@ -2223,7 +2243,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (>).
@@ -2244,7 +2264,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (>).
@@ -2265,7 +2285,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (<).
@@ -2286,7 +2306,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (<).
@@ -2307,7 +2327,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (<).
@@ -2328,7 +2348,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (<).
@@ -2349,7 +2369,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (<).
@@ -2370,7 +2390,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (<).
@@ -2391,7 +2411,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (>=).
@@ -2412,7 +2432,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanOrEqualA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (>=).
@@ -2433,7 +2453,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanOrEqualB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (>=).
@@ -2454,7 +2474,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanOrEqualC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (<=).
@@ -2475,7 +2495,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanOrEqualA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (<=).
@@ -2496,7 +2516,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanOrEqualB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (<=).
@@ -2517,7 +2537,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanOrEqualC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in formattedtype defined (defined)
@@ -2538,12 +2558,12 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassFormattedTypeA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in undefined (undefined)
 	@Test
-	public void unDefinedAttrEXP_DefinedAttrACT_Ok(){
+	public void unDefinedAttrEXP_3Con_DefinedAttrACT_Fail(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSDEFINEDB, OBJ_OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -2556,28 +2576,10 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	@Test
-	public void configOFFMandatoryConstraintEqualationBooleanTrue(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OBJ_OID1);
-		iomObjA.setattrvalue("attr1", "true");
-		iomObjA.setattrvalue("attr2", "false");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassEqualationI", ValidationConfig.CHECK,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertTrue(logger.getErrs().size()==3);
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassDefinedB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassDefinedB.Constraint2 is not true.", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassDefinedB.Constraint3 is not true.", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	@Test
@@ -2598,7 +2600,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationI.Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
 	}
 	
 }

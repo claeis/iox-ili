@@ -195,28 +195,7 @@ public class AdditionalConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	@Test
-	public void mandatoryConstraint_WrongConfigConstraintModelName_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
-		iomObjA.setattrvalue("attr1", "5");
-		iomObjA.setattrvalue("attr2", "10");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConCoordModel");
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Referenced class ManConClassCoord of additionalModels not found.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint AddManConModel.AddManConTopic.AddManConView.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -237,7 +216,7 @@ public class AdditionalConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Defined AdditionalModel AdditionalConstraints23Zusatz99999999 not exist.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("required additional model AdditionalConstraints23Zusatz99999999 not found", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// test in (!=), (<>).
@@ -265,7 +244,7 @@ public class AdditionalConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint AddManConCoordModel.AddManConCoordTopic.AddManConCoordView.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -296,7 +275,7 @@ public class AdditionalConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint AddManConCoordModel.AddManConCoordTopic.AddManConCoordView.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -324,7 +303,7 @@ public class AdditionalConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Set Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Set Constraint AdditionalConstraints23Zusatz4.BodenbedeckungZusatz.PrivatGebaeude.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test

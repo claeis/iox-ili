@@ -352,6 +352,10 @@ MODEL MandatoryConstraints23
 			attr1 : attrRef1;
 			MANDATORY CONSTRAINT
 			DEFINED(attr1);
+			MANDATORY CONSTRAINT
+			DEFINED(attr1);
+			MANDATORY CONSTRAINT
+			DEFINED(attr1);
 		END ClassDefinedB;
 		
 		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

@@ -967,7 +967,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassG.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -988,9 +988,9 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassL.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
-	
+
 	@Test
 	public void inEnumRange_EnumWithSubEnumNotBetween_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSI, OBJ_OID1);
@@ -1009,7 +1009,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassI.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1030,7 +1030,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassK.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1050,7 +1050,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassA1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1069,7 +1069,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassA2.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1089,7 +1089,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassA3.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1109,7 +1109,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassB1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1128,7 +1128,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassB2.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1148,7 +1148,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassB3.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1168,7 +1168,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassC1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1187,7 +1187,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassC2.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1207,7 +1207,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassC3.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1227,7 +1227,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassD1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1246,7 +1246,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassD2.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1266,7 +1266,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassD3.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1287,7 +1287,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassH.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1315,7 +1315,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassN.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1349,7 +1349,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassO.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1394,7 +1394,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassS.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1419,7 +1419,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassV.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1445,7 +1445,7 @@ public class Function23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
 		assertEquals("Attribute attrV1 requires a structure Function23.Topic.StructB", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassV.Constraint1 is not true.", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	@Test
@@ -1463,7 +1463,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassX.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1484,7 +1484,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassZ.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	@Test
@@ -1508,7 +1508,7 @@ public class Function23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassWB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// 2 objects == 4 intersection fails and 2 mandatoryConstraint fails.
@@ -1674,7 +1674,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassZB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// 2 objects == Class in Objects --> not valid
@@ -1757,8 +1757,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassZC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// 2 objects == second mandatory: class in Objects = fail
@@ -1841,8 +1840,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("Mandatory Constraint Constraint2 is not true.", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Mandatory Constraint Constraint2 is not true.", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassZD.Constraint2 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// 2 objects == first mandatory: class in Objects = fail
@@ -1925,8 +1923,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Mandatory Constraint Constraint1 is not true.", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassZE.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// 1 object. Objects=ALL, SurfaceBAG=BAG count, SurfaceAttr=surface of other structure
@@ -1978,7 +1975,7 @@ public class Function23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
+		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Attribute Numbers has wrong number of values", logger.getErrs().get(0).getEventMsg());
 	}
 	
