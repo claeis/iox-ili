@@ -9,6 +9,7 @@ import java.io.RandomAccessFile;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +33,27 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 			throw new IllegalStateException(e);
 		}
 	}
+    private static int MAX_CACHE=32;
+    private final LinkedHashMap<Long,V> cache = new LinkedHashMap<Long,V>(MAX_CACHE,0.75f,true){
+    	@Override
+    	protected boolean removeEldestEntry(Map.Entry<Long, V> eldest) {
+    		if(true){
+        		if(size()<MAX_CACHE){
+        			return false;
+        		}
+        		long pos=eldest.getKey();
+        		V value=eldest.getValue();
+    			try {
+					writeValue(pos, value);
+				} catch (IOException e) {
+					throw new IllegalStateException(e);
+				}
+                return true; // remove eldest
+    		}
+    		return false;
+        }
+
+    };
 	public void close()
 	{
 		if(tree!=null){
@@ -78,11 +100,14 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 	}
 	private V readValue(Long pos) throws IOException {
 		if(pos!=null){
+			V value=cache.get(pos);
+			if(value!=null){
+				return value;
+			}
 			outFile.seek(pos);
 			int size=outFile.readInt();
 			byte[] bytes=new byte[size];
 			outFile.read(bytes);
-			V value;
 		    try {
 				value=(V)valueSerializer.getObject(bytes);
 			} catch (ClassNotFoundException e) {
@@ -91,6 +116,12 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 			return value;
 		}
 		return null;
+	}
+	private void writeValue(long pos, V value) throws IOException {
+		outFile.seek(pos);
+		byte[] bytes=valueSerializer.getBytes(value);
+		outFile.writeInt(bytes.length);
+		outFile.write(bytes);
 	}
 
 	@Override
@@ -108,10 +139,7 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 		try {
 			
 			long pos = outFile.length();
-			outFile.seek(pos);
-			byte[] bytes=valueSerializer.getBytes(value);
-			outFile.writeInt(bytes.length);
-			outFile.write(bytes);
+			cache.put(pos, value);
 			Long retPos=tree.get((K)key);
 			tree.put(key, pos);
 			return null;
