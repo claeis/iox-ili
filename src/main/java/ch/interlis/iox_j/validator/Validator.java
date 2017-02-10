@@ -1702,9 +1702,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	ArrayList<ArrayList<String>> listOfUniqueObj = new ArrayList<ArrayList<String>>();
 	// List of all object Oid's and associated classPath's of uniqueness validate of Oid's.
 	Map<String , String> uniqueObjectIDs = new HashMap<String, String>();
+	HashSet<Object> loggedObjects=new HashSet<Object>();
 	
 	private void validateObject(IomObject iomObj,String attrPath) throws IoxException {
-		HashSet<Object> objectTypes=new HashSet<Object>();
 		// validate if object is null
 		boolean isObject = attrPath==null;
 		if(isObject){
@@ -1790,9 +1790,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				Object obj1 = attrI.next();
 				if(obj1 instanceof UniquenessConstraint){
 					UniquenessConstraint uniqueConstraint=(UniquenessConstraint) obj1;
-					if(!objectTypes.contains(uniqueConstraint)){
+					if(!loggedObjects.contains(uniqueConstraint)){
 						errs.addEvent(errFact.logInfoMsg("validate unique constraint {0}...",getScopedName(uniqueConstraint)));
-						objectTypes.add(uniqueConstraint);
+						loggedObjects.add(uniqueConstraint);
 					}
 					StringBuilder contentUniqueAttrs = new StringBuilder();
 					ArrayList<String> uniqueConstraintAttrs=new ArrayList<String>();
