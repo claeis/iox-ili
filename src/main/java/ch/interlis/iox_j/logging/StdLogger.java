@@ -44,7 +44,7 @@ public class StdLogger extends AbstractFilteringListener {
 		
 		String objRef=null;
 		if(event instanceof IoxLogEvent){
-			if(event.getEventKind()==IoxLogEvent.ERROR || event.getEventKind()==IoxLogEvent.WARNING){
+			if(isError(event.getEventKind())){
 				ioxErrc++;
 			}
 			objRef="";
@@ -74,7 +74,7 @@ public class StdLogger extends AbstractFilteringListener {
 			String msg=(String)msgi.next();
 			outputMsgLine(event.getEventKind(),event.getCustomLevel(),msgTimestamp+msgTag+objRef+msg);
 		}
-		if(event instanceof IoxLogEvent && logfile!=null && ioxErrc==1){
+		if(event instanceof IoxLogEvent && logfile!=null && ioxErrc==1 && isError(event.getEventKind())){
 			outputMsgLine(LogEvent.ADAPTION,0,msgTimestamp+INFO+": see <"+logfile+"> for more validation results");
 		}
 	}
@@ -100,10 +100,14 @@ public class StdLogger extends AbstractFilteringListener {
 				return INFO;
 		}
 	}
+	private boolean isError(int kind)
+	{
+		return kind==IoxLogEvent.ERROR || kind==IoxLogEvent.WARNING;
+	}
 	@Override
 	public boolean skipEvent(LogEvent event){
 		if(event instanceof IoxLogEvent){
-			if(ioxErrc>0 && logfile!=null){
+			if(ioxErrc>0 && logfile!=null && isError(event.getEventKind())){
 				return true;
 			}
 		}
