@@ -2,6 +2,7 @@ package ch.interlis.iom_j.itf.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.xml.ws.Holder;
 
@@ -9,6 +10,7 @@ import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.CompoundCurveSerializer;
 import ch.ehi.iox.objpool.impl.FileBasedCollection;
+import ch.ehi.iox.objpool.impl.JavaSerializer;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
@@ -24,7 +26,7 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 public class ItfAreaPolygon2Linetable {
 
 	private Collection<? extends CompoundCurve> lines=null;
-	private ArrayList<IomObject> ioxlines=null;
+	private Collection<IomObject> ioxlines=null;
 	private ObjectPoolManager recman=null;
 	public ItfAreaPolygon2Linetable(ObjectPoolManager recman1){
 		lines=new FileBasedCollection<CompoundCurve>(recman1,new CompoundCurveSerializer());
@@ -56,7 +58,17 @@ public class ItfAreaPolygon2Linetable {
 		}
 	}
 
-	public ArrayList<IomObject> getLines() throws IoxException {
+	public void validate() throws IoxException {
+		CompoundCurveNoder noder=new CompoundCurveNoder(recman,(java.util.List)lines,false);
+		if(!noder.isValid()){
+			for(Intersection is:noder.getIntersections()){
+				EhiLogger.logError("intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
+				EhiLogger.traceState("overlap "+is.getOverlap()+", seg1 "+is.getSegment1()+", seg2 "+is.getSegment2());
+			}
+			throw new IoxException("intersections");
+		}
+	}
+	public java.util.List<IomObject> getLines() throws IoxException {
 		if(ioxlines==null){
 			{
 				CompoundCurveNoder noder=new CompoundCurveNoder(recman,(java.util.List)lines,false);
@@ -73,7 +85,8 @@ public class ItfAreaPolygon2Linetable {
 			//CompoundCurveDissolver dissolver=new CompoundCurveDissolver();
 			//dissolver.dissolve(lines);
 			//lines=dissolver.getDissolved();
-			ioxlines=new ArrayList<IomObject>();
+			//ioxlines=new ArrayList<IomObject>();
+			ioxlines=new FileBasedCollection<IomObject>(recman,new JavaSerializer());
 			for(CompoundCurve line:lines){
 				IomObject ioxline;
 				try {
@@ -84,7 +97,7 @@ public class ItfAreaPolygon2Linetable {
 				ioxlines.add(ioxline);
 			}
 		}
-		return ioxlines;
+		return (List<IomObject>) ioxlines;
 	}
 
 	public static ArrayList<IomObject> getLinesFromPolygon(IomObject polygon)

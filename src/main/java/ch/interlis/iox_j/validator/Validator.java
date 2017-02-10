@@ -287,7 +287,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			errs.addEvent(errFact.logDetailInfoMsg("validate AREA {0}...", getScopedName(attr)));
 			ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
 			try {
-				allLines.getLines();
+				allLines.validate();
 			} catch (IoxException e) {
 				errs.addEvent(errFact.logErrorMsg("failed to validate AREA {0}", getScopedName(attr)));
 			}
@@ -1033,11 +1033,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 					}
 					try {
-						if(polygonPool.getLines().size()==0){
-							return new Value(false);
-						} else {
-							polygonPool.getLines(); // get all lines in polygonPool
-						}
+						polygonPool.validate(); 
 					} catch (IoxException e) {
 						return new Value(false); // if lines are empty, return false
 					}
@@ -1091,7 +1087,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 					}
 					try {
-						polygonPool.getLines();
+						polygonPool.validate();
 					} catch (IoxException e) {
 						return new Value(false);
 					}
