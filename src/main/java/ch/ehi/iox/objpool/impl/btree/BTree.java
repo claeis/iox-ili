@@ -30,6 +30,7 @@ public class BTree<Key, Value>  {
     private Serializer<Value> valueSerializer;
     java.util.Comparator<Key> keyComparator;
     private RandomAccessFile file;
+    private java.io.File fileName=null;
     public final static int BLOCK_SIZE=8192;
     private int pageCount=0;
     private static int MAX_CACHE=32;
@@ -128,6 +129,7 @@ public class BTree<Key, Value>  {
     	this.keyComparator=keyComparator;
     	this.keySerializer=keySerializer;
     	this.valueSerializer=valueSerializer;
+    	this.fileName=path;
 		this.file = new RandomAccessFile( path, "rw" );
 		height=0;
 		n=0;
@@ -357,7 +359,14 @@ public class BTree<Key, Value>  {
 		cache.put(nodeId, node);
 	}
 	public void close() throws IOException {
-		// TODO Auto-generated method stub
+		if(file!=null){
+			file.close();
+			file=null;
+		}
+		if(fileName!=null){
+			fileName.delete();
+			fileName=null;
+		}
 		
 	}
 	public NodeId getRoot() {

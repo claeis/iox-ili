@@ -20,7 +20,7 @@ public class ObjPoolImpl implements Map {
 	private HashMap pool=new HashMap();
 	private java.lang.ref.ReferenceQueue<ObjPoolEntry> writeQueue=new java.lang.ref.ReferenceQueue<ObjPoolEntry>(); 
 	private RandomAccessFile outFile=null;
-	private String outFilename=null;
+	private java.io.File outFilename=null;
 	private ObjectPoolManager recman=null;
 	private Serializer serializer=null;
 	public ObjPoolImpl(ObjectPoolManager objectPoolManager,Serializer serializer) {
@@ -35,7 +35,7 @@ public class ObjPoolImpl implements Map {
 			try {
 				outFile.close();
 				outFile=null;
-				new java.io.File(outFilename).delete();
+				outFilename.delete();
 				outFilename=null;
 			} catch (IOException e) {
 				throw new IllegalStateException(e);

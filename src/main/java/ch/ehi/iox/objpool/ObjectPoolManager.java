@@ -72,9 +72,9 @@ public class ObjectPoolManager {
 		maps3.clear();
 	}
 
-	static public String getCacheTmpFilename() {
+	static public File getCacheTmpFilename() {
 		String tmp=System.getProperty("java.io.tmpdir");
-		return new File(tmp,getTmpName()).getPath();
+		return new File(tmp,getTmpName());
 	}
 
 	static public String getTmpName() {

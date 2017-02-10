@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
+import java.lang.ref.SoftReference;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,33 +22,27 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 	
 	private HashMap<K, Long> tree= null;
 	private RandomAccessFile outFile=null;
+	private java.io.File outFilename=null;
 	private Serializer valueSerializer=null;
 	public ObjPoolImpl2( Serializer valueSerializer1)
 	{
 		try{
 			valueSerializer=valueSerializer1;
 			tree= new HashMap<K, Long>();
-			String outFilename=ObjectPoolManager.getCacheTmpFilename();
+			outFilename=ObjectPoolManager.getCacheTmpFilename();
 			outFile=new RandomAccessFile(outFilename, "rw");
 		}catch(IOException e){
 			throw new IllegalStateException(e);
 		}
 	}
     private static int MAX_CACHE=32;
-    private final LinkedHashMap<Long,V> cache = new LinkedHashMap<Long,V>(MAX_CACHE,0.75f,true){
+    private final LinkedHashMap<Long,SoftReference<V>> cache = new LinkedHashMap<Long,SoftReference<V>>(MAX_CACHE,0.75f,true){
     	@Override
-    	protected boolean removeEldestEntry(Map.Entry<Long, V> eldest) {
+    	protected boolean removeEldestEntry(Map.Entry<Long, SoftReference<V>> eldest) {
     		if(true){
         		if(size()<MAX_CACHE){
         			return false;
         		}
-        		long pos=eldest.getKey();
-        		V value=eldest.getValue();
-    			try {
-					writeValue(pos, value);
-				} catch (IOException e) {
-					throw new IllegalStateException(e);
-				}
                 return true; // remove eldest
     		}
     		return false;
@@ -67,6 +62,11 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 			}
 			outFile=null;
 		}
+		if(outFilename!=null){
+			outFilename.delete();
+			outFilename=null;
+		}
+			
 	}
 
 	@Override
@@ -100,9 +100,13 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 	}
 	private V readValue(Long pos) throws IOException {
 		if(pos!=null){
-			V value=cache.get(pos);
-			if(value!=null){
-				return value;
+			SoftReference<V> valueRef=cache.get(pos);
+			V value=null;
+			if(valueRef!=null){
+				value=valueRef.get();
+				if(value!=null){
+					return value;
+				}
 			}
 			outFile.seek(pos);
 			int size=outFile.readInt();
@@ -139,7 +143,8 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 		try {
 			
 			long pos = outFile.length();
-			cache.put(pos, value);
+			writeValue(pos,value);
+			cache.put(pos, new SoftReference<V>(value));
 			Long retPos=tree.get((K)key);
 			tree.put(key, pos);
 			return null;
