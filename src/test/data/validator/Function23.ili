@@ -269,12 +269,6 @@ MODEL Function23
 			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZB, UNDEFINED, >> Geometrie);
 		END ClassZB;
 		
-		!! (areAreas defined class in Objects --ClassZA--> not valid)
-        CLASS ClassZC =
-			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZA, UNDEFINED, >> Geometrie);
-		END ClassZC;
-		
 		!! (areAreas second mandatory: wrong class 'ClassZA' in Objects = fail)
         CLASS ClassZD =
 			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
@@ -282,10 +276,15 @@ MODEL Function23
 			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZA, UNDEFINED, >> Geometrie);
 		END ClassZD;
 		
-		!! (areAreas first mandatory: wrong class 'ClassZB' in Objects = fail)
+		
+		CLASS ClassZZ =
+			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END ClassZZ;
+		
+		!! (areAreas first mandatory: object of 'ClassZB' = fail)
         CLASS ClassZE =
 			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZB, UNDEFINED, >> Geometrie);
+			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZZ, UNDEFINED, >> Geometrie);
 			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZE, UNDEFINED, >> Geometrie);
 		END ClassZE;
         

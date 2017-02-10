@@ -1020,6 +1020,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								}
 							}
 						}
+						// if objects.equals(anObjectClass) never equal, handling.
 					} else {
 						Iterator iterIomObjects = objects.getValues().iterator(); // iterate through all objects of Argument[0] 
 						while(iterIomObjects.hasNext()){
@@ -1035,7 +1036,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 					}
 					try {
-						polygonPool.validate(); 
+						polygonPool.validate();
 					} catch (IoxException e) {
 						return new Value(false); // if lines are empty, return false
 					}
