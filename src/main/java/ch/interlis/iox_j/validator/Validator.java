@@ -286,7 +286,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	
 	private void validateAllAreas() {
 		for(AttributeDef attr:areaAttrs.keySet()){
-			errs.addEvent(errFact.logDetailInfoMsg("validate AREA {0}...", getScopedName(attr)));
+			errs.addEvent(errFact.logInfoMsg("validate AREA {0}...", getScopedName(attr)));
 			ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
 			try {
 				allLines.validate();
