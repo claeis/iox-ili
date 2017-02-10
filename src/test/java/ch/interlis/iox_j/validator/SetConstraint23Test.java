@@ -368,5 +368,5 @@ public class SetConstraint23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Set Constraint SetConstraint23.Topic.ClassD.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-	}	
+	}
 }
