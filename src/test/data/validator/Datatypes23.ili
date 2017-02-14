@@ -14,12 +14,15 @@ MODEL Datatypes23
 			ordEx EXTENDS ord = (unten (mitte));
 			ordFinal = (eins : FINAL);
 			ordFinalEx EXTENDS ordFinal = (eins (zwei));
+			
 			!! Numeric
 			numerictype = 0.0 .. 9.9 CIRCULAR;
 			!!numericCounterClockwise = MANDATORY 0.0 .. 359.9 CIRCULAR [DEGREE] COUNTERCLOCKWISE;
 			!!numericCounterClock = MANDATORY 0.0 .. 359.9 CIRCULAR [DEGREE] COUNTERCLOCK;
+			
 			!! Class
 			!!bClass : CLASS;
+			
 			!! Coord
 			Skoord = COORD 480000.000 .. 850000.000 [INTERLIS.m];
 			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
@@ -28,6 +31,7 @@ MODEL Datatypes23
 			Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
 					        70000.000 .. 310000.000 [INTERLIS.m],
 					              0.000 .. 5000.000 [INTERLIS.m];
+					              
 		CLASS ClassA =
 		   !! EnumerationType
 		   aufzaehlung : (null, eins, zwei, drei, mehr ( vier, fuenf, sechs, sieben, acht ,neun, zehn)); !! == zwei Stellen
@@ -37,11 +41,13 @@ MODEL Datatypes23
 		   aufzaehlungCircularEx : circuEx;
 		   aufzaehlungOrderedEx : ordEx;
 		   aufzaehlungFinal : ordFinal;
+		   
 		   !! OIDType
 		   aI32id : INTERLIS.I32OID;
 		   !!aAnyid : INTERLIS.ANYOID;
 		   aUuid : INTERLIS.UUIDOID;
 		   aStandardid : INTERLIS.STANDARDOID;
+		   
 		   !! TextType
 		   textLimited : TEXT*10;
 		   textUnlimited : TEXT;
@@ -49,38 +55,47 @@ MODEL Datatypes23
 		   mtextUnlimited : MTEXT;
 		   nametext : NAME;
 		   uritext : URI;
+		   
 		   !! AlignmentType
 		   horizAlignment : HALIGNMENT;
 		   vertAlignment : VALIGNMENT;
+		   
 		   !! BooleanType
 		   aBoolean : BOOLEAN;
+		   
 		   !! NumericType
 		   numericInt : 0 .. 10;
 		   numericDec : 0.0 .. 10.0;
 		   numericNum : numerictype;
 		   !!numCountClockWise : numericCounterClockwise;
 		   !!numCountClock : numericCounterClock;
+		   
 		   !! FormattedType
 		   !!basedOn : time1;
 		   !!basedOn2 : time2;
 		   !!extendsBaseOn : time3;
+		   
 		   !! Datum und Zeit
 		   aTime : INTERLIS.XMLTime;
 		   aDate : INTERLIS.XMLDate;
 		   aDateTime : INTERLIS.XMLDateTime;
+		   
 		   !! CoordinateType (s=1d, l=2d, h=3d)
 		   scoord : Skoord;
 		   lcoord : Lkoord;
 		   hcoord : Hkoord;
+		   
 		   !! BlackBoxType
 		   !!box1 : BLACKBOX XML;
 		   !!box2 : BLACKBOX BINARY;
+		   
 		   !! ClassType
 		   aClass : CLASS;
 		   !!STRUCTURE : bClass;
 		   !!ATTRIBUTE OF bClass;
 		   !!(RESTRICTION)
 		END ClassA;
+		
 		CLASS ClassB =
 		   !! Linientyp
 		   straights2d : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
@@ -90,12 +105,29 @@ MODEL Datatypes23
 		   straightsarcs2d : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Lkoord;
 		   straightsarcs3d : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
 		   arcsstraights2d : POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Lkoord;
+		   
+		   !! Linientyp (without overlaps is optional for polyline)
+		   straights2dWithoutOverlaps : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   !!straights3dWithoutOverlaps : POLYLINE WITH (STRAIGHTS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
 		END ClassB;
+		
+		CLASS ClassBDirected =
+		   !! Linientyp directed polyline
+		   !!straights2dWithoutOverlaps : DIRECTED POLYLINE WITH (STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   !!straights3dWithoutOverlaps : DIRECTED POLYLINE WITH (STRAIGHTS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		   !!arcs2dWithoutOverlaps : DIRECTED POLYLINE WITH (ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   !!arcs3dWithoutOverlaps : DIRECTED POLYLINE WITH (ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		   !!straightsarcs2dWithoutOverlaps : DIRECTED POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   !!straightsarcs3dWithoutOverlaps : DIRECTED POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		   !!arcsstraights2dWithoutOverlaps : DIRECTED POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END ClassBDirected;
+		
 		CLASS ClassC =
 		   !! Surfacetype (without overlaps is obligatory for individual surfaces)
 		   surface2d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 		   surface3d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
 		END ClassC;
+		
 		CLASS ClassD =
 		   !! Areatype (without overlaps is obligatory for individual areas)
 		   area2d : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;

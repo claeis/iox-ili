@@ -1,17 +1,13 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
-import ch.interlis.iom.IomConstants;
-import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
@@ -37,7 +33,8 @@ public class Datatypes10Test {
 	//############################################################/
 	//########## SUCCESSFUL TESTS ################################/
 	//############################################################/
-	////////////////// START Text /////////////////////////////////
+	
+	// Die maximale Länge des Textes wird getestet.
 	@Test
 	public void textMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -56,6 +53,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird die minimale Länge des Textes getestet.
 	@Test
 	public void textMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -74,6 +72,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob der Text alle Buchstaben des Alphabetes in klein und gross Schreibung enthalten kann.
 	@Test
 	public void text2Alphabetica_zA_ZOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -91,6 +90,8 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+	// Es wird getestet ob die Zahlen 0-9 in dieser Numeric vorkommen können.
 	@Test
 	public void text2Numeric0_9Ok(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -108,6 +109,8 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+	// Es wird getestet ob diese Befehl Wörter Auswirkungen auf die Eingabe haben.
 	@Test
 	public void text2ValOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -125,6 +128,8 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+	// Es wird getestet ob diese Zeichen im Text vorkommen können.
 	@Test
 	public void text2SignsOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -142,6 +147,8 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+	// Es wird getestet ob es möglich ist, 2 Wörter zu schreiben.
 	@Test
 	public void text2WordSeparationOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -159,6 +166,8 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+	// Test ob dieser Zeichensatz im Text vorkommen kann.
 	@Test
 	public void text2ZeichensatzContentOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -176,8 +185,7 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	////////////////// END Text ///////////////////////////////////	
-	////////////////// START Bereich //////////////////////////////
+
 	// Dezimal 9.9 wird gerundet auf (10.0).
 	// 10.4 gerundet = 10. valid.
 	// 10.5 gerundet = 11. unvalid.
@@ -198,6 +206,7 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
 	// Dezimal 0.0 wird gerundet auf (0).
 	// -0.4 gerundet =  0. valid.
 	// -0.5 gerundet = -1. unvalid.
@@ -219,6 +228,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die maximale Eingabe wird getestet.
 	@Test
 	public void bereich2MaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -237,6 +247,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die minimale Eingabe wird getestet.
 	@Test
 	public void bereich2MinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -254,8 +265,8 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	////////////////// END Bereich ////////////////////////////////	
-	////////////////// START Aufzaehlung //////////////////////////
+	
+	// Die maximale Aufzählung wird hier getestet.
 	@Test
 	public void aufzaehlungMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -274,6 +285,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die minimale Aufzählung wird getestet.
 	@Test
 	public void aufzaehlungMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -292,6 +304,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob diese Aufzählung in einer Verschachtelung funktioniert.
 	@Test
 	public void aufzaehlungVerschachtelungOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -309,8 +322,8 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	////////////////// END Aufzaehlung ////////////////////////////	
-	////////////////// START Laenge ///////////////////////////////
+	
+	// Die maximale Länge dieser Numeric wird getetstet.
 	@Test
 	public void laengeMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -329,6 +342,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die minimale Länge der Numeric wird getestet
 	@Test
 	public void laengeMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -347,6 +361,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// 3 Stellen nach dem Komma werden getestet auf die Zulässigkeit.
 	@Test
 	public void laenge2ThirdPositionAfterDotOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -364,8 +379,8 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	////////////////// END Laenge /////////////////////////////////	
-	////////////////// START Flaechenmass /////////////////////////
+	
+	// Das Maximum der Fläche wird getestet
 	@Test
 	public void flaecheMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -384,6 +399,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Das Minimum der Fläche wird getestet.
 	@Test
 	public void flaecheMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -402,6 +418,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// 3 Stellen nach dem Komma werden getestet auf die Fläche.
 	@Test
 	public void flaeche2ThirdPositionAfterDotOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -419,8 +436,8 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	////////////////// END Flaechenmass ///////////////////////////
-	////////////////// START Winkel ///////////////////////////////
+	
+	// Der Maximale Radius wird hier getestet.
 	@Test
 	public void winkelRadianMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -439,6 +456,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Der minimale Radius wird hier getestet.
 	@Test
 	public void winkelRadianMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -457,6 +475,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Der maximale grad wird getestet.
 	@Test
 	public void winkelGradsMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -475,6 +494,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die minimale Gradeingabe wird getestet.
 	@Test
 	public void winkelGradsMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -493,6 +513,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die maximale degrees Eingabe wird getestet.
 	@Test
 	public void winkelDegreesMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -511,6 +532,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die minimale Degrees Eingabe wird getestet.
 	@Test
 	public void winkelDegreesMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -529,8 +551,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	////////////////// END Winkel /////////////////////////////////
-	////////////////// START Datum ////////////////////////////////
+	// Das minimale Datum, welches möglich ist, wird getestet.
 	@Test
 	public void datumLowestYearOk(){
 		Iom_jObject objLowestYear=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -549,6 +570,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die Eingabe des maximalen Datums wird getestet.
 	@Test
 	public void datumHighestYearOk(){
 		Iom_jObject objHighestYear=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -567,6 +589,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Der minimale Monat Januar wird getestet.
 	@Test
 	public void datumLowestMonthOk(){
 		Iom_jObject objLowestMonth=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -585,6 +608,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die Eingabe des maximales Monats  12 wird getestet.
 	@Test
 	public void datumHighestMonthOk(){
 		Iom_jObject objHighestMonth=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -603,6 +627,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die minimale Eingabe des Tages 01 wird getestet.
 	@Test
 	public void datumLowestDayOk(){
 		Iom_jObject objLowestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -621,6 +646,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die maximal Eingabe des Tages 31 wird getestet.
 	@Test
 	public void datumHighestDayOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -638,8 +664,8 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	////////////////// END Datum //////////////////////////////////
-	////////////////// START HorizAlignment ///////////////////////
+
+	// Horizontale Lage: links wird getestet.
 	@Test
 	public void horizAlignmentLeftOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -658,6 +684,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// horizontale Lage: mittig wird getestet.
 	@Test
 	public void horizAlignmentCenterOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -676,6 +703,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Horizontale Lage: rechts wird getestet.
 	@Test
 	public void horizAlignmentRightOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -693,8 +721,8 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	////////////////// END HorizAlignment /////////////////////////
-	////////////////// START VertAlignment ////////////////////////
+	
+	// Die vertikale Lage: oben wird getestet.
 	@Test
 	public void vertAlignmentTopOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -713,6 +741,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die vertikale Lage: Cap wird getestet.
 	@Test
 	public void vertAlignmentCapOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -731,6 +760,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die vertikale Lage: half wird getestet.
 	@Test
 	public void vertAlignmentHalfOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -749,6 +779,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die vertikale Lage: Base wird getestet.
 	@Test
 	public void vertAlignmentBaseOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -767,6 +798,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die vertikale Lage: Bottom wird getestet.
 	@Test
 	public void vertAlignmentBottomOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -784,8 +816,8 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	////////////////// END VertAlignment //////////////////////////
-	////////////////// START Koord2 ///////////////////////////////
+	
+	// Die Eingabe von 2d Koordinaten wird getestet.
 	@Test
 	public void koord2Ok(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -804,8 +836,9 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die Koordinate als undefiniert markiert wird getestet.
 	@Test
-	public void koord2UOk(){
+	public void koord2UndefinedOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestDay.setattrvalue("koord2", "@");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -822,8 +855,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	////////////////// END Koord2 /////////////////////////////////	
-	////////////////// START Koord3 ///////////////////////////////
+	// Die Koordinate als 3d Eingabe wird getestet.
 	@Test
 	public void koord3Ok(){
 		Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -842,8 +874,9 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Die Koordinate in 3d als undefiniert wird gestetet.
 	@Test
-	public void koord3UOk(){
+	public void koord3UndefinedOk(){
 		Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objSuccessFormat.setattrvalue("koord3", "@");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -859,659 +892,12 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	////////////////// END Koord3 /////////////////////////////////	
-	////////////////// START Linientyp ////////////////////////////
-	@Test
-	public void polylineTypeStraights2dOk(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
-		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject coordStart=segments.addattrobj("segment", "COORD");
-		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordStart.setattrvalue("C1", "480000.000");
-		coordStart.setattrvalue("C2", "70000.000");
-		coordEnd.setattrvalue("C1", "480001.000");
-		coordEnd.setattrvalue("C2", "70001.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objStraightsSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void polylineTypeStraights3dOk(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
-		IomObject polylineValue=objStraightsSuccess.addattrobj("straights3d", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject coordStart=segments.addattrobj("segment", "COORD");
-		coordStart.setattrvalue("C1", "480000.000");
-		coordStart.setattrvalue("C2", "70000.000");
-		coordStart.setattrvalue("C3", "4000.000");
-		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordEnd.setattrvalue("C1", "480001.000");
-		coordEnd.setattrvalue("C2", "70000.000");
-		coordEnd.setattrvalue("C3", "4000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objStraightsSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void polylineTypeSTRAIGHTSARCS2DOk(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
-		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs2d", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480001.000");
-		endSegment.setattrvalue("C2", "70000.000");
-		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480002.000");
-		arcSegment.setattrvalue("A2", "300000.000");
-		arcSegment.setattrvalue("C1", "480000.000");
-		arcSegment.setattrvalue("C2", "70000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objStraightsSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void polylineTypeSTRAIGHTSARCS3DOk(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
-		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs3d", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		startSegment.setattrvalue("C3", "5000.000");
-		IomObject secondSegment=segments.addattrobj("segment", "COORD");
-		secondSegment.setattrvalue("C1", "480001.000");
-		secondSegment.setattrvalue("C2", "70000.000");
-		secondSegment.setattrvalue("C3", "5000.000");
-		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480002.000");
-		arcSegment.setattrvalue("A2", "300000.000");
-		arcSegment.setattrvalue("C1", "480000.000");
-		arcSegment.setattrvalue("C2", "70000.000");
-		arcSegment.setattrvalue("C3", "5000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objStraightsSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void polylineTypeARCS2DOk(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
-		IomObject polylineValue=objStraightsSuccess.addattrobj("arcs2d", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
-		arcSegment.setattrvalue("A2", "300000.000");
-		arcSegment.setattrvalue("C1", "480000.000");
-		arcSegment.setattrvalue("C2", "70000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objStraightsSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void polylineTypeARCS3DOk(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
-		IomObject polylineValue=objStraightsSuccess.addattrobj("arcs3d", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		startSegment.setattrvalue("C3", "5000.000");
-		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
-		arcSegment.setattrvalue("A2", "300000.000");
-		arcSegment.setattrvalue("C1", "480000.000");
-		arcSegment.setattrvalue("C2", "70000.000");
-		arcSegment.setattrvalue("C3", "5000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objStraightsSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	////////////////// END Linientyp //////////////////////////////
-	
-	////////////////// START LinientypWithoutOverlaps /////////////
-	// Wird noch von Claude im Valdator erstellt.
-	////////////////// END LinientypWithoutOverlaps ///////////////
-	
-	////////////////// START FlaechentypSurface ///////////////////
-	@Test
-	public void surfaceTypeSurface1Boundary2DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
-		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "500000.000");
-		startSegment2.setattrvalue("C2", "80000.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "600000.000");
-		endSegment2.setattrvalue("C2", "90000.000");
-		// polyline 3
-		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "600000.000");
-		startSegment3.setattrvalue("C2", "90000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void surfaceTypeSurface2Boundaries2DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		// outer boundary
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
-		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "500000.000");
-		startSegment2.setattrvalue("C2", "80000.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "550000.000");
-		endSegment2.setattrvalue("C2", "90000.000");
-		// polyline 3
-		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "550000.000");
-		startSegment3.setattrvalue("C2", "90000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
-		// inner boundary
-		IomObject innerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline
-		IomObject polylineValueInner = innerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segmentsInner=polylineValueInner.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		startSegmentInner.setattrvalue("C1", "500000.000");
-		startSegmentInner.setattrvalue("C2", "77000.000");
-		IomObject endSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		endSegmentInner.setattrvalue("C1", "500000.000");
-		endSegmentInner.setattrvalue("C2", "78000.000");
-		// polyline 2
-		IomObject polylineValue2Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2Inner=polylineValue2Inner.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		startSegment2Inner.setattrvalue("C1", "500000.000");
-		startSegment2Inner.setattrvalue("C2", "78000.000");
-		IomObject endSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		endSegment2Inner.setattrvalue("C1", "505000.000");
-		endSegment2Inner.setattrvalue("C2", "78000.000");
-		// polyline 3
-		IomObject polylineValue3Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3Inner=polylineValue3Inner.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
-		startSegment3Inner.setattrvalue("C1", "505000.000");
-		startSegment3Inner.setattrvalue("C2", "78000.000");
-		IomObject endSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
-		endSegment3Inner.setattrvalue("C1", "500000.000");
-		endSegment3Inner.setattrvalue("C2", "77000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void surfaceTypeSurface3Polylines2DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
-		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "500000.000");
-		startSegment2.setattrvalue("C2", "80000.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "600000.000");
-		endSegment2.setattrvalue("C2", "90000.000");
-		// polyline 3
-		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "600000.000");
-		startSegment3.setattrvalue("C2", "90000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void surfaceTypeSurfaceWithArc2DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments.addattrobj("segment", "ARC");
-		endSegment.setattrvalue("A1", "500001.000");
-		endSegment.setattrvalue("A2", "80000.000");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
-		// polyline 2
-		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
-		startSegment11.setattrvalue("C1", "500000.000");
-		startSegment11.setattrvalue("C2", "80000.000");
-		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
-		endSegment11.setattrvalue("C1", "520000.000");
-		endSegment11.setattrvalue("C2", "85000.000");
-		// polyline 2
-		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "520000.000");
-		startSegment3.setattrvalue("C2", "85000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void surfaceTypeSurface1Boundary3DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		startSegment.setattrvalue("C3", "1000.000");
-		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
-		endSegment.setattrvalue("C3", "1500.000");
-		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "500000.000");
-		startSegment2.setattrvalue("C2", "80000.000");
-		startSegment2.setattrvalue("C3", "1500.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "600000.000");
-		endSegment2.setattrvalue("C2", "90000.000");
-		endSegment2.setattrvalue("C3", "2000.000");
-		// polyline 3
-		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "600000.000");
-		startSegment3.setattrvalue("C2", "90000.000");
-		startSegment3.setattrvalue("C3", "2000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
-		endSegment3.setattrvalue("C3", "1000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void surfaceTypeSurface2Boundaries3DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		// outer boundary
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		startSegment.setattrvalue("C3", "1000.000");
-		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
-		endSegment.setattrvalue("C3", "1000.000");
-		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "500000.000");
-		startSegment2.setattrvalue("C2", "80000.000");
-		startSegment2.setattrvalue("C3", "1000.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "550000.000");
-		endSegment2.setattrvalue("C2", "90000.000");
-		endSegment2.setattrvalue("C3", "1000.000");
-		// polyline 3
-		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "550000.000");
-		startSegment3.setattrvalue("C2", "90000.000");
-		startSegment3.setattrvalue("C3", "1000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
-		endSegment3.setattrvalue("C3", "1000.000");
-		// inner boundary
-		IomObject innerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline
-		IomObject polylineValueInner = innerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segmentsInner=polylineValueInner.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		startSegmentInner.setattrvalue("C1", "500000.000");
-		startSegmentInner.setattrvalue("C2", "77000.000");
-		startSegmentInner.setattrvalue("C3", "1000.000");
-		IomObject endSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		endSegmentInner.setattrvalue("C1", "500000.000");
-		endSegmentInner.setattrvalue("C2", "78000.000");
-		endSegmentInner.setattrvalue("C3", "1000.000");
-		// polyline 2
-		IomObject polylineValue2Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2Inner=polylineValue2Inner.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		startSegment2Inner.setattrvalue("C1", "500000.000");
-		startSegment2Inner.setattrvalue("C2", "78000.000");
-		startSegment2Inner.setattrvalue("C3", "1000.000");
-		IomObject endSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		endSegment2Inner.setattrvalue("C1", "505000.000");
-		endSegment2Inner.setattrvalue("C2", "78000.000");
-		endSegment2Inner.setattrvalue("C3", "1000.000");
-		// polyline 3
-		IomObject polylineValue3Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3Inner=polylineValue3Inner.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
-		startSegment3Inner.setattrvalue("C1", "505000.000");
-		startSegment3Inner.setattrvalue("C2", "78000.000");
-		startSegment3Inner.setattrvalue("C3", "1000.000");
-		IomObject endSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
-		endSegment3Inner.setattrvalue("C1", "500000.000");
-		endSegment3Inner.setattrvalue("C2", "77000.000");
-		endSegment3Inner.setattrvalue("C3", "1000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void surfaceTypeSurface2Polylines3DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		startSegment.setattrvalue("C3", "1000.000");
-		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
-		endSegment.setattrvalue("C3", "1500.000");
-		// polyline 2
-		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
-		startSegment11.setattrvalue("C1", "500000.000");
-		startSegment11.setattrvalue("C2", "80000.000");
-		startSegment11.setattrvalue("C3", "1500.000");
-		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
-		endSegment11.setattrvalue("C1", "520000.000");
-		endSegment11.setattrvalue("C2", "85000.000");
-		endSegment11.setattrvalue("C3", "2000.000");
-		// polyline 2
-		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "520000.000");
-		startSegment3.setattrvalue("C2", "85000.000");
-		startSegment3.setattrvalue("C3", "2000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
-		endSegment3.setattrvalue("C3", "1000.000");		
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void surfaceTypeSurfaceWithArc3DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline 1 + arc
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		startSegment.setattrvalue("C3", "1000.000");
-		IomObject endSegment=segments.addattrobj("segment", "ARC");
-		endSegment.setattrvalue("A1", "500001.000");
-		endSegment.setattrvalue("A2", "80000.000");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
-		endSegment.setattrvalue("C3", "1500.000");
-		// polyline 2
-		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
-		startSegment11.setattrvalue("C1", "500000.000");
-		startSegment11.setattrvalue("C2", "80000.000");
-		startSegment11.setattrvalue("C3", "1500.000");
-		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
-		endSegment11.setattrvalue("C1", "520000.000");
-		endSegment11.setattrvalue("C2", "85000.000");
-		endSegment11.setattrvalue("C3", "2000.000");
-		// polyline 3
-		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "520000.000");
-		startSegment3.setattrvalue("C2", "85000.000");
-		startSegment3.setattrvalue("C3", "2000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
-		endSegment3.setattrvalue("C3", "1000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	////////////////// END FlaechentypSurface /////////////////////
+
 	//############################################################/
 	//########## FAILING TESTS ###################################/
 	//############################################################/
-	//////////////////START Text /////////////////////////////////
+	
+	// Testet die Fehlerausgabe, wenn der Text grösser ist, als zulässig.
 	@Test
 	public void textGreaterThanMaximumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1531,6 +917,7 @@ public class Datatypes10Test {
 		assertEquals("Attribute text is length restricted to 10", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Testet die Fehlerausgabe, wenn der Typ: Ztext nicht erkannt wird.
 	@Test
 	public void textUnknownPropertyFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1550,6 +937,7 @@ public class Datatypes10Test {
 		assertEquals("unknown property <Ztext>", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// testet, die Eingabe von nicht gültigen Zeichen.
 	@Test
 	public void textContainUnvalidCharactersFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1568,8 +956,8 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Attribute text must not contain control characters", logger.getErrs().get(0).getEventMsg());
 	}
-	////////////////// END Text ///////////////////////////////////	
-	////////////////// START Bereich //////////////////////////////
+
+	// Testet die Eingabe von Buchstaben in einem Bereich für Zahlen.
 	@Test
 	public void bereichContainLettersFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1589,6 +977,7 @@ public class Datatypes10Test {
 		assertEquals("value <test> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn die Zahleneingabe grösser ist, als erlaubt.
 	@Test
 	public void bereichGreaterThanMaximumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1608,6 +997,7 @@ public class Datatypes10Test {
 		assertEquals("value 10.5 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn die Zahleneingabe kleiner ist, als definiert wurde.
 	@Test
 	public void bereichLessThanMinimumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1627,6 +1017,7 @@ public class Datatypes10Test {
 		assertEquals("value -0.5 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn der Bereich (auf 3 Kommastellen gerundet) grösser ist als definiert.
 	@Test
 	public void bereich2GreaterThanMaximumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1646,6 +1037,7 @@ public class Datatypes10Test {
 		assertEquals("value 10.500 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt eine Fehlermeldung aus, wenn der Bereich kleiner ist (auf 3 Stellen gerundet), als definiert.
 	@Test
 	public void bereich2LessThanMinimumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1664,8 +1056,8 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value -0.500 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
-	////////////////// END Bereich ////////////////////////////////	
-	////////////////// START Aufzaehlung //////////////////////////
+
+	// Gibt einen Fehler aus, wenn die Hierarchie nicht richtig eingegeben wurde.
 	@Test
 	public void aufzaehlungInvalidHierarchicalLevelFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1685,6 +1077,7 @@ public class Datatypes10Test {
 		assertEquals("value mehr.mehr.vier is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn der Typ afuzaelung nicht richtig geschrieben wurde.
 	@Test
 	public void aufzaehlungNotTypeOfEnumerationFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1704,6 +1097,7 @@ public class Datatypes10Test {
 		assertEquals("unknown property <aufzaelung>", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn die Aufzählung nicht in der gleichen Enumeration sich befindet.
 	@Test
 	public void aufzaehlungNotInSameEnumerationFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1723,6 +1117,7 @@ public class Datatypes10Test {
 		assertEquals("value meter.ml is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn  die Aufzählung nicht in der selber Enumeratiobn sich befindet. Test 2.
 	@Test
 	public void aufzaehlungNotInSameEnumeration2Fail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1741,8 +1136,8 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value liter.mm is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
 	}
-	////////////////// END Aufzaehlung ////////////////////////////	
-	////////////////// START Laenge ///////////////////////////////
+
+	// Gibt einen Fehler aus, wenn die Länge zu hoch ist.
 	@Test
 	public void laengeToHighFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1762,6 +1157,7 @@ public class Datatypes10Test {
 		assertEquals("value 10.5 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn die Länge zu kurz ist.
 	@Test
 	public void laengeToLowFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1781,6 +1177,7 @@ public class Datatypes10Test {
 		assertEquals("value 0.4 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn die Länge nicht numerisch ist.
 	@Test
 	public void laengeNotValidFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1800,6 +1197,7 @@ public class Datatypes10Test {
 		assertEquals("value <abc> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn die Eingabe nicht Numerisch ist. Test mit Koordinaten.
 	@Test
 	public void laengeWith2DezFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1818,8 +1216,8 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2.0 5.2> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
-	////////////////// END Laenge /////////////////////////////////	
-	////////////////// START Flaechenmass /////////////////////////
+
+	// Gibt einen Fehler aus, wenn die Flächendefinition zu gross ist.
 	@Test
 	public void flaecheToHighFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1839,6 +1237,7 @@ public class Datatypes10Test {
 		assertEquals("value 10.5 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn die Flächendefinition zu klein ist.
 	@Test
 	public void flaecheToLowFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1858,6 +1257,7 @@ public class Datatypes10Test {
 		assertEquals("value 0.4 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn die Fläche nicht numerisch, sondern aus Buchstaben besteht.
 	@Test
 	public void flaecheNotValidFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1877,6 +1277,7 @@ public class Datatypes10Test {
 		assertEquals("value <abc> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn die Fläche nicht numerisch, sondern aus koordinaten besteht aus.
 	@Test
 	public void FlaecheWith2DezFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1895,8 +1296,8 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <2.0 5.2> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
-	////////////////// END Flaechenmass ///////////////////////////	
-	////////////////// START Winkel ///////////////////////////////
+	
+	// Gibt einen Fehler aus, wenn der Radian grösser ist, als die Definition des Maximums.
 	@Test
 	public void radiansGreaterThanMaxFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1916,6 +1317,7 @@ public class Datatypes10Test {
 		assertEquals("value 10.5 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn der Radian kleiner ist, als erlaubt.
 	@Test
 	public void radiansLessThanMinFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1935,6 +1337,7 @@ public class Datatypes10Test {
 		assertEquals("value 0.4 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn grads grösser definiert wurde, als erlaubt.
 	@Test
 	public void gradsGreaterThanMaxFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1954,6 +1357,7 @@ public class Datatypes10Test {
 		assertEquals("value 10.5 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn grads kleiner definiert wurde, als erlaubt.
 	@Test
 	public void gradsLessThanMinFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1973,6 +1377,7 @@ public class Datatypes10Test {
 		assertEquals("value 0.4 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn degrees grösser ist, als erlaubt.
 	@Test
 	public void degreesGreaterThanMaxFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1992,6 +1397,7 @@ public class Datatypes10Test {
 		assertEquals("value 10.5 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn degrees kleiner ist, als erlaubt.
 	@Test
 	public void degreesLessThanMinFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2011,6 +1417,7 @@ public class Datatypes10Test {
 		assertEquals("value 0.4 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn radian Type: abc keine Nummer ist.
 	@Test
 	public void winkelTypeNotValidFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2030,6 +1437,7 @@ public class Datatypes10Test {
 		assertEquals("value <abc> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn der Radian keine Nummer ist. Test2
 	@Test
 	public void winkelNotValidRFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2049,6 +1457,7 @@ public class Datatypes10Test {
 		assertEquals("value <1.5 5.2> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn Grads nicht valid ist.
 	@Test
 	public void winkelNotValidGFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2068,6 +1477,7 @@ public class Datatypes10Test {
 		assertEquals("value <1.5 5.2> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn degrees nicht valid ist.
 	@Test
 	public void winkelNotValidDFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2086,8 +1496,8 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <1.5 5.2> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
-	////////////////// END Winkel /////////////////////////////////	
-	////////////////// START Datum ////////////////////////////////
+
+	// Gibt einen Fehler aus, wenn das Datum des Jahres zu klein ist.
 	@Test
 	public void datumYearToLowFail(){
 		Iom_jObject objYearToLow=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2107,6 +1517,7 @@ public class Datatypes10Test {
 		assertEquals("value <15801225> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn das Datum die maximale Definition übersteigt.
 	@Test
 	public void datumYearToHighFail(){
 		Iom_jObject objYearToHigh=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2126,6 +1537,7 @@ public class Datatypes10Test {
 		assertEquals("value <30001225> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn das Datum des Monats zu tief ist.
 	@Test
 	public void datumMonthToLowFail(){
 		Iom_jObject objMonthToLow=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2145,6 +1557,7 @@ public class Datatypes10Test {
 		assertEquals("value <20160025> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn das Datum des Monats zu hoch ist.
 	@Test
 	public void datumMonthToHighFail(){
 		Iom_jObject objMonthToHigh=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2164,6 +1577,7 @@ public class Datatypes10Test {
 		assertEquals("value <20161325> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn das Datum des Tages zu tief ist.
 	@Test
 	public void datumDayToLowFail(){
 		Iom_jObject objDayToLow=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2183,6 +1597,7 @@ public class Datatypes10Test {
 		assertEquals("value <20161200> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Gibt einen Fehler aus, wenn das Datum des Tages zu hoch ist.
 	@Test
 	public void datumDayToHighFail(){
 		Iom_jObject objDayToHigh=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2202,6 +1617,7 @@ public class Datatypes10Test {
 		assertEquals("value <20161232> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Datum darf nicht mit Dots getrennt werden, sonst wird ein Fehler ausgegeben.
 	@Test
 	public void datumFormatWithDotsFail(){
 		Iom_jObject objFormatWithDots=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2221,6 +1637,7 @@ public class Datatypes10Test {
 		assertEquals("value <2016.12.25> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird ein Fehler ausgegeben, wenn das Datum zu kurz geschrieben wird.
 	@Test
 	public void datumLengthToShortFail(){
 		Iom_jObject objLengthToShort=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2240,6 +1657,7 @@ public class Datatypes10Test {
 		assertEquals("value <2016125> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird ein Fehler ausgegeben, wenn das Datum zu lang geschrieben wurde.
 	@Test
 	public void datumLengthToHighFail(){
 		Iom_jObject objLengthToLong=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2258,8 +1676,8 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <201612251> is not a valid Date", logger.getErrs().get(0).getEventMsg());
 	}
-	////////////////// END Datum //////////////////////////////////
-	////////////////// START HorizAlignment ///////////////////////
+
+	// Es wird ein Fehler ausgegeben, wenn die Horizontale nicht existiert.
 	@Test
 	public void horizAlignmentNotTypeOfEnumerationFail(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2279,8 +1697,7 @@ public class Datatypes10Test {
 		assertEquals("value Top is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	////////////////// END HorizAlignment /////////////////////////
-	////////////////// START VertAlignment ////////////////////////
+	// Es wird ein Fehler ausgegeben, wenn die Vertikale nicht existiert.
 	@Test
 	public void vertAlignmentNotTypeOfEnumerationFail(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2300,8 +1717,7 @@ public class Datatypes10Test {
 		assertEquals("value Left is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	////////////////// END VertAlignment //////////////////////////
-	////////////////// START Koord2 ///////////////////////////////
+	// Es wird ein Fehler ausgegeben, wenn die Koordinate eine falsche dimension aufweist.
 	@Test
 	public void koord2WrongDimensionsFail(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2319,9 +1735,8 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
-	////////////////// END Koord2 /////////////////////////////////	
-	////////////////// START Koord3 ///////////////////////////////
+
+	// Es wird ein Fehler ausgegeben, wenn dei Koordinate auf 2d geschrieben wird, obwohl sie eine 3d Definition hat.
 	@Test
 	public void koord3WrongDimensionsFail(){
 		Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2339,473 +1754,8 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	////////////////// END Koord3 /////////////////////////////////
-	////////////////// START Linientyp ////////////////////////////
-	@Test
-	public void polylineTypeAlineDoesNotContainTypePolylineFail(){
-		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
-		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "LINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject coordStart=segments.addattrobj("segment", "COORD");
-		coordStart.setattrvalue("C1", "480000.000");
-		coordStart.setattrvalue("C2", "70000.000");
-		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordEnd.setattrvalue("C1", "480000.000");
-		coordEnd.setattrvalue("C2", "70000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objStraightsFail));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("unexpected Type LINE; POLYLINE expected", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	@Test
-	public void polylineTypeSequenceDoesNotContainTypeSegmentsFail(){
-		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
-		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "COORD");
-		IomObject coordStart=segments.addattrobj("segment", "COORD");
-		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordStart.setattrvalue("C1", "480000.000");
-		coordEnd.setattrvalue("C1", "480000.000");
-		coordStart.setattrvalue("C2", "70000.000");
-		coordEnd.setattrvalue("C2", "70000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objStraightsFail));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("unexpected Type COORD", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	@Test
-	public void polylineTypeSegmentDoesNotContainTypeCoordOrArcFail(){
-		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
-		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject coordStart=segments.addattrobj("segment", "POLYLINE");
-		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordStart.setattrvalue("C1", "480000.000");
-		coordEnd.setattrvalue("C1", "480000.000");
-		coordStart.setattrvalue("C2", "70000.000");
-		coordEnd.setattrvalue("C2", "70000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objStraightsFail));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("unexpected Type POLYLINE", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	@Test
-	public void polylineTypeIOMCompleteWith2SequencesFail(){
-		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
-		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "POLYLINE");
-		polylineValue.setobjectconsistency(IomConstants.IOM_COMPLETE);
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject segment2=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject coordStart=segments.addattrobj("segment", "COORD");
-		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordStart.setattrvalue("C1", "480000.000");
-		coordEnd.setattrvalue("C1", "480000.000");
-		coordStart.setattrvalue("C2", "70000.000");
-		coordEnd.setattrvalue("C2", "70000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objStraightsFail));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid number of sequences in COMPLETE basket", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	@Test
-	public void polylineTypeUnexpectedARCFail(){
-		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
-		IomObject polylineValue=objStraightsFail.addattrobj("straightsarcs2d", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "480000.000");
-		arcSegment.setattrvalue("A2", "300000.000");
-		arcSegment.setattrvalue("C1", "480000.000");
-		arcSegment.setattrvalue("C2", "70000.000");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "480000.000");
-		endSegment.setattrvalue("C2", "70000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objStraightsFail));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("unexpected ARC", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	@Test
-	public void polylineTypeUnexpectedCOORDFail(){
-		Iom_jObject objStraightsFail=new Iom_jObject("Datatypes10.Topic.LineTable", "o1");
-		// polyline 1
-		IomObject polylineValue = objStraightsFail.addattrobj("arcs2d", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objStraightsFail));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("unexpected COORD", logger.getErrs().get(0).getEventMsg());
-	}
-	////////////////// END Linientyp //////////////////////////////	
-	////////////////// START LinientypWithoutOverlaps /////////////
-	
-	// Wird noch von Claude im Valdator erstellt.
-	
-	////////////////// END LinientypWithoutOverlaps ///////////////
-	////////////////// START FlaechentypSurface ///////////////////
-	@Test
-	public void surfaceTypeNotTypeMULTISURFACEFail(){
-		Iom_jObject objNotMultisurface=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject surfaceValue=objNotMultisurface.addattrobj("surface2d", "SURFACE");
-		// inner boundary
-		IomObject innerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue2 = innerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "480000.000");
-		startSegment2.setattrvalue("C2", "70000.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "500000.000");
-		endSegment2.setattrvalue("C2", "80000.000");
-		// polyline 2
-		IomObject polylineValue112 = innerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments112=polylineValue112.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment112=segments112.addattrobj("segment", "COORD");
-		startSegment112.setattrvalue("C1", "500000.000");
-		startSegment112.setattrvalue("C2", "80000.000");
-		IomObject endSegment112=segments112.addattrobj("segment", "COORD");
-		endSegment112.setattrvalue("C1", "520000.000");
-		endSegment112.setattrvalue("C2", "85000.000");
-		// polyline 3
-		IomObject polylineValue33 = innerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments33=polylineValue33.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment33=segments33.addattrobj("segment", "COORD");
-		startSegment33.setattrvalue("C1", "520000.000");
-		startSegment33.setattrvalue("C2", "85000.000");
-		IomObject endSegment33=segments33.addattrobj("segment", "COORD");
-		endSegment33.setattrvalue("C1", "480000.000");
-		endSegment33.setattrvalue("C2", "70000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objNotMultisurface));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("unexpected Type SURFACE; MULTISURFACE expected", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	@Test
-	public void surfaceTypeCompleteAndTwoSurfacesFail(){
-		Iom_jObject objCompleteMultisurface=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objCompleteMultisurface.addattrobj("surface2d", "MULTISURFACE");
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		IomObject surfaceValue2 = multisurfaceValue.addattrobj("surface", "SURFACE");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objCompleteMultisurface));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid number of surfaces in COMPLETE basket", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	@Test
-	public void surface2dWith3dImplementationFail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		// outer boundary
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
-		// polyline 2
-		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
-		startSegment11.setattrvalue("C1", "500000.000");
-		startSegment11.setattrvalue("C2", "80000.000");
-		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
-		endSegment11.setattrvalue("C1", "520000.000");
-		endSegment11.setattrvalue("C2", "85000.000");
-		// polyline 3
-		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "520000.000");
-		startSegment3.setattrvalue("C2", "85000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
-		endSegment3.setattrvalue("C3", "1000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Wrong COORD structure, C3 not expected", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	@Test
-	public void surface3dWith2dImplementationFail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline1
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject segment1=segments.addattrobj("segment", "COORD");
-		segment1.setattrvalue("C1", "480000.000");
-		segment1.setattrvalue("C2", "70000.000");
-		IomObject segment12=segments.addattrobj("segment", "COORD");
-		segment12.setattrvalue("C1", "500000.000");
-		segment12.setattrvalue("C2", "80000.000");
-		// polyline2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject segment21=segments2.addattrobj("segment", "COORD");
-		segment21.setattrvalue("C1", "500000.000");
-		segment21.setattrvalue("C2", "80000.000");
-		IomObject segment22=segments2.addattrobj("segment", "COORD");
-		segment22.setattrvalue("C1", "520000.000");
-		segment22.setattrvalue("C2", "90000.000");
-		// polyline3
-		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-		IomObject segment31=segments3.addattrobj("segment", "COORD");
-		segment31.setattrvalue("C1", "520000.000");
-		segment31.setattrvalue("C2", "90000.000");
-		IomObject segment32=segments3.addattrobj("segment", "COORD");
-		segment32.setattrvalue("C1", "480000.000");
-		segment32.setattrvalue("C2", "70000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-//		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
-	}
-	@Test
-	public void surface3dInvalidValueRangeInFail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
-		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject segment=segments.addattrobj("segment", "COORD");
-		segment.setattrvalue("C1", "4800000.000");
-		segment.setattrvalue("C2", "700000.000");
-		segment.setattrvalue("C3", "50000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==4);
-		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
-		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
-		assertEquals("value 50000.000 is out of range", logger.getErrs().get(2).getEventMsg());
-	}
-	
-	@Test
-	public void surface2dInvalidValueRangeFail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
-		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject coordSegment=segments.addattrobj("segment", "COORD");
-		coordSegment.setattrvalue("C1", "4800000.000");
-		coordSegment.setattrvalue("C2", "700000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
-		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
-	}
-	@Test
-	public void surface3dWithARCInvalidValueRangeOfA1AndA2Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface3d", "MULTISURFACE");
-		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject segment=segments.addattrobj("segment", "COORD");
-		segment.setattrvalue("C1", "480000.000");
-		segment.setattrvalue("C2", "70000.000");
-		segment.setattrvalue("C3", "5000.000");
-		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "4800000.000");
-		arcSegment.setattrvalue("A2", "700000.000");
-		arcSegment.setattrvalue("C1", "480000.000");
-		arcSegment.setattrvalue("C2", "70000.000");
-		arcSegment.setattrvalue("C3", "5000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
-		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
-	}
-	
-	@Test
-	public void surface2dWithARCInvalidValueRangeInArcA1A2Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes10.Topic.FlaechenTable", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
-		multisurfaceValue.setobjectconsistency(IomConstants.IOM_INCOMPLETE);
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject coordSegment=segments.addattrobj("segment", "COORD");
-		coordSegment.setattrvalue("C1", "480000.000");
-		coordSegment.setattrvalue("C2", "70000.000");
-		IomObject arcSegment=segments.addattrobj("segment", "ARC");
-		arcSegment.setattrvalue("A1", "4800000.000");
-		arcSegment.setattrvalue("A2", "700000.000");
-		arcSegment.setattrvalue("C1", "490000.000");
-		arcSegment.setattrvalue("C2", "80000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
-		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
-	}
-	
+
+	// Wenn ValidationConfig Type definiert wurde und ValidationConfig auf OFF steht, werden keine Warnungen oder Fehler ausgegeben.
 	@Test
 	public void configOFFtextTextIsNotANumberOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2825,6 +1775,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Eine Warnung wird ausgegeben, wenn Grads keine Nummer ist, wenn config Type eingeschalten wurde und ValidationConfig auf Warning steht.
 	@Test
 	public void configWARNINGtextTextIsNotANumberFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -2844,5 +1795,4 @@ public class Datatypes10Test {
 		assertTrue(logger.getWarn().size()==1);
 		assertEquals("value <1.5 5.2> is not a number", logger.getWarn().get(0).getEventMsg());
 	}
-	////////////////// END FlaechentypSurface /////////////////////	
 }
