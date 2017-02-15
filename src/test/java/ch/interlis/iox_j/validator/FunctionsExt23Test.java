@@ -1,10 +1,8 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -44,8 +42,10 @@ public class FunctionsExt23Test {
 	//#########################################################//
 	//######## SUCCESS FUNCTIONS ##############################//
 	//#########################################################//	
+	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn eine neue Funktion (subString) erstellt wird. Dabei alles richtg erstellt wird.
 	@Test
-	public void subString_Ok(){
+	public void newFunctionSubString_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
 		iomObjA.setattrvalue("text", "0123456789");
 		iomObjA.setattrvalue("from", "2");
@@ -69,8 +69,10 @@ public class FunctionsExt23Test {
 	//#########################################################//
 	//######## FAILING FUNCTIONS ##############################//
 	//#########################################################//	
+	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn eine neue Funktion (substring) erstellt wird und der SubString nicht analog attr2 ist.
 	@Test
-	public void subString_Fail(){
+	public void newFunctionSubString_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
 		iomObjA.setattrvalue("text", "123456789");
 		iomObjA.setattrvalue("from", "2");
@@ -92,8 +94,10 @@ public class FunctionsExt23Test {
 		assertEquals("Mandatory Constraint FunctionsExt23.Topic.ClassA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn eine neue Funktion (SubString) erstellt wird.
+	// Jedoch die Klasse SuperText zwar einen Verweis hat, jedoch keine gültige Klassenreferenz aufweist.
 	@Test
-	public void subString_IliValidClassNotExists_Fail(){
+	public void newFunctionSubStringValidClassRefNotFound_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
 		iomObjA.setattrvalue("text", "0123456789");
 		iomObjA.setattrvalue("from", "2");
@@ -115,8 +119,9 @@ public class FunctionsExt23Test {
 		assertEquals("Function is not yet implemented.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die neue Funktion (noText) keine Referenz findet. 
 	@Test
-	public void subString_IliValidClassNotDefined_Fail(){
+	public void newFunctionNoTextNotDefined_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
 		iomObjA.setattrvalue("text", "0123456789");
 		iomObjA.setattrvalue("from", "2");

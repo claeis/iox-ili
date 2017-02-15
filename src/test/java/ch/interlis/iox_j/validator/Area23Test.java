@@ -24,19 +24,19 @@ public class Area23Test {
 
 	private TransferDescription td=null;
 	// OID
-	private final static String OBJ_OID1 ="o1";
+	private final static String OID1 ="o1";
 	// MODEL.TOPIC
-	private final static String ILI_TOPIC="Area23.Topic";
+	private final static String ILI_TOPIC="Datatypes23.Topic";
 	// CLASS
-	private final static String ILI_CLASSB=ILI_TOPIC+".ClassD";
+	private final static String ILI_CLASSD=ILI_TOPIC+".ClassD";
 	// START BASKET EVENT
-	private final static String BASKET_ID1="b1";
+	private final static String BID="b1";
 	
 	@Before
 	public void setUp() throws Exception {
 		// ili-datei lesen
 		Configuration ili2cConfig=new Configuration();
-		FileEntry fileEntry=new FileEntry("src/test/data/validator/Area23.ili", FileEntryKind.ILIMODELFILE);
+		FileEntry fileEntry=new FileEntry("src/test/data/validator/Datatypes23.ili", FileEntryKind.ILIMODELFILE);
 		ili2cConfig.addFileEntry(fileEntry);
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
@@ -44,9 +44,11 @@ public class Area23Test {
 	//////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////// SUCCESSFUL Tests ////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////
+	
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn an 1 Punkt sich der Bereich selber berührt.
 	@Test
-	public void area2D_Oberlabed1PointTogether_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+	public void area2dOuterboundaryTouchesOwnLineOn1Point_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -113,7 +115,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -121,10 +123,10 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// there are 2 innerboundaries which dont touch each other. Expected: ok.
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich die 2 Innerboundaries nicht berühren.
 	@Test
-	public void area2D_noOverlabOfInnerboundaries_Expexted_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+	public void area2dWith2Innerboundaries_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -220,7 +222,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -228,10 +230,10 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// there are 2 innerboundaries which touch each other on 1 point. Expected: ok.
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn der Innerboundary den anderen Innerboundary an 1 Punkt berührt.
 	@Test
-	public void area2D_touchOfInnerboundariesOn1Point_Expexted_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+	public void area2dInnerTouchesOuterboundaryOn1Point_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -327,7 +329,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -335,10 +337,10 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// 1 point of innerboundary touch the outerboundary. Expected ok.
+	// Es wird getestet, ob ein 3d Bereich erstellt werden kann, wenn der Innerboundary, den Outerboundary an 1 Punkt berührt.
 	@Test
-	public void area3D_Oberlabed1PointTogether_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+	public void area3dInnerTouchesOuterboundaryOn1Point_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -417,7 +419,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -425,10 +427,10 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// there are 2 innerboundaries which dont touch each other. Expected: ok.
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er 2 Innerboundaries beinhaltet, welche sich nicht berühren.
 	@Test
-	public void area3D_noOverlabOfInnerboundaries_Expexted_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+	public void area3dWith2Innerboundaries_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -542,7 +544,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -550,10 +552,10 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// there are 2 innerboundaries which touch each other on 1 point. Expected: ok.
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die beiden Innerboundaries sich an 1 Punkt berühren.
 	@Test
-	public void area3D_touchOfInnerboundariesOn1Point_Expexted_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+	public void area3dIntersectionOf2InnerboundariesOn1Point_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -667,7 +669,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -675,9 +677,10 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er 1 Boundary beinhaltet.
 	@Test
-	public void surfaceTypeArea1Boundary2DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void area1Boundary2d_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
@@ -714,7 +717,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -722,9 +725,10 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er 2 Boundaries beinhaltet.
 	@Test
-	public void surfaceTypeArea2Boundaries2DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void area2Boundaries2d_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -791,7 +795,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -799,9 +803,10 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er 1 Boundary beinhaltet.
 	@Test
-	public void surfaceTypeArea2DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void area2d_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
@@ -838,7 +843,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -846,9 +851,10 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn ein Bereich mit einem Kreisbogen erstellt wird.
 	@Test
-	public void surfaceTypeAreaWithArc2DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void areaWithArc2d_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
@@ -873,7 +879,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -881,9 +887,10 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet, ob ein 3d Bereich erstellt werden kann, wenn er 1 Boundary beinhaltet.
 	@Test
-	public void surfaceTypeArea1Boundary3DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void area1Boundary3d_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
@@ -926,7 +933,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -934,9 +941,10 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet, ob ein 3d Bereich erstellt werden kann, wenn er 2 Boundaries beinhaltet.
 	@Test
-	public void surfaceTypeArea2Boundaries3DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void areaWith2Boundaries3d_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1015,7 +1023,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1023,62 +1031,10 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet, ob ein 3d Bereich erstellt werden kann, wenn er einen Kreisbogen beinhaltet. 
 	@Test
-	public void surfaceTypeArea3DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		startSegment.setattrvalue("C3", "1000.000");
-		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
-		endSegment.setattrvalue("C3", "1500.000");
-		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "500000.000");
-		startSegment2.setattrvalue("C2", "80000.000");
-		startSegment2.setattrvalue("C3", "1500.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "550000.000");
-		endSegment2.setattrvalue("C2", "90000.000");
-		endSegment2.setattrvalue("C3", "2000.000");
-		// polyline 3
-		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "550000.000");
-		startSegment3.setattrvalue("C2", "90000.000");
-		startSegment3.setattrvalue("C3", "2000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
-		endSegment3.setattrvalue("C3", "1000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void surfaceTypeAreaWithArc3DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void areaWithArc3d_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
@@ -1106,7 +1062,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1117,10 +1073,10 @@ public class Area23Test {
 	///////////////////////////////// FAILING Tests //////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////	
 	
-	// 4 edges are cut. Expected: Errs(failed to validate polygon).
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich die eigenen Outerboundaries überschneiden.
 	@Test
-	public void area2D_ExpectedFailToValidatePolygon_BecauseOverlabOf2Lines_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+	public void area2dIntersectionOf2Lines_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1187,19 +1143,19 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==5);
-		assertEquals("failed to validate polygon", logger.getErrs().get(4).getEventMsg());
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// intersection of the 2 innerboundaries. Expected: failed to validate polygon - invalid ring lines.
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich die 2 Innerboundaries überschneiden.
 	@Test
-	public void area2D_oberlabOfInnerboundariesFail_ExpextedInvalidRingLines_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+	public void area2dIntersectionOfInnerboundaries_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1295,20 +1251,19 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==7);
-		assertEquals("invald ring line", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(6).getEventMsg());
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}	
 	
-	// 4 edges are cut. Expected: Errs(failed to validate polygon).
+	// Es wird getestet, ob ein 3d Bereich erstellt werden kann, wenn die 2 Linien der eigenen Outerboundary überschneiden.
 	@Test
-	public void area3D_ExpectedFailToValidatePolygon_BecauseOverlabOf2Lines_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+	public void area3dIntersectionOfOwnOuterboundary_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1387,19 +1342,19 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==5);
-		assertEquals("failed to validate polygon", logger.getErrs().get(4).getEventMsg());
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// intersection of the 2 innerboundaries. Expected: failed to validate polygon - invalid ring lines.
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich die Innerboundaries überschneiden.
 	@Test
-	public void area3D_oberlabOfInnerboundariesFail_ExpextedInvalidRingLines_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+	public void area3dIntersectionOfInnerboundaries_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1513,20 +1468,19 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==7);
-		assertEquals("invald ring line", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(6).getEventMsg());
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// intersection of 2 innerboundary and outboundary.
+	// Es wird getestet, ob ein 3d Bereich erstellt werden kann, wenn sich die Innerboundaries überschneiden.
 	@Test
-	public void area3D_IntersectionOfBoundaries_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+	public void area3dIntersectionOfOuterboundaries_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1605,19 +1559,19 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("intersection tids null, null", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// intersection of 2 innerboundary and outboundary.
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich die Innerboundary mit der Outerboundary überschneidet.
 	@Test
-	public void area2D_IntersectionOfBoundaries_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+	public void area2dInnerIntersectOuterboundary_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		// outer boundary
@@ -1684,18 +1638,19 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("intersection tids null, null", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er aus 3d Koordinaten erstellt wird, obwohl er in 2d Koordinaten definiert wurde.
 	@Test
-	public void area2dWith3dImplementationFail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void area2dWith3dImplementation_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
@@ -1733,7 +1688,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1742,9 +1697,10 @@ public class Area23Test {
 		assertEquals("Wrong COORD structure, C3 not expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn aus 2d Koordinaten besteht, obwohl er aus 3d Koordinaten definiert ist.
 	@Test
-	public void area3dWith2dImplementationFail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void area3dWith2dImplementation_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
@@ -1786,7 +1742,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1795,9 +1751,10 @@ public class Area23Test {
 		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die Value eines Segmentes nicht gültig ist.
 	@Test
-	public void area3dInvalidValueRangeFail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void area3dInvalidValueRange_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
@@ -1840,7 +1797,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1851,9 +1808,10 @@ public class Area23Test {
 		assertEquals("value 10000.000 is out of range", logger.getErrs().get(2).getEventMsg());
 	}
 	
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die Value eines Segmentes nicht gültig ist.
 	@Test
-	public void area2dInvalidValueRangeFail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void area2dInvalidValueRange_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
@@ -1890,7 +1848,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1900,9 +1858,10 @@ public class Area23Test {
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 	}
 	
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er einen Kreisbogen beinahltet, welcher ein ungültiges Segment beinhaltet.
 	@Test
-	public void area3dWithARCInvalidValueRangeFail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void area3dWithARCInvalidValueRange_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area3d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
@@ -1947,7 +1906,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1957,9 +1916,10 @@ public class Area23Test {
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 	}
 	
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er einen Kreisbogen beinhaltet, welcher ein ungültiges Segment beinhaltet.
 	@Test
-	public void area2dWithARCInvalidValueRangeFail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void area2dWithARCInvalidValueRange_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
@@ -1998,7 +1958,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2008,9 +1968,10 @@ public class Area23Test {
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 	}
 	
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn der Type area nicht vom Type Multisurface ist.
 	@Test
-	public void areaTypeNotTypeMULTISURFACEFail(){
-		Iom_jObject objAreaMultisurface=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void invalidAreaType_Fail(){
+		Iom_jObject objAreaMultisurface=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject areaValue=objAreaMultisurface.addattrobj("area2d", "AREA");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -2018,7 +1979,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objAreaMultisurface));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2027,9 +1988,10 @@ public class Area23Test {
 		assertEquals("unexpected Type AREA; MULTISURFACE expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er Komplett ist, jedoch aus 2 Bereichen besteht.
 	@Test
-	public void areaTypeCompleteAndTwoAreasFail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void areaTypeCompleteWith2Areas_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_COMPLETE);
 		IomObject areaValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -2040,7 +2002,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2049,9 +2011,10 @@ public class Area23Test {
 		assertEquals("invalid number of surfaces in COMPLETE basket", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn 2 Coords nacheinander die selbe Position haben.
 	@Test
-	public void areaType2DRepeatedCoordFail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject("Datatypes23.Topic.ClassD", "o1");
+	public void areaType2DRepeatedCoord_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
@@ -2091,7 +2054,7 @@ public class Area23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());

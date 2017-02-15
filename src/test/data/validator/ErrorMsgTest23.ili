@@ -7,6 +7,7 @@ MODEL ErrorMsgTest23
 			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
 					        70000.000 .. 310000.000 [INTERLIS.m],
 						   ROTATION 2 -> 1;
+						   
 		CLASS ClassA =
 		   attrA : 0.0 .. 10.0;
 		   point : Lkoord;

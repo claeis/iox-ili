@@ -6,11 +6,11 @@ MODEL Function23
 			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
 					    70000.000 .. 310000.000 [INTERLIS.m],
 						ROTATION 2 -> 1;
-			Enumeration = (eins, mehr);																	!! node=mehr
-			Enumeration2 EXTENDS Enumeration = (mehr(vier, fuenf));										!! sub=mehr.vier
-			Enumeration3 = (eins, zwei, drei, vier, fuenf) ORDERED;										!! enum=drei, min=zwei, max=vier
-			Enumeration6 = (eins, zwei, drei, vier, fuenf);												!! (not ordered) enum=zwei, min=eins, max=drei
-			Enumeration4 = (eins(eins, zwei), zwei(eins, zwei, drei), drei(eins, zwei)) ORDERED;		!! enum=2.2, min=1.2, max=3.2
+			Enumeration = (eins, mehr);
+			Enumeration2 EXTENDS Enumeration = (mehr(vier, fuenf));
+			Enumeration3 = (eins, zwei, drei, vier, fuenf) ORDERED;
+			Enumeration6 = (eins, zwei, drei, vier, fuenf);
+			Enumeration4 = (eins(eins, zwei), zwei(eins, zwei, drei), drei(eins, zwei)) ORDERED;
 			
 		!! (len) attr1 vs. attr2		
 		CLASS ClassA1 =
@@ -276,7 +276,6 @@ MODEL Function23
 			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZA, UNDEFINED, >> Geometrie);
 		END ClassZD;
 		
-		
 		CLASS ClassZZ =
 			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 		END ClassZZ;
@@ -314,5 +313,7 @@ MODEL Function23
 			MANDATORY CONSTRAINT
 				INTERLIS.convertUnit(5);
 		END ClassZH;
+		
 	END Topic;
+	
 END Function23.

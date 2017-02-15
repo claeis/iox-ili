@@ -1,10 +1,8 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -22,23 +20,22 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 public class SetConstraint23Test {
 	private TransferDescription td=null;
 	// OID
-	private final static String OBJ_OID1 ="o1";
-	private final static String OBJ_OID2 ="o2";
-	private final static String OBJ_OID3 ="o3";
-	private final static String OBJ_OID4 ="o4";
-	private final static String OBJ_OID5 ="o5";
+	private final static String OID1 ="o1";
+	private final static String OID2 ="o2";
+	private final static String OID3 ="o3";
+	private final static String OID4 ="o4";
+	private final static String OID5 ="o5";
 	// MODEL
-	private final static String ILI_TOPIC="SetConstraint23.Topic";
+	private final static String TOPIC="SetConstraint23.Topic";
 	// STRUCTURE
-	private final static String ILI_STRUCTC=ILI_TOPIC+".StructC";
-	private final static String ILI_STRUCTD=ILI_TOPIC+".StructD";
-	
+	private final static String ILI_STRUCTC=TOPIC+".StructC";
+	private final static String ILI_STRUCTD=TOPIC+".StructD";
 	// CLASS
-	private final static String ILI_CLASSA=ILI_TOPIC+".ClassA";
-	private final static String ILI_CLASSB=ILI_TOPIC+".ClassB";
-	private final static String ILI_CLASSC=ILI_TOPIC+".ClassC";
-	private final static String ILI_CLASSD=ILI_TOPIC+".ClassD";
-	private final static String ILI_CLASSE=ILI_TOPIC+".ClassE";
+	private final static String ILI_CLASSA=TOPIC+".ClassA";
+	private final static String ILI_CLASSB=TOPIC+".ClassB";
+	private final static String ILI_CLASSC=TOPIC+".ClassC";
+	private final static String ILI_CLASSD=TOPIC+".ClassD";
+	private final static String ILI_CLASSE=TOPIC+".ClassE";
 	// START BASKET EVENT
 	private final static String BID1="b1";
 	private final static String BID2="b2";
@@ -56,11 +53,13 @@ public class SetConstraint23Test {
 	//#########################################################//
 	//######## SUCCESS FUNCTIONS ##############################//
 	//#########################################################//
+	
+	// Es wird getestet, was geschieht, wenn die Pre-Bedingung und die second Bedingung wahr ist.
 	@Test
-	public void setConstraint_Ok(){
-		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
+	public void preAndSecondConstraintAreTrue_Ok(){
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID1);
 		iomObj.setattrvalue("Art", "b");
-		Iom_jObject iomObj2=new Iom_jObject(ILI_CLASSA, OBJ_OID2);
+		Iom_jObject iomObj2=new Iom_jObject(ILI_CLASSA, OID2);
 		iomObj2.setattrvalue("Art", "c");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -68,7 +67,7 @@ public class SetConstraint23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObj));
 		validator.validate(new ObjectEvent(iomObj2));
 		validator.validate(new EndBasketEvent());
@@ -77,9 +76,10 @@ public class SetConstraint23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob ein Fehler auftritt, wenn der Pre-Constraint nicht wahr ist.
 	@Test
-	public void setConstraint_NoObjectInSet_Ok(){
-		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
+	public void noObjectFoundInPreConstraint_Ok(){
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID1);
 		iomObj.setattrvalue("Art", "a");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -87,7 +87,7 @@ public class SetConstraint23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObj));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -95,17 +95,18 @@ public class SetConstraint23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet, wenn der Pre-Constraint true ist und die Funktion: objectCount(ALL) wahr ist, ein Fehler ausgegeben wird.
 	@Test
-	public void setConstraint_5Values_Ok(){
-		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
+	public void preConstraintAndObjectCountTrue_Ok(){
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSB, OID1);
 		iomObj.setattrvalue("Art", "a");
-		Iom_jObject iomObj2=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
+		Iom_jObject iomObj2=new Iom_jObject(ILI_CLASSB, OID2);
 		iomObj2.setattrvalue("Art", "a");
-		Iom_jObject iomObj3=new Iom_jObject(ILI_CLASSB, OBJ_OID3);
+		Iom_jObject iomObj3=new Iom_jObject(ILI_CLASSB, OID3);
 		iomObj3.setattrvalue("Art", "a");
-		Iom_jObject iomObj4=new Iom_jObject(ILI_CLASSB, OBJ_OID4);
+		Iom_jObject iomObj4=new Iom_jObject(ILI_CLASSB, OID4);
 		iomObj4.setattrvalue("Art", "a");
-		Iom_jObject iomObj5=new Iom_jObject(ILI_CLASSB, OBJ_OID5);
+		Iom_jObject iomObj5=new Iom_jObject(ILI_CLASSB, OID5);
 		iomObj5.setattrvalue("Art", "a");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -113,7 +114,7 @@ public class SetConstraint23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObj));
 		validator.validate(new ObjectEvent(iomObj2));
 		validator.validate(new ObjectEvent(iomObj3));
@@ -125,11 +126,13 @@ public class SetConstraint23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die Funktion: objectCount in der richtigen Menge definiert wurde und der Pre-Constraint false ist.
+	// Wenn der Pre-Constraint false ist, wird der second Constraint nicht mehr ausgewertet. Somit sollte kein Fehler entstehen.
 	@Test
-	public void setConstraint_BagOfStruct_Ok(){
+	public void preConstraintWrong_Ok(){
 		Iom_jObject iomObjStruct=new Iom_jObject(ILI_STRUCTC, null);
 		Iom_jObject iomObjStruct2=new Iom_jObject(ILI_STRUCTC, null);
-		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSC, OID1);
 		iomObj.addattrobj("Numbers", iomObjStruct);
 		iomObj.addattrobj("Numbers", iomObjStruct2);
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -138,7 +141,7 @@ public class SetConstraint23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjStruct));
 		validator.validate(new ObjectEvent(iomObjStruct2));
 		validator.validate(new ObjectEvent(iomObj));
@@ -148,8 +151,9 @@ public class SetConstraint23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Wenn der Pre-Constraint true ist und die Funktion areAreas true ist, ein Fehler ausgegeben wird.
 	@Test
-	public void areArea_SurfaceAttrOfStruct_Ok(){
+	public void preConstraintAndAreAreasTrue_Ok(){
 		Iom_jObject iomObjStruct=new Iom_jObject(ILI_STRUCTD, null);
 		// Geometrie 1
 		IomObject multisurfaceValue=iomObjStruct.addattrobj("Surface", "MULTISURFACE");
@@ -214,7 +218,7 @@ public class SetConstraint23Test {
 		IomObject endSegment6=segments6.addattrobj("segment", "COORD");
 		endSegment6.setattrvalue("C1", "484000.000");
 		endSegment6.setattrvalue("C2", "70000.000");
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		objSurfaceSuccess.addattrobj("Numbers", iomObjStruct);
 		objSurfaceSuccess.addattrobj("Numbers", iomObjStruct2);
 		objSurfaceSuccess.setattrvalue("Art", "a");
@@ -224,7 +228,7 @@ public class SetConstraint23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjStruct));
 		validator.validate(new ObjectEvent(iomObjStruct2));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
@@ -232,14 +236,16 @@ public class SetConstraint23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
-	}	
+	}
+	
 	//#########################################################//
 	//######## FAIL FUNCTIONS #################################//
 	//#########################################################//
 	
+	// Es wird getestet ein Fehler ausgegeben wird, wenn der Pre-Constraint true ist und die Funktion: ObjectCount(ALL) false ist.
 	@Test
-	public void setConstraint_WrongNumberOfObjects_Fail(){
-		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
+	public void secondConstraintFalse_Fail(){
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSB, OID1);
 		iomObj.setattrvalue("Art", "a");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -247,7 +253,7 @@ public class SetConstraint23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObj));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -256,12 +262,13 @@ public class SetConstraint23Test {
 		assertEquals("Set Constraint SetConstraint23.Topic.ClassB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ein Fehler ausgegeben wird, wenn die Anzahl von objectCount nicht wahr ist.
 	@Test
-	public void setConstraint_BagOfStructNumberFalse_Fail(){
+	public void secondConstraintWrongCount_Fail(){
 		Iom_jObject iomObjStruct=new Iom_jObject(ILI_STRUCTC, null);
 		Iom_jObject iomObjStruct2=new Iom_jObject(ILI_STRUCTC, null);
 		Iom_jObject iomObjStruct3=new Iom_jObject(ILI_STRUCTC, null);
-		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSC, OID1);
 		iomObj.addattrobj("Numbers", iomObjStruct);
 		iomObj.addattrobj("Numbers", iomObjStruct2);
 		iomObj.addattrobj("Numbers", iomObjStruct3);
@@ -271,7 +278,7 @@ public class SetConstraint23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjStruct));
 		validator.validate(new ObjectEvent(iomObjStruct2));
 		validator.validate(new ObjectEvent(iomObjStruct3));
@@ -283,8 +290,9 @@ public class SetConstraint23Test {
 		assertEquals("Set Constraint SetConstraint23.Topic.ClassC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ein Fehler ausgegeben wird, wenn der Pre-Constraint true ist und die Area der Funktion: AreAreas nicht korrekt definiert wurde.
 	@Test
-	public void areArea_intersectionOfAreas_Fail(){
+	public void secondConstraintAreAreaFalse_Fail(){
 		Iom_jObject iomObjStruct=new Iom_jObject(ILI_STRUCTD, null);
 		// Geometrie 1
 		IomObject multisurfaceValue=iomObjStruct.addattrobj("Surface", "MULTISURFACE");
@@ -349,7 +357,7 @@ public class SetConstraint23Test {
 		IomObject endSegment6=segments6.addattrobj("segment", "COORD");
 		endSegment6.setattrvalue("C1", "484000.000");
 		endSegment6.setattrvalue("C2", "70000.000");
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		objSurfaceSuccess.addattrobj("Numbers", iomObjStruct);
 		objSurfaceSuccess.addattrobj("Numbers", iomObjStruct2);
 		objSurfaceSuccess.setattrvalue("Art", "a");
@@ -359,7 +367,7 @@ public class SetConstraint23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjStruct));
 		validator.validate(new ObjectEvent(iomObjStruct2));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));

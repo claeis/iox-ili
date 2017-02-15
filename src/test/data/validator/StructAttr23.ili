@@ -2,11 +2,14 @@ INTERLIS 2.3;
 
 MODEL StructAttr23
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-04" =
+	
 	TOPIC Topic=
+	
 		DOMAIN
 			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
 					        70000.000 .. 310000.000 [INTERLIS.m],
 						   ROTATION 2 -> 1;
+						   
 		STRUCTURE StructA =
 		   attrA : 0.0 .. 10.0;
 		   pointA : Lkoord;
@@ -20,4 +23,5 @@ MODEL StructAttr23
 		END ClassB;
 		
 	END Topic;
+	
 END StructAttr23.
