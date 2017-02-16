@@ -105,6 +105,50 @@ public class ReferenceType10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 		
+	// Es wird getestet ob ein Fehler geworfen wird, wenn die Konfiguration Target ausgeschalten wurde und die referenzierte Klasse nicht gefunden wurde.
+	@Test
+	public void configTargetOFF_ReferencedNoClassFound_Ok() throws Exception {
+		Iom_jObject objC1=new Iom_jObject(CLASSC, OID1);
+		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID2); // existiert nicht.
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("ReferenceType10.TopicA.ClassCattrC1.attrC1", ValidationConfig.TARGET,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPICA,BID1));
+		validator.validate(new ObjectEvent(objC1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0, logger.getErrs().size());
+	}
+	
+	// Es wird getestet ob ein Fehler geworfen wird, wenn die Konfiguration multiplicity ausgeschalten wurde und die multiplicität nicht stimmt.
+	@Test
+	public void configMultiplicityOFF_ReferencedClass_Ok() throws Exception {
+		Iom_jObject iomObjI=new Iom_jObject(CLASSA,OID1);
+		Iom_jObject iomObjJ=new Iom_jObject(CLASSD,OID2); // wird nicht in Basket ausgeführt.
+		iomObjJ.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1); // wird nicht in Basket ausgeführt.
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("ReferenceType10.TopicA.ClassDattrC1.attrC1", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPICA,BID1));
+		validator.validate(new ObjectEvent(iomObjI));
+		// CLASSD with Ref attrC1 --> oid1
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0, logger.getErrs().size());
+	}
+	
 	//#########################################################//
 	//######################### FAIL ##########################//
 	//#########################################################//
@@ -186,10 +230,6 @@ public class ReferenceType10Test {
 		assertEquals("attrC1 should associate 1 to 1 target objects (instead of 3)",logger.getErrs().get(0).getEventMsg());
 	}
 	
-	//#########################################################//
-	//################## CONFIG ON/OFF TEST ###################//
-	//#########################################################//	
-	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn config target auf ON steht und die eigene oid als Klassenreferenz angegeben wird.
 	@Test
 	public void configTargetON_NoClassFoundInRef_Fail() throws Exception {
@@ -211,9 +251,9 @@ public class ReferenceType10Test {
 		assertEquals("No object found with OID o1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	
+	// Es wird getestet ob ein Fehler geworfen wird, wenn multiplicity eingeschalten wird und die Oid's identisch sind.
 	@Test
-	public void configMultiplicityON_TwoReferencedClassesWithSameOidFail() throws Exception {
+	public void configMultiplicityON_TwoReferencedClassesWithSameOid_Fail() throws Exception {
 		Iom_jObject iomObjI=new Iom_jObject(CLASSA, OID1);
 		Iom_jObject iomObjJ=new Iom_jObject(CLASSC,OID2);
 		iomObjJ.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
@@ -238,8 +278,9 @@ public class ReferenceType10Test {
 		assertEquals("attrC1 should associate 1 to 1 target objects (instead of 2)", logger.getErrs().get(1).getEventMsg());
 	}
 	
+	// Es wird getestet ob ein Fehler geworfen wird, wenn multiplicity eingeschalten ist und die referenzierten Klassen die Selbe oid haben und nicht existieren.
 	@Test
-	public void configTAndMultiplicityON_TwoReferencedClassesWithSameOidFail() throws Exception {
+	public void configAndMultiplicityON_TwoReferencedClassesWithSameOid_Fail() throws Exception {
 		Iom_jObject iomObjI=new Iom_jObject(CLASSA, OID3);
 		Iom_jObject iomObjJ=new Iom_jObject(CLASSC,OID2);
 		iomObjJ.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
@@ -265,47 +306,10 @@ public class ReferenceType10Test {
 		assertEquals("attrC1 should associate 1 to 1 target objects (instead of 2)", logger.getErrs().get(2).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung oder eine Warnung ausgegeben wird, wenn die Konfiguration Warning ausgeschalten wurde und die referenzierte Klasse nicht gefunden wurde.
+	// Bei eingeschaltenem Warning bei Konfiguration target, soll, falls es zu einem Referenz-Fehler kommt, nur eine Warning und keinen Fehler ausgegeben werden.
 	@Test
-	public void configTargetOFF_ReferencedNoClassFoundOk() throws Exception {
-		Iom_jObject objC1=new Iom_jObject(CLASSC, OID1);
-		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ReferenceType10.TopicA.ClassCattrC1.attrC1", ValidationConfig.TARGET,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPICA,BID1));
-		validator.validate(new ObjectEvent(objC1));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertEquals(0, logger.getErrs().size());
-	}
-	
-	@Test
-	public void configMultiplicityOFF_TwoReferencedClassesOk() throws Exception {
-		Iom_jObject iomObjJ=new Iom_jObject(CLASSD,OID2);
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ReferenceType10.TopicA.ClassDattrC1.attrC1", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPICA,BID1));
-		validator.validate(new ObjectEvent(iomObjJ));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertEquals(0, logger.getErrs().size());
-	}
-	
-	@Test
-	public void configTargetWARNING_ReferencedNoClassFoundFail() throws Exception {
+	public void configTargetWARNING_ReferencedNoClassFound_Fail() throws Exception {
 		Iom_jObject objC1=new Iom_jObject(CLASSC, OID1);
 		objC1.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -321,13 +325,18 @@ public class ReferenceType10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
+		assertEquals(0, logger.getErrs().size());
 		assertEquals(1, logger.getWarn().size());
 		assertEquals("No object found with OID o1.", logger.getWarn().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung oder eine Warnung geworfen wird, wenn bei der Konfiguration multiplicity, warning eingeschalten wurde und es einen Fehler gibt.
+	// Bei eingeschaltenem Warning bei Konfiguration multiplicity, soll, falls es zu einem Multiplizitäten-Fehler kommt, nur eine Warning und keinen Fehler ausgegeben werden.
 	@Test
-	public void configMultiplicityWARNING_TwoReferencedClassesFail() throws Exception {
-		Iom_jObject iomObjJ=new Iom_jObject(CLASSD,OID2);
+	public void configMultiplicityWARNING_TwoReferencedClasses_Fail() throws Exception {
+		Iom_jObject iomObjA=new Iom_jObject(CLASSA,OID1); // wird nicht in Basket ausgeführt.
+		Iom_jObject iomObjI=new Iom_jObject(CLASSD,OID2);
+		// wird nicht gefunden (iomObjI.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1))
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue("ReferenceType10.TopicA.ClassDattrC1.attrC1", ValidationConfig.MULTIPLICITY,ValidationConfig.WARNING);
 		LogCollector logger=new LogCollector();
@@ -337,10 +346,12 @@ public class ReferenceType10Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPICA,BID1));
-		validator.validate(new ObjectEvent(iomObjJ));
+		validator.validate(new ObjectEvent(iomObjI));
+		// iomObjA with ClassA.
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
+		assertEquals(0, logger.getErrs().size());
 		assertEquals(1, logger.getWarn().size());
 		assertEquals("attrC1 should associate 1 to 1 target objects (instead of 0)", logger.getWarn().get(0).getEventMsg());
 	}

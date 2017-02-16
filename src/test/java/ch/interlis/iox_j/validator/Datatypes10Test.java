@@ -36,7 +36,7 @@ public class Datatypes10Test {
 	
 	// Die maximale Länge des Textes wird getestet.
 	@Test
-	public void textMaximumOk(){
+	public void textMaximum_Ok(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objTest.setattrvalue("text", "aabbccddee");
 		ValidationConfig modelConfig=new ValidationConfig();

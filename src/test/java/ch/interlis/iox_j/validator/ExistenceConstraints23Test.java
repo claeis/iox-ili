@@ -8,7 +8,6 @@ import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
-import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox_j.EndBasketEvent;
@@ -21,6 +20,14 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 public class ExistenceConstraints23Test {
 	
 	private TransferDescription td=null;
+	// OID
+	private final static String OID1 ="o1";
+	private final static String OID2 ="o2";
+	private final static String OID3 ="o3";
+	private final static String OID4 ="o4";
+	// START BASKET EVENT
+	private final static String BID1="b1";
+	private final static String BID2="b2";
 	
 	@Before
 	public void setUp() throws Exception {
