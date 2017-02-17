@@ -631,8 +631,6 @@ public class Association23Test {
 	//#########################################################//	
 	
 	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a1, 0 bis 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
-	// classB with OID b1, association to classA with oid d1
-	// classA with OID d1, associated by classB with OID b1, does not exist
 	@Test
 	public void wrongTargetClass_Fail(){
 		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
@@ -675,7 +673,6 @@ public class Association23Test {
 		assertEquals("e1 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Die KlasseB mit der OID b1 hat eine Verbindung zur KlasseA mit der OID a1
 	// Die OID a1 der Klasse A, welche von der Klasse B mit der Rolle b1 Verbunden wird, existiert nicht.
 	@Test
 	public void noTargetObject_Fail(){
@@ -698,8 +695,8 @@ public class Association23Test {
 		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Die classBp welche auf classB mit der OID b1, zeigt, verbindet die classA mit der OID a1, mit einer Einschränkung der Klasse: classAp, welche die Klasse: classA extended.
-	//  Die Klasse: classA mit der OID a1, verbindet über die Klasse: classBp mit der OID b1. Die Klasse existiert jedoch nicht.
+	// Die KlasseA mit der OID a1, verbindet über die Klasse: classBp mit der OID b1.
+	// Es soll eine Fehlermeldung ausgegeben werden, wenn diese Klasse nicht existiert.
 	@Test
 	public void wrongExtendedClass_Fail(){
 		Iom_jObject iomObjC=new Iom_jObject(ILI_CLASSCP, OBJ_OID1);
@@ -721,10 +718,9 @@ public class Association23Test {
 		assertEquals("Object Association23.Topic.ClassCp with OID o1 must be of Association23.Topic.ClassA", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// classBp extends to classB with OID b1, associate to classA with OID a1, with a restriction to classAp, which extends classA
-	// OID z1 of classA, associated by classB with OID b1, does not exist
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die Klasse der referenzierten oid: oid3, der Association abp3, nicht exisitiert.
 	@Test
-	public void noTargetObjectOfExtendedClasses1toNFail(){
+	public void noTargetObjectOfExtendedClassFound_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAP, OBJ_OID1);
 		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSBP, OBJ_OID2);
 		iomObjB.addattrobj(ILI_ASSOC_ABP3_AP3, "REF").setobjectrefoid(OBJ_OID3);
@@ -744,11 +740,9 @@ public class Association23Test {
 		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	
-	// classBp extends to classB with OID b1, associate to classA with OID a1, with a restriction to classAp, which extends classA
-	// OID z1 of classA, associated by classB with OID b1, does not exist
+	// Die Klasse der von der Association referenzierten oid2, existiert nicht.
 	@Test
-	public void noTargetObjectOfExtendedClassesNtoNFail(){
+	public void noTargetObjectOfExtendedClassFound2_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAP, OBJ_OID1);
 		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSBP, OBJ_OID2);
 		Iom_jObject iomObjAp=new Iom_jObject(ILI_ASSOC_ABP2, null);
@@ -771,8 +765,9 @@ public class Association23Test {
 		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Multiplizität der Rolle Maximal 1 sein darf, jedoch 5 Objekte erstellt wurden.
 	@Test
-	public void oneGObjectAnd5HObjectsInCard1To1Fail(){
+	public void objectRangeOfMultiplicityExceeded_Fail(){
 		Iom_jObject iomObjG=new Iom_jObject(ILI_CLASSG, OBJ_OID1);
 		Iom_jObject iomObjH1=new Iom_jObject(ILI_CLASSH, OBJ_OID2);
 		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
@@ -808,8 +803,9 @@ public class Association23Test {
 	//################# CONFIG ON/OFF TEST ####################//
 	//#########################################################//
 	
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn Multiplicity eingeschalten ist und die Referenz einen Fehler ergibt.
 	@Test
-	public void configMultiplicityON_AssociationRefFail(){
+	public void configMultiplicityONAssociationFail_Fail(){
 		Iom_jObject iomObjI=new Iom_jObject(ILI_CLASSI, OBJ_OID1);
 		Iom_jObject iomObjJ=new Iom_jObject(ILI_CLASSJ, OBJ_OID2);
 		iomObjJ.addattrobj(ILI_ASSOC_AB4_A4, "REF").setobjectrefoid(OBJ_OID1);
@@ -830,8 +826,9 @@ public class Association23Test {
 		assertEquals("a4 should associate 1 to 5 target objects (instead of 0)", logger.getErrs().get(1).getEventMsg());
 	}
 	
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Konfiguration Target Objects eingeschalten ist und das Target Object nicht gefunden werden kann.
 	@Test
-	public void configTargetON_NoTargetObject1toNFail(){
+	public void configTargetONNoTargetObjectFound_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
 		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
 		iomObjB.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID3);
@@ -851,53 +848,9 @@ public class Association23Test {
 		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Konfiguration Multiplicity ausgeschalten wird und die Anzahl die referenzierten Objekte nicht stimmt. 
 	@Test
-	public void configTargetON_WrongTargetClass1to1Fail(){
-		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(OBJ_OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjD));
-		validator.validate(new ObjectEvent(iomObjB));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Object Association23.Topic.ClassD with OID o1 must be of Association23.Topic.ClassA", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	@Test
-	public void configTargetAndMultiplicityON_Embedded_CLASSBassociatetoClassA_ab3_0to1_Fail(){
-		Iom_jObject iomObjA1=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		Iom_jObject iomObjA2=new Iom_jObject(ILI_CLASSA, OBJ_OID2);
-		Iom_jObject iomObjB4=new Iom_jObject(ILI_CLASSB, OBJ_OID4);
-		iomObjB4.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID1);
-		iomObjB4.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID2);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjA1));
-		validator.validate(new ObjectEvent(iomObjA2));
-		validator.validate(new ObjectEvent(iomObjB4));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertEquals(1,logger.getErrs().size());
-		assertEquals("a3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	@Test
-	public void configMultiplicityOFF_AssociationRefOk(){
+	public void configMultiplicityOFFObjectCountWrong_Ok(){
 		Iom_jObject iomObjI=new Iom_jObject(ILI_CLASSI, OBJ_OID1);
 		Iom_jObject iomObjJ=new Iom_jObject(ILI_CLASSJ, OBJ_OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -916,8 +869,9 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Konfiguration Target Objects ausgeschalten worden ist und keine referenzierten Objekte gefunden worden sind.
 	@Test
-	public void configTargetOFF_NoTargetObject1toNOk(){
+	public void configTargetOFFNoTargetObjectFound_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
 		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
 		iomObjB.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID3);
@@ -937,29 +891,10 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Multiplicity und die TargetObjects Konfiguration ausgeschalten worden ist und
+	// es einen Fehler in der Objektmenge und der Referenz Objekte gibt.
 	@Test
-	public void configTargetOFF_WrongTargetClass1to1Ok(){
-		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(OBJ_OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("Association23.Topic.ab1.a1", ValidationConfig.TARGET,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjD));
-		validator.validate(new ObjectEvent(iomObjB));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	@Test
-	public void configTargetAndMultiplicityOFF_Embedded_CLASSBassociatetoClassA_ab3_0to1_Ok(){
+	public void configTargetAndMultiplicityOFFEmbeddedFail_Ok(){
 		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID2);
 		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OBJ_OID3);
@@ -988,8 +923,9 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Multiplicity auf Warning gestellt wird und das referenzierte Objekt nicht gefunden werden kann.
 	@Test
-	public void configMultiplicityWARNING_AssociationRefFail(){
+	public void configMultiplicityWarningONFail_Fail(){
 		Iom_jObject iomObjI=new Iom_jObject(ILI_CLASSI, OBJ_OID1);
 		Iom_jObject iomObjJ=new Iom_jObject(ILI_CLASSJ, OBJ_OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1006,6 +942,7 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
+		assertTrue(logger.getErrs().size()==0);
 		assertEquals("a4 should associate 1 to 5 target objects (instead of 0)", logger.getWarn().get(0).getEventMsg());
 	}
 }
