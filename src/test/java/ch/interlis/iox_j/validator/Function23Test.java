@@ -1793,6 +1793,7 @@ public class Function23Test {
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die Funktion noch nicht implementiert wurde.
+	// Die Funktion wurde zwar gefunden, sie ist jedoch nicht implementiert, deshalb der Fehler Function(Name) wurde noch nicht implementiert.
 	@Test
 	public void function_notYetImplemented_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSZH, OBJ_OID1);
@@ -1808,7 +1809,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Function is not yet implemented.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Function INTERLIS.convertUnit is not yet implemented.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: areArea, die Anzahl der Objects im ersten Argument nicht mit den Geometrien übereinstimmt.

@@ -491,8 +491,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 		} else {
-			logMsg(checkConstraint,"Function is not yet implemented.");
-			Value.createNotYetImplemented();
+			if(condition instanceof FunctionCall){
+				FunctionCall functionCallObj = (FunctionCall) condition;
+				Function function = functionCallObj.getFunction();
+				logMsg(checkConstraint,"Function {0} is not yet implemented.", function.getScopedName(null));
+				Value.createNotYetImplemented();
+			} else {
+				logMsg(checkConstraint,"MandatoryConstraint {0} of {1} is not yet implemented.", mandatoryConstraintObj.getScopedName(null), iomObj.getobjecttag());
+				Value.createNotYetImplemented();
+			}
 		}
 	}
 
@@ -1218,6 +1225,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 			return new Value(listOfIomObjects);
+		} else {
+			logMsg(checkConstraint,"expression {0} is not yet implemented.",expression.toString());
 		}
 		return Value.createSkipEvaluation(); // skip further evaluation
 		//TODO instance of ParameterValue

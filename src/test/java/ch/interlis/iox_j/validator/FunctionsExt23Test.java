@@ -96,6 +96,8 @@ public class FunctionsExt23Test {
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn eine neue Funktion (SubString) erstellt wird.
 	// Jedoch die Klasse SuperText zwar einen Verweis hat, jedoch keine gültige Klassenreferenz aufweist.
+	// Das heisst dass die Constraint nicht als Funktion angeschaut werden kann, da diese nicht einmal die Referenz auf die Function finden kann.
+	// Somit ist der Fehler keine Inexistenz der Funktion, sondern des MandatoryConstraints.
 	@Test
 	public void newFunctionSubStringValidClassRefNotFound_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
@@ -116,10 +118,11 @@ public class FunctionsExt23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Function is not yet implemented.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("MandatoryConstraint Constraint1 of FunctionsExt23.Topic.ClassB is not yet implemented.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die neue Funktion (noText) keine Referenz findet. 
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die neue Funktion (noText) keine Referenz findet.
+	// Da der Constraint nicht unmittelbar als Function identifiziert werden kann, wird die Meldung MandatoryConstraint: .... ausgegeben.
 	@Test
 	public void newFunctionNoTextNotDefined_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
@@ -140,6 +143,6 @@ public class FunctionsExt23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Function is not yet implemented.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("MandatoryConstraint Constraint1 of FunctionsExt23.Topic.ClassC is not yet implemented.", logger.getErrs().get(0).getEventMsg());
 	}
 }

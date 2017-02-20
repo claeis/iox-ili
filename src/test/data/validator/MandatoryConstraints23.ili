@@ -102,6 +102,13 @@ MODEL MandatoryConstraints23
 			attr1 == attr2;
 		END ClassEqualationF;
 		
+		CLASS ClassEqualationNot =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			MANDATORY CONSTRAINT
+			attr1 == attr2;
+		END ClassEqualationNot;
+		
 		CLASS ClassEqualationG =
 			attr1 : TEXT*10;
 			attr2 : TEXT*10;
