@@ -327,7 +327,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		HashSet<AbstractLeafElement> abstractLeafElement=new HashSet<AbstractLeafElement>();
 		for (String basketId : objectPool.getBasketIds()){
 			// iterate through iomObjects
-			Iterator<IomObject> objectIterator = ((ch.ehi.iox.objpool.impl.ObjPoolImpl) objectPool.getObjectsOfBasketId(basketId)).valueIterator();
+			Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
 			while (objectIterator.hasNext()){
 				IomObject iomObj = objectIterator.next();
 				setCurrentMainObj(iomObj);
@@ -1403,7 +1403,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				String attrValueThisObj = iomObj.getattrvalue(otherAttrName);
 				for (String basketId : objectPool.getBasketIds()){
 					// iterate through iomObjects
-					Iterator<IomObject> objectIterator = ((ch.ehi.iox.objpool.impl.ObjPoolImpl) objectPool.getObjectsOfBasketId(basketId)).valueIterator();
+					Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
 					while (objectIterator.hasNext()){
 						IomObject otherIomObj = objectIterator.next();
 						if (otherIomObj.getattrcount() == 0){

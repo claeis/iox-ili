@@ -19,13 +19,13 @@ import ch.ehi.iox.objpool.impl.btree.BTreeCursor;
 import ch.ehi.iox.objpool.impl.btree.NodeId;
 
 public class BTreeImpl<K,V> implements Map<K, V> {
-	
+	private ObjectPoolManager objectPoolManager=null;
 	private BTree<K, Long> tree= null;
 	private RandomAccessFile outFile=null;
 	private java.io.File outFilename=null;
 	private Serializer valueSerializer=null;
     private static int MAX_CACHE=32;
-    private final LinkedHashMap<Long,SoftReference<V>> cache = new LinkedHashMap<Long,SoftReference<V>>(MAX_CACHE,0.75f,true){
+    private LinkedHashMap<Long,SoftReference<V>> cache = new LinkedHashMap<Long,SoftReference<V>>(MAX_CACHE,0.75f,true){
     	@Override
     	protected boolean removeEldestEntry(Map.Entry<Long, SoftReference<V>> eldest) {
     		if(true){
@@ -40,9 +40,10 @@ public class BTreeImpl<K,V> implements Map<K, V> {
     };
 
 	
-	public BTreeImpl( Serializer keySerializer,Serializer valueSerializer1)
+	public BTreeImpl( ObjectPoolManager objectPoolManager1,Serializer keySerializer,Serializer valueSerializer1)
 	{
 		try{
+			objectPoolManager=objectPoolManager1;
 			valueSerializer=valueSerializer1;
 			tree= new BTree<K, Long>( ObjectPoolManager.getCacheTmpFilename() , new JavaComparator<K>());
 			outFilename=ObjectPoolManager.getCacheTmpFilename();
@@ -74,7 +75,10 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 			outFilename=null;
 		}
 	}
-
+	public void disableCache()
+	{
+		cache=null;
+	}
 	@Override
 	public void clear() {
 		throw new java.lang.UnsupportedOperationException();
@@ -106,7 +110,13 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 	}
 	private V readValue(Long pos) throws IOException {
 		if(pos!=null){
-			SoftReference<V> valueRef=cache.get(pos);
+			SoftReference<V> valueRef=null;
+			if(cache!=null){
+				objectPoolManager.flushWriteQueues();
+				if(cache!=null){
+					valueRef=cache.get(pos);
+				}
+			}
 			V value=null;
 			if(valueRef!=null){
 				value=valueRef.get();
@@ -150,7 +160,12 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 			
 			long pos = outFile.length();
 			writeValue(pos,value);
-			cache.put(pos, new SoftReference<V>(value));
+			if(cache!=null){
+				objectPoolManager.flushWriteQueues();
+				if(cache!=null){
+					cache.put(pos, new SoftReference<V>(value));
+				}
+			}
 			Long retPos=tree.get((K)key);
 			tree.put(key, pos);
 			return null;

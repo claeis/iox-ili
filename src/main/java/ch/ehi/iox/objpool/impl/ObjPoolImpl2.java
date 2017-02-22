@@ -24,9 +24,11 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 	private RandomAccessFile outFile=null;
 	private java.io.File outFilename=null;
 	private Serializer valueSerializer=null;
-	public ObjPoolImpl2( Serializer valueSerializer1)
+	private ObjectPoolManager objectPoolManager=null;
+	public ObjPoolImpl2( ObjectPoolManager objectPoolManager1, Serializer valueSerializer1)
 	{
 		try{
+			objectPoolManager=objectPoolManager1;
 			valueSerializer=valueSerializer1;
 			tree= new HashMap<K, Long>();
 			outFilename=ObjectPoolManager.getCacheTmpFilename();
@@ -36,7 +38,7 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 		}
 	}
     private static int MAX_CACHE=32;
-    private final LinkedHashMap<Long,SoftReference<V>> cache = new LinkedHashMap<Long,SoftReference<V>>(MAX_CACHE,0.75f,true){
+    private LinkedHashMap<Long,SoftReference<V>> cache = new LinkedHashMap<Long,SoftReference<V>>(MAX_CACHE,0.75f,true){
     	@Override
     	protected boolean removeEldestEntry(Map.Entry<Long, SoftReference<V>> eldest) {
     		if(true){
@@ -68,6 +70,10 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 		}
 			
 	}
+	public void disableCache()
+	{
+		cache=null;
+	}
 
 	@Override
 	public void clear() {
@@ -92,6 +98,9 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 	@Override
 	public V get(Object key) {
 		try {
+			if(cache!=null){
+				objectPoolManager.flushWriteQueues();
+			}
 			Long pos= tree.get((K)key);
 			return readValue(pos);
 		} catch (IOException e) {
@@ -100,7 +109,10 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 	}
 	private V readValue(Long pos) throws IOException {
 		if(pos!=null){
-			SoftReference<V> valueRef=cache.get(pos);
+			SoftReference<V> valueRef=null;
+			if(cache!=null){
+				valueRef=cache.get(pos);
+			}
 			V value=null;
 			if(valueRef!=null){
 				value=valueRef.get();
@@ -135,7 +147,7 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 
 	@Override
 	public Set<K> keySet() {
-		throw new java.lang.UnsupportedOperationException();
+		return tree.keySet();
 	}
 
 	@Override
@@ -144,7 +156,12 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 			
 			long pos = outFile.length();
 			writeValue(pos,value);
-			cache.put(pos, new SoftReference<V>(value));
+			if(cache!=null){
+				objectPoolManager.flushWriteQueues();
+				if(cache!=null){
+					cache.put(pos, new SoftReference<V>(value));
+				}
+			}
 			Long retPos=tree.get((K)key);
 			tree.put(key, pos);
 			return null;
@@ -160,8 +177,7 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 
 	@Override
 	public V remove(Object key) {
-		Long retPos=tree.get((K)key);
-		tree.put((K)key,null);
+		tree.remove(key);
 		return null;
 	}
 

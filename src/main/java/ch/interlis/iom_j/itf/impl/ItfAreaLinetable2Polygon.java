@@ -12,6 +12,7 @@ import java.util.Set;
 
 
 
+
 import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
 import com.vividsolutions.jts.algorithm.locate.SimplePointInAreaLocator;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -34,6 +35,7 @@ import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.ehi.iox.objpool.impl.JavaSerializer;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.CoordType;
@@ -129,7 +131,7 @@ public class ItfAreaLinetable2Polygon {
 	public void addItfLinetableObject(IomObject iomObj)
 	{
 		if(lines==null){
-			lines=objPool.newObjectPool();
+			lines=objPool.newObjectPoolImpl2(new JavaSerializer());
 		}
 		IomObject polyline=iomObj.getattrobj(helperTableGeomAttrName, 0);
 		if(polyline==null){

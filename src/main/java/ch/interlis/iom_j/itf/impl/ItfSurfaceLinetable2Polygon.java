@@ -19,6 +19,7 @@ import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.ehi.iox.objpool.impl.JavaSerializer;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.NumericType;
@@ -141,21 +142,21 @@ public class ItfSurfaceLinetable2Polygon {
 		helperTableMainTableRef=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableMainTableRef(surfaceAttr);
 		helperTableGeomAttrName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableGeomAttrName(surfaceAttr);
 		objPool=new ObjectPoolManager();
-		polygons=objPool.newObjectPool();
+		polygons=objPool.newObjectPoolImpl2(new JavaSerializer());
 	}
 	public ItfSurfaceLinetable2Polygon(String tableRef, String geomAttr)
 	{
 		helperTableMainTableRef=tableRef;
 		helperTableGeomAttrName=geomAttr;
 		objPool=new ObjectPoolManager();
-		polygons=objPool.newObjectPool();
+		polygons=objPool.newObjectPoolImpl2(new JavaSerializer());
 	}
 	public ItfSurfaceLinetable2Polygon(String tableRef, String geomAttr,double maxOverlaps,double accuracy)
 	{
 		helperTableMainTableRef=tableRef;
 		helperTableGeomAttrName=geomAttr;
 		objPool=new ObjectPoolManager();
-		polygons=objPool.newObjectPool();
+		polygons=objPool.newObjectPoolImpl2(new JavaSerializer());
 		this.maxOverlaps=maxOverlaps;
 		if(accuracy>0){
 			newVertexOffset=2*Math.pow(10, -accuracy);
@@ -175,7 +176,7 @@ public class ItfSurfaceLinetable2Polygon {
 	public void addItfLinetableObject(IomObject iomObj)
 	{
 		if(linepool==null){
-			linepool=objPool.newObjectPool();
+			linepool=objPool.newObjectPoolImpl2(new JavaSerializer());
 		}
 		IomObject structvalue=iomObj.getattrobj(helperTableMainTableRef,0);
 		String refoid=structvalue.getobjectrefoid();

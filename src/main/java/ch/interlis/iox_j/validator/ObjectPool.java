@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.xml.ws.Holder;
 
 import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.ehi.iox.objpool.impl.JavaSerializer;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.RoleDef;
@@ -83,7 +84,7 @@ public class ObjectPool {
 		if(collectionOfBaskets.containsKey(currentBasketId)){
 			collectionOfObjects=collectionOfBaskets.get(currentBasketId);
 		} else {
-			collectionOfObjects=objPoolManager.newObjectPool(); // new HashMap<ObjectPoolKey, IomObject>();
+			collectionOfObjects=objPoolManager.newObjectPoolImpl2(new JavaSerializer()); // new HashMap<ObjectPoolKey, IomObject>();
 			collectionOfBaskets.put(currentBasketId, collectionOfObjects);
 		}
 		if(collectionOfObjects.containsKey(key)){
@@ -93,8 +94,8 @@ public class ObjectPool {
 		return null;
 	}
 	
-	public ch.ehi.iox.objpool.impl.ObjPoolImpl getObjectsOfBasketId(String basketId){
-		return (ch.ehi.iox.objpool.impl.ObjPoolImpl)collectionOfBaskets.get(basketId);
+	public ch.ehi.iox.objpool.impl.ObjPoolImpl2 getObjectsOfBasketId(String basketId){
+		return (ch.ehi.iox.objpool.impl.ObjPoolImpl2)collectionOfBaskets.get(basketId);
 	}
 	
 	public Set<String> getBasketIds(){
