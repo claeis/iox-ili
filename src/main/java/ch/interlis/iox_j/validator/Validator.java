@@ -480,6 +480,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
 	private void validateMandatoryConstraint(IomObject iomObj, MandatoryConstraint mandatoryConstraintObj) {
+		Object modelElement=tag2class.get(iomObj.getobjecttag());
+		Viewable aClass = (Viewable) modelElement;
 		Evaluable condition = (Evaluable) mandatoryConstraintObj.getCondition();
 		Value conditionValue = evaluateExpression(iomObj, condition);
 		if (!conditionValue.isNotYetImplemented()){
@@ -487,7 +489,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if (conditionValue.isTrue()){
 					// ok
 				} else {
-					logMsg(checkConstraint,"Mandatory Constraint {0} is not true.", getScopedName(mandatoryConstraintObj));				
+					String msg = aClass.getScopedName(null).toString();
+					msg=validationConfig.getConfigValue(msg, ValidationConfig.MSG);
+					if(!ValidationConfig.MSG.isEmpty()){
+						logMsg(checkConstraint,ValidationConfig.MSG, getScopedName(mandatoryConstraintObj));
+						ValidationConfig.MSG="";
+					} else {
+						logMsg(checkConstraint,"Mandatory Constraint {0} is not true.", getScopedName(mandatoryConstraintObj));
+					}
 				}
 			}
 		} else {
