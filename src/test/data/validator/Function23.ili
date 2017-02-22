@@ -6,13 +6,12 @@ MODEL Function23
 			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
 					    70000.000 .. 310000.000 [INTERLIS.m],
 						ROTATION 2 -> 1;
-			Enumeration = (eins, mehr);																	!! node=mehr
-			Enumeration2 EXTENDS Enumeration = (mehr(vier, fuenf));										!! sub=mehr.vier
-			Enumeration3 = (eins, zwei, drei, vier, fuenf) ORDERED;										!! enum=drei, min=zwei, max=vier
-			Enumeration6 = (eins, zwei, drei, vier, fuenf);												!! (not ordered) enum=zwei, min=eins, max=drei
-			Enumeration4 = (eins(eins, zwei), zwei(eins, zwei, drei), drei(eins, zwei)) ORDERED;		!! enum=2.2, min=1.2, max=3.2
+			Enumeration = (eins, mehr);
+			Enumeration2 EXTENDS Enumeration = (mehr(vier, fuenf));
+			Enumeration3 = (eins, zwei, drei, vier, fuenf) ORDERED;
+			Enumeration6 = (eins, zwei, drei, vier, fuenf);
+			Enumeration4 = (eins(eins, zwei), zwei(eins, zwei, drei), drei(eins, zwei)) ORDERED;
 			
-		!! (len) attr1 vs. attr2		
 		CLASS ClassA1 =
 			attr1: TEXT;
 			attr2: 0..10;
@@ -20,14 +19,12 @@ MODEL Function23
 				(INTERLIS.len (attr1)) == (attr2);
 		END ClassA1;
 		
-		!! (len) String vs. attr2		
 		CLASS ClassA2 =
 			attr2: 0..10;
 			MANDATORY CONSTRAINT
 				(INTERLIS.len ("x"))==attr2;
 		END ClassA2;
 		
-		!! (len) len of attr1 vs. attr2
 		CLASS ClassA3 =
 			attr1: TEXT;
 			attr2: 0..10;
@@ -35,7 +32,6 @@ MODEL Function23
 				INTERLIS.len (INTERLIS.trim (attr1))==attr2;
 		END ClassA3;
 		
-		!! (lenM)
 		CLASS ClassB1 =
 			attr1: MTEXT;
 			attr2: 0..10;
@@ -43,14 +39,12 @@ MODEL Function23
 				(INTERLIS.lenM (attr1)) == (attr2);
 		END ClassB1;
 		
-		!! (lenM)
 		CLASS ClassB2 =
 			attr2: 0..10;
 			MANDATORY CONSTRAINT
 				(INTERLIS.len ("x"))==attr2;
 		END ClassB2;
 		
-		!! (lenM)
 		CLASS ClassB3 =
 			attr1: MTEXT;
 			attr2: 0..10;
@@ -58,7 +52,6 @@ MODEL Function23
 				INTERLIS.len (INTERLIS.trim (attr1))==attr2;
 		END ClassB3;
 		
-		!! (trim)
 		CLASS ClassC1 =
 			attr1: TEXT;
 			attr2: TEXT;
@@ -66,14 +59,12 @@ MODEL Function23
 				(INTERLIS.trim (attr1)) == (attr2);
 		END ClassC1;
 		
-		!! (trim)
 		CLASS ClassC2 =
 			attr2: TEXT;
 			MANDATORY CONSTRAINT
 				(INTERLIS.trim (" abcdefghij "))==attr2;
 		END ClassC2;
 		
-		!! (trim)
 		CLASS ClassC3 =
 			attr1: TEXT;
 			attr2: TEXT;
@@ -81,7 +72,6 @@ MODEL Function23
 				INTERLIS.trim (INTERLIS.trim (attr1))==attr2;
 		END ClassC3;
 		
-		!! (trimM)
 		CLASS ClassD1 =
 			attr1: MTEXT;
 			attr2: MTEXT;
@@ -89,14 +79,12 @@ MODEL Function23
 				(INTERLIS.trimM (attr1)) == (attr2);
 		END ClassD1;
 		
-		!! (trimM)
 		CLASS ClassD2 =
 			attr2: MTEXT;
 			MANDATORY CONSTRAINT
 				(INTERLIS.trimM (" abcdef\\nhij "))==attr2;
 		END ClassD2;
 		
-		!! (trimM)
 		CLASS ClassD3 =
 			attr1: MTEXT;
 			attr2: MTEXT;
@@ -104,7 +92,6 @@ MODEL Function23
 				INTERLIS.trimM (INTERLIS.trimM (attr1))==attr2;
 		END ClassD3;
 		
-		!! (enumeration is sub value)
 		CLASS ClassG =
 			attr1 : Enumeration;
 			attr2 : Enumeration2;
@@ -112,7 +99,6 @@ MODEL Function23
 				INTERLIS.isEnumSubVal (attr2, attr1);
 		END ClassG;
 		
-		!! (enumeration in range)
 		CLASS ClassH =
 			attr01 : Enumeration3;
 			attr02 : Enumeration3;
@@ -121,7 +107,6 @@ MODEL Function23
 				INTERLIS.inEnumRange(attr01, attr02, attr03);
 		END ClassH;
 		
-		!! (enumeration in range) enumerations a stage below the node.
 		CLASS ClassI =
 			attr11 : Enumeration4;
 			attr12 : Enumeration4;
@@ -130,7 +115,6 @@ MODEL Function23
 				INTERLIS.inEnumRange (attr11, attr12, attr13);
 		END ClassI;
 		
-		!! (enumeration in range) other min, max enumeration.
 		CLASS ClassK =
 			attr11 : Enumeration3;
 			attr21 : Enumeration4;
@@ -139,7 +123,6 @@ MODEL Function23
 				INTERLIS.inEnumRange (attr11, attr21, attr31);
 		END ClassK;
 		
-		!! (enumeration in range) not ordered.
 		CLASS ClassL =
 			attr01 : Enumeration6;
 			attr02 : Enumeration6;
@@ -148,7 +131,6 @@ MODEL Function23
 				INTERLIS.inEnumRange (attr01, attr02, attr03);
 		END ClassL;
 		
-		!! (element Count)
 		STRUCTURE StructM =
 		END StructM;
 		
@@ -166,7 +148,6 @@ MODEL Function23
 		   		(INTERLIS.elementCount(attrlist1)) == attr2;
 		END ClassO;
 		
-		!! (object Count ALL)
 		CLASS ClassQ =
 			Art: (a, b, c);
 			SET CONSTRAINT WHERE Art == #a : (INTERLIS.objectCount(ALL)) == 2;
@@ -175,7 +156,6 @@ MODEL Function23
 		CLASS ClassR =
 		END ClassR;
 		
-		!! (object Count role: t1 STAND ALONE Association)
 		CLASS ClassS =
 		END ClassS;
 		
@@ -192,7 +172,6 @@ MODEL Function23
 		   		(INTERLIS.objectCount(t1)) == 2;
 		END;
 		
-		!! (isOfClass)
 		STRUCTURE StructA =
         END StructA;
         
@@ -204,13 +183,11 @@ MODEL Function23
            MANDATORY CONSTRAINT INTERLIS.isOfClass(attrU1[1],>StructAp);
         END ClassU;
         
-        !! (isOfClass with myClass)
         CLASS ClassUA =
            attrU1 : BAG {1..*} OF StructA;
            MANDATORY CONSTRAINT INTERLIS.isOfClass(INTERLIS.myClass(attrU1[1]),>StructAp);
         END ClassUA;
         
-		!! (isOfClass fail)
         STRUCTURE StructB =
         END StructB;
         
@@ -222,73 +199,61 @@ MODEL Function23
            MANDATORY CONSTRAINT INTERLIS.isOfClass(attrV1[1],>StructAp);
         END ClassV;
         
-        !! (isSubClass)
         CLASS ClassW =
            MANDATORY CONSTRAINT INTERLIS.isSubClass(>StructB,>StructBp);
         END ClassW;
         
-        !! (isSubClass with myClass)
         CLASS ClassWA =
        		attrWA1 : BAG {1..*} OF StructB;
            MANDATORY CONSTRAINT INTERLIS.isSubClass(INTERLIS.myClass(attrWA1[1]),>StructBp);
         END ClassWA;
         
-        !! (isSubClass with myClass fail)
         CLASS ClassWB =
        		attrWA1 : BAG {1..*} OF StructA;
            MANDATORY CONSTRAINT INTERLIS.isSubClass(INTERLIS.myClass(attrWA1[1]),>StructBp);
         END ClassWB;
         
-        !! (isSubClass fail)
         CLASS ClassX =
            MANDATORY CONSTRAINT INTERLIS.isSubClass(>StructA,>StructBp);
         END ClassX;
         
-        !! (myClass)
         CLASS ClassY =
            attrY1 : BAG {1..*} OF StructB;
            MANDATORY CONSTRAINT INTERLIS.myClass(attrY1[1]) == >StructBp;
         END ClassY;
         
-        !! (myClass)
         CLASS ClassZ =
            attrZ1 : BAG {1..*} OF StructB;
            MANDATORY CONSTRAINT INTERLIS.myClass(attrZ1[1]) == >StructAp;
         END ClassZ;
         
-        !! (areAreas ALL)
         CLASS ClassZA =
 			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 			Art: (a, b, c);
 			SET CONSTRAINT WHERE Art == #a : INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie);
 		END ClassZA;
 		
-		!! (areAreas class)
         CLASS ClassZB =
 			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZB, UNDEFINED, >> Geometrie);
 		END ClassZB;
 		
-		!! (areAreas second mandatory: wrong class 'ClassZA' in Objects = fail)
         CLASS ClassZD =
 			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZD, UNDEFINED, >> Geometrie);
 			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZA, UNDEFINED, >> Geometrie);
 		END ClassZD;
 		
-		
 		CLASS ClassZZ =
 			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 		END ClassZZ;
 		
-		!! (areAreas first mandatory: object of 'ClassZB' = fail)
         CLASS ClassZE =
 			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZZ, UNDEFINED, >> Geometrie);
 			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZE, UNDEFINED, >> Geometrie);
 		END ClassZE;
         
-        !! (areAreas surfaceBAG = Numbers, surfaceAttr = Surface of struct)
         STRUCTURE StructF =
 			Surface: SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 		END StructF;
@@ -309,10 +274,11 @@ MODEL Function23
 			MANDATORY CONSTRAINT INTERLIS.areAreas(ALL, >> Numbers, >> StructF->Surface);
 		END ClassZG;
 		
-		!! (function notYetImplemented)	
 		CLASS ClassZH =
 			MANDATORY CONSTRAINT
 				INTERLIS.convertUnit(5);
 		END ClassZH;
+		
 	END Topic;
+	
 END Function23.

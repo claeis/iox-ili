@@ -1,7 +1,6 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import ch.ehi.basics.settings.Settings;
@@ -28,15 +27,12 @@ public class AdditionalConstraints23Test {
 	// CLASS
 	private final static String ILI_MANDATORYCONSTRAINT_CLASS=ILI_TOPIC+".ManConClass";
 	private final static String ILI_MANDATORYCONSTRAINT_COORDCLASS=ILI_TOPIC+".ManConClassCoord";
-	private final static String ILI_CLASSZA=ILI_TOPIC+".ClassZA";
 	private final static String ILI_STRUCTC=ILI_TOPIC+".StructC";
 	private final static String ILI_CLASSC=ILI_TOPIC+".ClassC";
-	private final static String ILI_CLASSA=ILI_TOPIC+".ClassA";
 	private final static String ILI_EXISTENCECONSTRAINT_CLASS=ILI_TOPIC+".ExConClass";
 	private final static String ILI_EXISTENCECONSTRAINT_CONDITION=ILI_TOPIC+".ExConCondition";
 	// START BASKET EVENT
 	private final static String BID="b1";
-	private final static String BID2="b2";
 	
 	@Before
 	public void setUp() throws Exception {
@@ -51,8 +47,11 @@ public class AdditionalConstraints23Test {
 	//#########################################################//
 	//######## SUCCESS ADDITIONAL CONSTRAINTS #################//
 	//#########################################################//	
+	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
+	// ein MandatoryConstraint true ergibt.
 	@Test
-	public void mandatoryConstraint_Equalation_Ok(){
+	public void mandatoryConstraintTrue_Ok(){
 		Iom_jObject obj1=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
 		obj1.setattrvalue("attr1", "5");
 		obj1.setattrvalue("attr2", "5");
@@ -71,9 +70,10 @@ public class AdditionalConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (!=), (<>).
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
+	// ein MandatoryConstraint InEqualation true ergibt.
 	@Test
-	public void mandatoryConstraint_InEqualation_Coord_Ok(){
+	public void mandatoryConstraint_InEqualationTrue_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_MANDATORYCONSTRAINT_COORDCLASS, OBJ_OID1);
 		IomObject coordValue3=iomObjA.addattrobj("attr3", "COORD");
 		coordValue3.setattrvalue("C1", "480000.000");
@@ -98,8 +98,10 @@ public class AdditionalConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn Daten in 2 unterschiedlichen VIEW's ausserhalb des Models
+	// in MandatoryConstraints true ergeben.
 	@Test
-	public void mandatoryConstraint_2Models_Ok(){
+	public void mandatoryConstraint_2ModelsBothTrue_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_MANDATORYCONSTRAINT_COORDCLASS, OBJ_OID1);
 		IomObject coordValue3=iomObjA.addattrobj("attr3", "COORD");
 		coordValue3.setattrvalue("C1", "480000.000");
@@ -128,6 +130,8 @@ public class AdditionalConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
+	// ein SetConstraint true ist.
 	@Test
 	public void setConstraint_BagOfStruct_Ok(){
 		Iom_jObject iomObjStruct=new Iom_jObject(ILI_STRUCTC, null);
@@ -152,8 +156,10 @@ public class AdditionalConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}	
 	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
+	// eine existenceContraint true ergibt.
 	@Test
-	public void existenceConstraintInSameModel_Ok() throws Exception{
+	public void existenceConstraintTrue_Ok() throws Exception{
 		Iom_jObject conditionObj=new Iom_jObject(ILI_EXISTENCECONSTRAINT_CONDITION, OBJ_OID1);
 		conditionObj.setattrvalue("superAttr", "lars");
 		Iom_jObject obj1=new Iom_jObject(ILI_EXISTENCECONSTRAINT_CLASS, OBJ_OID2);
@@ -177,6 +183,9 @@ public class AdditionalConstraints23Test {
 	//#########################################################//
 	//########### FAIL ADDITIONAL CONSTRAINTS #################//
 	//#########################################################//
+	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
+	// ein MandatoryConstraint false ergibt.
 	@Test
 	public void mandatoryConstraint_NotEqualation_Fail(){
 		Iom_jObject obj1=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
@@ -198,6 +207,7 @@ public class AdditionalConstraints23Test {
 		assertEquals("Mandatory Constraint AddManConModel.AddManConTopic.AddManConView.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die VIEW ausserhalb des Models nicht gefunden wird.
 	@Test
 	public void mandatoryConstraint_ConfigConstraintModelNameNotExist_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
@@ -219,7 +229,8 @@ public class AdditionalConstraints23Test {
 		assertEquals("required additional model AdditionalConstraints23Zusatz99999999 not found", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (!=), (<>).
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
+	// ein MandatoryConstraint false ergibt.
 	@Test
 	public void mandatoryConstraint_CoordsAreEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_MANDATORYCONSTRAINT_COORDCLASS, OBJ_OID1);
@@ -247,6 +258,8 @@ public class AdditionalConstraints23Test {
 		assertEquals("Mandatory Constraint AddManConCoordModel.AddManConCoordTopic.AddManConCoordView.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in 2 VIEW's ausserhalb des Models
+	// ein MandatoryConstraint aus einer VIEW mit einer Coord Equalation false ergibt.
 	@Test
 	public void mandatoryConstraint_2Models_CoordIsEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_MANDATORYCONSTRAINT_COORDCLASS, OBJ_OID1);
@@ -278,6 +291,8 @@ public class AdditionalConstraints23Test {
 		assertEquals("Mandatory Constraint AddManConCoordModel.AddManConCoordTopic.AddManConCoordView.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
+	// ein SetConstraint false ergibt.
 	@Test
 	public void setConstraint_BagOfStructWrongNumber_Fail(){
 		Iom_jObject iomObjStruct=new Iom_jObject(ILI_STRUCTC, null);
@@ -306,6 +321,7 @@ public class AdditionalConstraints23Test {
 		assertEquals("Set Constraint AdditionalConstraints23Zusatz4.BodenbedeckungZusatz.PrivatGebaeude.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann.
 	@Test
 	public void existenceConstraint_AttrsNotEqual_Fail() throws Exception{
 		Iom_jObject conditionObj=new Iom_jObject(ILI_EXISTENCECONSTRAINT_CONDITION, OBJ_OID1);

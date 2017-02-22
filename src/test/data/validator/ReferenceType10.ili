@@ -1,7 +1,9 @@
 TRANSFER Ili1FmtTest;
 
 MODEL ReferenceType10
+
 	TOPIC TopicA=
+	
 		TABLE ClassA =
 		   attrA1 : OPTIONAL TEXT*10;
 		NO IDENT
@@ -24,6 +26,7 @@ MODEL ReferenceType10
 		END ClassD;
 		
 	END TopicA.
+	
 END ReferenceType10.
 
 FORMAT FREE;

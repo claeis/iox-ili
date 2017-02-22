@@ -1,11 +1,10 @@
 INTERLIS 2.3;
 
 MODEL ExistenceConstraints23
-  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" =
-  IMPORTS ExistenceConstraints23Condition;
-	TOPIC Topic= DEPENDS ON ExistenceConstraints23Condition.Topic;
+	AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" =
+	IMPORTS ExistenceConstraints23Condition;
 	
-		!! CONDITIONCLASSES !!
+	TOPIC Topic= DEPENDS ON ExistenceConstraints23Condition.Topic;
 		
 		CLASS ConditionClass =
 			attr1 : TEXT*10;
@@ -17,8 +16,6 @@ MODEL ExistenceConstraints23
 		
 		CLASS ConditionClassX EXTENDS ConditionClass =
 		END ConditionClassX;
-		
-		!! CLASSES !!
 		
 		CLASS ClassA =
 			attr5 : TEXT*10;
@@ -49,5 +46,7 @@ MODEL ExistenceConstraints23
 			!!attr3 : TEXT*20;
 			EXISTENCE CONSTRAINT attr1 REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClassStructure : attr1;
 		END ClassStructureOtherModel;
+		
 	END Topic;
+	
 END ExistenceConstraints23.

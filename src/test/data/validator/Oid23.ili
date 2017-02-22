@@ -2,6 +2,7 @@ INTERLIS 2.3;
 
 MODEL Oid23
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-16" =
+	
 	TOPIC Topic=
 	
 		STRUCTURE StructA =
@@ -39,4 +40,5 @@ MODEL Oid23
 		END bc4;
 		
 	END Topic;
+	
 END Oid23.

@@ -120,11 +120,9 @@ MODEL Association23
 		  ad3 -- {0..1} ClassA OR ClassD;
 		  bd3 -- {0..*} ClassB OR ClassD;
 		END abd3;
-		
 	END Topic;
 
 	TOPIC TopicB=
-		
 		CLASS ClassE =
 		   attrE1 : TEXT*10;
 		END ClassE;
@@ -150,7 +148,5 @@ MODEL Association23
 		  e1 (EXTERNAL) -- {1..*} ClassE;
 		  f1 (EXTERNAL) -- {1..*} ClassF;
 		END ef1;
-		
 	END TopicB;
-
 END Association23.

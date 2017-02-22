@@ -1,16 +1,13 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
-import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox_j.EndBasketEvent;
@@ -23,59 +20,59 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 public class MandatoryConstraints23 {
 	private TransferDescription td=null;
 	// OID
-	private final static String OBJ_OID1 ="o1";
+	private final static String OID ="o1";
 	// MODEL.TOPIC
-	private final static String ILI_TOPIC="MandatoryConstraints23.Topic";
+	private final static String TOPIC="MandatoryConstraints23.Topic";
 	// CONSTANT SUCCESS
-	private final static String ILI_CLASSCONSTANTA=ILI_TOPIC+".ClassConstantA";
-	private final static String ILI_CLASSCONSTANTB=ILI_TOPIC+".ClassConstantB";
-	private final static String ILI_CLASSCONSTANTD=ILI_TOPIC+".ClassConstantD";
-	private final static String ILI_CLASSCONSTANTE=ILI_TOPIC+".ClassConstantE";
-	private final static String ILI_CLASSCONSTANTF=ILI_TOPIC+".ClassConstantF";
-	private final static String ILI_CLASSCONSTANTG=ILI_TOPIC+".ClassConstantG";
+	private final static String ILI_CLASSCONSTANTA=TOPIC+".ClassConstantA";
+	private final static String ILI_CLASSCONSTANTB=TOPIC+".ClassConstantB";
+	private final static String ILI_CLASSCONSTANTD=TOPIC+".ClassConstantD";
+	private final static String ILI_CLASSCONSTANTE=TOPIC+".ClassConstantE";
+	private final static String ILI_CLASSCONSTANTF=TOPIC+".ClassConstantF";
+	private final static String ILI_CLASSCONSTANTG=TOPIC+".ClassConstantG";
 	// ATTRIBUTES EQUALATION (==) SUCCESS AND FAIL
-	private final static String ILI_CLASSEQUALATIONA=ILI_TOPIC+".ClassEqualationA";
-	private final static String ILI_CLASSEQUALATIONB=ILI_TOPIC+".ClassEqualationB";
-	private final static String ILI_CLASSEQUALATIONC=ILI_TOPIC+".ClassEqualationC";
-	private final static String ILI_CLASSEQUALATIOND=ILI_TOPIC+".ClassEqualationD";
-	private final static String ILI_CLASSEQUALATIONE=ILI_TOPIC+".ClassEqualationE";
-	private final static String ILI_CLASSEQUALATIONF=ILI_TOPIC+".ClassEqualationF";
-	private final static String ILI_CLASSEQUALATIONG=ILI_TOPIC+".ClassEqualationG";
-	private final static String ILI_CLASSEQUALATIONH=ILI_TOPIC+".ClassEqualationH";
-	private final static String ILI_CLASSEQUALATIONI=ILI_TOPIC+".ClassEqualationI";
+	private final static String ILI_CLASSEQUALATIONA=TOPIC+".ClassEqualationA";
+	private final static String ILI_CLASSEQUALATIONB=TOPIC+".ClassEqualationB";
+	private final static String ILI_CLASSEQUALATIONC=TOPIC+".ClassEqualationC";
+	private final static String ILI_CLASSEQUALATIOND=TOPIC+".ClassEqualationD";
+	private final static String ILI_CLASSEQUALATIONE=TOPIC+".ClassEqualationE";
+	private final static String ILI_CLASSEQUALATIONF=TOPIC+".ClassEqualationF";
+	private final static String ILI_CLASSEQUALATIONG=TOPIC+".ClassEqualationG";
+	private final static String ILI_CLASSEQUALATIONH=TOPIC+".ClassEqualationH";
+	private final static String ILI_CLASSEQUALATIONI=TOPIC+".ClassEqualationI";
 	// ATTRIBUTES INEQUALATION (!=), (<>) SUCCESS AND FAIL
-	private final static String ILI_CLASSINEQUALATIONA=ILI_TOPIC+".ClassInEqualationA";
-	private final static String ILI_CLASSINEQUALATIONB=ILI_TOPIC+".ClassInEqualationB";
-	private final static String ILI_CLASSINEQUALATIONC=ILI_TOPIC+".ClassInEqualationC";
-	private final static String ILI_CLASSINEQUALATIOND=ILI_TOPIC+".ClassInEqualationD";
-	private final static String ILI_CLASSINEQUALATIONE=ILI_TOPIC+".ClassInEqualationE";
-	private final static String ILI_CLASSINEQUALATIONF=ILI_TOPIC+".ClassInEqualationF";
-	private final static String ILI_CLASSINEQUALATIONG=ILI_TOPIC+".ClassInEqualationG";
-	private final static String ILI_CLASSINEQUALATIONH=ILI_TOPIC+".ClassInEqualationH";
-	private final static String ILI_CLASSINEQUALATIONI=ILI_TOPIC+".ClassInEqualationI";
+	private final static String ILI_CLASSINEQUALATIONA=TOPIC+".ClassInEqualationA";
+	private final static String ILI_CLASSINEQUALATIONB=TOPIC+".ClassInEqualationB";
+	private final static String ILI_CLASSINEQUALATIONC=TOPIC+".ClassInEqualationC";
+	private final static String ILI_CLASSINEQUALATIOND=TOPIC+".ClassInEqualationD";
+	private final static String ILI_CLASSINEQUALATIONE=TOPIC+".ClassInEqualationE";
+	private final static String ILI_CLASSINEQUALATIONF=TOPIC+".ClassInEqualationF";
+	private final static String ILI_CLASSINEQUALATIONG=TOPIC+".ClassInEqualationG";
+	private final static String ILI_CLASSINEQUALATIONH=TOPIC+".ClassInEqualationH";
+	private final static String ILI_CLASSINEQUALATIONI=TOPIC+".ClassInEqualationI";
 	// ATTRIBUTES GREATER THAN (>) SUCCESS AND FAIL
-	private final static String ILI_CLASSGREATERTHANA=ILI_TOPIC+".ClassGreaterThanA";
-	private final static String ILI_CLASSGREATERTHANB=ILI_TOPIC+".ClassGreaterThanB";
-	private final static String ILI_CLASSGREATERTHANC=ILI_TOPIC+".ClassGreaterThanC";
+	private final static String ILI_CLASSGREATERTHANA=TOPIC+".ClassGreaterThanA";
+	private final static String ILI_CLASSGREATERTHANB=TOPIC+".ClassGreaterThanB";
+	private final static String ILI_CLASSGREATERTHANC=TOPIC+".ClassGreaterThanC";
 	// ATTRIBUTES SMALLER THAN (<) SUCCESS AND FAIL
-	private final static String ILI_CLASSLESSTHANA=ILI_TOPIC+".ClassLessThanA";
-	private final static String ILI_CLASSLESSTHANB=ILI_TOPIC+".ClassLessThanB";
-	private final static String ILI_CLASSLESSTHANC=ILI_TOPIC+".ClassLessThanC";
+	private final static String ILI_CLASSLESSTHANA=TOPIC+".ClassLessThanA";
+	private final static String ILI_CLASSLESSTHANB=TOPIC+".ClassLessThanB";
+	private final static String ILI_CLASSLESSTHANC=TOPIC+".ClassLessThanC";
 	// ATTRIBUTES GREATER OR EQUAL THAN (>=) SUCCESS AND FAIL
-	private final static String ILI_CLASSGREATERTHANOREQUALA=ILI_TOPIC+".ClassGreaterThanOrEqualA";
-	private final static String ILI_CLASSGREATERTHANOREQUALB=ILI_TOPIC+".ClassGreaterThanOrEqualB";
-	private final static String ILI_CLASSGREATERTHANOREQUALC=ILI_TOPIC+".ClassGreaterThanOrEqualC";
+	private final static String ILI_CLASSGREATERTHANOREQUALA=TOPIC+".ClassGreaterThanOrEqualA";
+	private final static String ILI_CLASSGREATERTHANOREQUALB=TOPIC+".ClassGreaterThanOrEqualB";
+	private final static String ILI_CLASSGREATERTHANOREQUALC=TOPIC+".ClassGreaterThanOrEqualC";
 	// ATTRIBUTES GREATER OR EQUAL THAN (<=) SUCCESS AND FAIL
-	private final static String ILI_CLASSLESSTHANOREQUALA=ILI_TOPIC+".ClassLessThanOrEqualA";
-	private final static String ILI_CLASSLESSTHANOREQUALB=ILI_TOPIC+".ClassLessThanOrEqualB";
-	private final static String ILI_CLASSLESSTHANOREQUALC=ILI_TOPIC+".ClassLessThanOrEqualC";
+	private final static String ILI_CLASSLESSTHANOREQUALA=TOPIC+".ClassLessThanOrEqualA";
+	private final static String ILI_CLASSLESSTHANOREQUALB=TOPIC+".ClassLessThanOrEqualB";
+	private final static String ILI_CLASSLESSTHANOREQUALC=TOPIC+".ClassLessThanOrEqualC";
 	// ATTRIBUTES GREATER OR EQUAL THAN (<=) SUCCESS AND FAIL
-	private final static String ILI_CLASSDEFINEDA=ILI_TOPIC+".ClassDefinedA";
-	private final static String ILI_CLASSDEFINEDB=ILI_TOPIC+".ClassDefinedB";
+	private final static String ILI_CLASSDEFINEDA=TOPIC+".ClassDefinedA";
+	private final static String ILI_CLASSDEFINEDB=TOPIC+".ClassDefinedB";
 	// ATTRIBUTES FORMATTED TYPE EQUAL (==) SUCCESS AND FAIL
-	private final static String ILI_CLASSFORMATTEDTYPEA=ILI_TOPIC+".ClassFormattedTypeA";
+	private final static String ILI_CLASSFORMATTEDTYPEA=TOPIC+".ClassFormattedTypeA";
 	// START BASKET EVENT
-	private final static String START_BASKET_EVENT="b1";
+	private final static String BID="b1";
 	
 	@Before
 	public void setUp() throws Exception {
@@ -90,17 +87,18 @@ public class MandatoryConstraints23 {
 	//#########################################################//
 	//######## SUCCESS MANDATORY CONSTRAINTS ##################//
 	//#########################################################//	
-	// test with simple constant
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn eine Konstante auf true gesetzt wird.
 	@Test
-	public void mandatoryConstraintConstantTrueOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTA, OBJ_OID1);
+	public void constantTrue_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTA, OID);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -108,17 +106,17 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in negation (NOT)
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn eine Konstante true ergibt oder not false ist.
 	@Test
-	public void mandatoryConstraintConstantNegationOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTB, OBJ_OID1);
+	public void constantNegation_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTB, OID);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -126,17 +124,17 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in defined
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn eine Konstante definiert ist.
 	@Test
-	public void mandatoryConstraintConstantDefinedOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTD, OBJ_OID1);
+	public void constantDefined_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTD, OID);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -144,17 +142,17 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in conjunction (AND)
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn alle Konstanten die mit AND verbunden sind, true ergeben.
 	@Test
-	public void mandatoryConstraintConstantANDOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTE, OBJ_OID1);
+	public void constantAND_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTE, OID);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -162,17 +160,17 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in disjunction (OR)
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn alle Konstanten welche mit OR verbunden sind, true ergeben.
 	@Test
-	public void mandatoryConstraintConstantOROk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTF, OBJ_OID1);
+	public void constantOR_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTF, OID);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -180,17 +178,17 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in equal (==).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Konstante in einem Vergleich zu einer anderen Konstante true ergibt.
 	@Test
-	public void mandatoryConstraintConstantEqualOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTG, OBJ_OID1);
+	public void constantEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTG, OID);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -198,10 +196,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in equal (==)
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2 Attribute von boolean in einem Vergleich true sind.
 	@Test
-	public void mandatoryConstraintEqualationBooleanOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OBJ_OID1);
+	public void booleanEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "true");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -210,7 +208,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -218,11 +216,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	
-	// test in equal (==).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn diese 2 Strings in einem Vergleich übereinstimmen.
 	@Test
-	public void mandatoryConstraintEqualationTextOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONG, OBJ_OID1);
+	public void textEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONG, OID);
 		iomObjA.setattrvalue("attr1", "Bernhard");
 		iomObjA.setattrvalue("attr2", "Bernhard");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -231,7 +228,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -239,10 +236,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// test in equal (==).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2 Numerischen Werte übereinstimmen.
 	@Test
-	public void mandatoryConstraintEqualationNumericOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OBJ_OID1);
+	public void numericEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -251,7 +248,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -259,10 +256,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in equal (==).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn diese Aufzählungen miteinander übereinstimmen.
 	@Test
-	public void mandatoryConstraintEnumerationEqualityOk(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSEQUALATIONH, OBJ_OID1);
+	public void enumerationEquality_Ok(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSEQUALATIONH, OID);
 		objValue.setattrvalue("aufzaehlung1", "null");
 		objValue.setattrvalue("aufzaehlung2", "null");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -271,7 +268,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -279,10 +276,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in equal (==).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählungen mit der Unter-Hierarchie übereinstimmen.
 	@Test
-	public void mandatoryConstraintEnumerationEqualitySubValueOk(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSEQUALATIONH, OBJ_OID1);
+	public void subEnumerationEqual_Ok(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSEQUALATIONH, OID);
 		objValue.setattrvalue("aufzaehlung1", "mehr.vier");
 		objValue.setattrvalue("aufzaehlung2", "mehr.vier");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -291,7 +288,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -299,11 +296,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	
-	// test in equal (==)
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Koordinaten übereinstimmen.
 	@Test
-	public void mandatoryConstraintEqualityCoordTypeOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONE, OBJ_OID1);
+	public void coordsEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONE, OID);
 		IomObject coordValue=iomObjA.addattrobj("attr1", "COORD");
 		coordValue.setattrvalue("C1", "480000.000");
 		coordValue.setattrvalue("C2", "70000.000");
@@ -322,7 +318,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -330,10 +326,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in equal (==)
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polylines nur aus Geraden übereinstimmen.
 	@Test
-	public void mandatoryConstraintEqualityPolylineTypeStraights2dOk(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIOND, OBJ_OID1);
+	public void polylines2dStrainghtsEqual_Ok(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIOND, OID);
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
 		IomObject coordStart=segments.addattrobj("segment", "COORD");
@@ -356,7 +352,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -364,10 +360,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in equal (==)
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2 3d Polylines aus Geraden und Kurven übereinstimmen.
 	@Test
-	public void mandatoryConstraintEqualityPolylineTypeSTRAIGHTSARCS3DOk(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIONA, OBJ_OID1);
+	public void polylines3dStraightsArcs_Ok(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIONA, OID);
 		// line 1
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -408,7 +404,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -416,10 +412,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in equal (==)
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Oberflächen übereinstimmen.
 	@Test
-	public void mandatoryConstraintEqualitySurfaceTwice2DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONB, OBJ_OID1);
+	public void surface2dEqual_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONB, OID);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -492,7 +488,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -503,7 +499,7 @@ public class MandatoryConstraints23 {
 	// test in equal (==)
 	@Test
 	public void mandatoryConstraintEqualityAreaTwice2DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONC, OBJ_OID1);
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONC, OID);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -576,7 +572,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -584,10 +580,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (!=), (<>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Texte ungleich sind.
 	@Test
-	public void mandatoryConstraintInEqualationTextOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONA, OBJ_OID1);
+	public void textInEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONA, OID);
 		iomObjA.setattrvalue("attr1", "Bernhard");
 		iomObjA.setattrvalue("attr2", "Hannes");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -596,7 +592,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -604,10 +600,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// test in (!=), (<>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummern ungleich sind.
 	@Test
-	public void mandatoryConstraintInEqualationNumericOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OBJ_OID1);
+	public void numericInEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OID);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "10");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -616,7 +612,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -624,10 +620,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (!=), (<>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzählungen ungleich sind.
 	@Test
-	public void mandatoryConstraintInEqualationEnumerationOk(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OBJ_OID1);
+	public void enumerationInEqual_Ok(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID);
 		objValue.setattrvalue("aufzaehlung1", "null");
 		objValue.setattrvalue("aufzaehlung2", "eins");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -636,7 +632,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -644,10 +640,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (!=), (<>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählungen mit der Unter-Hierarchy ungleich sind.
 	@Test
-	public void mandatoryConstraintInEqualationEnumerationSubValueOk(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OBJ_OID1);
+	public void enumerationSubInEqual_Ok(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID);
 		objValue.setattrvalue("aufzaehlung1", "mehr.vier");
 		objValue.setattrvalue("aufzaehlung2", "drei");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -656,7 +652,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -664,11 +660,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	
-	// test in (!=), (<>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Coords ungleich sind.
 	@Test
-	public void mandatoryConstraintInEqualationCoordTypeOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIOND, OBJ_OID1);
+	public void coordsUnEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIOND, OID);
 		IomObject coordValue=iomObjA.addattrobj("attr1", "COORD");
 		coordValue.setattrvalue("C1", "480000.000");
 		coordValue.setattrvalue("C2", "70000.000");
@@ -687,17 +682,18 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	// test in (!=), (<>).
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polylines aus Geraden ungleich zu einander sind.
 	@Test
-	public void mandatoryConstraintInEqualationPolylineTypeStraights2dOk(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONE, OBJ_OID1);
+	public void polylines2dStraights_Ok(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONE, OID);
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
 		IomObject coordStart=segments.addattrobj("segment", "COORD");
@@ -720,17 +716,18 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	// test in (!=), (<>).
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Polylines 3d mit Geraden und Kurven ungleich sind.
 	@Test
-	public void mandatoryConstraintInEqualationPolylineTypeSTRAIGHTSARCS3DOk(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONF, OBJ_OID1);
+	public void polylines3dStraightsArcsInEqual_Ok(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONF, OID);
 		// line 1
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -771,17 +768,18 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	// test in (!=), (<>).
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Oberflächen in 2d ungleich zu einander stehen.
 	@Test
-	public void mandatoryConstraintInEqualationSurface2DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONG, OBJ_OID1);
+	public void surface2dInEqual_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONG, OID);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -850,17 +848,18 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	// test in (!=), (<>).
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Areas in 2d ungleich sind.
 	@Test
-	public void mandatoryConstraintInEqualationArea2DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONH, OBJ_OID1);
+	public void area2dInEqual_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONH, OID);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -929,7 +928,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -937,10 +936,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in attr boolean
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Booleans ungleich sind.
 	@Test
-	public void mandatoryConstraintInEqualationBooleanOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONI, OBJ_OID1);
+	public void booleanInEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONI, OID);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -949,7 +948,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -957,10 +956,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummer aus attr1 grösser als die Nummer aus attr2 ist.
 	@Test
-	public void mandatoryConstraintGreaterThanNumericOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OBJ_OID1);
+	public void numericGreaterThan_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -969,7 +968,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -977,10 +976,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung grösser als die zweite Aufzählung ist.
 	@Test
-	public void mandatoryConstraintGreaterThanEnumerationOk(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OBJ_OID1);
+	public void enumerationGreaterThan_Ok(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OID);
 		objValue.setattrvalue("aufzaehlung1", "eins");
 		objValue.setattrvalue("aufzaehlung2", "null");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -989,7 +988,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -997,10 +996,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 grösser als attr2 ist.
 	@Test
-	public void mandatoryConstraintGreaterThanTextOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OBJ_OID1);
+	public void textGreaterThan_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OID);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaaa");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1009,7 +1008,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1017,10 +1016,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (<).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 kleiner als attr2 in Numerischen Zahlen ist.
 	@Test
-	public void mandatoryConstraintLessThanNumericOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OBJ_OID1);
+	public void numericLessThan_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OID);
 		iomObjA.setattrvalue("attr1", "4");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1029,7 +1028,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1037,10 +1036,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (<).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 kleiner als die Aufzählung2 ist.
 	@Test
-	public void mandatoryConstraintLessThanEnumerationOk(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OBJ_OID1);
+	public void enumerationLessThan_Ok(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OID);
 		objValue.setattrvalue("aufzaehlung1", "eins");
 		objValue.setattrvalue("aufzaehlung2", "drei");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1049,7 +1048,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1057,10 +1056,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (<).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 kleiner als attr2 ist.
 	@Test
-	public void mandatoryConstraintLessThanTextOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANC, OBJ_OID1);
+	public void textLessTahn_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANC, OID);
 		iomObjA.setattrvalue("attr1", "Aaaaa");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1069,7 +1068,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1077,10 +1076,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (>=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 grösser oder gleich attr2 ist.
 	@Test
-	public void mandatoryConstraintGreaterThanOrEqualNumericOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OBJ_OID1);
+	public void numericGreaterThanOrEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1089,7 +1088,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1097,10 +1096,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (>=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 grösser oder gleich wie attr2 ist.
 	@Test
-	public void mandatoryConstraintGreaterThanOrEqualNumericEqualOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OBJ_OID1);
+	public void numericGreaterOrEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1109,7 +1108,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1117,10 +1116,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (>=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 grösser oder gleich der Aufzählung2 ist.
 	@Test
-	public void mandatoryConstraintGreaterThanOrEqualEnumerationOk(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OBJ_OID1);
+	public void enumerationGreaterOrEqual_Ok(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OID);
 		objValue.setattrvalue("aufzaehlung1", "eins");
 		objValue.setattrvalue("aufzaehlung2", "null");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1129,7 +1128,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1137,10 +1136,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (>=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 grösser oder gleich der Aufzählung2 ist. 
 	@Test
-	public void mandatoryConstraintGreaterThanOrEqualEnumerationEqualOk(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OBJ_OID1);
+	public void enumerationGreaterOrEqual2_Ok(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OID);
 		objValue.setattrvalue("aufzaehlung1", "null");
 		objValue.setattrvalue("aufzaehlung2", "null");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1149,7 +1148,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1157,10 +1156,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (>=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 grösser oder gleich dem Text aus attr2 ist.
 	@Test
-	public void mandatoryConstraintGreaterThanOrEqualTextOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OBJ_OID1);
+	public void textGreaterOrEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OID);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaaa");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1169,7 +1168,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1177,10 +1176,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (>=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 grösser oder gleich dem Text aus attr2 ist
 	@Test
-	public void mandatoryConstraintGreaterThanOrEqualTextEqualOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OBJ_OID1);
+	public void textGreaterOrEqual2_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OID);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1189,7 +1188,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1197,10 +1196,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (<=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 kleiner oder gleich dem Text aus attr2 ist.
 	@Test
-	public void mandatoryConstraintLessThanOrEqualNumericOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALA, OBJ_OID1);
+	public void textLessThanOrEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALA, OID);
 		iomObjA.setattrvalue("attr1", "4");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1209,7 +1208,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1217,10 +1216,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (<=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 kleiner oder gleich dem Text aus attr2 ist
 	@Test
-	public void mandatoryConstraintLessThanOrEqualNumericEqualOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALA, OBJ_OID1);
+	public void numericLessThanOrEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALA, OID);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1229,7 +1228,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1237,10 +1236,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (<=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 kleiner oder gleich gross der Aufzählung2 ist.
 	@Test
-	public void mandatoryConstraintLessThanOrEqualEnumerationOk(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OBJ_OID1);
+	public void enumerationLessThanOrEqual_Ok(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OID);
 		objValue.setattrvalue("aufzaehlung1", "eins");
 		objValue.setattrvalue("aufzaehlung2", "drei");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1249,7 +1248,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1257,10 +1256,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (<=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 kleiner oder gleich der Aufzählung2 ist.
 	@Test
-	public void mandatoryConstraintLessThanOrEqualEnumerationEqualOk(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OBJ_OID1);
+	public void enumerationLessThanOrEqual2_Ok(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OID);
 		objValue.setattrvalue("aufzaehlung1", "drei");
 		objValue.setattrvalue("aufzaehlung2", "drei");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1269,7 +1268,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1277,10 +1276,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (<=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der erste Text kleiner oder gleich dem zweiten Text ist.
 	@Test
-	public void mandatoryConstraintLessThanOrEqualTextOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALC, OBJ_OID1);
+	public void textLessThanOrEqual2_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALC, OID);
 		iomObjA.setattrvalue("attr1", "Aaaaa");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1289,7 +1288,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1297,10 +1296,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in (<=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der erste Text kleiner oder gleich dem zweiten Text ist.
 	@Test
-	public void mandatoryConstraintLessThanOrEqualTextEqualOk(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALC, OBJ_OID1);
+	public void textLessTahnOrEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALC, OID);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1309,7 +1308,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1317,10 +1316,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}	
 	
-	// test in defined (defined)
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2d Polyline nur mit Geraden definiert wurde.
 	@Test
-	public void mandatoryConstraintDefinedPolylineTypeStraights2dOk(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSDEFINEDA, OBJ_OID1);
+	public void polyline2dStraightsDefined_Ok(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSDEFINEDA, OID);
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs1", "POLYLINE");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1328,7 +1327,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1336,10 +1335,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// test in formattedtype defined (defined)
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der formattedType definiert wurde.
 	@Test
-	public void mandatoryConstraintEqualationFormattedTypeOk(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSFORMATTEDTYPEA, OBJ_OID1);
+	public void formattedTypeDefined_Ok(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSFORMATTEDTYPEA, OID);
 		objStraightsSuccess.setattrvalue("attr1", "2005-12-31T23:59:59.999");
 		objStraightsSuccess.setattrvalue("attr2", "2005-12-31T23:59:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1348,7 +1347,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1356,19 +1355,18 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die verschiedenen Expressions alle stimmen.
 	@Test
-	public void mandatoryConstraintSomeDifferentExpressions_Ok(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_TOPIC+".ClassDiffExpressions", OBJ_OID1);
-		//objStraightsSuccess.setattrvalue("Geometrie_Punkt", "true");
+	public void differentExpressions_Ok(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(TOPIC+".ClassDiffExpressions", OID);
 		objStraightsSuccess.setattrvalue("Geometrie_Polygon", "true");
-		//objStraightsSuccess.setattrvalue("Geometrie_Linie", "true");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1376,9 +1374,10 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn config auf off gestellt wurde und die Booleans nicht übereinstimmen.
 	@Test
-	public void configOFFMandatoryConstraintEqualationBooleanTrue_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OBJ_OID1);
+	public void configOFFbooleanInEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1388,7 +1387,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1400,10 +1399,10 @@ public class MandatoryConstraints23 {
 	//########### FAIL MANDATORY CONSTRAINTS ##################//
 	//#########################################################//
 	
-	// test in equal (==)
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die boolean nicht übereinstimmen.	
 	@Test
-	public void mandatoryConstraintEqualationBooleanFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OBJ_OID1);
+	public void booleanEqual_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1412,7 +1411,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1421,10 +1420,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationI.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in equal (==).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Texte nicht übereinstimmen.
 	@Test
-	public void mandatoryConstraintEqualationTextFail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONG, OBJ_OID1);
+	public void textNotEqual_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONG, OID);
 		iomObjA.setattrvalue("attr1", "Bernhard");
 		iomObjA.setattrvalue("attr2", "Albert");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1433,7 +1432,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1442,10 +1441,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationG.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in equal (==).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummern nicht übereinstimmen.
 	@Test
-	public void mandatoryConstraintEqualationNumericFail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OBJ_OID1);
+	public void numericNotEqual_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1454,7 +1453,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1463,10 +1462,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationF.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in attr boolean
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Coords nicht übereinstimmen.
 	@Test
-	public void mandatoryConstraintEqualationCoordValue4False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONE, OBJ_OID1);
+	public void coordsNotEqual_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONE, OID);
 		IomObject coordValue=iomObjA.addattrobj("attr1", "COORD");
 		coordValue.setattrvalue("C1", "480000.000");
 		coordValue.setattrvalue("C2", "70000.000");
@@ -1485,7 +1484,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1494,9 +1493,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationE.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2d Polylines nicht übereinstimmen.
 	@Test
-	public void mandatoryConstraintEqualationPolyline2dFalse(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIOND, OBJ_OID1);
+	public void polylines2dNotEqual_False(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIOND, OID);
 		// polyline 1
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -1543,7 +1543,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1552,9 +1552,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationD.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 3d Polylines nich übereinstimmen.
 	@Test
-	public void mandatoryConstraintEqualationPolyline2ARCS3DFalse(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIONA, OBJ_OID1);
+	public void polyline3dNotEqual_False(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIONA, OID);
 		// line 1
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -1595,7 +1596,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1604,9 +1605,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2d Oberflächen nicht übereinstimmen.
 	@Test
-	public void mandatoryConstraintEqualation2DSurfaceFalse(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONB, OBJ_OID1);
+	public void polyline2dNotEqual_False(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONB, OID);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -1675,7 +1677,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1684,9 +1686,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2d Areas nicht übereinstimmen.
 	@Test
-	public void mandatoryConstraintEqualationArea2DValueFalse(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONC, OBJ_OID1);
+	public void area2dNotEqual_False(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONC, OID);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -1759,7 +1762,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1768,21 +1771,19 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (!=), (<>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Texte übereinstimmen.
 	@Test
-	public void mandatoryConstraintInEqualationTextFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONA, OBJ_OID1);
+	public void textIsEqual_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONA, OID);
 		iomObjA.setattrvalue("attr1", "Bernhard");
 		iomObjA.setattrvalue("attr2", "Bernhard");
 		ValidationConfig modelConfig=new ValidationConfig();
-//		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassInEqualationA.attr1", ValidationConfig.CHECK,ValidationConfig.OFF);
-//		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassInEqualationA.attr2", ValidationConfig.CHECK,ValidationConfig.OFF);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1791,10 +1792,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// test in (!=), (<>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Texte übereinstimmen.
 	@Test
-	public void unequalNumbersEXP_SameNumbersACT_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OBJ_OID1);
+	public void numberInEqual_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OID);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1803,7 +1804,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1812,10 +1813,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (!=), (<>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzählungen nicht ungleich sind.
 	@Test
-	public void mandatoryConstraintInEqualationEnumerationFalse(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OBJ_OID1);
+	public void enumerationInEqual_False(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID);
 		objValue.setattrvalue("aufzaehlung1", "null");
 		objValue.setattrvalue("aufzaehlung2", "null");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1824,7 +1825,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1833,10 +1834,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (!=), (<>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzählungen mit ihrer Sub-Hierarchie nicht übereinstimmen.
 	@Test
-	public void mandatoryConstraintInEqualationEnumerationSubValueFalse(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OBJ_OID1);
+	public void subEnumerationInEqual_False(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID);
 		objValue.setattrvalue("aufzaehlung1", "mehr.vier");
 		objValue.setattrvalue("aufzaehlung2", "mehr.vier");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1845,7 +1846,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1854,10 +1855,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (!=), (<>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Coords nicht übereinstimmen.
 	@Test
-	public void mandatoryConstraintInEqualationCoordTypeFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIOND, OBJ_OID1);
+	public void coordsInEqual_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIOND, OID);
 		IomObject coordValue=iomObjA.addattrobj("attr1", "COORD");
 		coordValue.setattrvalue("C1", "480000.000");
 		coordValue.setattrvalue("C2", "70000.000");
@@ -1876,7 +1877,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1884,10 +1885,11 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationD.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
-	// test in (!=), (<>).
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polylines nur aus Geraden, nicht übereinstimmen.
 	@Test
-	public void mandatoryConstraintInEqualationPolylineTypeStraights2dFalse(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONE, OBJ_OID1);
+	public void polyline2dStraightsInEqual_False(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONE, OID);
 		// polyline 1
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -1912,7 +1914,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1920,10 +1922,11 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationE.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
-	// test in (!=), (<>).
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 3d Polylines aus Geraden und Kurven nicht übereinstimmen.
 	@Test
-	public void mandatoryConstraintInEqualationPolylineTypeSTRAIGHTSARCS3DFalse(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONF, OBJ_OID1);
+	public void polyline3dStraightsArcsInEqual_False(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONF, OID);
 		// line 1
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -1964,7 +1967,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1972,10 +1975,11 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationF.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
-	// test in (!=), (<>).
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Oberflächen nicht ungleich zueinander sind.
 	@Test
-	public void mandatoryConstraintInEqualationSurface2DFalse(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONG, OBJ_OID1);
+	public void surface2dInEqual_False(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONG, OID);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -2048,7 +2052,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2056,10 +2060,11 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationG.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
-	// test in (!=), (<>).
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Bereiche nicht ungleich sind.
 	@Test
-	public void mandatoryConstraintInEqualationArea2DFalse(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONH, OBJ_OID1);
+	public void area2DInEqual_False(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONH, OID);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -2132,7 +2137,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objSurfaceSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2141,10 +2146,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationH.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in attr boolean
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Booleans nicht ungleich sind.
 	@Test
-	public void mandatoryConstraintInEqualationBooleanFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONI, OBJ_OID1);
+	public void booleanNotInEqual_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONI, OID);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "true");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2153,7 +2158,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2162,10 +2167,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationI.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn das erste Attribute nicht grösser als das Zweite Attribute ist.
 	@Test
-	public void mandatoryConstraintGreaterThanNumericFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OBJ_OID1);
+	public void numericGreaterThan_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2174,7 +2179,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2183,10 +2188,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die attr1 nicht grösser als attr2 ist. 
 	@Test
-	public void mandatoryConstraintGreaterThanNumericEqualFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OBJ_OID1);
+	public void numericNotGreaterThan_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2195,7 +2200,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2204,10 +2209,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 nicht grösser als die Aufzählung2 ist.
 	@Test
-	public void mandatoryConstraintGreaterThanEnumerationFalse(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OBJ_OID1);
+	public void enumerationNotGreaterThan_False(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OID);
 		objValue.setattrvalue("aufzaehlung1", "null");
 		objValue.setattrvalue("aufzaehlung2", "eins");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2216,7 +2221,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2225,10 +2230,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzählungen nicht ungleich sind.
 	@Test
-	public void mandatoryConstraintGreaterThanEnumerationEqualFalse(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OBJ_OID1);
+	public void enumerationInEqual2_False(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OID);
 		objValue.setattrvalue("aufzaehlung1", "null");
 		objValue.setattrvalue("aufzaehlung2", "null");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2237,7 +2242,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2246,10 +2251,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht grösser als attr2 ist.
 	@Test
-	public void mandatoryConstraintGreaterThanTextFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OBJ_OID1);
+	public void textNotGreaterThan_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OID);
 		iomObjA.setattrvalue("attr1", "Aaaaa");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2258,7 +2263,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2267,10 +2272,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (>).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht grösser als attr2 ist.
 	@Test
-	public void mandatoryConstraintGreaterThanTextEqualFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OBJ_OID1);
+	public void textNotGreaterThan2_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OID);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2279,7 +2284,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2288,10 +2293,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (<).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn  die attr1 Nummer nicht kleiner als die attr2 Nummer ist.
 	@Test
-	public void mandatoryConstraintLessThanNumericFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OBJ_OID1);
+	public void numericNotLessThan_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OID);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2300,7 +2305,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2309,10 +2314,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (<).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht kleiner als attr2 ist.
 	@Test
-	public void mandatoryConstraintLessThanNumericEqualFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OBJ_OID1);
+	public void numericNotLess_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OID);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2321,7 +2326,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2330,10 +2335,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (<).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 nicht kleiner als Aufzählung2 ist.
 	@Test
-	public void mandatoryConstraintLessThanEnumerationFalse(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OBJ_OID1);
+	public void enumerationNotLessThan_False(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OID);
 		objValue.setattrvalue("aufzaehlung1", "drei");
 		objValue.setattrvalue("aufzaehlung2", "eins");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2342,7 +2347,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2351,10 +2356,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (<).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 nicht kleiner als die Aufzählung ist.
 	@Test
-	public void mandatoryConstraintLessThanEnumerationEqualFalse(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OBJ_OID1);
+	public void enumeriationsNotLessThan_False(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OID);
 		objValue.setattrvalue("aufzaehlung1", "drei");
 		objValue.setattrvalue("aufzaehlung2", "drei");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2363,7 +2368,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2372,10 +2377,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (<).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 nicht kleiner als attr2 ist.
 	@Test
-	public void mandatoryConstraintLessThanTextFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANC, OBJ_OID1);
+	public void textNotLessThan_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANC, OID);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaaa");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2384,7 +2389,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2393,10 +2398,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (<).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht kleiner als attr2 ist.
 	@Test
-	public void mandatoryConstraintLessThanTextEqualFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANC, OBJ_OID1);
+	public void textLessThan_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANC, OID);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2405,7 +2410,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2414,10 +2419,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (>=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nocht grösser oder gleich attr2 ist.
 	@Test
-	public void mandatoryConstraintGreaterThanOrEqualNumericFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OBJ_OID1);
+	public void numericNotGreaterThanOrEqual_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2426,7 +2431,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2435,10 +2440,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanOrEqualA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (>=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 nicht grösser oder gleich die Aufzählung2 ist.
 	@Test
-	public void mandatoryConstraintGreaterThanOrEqualEnumerationFalse(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OBJ_OID1);
+	public void enumeriationNotGreaterThanOrEqual_False(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OID);
 		objValue.setattrvalue("aufzaehlung1", "null");
 		objValue.setattrvalue("aufzaehlung2", "eins");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2447,7 +2452,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2456,10 +2461,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanOrEqualB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (>=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 nicht grösser oder gleich dem Text aus attr2 ist.
 	@Test
-	public void mandatoryConstraintGreaterThanOrEqualTextFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OBJ_OID1);
+	public void textNotGreaterThanOrEqual_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OID);
 		iomObjA.setattrvalue("attr1", "Aaaaa");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2468,7 +2473,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2477,10 +2482,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanOrEqualC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (<=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummer aus attr1 nicht kleiner der Nummer aus attr2 ist.
 	@Test
-	public void mandatoryConstraintLessThanOrEqualNumericFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALA, OBJ_OID1);
+	public void numericNotLessThan2_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALA, OID);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2489,7 +2494,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2498,10 +2503,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanOrEqualA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (<=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 nicht kleiner oder gleich der Aufzählung2 ist.
 	@Test
-	public void mandatoryConstraintLessThanOrEqualEnumerationFalse(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OBJ_OID1);
+	public void enumerationNotLessThanOrEqual_False(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OID);
 		objValue.setattrvalue("aufzaehlung1", "drei");
 		objValue.setattrvalue("aufzaehlung2", "eins");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2510,7 +2515,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2519,10 +2524,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanOrEqualB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in (<=).
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1, nicht kleiner oder gleich dem Text aus attr2 ist.
 	@Test
-	public void mandatoryConstraintLessThanOrEqualTextFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALC, OBJ_OID1);
+	public void textNotLessThanOrEqual_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALC, OID);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaaa");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2531,7 +2536,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2540,10 +2545,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanOrEqualC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in formattedtype defined (defined)
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der FormattedType aus attr1, dem FormattedType aus attr2 entspricht.
 	@Test
-	public void mandatoryConstraintEqualationFormattedTypeFail(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSFORMATTEDTYPEA, OBJ_OID1);
+	public void formattedTypeInEqualation_Fail(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSFORMATTEDTYPEA, OID);
 		objStraightsSuccess.setattrvalue("attr1", "2005-12-31T23:59:59.999");
 		objStraightsSuccess.setattrvalue("attr2", "2005-12-31T23:59:59.888");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2552,7 +2557,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2561,17 +2566,17 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassFormattedTypeA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// test in undefined (undefined)
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn alle 3 Constraints definierte Attribute enthalten.
 	@Test
-	public void unDefinedAttrEXP_3Con_DefinedAttrACT_Fail(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSDEFINEDB, OBJ_OID1);
+	public void unDefinedAttrs_Fail(){
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSDEFINEDB, OID);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objStraightsSuccess));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2582,9 +2587,10 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassDefinedB.Constraint3 is not true.", logger.getErrs().get(2).getEventMsg());
 	}
 	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn config auf Warning eingestellt ist und die boolean nicht übereinstimmen.
 	@Test
-	public void configWARNINGMandatoryConstraintEqualationBooleanFalse(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OBJ_OID1);
+	public void configWarningON_booleanNotEqual_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2594,7 +2600,7 @@ public class MandatoryConstraints23 {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,START_BASKET_EVENT));
+		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -2602,5 +2608,4 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getWarn().size()==1);
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationI.Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
 	}
-	
 }

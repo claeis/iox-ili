@@ -1,11 +1,13 @@
 INTERLIS 2.3;
 MODEL SetConstraint23
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
+	
 	TOPIC Topic=
-	DOMAIN
-		Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
-					    70000.000 .. 310000.000 [INTERLIS.m],
-						ROTATION 2 -> 1;
+	
+		DOMAIN
+			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+						    70000.000 .. 310000.000 [INTERLIS.m],
+							ROTATION 2 -> 1;
 
 		CLASS ClassA =
 			Art: (a, b, c);
@@ -18,7 +20,6 @@ MODEL SetConstraint23
 			SET CONSTRAINT WHERE Art == #a :
 				INTERLIS.objectCount(ALL) == 5;
 		END ClassB;
-		
 		
 		STRUCTURE StructC =
 		END StructC;
@@ -40,4 +41,5 @@ MODEL SetConstraint23
 		END ClassD;
 		
 	END Topic;
+	
 END SetConstraint23.

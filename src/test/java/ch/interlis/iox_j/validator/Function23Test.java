@@ -110,7 +110,9 @@ public class Function23Test {
 
 	//#########################################################//
 	//######## SUCCESS FUNCTIONS ##############################//
-	//#########################################################//	
+	//#########################################################//
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: len, die Länge stimmt. 
 	@Test
 	public void len_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA1, OBJ_OID1);
@@ -130,6 +132,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: len die länge der Konstanten mit der Länge des Textes übereinstimmt.
 	@Test
 	public void lenWithText_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA2, OBJ_OID1);
@@ -148,6 +151,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenTrim die Länge des Textes stimmt.
 	@Test
 	public void lenTrimAttr1_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA3, OBJ_OID1);
@@ -167,6 +171,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM die Länge des Textes mit einem Zeilenumbruch stimmt.
 	@Test
 	public void lenM_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB1, OBJ_OID1);
@@ -186,6 +191,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM die Länge einer Konstanten mit der Länge des Textes übereinstimmt.
 	@Test
 	public void lenMLenConstant_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB2, OBJ_OID1);
@@ -204,8 +210,9 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenMTrim die Länge mit einem Zeilenumbruch strimmt.
 	@Test
-	public void lenMTrimConstant_Ok(){
+	public void lenMTrim_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB3, OBJ_OID1);
 		iomObjA.setattrvalue(OBJ_ATTR1, "abcdef\nhij");
 		iomObjA.setattrvalue(OBJ_ATTR2, "10");
@@ -223,6 +230,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim die Längen der Texte übereinstimmen.
 	@Test
 	public void trim_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC1, OBJ_OID1);
@@ -242,6 +250,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim die Konstante mit der Länge des Textes übereinstimmt.
 	@Test
 	public void trimConstant_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC2, OBJ_OID1);
@@ -260,6 +269,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim Stimmen die Längen der Texte überein.
 	@Test
 	public void trimTrimAttr1_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC3, OBJ_OID1);
@@ -279,6 +289,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM die Text übereinstimmen.
 	@Test
 	public void trimM_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD1, OBJ_OID1);
@@ -298,6 +309,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM, die Konstante mit dem Text übereinstimmt.
 	@Test
 	public void trimMConstant_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD2, OBJ_OID1);
@@ -316,6 +328,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim, die beiden Texte übereinstimmen.
 	@Test
 	public void trimTrimAttr_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD3, OBJ_OID1);
@@ -335,6 +348,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isEnumSubVal, das Attribute 2 eine Hierarchie-Stufe unter dem Attribute 1 ist.
 	@Test
 	public void isEnumSubVal_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSG, OBJ_OID1);
@@ -354,6 +368,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: inEnumRange das attr2 zwischen attr1 und attr3 sich befindet.
 	@Test
 	public void inEnumRange_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSH, OBJ_OID1);
@@ -374,6 +389,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: inEnumRange das attr2 sich innerhalb von attr1 und attr3 befindet, welche über eine Unter-Hierarchie gehen.
 	@Test
 	public void inEnumRangeSubEnum_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSI, OBJ_OID1);
@@ -394,8 +410,9 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Anzahl der elemente mit dem attr2 übereinstimmen.
 	@Test
-	public void elementCount3_Ok(){
+	public void elementCountTrue_Ok(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
 		Iom_jObject iomObjM2=new Iom_jObject(ILI_STRUCTM, null);
 		Iom_jObject iomObjM3=new Iom_jObject(ILI_STRUCTM, null);
@@ -410,7 +427,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjM));
 		validator.validate(new ObjectEvent(iomObjM2));
 		validator.validate(new ObjectEvent(iomObjM3));
@@ -421,6 +438,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount der Bag mit dem attr2 übereinstimmt.
 	@Test
 	public void elementCount_Ok(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
@@ -433,7 +451,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjM));
 		validator.validate(new ObjectEvent(iomObjN));
 		validator.validate(new EndBasketEvent());
@@ -442,6 +460,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Anzahl der Listen mit der Anzahl von attr2 übereinstimmt.
 	@Test
 	public void elementCount5Lists_Ok(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
@@ -462,7 +481,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjM));
 		validator.validate(new ObjectEvent(iomObjM2));
 		validator.validate(new ObjectEvent(iomObjM3));
@@ -475,6 +494,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Liste mit dem Attribute2 übereinstimmt.
 	@Test
 	public void elementCountList_Ok(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
@@ -487,7 +507,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjM));
 		validator.validate(new ObjectEvent(iomObjO));
 		validator.validate(new EndBasketEvent());
@@ -496,6 +516,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: objectCount All die richtige Menge der Objekte der Klasse, welche gesucht wird, ausgegeben wird.
 	@Test
 	public void objectCountALL_Ok(){
 		Iom_jObject iomObjQ1=new Iom_jObject(ILI_CLASSQ, OBJ_OID1);
@@ -510,7 +531,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjQ1));
 		validator.validate(new ObjectEvent(iomObjQ2));
 		validator.validate(new ObjectEvent(iomObjR1));
@@ -521,6 +542,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass die gesuchte Klasse die Super-Klasse oder eine referenzierte Klasse ist. 
 	@Test
 	public void isOfClassWithRef_Ok(){
 		String objTargetId=OBJ_OID1;
@@ -536,7 +558,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjU));
 		validator.validate(new ObjectEvent(iomObjS1));
 		validator.validate(new EndBasketEvent());
@@ -545,8 +567,9 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass die gesuchte Klasse, mit dem Resultat der Funktion: myClass übereinstimmt.
 	@Test
-	public void isOfClassWithRefAndMyClass_Ok(){
+	public void isOfClassWithRefEqualToMyClass_Ok(){
 		String objTargetId=OBJ_OID1;
 		Iom_jObject iomObjAP=new Iom_jObject(ILI_STRUCTAP, objTargetId);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
@@ -559,7 +582,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjU));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -567,6 +590,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isSubClass die Konstante Klasse eine SubKlasse von ClassW ist.
 	@Test
 	public void isSubClassConstants_Ok(){
 		Iom_jObject iomObjW=new Iom_jObject(ILI_CLASSW, OBJ_OID1);
@@ -576,7 +600,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjW));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -584,6 +608,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: myClass, die KlasseY mit der Gesuchten Klasse übereinstimmt.
 	@Test
 	public void myClass_Ok(){
 		Iom_jObject iomObjS1=new Iom_jObject(ILI_STRUCTB, null);
@@ -595,7 +620,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjU));
 		validator.validate(new ObjectEvent(iomObjS1));
 		validator.validate(new EndBasketEvent());
@@ -604,6 +629,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isSubClass die referenzierte Klasse mit der Klasse der Funktion: myClass übereinstimmt.
 	@Test
 	public void isSubClassWithRefAndMyClass_Ok(){
 		String objTargetId=OBJ_OID1;
@@ -619,7 +645,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjU));
 		validator.validate(new ObjectEvent(iomObjS1));
 		validator.validate(new EndBasketEvent());
@@ -628,6 +654,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: objectCount(Role) die Anzahl der Rollen welche von S zu T referenzieren, 2 ist.
 	@Test
 	public void objectCountRole_Ok(){
 		// erstes S->T
@@ -648,7 +675,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjS1));
 		validator.validate(new ObjectEvent(iomObjS2));
 		validator.validate(new ObjectEvent(iomObjT1));
@@ -661,6 +688,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: areArea die richtige Anzahl der Areas von der Geometrie: AREA stammt.
 	// 2 objects. Objects with Class implementation
 	@Test
 	public void areArea_ObjectsWithClass_Ok(){
@@ -743,6 +771,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}	
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: areArea das Erste Constraint true ist, und das zweite false.
 	// 2 objects == second mandatory: class in Objects = fail
 	@Test
 	public void areArea_EmptyPolygonSet_Ok(){
@@ -825,9 +854,10 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: areArea die Geometrien einer AREA im Argument Objects die angegebene Klasse diese Anforderung erfüllt. 
 	// 2 objects. Objects with Class implementation
 	@Test
-	public void areArea_SetConstraintDefined_Ok(){
+	public void areAreaObjectsOfSpecificClass_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSZA, OBJ_OID1);
 		objSurfaceSuccess.setattrvalue("Art", "c");
 		// Geometrie 1
@@ -907,12 +937,12 @@ public class Function23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
 	//#########################################################//
 	//######## FAIL FUNCTIONS #################################//
 	//#########################################################//
 	
-	
-	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der höheren Hierarchie nicht übereinstimmt.
 	@Test
 	public void isEnumSubVal_MehrVierIsNotSubValOfEins_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSG, OBJ_OID1);
@@ -933,6 +963,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassG.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: inEnumRange, keine Ordnung besteht.
 	@Test
 	public void inEnumRange_EnumerationNotOrdered_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSL, OBJ_OID1);
@@ -954,6 +985,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassL.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: inEnumRange, das ZielAttribute nicht zwischen dem min Attribute und dem max Attribute liegt.
 	@Test
 	public void inEnumRange_EnumWithSubEnumNotBetween_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSI, OBJ_OID1);
@@ -975,6 +1007,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassI.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: inEnumRange die Enumeration verschieden ist.
 	@Test
 	public void inEnumRange_EnumerationsNotSame_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSK, OBJ_OID1);
@@ -996,6 +1029,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassK.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: len, die Anzahl der Zeichen nicht gleich lang sind.
 	@Test
 	public void len_numberOrCharNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA1, OBJ_OID1);
@@ -1016,6 +1050,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassA1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: len, die länge der Strings nicht der Länge des attr2 entspricht.
 	@Test
 	public void len_StringLenthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA2, OBJ_OID1);
@@ -1035,6 +1070,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassA2.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: len die Länge zu lang ist.
 	@Test
 	public void len_TrimLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA3, OBJ_OID1);
@@ -1055,6 +1091,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassA3.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM, die Längen nicht übereinstimmen.
 	@Test
 	public void lenM_lengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB1, OBJ_OID1);
@@ -1075,6 +1112,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassB1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM, die Länge der Konstanten nicht übereinstimmen.
 	@Test
 	public void lenM_ConstantLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB2, OBJ_OID1);
@@ -1094,6 +1132,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassB2.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM, die Länge der attr in der Funktion: trim stehenden länge mit der Länge in attr2 nicht übereinstimmt.
 	@Test
 	public void lenM_TrimLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB3, OBJ_OID1);
@@ -1114,6 +1153,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassB3.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim, die Längen der beiden Strings nicht übereinstimmen.
 	@Test
 	public void trim_LengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC1, OBJ_OID1);
@@ -1134,6 +1174,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassC1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim, die Länge der Konstanten und die Länge von attr2 nicht übereinstimmen.
 	@Test
 	public void trim_ConstantLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC2, OBJ_OID1);
@@ -1153,6 +1194,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassC2.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim, der getrimmte Text: attr1 und der attr2 Text nicht übereinstimmt.
 	@Test
 	public void trim_TrimedTextLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC3, OBJ_OID1);
@@ -1173,6 +1215,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassC3.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM, der getrimmte Text in attr1 nicht mit dem Text in attr2 nicht übereinstimmt.
 	@Test
 	public void trimM_MTrimmedLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD1, OBJ_OID1);
@@ -1193,6 +1236,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassD1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM, die Länge in der Konstante mit der Länge in attr2 nicht übereinstimmt.
 	@Test
 	public void trimM_ConstantLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD2, OBJ_OID1);
@@ -1212,6 +1256,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassD2.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM, die Länge der Texte nicht übereinstimmen.
 	@Test
 	public void trimM_TrimmedLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD3, OBJ_OID1);
@@ -1232,6 +1277,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassD3.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: inEnumRange das ZielAttribute nicht zwischen min und max enum in der Enumeration sich befindet.
 	@Test
 	public void inEnumRange_1IsNotBetween2And4_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSH, OBJ_OID1);
@@ -1253,6 +1299,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassH.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount, der Count des BAG nicht mit dem attr2 übereinstimmt.
 	@Test
 	public void elementCount_CountOfBagNotEqual_Fail(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
@@ -1269,7 +1316,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjM));
 		validator.validate(new ObjectEvent(iomObjM2));
 		validator.validate(new ObjectEvent(iomObjM3));
@@ -1281,6 +1328,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassN.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Anzahl der Listen nicht mit der Value von attr2 übereinstimmt.
 	@Test
 	public void elementCount_ListCountNotEqual_Fail(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
@@ -1301,7 +1349,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjM));
 		validator.validate(new ObjectEvent(iomObjM2));
 		validator.validate(new ObjectEvent(iomObjM3));
@@ -1315,6 +1363,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassO.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: objectCount(All), die Anzahl der Objekte nicht stimmt.
 	@Test
 	public void objectCountALL_ObjectCountNotEqual_Fail(){
 		Iom_jObject iomObjQ1=new Iom_jObject(ILI_CLASSQ, OBJ_OID1);
@@ -1329,7 +1378,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjQ1));
 		validator.validate(new ObjectEvent(iomObjR1));
 		validator.validate(new EndBasketEvent());
@@ -1339,6 +1388,7 @@ public class Function23Test {
 		assertEquals("Set Constraint Function23.Topic.ClassQ.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: objectCount(Role), die Anzahl der Rollen von KlasseS nach KlasseT nicht stimmt.
 	@Test
 	public void objectCountRole_RoleCountNotEqual_Fail(){
 		// erstes S->T
@@ -1353,7 +1403,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjS1));
 		validator.validate(new ObjectEvent(iomObjT1));
 		validator.validate(new ObjectEvent(iomObjST1));
@@ -1364,6 +1414,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassS.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass, die Klasse nicht von der Eltern-Klasse stammt.
 	@Test
 	public void isOfClass_ParentClassNotValid_Fail(){
 		String objTargetId=OBJ_OID1;
@@ -1379,7 +1430,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjV));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
@@ -1389,6 +1440,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassV.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass die referenzierte Klasse, keine gültige Klasse der Eltern-Klasse ist.
 	@Test
 	public void isOfClass_ChildClassNotValid_Fail(){
 		String objTargetId=OBJ_OID1;
@@ -1404,7 +1456,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjV));
 		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
@@ -1415,6 +1467,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassV.Constraint1 is not true.", logger.getErrs().get(1).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isSubClass, die beiden Konstanten Klassen nicht übereinstimmen.
 	@Test
 	public void isSubClassConstants_SubClassNotValid_Fail(){
 		Iom_jObject iomObjW=new Iom_jObject(ILI_CLASSX, OBJ_OID1);
@@ -1424,7 +1477,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjW));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1433,6 +1486,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassX.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: myClass, die myClass auf eine falsche Klasse verweist.
 	@Test
 	public void myClass_WrongClass_Fail(){
 		Iom_jObject iomObjS1=new Iom_jObject(ILI_STRUCTB, null);
@@ -1444,7 +1498,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjU));
 		validator.validate(new ObjectEvent(iomObjS1));
 		validator.validate(new EndBasketEvent());
@@ -1454,6 +1508,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassZ.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass die MyClass über eine falsche Referenz führt.
 	@Test
 	public void isOfClass_MyClassNotValid_Fail(){
 		String objTargetId=OBJ_OID1;
@@ -1469,7 +1524,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,"b1"));
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjU));
 		validator.validate(new ObjectEvent(iomObjS1));
 		validator.validate(new EndBasketEvent());
@@ -1478,6 +1533,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassWB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: areArea, die Linien sich überschneiden.
 	// 2 objects == 2 mandatoryConstraint fails.
 	@Test
 	public void areArea_ObjectsWithClass_IntersectionAreas_Fail(){
@@ -1558,9 +1614,11 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
+		// Intersection Fail taucht auch auf.
 		assertEquals("Mandatory Constraint Function23.Topic.ClassZB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei mehreren Constraints, der Erste Constraint Fehl Schlägt, jedoch der zweite richtig wäre.
 	@Test
 	public void multipleConstraints_firstConstraint_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSZZ, OBJ_OID1);
@@ -1680,6 +1738,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassZE.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: areArea, der referenzierte BAG nicht existiert.
 	// 1 object. Objects=ALL, SurfaceBAG=BAG count, SurfaceAttr=surface of other structure
 	@Test
 	public void areArea_SurfaceBAGAttrNameInExists_Fail(){
@@ -1733,6 +1792,8 @@ public class Function23Test {
 		assertEquals("Attribute Numbers has wrong number of values", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die Funktion noch nicht implementiert wurde.
+	// Die Funktion wurde zwar gefunden, sie ist jedoch nicht implementiert, deshalb der Fehler Function(Name) wurde noch nicht implementiert.
 	@Test
 	public void function_notYetImplemented_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSZH, OBJ_OID1);
@@ -1748,9 +1809,10 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Function is not yet implemented.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Function INTERLIS.convertUnit is not yet implemented.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: areArea, die Anzahl der Objects im ersten Argument nicht mit den Geometrien übereinstimmt.
 	// 2 objects. Objects with Class implementation
 	@Test
 	public void areArea_WrongCount_Fail(){
