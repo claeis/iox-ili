@@ -207,6 +207,54 @@ public class AdditionalConstraints23Test {
 		assertEquals("Mandatory Constraint AddManConModel.AddManConTopic.AddManConView.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
+	// ein MandatoryConstraint false ergibt und validationConfig msg nicht leer ist.
+	@Test
+	public void mandatoryConstraint_NotEqualation_MSGNotEmpty_Fail(){
+		Iom_jObject obj1=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
+		obj1.setattrvalue("attr1", "5");
+		obj1.setattrvalue("attr2", "10");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("AddManConModel.AddManConTopic.AddManConView"+".Constraint1", ValidationConfig.MSG, "This is my own error message!");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConModel;");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("This is my own error message!", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
+	// ein MandatoryConstraint false ergibt und validationConfig msg leer ist.
+	@Test
+	public void mandatoryConstraint_NotEqualation_MSGIsEmpty_Fail(){
+		Iom_jObject obj1=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
+		obj1.setattrvalue("attr1", "5");
+		obj1.setattrvalue("attr2", "10");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("AddManConModel.AddManConTopic.AddManConView"+".Constraint1", ValidationConfig.MSG, "");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConModel;");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Mandatory Constraint AddManConModel.AddManConTopic.AddManConView.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die VIEW ausserhalb des Models nicht gefunden wird.
 	@Test
 	public void mandatoryConstraint_ConfigConstraintModelNameNotExist_False(){

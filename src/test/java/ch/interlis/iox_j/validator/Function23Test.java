@@ -970,7 +970,7 @@ public class Function23Test {
 		iomObjA.setattrvalue(OBJ_ATTR1, "eins");
 		iomObjA.setattrvalue(OBJ_ATTR2, "mehr.vier");
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("Function23.Topic.ClassG", ValidationConfig.MSG, ValidationConfig.MSG="This Function Error is written by my own.");
+		modelConfig.setConfigValue(ILI_CLASSG+".Constraint1", ValidationConfig.MSG, "This Function Error is written by my own.");
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();

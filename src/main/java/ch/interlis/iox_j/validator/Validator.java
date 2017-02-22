@@ -473,15 +473,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if (constraintValue.isTrue()){
 					// ok
 				} else {
-					logMsg(checkConstraint,"Set Constraint {0} is not true.", getScopedName(setConstraintObj));
+					String msg=validationConfig.getConfigValue(getScopedName(setConstraintObj), ValidationConfig.MSG);
+					if(msg!=null && msg.length()>0){
+						logMsg(checkConstraint,msg);
+					} else {
+						logMsg(checkConstraint,"Set Constraint {0} is not true.", getScopedName(setConstraintObj));
+					}
 				}
 			}
 		}
 	}
 	
 	private void validateMandatoryConstraint(IomObject iomObj, MandatoryConstraint mandatoryConstraintObj) {
-		Object modelElement=tag2class.get(iomObj.getobjecttag());
-		Viewable aClass = (Viewable) modelElement;
 		Evaluable condition = (Evaluable) mandatoryConstraintObj.getCondition();
 		Value conditionValue = evaluateExpression(iomObj, condition);
 		if (!conditionValue.isNotYetImplemented()){
@@ -489,11 +492,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if (conditionValue.isTrue()){
 					// ok
 				} else {
-					String msg = aClass.getScopedName(null).toString();
-					msg=validationConfig.getConfigValue(msg, ValidationConfig.MSG);
-					if(!ValidationConfig.MSG.isEmpty()){
-						logMsg(checkConstraint,ValidationConfig.MSG, getScopedName(mandatoryConstraintObj));
-						ValidationConfig.MSG="";
+					String msg=validationConfig.getConfigValue(getScopedName(mandatoryConstraintObj), ValidationConfig.MSG);
+					if(msg!=null && msg.length()>0){
+						logMsg(checkConstraint,msg);
 					} else {
 						logMsg(checkConstraint,"Mandatory Constraint {0} is not true.", getScopedName(mandatoryConstraintObj));
 					}
@@ -1462,7 +1463,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 			if (!valueExists){
-				logMsg(checkConstraint,"The value of the attribute {0} of {1} was not found in the condition class.", restrictedAttrName.toString(), iomObj.getobjecttag().toString());
+				//String msg=validationConfig.getConfigValue(getScopedName(existenceConstraint), ValidationConfig.MSG);
+				String msg=validationConfig.getConfigValue(existenceConstraint.getContainer().getScopedName(null), ValidationConfig.MSG);
+				if(msg!=null && msg.length()>0){
+					logMsg(checkConstraint,msg);
+				} else {
+					logMsg(checkConstraint,"The value of the attribute {0} of {1} was not found in the condition class.", restrictedAttrName.toString(), iomObj.getobjecttag().toString());
+				}
 			}
 		}
 	
@@ -1830,7 +1837,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if (returnValue == null){
 						// ok
 					} else {
-						errs.addEvent(errFact.logErrorMsg("Unique is violated! Values {0} already exist in Object: {1}", returnValue.valuesAsString(), returnValue.getOid()));
+						String msg=validationConfig.getConfigValue(uniqueConstraint.getContainer().getScopedName(null), ValidationConfig.MSG);
+						if(msg!=null && msg.length()>0){
+							logMsg(checkConstraint,msg);
+						} else {
+							logMsg(checkConstraint,"Unique is violated! Values {0} already exist in Object: {1}", returnValue.valuesAsString(), returnValue.getOid());
+						}
 					}
 				}
 			}

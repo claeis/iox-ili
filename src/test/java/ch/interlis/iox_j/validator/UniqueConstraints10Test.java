@@ -174,6 +174,56 @@ public class UniqueConstraints10Test {
 		assertEquals("Unique is violated! Values Anna already exist in Object: o2",logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob der eigens erstellte Fehler ausgegeben wird, wenn beide Values von einem Unique Attribute identisch sind und validationConfig msg nicht leer ist.
+	@Test
+	public void uniqueValueExistsTwice_MSGNotEmpty_Fail(){
+		Iom_jObject objA1=new Iom_jObject(TABLEA, OID1);
+		objA1.setattrvalue("a1", "Anna");
+		Iom_jObject objA2=new Iom_jObject(TABLEA, OID2);
+		objA2.setattrvalue("a1", "Anna");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(TABLEA, ValidationConfig.MSG, "My own Set Constraint.");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(objA1));
+		validator.validate(new ObjectEvent(objA2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("My own Set Constraint.",logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet ob der eigens erstellte Fehler ausgegeben wird, wenn beide Values von einem Unique Attribute identisch sind und validationConfig msg leer ist.
+	@Test
+	public void uniqueValueExistsTwice_MSGIsEmpty_Fail(){
+		Iom_jObject objA1=new Iom_jObject(TABLEA, OID1);
+		objA1.setattrvalue("a1", "Anna");
+		Iom_jObject objA2=new Iom_jObject(TABLEA, OID2);
+		objA2.setattrvalue("a1", "Anna");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(TABLEA, ValidationConfig.MSG, "");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(objA1));
+		validator.validate(new ObjectEvent(objA2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Unique is violated! Values Anna already exist in Object: o2",logger.getErrs().get(0).getEventMsg());
+	}
+	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die Referenz auf ein bereits existierendes unique Attribute verweist.
 	@Test
 	public void refOfUniqueValueExistsTwice_Fail(){

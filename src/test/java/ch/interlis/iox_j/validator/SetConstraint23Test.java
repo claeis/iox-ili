@@ -262,6 +262,48 @@ public class SetConstraint23Test {
 		assertEquals("Set Constraint SetConstraint23.Topic.ClassB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet die eigens erstellte Fehlermeldung ausgegeben wird, wenn der Pre-Constraint true ist und die Funktion: ObjectCount(ALL) false ist und die Config msg nicht leer ist.
+	@Test
+	public void secondConstraintFalse_OwnErrorMessage_Fail(){
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSB, OID1);
+		iomObj.setattrvalue("Art", "a");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ILI_CLASSB+".Constraint1", ValidationConfig.MSG, "My own Set Constraint.");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("My own Set Constraint.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet die eigens erstellte Fehlermeldung ausgegeben wird, wenn der Pre-Constraint true ist und die Funktion: ObjectCount(ALL) false ist und die Config msg definiert, jedoch leer ist.
+	@Test
+	public void secondConstraintFalse_OwnErrorMessageIsEmpty_Fail(){
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSB, OID1);
+		iomObj.setattrvalue("Art", "a");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ILI_CLASSB+".Constraint1", ValidationConfig.MSG, "");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Set Constraint SetConstraint23.Topic.ClassB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
 	// Es wird getestet ein Fehler ausgegeben wird, wenn die Anzahl von objectCount nicht wahr ist.
 	@Test
 	public void secondConstraintWrongCount_Fail(){

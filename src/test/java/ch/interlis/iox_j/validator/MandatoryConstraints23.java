@@ -2616,7 +2616,7 @@ public class MandatoryConstraints23 {
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassEqualationI", ValidationConfig.MSG, ValidationConfig.MSG="This is my own error message!");
+		modelConfig.setConfigValue(ILI_CLASSEQUALATIONI+".Constraint1", ValidationConfig.MSG, "This is my own error message!");
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -2638,7 +2638,7 @@ public class MandatoryConstraints23 {
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassEqualationI", ValidationConfig.MSG, ValidationConfig.MSG="");
+		modelConfig.setConfigValue(ILI_CLASSEQUALATIONI+"Constraint1", ValidationConfig.MSG, "");
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
