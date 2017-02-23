@@ -12,6 +12,12 @@ CONTRACTED MODEL AdditionalConstraints23 AT "mailto:ceis@localhost" VERSION "201
 			enumerationOrdered = (null, eins, zwei, drei, mehr (vier)) ORDERED;
 			attrRef1 = TEXT*12;
 		
+		!! UniquenessConstraints
+		!!CLASS ClassB =
+		!!  attr1 : TEXT*10;
+		!!  attr2 : 0 .. 100;
+		!!END ClassB;
+		
 		!! mandatory constraints
 		CLASS ManConClass =
 			attr1 : 0..10;
@@ -46,6 +52,24 @@ CONTRACTED MODEL AdditionalConstraints23 AT "mailto:ceis@localhost" VERSION "201
 	END Bodenbedeckung;
 END AdditionalConstraints23.
 
+
+!! VIEW Uniqueness Constraint
+CONTRACTED MODEL AddUnConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS AdditionalConstraints23;
+	
+	VIEW TOPIC AddUnConTopic =
+		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+		
+		VIEW AddUnConView
+			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ExConClass;
+			=
+			ALL OF ExConClass;
+			EXISTENCE CONSTRAINT subAttr REQUIRED IN AdditionalConstraints23.Bodenbedeckung.ExConCondition : superAttr;
+		END AddUnConView;
+
+	END AddUnConTopic;
+
+END AddUnConModel.
 
 !! VIEW Existence Constraint
 CONTRACTED MODEL AddExConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
@@ -121,6 +145,18 @@ END AddManConCoordModel.
 !!  END BodenbedeckungZusatz;
 !!END AdditionalConstraints23Zusatz3.
 
+!!CONTRACTED MODEL AdditionalConstraints23Un AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+!!	IMPORTS AdditionalConstraints23;
+!!	VIEW TOPIC BodenbedeckungZusatzUn =
+!!		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+!!		VIEW PrivatGebaeudeUn
+!!			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ClassB;
+!!			=
+!!			ALL OF ClassB;
+!!			UNIQUE attr1, attr2;
+!!		END PrivatGebaeudeUn;
+!!	END BodenbedeckungZusatzUn;
+!!END AdditionalConstraints23Un.
 
 CONTRACTED MODEL AdditionalConstraints23Zusatz4 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
 	IMPORTS AdditionalConstraints23;
