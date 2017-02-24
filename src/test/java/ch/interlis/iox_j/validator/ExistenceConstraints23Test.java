@@ -1111,7 +1111,7 @@ public class ExistenceConstraints23Test {
 		objA.setattrvalue("attr5", "lars");
 		objA.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassA", ValidationConfig.MSG, "My own error message.");
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassA"+".Constraint1", ValidationConfig.MSG, "My own error message.");
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();

@@ -180,6 +180,31 @@ public class AdditionalConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg nicht leer ist.
+	@Test
+	public void uniquenessConstraint_AttrsNotEqual_Ok() throws Exception {
+		Iom_jObject obj1=new Iom_jObject("AdditionalConstraints23.Bodenbedeckung.ClassB", OBJ_OID1);
+		obj1.setattrvalue("attr1", "Ralf");
+		obj1.setattrvalue("attr2", "20");
+		Iom_jObject obj2=new Iom_jObject("AdditionalConstraints23.Bodenbedeckung.ClassB", OBJ_OID2);
+		obj2.setattrvalue("attr1", "Anna");
+		obj2.setattrvalue("attr2", "10");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Un");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(obj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
 	//#########################################################//
 	//########### FAIL ADDITIONAL CONSTRAINTS #################//
 	//#########################################################//
@@ -463,7 +488,7 @@ public class AdditionalConstraints23Test {
 		Iom_jObject obj1=new Iom_jObject(ILI_EXISTENCECONSTRAINT_CLASS, OBJ_OID2);
 		obj1.setattrvalue("subAttr", "Andreas");
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("AddExConModel.AddExConTopic.AddExConView", ValidationConfig.MSG, "This is my own Existence Constraint Error Message.");
+		modelConfig.setConfigValue("AddExConModel.AddExConTopic.AddExConView"+".Constraint1", ValidationConfig.MSG, "This is my own Existence Constraint Error Message.");
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -488,7 +513,7 @@ public class AdditionalConstraints23Test {
 		Iom_jObject obj1=new Iom_jObject(ILI_EXISTENCECONSTRAINT_CLASS, OBJ_OID2);
 		obj1.setattrvalue("subAttr", "Andreas");
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("AddExConModel.AddExConTopic.AddExConView", ValidationConfig.MSG, "");
+		modelConfig.setConfigValue("AddExConModel.AddExConTopic.AddExConView"+".Constraint1", ValidationConfig.MSG, "");
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -506,29 +531,55 @@ public class AdditionalConstraints23Test {
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg nicht leer ist.
-//	@Test
-//	public void uniquenessConstraint_AttrsNotEqual_MSGNotEmpty_Fail() throws Exception{
-//		Iom_jObject obj1=new Iom_jObject("AdditionalConstraints23.Bodenbedeckung.ClassB", OBJ_OID1);
-//		obj1.setattrvalue("attr1", "Ralf");
-//		obj1.setattrvalue("attr2", "20");
-//		Iom_jObject obj2=new Iom_jObject("AdditionalConstraints23.Bodenbedeckung.ClassB", OBJ_OID2);
-//		obj2.setattrvalue("attr1", "Ralf");
-//		obj2.setattrvalue("attr2", "20");
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		modelConfig.setConfigValue("AdditionalConstraints23Un.BodenbedeckungZusatzUn.PrivatGebaeudeUn", ValidationConfig.MSG, "This is my own Uniqueness Constraint Error Message.");
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Un");
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-//		validator.validate(new ObjectEvent(obj1));
-//		validator.validate(new ObjectEvent(obj2));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==1);
-//		assertEquals("This is my own Uniqueness Constraint Error Message.", logger.getErrs().get(0).getEventMsg());
-//	}
+	@Test
+	public void uniquenessConstraint_AttrsNotEqual_Fail() throws Exception {
+		Iom_jObject obj1=new Iom_jObject("AdditionalConstraints23.Bodenbedeckung.ClassB", OBJ_OID1);
+		obj1.setattrvalue("attr1", "Ralf");
+		obj1.setattrvalue("attr2", "20");
+		Iom_jObject obj2=new Iom_jObject("AdditionalConstraints23.Bodenbedeckung.ClassB", OBJ_OID2);
+		obj2.setattrvalue("attr1", "Ralf");
+		obj2.setattrvalue("attr2", "20");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Un");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(obj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg nicht leer ist.
+	@Test
+	public void uniquenessConstraint_AttrsNotEqual_MSGNotEmpty_Fail() throws Exception{
+		Iom_jObject obj1=new Iom_jObject("AdditionalConstraints23.Bodenbedeckung.ClassB", OBJ_OID1);
+		obj1.setattrvalue("attr1", "Ralf");
+		obj1.setattrvalue("attr2", "20");
+		Iom_jObject obj2=new Iom_jObject("AdditionalConstraints23.Bodenbedeckung.ClassB", OBJ_OID2);
+		obj2.setattrvalue("attr1", "Ralf");
+		obj2.setattrvalue("attr2", "20");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("AdditionalConstraints23Un.BodenbedeckungZusatzUn.PrivatGebaeudeUn.Constraint1", ValidationConfig.MSG, "My Error Message.");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Un");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(obj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("My Error Message.", logger.getErrs().get(0).getEventMsg());
+	}
 }

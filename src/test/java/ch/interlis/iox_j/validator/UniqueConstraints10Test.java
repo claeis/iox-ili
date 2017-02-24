@@ -183,7 +183,7 @@ public class UniqueConstraints10Test {
 		objA2.setattrvalue("a1", "Anna");
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(TABLEA, ValidationConfig.MSG, "My own Set Constraint.");
+		modelConfig.setConfigValue(TABLEA+".Constraint1", ValidationConfig.MSG, "My own Set Constraint.");
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -208,7 +208,7 @@ public class UniqueConstraints10Test {
 		objA2.setattrvalue("a1", "Anna");
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(TABLEA, ValidationConfig.MSG, "");
+		modelConfig.setConfigValue(TABLEA+".Constraint1", ValidationConfig.MSG, "");
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
