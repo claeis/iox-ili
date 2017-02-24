@@ -430,35 +430,44 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	private void validateUniquenessConstraint(IomObject iomObj, UniquenessConstraint uniquenessConstraint) {
-		Object modelElement=tag2class.get(iomObj.getobjecttag());
-		Viewable aClass1= (Viewable) modelElement;
-		if(!loggedObjects.contains(uniquenessConstraint)){
-			loggedObjects.add(uniquenessConstraint);
-			errs.addEvent(errFact.logInfoMsg("validate unique constraint {0}...",getScopedName(uniquenessConstraint)));
-		}
-		StringBuilder contentUniqueAttrs = new StringBuilder();
-		ArrayList<String> uniqueConstraintAttrs=new ArrayList<String>();
-		// gets all constraint attribute-names.
-		Iterator iter = uniquenessConstraint.getElements().iteratorAttribute();
-		uniqueConstraintAttrs.add(aClass1.toString());
-		while (iter.hasNext()){
-			ObjectPath object = (ObjectPath)iter.next();
-			uniqueConstraintAttrs.add(object.getLastPathEl().getName());
-			contentUniqueAttrs.append(object.getLastPathEl().getName());
-		}
-//		if (!listOfUniqueObj.contains(uniqueConstraintAttrs)){
-//			listOfUniqueObj.add(uniqueConstraintAttrs);
-//		}
-		AttributeArray returnValue = validateUnique(iomObj,uniqueConstraintAttrs);
-		if (returnValue == null){
-			// ok
-		} else {
-			
-			String msg=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.MSG);
-			if(msg!=null && msg.length()>0){
-				logMsg(checkConstraint,msg);
+		String check = getScopedName(uniquenessConstraint);
+		String checkUniqueConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
+		if(ValidationConfig.OFF.equals(checkUniqueConstraint)){
+			 // skip it
+		}else{
+			Object modelElement=tag2class.get(iomObj.getobjecttag());
+			Viewable aClass1= (Viewable) modelElement;
+			if(!loggedObjects.contains(uniquenessConstraint)){
+				loggedObjects.add(uniquenessConstraint);
+				errs.addEvent(errFact.logInfoMsg("validate unique constraint {0}...",getScopedName(uniquenessConstraint)));
+			}
+			StringBuilder contentUniqueAttrs = new StringBuilder();
+			ArrayList<String> uniqueConstraintAttrs=new ArrayList<String>();
+			// gets all constraint attribute-names.
+			Iterator iter = uniquenessConstraint.getElements().iteratorAttribute();
+			uniqueConstraintAttrs.add(aClass1.toString());
+			while (iter.hasNext()){
+				ObjectPath object = (ObjectPath)iter.next();
+				uniqueConstraintAttrs.add(object.getLastPathEl().getName());
+				contentUniqueAttrs.append(object.getLastPathEl().getName());
+			}
+			if (!listOfUniqueObj.contains(uniqueConstraintAttrs)){
+				listOfUniqueObj.add(uniqueConstraintAttrs);
+			}
+			AttributeArray returnValue = validateUnique(iomObj,uniqueConstraintAttrs);
+			if (returnValue == null){
+				// ok
 			} else {
-				logMsg(checkConstraint,"Unique is violated! Values {0} already exist in Object: {1}", returnValue.valuesAsString(), returnValue.getOid());
+				if(ValidationConfig.WARNING.equals(checkUniqueConstraint)){
+					logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", returnValue.valuesAsString(), returnValue.getOid());
+				} else {
+					String msg=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.MSG);
+					if(msg!=null && msg.length()>0){
+						logMsg(checkConstraint,msg);
+					} else {
+						logMsg(checkConstraint,"Unique is violated! Values {0} already exist in Object: {1}", returnValue.valuesAsString(), returnValue.getOid());
+					}
+				}
 			}
 		}
 	}
