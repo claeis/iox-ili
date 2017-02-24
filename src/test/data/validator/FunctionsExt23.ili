@@ -9,8 +9,19 @@ CONTRACTED MODEL FunctionsExt23
   	FUNCTION superText (text: TEXT; from: NUMERIC; to: NUMERIC): TEXT;
   	FUNCTION noText (text: TEXT; from: NUMERIC; to: NUMERIC): TEXT;
   	
+  	!!@ilivalid.impl.java=ch.interlis.iox_j.validator.ElementCount
+  	FUNCTION elementCount (bag: BAG OF ANYSTRUCTURE): BOOLEAN;
+  	
 	TOPIC Topic=
-
+	
+		STRUCTURE StructA =
+    	END StructA;
+    	
+		CLASS ClassD =
+			attr3 : BAG {0..*} OF StructA;
+			MANDATORY CONSTRAINT elementCount(attr3);
+		END ClassD;
+    	
 		CLASS ClassA =
 			text : TEXT;
 			from : 0..10;
