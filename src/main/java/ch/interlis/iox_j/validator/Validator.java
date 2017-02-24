@@ -95,6 +95,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE_DO="doItfOidPerTable";
+	public static final String CONFIG_CUSTOM_FUNCTIONS="ch.interlis.iox_j.validator.customFunctions";
 	private ObjectPoolManager objPoolManager=null;
 	private ObjectPool objectPool = null;
 	private LinkPool linkPool;
@@ -113,7 +114,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
 	private String checkConstraint=null;
 	private String validateType=null;
-	private HashMap<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
+	private Map<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	private HashMap<Constraint,Viewable> additionalConstraints=new HashMap<Constraint,Viewable>();
 	
 	@Deprecated
@@ -134,6 +135,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		this.config=config;
 		this.pipelinePool=pipelinePool;
 		objPoolManager=new ObjectPoolManager();
+		Map<String,Class> cf=(Map<String, Class>) config.getTransientObject(CONFIG_CUSTOM_FUNCTIONS);
+		if(cf!=null){
+			customFunctions=cf;
+		}
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(config.getValue(CONFIG_DO_ITF_OIDPERTABLE));
 		if(doItfLineTables){
@@ -1162,19 +1167,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				String functionQname=function.getScopedName(null);
 				Class functionTargetClass=customFunctions.get(functionQname);
 				if(functionTargetClass==null){
-					String javaClassname=validationConfig.getConfigValue(functionQname, ValidationConfig.IMPL_JAVA);
-					if(javaClassname==null){
-	 					customFunctions.put(functionQname, null);
-						return Value.createNotYetImplemented();
-					}else{
-						try {
-							functionTargetClass=Class.forName(javaClassname);
-						} catch (ClassNotFoundException e) {
-		 					customFunctions.put(functionQname, null);
-							return Value.createNotYetImplemented();
-						}
-	 					customFunctions.put(functionQname, functionTargetClass);
-					}
+					return Value.createNotYetImplemented();
 				}
 				// get values for all actual arguments
 				FunctionCall functionCall = (FunctionCall) expression;
@@ -1197,9 +1190,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				} catch (IllegalAccessException e) {
 					throw new IllegalStateException(e);
 				}
-				functionTarget.init(td, (FunctionCall)expression,config,validationConfig);
-				functionTarget.addObject(iomObj, actualArguments);
-				return functionTarget.evaluate();
+				functionTarget.init(td,config,validationConfig, objectPool, errFact);
+				return functionTarget.evaluate(iomObj, actualArguments);
 			}
 			//TODO INTERLIS.convertUnit
 			//TODO instance of InspectionFactor

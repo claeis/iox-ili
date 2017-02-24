@@ -2,14 +2,11 @@ INTERLIS 2.3;
 CONTRACTED MODEL FunctionsExt23
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
   
-    !!@ilivalid.impl.java=ch.interlis.iox_j.validator.SubText
   	FUNCTION subText (text: TEXT; from: NUMERIC; to: NUMERIC): TEXT;
   	
-  	!!@ilivalid.impl.java=ch.interlis.iox_j.validator.SuperText
   	FUNCTION superText (text: TEXT; from: NUMERIC; to: NUMERIC): TEXT;
   	FUNCTION noText (text: TEXT; from: NUMERIC; to: NUMERIC): TEXT;
   	
-  	!!@ilivalid.impl.java=ch.interlis.iox_j.validator.ElementCount
   	FUNCTION elementCount (bag: BAG OF ANYSTRUCTURE): BOOLEAN;
   	
 	TOPIC Topic=

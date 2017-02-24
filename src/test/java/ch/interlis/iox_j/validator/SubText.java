@@ -7,27 +7,19 @@ import ch.interlis.ili2c.metamodel.TextType;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxValidationConfig;
+import ch.interlis.iox_j.logging.LogEventFactory;
 import ch.interlis.iox_j.validator.InterlisFunction;
 import ch.interlis.iox_j.validator.Value;
 
 public class SubText implements InterlisFunction {
 
-	private IomObject mainObj;
-	private Value[] actualArguments;
 	
 	@Override
-	public void init(TransferDescription td, FunctionCall func,Settings settings,IoxValidationConfig validationConfig) {
+	public void init(TransferDescription td,Settings settings,IoxValidationConfig validationConfig, ObjectPool objectPool, LogEventFactory logEventFactory) {
 	}
 
 	@Override
-	public void addObject(IomObject mainObj, Value[] actualArguments) {
-		this.setMainObj(mainObj);
-		this.setActualArguments(actualArguments);
-	}
-
-	@Override
-	public Value evaluate() {
-		Value[] args = getActualArguments();
+	public Value evaluate(IomObject mainObj, Value[] args) {
 		if (args[0].skipEvaluation()){
 			return args[0];
 		}
@@ -54,19 +46,10 @@ public class SubText implements InterlisFunction {
 		return new Value(text, subStringValue);
 	}
 
-	private IomObject getMainObj() {
-		return mainObj;
-	}
 
-	private void setMainObj(IomObject mainObj) {
-		this.mainObj = mainObj;
-	}
-
-	private Value[] getActualArguments() {
-		return actualArguments;
-	}
-
-	private void setActualArguments(Value[] actualArguments) {
-		this.actualArguments = actualArguments;
+	@Override
+	public String getQualifiedIliName() {
+		
+		return "FunctionsExt23.subText";
 	}
 }

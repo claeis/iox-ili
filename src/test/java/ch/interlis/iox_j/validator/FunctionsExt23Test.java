@@ -1,6 +1,10 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import ch.ehi.basics.settings.Settings;
@@ -56,6 +60,9 @@ public class FunctionsExt23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+		Map<String,Class> newFunctions=new HashMap<String,Class>();
+		newFunctions.put("FunctionsExt23.subText",SubText.class);
+		settings.setTransientObject(Validator.CONFIG_CUSTOM_FUNCTIONS, newFunctions);
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
@@ -111,6 +118,9 @@ public class FunctionsExt23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+		Map<String,Class> newFunctions=new HashMap<String,Class>();
+		newFunctions.put("FunctionsExt23.subText",SubText.class);
+		settings.setTransientObject(Validator.CONFIG_CUSTOM_FUNCTIONS, newFunctions);
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
