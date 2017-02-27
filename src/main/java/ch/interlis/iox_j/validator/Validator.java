@@ -90,7 +90,6 @@ import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
-	public static final String CONFIG_ADDITIONAL_MODELS="ch.interlis.iox_j.validator.additionalModels";
 	public static final String CONFIG_DO_ITF_LINETABLES="ch.interlis.iox_j.validator.doItfLinetables";
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
@@ -150,9 +149,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
 		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class,objPoolManager);
 		linkPool=new LinkPool();
-		if(config.getValue(CONFIG_ADDITIONAL_MODELS)!=null){
-			String[] additionalModels = config.getValue(CONFIG_ADDITIONAL_MODELS).split(";");
-			iterateThroughAdditionalModels(additionalModels);
+		String additionalModels=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS);
+		if(additionalModels!=null){
+			String[] additionalModelv = additionalModels.split(";");
+			iterateThroughAdditionalModels(additionalModelv);
 	}
 	}
 	/** mappings from xml-tags to Viewable|AttributeDef
@@ -215,7 +215,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(additionalModel==null){
 				continue;
 			}
-			errs.addEvent(errFact.logInfoMsg("iterate through additional model {0}", additionalModel));
+			errs.addEvent(errFact.logInfoMsg("additional model {0}", additionalModel));
 			// models
 			Iterator tdIterator = td.iterator();
 			boolean modelExists=false;
@@ -279,7 +279,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						 // skip it
 					}else{
 						additionalConstraints.put(constraint, classValue);
-						errs.addEvent(errFact.logInfoMsg("collect additional constraint {0}", getScopedName(constraint)));
 					}
 				}
 			}

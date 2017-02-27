@@ -59,7 +59,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConModel;");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddManConModel;");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -73,7 +73,7 @@ public class AdditionalConstraints23Test {
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
 	// ein MandatoryConstraint InEqualation true ergibt.
 	@Test
-	public void mandatoryConstraint_InEqualationTrue_Ok(){
+	public void mandatoryConstraint_InEqualTrue_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_MANDATORYCONSTRAINT_COORDCLASS, OBJ_OID1);
 		IomObject coordValue3=iomObjA.addattrobj("attr3", "COORD");
 		coordValue3.setattrvalue("C1", "480000.000");
@@ -87,7 +87,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConCoordModel");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddManConModel;");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -118,7 +118,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConCoordModel;AddManConModel");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddManConCoordModel;AddManConModel;");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -143,7 +143,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz4");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz4;");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -168,7 +168,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddExConModel");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddExConModel;");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -193,7 +193,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Un");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalConstraints23Un");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -212,7 +212,7 @@ public class AdditionalConstraints23Test {
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
 	// ein MandatoryConstraint false ergibt.
 	@Test
-	public void mandatoryConstraint_NotEqualation_Fail(){
+	public void mandatoryConstraint_NotEqual_Fail(){
 		Iom_jObject obj1=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
 		obj1.setattrvalue("attr1", "5");
 		obj1.setattrvalue("attr2", "10");
@@ -220,7 +220,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConModel;");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddManConModel;");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -235,7 +235,7 @@ public class AdditionalConstraints23Test {
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
 	// ein MandatoryConstraint false ergibt und validationConfig msg nicht leer ist.
 	@Test
-	public void mandatoryConstraint_NotEqualation_MSGNotEmpty_Fail(){
+	public void mandatoryConstraint_NotEqual_MSGNotEmpty_Fail(){
 		Iom_jObject obj1=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
 		obj1.setattrvalue("attr1", "5");
 		obj1.setattrvalue("attr2", "10");
@@ -244,7 +244,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConModel;");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddManConModel");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -259,7 +259,7 @@ public class AdditionalConstraints23Test {
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
 	// ein MandatoryConstraint false ergibt und validationConfig msg leer ist.
 	@Test
-	public void mandatoryConstraint_NotEqualation_MSGIsEmpty_Fail(){
+	public void mandatoryConstraint_NotEqual_MSGIsEmpty_Fail(){
 		Iom_jObject obj1=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
 		obj1.setattrvalue("attr1", "5");
 		obj1.setattrvalue("attr2", "10");
@@ -268,7 +268,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConModel;");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddManConModel");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -290,7 +290,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz99999999");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz99999999");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -319,7 +319,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConCoordModel");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddManConCoordModel");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -351,7 +351,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddManConCoordModel;AddManConModel");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddManConCoordModel;AddManConModel");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -379,7 +379,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz4");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz4");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -410,7 +410,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz4");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz4");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -441,7 +441,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz4");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz4");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -467,7 +467,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddExConModel");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddExConModel");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -492,7 +492,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddExConModel");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddExConModel");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -517,7 +517,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AddExConModel");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddExConModel");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -543,7 +543,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Un");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalConstraints23Un");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -570,7 +570,7 @@ public class AdditionalConstraints23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_ADDITIONAL_MODELS, "AdditionalConstraints23Un");
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalConstraints23Un");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));

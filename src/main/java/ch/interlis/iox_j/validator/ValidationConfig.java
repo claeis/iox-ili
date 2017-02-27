@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.HashMap;
+
 import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.Constraint;
@@ -15,6 +16,7 @@ import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.TransferDescription;
+
 import com.moandjiezana.toml.Toml;
 
 public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
@@ -30,6 +32,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	public static final String ILI_METAATTR_PREFIX="ilivalid.";
 	public static final String PARAMETER = "PARAMETER";
 	public static final String VALIDATION = "validation";
+	public static final String ADDITIONAL_MODELS="additionalModels";
 	public void mergeIliMetaAttrs(TransferDescription td){
 		mergeIliMetaAttrsHelper(td);
 	}
