@@ -1,0 +1,41 @@
+INTERLIS 2.3;
+
+MODEL PlausibilityConstraint23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
+	
+	TOPIC Topic=
+	
+		DOMAIN
+			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					        70000.000 .. 310000.000 [INTERLIS.m],
+						   ROTATION 2 -> 1;
+			Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					        70000.000 .. 310000.000 [INTERLIS.m],
+					              0.000 .. 5000.000 [INTERLIS.m];
+		
+		CLASS ClassA =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			CONSTRAINT >= 50%
+			attr1 >= attr2;
+		END ClassA;
+		
+		CLASS ClassB =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			CONSTRAINT >= 60%
+			attr1 >= attr2;
+		END ClassB;
+		
+		CLASS ClassC =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			CONSTRAINT >= 80%
+			attr1 >= attr2;
+			CONSTRAINT >= 60%
+			attr1 >= attr2;
+		END ClassC;
+		
+	END Topic;
+
+END PlausibilityConstraint23.

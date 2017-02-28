@@ -24,7 +24,7 @@ public class ElementCount implements InterlisFunction {
 		if (args[0].isUndefined()){
 			return Value.createSkipEvaluation();
 		}
-		Collection<IomObject> obj1 = args[0].getValues();
+		Collection<IomObject> obj1 = args[0].getComplexObjects();
 		if(obj1==null){
 			throw new IllegalArgumentException(obj1.toString());
 		}

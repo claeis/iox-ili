@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
 import javax.xml.ws.Holder;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -57,6 +59,7 @@ import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.Objects;
 import ch.interlis.ili2c.metamodel.PathEl;
 import ch.interlis.ili2c.metamodel.PathElAbstractClassRole;
+import ch.interlis.ili2c.metamodel.PlausibilityConstraint;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
 import ch.interlis.ili2c.metamodel.Projection;
@@ -115,6 +118,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String validateType=null;
 	private Map<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	private HashMap<Constraint,Viewable> additionalConstraints=new HashMap<Constraint,Viewable>();
+	private Map<PlausibilityConstraint,ArrayList<Double>> plausibilityResults=new HashMap<PlausibilityConstraint,ArrayList<Double>>();
 	
 	@Deprecated
 	protected Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -203,6 +207,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
 			iterateThroughAllObjects();
 			validateAllAreas();
+			if(!plausibilityResults.isEmpty()){
+				validatePlausibilityConstraint();
+			}
 		}
 	}
 	
@@ -357,6 +364,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							} else if(constraintObj instanceof UniquenessConstraint){
 								UniquenessConstraint uniquenessConstraint = (UniquenessConstraint) constraintObj;
 								validateUniquenessConstraint(iomObj, uniquenessConstraint);
+							} else if(constraintObj instanceof PlausibilityConstraint){
+								PlausibilityConstraint plausibilityConstraint = (PlausibilityConstraint) constraintObj;
+								collectPlausibilityConstraintResults(iomObj, plausibilityConstraint);
 							}
 						}
 					}
@@ -386,7 +396,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							SetConstraint setConstraint=(SetConstraint) constraintObj;
 							collectSetConstraintObjs(iomObj, setConstraint);
 						}
-						
+						// plausibility constraint
+						if(constraintObj instanceof PlausibilityConstraint){
+							PlausibilityConstraint plausibilityConstraint=(PlausibilityConstraint) constraintObj;
+							if(!constraints.contains(plausibilityConstraint)){
+								constraints.add(plausibilityConstraint);
+								errs.addEvent(errFact.logInfoMsg("validate plausibility constraint {0}...",getScopedName(plausibilityConstraint)));
+							}
+							collectPlausibilityConstraintResults(iomObj, plausibilityConstraint);
+						}
 					}
 				}
 				Iterator<ViewableTransferElement> attrIterator=currentClass.getAttributesAndRoles2();
@@ -433,6 +451,83 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
+	private void collectPlausibilityConstraintResults(IomObject iomObj,PlausibilityConstraint plausibilityConstraint){
+		ArrayList<Double> results = new ArrayList<Double>();
+		double resultTrue=0;
+		double total=0;
+		Evaluable condition = (Evaluable) plausibilityConstraint.getCondition();
+		Value conditionValue = evaluateExpression(iomObj, condition);
+		if (conditionValue.isTrue()){
+			if(plausibilityResults.containsKey(plausibilityConstraint)){
+				results = plausibilityResults.get(plausibilityConstraint);
+				resultTrue = results.get(0);
+				total = results.get(1);
+				resultTrue += 1;
+				total += 1;
+				plausibilityResults.remove(plausibilityConstraint);
+				results.clear();
+				results.add(0, resultTrue);
+				results.add(1, total);
+				plausibilityResults.put(plausibilityConstraint, results);
+			} else {
+				resultTrue = 1;
+				total = 1;
+				results.add(0, resultTrue);
+				results.add(1, total);
+				plausibilityResults.put(plausibilityConstraint, results);
+			}
+		} else {
+			if(plausibilityResults.containsKey(plausibilityConstraint)){
+				results = plausibilityResults.get(plausibilityConstraint);
+				resultTrue = results.get(0);
+				total = results.get(1);
+				total += 1;
+				plausibilityResults.remove(plausibilityConstraint);
+				results.clear();
+				results.add(0, resultTrue);
+				results.add(1, total);
+				plausibilityResults.put(plausibilityConstraint, results);
+			} else {
+				resultTrue = 0;
+				total = 1;
+				results.add(0, resultTrue);
+				results.add(1, total);
+				plausibilityResults.put(plausibilityConstraint, results);
+			}
+		}
+	}
+	
+	private void validatePlausibilityConstraint(){
+		for (Entry<PlausibilityConstraint, ArrayList<Double>> entry  : plausibilityResults.entrySet()){
+			PlausibilityConstraint plausibilityConstraint = entry.getKey();
+			Evaluable condition = (Evaluable) plausibilityConstraint.getCondition();
+			double percentage = plausibilityConstraint.getPercentage();
+			ArrayList<Double> resultList = entry.getValue();
+			String msg=validationConfig.getConfigValue(getScopedName(plausibilityConstraint), ValidationConfig.MSG);
+			if(condition instanceof GreaterThanOrEqual){
+				if(((resultList.get(0)/resultList.get(1))*100) >= percentage){
+					// ok
+				} else {
+					if(msg!=null && msg.length()>0){
+						logMsg(checkConstraint,msg);
+					} else {
+						logMsg(checkConstraint,"Plausibility Constraint {0} is not true.", getScopedName(plausibilityConstraint));
+					}
+				}
+			} else if(condition instanceof LessThanOrEqual){
+				if(((resultList.get(0)/resultList.get(1))*100) <= percentage){
+					// ok
+				} else {
+					if(msg!=null && msg.length()>0){
+						logMsg(checkConstraint,msg);
+					} else {
+						logMsg(checkConstraint,"Plausibility Constraint {0} is not true.", getScopedName(plausibilityConstraint));
+					}
+				}
+			}
+		}
+	}
+	
 	private void validateUniquenessConstraint(IomObject iomObj, UniquenessConstraint uniquenessConstraint) {
 		String check = getScopedName(uniquenessConstraint);
 		String checkUniqueConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
@@ -947,7 +1042,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if (value.isUndefined()){
 						return Value.createSkipEvaluation();
 						}
-					return new Value(value.getValues().size());
+					return new Value(value.getComplexObjects().size());
 				} else if (anArgument instanceof ObjectPath){
 					Value value=evaluateExpression(iomObj, anArgument);
 					if (value.skipEvaluation()){
@@ -1088,7 +1183,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 						// if objects.equals(anObjectClass) never equal, handling.
 					} else {
-						Iterator iterIomObjects = objects.getValues().iterator(); // iterate through all objects of Argument[0] 
+						Iterator iterIomObjects = objects.getComplexObjects().iterator(); // iterate through all objects of Argument[0] 
 						while(iterIomObjects.hasNext()){
 							IomObject anObject = (IomObject) iterIomObjects.next();
 							IomObject polygon = anObject.getattrobj(surfaceAttr.getValue(), 0); // get polygon of current object
@@ -1136,7 +1231,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							}
 						}
 					} else {
-						Iterator iterIomObjects = objects.getValues().iterator();
+						Iterator iterIomObjects = objects.getComplexObjects().iterator();
 						while(iterIomObjects.hasNext()){
 							IomObject anObject = (IomObject) iterIomObjects.next();
 							int countOfSurfaceBagValues = anObject.getattrvaluecount(surfaceBag.getValue());
