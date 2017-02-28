@@ -30,11 +30,47 @@ MODEL PlausibilityConstraint23
 		CLASS ClassC =
 			attr1 : 0..10;
 			attr2 : 0..10;
+			CONSTRAINT >= 60%
+			attr1 >= attr2;
+			CONSTRAINT >= 80%
+			attr1 >= attr2;
+		END ClassC;
+		
+		CLASS ClassD =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			CONSTRAINT <= 50%
+			attr1 >= attr2;
+		END ClassD;
+		
+		CLASS ClassE =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			CONSTRAINT <= 60%
+			attr1 >= attr2;
+		END ClassE;
+		
+		CLASS ClassF =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			CONSTRAINT <= 80%
+			attr1 >= attr2;
+			CONSTRAINT <= 60%
+			attr1 >= attr2;
+		END ClassF;
+		
+		CLASS ClassZ =
+			attr1 : 0..10;
+			attr2 : 0..10;
 			CONSTRAINT >= 80%
 			attr1 >= attr2;
 			CONSTRAINT >= 60%
 			attr1 >= attr2;
-		END ClassC;
+			CONSTRAINT >= 40%
+			attr1 >= attr2;
+			CONSTRAINT >= 20%
+			attr1 >= attr2;
+		END ClassZ;
 		
 	END Topic;
 

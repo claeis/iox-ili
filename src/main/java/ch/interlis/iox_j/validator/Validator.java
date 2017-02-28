@@ -118,7 +118,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String validateType=null;
 	private Map<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	private HashMap<Constraint,Viewable> additionalConstraints=new HashMap<Constraint,Viewable>();
-	private Map<PlausibilityConstraint,ArrayList<Double>> plausibilityResults=new HashMap<PlausibilityConstraint,ArrayList<Double>>();
+	private Map<PlausibilityConstraint,ArrayList<Double>> plausibilityConstraintMap=new HashMap<PlausibilityConstraint,ArrayList<Double>>();
 	
 	@Deprecated
 	protected Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -207,7 +207,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
 			iterateThroughAllObjects();
 			validateAllAreas();
-			if(!plausibilityResults.isEmpty()){
+			if(!plausibilityConstraintMap.isEmpty()){
 				validatePlausibilityConstraint();
 			}
 		}
@@ -452,60 +452,46 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	private void collectPlausibilityConstraintResults(IomObject iomObj,PlausibilityConstraint plausibilityConstraint){
-		ArrayList<Double> results = new ArrayList<Double>();
-		double resultTrue=0;
-		double total=0;
+		Object modelElement=tag2class.get(iomObj.getobjecttag());
+		Viewable aClass1= (Viewable) modelElement;
+		ArrayList<Double> evaluableQuantities = new ArrayList<Double>();
 		Evaluable condition = (Evaluable) plausibilityConstraint.getCondition();
 		Value conditionValue = evaluateExpression(iomObj, condition);
 		if (conditionValue.isTrue()){
-			if(plausibilityResults.containsKey(plausibilityConstraint)){
-				results = plausibilityResults.get(plausibilityConstraint);
-				resultTrue = results.get(0);
-				total = results.get(1);
-				resultTrue += 1;
-				total += 1;
-				plausibilityResults.remove(plausibilityConstraint);
-				results.clear();
-				results.add(0, resultTrue);
-				results.add(1, total);
-				plausibilityResults.put(plausibilityConstraint, results);
+			if(plausibilityConstraintMap.containsKey(plausibilityConstraint)){
+				evaluableQuantities = plausibilityConstraintMap.get(plausibilityConstraint);
+				plausibilityConstraintMap.remove(plausibilityConstraint);
+				evaluableQuantities.set(0, (evaluableQuantities.get(0))+1);
+				evaluableQuantities.set(1, (evaluableQuantities.get(1))+1);
+				plausibilityConstraintMap.put(plausibilityConstraint, evaluableQuantities);
 			} else {
-				resultTrue = 1;
-				total = 1;
-				results.add(0, resultTrue);
-				results.add(1, total);
-				plausibilityResults.put(plausibilityConstraint, results);
+				evaluableQuantities.add(0, 1.0);
+				evaluableQuantities.add(1, 1.0);
+				plausibilityConstraintMap.put(plausibilityConstraint, evaluableQuantities);
 			}
 		} else {
-			if(plausibilityResults.containsKey(plausibilityConstraint)){
-				results = plausibilityResults.get(plausibilityConstraint);
-				resultTrue = results.get(0);
-				total = results.get(1);
-				total += 1;
-				plausibilityResults.remove(plausibilityConstraint);
-				results.clear();
-				results.add(0, resultTrue);
-				results.add(1, total);
-				plausibilityResults.put(plausibilityConstraint, results);
+			if(plausibilityConstraintMap.containsKey(plausibilityConstraint)){
+				evaluableQuantities = plausibilityConstraintMap.get(plausibilityConstraint);
+				plausibilityConstraintMap.remove(plausibilityConstraint);
+				evaluableQuantities.set(0, (evaluableQuantities.get(0)));
+				evaluableQuantities.set(1, (evaluableQuantities.get(1))+1);
+				plausibilityConstraintMap.put(plausibilityConstraint, evaluableQuantities);
 			} else {
-				resultTrue = 0;
-				total = 1;
-				results.add(0, resultTrue);
-				results.add(1, total);
-				plausibilityResults.put(plausibilityConstraint, results);
+				evaluableQuantities.add(0, 0.0);
+				evaluableQuantities.add(1, 1.0);
+				plausibilityConstraintMap.put(plausibilityConstraint, evaluableQuantities);
 			}
 		}
 	}
 	
 	private void validatePlausibilityConstraint(){
-		for (Entry<PlausibilityConstraint, ArrayList<Double>> entry  : plausibilityResults.entrySet()){
-			PlausibilityConstraint plausibilityConstraint = entry.getKey();
-			Evaluable condition = (Evaluable) plausibilityConstraint.getCondition();
+		for (Entry<PlausibilityConstraint, ArrayList<Double>> constraintEntry  : plausibilityConstraintMap.entrySet()){
+			PlausibilityConstraint plausibilityConstraint = constraintEntry.getKey();
 			double percentage = plausibilityConstraint.getPercentage();
-			ArrayList<Double> resultList = entry.getValue();
+			ArrayList<Double> evaluableQuantities = constraintEntry.getValue();
 			String msg=validationConfig.getConfigValue(getScopedName(plausibilityConstraint), ValidationConfig.MSG);
-			if(condition instanceof GreaterThanOrEqual){
-				if(((resultList.get(0)/resultList.get(1))*100) >= percentage){
+			if(plausibilityConstraint.getDirection()==0){ // >=
+				if(((evaluableQuantities.get(0)/evaluableQuantities.get(1))*100) >= percentage){
 					// ok
 				} else {
 					if(msg!=null && msg.length()>0){
@@ -514,8 +500,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						logMsg(checkConstraint,"Plausibility Constraint {0} is not true.", getScopedName(plausibilityConstraint));
 					}
 				}
-			} else if(condition instanceof LessThanOrEqual){
-				if(((resultList.get(0)/resultList.get(1))*100) <= percentage){
+			} else if(plausibilityConstraint.getDirection()==1){ // <=
+				if(((evaluableQuantities.get(0)/evaluableQuantities.get(1))*100) <= percentage){
 					// ok
 				} else {
 					if(msg!=null && msg.length()>0){

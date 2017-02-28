@@ -32,6 +32,11 @@ public class PlausibilityConstraints23Test {
 	private final static String ILI_CLASSA=TOPIC+".ClassA";
 	private final static String ILI_CLASSB=TOPIC+".ClassB";
 	private final static String ILI_CLASSC=TOPIC+".ClassC";
+	private final static String ILI_CLASSD=TOPIC+".ClassD";
+	private final static String ILI_CLASSE=TOPIC+".ClassE";
+	private final static String ILI_CLASSF=TOPIC+".ClassF";
+	
+	private final static String ILI_CLASSZ=TOPIC+".ClassZ";
 	// START BASKET EVENT
 	private final static String BID="b1";
 	
@@ -49,7 +54,7 @@ public class PlausibilityConstraints23Test {
 	//######## SUCCESS PLAUSIBILITY CONSTRAINTS ###############//
 	//#########################################################//	
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 100% liegt und mehr als 50% erreicht werden muss.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 100% liegt und >= 50% erreicht werden muss.
 	@Test
 	public void targetResultEqualsPercentage_1object_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
@@ -69,7 +74,7 @@ public class PlausibilityConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 80% liegt und mehr als 60% erreicht werden muss.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 80% liegt und >= 60% erreicht werden muss.
 	@Test
 	public void targetResultGreaterThanPercentage_5objects_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB, OID1);
@@ -105,7 +110,7 @@ public class PlausibilityConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 60% liegt und mehr als 60% erreicht werden muss.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 60% liegt und >= 60% erreicht werden muss.
 	@Test
 	public void targetResultEqualsPercentage_5objects_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB, OID1);
@@ -142,8 +147,8 @@ public class PlausibilityConstraints23Test {
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil des
-	// Constraint1 bei 80% liegt und der
-	// Constraint2 bei 60% liegt und dabei
+	// Constraint1 >= 80% liegt und der
+	// Constraint2 >= 60% liegt und dabei
 	// die prozentuale Richtigkeit bei 80% liegt.
 	@Test
 	public void resultsInValidRange_5objects_2Constraints_Ok(){
@@ -181,8 +186,8 @@ public class PlausibilityConstraints23Test {
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil des
-	// Constraint1 bei 80% liegt und der
-	// Constraint2 bei 60% liegt und dabei
+	// Constraint1 >= 80% liegt und der
+	// Constraint2 >= 60% liegt und dabei
 	// die prozentuale Richtigkeit bei 80% liegt.
 	@Test
 	public void firstEqualsSecondGreater_5objects_2Constraints_Ok(){
@@ -219,11 +224,181 @@ public class PlausibilityConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 60% liegt und <= 60% erreicht werden muss.
+	@Test
+	public void targetResultEqualsPercentage_5objects_LessThanTest_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSE, OID1);
+		iomObjA.setattrvalue("attr1", "5");
+		iomObjA.setattrvalue("attr2", "7");
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSE, OID2);
+		iomObjB.setattrvalue("attr1", "5");
+		iomObjB.setattrvalue("attr2", "7");
+		Iom_jObject iomObjC=new Iom_jObject(ILI_CLASSE, OID3);
+		iomObjC.setattrvalue("attr1", "7");
+		iomObjC.setattrvalue("attr2", "5");
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSE, OID4);
+		iomObjD.setattrvalue("attr1", "7");
+		iomObjD.setattrvalue("attr2", "5");
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OID5);
+		iomObjE.setattrvalue("attr1", "7");
+		iomObjE.setattrvalue("attr2", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new ObjectEvent(iomObjC));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und <= 50% erreicht werden muss.
+	@Test
+	public void targetResultLessThanPercentage_1object_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD, OID1);
+		iomObjA.setattrvalue("attr1", "5");
+		iomObjA.setattrvalue("attr2", "7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 40% liegt und <= 60% erreicht werden muss.
+	@Test
+	public void targetResultLessThanPercentage_5objects_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSE, OID1);
+		iomObjA.setattrvalue("attr1", "5");
+		iomObjA.setattrvalue("attr2", "7");
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSE, OID2);
+		iomObjB.setattrvalue("attr1", "5");
+		iomObjB.setattrvalue("attr2", "7");
+		Iom_jObject iomObjC=new Iom_jObject(ILI_CLASSE, OID3);
+		iomObjC.setattrvalue("attr1", "5");
+		iomObjC.setattrvalue("attr2", "7");
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSE, OID4);
+		iomObjD.setattrvalue("attr1", "7");
+		iomObjD.setattrvalue("attr2", "5");
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OID5);
+		iomObjE.setattrvalue("attr1", "7");
+		iomObjE.setattrvalue("attr2", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new ObjectEvent(iomObjC));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil des
+	// Constraint1 <= 80% liegt und der
+	// Constraint2 <= 60% liegt und dabei
+	// die prozentuale Richtigkeit bei 60% liegt.
+	@Test
+	public void firstLessSecondEquals_5objects_2Constraints_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSF, OID1);
+		iomObjA.setattrvalue("attr1", "5");
+		iomObjA.setattrvalue("attr2", "7");
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSF, OID2);
+		iomObjB.setattrvalue("attr1", "5");
+		iomObjB.setattrvalue("attr2", "7");
+		Iom_jObject iomObjC=new Iom_jObject(ILI_CLASSF, OID3);
+		iomObjC.setattrvalue("attr1", "7");
+		iomObjC.setattrvalue("attr2", "5");
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSF, OID4);
+		iomObjD.setattrvalue("attr1", "7");
+		iomObjD.setattrvalue("attr2", "5");
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSF, OID5);
+		iomObjE.setattrvalue("attr1", "7");
+		iomObjE.setattrvalue("attr2", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new ObjectEvent(iomObjC));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil des
+	// Constraint1 <= 80% liegt und der
+	// Constraint2 <= 60% liegt und dabei
+	// die prozentuale Richtigkeit bei 40% liegt.
+	@Test
+	public void bothConstraintsLessThanPercentage_5objects_2Constraints_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSF, OID1);
+		iomObjA.setattrvalue("attr1", "5");
+		iomObjA.setattrvalue("attr2", "7");
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSF, OID2);
+		iomObjB.setattrvalue("attr1", "5");
+		iomObjB.setattrvalue("attr2", "7");
+		Iom_jObject iomObjC=new Iom_jObject(ILI_CLASSF, OID3);
+		iomObjC.setattrvalue("attr1", "5");
+		iomObjC.setattrvalue("attr2", "7");
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSF, OID4);
+		iomObjD.setattrvalue("attr1", "7");
+		iomObjD.setattrvalue("attr2", "5");
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSF, OID5);
+		iomObjE.setattrvalue("attr1", "7");
+		iomObjE.setattrvalue("attr2", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new ObjectEvent(iomObjC));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
 	//#########################################################//
 	//########### FAIL PLAUSIBILITY CONSTRAINTS ##################//
 	//#########################################################//
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und mehr als 50% erreicht werden muss.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und >= 50% erreicht werden muss.
 	@Test
 	public void targetResultLessThanPercentage_1object_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
@@ -244,7 +419,7 @@ public class PlausibilityConstraints23Test {
 		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 40% liegt und mehr als 60% erreicht werden muss.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 40% liegt und >= 60% erreicht werden muss.
 	@Test
 	public void targetResultLessThanPercentage_5objects_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB, OID1);
@@ -282,8 +457,8 @@ public class PlausibilityConstraints23Test {
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil des
-	// Constraint1 bei 80% liegt und der
-	// Constraint2 bei 60% liegt und dabei
+	// Constraint1 >= 80% liegt und der
+	// Constraint2 >= 60% liegt und dabei
 	// die prozentuale Richtigkeit bei 60% liegt.
 	@Test
 	public void firstLessSecondEquals_5objects_2Constraints_Fail(){
@@ -318,12 +493,12 @@ public class PlausibilityConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassC.Constraint2 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil des
-	// Constraint1 bei 80% liegt und der
-	// Constraint2 bei 60% liegt und dabei
+	// Constraint1 >= 80% liegt und der
+	// Constraint2 >= 60% liegt und dabei
 	// die prozentuale Richtigkeit bei 40% liegt.
 	@Test
 	public void bothConstraintsLessThanPercentage_5objects_2Constraints_Fail(){
@@ -358,14 +533,173 @@ public class PlausibilityConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassC.Constraint2 is not true.", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassC.Constraint2 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassC.Constraint1 is not true.", logger.getErrs().get(1).getEventMsg());
+	}
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 100% liegt und <= 50% erreicht werden muss.
+	@Test
+	public void targetResultEqualsPercentage_1object_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD, OID1);
+		iomObjA.setattrvalue("attr1", "7");
+		iomObjA.setattrvalue("attr2", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassD.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 80% liegt und <= 60% erreicht werden muss.
+	@Test
+	public void targetResultGreaterThanPercentage_5objects_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSE, OID1);
+		iomObjA.setattrvalue("attr1", "5");
+		iomObjA.setattrvalue("attr2", "7");
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSE, OID2);
+		iomObjB.setattrvalue("attr1", "7");
+		iomObjB.setattrvalue("attr2", "5");
+		Iom_jObject iomObjC=new Iom_jObject(ILI_CLASSE, OID3);
+		iomObjC.setattrvalue("attr1", "7");
+		iomObjC.setattrvalue("attr2", "5");
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSE, OID4);
+		iomObjD.setattrvalue("attr1", "7");
+		iomObjD.setattrvalue("attr2", "5");
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OID5);
+		iomObjE.setattrvalue("attr1", "7");
+		iomObjE.setattrvalue("attr2", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new ObjectEvent(iomObjC));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassE.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil des
+	// Constraint1 <= 80% liegt und der
+		// Constraint2 <= 60% liegt und dabei
+		// die prozentuale Richtigkeit bei 80% liegt.
+	@Test
+	public void resultsInValidRange_5objects_2Constraints_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSF, OID1);
+		iomObjA.setattrvalue("attr1", "7");
+		iomObjA.setattrvalue("attr2", "5");
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSF, OID2);
+		iomObjB.setattrvalue("attr1", "7");
+		iomObjB.setattrvalue("attr2", "5");
+		Iom_jObject iomObjC=new Iom_jObject(ILI_CLASSF, OID3);
+		iomObjC.setattrvalue("attr1", "7");
+		iomObjC.setattrvalue("attr2", "5");
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSF, OID4);
+		iomObjD.setattrvalue("attr1", "5");
+		iomObjD.setattrvalue("attr2", "7");
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSF, OID5);
+		iomObjE.setattrvalue("attr1", "7");
+		iomObjE.setattrvalue("attr2", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new ObjectEvent(iomObjC));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassF.Constraint2 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil des
+	// Constraint1 <= 80% liegt und der
+	// Constraint2 <= 60% liegt und dabei
+	// die prozentuale Richtigkeit bei 100% liegt.
+	@Test
+	public void firstEqualsSecondGreater_5objects_2Constraints_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSF, OID1);
+		iomObjA.setattrvalue("attr1", "7");
+		iomObjA.setattrvalue("attr2", "5");
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSF, OID2);
+		iomObjB.setattrvalue("attr1", "7");
+		iomObjB.setattrvalue("attr2", "5");
+		Iom_jObject iomObjC=new Iom_jObject(ILI_CLASSF, OID3);
+		iomObjC.setattrvalue("attr1", "7");
+		iomObjC.setattrvalue("attr2", "5");
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSF, OID4);
+		iomObjD.setattrvalue("attr1", "7");
+		iomObjD.setattrvalue("attr2", "5");
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSF, OID5);
+		iomObjE.setattrvalue("attr1", "7");
+		iomObjE.setattrvalue("attr2", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new ObjectEvent(iomObjC));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassF.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassF.Constraint2 is not true.", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// validateConfig OFF
 	// validateConfig Warning ON
 	// additionalConstraints
-	// error if result not >= % or <= %.
 	// über structs
 	// über BAG/LIST's
+	// MSG not empty
+	
+	@Test
+	public void test(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSZ, OID1);
+		iomObjA.setattrvalue("attr1", "5");
+		iomObjA.setattrvalue("attr2", "10");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==4);
+		//assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassD.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
 }
