@@ -59,7 +59,7 @@ MODEL PlausibilityConstraint23
 			attr1 >= attr2;
 		END ClassF;
 		
-		CLASS ClassZ =
+		CLASS ClassG =
 			attr1 : 0..10;
 			attr2 : 0..10;
 			CONSTRAINT >= 80%
@@ -70,7 +70,7 @@ MODEL PlausibilityConstraint23
 			attr1 >= attr2;
 			CONSTRAINT >= 20%
 			attr1 >= attr2;
-		END ClassZ;
+		END ClassG;
 		
 	END Topic;
 

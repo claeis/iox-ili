@@ -6,9 +6,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.ws.Holder;
 
@@ -118,7 +120,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String validateType=null;
 	private Map<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	private HashMap<Constraint,Viewable> additionalConstraints=new HashMap<Constraint,Viewable>();
-	private Map<PlausibilityConstraint,ArrayList<Double>> plausibilityConstraintMap=new HashMap<PlausibilityConstraint,ArrayList<Double>>();
+	private Map<PlausibilityConstraint, PlausibilityPool> plausibilityConstraintObjects=new LinkedHashMap<PlausibilityConstraint, PlausibilityPool>();
+	private PlausibilityPool plausibilityPool=null;
 	
 	@Deprecated
 	protected Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -138,6 +141,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		this.config=config;
 		this.pipelinePool=pipelinePool;
 		objPoolManager=new ObjectPoolManager();
+		plausibilityPool=new PlausibilityPool();
 		Map<String,Class> cf=(Map<String, Class>) config.getTransientObject(CONFIG_CUSTOM_FUNCTIONS);
 		if(cf!=null){
 			customFunctions=cf;
@@ -207,7 +211,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
 			iterateThroughAllObjects();
 			validateAllAreas();
-			if(!plausibilityConstraintMap.isEmpty()){
+			if(!plausibilityConstraintObjects.isEmpty()){
 				validatePlausibilityConstraint();
 			}
 		}
@@ -366,7 +370,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								validateUniquenessConstraint(iomObj, uniquenessConstraint);
 							} else if(constraintObj instanceof PlausibilityConstraint){
 								PlausibilityConstraint plausibilityConstraint = (PlausibilityConstraint) constraintObj;
-								collectPlausibilityConstraintResults(iomObj, plausibilityConstraint);
+								addPlausibilityConstraints(plausibilityConstraint, iomObj);
 							}
 						}
 					}
@@ -403,7 +407,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								constraints.add(plausibilityConstraint);
 								errs.addEvent(errFact.logInfoMsg("validate plausibility constraint {0}...",getScopedName(plausibilityConstraint)));
 							}
-							collectPlausibilityConstraintResults(iomObj, plausibilityConstraint);
+							addPlausibilityConstraints(plausibilityConstraint, iomObj);
 						}
 					}
 				}
@@ -451,63 +455,56 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private void collectPlausibilityConstraintResults(IomObject iomObj,PlausibilityConstraint plausibilityConstraint){
-		Object modelElement=tag2class.get(iomObj.getobjecttag());
-		Viewable aClass1= (Viewable) modelElement;
-		ArrayList<Double> evaluableQuantities = new ArrayList<Double>();
+	private void addPlausibilityConstraints(PlausibilityConstraint plausibilityConstraint, IomObject iomObj){
 		Evaluable condition = (Evaluable) plausibilityConstraint.getCondition();
 		Value conditionValue = evaluateExpression(iomObj, condition);
-		if (conditionValue.isTrue()){
-			if(plausibilityConstraintMap.containsKey(plausibilityConstraint)){
-				evaluableQuantities = plausibilityConstraintMap.get(plausibilityConstraint);
-				plausibilityConstraintMap.remove(plausibilityConstraint);
-				evaluableQuantities.set(0, (evaluableQuantities.get(0))+1);
-				evaluableQuantities.set(1, (evaluableQuantities.get(1))+1);
-				plausibilityConstraintMap.put(plausibilityConstraint, evaluableQuantities);
+		if(plausibilityConstraintObjects.containsKey(plausibilityConstraint)){
+			PlausibilityPool containedConstraint = plausibilityConstraintObjects.get(plausibilityConstraint);
+			double resultTrue = containedConstraint.getResultTrue();
+			double resultTotal = containedConstraint.getResultTotal();
+			if (conditionValue.isTrue()){
+				plausibilityConstraintObjects.remove(plausibilityConstraint);
+				plausibilityConstraintObjects.put(plausibilityConstraint, new PlausibilityPool(resultTrue+1.0, resultTotal+1.0));
 			} else {
-				evaluableQuantities.add(0, 1.0);
-				evaluableQuantities.add(1, 1.0);
-				plausibilityConstraintMap.put(plausibilityConstraint, evaluableQuantities);
+				plausibilityConstraintObjects.remove(plausibilityConstraint);
+				plausibilityConstraintObjects.put(plausibilityConstraint, new PlausibilityPool(resultTrue, resultTotal+1.0));
 			}
 		} else {
-			if(plausibilityConstraintMap.containsKey(plausibilityConstraint)){
-				evaluableQuantities = plausibilityConstraintMap.get(plausibilityConstraint);
-				plausibilityConstraintMap.remove(plausibilityConstraint);
-				evaluableQuantities.set(0, (evaluableQuantities.get(0)));
-				evaluableQuantities.set(1, (evaluableQuantities.get(1))+1);
-				plausibilityConstraintMap.put(plausibilityConstraint, evaluableQuantities);
+			if (conditionValue.isTrue()){
+				plausibilityConstraintObjects.put(plausibilityConstraint, new PlausibilityPool(1.0, 1.0));
 			} else {
-				evaluableQuantities.add(0, 0.0);
-				evaluableQuantities.add(1, 1.0);
-				plausibilityConstraintMap.put(plausibilityConstraint, evaluableQuantities);
+				plausibilityConstraintObjects.put(plausibilityConstraint, new PlausibilityPool(0.0, 1.0));
 			}
 		}
 	}
 	
 	private void validatePlausibilityConstraint(){
-		for (Entry<PlausibilityConstraint, ArrayList<Double>> constraintEntry  : plausibilityConstraintMap.entrySet()){
-			PlausibilityConstraint plausibilityConstraint = constraintEntry.getKey();
-			double percentage = plausibilityConstraint.getPercentage();
-			ArrayList<Double> evaluableQuantities = constraintEntry.getValue();
-			String msg=validationConfig.getConfigValue(getScopedName(plausibilityConstraint), ValidationConfig.MSG);
-			if(plausibilityConstraint.getDirection()==0){ // >=
-				if(((evaluableQuantities.get(0)/evaluableQuantities.get(1))*100) >= percentage){
-					// ok
-				} else {
-					if(msg!=null && msg.length()>0){
-						logMsg(checkConstraint,msg);
+		for (Entry<PlausibilityConstraint, PlausibilityPool> entry : plausibilityConstraintObjects.entrySet()){
+			String check = getScopedName(entry.getKey());
+			checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
+			if(ValidationConfig.OFF.equals(checkConstraint)){
+				// skip it
+			}else{
+				String msg=validationConfig.getConfigValue(getScopedName(entry.getKey()), ValidationConfig.MSG);
+				if(entry.getKey().getDirection()==0){ // >=
+					if(((entry.getValue().getResultTrue()/entry.getValue().getResultTotal())*100) >= entry.getKey().getPercentage()){
+						// ok
 					} else {
-						logMsg(checkConstraint,"Plausibility Constraint {0} is not true.", getScopedName(plausibilityConstraint));
+						if(msg!=null && msg.length()>0){
+							logMsg(checkConstraint,msg);
+						} else {
+							logMsg(checkConstraint,"Plausibility Constraint {0} is not true.", getScopedName(entry.getKey()));
+						}
 					}
-				}
-			} else if(plausibilityConstraint.getDirection()==1){ // <=
-				if(((evaluableQuantities.get(0)/evaluableQuantities.get(1))*100) <= percentage){
-					// ok
-				} else {
-					if(msg!=null && msg.length()>0){
-						logMsg(checkConstraint,msg);
+				} else if(entry.getKey().getDirection()==1){ // <=
+					if(((entry.getValue().getResultTrue()/entry.getValue().getResultTotal())*100) <= entry.getKey().getPercentage()){
+						// ok
 					} else {
-						logMsg(checkConstraint,"Plausibility Constraint {0} is not true.", getScopedName(plausibilityConstraint));
+						if(msg!=null && msg.length()>0){
+							logMsg(checkConstraint,msg);
+						} else {
+							logMsg(checkConstraint,"Plausibility Constraint {0} is not true.", getScopedName(entry.getKey()));
+						}
 					}
 				}
 			}

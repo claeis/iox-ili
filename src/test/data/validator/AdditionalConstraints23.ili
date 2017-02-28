@@ -46,6 +46,12 @@ CONTRACTED MODEL AdditionalConstraints23 AT "mailto:ceis@localhost" VERSION "201
 			superAttr : TEXT*10;
 		END ExConCondition;
 		
+		!! plausibility constraints
+		CLASS PlConClass =
+			attr1 : 0..10;
+			attr2 : 0..10;
+		END PlConClass;
+		
 		CLASS ExConClass =
 			subAttr : TEXT*10;
 		END ExConClass;
@@ -174,3 +180,23 @@ CONTRACTED MODEL AdditionalConstraints23Zusatz4 AT "mailto:ceis@localhost" VERSI
 	END BodenbedeckungZusatz;
 	
 END AdditionalConstraints23Zusatz4.
+
+!! VIEW Plausibility Constraint
+CONTRACTED MODEL AddPlConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS AdditionalConstraints23;
+	
+	VIEW TOPIC AddPlConTopic =
+		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+		
+		VIEW AddPlConView
+			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.PlConClass;
+			=
+			ALL OF PlConClass;
+			CONSTRAINT >= 50%
+			attr1 >= attr2;
+
+		END AddPlConView;
+
+	END AddPlConTopic;
+
+END AddPlConModel.

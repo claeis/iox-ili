@@ -26,6 +26,7 @@ public class AdditionalConstraints23Test {
 	private final static String ILI_TOPIC="AdditionalConstraints23.Bodenbedeckung";
 	// CLASS
 	private final static String ILI_MANDATORYCONSTRAINT_CLASS=ILI_TOPIC+".ManConClass";
+	private final static String ILI_PLAUSIBILITYCONSTRAINT_CLASS=ILI_TOPIC+".PlConClass";
 	private final static String ILI_MANDATORYCONSTRAINT_COORDCLASS=ILI_TOPIC+".ManConClassCoord";
 	private final static String ILI_STRUCTC=ILI_TOPIC+".StructC";
 	private final static String ILI_CLASSC=ILI_TOPIC+".ClassC";
@@ -47,6 +48,28 @@ public class AdditionalConstraints23Test {
 	//#########################################################//
 	//######## SUCCESS ADDITIONAL CONSTRAINTS #################//
 	//#########################################################//	
+	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
+	// ein PlausibilityContraint true ergibt.
+	@Test
+	public void plausibilityConstraintTrue_Ok(){
+		Iom_jObject obj1=new Iom_jObject(ILI_PLAUSIBILITYCONSTRAINT_CLASS, OBJ_OID1);
+		obj1.setattrvalue("attr1", "7");
+		obj1.setattrvalue("attr2", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddPlConModel;");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}	
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
 	// ein MandatoryConstraint true ergibt.
@@ -205,9 +228,33 @@ public class AdditionalConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	
 	//#########################################################//
 	//########### FAIL ADDITIONAL CONSTRAINTS #################//
 	//#########################################################//
+	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
+	// ein PlausibilityContraint false ergibt.
+	@Test
+	public void plausibilityConstraintFale_False(){
+		Iom_jObject obj1=new Iom_jObject(ILI_PLAUSIBILITYCONSTRAINT_CLASS, OBJ_OID1);
+		obj1.setattrvalue("attr1", "5");
+		obj1.setattrvalue("attr2", "7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddPlConModel;");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Plausibility Constraint AddPlConModel.AddPlConTopic.AddPlConView.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
 	// ein MandatoryConstraint false ergibt.
