@@ -2223,14 +2223,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(ValidationConfig.OFF.equals(validateMultiplicity)){
 				// skip multiplicity validation
 			}else{
-				 int structc=iomObj.getattrvaluecount(attrName);
-				 if(attr.getDomain().isMandatoryConsideringAliases() && structc==0){
-					 if(doItfLineTables && type instanceof SurfaceType){
-						 // SURFACE; no attrValue in maintable
-					 }else{
-						 logMsg(validateMultiplicity,"Attribute {0} requires a value", attrPath);
+				Boolean topologyValidationOk=(Boolean)pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY_VALIDATION_OK);
+				if(topologyValidationOk==null || topologyValidationOk){
+					 int structc=iomObj.getattrvaluecount(attrName);
+					 if(attr.getDomain().isMandatoryConsideringAliases() && structc==0){
+						 if(doItfLineTables && type instanceof SurfaceType){
+							 // SURFACE; no attrValue in maintable
+						 }else{
+							 logMsg(validateMultiplicity,"Attribute {0} requires a value", attrPath);
+						 }
 					 }
-				 }
+				}
 			}
 			if(ValidationConfig.OFF.equals(validateType)){
 				// skip type validation
