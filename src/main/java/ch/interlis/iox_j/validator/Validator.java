@@ -1049,7 +1049,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							}
 						}
 						return new Value(counter);
-					} else if (value.getComplexValue()!=null){
+					} else if (value.getComplexObjects()!=null){
 						int countOfObjects = iomObj.getattrvaluecount(anArgument.toString());
 						return new Value(countOfObjects);
 					}
@@ -1330,7 +1330,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 						return new Value(type, objValue);
 					} else {
-						return new Value(iomObj.getattrobj(attrName, 0));
+						List<IomObject> objects = new ArrayList<IomObject>();
+						objects.add(iomObj.getattrobj(attrName, 0));
+						return new Value(objects);
 					}
 				}
 			}
