@@ -83,19 +83,20 @@ class PolygonizeGraph
   public void addEdge(LineString line)
   {
     if (line.isEmpty()) { return; }
+    
     Coordinate[] linePts = CoordinateArrays.removeRepeatedPoints(line.getCoordinates());
     
     if (linePts.length < 2) { return; }
     
-    Coordinate startPt = linePts[0];
-    Coordinate endPt = linePts[linePts.length - 1];
+    Coordinate startPt = line.getStartPoint().getCoordinate();
+    Coordinate endPt = line.getEndPoint().getCoordinate();
 
     Node nStart = getNode(startPt);
     Node nEnd = getNode(endPt);
 
-    // TODO 20150703 use directionPt based on arc start/end direction angle
-    DirectedEdge de0 = new PolygonizeDirectedEdge(nStart, nEnd, linePts[1], true);
-    DirectedEdge de1 = new PolygonizeDirectedEdge(nEnd, nStart, linePts[linePts.length - 2], false);
+    double maxOverlap=0.0;
+    DirectedEdge de0 = new PolygonizeDirectedEdge(nStart, nEnd, CompoundCurve.getDirectionPt(line,true), true);
+    DirectedEdge de1 = new PolygonizeDirectedEdge(nEnd, nStart, CompoundCurve.getDirectionPt(line,false), false);
     Edge edge = new PolygonizeEdge(line);
     edge.setDirectedEdges(de0, de1);
     add(edge);

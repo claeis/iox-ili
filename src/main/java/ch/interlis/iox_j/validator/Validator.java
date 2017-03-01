@@ -120,7 +120,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private HashMap<Constraint,Viewable> additionalConstraints=new HashMap<Constraint,Viewable>();
 	
 	@Deprecated
-	protected Validator(TransferDescription td, IoxValidationConfig validationConfig,
+	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
 			IoxLogging errs, LogEventFactory errFact, Settings config) {
 		this(td, validationConfig,errs, errFact, new PipelinePool(),config);
 	}
