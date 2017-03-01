@@ -15,8 +15,9 @@ CONTRACTED MODEL FunctionsExt23
     	END StructA;
     	
 		CLASS ClassD =
+			attr2 : BOOLEAN;
 			attr3 : BAG {0..*} OF StructA;
-			MANDATORY CONSTRAINT elementCount(attr3);
+			MANDATORY CONSTRAINT elementCount(attr3) == attr2;
 		END ClassD;
     	
 		CLASS ClassA =

@@ -1331,7 +1331,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						return new Value(type, objValue);
 					} else {
 						List<IomObject> objects = new ArrayList<IomObject>();
-						objects.add(iomObj.getattrobj(attrName, 0));
+						int attrValueCount = iomObj.getattrvaluecount(attrName);
+						// iterate, because it's a list of attrObjects.
+						for(int i=0;i<attrValueCount;i++){
+							objects.add(iomObj.getattrobj(attrName, i));
+						}
 						return new Value(objects);
 					}
 				}

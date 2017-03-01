@@ -16,8 +16,6 @@ public class Value {
 	private boolean error=false;
 	private boolean booleanIsDefined=false;
 	private boolean booleanValue;
-//	private IomObject complexValue=null; // léschen. bisherige Referenz auf complexObjects zuweisen. (Achtung Liste).
-	
 	private String refTypeName;
 	private String value=null;
 	private List<IomObject> complexObjects;
@@ -50,10 +48,6 @@ public class Value {
 	public Value(List<IomObject> complexObjects){
 		this.complexObjects = complexObjects;
 	}
-	
-//	public Value(IomObject value){
-//		this.complexValue = value;
-//	}
 	
 	public Value(RoleDef role){
 		this.role = role;
@@ -117,13 +111,6 @@ public class Value {
 		return role;
 	}
 	
-//	public IomObject getComplexValue(){
-//		if(skipEvaluation()){
-//			throw new IllegalArgumentException();
-//		}
-//		return complexValue;
-//	}
-	
 	public Collection<IomObject> getComplexObjects(){
 		if(skipEvaluation()){
 			throw new IllegalArgumentException();
@@ -136,9 +123,7 @@ public class Value {
 	}
 	
 	public boolean isUndefined(){
-		return !(
-						//getComplexValue() != null ||
-						getValue() != null ||
+		return !(getValue() != null ||
 						getComplexObjects() != null ||
 						booleanIsDefined ||
 						getRole() != null ||
