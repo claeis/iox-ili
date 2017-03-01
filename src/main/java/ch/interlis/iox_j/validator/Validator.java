@@ -2428,7 +2428,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		CompoundCurve seg=null;
 		try {
 			Holder<Boolean> foundErrs=new Holder<Boolean>();
-			seg = Iox2jtsext.polyline2JTS(iomValue, false, 0.0,foundErrs,errFact,0.0,validateType);
+			seg = Iox2jtsext.polyline2JTS(iomValue, false, 0.0,foundErrs,errFact,0.0,validateType,ValidationConfig.WARNING);
 			if(seg==null || foundErrs.value){
 				return;
 			}

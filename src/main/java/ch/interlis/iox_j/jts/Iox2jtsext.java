@@ -174,9 +174,9 @@ public class Iox2jtsext {
 		LogEventFactory errs=new LogEventFactory();
 		errs.setLogger(logger);
 		Holder<Boolean> foundErrs=new Holder<Boolean>();
-		return polyline2JTS(polylineObj, isSurfaceOrArea, p,foundErrs,errs,0.0,ValidationConfig.WARNING);
+		return polyline2JTS(polylineObj, isSurfaceOrArea, p,foundErrs,errs,0.0,ValidationConfig.WARNING,ValidationConfig.WARNING);
 	}
-	public static CompoundCurve polyline2JTS(IomObject polylineObj,boolean isSurfaceOrArea,double p,Holder<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType)
+	public static CompoundCurve polyline2JTS(IomObject polylineObj,boolean isSurfaceOrArea,double p,Holder<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType,String degeneratedArcValidationType)
 	throws IoxException
 	{
 		foundErrs.value=false;
@@ -218,7 +218,7 @@ public class Iox2jtsext {
 					}else{
 						Coordinate newSegEndPt=coord2JTS(segment);
 						if(lastSegmentEndpoint.equals2D(newSegEndPt, tolerance)){
-							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord ignored at {0}",newSegEndPt.toString());
+							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegEndPt.toString());
 						}else{
 							curve=new StraightSegment(lastSegmentEndpoint,newSegEndPt);
 							ret.add(curve);
@@ -235,22 +235,22 @@ public class Iox2jtsext {
 					}
 					if(lastSegmentEndpoint.equals2D(newSegMidPt, tolerance)){
 						if(newSegMidPt.equals2D(newSegEndPt, tolerance)){
-							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"arc ignored at {0}",newSegEndPt.toString());
+							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegEndPt.toString());
 						}else{
-							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"arc convertet to straight at {0}",newSegMidPt.toString());
+							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegMidPt.toString());
 							curve=new StraightSegment(lastSegmentEndpoint,newSegEndPt);
 							ret.add(curve);
 							lastSegmentEndpoint=curve.getEndPoint();
 						}
 					}else if(newSegMidPt.equals2D(newSegEndPt, tolerance)){
-						foundErrs.value = foundErrs.value || logMsg(errs,validationType,"arc convertet to straight at {0}",newSegMidPt.toString());
+						foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegMidPt.toString());
 						curve=new StraightSegment(lastSegmentEndpoint,newSegMidPt);
 						ret.add(curve);
 						lastSegmentEndpoint=curve.getEndPoint();
 					}else{
 						curve=new ArcSegment(lastSegmentEndpoint,newSegMidPt,newSegEndPt);
 						if(((ArcSegment) curve).isStraight()){
-							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"arc convertet to straight at {0}",((ArcSegment) curve).getMidPoint().toString());
+							foundErrs.value = foundErrs.value || logMsg(errs,degeneratedArcValidationType,"arc is straight at {0}",((ArcSegment) curve).getMidPoint().toString());
 							curve=new StraightSegment(curve.getStartPoint(),curve.getEndPoint());
 						}
 						ret.add(curve);
@@ -337,7 +337,7 @@ public class Iox2jtsext {
 				for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
 					IomObject polyline=boundary.getattrobj("polyline",polylinei);
 					Holder<Boolean> lineErrs=new Holder<Boolean>();
-					CompoundCurve jtsLine=polyline2JTS(polyline,true,strokeP,lineErrs,errs,tolerance,validationType);
+					CompoundCurve jtsLine=polyline2JTS(polyline,true,strokeP,lineErrs,errs,tolerance,validationType,ValidationConfig.WARNING);
 					if(lineErrs.value){
 						foundErrs.value=foundErrs.value || lineErrs.value;
 					}

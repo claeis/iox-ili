@@ -22,6 +22,7 @@ import ch.interlis.iox_j.jts.Iox2jtsException;
 import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.jts.Jtsext2iox;
 import ch.interlis.iox_j.logging.LogEventFactory;
+import ch.interlis.iox_j.validator.ValidationConfig;
 
 public class ItfAreaPolygon2Linetable {
 
@@ -46,7 +47,7 @@ public class ItfAreaPolygon2Linetable {
 	public void addLines(String mainObjTid,String internalTid,ArrayList<IomObject> ioxlines,String validationType,LogEventFactory errs) throws IoxException {
 		for(IomObject ioxline:ioxlines){
 			Holder<Boolean> foundErrs=new Holder<Boolean>();
-			CompoundCurve line=Iox2jtsext.polyline2JTS(ioxline, false, 0.0,foundErrs,errs,0.0,validationType);
+			CompoundCurve line=Iox2jtsext.polyline2JTS(ioxline, false, 0.0,foundErrs,errs,0.0,validationType,ValidationConfig.WARNING);
 			if(line!=null){
 				if(internalTid!=null){
 					line.setUserData(internalTid);
