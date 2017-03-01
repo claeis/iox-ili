@@ -135,7 +135,7 @@ MODEL Function23
 		END StructM;
 		
 		CLASS ClassN =
-		   attrbag1 : BAG OF StructM;
+		   attrbag1 : BAG {0..*} OF StructM;
 		   attr2 : 0..10;
 		   MANDATORY CONSTRAINT
 		   		(INTERLIS.elementCount(attrbag1)) == attr2;

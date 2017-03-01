@@ -18,10 +18,11 @@ public class Value {
 	private boolean error=false;
 	private boolean booleanIsDefined=false;
 	private boolean booleanValue;
-	private IomObject complexValue=null;
+	private IomObject complexValue=null; // léschen. bisherige Referenz auf complexObjects zuweisen. (Achtung Liste).
+	
 	private String refTypeName;
 	private String value=null;
-	private List<IomObject> values;
+	private List<IomObject> complexObjects;
 	private RoleDef role=null;
 	private int numeric=0;
 	private boolean numericIsDefined=false;
@@ -48,8 +49,8 @@ public class Value {
 		this.type=type;
 	}
 	
-	public Value(List<IomObject> values){
-		this.values = values;
+	public Value(List<IomObject> complexObjects){
+		this.complexObjects = complexObjects;
 	}
 	
 	public Value(IomObject value){
@@ -125,11 +126,11 @@ public class Value {
 		return complexValue;
 	}
 	
-	public Collection<IomObject> getValues(){
+	public Collection<IomObject> getComplexObjects(){
 		if(skipEvaluation()){
 			throw new IllegalArgumentException();
 		}
-		return values;
+		return complexObjects;
 	}
 	
 	public static Value createUndefined(){
@@ -139,7 +140,7 @@ public class Value {
 	public boolean isUndefined(){
 		return !(getComplexValue() != null ||
 						getValue() != null ||
-						getValues() != null ||
+						getComplexObjects() != null ||
 						booleanIsDefined ||
 						getRole() != null ||
 						numericIsDefined ||
