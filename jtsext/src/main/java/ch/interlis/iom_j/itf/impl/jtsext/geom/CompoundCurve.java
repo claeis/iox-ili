@@ -10,6 +10,7 @@ import ch.interlis.iom_j.itf.impl.jtsext.io.WKTWriterJtsext;
 
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateArrays;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -336,6 +337,43 @@ public class CompoundCurve extends LineString {
 			}
 		}
 		
+	}
+
+	public static Coordinate getDirectionPt(LineString line, boolean atStart) {
+		if(line instanceof CompoundCurveRing){
+			if(atStart){
+				line=((CompoundCurveRing)line).getLines().get(0);
+			}else{
+				ArrayList<CompoundCurve> lines = ((CompoundCurveRing)line).getLines();
+				line=lines.get(lines.size()-1);
+			}
+		}
+		if(line instanceof CompoundCurve){
+			ArrayList<CurveSegment> segs = ((CompoundCurve) line).getSegments();
+			CurveSegment seg=null;
+			if(atStart){
+				seg=segs.get(0);
+				if(seg instanceof StraightSegment){
+					return seg.getEndPoint();
+				}
+			}else{
+				seg=segs.get(segs.size()-1);
+				if(seg instanceof StraightSegment){
+					return seg.getStartPoint();
+				}
+			}
+			Coordinate directionPt=((ArcSegment)seg).getDirectionPt(atStart);
+			return directionPt;
+		}	
+		
+	    Coordinate[] linePts = CoordinateArrays.removeRepeatedPoints(line.getCoordinates());
+		if(atStart){
+		    Coordinate startPt = linePts[0];
+		    return startPt;
+		}else{
+		    Coordinate endPt = linePts[linePts.length - 1];			    
+		    return endPt;
+		}
 	}
 
 }

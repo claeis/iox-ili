@@ -39,23 +39,19 @@ class PolygonizeDirectedEdge
   }
   protected void adjustDirectionPt()
   {
-	  Coordinate directionPt=null;
-		 PolygonizeEdge edge=(PolygonizeEdge)getEdge();
-		 CompoundCurve line = (CompoundCurve)edge.getLine();
-	Coordinate[] linePts = CoordinateArrays.removeRepeatedPoints(line.getCoordinates());
-
-	  if(getEdgeDirection()){
-		 directionPt=linePts[1];
-	  }else{
-		  directionPt=linePts[linePts.length - 2];
+	  if(true){
+		  Coordinate directionPt=null;
+			 PolygonizeEdge edge=(PolygonizeEdge)getEdge();
+			 CompoundCurve line = (CompoundCurve)edge.getLine();
+		  directionPt=CompoundCurve.getDirectionPt(line,getEdgeDirection());		  
+		  
+		  p1=new Coordinate(directionPt);
+		    double dx = p1.x - p0.x;
+		    double dy = p1.y - p0.y;
+		    quadrant = Quadrant.quadrant(dx, dy);
+		    angle = Math.atan2(dy, dx);
+		  
 	  }
-	  
-	  
-	  p1=new Coordinate(directionPt);
-	    double dx = p1.x - p0.x;
-	    double dy = p1.y - p0.y;
-	    quadrant = Quadrant.quadrant(dx, dy);
-	    angle = Math.atan2(dy, dx);
   }
   /**
    * Returns the identifier attached to this directed edge.

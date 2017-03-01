@@ -124,7 +124,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private PlausibilityPool plausibilityPool=null;
 	
 	@Deprecated
-	protected Validator(TransferDescription td, IoxValidationConfig validationConfig,
+	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
 			IoxLogging errs, LogEventFactory errFact, Settings config) {
 		this(td, validationConfig,errs, errFact, new PipelinePool(),config);
 	}
@@ -2229,14 +2229,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(ValidationConfig.OFF.equals(validateMultiplicity)){
 				// skip multiplicity validation
 			}else{
-				 int structc=iomObj.getattrvaluecount(attrName);
-				 if(attr.getDomain().isMandatoryConsideringAliases() && structc==0){
-					 if(doItfLineTables && type instanceof SurfaceType){
-						 // SURFACE; no attrValue in maintable
-					 }else{
-						 logMsg(validateMultiplicity,"Attribute {0} requires a value", attrPath);
+				Boolean topologyValidationOk=(Boolean)pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY_VALIDATION_OK);
+				if(topologyValidationOk==null || topologyValidationOk){
+					 int structc=iomObj.getattrvaluecount(attrName);
+					 if(attr.getDomain().isMandatoryConsideringAliases() && structc==0){
+						 if(doItfLineTables && type instanceof SurfaceType){
+							 // SURFACE; no attrValue in maintable
+						 }else{
+							 logMsg(validateMultiplicity,"Attribute {0} requires a value", attrPath);
+						 }
 					 }
-				 }
+				}
 			}
 			if(ValidationConfig.OFF.equals(validateType)){
 				// skip type validation
@@ -2431,7 +2434,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		CompoundCurve seg=null;
 		try {
 			Holder<Boolean> foundErrs=new Holder<Boolean>();
-			seg = Iox2jtsext.polyline2JTS(iomValue, false, 0.0,foundErrs,errFact,0.0,validateType);
+			seg = Iox2jtsext.polyline2JTS(iomValue, false, 0.0,foundErrs,errFact,0.0,validateType,ValidationConfig.WARNING);
 			if(seg==null || foundErrs.value){
 				return;
 			}

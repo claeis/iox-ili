@@ -12,7 +12,7 @@ public class ArcSegment extends CurveSegment {
 	private Coordinate endPoint=null;
 	private Coordinate centerPoint=null;
 	private com.vividsolutions.jts.geom.CoordinateList ret=null;
-	
+	private static final double EPSILON=0.00000001;
 
 	public ArcSegment(Object userData,Coordinate startPoint, Coordinate midPoint,
 			Coordinate endPoint) {
@@ -251,5 +251,14 @@ public class ArcSegment extends CurveSegment {
 			getCenterPoint();
 		}
 		return sign;
+	}
+	public Coordinate getDirectionPt(boolean atStart) {
+		if(atStart){
+			Coordinate directionPt=CompoundCurve.calcKleinp(getCenterPoint(), startPoint, radius, 1.0*-sign);
+			return directionPt;
+		}else{
+			Coordinate directionPt=CompoundCurve.calcKleinp(getCenterPoint(), endPoint, radius, -1.0*-sign);
+			return directionPt;
+		}
 	}
 }
