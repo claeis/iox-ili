@@ -1043,8 +1043,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = (Evaluable[]) functionCall.getArguments();
 				Evaluable anArgument = (Evaluable) arguments[0];
-				int elementCount = iomObj.getattrvaluecount(anArgument.toString());
-				return new Value(elementCount);
+				Value value=evaluateExpression(iomObj, anArgument);
+				if (value.skipEvaluation()){
+					return value;
+				}
+				if (value.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				return new Value(value.getComplexObjects().size());
 			} else if (function.getScopedName(null).equals("INTERLIS.isOfClass")){
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = functionCall.getArguments();
