@@ -120,8 +120,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String validateType=null;
 	private Map<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	private HashMap<Constraint,Viewable> additionalConstraints=new HashMap<Constraint,Viewable>();
-	private Map<PlausibilityConstraint, PlausibilityPool> plausibilityConstraintObjects=new LinkedHashMap<PlausibilityConstraint, PlausibilityPool>();
-	private PlausibilityPool plausibilityPool=null;
+	private Map<PlausibilityConstraint, PlausibilityPoolValue> plausibilityConstraints=new LinkedHashMap<PlausibilityConstraint, PlausibilityPoolValue>();
 	
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -141,7 +140,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		this.config=config;
 		this.pipelinePool=pipelinePool;
 		objPoolManager=new ObjectPoolManager();
-		plausibilityPool=new PlausibilityPool();
 		Map<String,Class> cf=(Map<String, Class>) config.getTransientObject(CONFIG_CUSTOM_FUNCTIONS);
 		if(cf!=null){
 			customFunctions=cf;
@@ -211,9 +209,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
 			iterateThroughAllObjects();
 			validateAllAreas();
-			if(!plausibilityConstraintObjects.isEmpty()){
-				validatePlausibilityConstraint();
-			}
+			validatePlausibilityConstraints();
 		}
 	}
 	
@@ -370,7 +366,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								validateUniquenessConstraint(iomObj, uniquenessConstraint);
 							} else if(constraintObj instanceof PlausibilityConstraint){
 								PlausibilityConstraint plausibilityConstraint = (PlausibilityConstraint) constraintObj;
-								addPlausibilityConstraints(plausibilityConstraint, iomObj);
+								fillOfPlausibilityConstraintMap(plausibilityConstraint, iomObj);
 							}
 						}
 					}
@@ -407,7 +403,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								constraints.add(plausibilityConstraint);
 								errs.addEvent(errFact.logInfoMsg("validate plausibility constraint {0}...",getScopedName(plausibilityConstraint)));
 							}
-							addPlausibilityConstraints(plausibilityConstraint, iomObj);
+							fillOfPlausibilityConstraintMap(plausibilityConstraint, iomObj);
 						}
 					}
 				}
@@ -455,55 +451,57 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private void addPlausibilityConstraints(PlausibilityConstraint plausibilityConstraint, IomObject iomObj){
-		Evaluable condition = (Evaluable) plausibilityConstraint.getCondition();
+	private void fillOfPlausibilityConstraintMap(PlausibilityConstraint currentConstraint, IomObject iomObj){
+		Evaluable condition = (Evaluable) currentConstraint.getCondition();
 		Value conditionValue = evaluateExpression(iomObj, condition);
-		if(plausibilityConstraintObjects.containsKey(plausibilityConstraint)){
-			PlausibilityPool containedConstraint = plausibilityConstraintObjects.get(plausibilityConstraint);
-			double resultTrue = containedConstraint.getResultTrue();
-			double resultTotal = containedConstraint.getResultTotal();
+		if(plausibilityConstraints.containsKey(currentConstraint)){
+			PlausibilityPoolValue poolConstraintValues = plausibilityConstraints.get(currentConstraint);
+			double successfulResults = poolConstraintValues.getSuccessfulResults();
+			double totalSumOfConstraints = poolConstraintValues.getTotalSumOfConstraints();
 			if (conditionValue.isTrue()){
-				plausibilityConstraintObjects.remove(plausibilityConstraint);
-				plausibilityConstraintObjects.put(plausibilityConstraint, new PlausibilityPool(resultTrue+1.0, resultTotal+1.0));
+				plausibilityConstraints.remove(currentConstraint);
+				plausibilityConstraints.put(currentConstraint, new PlausibilityPoolValue(successfulResults+1.0, totalSumOfConstraints+1.0));
 			} else {
-				plausibilityConstraintObjects.remove(plausibilityConstraint);
-				plausibilityConstraintObjects.put(plausibilityConstraint, new PlausibilityPool(resultTrue, resultTotal+1.0));
+				// error, undefined, false
+				plausibilityConstraints.remove(currentConstraint);
+				plausibilityConstraints.put(currentConstraint, new PlausibilityPoolValue(successfulResults, totalSumOfConstraints+1.0));
 			}
 		} else {
 			if (conditionValue.isTrue()){
-				plausibilityConstraintObjects.put(plausibilityConstraint, new PlausibilityPool(1.0, 1.0));
+				plausibilityConstraints.put(currentConstraint, new PlausibilityPoolValue(1.0, 1.0));
 			} else {
-				plausibilityConstraintObjects.put(plausibilityConstraint, new PlausibilityPool(0.0, 1.0));
+				// error, undefined, false
+				plausibilityConstraints.put(currentConstraint, new PlausibilityPoolValue(0.0, 1.0));
 			}
 		}
 	}
 	
-	private void validatePlausibilityConstraint(){
-		for (Entry<PlausibilityConstraint, PlausibilityPool> entry : plausibilityConstraintObjects.entrySet()){
-			String check = getScopedName(entry.getKey());
+	private void validatePlausibilityConstraints(){
+		for (Entry<PlausibilityConstraint, PlausibilityPoolValue> constraintEntry : plausibilityConstraints.entrySet()){
+			String check = getScopedName(constraintEntry.getKey());
 			checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
 			if(ValidationConfig.OFF.equals(checkConstraint)){
 				// skip it
 			}else{
-				String msg=validationConfig.getConfigValue(getScopedName(entry.getKey()), ValidationConfig.MSG);
-				if(entry.getKey().getDirection()==0){ // >=
-					if(((entry.getValue().getResultTrue()/entry.getValue().getResultTotal())*100) >= entry.getKey().getPercentage()){
+				String msg=validationConfig.getConfigValue(getScopedName(constraintEntry.getKey()), ValidationConfig.MSG);
+				if(constraintEntry.getKey().getDirection()==0){ // >=
+					if(((constraintEntry.getValue().getSuccessfulResults()/constraintEntry.getValue().getTotalSumOfConstraints())*100) >= constraintEntry.getKey().getPercentage()){
 						// ok
 					} else {
 						if(msg!=null && msg.length()>0){
 							logMsg(checkConstraint,msg);
 						} else {
-							logMsg(checkConstraint,"Plausibility Constraint {0} is not true.", getScopedName(entry.getKey()));
+							logMsg(checkConstraint,"Plausibility Constraint {0} is not true.", getScopedName(constraintEntry.getKey()));
 						}
 					}
-				} else if(entry.getKey().getDirection()==1){ // <=
-					if(((entry.getValue().getResultTrue()/entry.getValue().getResultTotal())*100) <= entry.getKey().getPercentage()){
+				} else if(constraintEntry.getKey().getDirection()==1){ // <=
+					if(((constraintEntry.getValue().getSuccessfulResults()/constraintEntry.getValue().getTotalSumOfConstraints())*100) <= constraintEntry.getKey().getPercentage()){
 						// ok
 					} else {
 						if(msg!=null && msg.length()>0){
 							logMsg(checkConstraint,msg);
 						} else {
-							logMsg(checkConstraint,"Plausibility Constraint {0} is not true.", getScopedName(entry.getKey()));
+							logMsg(checkConstraint,"Plausibility Constraint {0} is not true.", getScopedName(constraintEntry.getKey()));
 						}
 					}
 				}
