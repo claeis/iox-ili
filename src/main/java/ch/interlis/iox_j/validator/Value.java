@@ -12,19 +12,24 @@ import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.iom.IomObject;
 
 public class Value {
-	private boolean notYetImplemented=false;
-	private boolean error=false;
+	// boolean
 	private boolean booleanIsDefined=false;
 	private boolean booleanValue;
-	private String refTypeName;
-	private String value=null;
-	private List<IomObject> complexObjects;
-	private RoleDef role=null;
+	// numeric
 	private int numeric=0;
 	private boolean numericIsDefined=false;
-	private Viewable viewable=null;
+	// type & value
 	private Type type=null;
-	private String functionName=null;
+	private String value=null;
+	private String refTypeName;
+	private List<IomObject> complexObjects;
+	private RoleDef role=null;
+	private Viewable viewable=null;
+	
+	// not yet implemented
+	private boolean notYetImplemented=false;
+	// error
+	private boolean error=false;
 	
 	public Value(boolean booleanValue) {
 		this.booleanValue = booleanValue;

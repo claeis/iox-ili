@@ -29,6 +29,7 @@ import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.Constant;
 import ch.interlis.ili2c.metamodel.Constant.Enumeration;
 import ch.interlis.ili2c.metamodel.Constraint;
+import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Domain;
@@ -312,6 +313,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String getScopedName(Constraint cnstr) {
 		return cnstr.getContainer().getScopedName(null)+"."+cnstr.getName();
 	}
+	private String getScopedName(Viewable viewable) {
+		return viewable.getContainer().getScopedName(null)+"."+viewable.getName();
+	}
 	private boolean isBasketSame(RoleDef role, ReferenceType ref,String bidOfTargetObject){
 		if(!currentBasketId.equals(bidOfTargetObject)){
 			if(role != null){
@@ -341,7 +345,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				setCurrentMainObj(iomObj);
 				Object modelElement=tag2class.get(iomObj.getobjecttag());
 				Viewable currentClass= (Viewable) modelElement;
-				String check = currentClass.getContainer().getScopedName(null)+"."+currentClass.getName();
+				String check = getScopedName(currentClass);
 				checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
 				if(ValidationConfig.OFF.equals(checkConstraint)){
 					 // skip it
@@ -639,6 +643,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	private Value evaluateExpression(IomObject iomObj, Evaluable expression) {
+		TextType texttype = new TextType();
 		if(expression instanceof Equality){
 			// ==
 			Equality equality = (Equality) expression;
@@ -879,14 +884,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					} else if (value[0].equals("false")){
 						return new Value(false);
 					}
-					TextType texttype = new TextType();
 					return new Value(texttype, value[0]);
 				}
 			// TODO instance of EnumerationRange
 			} else if (constantObj instanceof Constant.Text){
 				Constant.Text textConstant = (Constant.Text) constantObj;
 				if(textConstant!=null){
-					TextType texttype = new TextType();
 					return new Value(texttype, textConstant.getValue());
 			}
 			} else if (constantObj instanceof Constant.Numeric){
@@ -912,8 +915,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(attrPath.getValue() instanceof LocalAttribute){
 					LocalAttribute attrLocal = (LocalAttribute) attrPath.getValue();
 					String attrName = attrLocal.getName();
-					TextType text = new TextType();
-					return new Value(text, attrName);
+					return new Value(texttype, attrName);
 				}
 			}
 		//TODO instance of ConditionalExpression
@@ -932,9 +934,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 					if(arg.getValue()!=null){
 						int lengthOfArgument = arg.getValue().length();
-						
 						return new Value(lengthOfArgument);
-				}
+					}
 				}
 				return new Value(false);
 			} else if(function.getScopedName(null).equals("INTERLIS.trim") || function.getScopedName(null).equals("INTERLIS.trimM")){
@@ -947,8 +948,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if (arg.isUndefined()){
 						return Value.createSkipEvaluation();
 				}
-					TextType type = new TextType();
-					return new Value(type, arg.getValue().trim());
+					return new Value(texttype, arg.getValue().trim());
 				}
 			} else if (function.getScopedName(null).equals("INTERLIS.isEnumSubVal")){
 				Evaluable[] arguments = functionCallObj.getArguments();
@@ -1069,7 +1069,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					return Value.createSkipEvaluation();
 				}
 				if(childViewable.getViewable().equals(parentViewable.getViewable())){
-							return new Value(true);
+					return new Value(true);
 				}
 				if(parentViewable.getViewable().isExtending(childViewable.getViewable())){
 					return new Value(true);					
@@ -1356,7 +1356,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {
-		String roleQName = role.getContainer().getScopedName(null)+"."+role.getName();
+		String roleQName = getScopedName(role);
 		String multiplicity=validationConfig.getConfigValue(roleQName, ValidationConfig.MULTIPLICITY);
 		if(multiplicity !=null && ValidationConfig.OFF.equals(multiplicity)){
 			// skip it
@@ -1387,8 +1387,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(targetOid==null){
 			return;
 		}
-		String roleQName = role.getContainer().getScopedName(null)+"."+role.getName();
-		String validateTarget=validationConfig.getConfigValue(roleQName, ValidationConfig.TARGET);
+		String check = getScopedName(role);
+		String validateTarget=validationConfig.getConfigValue(check, ValidationConfig.TARGET);
 		if(ValidationConfig.OFF.equals(validateTarget)){
 			// skip it
 		}else{
@@ -2170,8 +2170,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	private void validateAttrValue(IomObject iomObj, AttributeDef attr,String attrPath) throws IoxException {
-		 String attrName=attr.getName();
-		 String attrQName=attr.getContainer().getScopedName(null)+"."+attrName;
+		 String attrName = attr.getName();
+		 String attrQName = getScopedName(attr);
 		 if(attrPath==null){
 			 attrPath=attrName;
 		 }else{
