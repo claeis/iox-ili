@@ -1015,42 +1015,29 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = (Evaluable[]) functionCall.getArguments();
 				Evaluable anArgument = (Evaluable) arguments[0];
-				if(anArgument instanceof Objects){
-					Value value=evaluateExpression(iomObj, anArgument);
-					if (value.skipEvaluation()){
-						return value;
-							}
-					if (value.isUndefined()){
-						return Value.createSkipEvaluation();
-						}
+				Value value=evaluateExpression(iomObj, anArgument);
+				if (value.skipEvaluation()){
+					return value;
+				}
+				if (value.isUndefined()){
+					return Value.createSkipEvaluation();
+				}
+				if(value.getComplexObjects()!=null){
 					return new Value(value.getComplexObjects().size());
-				} else if (anArgument instanceof ObjectPath){
-					Value value=evaluateExpression(iomObj, anArgument);
-					if (value.skipEvaluation()){
-						return value;
-					}
-					if (value.isUndefined()){
-						return Value.createSkipEvaluation();
-					}
-					// through all objects
+				} else if(value.getViewable()!=null) {
 					Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
 					int counter = 0;
-					if(value.getViewable()!=null){
-						while(objectIterator.hasNext()){
-							IomObject aIomObj = (IomObject) objectIterator.next();
-							if(aIomObj!=null){
-								Object modelElement=tag2class.get(aIomObj.getobjecttag());
-								Viewable anObjectClass = (Viewable) modelElement;
-								if(value.getViewable().equals(anObjectClass)){
-									counter+=1;
-								}
+					while(objectIterator.hasNext()){
+						IomObject aIomObj = (IomObject) objectIterator.next();
+						if(aIomObj!=null){
+							Object modelElement=tag2class.get(aIomObj.getobjecttag());
+							Viewable anObjectClass = (Viewable) modelElement;
+							if(value.getViewable().equals(anObjectClass)){
+								counter+=1;
 							}
 						}
-						return new Value(counter);
-					} else if (value.getComplexObjects()!=null){
-						int countOfObjects = iomObj.getattrvaluecount(anArgument.toString());
-						return new Value(countOfObjects);
 					}
+					return new Value(counter);
 				}
 			} else if (function.getScopedName(null).equals("INTERLIS.elementCount")){
 				FunctionCall functionCall = (FunctionCall) expression;
@@ -1077,10 +1064,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 				if(childViewable.getViewable().equals(parentViewable.getViewable())){
 							return new Value(true);
-						}
+				}
 				if(parentViewable.getViewable().isExtending(childViewable.getViewable())){
 					return new Value(true);					
-					}
+				}
 				return new Value(false);
 			} else if (function.getScopedName(null).equals("INTERLIS.isSubClass")){
 				FunctionCall functionCall = (FunctionCall) expression;
@@ -1112,7 +1099,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				Value targetViewable=evaluateExpression(iomObj,arguments[0]);
 				if (targetViewable.skipEvaluation()){
 					return targetViewable;
-			}
+				}
 				if (targetViewable.isUndefined()){
 					return Value.createSkipEvaluation();
 				}

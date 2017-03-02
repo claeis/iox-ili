@@ -519,12 +519,12 @@ public class Function23Test {
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: objectCount All die richtige Menge der Objekte der Klasse, welche gesucht wird, ausgegeben wird.
 	@Test
 	public void objectCountALL_Ok(){
+		// obj1
 		Iom_jObject iomObjQ1=new Iom_jObject(ILI_CLASSQ, OBJ_OID1);
-		iomObjQ1.setattrvalue("Art", "a");
+		iomObjQ1.setattrvalue("Art", "a"); // 1. Art=a
+		// obj2
 		Iom_jObject iomObjQ2=new Iom_jObject(ILI_CLASSQ, OBJ_OID2);
-		iomObjQ2.setattrvalue("Art", "a");
-		Iom_jObject iomObjR1=new Iom_jObject(ILI_CLASSR, OBJ_OID3);
-		Iom_jObject iomObjR2=new Iom_jObject(ILI_CLASSR, OBJ_OID4);
+		iomObjQ2.setattrvalue("Art", "a"); // 2. Art=a
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -534,8 +534,6 @@ public class Function23Test {
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjQ1));
 		validator.validate(new ObjectEvent(iomObjQ2));
-		validator.validate(new ObjectEvent(iomObjR1));
-		validator.validate(new ObjectEvent(iomObjR2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
@@ -938,6 +936,39 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Rolle t1, 2 mal aufgerufen wird.
+	@Test
+	public void objectCountRole_RoleCountEqual_Ok(){
+		// erstes S->T
+		// zweites S->T
+		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
+		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, OBJ_OID3);
+		Iom_jObject iomObjS2=new Iom_jObject(ILI_CLASSS, OBJ_OID2);
+		Iom_jObject iomObjT2=new Iom_jObject(ILI_CLASST, OBJ_OID4);
+		Iom_jObject iomObjST1=new Iom_jObject(ILI_ASSOC_ST1, null);
+		iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID1);
+		iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID3);
+		Iom_jObject iomObjST2=new Iom_jObject(ILI_ASSOC_ST1, null);
+		iomObjST2.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID2);
+		iomObjST2.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID4);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjS1));
+		validator.validate(new ObjectEvent(iomObjT1));
+		validator.validate(new ObjectEvent(iomObjST1));
+		validator.validate(new ObjectEvent(iomObjS2));
+		validator.validate(new ObjectEvent(iomObjT2));
+		validator.validate(new ObjectEvent(iomObjST2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 	//#########################################################//
 	//######## FAIL FUNCTIONS #################################//
 	//#########################################################//
