@@ -427,7 +427,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						RoleDef roleDef = (RoleDef) objA.obj;
 						if(!abstractLeafElement.contains(roleDef)){
 							abstractLeafElement.add(roleDef);
-							errs.addEvent(errFact.logInfoMsg("validate role reference {0}...",getScopedName(roleDef)));
+							errs.addEvent(errFact.logInfoMsg("validate role reference of {0}...",getScopedName(roleDef)));
+
+							// query for disabled multiplicity check
+							String checkRole = getScopedName(roleDef);
+							String validateTarget=validationConfig.getConfigValue(checkRole, ValidationConfig.MULTIPLICITY);
+							if(ValidationConfig.OFF.equals(validateTarget)){
+								errs.addEvent(errFact.logInfoMsg("... check for multiplicity of [{0}] disabled by user.", checkRole));
+							}
 						}
 						validateRoleReference(roleDef, iomObj);
 					}
