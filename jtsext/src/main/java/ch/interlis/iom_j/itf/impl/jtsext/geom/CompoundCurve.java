@@ -368,10 +368,10 @@ public class CompoundCurve extends LineString {
 		
 	    Coordinate[] linePts = CoordinateArrays.removeRepeatedPoints(line.getCoordinates());
 		if(atStart){
-		    Coordinate startPt = linePts[0];
+		    Coordinate startPt = linePts[1];
 		    return startPt;
 		}else{
-		    Coordinate endPt = linePts[linePts.length - 1];			    
+		    Coordinate endPt = linePts[linePts.length - 2];			    
 		    return endPt;
 		}
 	}
