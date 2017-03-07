@@ -91,6 +91,7 @@ import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxLogging;
 import ch.interlis.iox.IoxValidationConfig;
+import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.PipelinePool;
 import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.logging.LogEventFactory;
@@ -211,6 +212,39 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			iterateThroughAllObjects();
 			validateAllAreas();
 			validatePlausibilityConstraints();
+			validationConfigInfo();
+		}
+	}
+	
+	private void validationConfigInfo(){
+		Set<String> iliQNames = validationConfig.getIliQnames();
+		for(String iliQName : iliQNames){
+			Set<String> iliParameters = validationConfig.getConfigParams(iliQName);
+			for(String iliParameter : iliParameters){
+				String iliValue = validationConfig.getConfigValue(iliQName, iliParameter);
+				if(iliValue.equals(ValidationConfig.OFF)){
+					if(iliParameter.equals(ValidationConfig.CHECK)){
+						errs.addEvent(errFact.logInfoMsg("validation configuration: CHECK=off"));
+//						logMsg(ValidationConfig.WARNING, "Warning: validation configuration: CHECK={0}", iliValue);
+					}
+					if(iliParameter.equals(ValidationConfig.MSG)){
+						errs.addEvent(errFact.logInfoMsg("validation configuration: MSG=off"));
+//						logMsg(ValidationConfig.WARNING, "Warning: validation configuration: MSG=", iliValue);
+					}
+					if(iliParameter.equals(ValidationConfig.MULTIPLICITY)){
+						errs.addEvent(errFact.logInfoMsg("validation configuration: MULTIPLICITY=off"));
+//						logMsg(ValidationConfig.WARNING, "Warning: validation configuration: MULTIPLICITY=", iliValue);
+					}
+					if(iliParameter.equals(ValidationConfig.TARGET)){
+						errs.addEvent(errFact.logInfoMsg("validation configuration: TARGET=off"));
+//						logMsg(ValidationConfig.WARNING, "Warning: validation configuration: TARGET=", iliValue);
+					}
+					if(iliParameter.equals(ValidationConfig.TYPE)){
+						errs.addEvent(errFact.logInfoMsg("validation configuration: TYPE=off"));
+//						logMsg(ValidationConfig.WARNING, "Warning: validation configuration: TYPE=", iliValue);
+					}
+				}
+			}
 		}
 	}
 	
@@ -284,7 +318,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					String check = getScopedName(constraint);
 					checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
 					if(ValidationConfig.OFF.equals(checkConstraint)){
-						 // skip it
+						errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration CHECK= off", check));
 					}else{
 						additionalConstraints.put(constraint, classValue);
 					}
@@ -348,7 +382,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				String check = getScopedName(currentClass);
 				checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
 				if(ValidationConfig.OFF.equals(checkConstraint)){
-					 // skip it
+					errs.addEvent(errFact.logInfoMsg("{0} of object {1} not validated, validation configuration CHECK=off", check, iomObj.getobjectoid()));
 				}else{
 					// additional constraint
 					Viewable classValue=null;
@@ -485,7 +519,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			String check = getScopedName(constraintEntry.getKey());
 			checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
 			if(ValidationConfig.OFF.equals(checkConstraint)){
-				// skip it
+				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration CHECK=off", check));
 			}else{
 				String msg=validationConfig.getConfigValue(getScopedName(constraintEntry.getKey()), ValidationConfig.MSG);
 				if(constraintEntry.getKey().getDirection()==0){ // >=
@@ -517,7 +551,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		String check = getScopedName(uniquenessConstraint);
 		String checkUniqueConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
 		if(ValidationConfig.OFF.equals(checkUniqueConstraint)){
-			 // skip it
+			errs.addEvent(errFact.logInfoMsg("{0} of object {1} not validated, validation configuration CHECK=off", check, iomObj.getobjectoid()));
 		}else{
 			Object modelElement=tag2class.get(iomObj.getobjecttag());
 			Viewable aClass1= (Viewable) modelElement;
@@ -1356,10 +1390,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {
-		String roleQName = getScopedName(role);
+		String roleQName = null;
+		roleQName = getScopedName(role);
 		String multiplicity=validationConfig.getConfigValue(roleQName, ValidationConfig.MULTIPLICITY);
-		if(multiplicity !=null && ValidationConfig.OFF.equals(multiplicity)){
-			// skip it
+		if(multiplicity != null && ValidationConfig.OFF.equals(multiplicity)){
+			errs.addEvent(errFact.logInfoMsg("{0} in {1} of Object {2} not validated, validation configuration MULTIPLICITY=off", roleQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 		}else{
 			int nrOfTargetObjs=linkPool.getTargetObjectCount(iomObj,role,doItfOidPerTable);
 			long cardMin=role.getCardinality().getMinimum();
@@ -1378,20 +1413,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	private void validateRoleReference(RoleDef role, IomObject iomObj) {
-		String targetOid = null;
-		// role of iomObj
-		IomObject roleDefValue = iomObj.getattrobj(role.getName(), 0);
-		if (roleDefValue != null){
-			targetOid = roleDefValue.getobjectrefoid();
-		}
-		if(targetOid==null){
-			return;
-		}
-		String check = getScopedName(role);
-		String validateTarget=validationConfig.getConfigValue(check, ValidationConfig.TARGET);
-		if(ValidationConfig.OFF.equals(validateTarget)){
-			// skip it
+		String roleQName = getScopedName(role);
+		String validateTarget=validationConfig.getConfigValue(roleQName, ValidationConfig.TARGET);
+		if(validateTarget!=null && ValidationConfig.OFF.equals(validateTarget)){
+			errs.addEvent(errFact.logInfoMsg("{0} of object {1} not validated, validation configuration TARGET=off", roleQName, iomObj.getobjectoid()));
 		}else{
+			String targetOid = null;
+			// role of iomObj
+			IomObject roleDefValue = iomObj.getattrobj(role.getName(), 0);
+			if (roleDefValue != null){
+				targetOid = roleDefValue.getobjectrefoid();
+			}
+			if(targetOid==null){
+				return;
+			}
 		 	// OID has to be unique in each table (ili 1.0)
 			// OID has to be unique in the whole file (ili 2.3)	
 			Iterator<AbstractClassDef> targetClassIterator = role.iteratorDestination();
@@ -2184,7 +2219,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if (type instanceof CompositionType){
 			 int structc=iomObj.getattrvaluecount(attrName);
 				if(ValidationConfig.OFF.equals(validateMultiplicity)){
-					// skip it
+					errs.addEvent(errFact.logInfoMsg("{0} in {1} of Object {2} not validated, validation configuration MULTIPLICITY=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 				}else{
 					 Cardinality card = ((CompositionType)type).getCardinality();
 					 if(structc<card.getMinimum() || structc>card.getMaximum()){
@@ -2194,7 +2229,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			 for(int structi=0;structi<structc;structi++){
 				 IomObject structEle=iomObj.getattrobj(attrName, structi);
 					if(ValidationConfig.OFF.equals(validateType)){
-						// skip it
+						errs.addEvent(errFact.logInfoMsg("{0} in {1} of Object {2} not validated, validation configuration TYPE=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 					}else{
 						String tag=structEle.getobjecttag();
 						Object modelele=tag2class.get(tag);
@@ -2218,7 +2253,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			 }
 		}else{
 			if(ValidationConfig.OFF.equals(validateMultiplicity)){
-				// skip multiplicity validation
+				errs.addEvent(errFact.logInfoMsg("{0} in {1} of Object {2} not validated, validation configuration MULTIPLICITY=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 			}else{
 				Boolean topologyValidationOk=(Boolean)pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY_VALIDATION_OK);
 				if(topologyValidationOk==null || topologyValidationOk){
@@ -2233,7 +2268,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 			if(ValidationConfig.OFF.equals(validateType)){
-				// skip type validation
+				errs.addEvent(errFact.logInfoMsg("{0} in {1} of Object {2} not validated, validation configuration TYPE=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 			}else{
 				if (attr.isDomainIli1Date()) {
 					String valueStr = iomObj.getattrvalue(attrName);

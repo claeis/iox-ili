@@ -869,12 +869,36 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	
+	@Test
+	public void fail_Ok(){
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID2);
+		Iom_jObject iomObjB3=new Iom_jObject(ILI_CLASSB, OBJ_OID5);
+		iomObjB3.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID6);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Association23.Topic.ab3.a3", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
+		modelConfig.setConfigValue("Association23.Topic.ab3.a3", ValidationConfig.TARGET,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB3));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Konfiguration Target Objects ausgeschalten worden ist und keine referenzierten Objekte gefunden worden sind.
 	@Test
 	public void configTargetOFFNoTargetObjectFound_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
 		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		iomObjB.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID3);
+		iomObjB.addattrobj("a3", "REF").setobjectrefoid(OBJ_OID3);
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue("Association23.Topic.ab3.a3", ValidationConfig.TARGET,ValidationConfig.OFF);
 		LogCollector logger=new LogCollector();

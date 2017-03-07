@@ -133,7 +133,7 @@ public class ReferenceType10Test {
 		Iom_jObject iomObjJ=new Iom_jObject(CLASSD,OID2); // wird nicht in Basket ausgeführt.
 		iomObjJ.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1); // wird nicht in Basket ausgeführt.
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ReferenceType10.TopicA.ClassDattrC1.attrC1", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
+		modelConfig.setConfigValue("ReferenceType10.TopicA.ClassDattrC1", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
