@@ -339,7 +339,7 @@ public class CompoundCurve extends LineString {
 		
 	}
 
-	public static Coordinate getDirectionPt(LineString line, boolean atStart) {
+	public static Coordinate getDirectionPt(LineString line, boolean atStart,double dist) {
 		if(line instanceof CompoundCurveRing){
 			if(atStart){
 				line=((CompoundCurveRing)line).getLines().get(0);
@@ -362,7 +362,7 @@ public class CompoundCurve extends LineString {
 					return seg.getStartPoint();
 				}
 			}
-			Coordinate directionPt=((ArcSegment)seg).getDirectionPt(atStart);
+			Coordinate directionPt=((ArcSegment)seg).getDirectionPt(atStart,dist);
 			return directionPt;
 		}	
 		
