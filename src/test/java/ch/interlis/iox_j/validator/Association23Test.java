@@ -869,14 +869,15 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Konfiguration Multiplicity und Target ausgeschalten wird und das referenzierte Objekt nicht gefunden wird.
 	@Test
-	public void fail_Ok(){
+	public void configTargetOFFMultiplicityOFF_Ok(){
 		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID2);
 		Iom_jObject iomObjB3=new Iom_jObject(ILI_CLASSB, OBJ_OID5);
 		iomObjB3.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID6);
 		ValidationConfig modelConfig=new ValidationConfig();
+		// Wenn multiplicity eingeschalten wird, so wird info: target ausgegeben.
 		modelConfig.setConfigValue("Association23.Topic.ab3.a3", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
 		modelConfig.setConfigValue("Association23.Topic.ab3.a3", ValidationConfig.TARGET,ValidationConfig.OFF);
 		LogCollector logger=new LogCollector();
@@ -898,7 +899,7 @@ public class Association23Test {
 	public void configTargetOFFNoTargetObjectFound_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
 		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		iomObjB.addattrobj("a3", "REF").setobjectrefoid(OBJ_OID3);
+		iomObjB.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID3);
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue("Association23.Topic.ab3.a3", ValidationConfig.TARGET,ValidationConfig.OFF);
 		LogCollector logger=new LogCollector();
