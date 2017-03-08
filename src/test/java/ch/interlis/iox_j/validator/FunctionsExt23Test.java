@@ -74,32 +74,36 @@ public class FunctionsExt23Test {
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Anzahl der elemente mit dem attr2 übereinstimmen.
-//	@Test
-//	public void elementCountTrue_Ok(){
-//		Iom_jObject iomObjM=new Iom_jObject("FunctionsExt23.Topic.StructA", null);
-//		Iom_jObject iomObjM2=new Iom_jObject("FunctionsExt23.Topic.StructA", null);
-//		Iom_jObject iomObjM3=new Iom_jObject("FunctionsExt23.Topic.StructA", null);
-//		Iom_jObject iomObjN=new Iom_jObject("FunctionsExt23.Topic.ClassD", "o2");
-//		iomObjN.addattrobj("attr3", iomObjM);
-//		iomObjN.addattrobj("attr3", iomObjM2);
-//		iomObjN.addattrobj("attr3", iomObjM3);
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		modelConfig.mergeIliMetaAttrs(td);
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-//		validator.validate(new ObjectEvent(iomObjM));
-//		validator.validate(new ObjectEvent(iomObjM2));
-//		validator.validate(new ObjectEvent(iomObjM3));
-//		validator.validate(new ObjectEvent(iomObjN));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==0);
-//	}
+	@Test
+	public void elementCountTrue_Ok(){
+		Iom_jObject iomObjM=new Iom_jObject("FunctionsExt23.Topic.StructA", null);
+		Iom_jObject iomObjM2=new Iom_jObject("FunctionsExt23.Topic.StructA", null);
+		Iom_jObject iomObjM3=new Iom_jObject("FunctionsExt23.Topic.StructA", null);
+		Iom_jObject iomObjN=new Iom_jObject("FunctionsExt23.Topic.ClassD", "o2");
+		iomObjN.setattrvalue("attr2", "true");
+		iomObjN.addattrobj("attr3", iomObjM);
+		iomObjN.addattrobj("attr3", iomObjM2);
+		iomObjN.addattrobj("attr3", iomObjM3);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.mergeIliMetaAttrs(td);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Map<String,Class> newFunctions=new HashMap<String,Class>();
+		newFunctions.put("FunctionsExt23.elementCount",ElementCount.class);
+		settings.setTransientObject(Validator.CONFIG_CUSTOM_FUNCTIONS, newFunctions);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjM));
+		validator.validate(new ObjectEvent(iomObjM2));
+		validator.validate(new ObjectEvent(iomObjM3));
+		validator.validate(new ObjectEvent(iomObjN));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 	
 	//#########################################################//
 	//######## FAILING FUNCTIONS ##############################//

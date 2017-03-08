@@ -2,8 +2,6 @@ package ch.interlis.iox_j.validator;
 
 import java.util.Collection;
 import java.util.List;
-
-import ch.interlis.ili2c.metamodel.Constant.Numeric;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.NumericType;
@@ -14,21 +12,24 @@ import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.iom.IomObject;
 
 public class Value {
-	private boolean notYetImplemented=false;
-	private boolean error=false;
+	// boolean
 	private boolean booleanIsDefined=false;
 	private boolean booleanValue;
-	private IomObject complexValue=null; // léschen. bisherige Referenz auf complexObjects zuweisen. (Achtung Liste).
-	
-	private String refTypeName;
-	private String value=null;
-	private List<IomObject> complexObjects;
-	private RoleDef role=null;
+	// numeric
 	private int numeric=0;
 	private boolean numericIsDefined=false;
-	private Viewable viewable=null;
+	// type & value
 	private Type type=null;
-	private String functionName=null;
+	private String value=null;
+	private String refTypeName;
+	private List<IomObject> complexObjects;
+	private RoleDef role=null;
+	private Viewable viewable=null;
+	
+	// not yet implemented
+	private boolean notYetImplemented=false;
+	// error
+	private boolean error=false;
 	
 	public Value(boolean booleanValue) {
 		this.booleanValue = booleanValue;
@@ -51,10 +52,6 @@ public class Value {
 	
 	public Value(List<IomObject> complexObjects){
 		this.complexObjects = complexObjects;
-	}
-	
-	public Value(IomObject value){
-		this.complexValue = value;
 	}
 	
 	public Value(RoleDef role){
@@ -119,13 +116,6 @@ public class Value {
 		return role;
 	}
 	
-	public IomObject getComplexValue(){
-		if(skipEvaluation()){
-			throw new IllegalArgumentException();
-		}
-		return complexValue;
-	}
-	
 	public Collection<IomObject> getComplexObjects(){
 		if(skipEvaluation()){
 			throw new IllegalArgumentException();
@@ -134,12 +124,11 @@ public class Value {
 	}
 	
 	public static Value createUndefined(){
-		return new Value((IomObject) null);
+		return new Value((List<IomObject>) null);
 	}
 	
 	public boolean isUndefined(){
-		return !(getComplexValue() != null ||
-						getValue() != null ||
+		return !(getValue() != null ||
 						getComplexObjects() != null ||
 						booleanIsDefined ||
 						getRole() != null ||
@@ -178,19 +167,23 @@ public class Value {
 			throw new IllegalArgumentException();
 		}
 		// intercept complex value
-		if (this.complexValue != null && other.complexValue != null){
-			// intercept coords and arcs
-			if((this.complexValue.getobjecttag().equals("COORD") && other.complexValue.getobjecttag().equals("COORD"))
-				|| (this.complexValue.getobjecttag().equals("ARC") && other.complexValue.getobjecttag().equals("ARC"))){
-				return compareCoordsTo(this.complexValue, other);
-			}
-			// intercept polylines
-			if(this.complexValue.getobjecttag().equals("POLYLINE") && other.complexValue.getobjecttag().equals("POLYLINE")){
-				return comparePolylineTo(this.complexValue, other);
-			}
-			// intercept surfaces and areas
-			if(this.complexValue.getobjecttag().equals("MULTISURFACE") && other.complexValue.getobjecttag().equals("MULTISURFACE")){
-				return compareSurfaceOrAreaTo(this.complexValue, other);
+		if (this.complexObjects != null && other.complexObjects != null){
+			for(IomObject iomObj : this.complexObjects){
+				for(IomObject iomObjOther : other.complexObjects){
+					// intercept coords and arcs
+					if((iomObj.getobjecttag().equals("COORD") && iomObjOther.getobjecttag().equals("COORD"))
+							|| (iomObj.getobjecttag().equals("ARC") && iomObjOther.getobjecttag().equals("ARC"))){
+						return compareCoordsTo(iomObj, iomObjOther);
+					}
+					// intercept polylines
+					if(iomObj.getobjecttag().equals("POLYLINE") && iomObjOther.getobjecttag().equals("POLYLINE")){
+						return comparePolylineTo(iomObj, iomObjOther);
+					}
+					// intercept surfaces and areas
+					if(iomObj.getobjecttag().equals("MULTISURFACE") && iomObjOther.getobjecttag().equals("MULTISURFACE")){
+						return compareSurfaceOrAreaTo(iomObj, iomObjOther);
+					}
+				}
 			}
 		}
 		// intercept value
@@ -231,7 +224,7 @@ public class Value {
 		// incompatible type
 		throw new IllegalArgumentException("incompatible values");
 	}
-
+	
 	private int compareViewable(Viewable viewable2, Viewable viewable3) {
 		return (viewable3.equals(viewable2) ? 0 : (!viewable3.equals(viewable2) ? 1 : -1));
 	}
@@ -244,16 +237,16 @@ public class Value {
 		return (thisVal<anotherVal ? -1 : (thisVal==anotherVal ? 0 : 1));
 	}
 
-	private int compareSurfaceOrAreaTo(IomObject complexValue2, Value other) {
+	private int compareSurfaceOrAreaTo(IomObject complexValue2, IomObject iomObjOther2) {
 		for(int l=0;l<complexValue2.getattrvaluecount("surface");l++){
 			IomObject thisSurfaceValue=complexValue2.getattrobj("surface",l);
-			IomObject otherSurfaceValue=other.complexValue.getattrobj("surface",l);
+			IomObject otherSurfaceValue=iomObjOther2.getattrobj("surface",l);
 			for(int m=0;m<thisSurfaceValue.getattrvaluecount("boundary");m++){
 				IomObject thisBoundaryValue = thisSurfaceValue.getattrobj("boundary",m);
 				IomObject otherBoundaryValue = otherSurfaceValue.getattrobj("boundary", m);
 				for(int n=0;n<thisBoundaryValue.getattrvaluecount("polyline");n++){
 					IomObject thisPolylineValue = thisBoundaryValue.getattrobj("polyline",n);
-					Value otherPolylineValue = new Value(otherBoundaryValue.getattrobj("polyline", n));
+					IomObject otherPolylineValue = otherBoundaryValue.getattrobj("polyline",n);
 					if (comparePolylineTo(thisPolylineValue, otherPolylineValue) !=0){
 						return comparePolylineTo(thisPolylineValue, otherPolylineValue);
 					}
@@ -263,13 +256,13 @@ public class Value {
 		return 0;
 	}
 	
-	private int comparePolylineTo(IomObject complexValue2, Value other) {
-		for(int l=0;l<complexValue2.getattrvaluecount("sequence");l++){
-			IomObject thisSegmentsValue=complexValue2.getattrobj("sequence",l);
-			IomObject otherSegmentsValue=other.complexValue.getattrobj("sequence",l);
+	private int comparePolylineTo(IomObject iomObj, IomObject iomObjOther) {
+		for(int l=0;l<iomObj.getattrvaluecount("sequence");l++){
+			IomObject thisSegmentsValue=iomObj.getattrobj("sequence",l);
+			IomObject otherSegmentsValue=iomObjOther.getattrobj("sequence",l);
 			for(int m=0;m<thisSegmentsValue.getattrvaluecount("segment");m++){
 				IomObject thisCoord=thisSegmentsValue.getattrobj("segment",m);
-				Value otherCoord = new Value(otherSegmentsValue.getattrobj("segment", m));
+				IomObject otherCoord=otherSegmentsValue.getattrobj("segment",m);
 				if (compareCoordsTo(thisCoord, otherCoord) !=0){
 					return compareCoordsTo(thisCoord, otherCoord);
 				}
@@ -278,31 +271,31 @@ public class Value {
 		return 0;
 	}
 	
-	private int compareCoordsTo(IomObject complexValue, Value other){
+	private int compareCoordsTo(IomObject complexValue, IomObject iomObjOther){
 		// if complexValue, return boolean of complex value comparison.
-		if(complexValue.getattrvalue("C1") != null && other.complexValue.getattrvalue("C1") != null){
-			if (complexValue.getattrvalue("C1").compareTo(other.complexValue.getattrvalue("C1"))!=0){
-				return complexValue.getattrvalue("C1").compareTo(other.complexValue.getattrvalue("C1"));
+		if(complexValue.getattrvalue("C1") != null && iomObjOther.getattrvalue("C1") != null){
+			if (complexValue.getattrvalue("C1").compareTo(iomObjOther.getattrvalue("C1"))!=0){
+				return complexValue.getattrvalue("C1").compareTo(iomObjOther.getattrvalue("C1"));
 			}
 		}
-		if(complexValue.getattrvalue("C2") != null && other.complexValue.getattrvalue("C2") != null){
-			if (complexValue.getattrvalue("C2").compareTo(other.complexValue.getattrvalue("C2"))!=0){
-				return complexValue.getattrvalue("C2").compareTo(other.complexValue.getattrvalue("C2"));
+		if(complexValue.getattrvalue("C2") != null && iomObjOther.getattrvalue("C2") != null){
+			if (complexValue.getattrvalue("C2").compareTo(iomObjOther.getattrvalue("C2"))!=0){
+				return complexValue.getattrvalue("C2").compareTo(iomObjOther.getattrvalue("C2"));
 			}
 		}
-		if(complexValue.getattrvalue("C3") != null && other.complexValue.getattrvalue("C3") != null){
-			if (complexValue.getattrvalue("C3").compareTo(other.complexValue.getattrvalue("C3"))!=0){
-				return complexValue.getattrvalue("C3").compareTo(other.complexValue.getattrvalue("C3"));
+		if(complexValue.getattrvalue("C3") != null && iomObjOther.getattrvalue("C3") != null){
+			if (complexValue.getattrvalue("C3").compareTo(iomObjOther.getattrvalue("C3"))!=0){
+				return complexValue.getattrvalue("C3").compareTo(iomObjOther.getattrvalue("C3"));
 			}
 		}
-		if(complexValue.getattrvalue("A1") != null && other.complexValue.getattrvalue("A1") != null){
-			if (complexValue.getattrvalue("A1").compareTo(other.complexValue.getattrvalue("A1"))!=0){
-				return complexValue.getattrvalue("A1").compareTo(other.complexValue.getattrvalue("A1"));
+		if(complexValue.getattrvalue("A1") != null && iomObjOther.getattrvalue("A1") != null){
+			if (complexValue.getattrvalue("A1").compareTo(iomObjOther.getattrvalue("A1"))!=0){
+				return complexValue.getattrvalue("A1").compareTo(iomObjOther.getattrvalue("A1"));
 			}
 		}
-		if(complexValue.getattrvalue("A2") != null && other.complexValue.getattrvalue("A2") != null){
-			if (complexValue.getattrvalue("A2").compareTo(other.complexValue.getattrvalue("A2"))!=0){
-				return complexValue.getattrvalue("A2").compareTo(other.complexValue.getattrvalue("A2"));
+		if(complexValue.getattrvalue("A2") != null && iomObjOther.getattrvalue("A2") != null){
+			if (complexValue.getattrvalue("A2").compareTo(iomObjOther.getattrvalue("A2"))!=0){
+				return complexValue.getattrvalue("A2").compareTo(iomObjOther.getattrvalue("A2"));
 			}
 		}
 		return 0;
