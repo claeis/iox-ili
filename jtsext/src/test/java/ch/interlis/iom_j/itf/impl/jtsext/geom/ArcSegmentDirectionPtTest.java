@@ -14,7 +14,7 @@ public class ArcSegmentDirectionPtTest {
 	public void bogenStartLinksDrehendOhneOverlap() {
 		ArcSegment seg=new ArcSegment(new Coordinate(5.0,0.0),new Coordinate(4.0,3.0),new Coordinate(3.0,4.0));
 		//System.out.println(seg.getCenterPoint());
-		Coordinate directionPt=seg.getDirectionPt(true);
+		Coordinate directionPt=seg.getDirectionPt(true,0.0);
 		//System.out.println(directionPt);
 		assertEquals(5.0,directionPt.x,EPSILON);
 		assertEquals(1.0,directionPt.y,EPSILON);
@@ -22,7 +22,7 @@ public class ArcSegmentDirectionPtTest {
 	@Test
 	public void bogenStartRechtsDrehendOhneOverlap() {
 		ArcSegment seg=new ArcSegment(new Coordinate(5.0,0.0),new Coordinate(4.0,-3.0),new Coordinate(3.0,-4.0));
-		Coordinate directionPt=seg.getDirectionPt(true);
+		Coordinate directionPt=seg.getDirectionPt(true,0.0);
 		assertEquals(5.0,directionPt.x,EPSILON);
 		assertEquals(-1.0,directionPt.y,EPSILON);
 	}
@@ -30,7 +30,7 @@ public class ArcSegmentDirectionPtTest {
 	public void bogenEndeRechtsDrehendOhneOverlap() {
 		ArcSegment seg=new ArcSegment(new Coordinate(3.0,4.0),new Coordinate(4.0,3.0),new Coordinate(5.0,0.0));
 		//System.out.println(seg.getCenterPoint());
-		Coordinate directionPt=seg.getDirectionPt(false);
+		Coordinate directionPt=seg.getDirectionPt(false,0.0);
 		//System.out.println(directionPt);
 		assertEquals(5.0,directionPt.x,EPSILON);
 		assertEquals(1.0,directionPt.y,EPSILON);
@@ -38,9 +38,44 @@ public class ArcSegmentDirectionPtTest {
 	@Test
 	public void bogenEndeLinksDrehendOhneOverlap() {
 		ArcSegment seg=new ArcSegment(new Coordinate(3.0,-4.0),new Coordinate(4.0,-3.0),new Coordinate(5.0,0.0));
-		Coordinate directionPt=seg.getDirectionPt(false);
+		Coordinate directionPt=seg.getDirectionPt(false,0.0);
 		assertEquals(5.0,directionPt.x,EPSILON);
 		assertEquals(-1.0,directionPt.y,EPSILON);
+	}
+////
+	private double px=4.9;
+	private double py=0.9949874371066197;
+	@Test
+	public void bogenStartLinksDrehendMitDist() {
+		ArcSegment seg=new ArcSegment(new Coordinate(5.0,0.0),new Coordinate(4.0,3.0),new Coordinate(3.0,4.0));
+		//System.out.println(seg.getCenterPoint());
+		Coordinate directionPt=seg.getDirectionPt(true,1.0);
+		//System.out.println(directionPt);
+		assertEquals(px,directionPt.x,EPSILON);
+		assertEquals(py,directionPt.y,EPSILON);
+	}
+	@Test
+	public void bogenStartRechtsDrehendMitDist() {
+		ArcSegment seg=new ArcSegment(new Coordinate(5.0,0.0),new Coordinate(4.0,-3.0),new Coordinate(3.0,-4.0));
+		Coordinate directionPt=seg.getDirectionPt(true,1.0);
+		assertEquals(px,directionPt.x,EPSILON);
+		assertEquals(-py,directionPt.y,EPSILON);
+	}
+	@Test
+	public void bogenEndeRechtsDrehendMitDist() {
+		ArcSegment seg=new ArcSegment(new Coordinate(3.0,4.0),new Coordinate(4.0,3.0),new Coordinate(5.0,0.0));
+		//System.out.println(seg.getCenterPoint());
+		Coordinate directionPt=seg.getDirectionPt(false,1.0);
+		//System.out.println(directionPt);
+		assertEquals(px,directionPt.x,EPSILON);
+		assertEquals(py,directionPt.y,EPSILON);
+	}
+	@Test
+	public void bogenEndeLinksDrehendMitDist() {
+		ArcSegment seg=new ArcSegment(new Coordinate(3.0,-4.0),new Coordinate(4.0,-3.0),new Coordinate(5.0,0.0));
+		Coordinate directionPt=seg.getDirectionPt(false,1.0);
+		assertEquals(px,directionPt.x,EPSILON);
+		assertEquals(-py,directionPt.y,EPSILON);
 	}
 
 }

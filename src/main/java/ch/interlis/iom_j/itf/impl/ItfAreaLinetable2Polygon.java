@@ -119,6 +119,18 @@ public class ItfAreaLinetable2Polygon {
 		objPool=new ObjectPoolManager();
 		
 	}
+	public ItfAreaLinetable2Polygon(String geomAttr,double maxOverlaps1,double accuracy)
+	{
+		helperTableGeomAttrName=geomAttr;
+		objPool=new ObjectPoolManager();
+		maxOverlaps=maxOverlaps1;
+		if(maxOverlaps>0){
+			if(accuracy>0){
+				newVertexOffset=2*Math.pow(10, -accuracy);
+			}
+		}
+		
+	}
 	public void close()
 	{
 		if(objPool!=null){
