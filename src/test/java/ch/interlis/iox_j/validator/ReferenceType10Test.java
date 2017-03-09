@@ -126,7 +126,7 @@ public class ReferenceType10Test {
 		assertEquals(0, logger.getErrs().size());
 	}
 	
-	// Es wird getestet ob ein Fehler geworfen wird, wenn die Konfiguration multiplicity ausgeschalten wurde und die multiplicität nicht stimmt.
+	// Es wird getestet ob ein Fehler geworfen wird, wenn die Konfiguration multiplicity ausgeschalten wurde, die multiplicität nicht stimmt und das attrObjekt nicht erstellt wird.
 	@Test
 	public void configMultiplicityOFF_ReferencedClass_Ok() throws Exception {
 		Iom_jObject iomObjI=new Iom_jObject(CLASSA,OID1);
@@ -143,6 +143,32 @@ public class ReferenceType10Test {
 		validator.validate(new StartBasketEvent(TOPICA,BID1));
 		validator.validate(new ObjectEvent(iomObjI));
 		// CLASSD with Ref attrC1 --> oid1
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0, logger.getErrs().size());
+	}
+	
+	// Es wird getestet ob ein Fehler geworfen wird, wenn die Konfiguration multiplicity ausgeschalten wurde und die multiplicität nicht stimmt.
+	@Test
+	public void configMultiplicityOFF_Ok() throws Exception {
+		Iom_jObject iomObjI=new Iom_jObject(CLASSA,OID1);
+		Iom_jObject iomObjJ=new Iom_jObject(CLASSD,OID2);
+		iomObjJ.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjK=new Iom_jObject(CLASSD,OID3);
+		iomObjK.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("ReferenceType10.TopicA.ClassDattrC1.attrC1", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPICA,BID1));
+		validator.validate(new ObjectEvent(iomObjI));
+		validator.validate(new ObjectEvent(iomObjJ));
+		validator.validate(new ObjectEvent(iomObjK));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
