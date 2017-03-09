@@ -131,6 +131,56 @@ public class ItfReader2Test {
 			 assertError("empty line","1");
 		}
 	}
+	@Test
+	public void testSURFACEnoMainObj() throws Iox2jtsException, IoxException {
+		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceNoMainObj.itf"),false);
+		reader.setModel(td);
+		IoxEvent event=null;
+		HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
+		try{
+			 do{
+			        event=reader.read();
+			        if(event instanceof StartTransferEvent){
+			        }else if(event instanceof StartBasketEvent){
+			        }else if(event instanceof ObjectEvent){
+			        	IomObject iomObj=((ObjectEvent)event).getIomObject();
+			    		System.out.println(iomObj);
+			    		assertNotNull(iomObj.getobjectoid());
+			    		objs.put(iomObj.getobjectoid(), iomObj);
+			        }else if(event instanceof EndBasketEvent){
+			        }else if(event instanceof EndTransferEvent){
+			        }
+			 }while(!(event instanceof EndTransferEvent));
+			 fail();
+		}catch(IoxInvalidDataException ex){
+			 assertError("no main obj","1");
+		}
+	}
+	@Test
+	public void testSURFACEnoMainTable() throws Iox2jtsException, IoxException {
+		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceNoMainTable.itf"),false);
+		reader.setModel(td);
+		IoxEvent event=null;
+		HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
+		try{
+			 do{
+			        event=reader.read();
+			        if(event instanceof StartTransferEvent){
+			        }else if(event instanceof StartBasketEvent){
+			        }else if(event instanceof ObjectEvent){
+			        	IomObject iomObj=((ObjectEvent)event).getIomObject();
+			    		System.out.println(iomObj);
+			    		assertNotNull(iomObj.getobjectoid());
+			    		objs.put(iomObj.getobjectoid(), iomObj);
+			        }else if(event instanceof EndBasketEvent){
+			        }else if(event instanceof EndTransferEvent){
+			        }
+			 }while(!(event instanceof EndTransferEvent));
+			 fail();
+		}catch(IoxInvalidDataException ex){
+			 assertError("no main table","1");
+		}
+	}
 
 	@Test
 	public void testAREAbasic() throws Iox2jtsException, IoxException {
@@ -199,6 +249,56 @@ public class ItfReader2Test {
 			 fail();
 		}catch(IoxInvalidDataException ex){
 			 assertError("empty line","1");
+		}
+	}
+	@Test
+	public void testAREAnoMainObj() throws Iox2jtsException, IoxException {
+		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/AreaNoMainObj.itf"),false);
+		reader.setModel(td);
+		IoxEvent event=null;
+		HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
+		try{
+			 do{
+			        event=reader.read();
+			        if(event instanceof StartTransferEvent){
+			        }else if(event instanceof StartBasketEvent){
+			        }else if(event instanceof ObjectEvent){
+			        	IomObject iomObj=((ObjectEvent)event).getIomObject();
+			    		System.out.println(iomObj);
+			    		assertNotNull(iomObj.getobjectoid());
+			    		objs.put(iomObj.getobjectoid(), iomObj);
+			        }else if(event instanceof EndBasketEvent){
+			        }else if(event instanceof EndTransferEvent){
+			        }
+			 }while(!(event instanceof EndTransferEvent));
+			 fail();
+		}catch(IoxInvalidDataException ex){
+			 assertError("no main obj","1");
+		}
+	}
+	@Test
+	public void testAREAnoMainTable() throws Iox2jtsException, IoxException {
+		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/AreaNoMainTable.itf"),false);
+		reader.setModel(td);
+		IoxEvent event=null;
+		HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
+		try{
+			 do{
+			        event=reader.read();
+			        if(event instanceof StartTransferEvent){
+			        }else if(event instanceof StartBasketEvent){
+			        }else if(event instanceof ObjectEvent){
+			        	IomObject iomObj=((ObjectEvent)event).getIomObject();
+			    		System.out.println(iomObj);
+			    		assertNotNull(iomObj.getobjectoid());
+			    		objs.put(iomObj.getobjectoid(), iomObj);
+			        }else if(event instanceof EndBasketEvent){
+			        }else if(event instanceof EndTransferEvent){
+			        }
+			 }while(!(event instanceof EndTransferEvent));
+			 fail();
+		}catch(IoxInvalidDataException ex){
+			 assertError("no main table","1");
 		}
 	}
 	@Test
