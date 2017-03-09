@@ -182,24 +182,17 @@ class PolygonizeGraph
             PolygonizeDirectedEdge startDE = null;
             PolygonizeDirectedEdge prevDE = null;
             // the edges are stored in CCW order around the star
-            //System.out.print(node.getCoordinate()+": ");
-            List<PolygonizeDirectedEdge> edges=new ArrayList<PolygonizeDirectedEdge>();
-            for (Iterator i = deStar.getEdges().iterator(); i.hasNext(); ) {
-              PolygonizeDirectedEdge currentDE = (PolygonizeDirectedEdge) i.next();
-              if (currentDE.isMarked()) continue;
-              edges.add(currentDE);
-              //System.out.print(((PolygonizeEdge)currentDE.getEdge()).getLine().getUserData()+", ");
-            }
-    	    //System.out.println();
-    	    //System.out.print("   ");
-            double maxDist=0.0;
+            List<PolygonizeDirectedEdge> edges = getActiveOutgoingEdges(deStar);
+            //printEdges(node.getCoordinate()+": ",edges);
             int edgec=edges.size();
+            double maxDist=0.0;
             for(int i=0;i<edgec;i++){
                 PolygonizeDirectedEdge currentDE = edges.get(i);
-                for(int j=i+1;j<=edgec;j++){
-                    PolygonizeDirectedEdge nextDE = edges.get(j%edgec);
-                    if(Math.abs(currentDE.getAngle()-nextDE.getAngle())<0.00001){
+                for(int j=i+1;j<edgec;j++){
+                    PolygonizeDirectedEdge nextDE = edges.get(j);
+                    if((currentDE.isArc() || nextDE.isArc()) && Math.abs(currentDE.getAngle()-nextDE.getAngle())<0.0001){
                     	maxDist=newVertexOffset;
+                    	//System.out.println("  angleDiff "+(currentDE.getAngle()-nextDE.getAngle()));
                     }
                     Coordinate is=getIntersection(li,node.getCoordinate(),currentDE, nextDE);
                     if(is!=null){
@@ -212,14 +205,18 @@ class PolygonizeGraph
             }
             if(maxDist>0){
             	maxDist=maxDist*1.1;
+            	//System.out.println("  maxDist "+maxDist);
                 for(int i=0;i<edgec;i++){
                     PolygonizeDirectedEdge currentDE = edges.get(i);
                     currentDE.adjustDirectionPt(maxDist);
                 }
     		    Collections.sort(deStar.getEdges());
+                edges = getActiveOutgoingEdges(deStar);
+        	    //printEdges("   reordered ",edges);
             }
-                        
+            
             // the edges are stored in CCW order around the star
+    	    //System.out.print("   ");
             for (Iterator i = deStar.getEdges().iterator(); i.hasNext(); ) {
               PolygonizeDirectedEdge currentDE = (PolygonizeDirectedEdge) i.next();
               if (currentDE.isMarked()) continue;
@@ -237,10 +234,33 @@ class PolygonizeGraph
             	  // check prevDE,startDE
             	overlapRemoved=overlapRemoved || removeOverlap(li,node.getCoordinate(),prevDE, startDE,newVertexOffset);
             }
-    	    //System.out.println();
+            if(overlapRemoved){
+        	    //printEdges("   overlapRemoved ",edges);
+            }
 	      }
 	  
   }
+
+private void printEdges(String tag,List<PolygonizeDirectedEdge> edges) {
+		System.out.print(tag);
+		int edgec=edges.size();
+		for(int i=0;i<edgec;i++){
+		    PolygonizeDirectedEdge currentDE = edges.get(i);
+		    System.out.print(((PolygonizeEdge)currentDE.getEdge()).getLine().getUserData()+"{a "+currentDE.getAngle()+"}, ");
+		}            	
+		System.out.println();System.out.flush();
+}
+
+private List<PolygonizeDirectedEdge> getActiveOutgoingEdges(
+		DirectedEdgeStar deStar) {
+	List<PolygonizeDirectedEdge> edges=new ArrayList<PolygonizeDirectedEdge>();
+	for (Iterator i = deStar.getEdges().iterator(); i.hasNext(); ) {
+	  PolygonizeDirectedEdge currentDE = (PolygonizeDirectedEdge) i.next();
+	  if (currentDE.isMarked()) continue;
+	  edges.add(currentDE);
+	}
+	return edges;
+}
 
 private boolean removeOverlap(CurveSegmentIntersector li,Coordinate node,
 		PolygonizeDirectedEdge de0, PolygonizeDirectedEdge de1,double newVertexOffset) {

@@ -67,6 +67,11 @@ class PolygonizeDirectedEdge
 		  
 	  }
   }
+  public boolean isArc() {
+		 PolygonizeEdge edge=(PolygonizeEdge)getEdge();
+		 CompoundCurve line = (CompoundCurve)edge.getLine();
+		return CompoundCurve.isArc(line,getEdgeDirection());
+	}
   /**
    * Returns the identifier attached to this directed edge.
    */

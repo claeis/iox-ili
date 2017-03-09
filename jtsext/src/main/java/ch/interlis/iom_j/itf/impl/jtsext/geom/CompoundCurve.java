@@ -375,5 +375,32 @@ public class CompoundCurve extends LineString {
 		    return endPt;
 		}
 	}
+	public static boolean isArc(LineString line, boolean atStart) {
+		if(line instanceof CompoundCurveRing){
+			if(atStart){
+				line=((CompoundCurveRing)line).getLines().get(0);
+			}else{
+				ArrayList<CompoundCurve> lines = ((CompoundCurveRing)line).getLines();
+				line=lines.get(lines.size()-1);
+			}
+		}
+		if(line instanceof CompoundCurve){
+			ArrayList<CurveSegment> segs = ((CompoundCurve) line).getSegments();
+			CurveSegment seg=null;
+			if(atStart){
+				seg=segs.get(0);
+				if(seg instanceof StraightSegment){
+					return false;
+				}
+			}else{
+				seg=segs.get(segs.size()-1);
+				if(seg instanceof StraightSegment){
+					return false;
+				}
+			}
+			return true;
+		}	
+		return false;
+	}
 
 }
