@@ -552,18 +552,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if (!listOfUniqueObj.contains(uniqueConstraintAttrs)){
 				listOfUniqueObj.add(uniqueConstraintAttrs);
 			}
-			AttributeArray returnValue = validateUnique(iomObj,uniqueConstraintAttrs);
+			Holder<AttributeArray> values = new Holder<AttributeArray>();
+			String returnValue = validateUnique(iomObj,uniqueConstraintAttrs, values);
 			if (returnValue == null){
 				// ok
 			} else {
 				if(ValidationConfig.WARNING.equals(checkUniqueConstraint)){
-					logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", returnValue.valuesAsString(), returnValue.getOid());
+					logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), returnValue);
 				} else {
 					String msg=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.MSG);
 					if(msg!=null && msg.length()>0){
 						logMsg(checkConstraint,msg);
 					} else {
-						logMsg(checkConstraint,"Unique is violated! Values {0} already exist in Object: {1}", returnValue.valuesAsString(), returnValue.getOid());
+						logMsg(checkConstraint,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), returnValue);
 					}
 				}
 			}
@@ -1855,7 +1856,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	// Declaration of the uniqueness of Oid's.
 	String uniquenessOfOid = null;
 	// HashMap of unique constraints.
-	HashMap<ArrayList<String>, HashSet<AttributeArray>> seenValues = new HashMap<ArrayList<String>, HashSet<AttributeArray>>();
+	HashMap<ArrayList<String>, HashMap<AttributeArray, String>> seenUniqueConstraintValues = new HashMap<ArrayList<String>, HashMap<AttributeArray, String>>();
 	// List of all arrayLists of unique attributes and classes.
 	ArrayList<ArrayList<String>> listOfUniqueObj = new ArrayList<ArrayList<String>>();
 	// List of all object Oid's and associated classPath's of uniqueness validate of Oid's.
@@ -2159,7 +2160,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	// viewable aClass
-	private AttributeArray validateUnique(IomObject currentObject,ArrayList<String>uniqueAttrs) {
+	private String validateUnique(IomObject currentObject,ArrayList<String>uniqueAttrs, Holder<AttributeArray> values) {
 		
 		int sizeOfUniqueAttribute = uniqueAttrs.size();
 		ArrayList<String> accu = new ArrayList<String>();
@@ -2176,16 +2177,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			accu.add(attrValue);
 		}
-		AttributeArray values=new AttributeArray(currentObject.getobjectoid(), accu);
-		HashSet<AttributeArray> allValues = new HashSet<AttributeArray>();
-		allValues.add(values);
-		if (seenValues.containsKey(uniqueAttrs)){
-			HashSet<AttributeArray> valuesOfKey = seenValues.get(uniqueAttrs);
-			if (valuesOfKey.equals(allValues)){
-				return values;
+		values.value=new AttributeArray(currentObject.getobjectoid(), accu);
+		HashMap<AttributeArray, String> allValues = null;
+		if (seenUniqueConstraintValues.containsKey(uniqueAttrs)){
+			allValues = seenUniqueConstraintValues.get(uniqueAttrs);
+			if (allValues.containsKey(values.value)){
+				return allValues.get(values.value);
+			} else {
+				allValues.put(values.value, currentObject.getobjectoid());
 			}
 		} else {
-			seenValues.put(uniqueAttrs, allValues);
+			allValues = new HashMap<AttributeArray, String>();
+			allValues.put(values.value, currentObject.getobjectoid());
+			seenUniqueConstraintValues.put(uniqueAttrs, allValues);
 		}
 		return null;
 	}

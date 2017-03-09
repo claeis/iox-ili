@@ -171,7 +171,7 @@ public class UniqueConstraints10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Anna already exist in Object: o2",logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values Anna already exist in Object: o1",logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob der eigens erstellte Fehler ausgegeben wird, wenn beide Values von einem Unique Attribute identisch sind und validationConfig msg nicht leer ist.
@@ -221,7 +221,7 @@ public class UniqueConstraints10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Anna already exist in Object: o2",logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values Anna already exist in Object: o1",logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die Referenz auf ein bereits existierendes unique Attribute verweist.
@@ -251,7 +251,7 @@ public class UniqueConstraints10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values o1 already exist in Object: o4",logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values o1 already exist in Object: o3",logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Warning anstelle einer Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist und validationConfig check auf off geschalten ist.
@@ -304,6 +304,6 @@ public class UniqueConstraints10Test {
 		// Asserts.
 		assertTrue(logger.getErrs().size()==0);
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o2", logger.getWarn().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
 	}
 }

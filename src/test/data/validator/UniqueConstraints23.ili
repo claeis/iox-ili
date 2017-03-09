@@ -45,7 +45,7 @@ MODEL UniqueConstraints23
 		  UNIQUE attr1,attr2;
 		  UNIQUE attr2;
 		END ClassE;
-
+		
 	END Topic;
 
 END UniqueConstraints23.
