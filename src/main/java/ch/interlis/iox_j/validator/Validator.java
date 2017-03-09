@@ -902,13 +902,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(enumConstOrRange instanceof Enumeration){
 					// enumeration
 					Enumeration enumObj = (Enumeration) enumConstOrRange;
-					String[] value = enumObj.getValue();
-					if (value[0].equals("true")){
+					String value = getEnumerationConstantXtfValue(enumObj);
+					if (value.equals("true")){
 						return new Value(true);
-					} else if (value[0].equals("false")){
+					} else if (value.equals("false")){
 						return new Value(false);
 					}
-					return new Value(texttype, value[0]);
+					return new Value(texttype, value);
 				}
 			// TODO instance of EnumerationRange
 			} else if (constantObj instanceof Constant.Text){
@@ -1378,7 +1378,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		//TODO instance of ViewableAggregate
 		//TODO instance of ViewableAlias
 	}
-
+	private String getEnumerationConstantXtfValue(Constant.Enumeration enumValue)
+	{
+		String value[] = enumValue.getValue();
+		StringBuilder buf = new StringBuilder(100);
+		for (int i = 0; i < value.length; i++) {
+			if (i > 0) {
+				buf.append('.');
+			}
+			buf.append(value[i]);
+		}
+		return buf.toString();
+	}
 	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {
 		String roleQName = null;
 		roleQName = getScopedName(role);

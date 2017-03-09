@@ -55,6 +55,12 @@ MODEL MandatoryConstraints23
 			MANDATORY CONSTRAINT
 			(#true <> #true) <> (#true <> (#true <> (#false)));
 		END ClassConstantI;
+
+		CLASS ClassConstantJ =
+			aufzaehlung1 : enumeration;
+			MANDATORY CONSTRAINT
+			aufzaehlung1 == #mehr.vier;
+		END ClassConstantJ;
 		
 		CLASS ClassEqualationA =
 			straightsarcs1 : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
