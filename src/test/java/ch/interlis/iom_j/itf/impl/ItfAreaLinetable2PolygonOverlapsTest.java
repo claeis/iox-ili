@@ -276,5 +276,81 @@ public class ItfAreaLinetable2PolygonOverlapsTest {
 		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 605374.443, C2 259719.026}, COORD {C1 605374.443, C2 259724.372}, COORD {C1 605384.196, C2 259724.372}, ARC {A2 259719.764, A1 605385.346, C1 605389.486, C2 259717.436}, COORD {C1 605374.443, C2 259719.026}]}}}}}",polygon12.toString());
 		              
 	}
+	@Test
+	public void testArcArcTangentialValidOverlap() throws IoxException {
+		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(geomAttr,0.002,3);
+		
+		IomObject polyline=newPolyline();
+		addCoord(polyline,610970.061, 224500.782);
+		addCoord(polyline,610969.663 ,224506.444);
+		IomObject linetableObj=createLinetableObj("136",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+		
+		polyline=newPolyline();
+		addCoord(polyline,610970.087, 224500.378);
+		addArc(polyline,610970.075, 224500.580, // overlap mit zweiten bogen von 4
+						610970.061, 224500.782);
+		linetableObj=createLinetableObj("139",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+		
+		polyline=newPolyline();
+		addCoord(polyline,610962.445, 224499.816);
+		addCoord(polyline,610970.087, 224500.378);
+		linetableObj=createLinetableObj("140",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+
+		polyline=newPolyline();
+		addCoord(polyline,610977.910, 224447.300);
+		addCoord(polyline,610975.063, 224453.534);
+		addArc(polyline,610973.439, 224465.726,
+						610972.045, 224477.946);
+		addArc(polyline,610970.953, 224489.355,  
+						610970.061, 224500.782);
+		linetableObj=createLinetableObj("155",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+		
+		// Abschlusslinie 1
+		polyline=newPolyline();
+		addCoord(polyline,610969.663, 224506.444);
+		addCoord(polyline,610977.910, 224447.300);
+		linetableObj=createLinetableObj("100",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+		
+		// Abschlusslinie 2
+		polyline=newPolyline();
+		addCoord(polyline,610977.910, 224447.300);
+		addCoord(polyline,610967.680, 224444.770);
+		linetableObj=createLinetableObj("200",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+
+		// Abschlusslinie 3
+		polyline=newPolyline();
+		addCoord(polyline,610967.680, 224444.770);
+		addCoord(polyline,610970.087, 224500.378);
+		linetableObj=createLinetableObj("300",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+
+		// Abschlusslinie 4
+		polyline=newPolyline();
+		addCoord(polyline,610962.445, 224499.816);
+		addCoord(polyline,610969.663, 224506.444);
+		linetableObj=createLinetableObj("500",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+		
+		String mainObj10="100x";
+		builder.addGeoRef(mainObj10, newCoord(610976.000, 224453.000));
+		String mainObj11="300x";
+		builder.addGeoRef(mainObj11, newCoord(610968.000, 224445.000));
+		String mainObj12="500x";
+		builder.addGeoRef(mainObj12, newCoord(610969.000, 224505.000));
+		builder.buildSurfaces();
+		IomObject polygon10=builder.getSurfaceObject(mainObj10);
+		IomObject polygon11=builder.getSurfaceObject(mainObj11);
+		IomObject polygon12=builder.getSurfaceObject(mainObj12);
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 610969.663, C2 224506.444}, COORD {C1 610977.91, C2 224447.3}, COORD {C1 610975.063, C2 224453.534}, ARC {A2 224465.726, A1 610973.439, C1 610972.045, C2 224477.946}, ARC {A2 224489.355, A1 610970.953, C1 610970.061, C2 224500.782}, COORD {C1 610969.663, C2 224506.444}]}}}}}",polygon10.toString());
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 610967.68, C2 224444.77}, COORD {C1 610970.087, C2 224500.378}, ARC {A2 224500.38124136152, A1 610970.0868232136, C1 610970.0866459147, C2 224500.38448269508}, ARC {A2 224500.58323939552, A1 610970.0737927004, C1 610970.061, C2 224500.782}, ARC {A2 224489.355, A1 610970.953, C1 610972.045, C2 224477.946}, ARC {A2 224465.726, A1 610973.439, C1 610975.063, C2 224453.534}, COORD {C1 610977.91, C2 224447.3}, COORD {C1 610967.68, C2 224444.77}]}}}}}",polygon11.toString());
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 610962.445, C2 224499.816}, COORD {C1 610969.663, C2 224506.444}, COORD {C1 610970.061, C2 224500.782}, ARC {A2 224500.58323939552, A1 610970.0737927004, C1 610970.0866459147, C2 224500.38448269508}, ARC {A2 224500.38124136152, A1 610970.0868232136, C1 610970.087, C2 224500.378}, COORD {C1 610962.445, C2 224499.816}]}}}}}",polygon12.toString());
+		              
+	}
 
 }
