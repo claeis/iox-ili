@@ -173,6 +173,7 @@ class PolygonizeGraph
 
   public void removeOverlaps(double newVertexOffset)
   {
+	  final boolean doDetailTrace=false;
 		CurveSegmentIntersector li = new CurveSegmentIntersector();
 	    for (Iterator iNode = nodeIterator(); iNode.hasNext(); ) {
 	        Node node = (Node) iNode.next();
@@ -183,7 +184,7 @@ class PolygonizeGraph
             PolygonizeDirectedEdge prevDE = null;
             // the edges are stored in CCW order around the star
             List<PolygonizeDirectedEdge> edges = getActiveOutgoingEdges(deStar);
-            //printEdges(node.getCoordinate()+": ",edges);
+            if(doDetailTrace)printEdges(node.getCoordinate()+": ",edges);
             int edgec=edges.size();
             double maxDist=0.0;
             for(int i=0;i<edgec;i++){
@@ -191,8 +192,8 @@ class PolygonizeGraph
                 for(int j=i+1;j<edgec;j++){
                     PolygonizeDirectedEdge nextDE = edges.get(j);
                     if((currentDE.isArc() || nextDE.isArc()) && Math.abs(currentDE.getAngle()-nextDE.getAngle())<0.0001){
-                    	maxDist=newVertexOffset;
-                    	//System.out.println("  angleDiff "+(currentDE.getAngle()-nextDE.getAngle()));
+                    	maxDist=2*newVertexOffset;
+                    	if(doDetailTrace)System.out.println("  angleDiff "+(currentDE.getAngle()-nextDE.getAngle()));
                     }
                     Coordinate is=getIntersection(li,node.getCoordinate(),currentDE, nextDE);
                     if(is!=null){
@@ -205,22 +206,20 @@ class PolygonizeGraph
             }
             if(maxDist>0){
             	maxDist=maxDist*1.1;
-            	//System.out.println("  maxDist "+maxDist);
+            	if(doDetailTrace)System.out.println("  maxDist "+maxDist);
                 for(int i=0;i<edgec;i++){
                     PolygonizeDirectedEdge currentDE = edges.get(i);
                     currentDE.adjustDirectionPt(maxDist);
                 }
     		    Collections.sort(deStar.getEdges());
                 edges = getActiveOutgoingEdges(deStar);
-        	    //printEdges("   reordered ",edges);
+                if(doDetailTrace)printEdges("   reordered ",edges);
             }
             
             // the edges are stored in CCW order around the star
-    	    //System.out.print("   ");
             for (Iterator i = deStar.getEdges().iterator(); i.hasNext(); ) {
               PolygonizeDirectedEdge currentDE = (PolygonizeDirectedEdge) i.next();
               if (currentDE.isMarked()) continue;
-              //System.out.print(((PolygonizeEdge)currentDE.getEdge()).getLine().getUserData()+", ");
               if (startDE == null){
                 startDE = currentDE;
               }
@@ -237,7 +236,7 @@ class PolygonizeGraph
             	overlapRemoved=overlapRemoved || removed;
             }
             if(overlapRemoved){
-        	    //printEdges("   overlapRemoved ",edges);
+            	if(doDetailTrace)printEdges("   overlapRemoved ",edges);
             }
 	      }
 	  
