@@ -352,5 +352,72 @@ public class ItfAreaLinetable2PolygonOverlapsTest {
 		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 610962.445, C2 224499.816}, COORD {C1 610969.663, C2 224506.444}, COORD {C1 610970.061, C2 224500.782}, ARC {A2 224500.58323939552, A1 610970.0737927004, C1 610970.0866459147, C2 224500.38448269508}, ARC {A2 224500.38124136152, A1 610970.0868232136, C1 610970.087, C2 224500.378}, COORD {C1 610962.445, C2 224499.816}]}}}}}",polygon12.toString());
 		              
 	}
+	@Test
+	public void testStraightArcTangentialMultiValidOverlap() throws IoxException {
+		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(geomAttr,0.002,3);
+		
+		IomObject polyline=newPolyline();
+		addCoord(polyline,641096.061, 245172.460);
+		addCoord(polyline,641085.027, 245162.258);
+		IomObject linetableObj=createLinetableObj("8665",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+		
+		polyline=newPolyline();
+		addCoord(polyline,641096.061, 245172.460);
+		addArc(polyline,641095.220, 245171.941,
+						641094.243, 245171.796);  // overlap mit 8665
+		linetableObj=createLinetableObj("8999",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+		
+		polyline=newPolyline();
+		addCoord(polyline,641096.061, 245172.460);
+		addArc(polyline,641096.514, 245172.993,
+						641096.797, 245173.632); // overlap mit 8664
+		linetableObj=createLinetableObj("9004",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+
+		polyline=newPolyline();
+		addCoord(polyline,641100.934, 245176.966);
+		addCoord(polyline,641096.061, 245172.460);
+		linetableObj=createLinetableObj("8664",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+		
+		// Abschlusslinie 1
+		polyline=newPolyline();
+		addCoord(polyline,641085.027, 245162.258);
+		addCoord(polyline,641094.243, 245171.796);
+		linetableObj=createLinetableObj("a1",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+		
+		// Abschlusslinie 2
+		polyline=newPolyline();
+		addCoord(polyline,641094.243, 245171.796);
+		addCoord(polyline,641096.797, 245173.632);
+		linetableObj=createLinetableObj("a2",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+
+		// Abschlusslinie 3
+		polyline=newPolyline();
+		addCoord(polyline,641096.797, 245173.632);
+		addCoord(polyline,641100.934, 245176.966);
+		linetableObj=createLinetableObj("a3",tableName,geomAttr,polyline);
+		builder.addItfLinetableObject(linetableObj);
+
+		
+		String mainObj10="p1";
+		builder.addGeoRef(mainObj10, newCoord(641094.000, 245171.000));
+		String mainObj11="p2";
+		builder.addGeoRef(mainObj11, newCoord(641096.000, 245173.000));
+		String mainObj12="p3";
+		builder.addGeoRef(mainObj12, newCoord(641097.000, 245173.500));
+		builder.buildSurfaces();
+		IomObject polygon10=builder.getSurfaceObject(mainObj10);
+		IomObject polygon11=builder.getSurfaceObject(mainObj11);
+		IomObject polygon12=builder.getSurfaceObject(mainObj12);
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 641085.027, C2 245162.258}, COORD {C1 641094.243, C2 245171.796}, ARC {A2 245171.941, A1 641095.22, C1 641095.9677911773, C2 245172.37654330902}, COORD {C1 641096.061, C2 245172.46}, COORD {C1 641085.027, C2 245162.258}]}}}}}",polygon10.toString());
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 641094.243, C2 245171.796}, COORD {C1 641096.797, C2 245173.632}, ARC {A2 245172.993, A1 641096.514, C1 641096.1862836669, C2 245172.57857218612}, COORD {C1 641096.061, C2 245172.46}, COORD {C1 641095.9677911773, C2 245172.37654330902}, ARC {A2 245171.941, A1 641095.22, C1 641094.243, C2 245171.796}]}}}}}",polygon11.toString());
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 641096.061, C2 245172.46}, COORD {C1 641096.1862836669, C2 245172.57857218612}, ARC {A2 245172.993, A1 641096.514, C1 641096.797, C2 245173.632}, COORD {C1 641100.934, C2 245176.966}, COORD {C1 641096.061, C2 245172.46}]}}}}}",polygon12.toString());
+		              
+	}
 
 }

@@ -226,13 +226,15 @@ class PolygonizeGraph
               }
               if (prevDE != null) {
             	  // check outDE,prevDE
-            	  overlapRemoved=overlapRemoved || removeOverlap(li,node.getCoordinate(),prevDE, currentDE,newVertexOffset);
+            	  boolean removed=removeOverlap(li,node.getCoordinate(),prevDE, currentDE,newVertexOffset);
+            	  overlapRemoved=overlapRemoved || removed;
               }
               prevDE = currentDE;
             }
             if (prevDE != null) {
             	  // check prevDE,startDE
-            	overlapRemoved=overlapRemoved || removeOverlap(li,node.getCoordinate(),prevDE, startDE,newVertexOffset);
+            	boolean removed=removeOverlap(li,node.getCoordinate(),prevDE, startDE,newVertexOffset);
+            	overlapRemoved=overlapRemoved || removed;
             }
             if(overlapRemoved){
         	    //printEdges("   overlapRemoved ",edges);
