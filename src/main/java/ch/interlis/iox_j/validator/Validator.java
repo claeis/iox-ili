@@ -128,6 +128,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			IoxLogging errs, LogEventFactory errFact, Settings config) {
 		this(td, validationConfig,errs, errFact, new PipelinePool(),config);
 	}
+	/** 
+	 * @param td
+	 * @param validationConfig
+	 * @param errs
+	 * @param errFact
+	 * @param pipelinePool
+	 * @param config to validate ITF files you normally need to set config.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+	 */
+
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
 			IoxLogging errs, LogEventFactory errFact, PipelinePool pipelinePool,Settings config) {
 		super();
