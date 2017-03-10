@@ -297,7 +297,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(ValidationConfig.OFF.equals(checkConstraint)){
 						if(!validationConfigOff.contains(ValidationConfig.CHECK)){
 							validationConfigOff.add(ValidationConfig.CHECK);
-							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration CHECK= off", check));
+							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check= off", check));
 						}
 					}else{
 						additionalConstraints.put(constraint, classValue);
@@ -364,7 +364,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(ValidationConfig.OFF.equals(checkConstraint)){
 					if(!validationConfigOff.contains(ValidationConfig.CHECK)){
 						validationConfigOff.add(ValidationConfig.CHECK);
-						errs.addEvent(errFact.logInfoMsg("{0} of object {1} not validated, validation configuration CHECK=off", check, iomObj.getobjectoid()));
+						errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", check, iomObj.getobjectoid()));
 					}
 					}else{
 					// additional constraint
@@ -504,7 +504,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(ValidationConfig.OFF.equals(checkConstraint)){
 				if(!validationConfigOff.contains(ValidationConfig.CHECK)){
 					validationConfigOff.add(ValidationConfig.CHECK);
-					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration CHECK=off", check));
+					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", check));
 				}
 			}else{
 				String msg=validationConfig.getConfigValue(getScopedName(constraintEntry.getKey()), ValidationConfig.MSG);
@@ -539,7 +539,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(ValidationConfig.OFF.equals(checkUniqueConstraint)){
 			if(!validationConfigOff.contains(ValidationConfig.CHECK)){
 				validationConfigOff.add(ValidationConfig.CHECK);
-				errs.addEvent(errFact.logInfoMsg("{0} of object {1} not validated, validation configuration CHECK=off", check, iomObj.getobjectoid()));
+				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", check, iomObj.getobjectoid()));
 			}
 		}else{
 			Object modelElement=tag2class.get(iomObj.getobjecttag());
@@ -1397,7 +1397,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(multiplicity != null && ValidationConfig.OFF.equals(multiplicity)){
 			if(!validationConfigOff.contains(ValidationConfig.MULTIPLICITY)){
 				validationConfigOff.add(ValidationConfig.MULTIPLICITY);
-				errs.addEvent(errFact.logInfoMsg("{0} in {1} of Object {2} not validated, validation configuration MULTIPLICITY=off", roleQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
+				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration multiplicity=off", roleQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 			}
 		}else{
 			int nrOfTargetObjs=linkPool.getTargetObjectCount(iomObj,role,doItfOidPerTable);
@@ -1422,7 +1422,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(validateTarget!=null && ValidationConfig.OFF.equals(validateTarget)){
 			if(!validationConfigOff.contains(ValidationConfig.TARGET)){
 				validationConfigOff.add(ValidationConfig.TARGET);
-				errs.addEvent(errFact.logInfoMsg("{0} of object {1} not validated, validation configuration TARGET=off", roleQName, iomObj.getobjectoid()));
+				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration target=off", roleQName, iomObj.getobjectoid()));
 			}
 		}else{
 			String targetOid = null;
@@ -2231,7 +2231,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(ValidationConfig.OFF.equals(validateMultiplicity)){
 					if(!validationConfigOff.contains(ValidationConfig.MULTIPLICITY)){
 						validationConfigOff.add(ValidationConfig.MULTIPLICITY);
-						errs.addEvent(errFact.logInfoMsg("{0} in {1} of Object {2} not validated, validation configuration MULTIPLICITY=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
+						errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration multiplicity=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 					}
 				}else{
 					 Cardinality card = ((CompositionType)type).getCardinality();
@@ -2244,7 +2244,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(ValidationConfig.OFF.equals(validateType)){
 						if(!validationConfigOff.contains(ValidationConfig.TYPE)){
 							validationConfigOff.add(ValidationConfig.TYPE);
-							errs.addEvent(errFact.logInfoMsg("{0} in {1} of Object {2} not validated, validation configuration TYPE=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
+							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration type=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 						}
 					}else{
 						String tag=structEle.getobjecttag();
@@ -2271,7 +2271,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(ValidationConfig.OFF.equals(validateMultiplicity)){
 				if(!validationConfigOff.contains(ValidationConfig.MULTIPLICITY)){
 					validationConfigOff.add(ValidationConfig.MULTIPLICITY);
-					errs.addEvent(errFact.logInfoMsg("{0} in {1} of Object {2} not validated, validation configuration MULTIPLICITY=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
+					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration multiplicity=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 				}
 			}else{
 				Boolean topologyValidationOk=(Boolean)pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY_VALIDATION_OK);
@@ -2289,7 +2289,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(ValidationConfig.OFF.equals(validateType)){
 				if(!validationConfigOff.contains(ValidationConfig.TYPE)){
 					validationConfigOff.add(ValidationConfig.TYPE);
-					errs.addEvent(errFact.logInfoMsg("{0} in {1} of Object {2} not validated, validation configuration TYPE=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
+					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration type=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 				}
 			}else{
 				if (attr.isDomainIli1Date()) {
