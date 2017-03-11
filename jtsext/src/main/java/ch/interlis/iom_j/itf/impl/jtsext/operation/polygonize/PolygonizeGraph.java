@@ -95,8 +95,8 @@ class PolygonizeGraph
     Node nEnd = getNode(endPt);
 
     double maxOverlap=0.0;
-    DirectedEdge de0 = new PolygonizeDirectedEdge(nStart, nEnd, CompoundCurve.getDirectionPt(line,true), true);
-    DirectedEdge de1 = new PolygonizeDirectedEdge(nEnd, nStart, CompoundCurve.getDirectionPt(line,false), false);
+    DirectedEdge de0 = new PolygonizeDirectedEdge(nStart, nEnd, CompoundCurve.getDirectionPt(line,true,0.0), true);
+    DirectedEdge de1 = new PolygonizeDirectedEdge(nEnd, nStart, CompoundCurve.getDirectionPt(line,false,0.0), false);
     Edge edge = new PolygonizeEdge(line);
     edge.setDirectedEdges(de0, de1);
     add(edge);
@@ -173,42 +173,95 @@ class PolygonizeGraph
 
   public void removeOverlaps(double newVertexOffset)
   {
+	  final boolean doDetailTrace=false;
 		CurveSegmentIntersector li = new CurveSegmentIntersector();
 	    for (Iterator iNode = nodeIterator(); iNode.hasNext(); ) {
 	        Node node = (Node) iNode.next();
 	        //computeNextCWEdges(node);
 	        boolean overlapRemoved=false;
-	        do{
-		        overlapRemoved=false;
-	            DirectedEdgeStar deStar = node.getOutEdges();
-	            PolygonizeDirectedEdge startDE = null;
-	            PolygonizeDirectedEdge prevDE = null;
-
-	            // the edges are stored in CCW order around the star
-	            for (Iterator i = deStar.getEdges().iterator(); i.hasNext(); ) {
-	              PolygonizeDirectedEdge outDE = (PolygonizeDirectedEdge) i.next();
-	              if (outDE.isMarked()) continue;
-
-	              if (startDE == null)
-	                startDE = outDE;
-	              if (prevDE != null) {
-	            	  // check outDE,prevDE
-	            	  overlapRemoved=overlapRemoved || removeOverlap(li,node.getCoordinate(),prevDE, outDE,newVertexOffset);
-	              }
-	              prevDE = outDE;
-	            }
-	            if (prevDE != null) {
-	            	  // check prevDE,startDE
-	            	overlapRemoved=overlapRemoved || removeOverlap(li,node.getCoordinate(),prevDE, startDE,newVertexOffset);
-	            }
-	        	if(overlapRemoved){
-	    	        // if overlaps removed, re-sort outgoing edges in node
-	    		    Collections.sort(deStar.getEdges());
-	        	}
-	          }while(overlapRemoved);
+            DirectedEdgeStar deStar = node.getOutEdges();
+            PolygonizeDirectedEdge startDE = null;
+            PolygonizeDirectedEdge prevDE = null;
+            // the edges are stored in CCW order around the star
+            List<PolygonizeDirectedEdge> edges = getActiveOutgoingEdges(deStar);
+            if(doDetailTrace)printEdges(node.getCoordinate()+": ",edges);
+            int edgec=edges.size();
+            double maxDist=0.0;
+            for(int i=0;i<edgec;i++){
+                PolygonizeDirectedEdge currentDE = edges.get(i);
+                for(int j=i+1;j<edgec;j++){
+                    PolygonizeDirectedEdge nextDE = edges.get(j);
+                    if((currentDE.isArc() || nextDE.isArc()) && Math.abs(currentDE.getAngle()-nextDE.getAngle())<0.0001){
+                    	maxDist=2*newVertexOffset;
+                    	if(doDetailTrace)System.out.println("  angleDiff "+(currentDE.getAngle()-nextDE.getAngle()));
+                    }
+                    Coordinate is=getIntersection(li,node.getCoordinate(),currentDE, nextDE);
+                    if(is!=null){
+                    	double dist=CurveSegment.dist(node.getCoordinate(),is);
+                    	if(dist>maxDist){
+                    		maxDist=dist;
+                    	}
+                    }
+                }
+            }
+            if(maxDist>0){
+            	maxDist=maxDist*1.1;
+            	if(doDetailTrace)System.out.println("  maxDist "+maxDist);
+                for(int i=0;i<edgec;i++){
+                    PolygonizeDirectedEdge currentDE = edges.get(i);
+                    currentDE.adjustDirectionPt(maxDist);
+                }
+    		    Collections.sort(deStar.getEdges());
+                edges = getActiveOutgoingEdges(deStar);
+                if(doDetailTrace)printEdges("   reordered ",edges);
+            }
+            
+            // the edges are stored in CCW order around the star
+            for (Iterator i = deStar.getEdges().iterator(); i.hasNext(); ) {
+              PolygonizeDirectedEdge currentDE = (PolygonizeDirectedEdge) i.next();
+              if (currentDE.isMarked()) continue;
+              if (startDE == null){
+                startDE = currentDE;
+              }
+              if (prevDE != null) {
+            	  // check outDE,prevDE
+            	  boolean removed=removeOverlap(li,node.getCoordinate(),prevDE, currentDE,newVertexOffset);
+            	  overlapRemoved=overlapRemoved || removed;
+              }
+              prevDE = currentDE;
+            }
+            if (prevDE != null) {
+            	  // check prevDE,startDE
+            	boolean removed=removeOverlap(li,node.getCoordinate(),prevDE, startDE,newVertexOffset);
+            	overlapRemoved=overlapRemoved || removed;
+            }
+            if(overlapRemoved){
+            	if(doDetailTrace)printEdges("   overlapRemoved ",edges);
+            }
 	      }
 	  
   }
+
+private void printEdges(String tag,List<PolygonizeDirectedEdge> edges) {
+		System.out.print(tag);
+		int edgec=edges.size();
+		for(int i=0;i<edgec;i++){
+		    PolygonizeDirectedEdge currentDE = edges.get(i);
+		    System.out.print(((PolygonizeEdge)currentDE.getEdge()).getLine().getUserData()+"{a "+currentDE.getAngle()+"}, ");
+		}            	
+		System.out.println();System.out.flush();
+}
+
+private List<PolygonizeDirectedEdge> getActiveOutgoingEdges(
+		DirectedEdgeStar deStar) {
+	List<PolygonizeDirectedEdge> edges=new ArrayList<PolygonizeDirectedEdge>();
+	for (Iterator i = deStar.getEdges().iterator(); i.hasNext(); ) {
+	  PolygonizeDirectedEdge currentDE = (PolygonizeDirectedEdge) i.next();
+	  if (currentDE.isMarked()) continue;
+	  edges.add(currentDE);
+	}
+	return edges;
+}
 
 private boolean removeOverlap(CurveSegmentIntersector li,Coordinate node,
 		PolygonizeDirectedEdge de0, PolygonizeDirectedEdge de1,double newVertexOffset) {
@@ -301,6 +354,60 @@ private boolean removeOverlap(CurveSegmentIntersector li,Coordinate node,
 		}
 	}
 	return  overlapRemoved;
+}
+private Coordinate getIntersection(CurveSegmentIntersector li,Coordinate node,
+		PolygonizeDirectedEdge de0, PolygonizeDirectedEdge de1) {
+	PolygonizeEdge edge0=(PolygonizeEdge)de0.getEdge();
+	  CompoundCurve line0 = (CompoundCurve)edge0.getLine();
+	  CurveSegment s0=null;
+		int s0idx = 0;
+		if (de0.getEdgeDirection() == true) {
+			s0idx = 0;
+		} else {
+			s0idx = line0.getNumSegments() - 1;
+
+		}
+		s0 = line0.getSegments().get(s0idx);
+	  PolygonizeEdge edge1=(PolygonizeEdge)de1.getEdge();
+	  CompoundCurve line1 = (CompoundCurve)edge1.getLine();
+	  CurveSegment s1=null;
+	  int s1idx=0;
+		if (de1.getEdgeDirection() == true) {
+			s1idx = 0;
+		} else {
+			s1idx = line1.getNumSegments() - 1;
+		}
+		s1=line1.getSegments().get(s1idx);
+	if(s0 instanceof StraightSegment && s1 instanceof StraightSegment){
+		// could not intersect, if correct noded
+	}else{
+		if(s0.getStartPoint().equals2D(s1.getStartPoint()) && s0.getEndPoint().equals2D(s1.getEndPoint())
+				|| s0.getStartPoint().equals2D(s1.getEndPoint()) && s0.getEndPoint().equals2D(s1.getStartPoint())){
+			// eye (two lines with only one segment (Arc and one Straight/Arc))
+			// if eye with lines that have more than one segment, this case should have been already detected, because then it is not correct noded 
+		}else{
+			  li.computeIntersection(s0, s1);
+			  if(li.hasIntersection()){
+				  if(li.getIntersectionNum()==1){
+					  if(!li.isIntersection(node)){
+						  throw new IllegalStateException("unexpected overlap");
+					  }
+				  }else{
+					  Coordinate is0=li.getIntersection(0);
+					  Coordinate is1=li.getIntersection(1);
+					  if(is0.equals2D(node)){
+			    		  return is1;
+					  }else if(is1.equals2D(node)){
+			    		  return is0;
+					  }else{
+						  throw new IllegalStateException("unexpected overlap");
+					  }
+				  }
+			
+			  }
+		}
+	}
+	return  null;
 }
   /**
    * Computes the minimal EdgeRings formed by the edges in this graph.

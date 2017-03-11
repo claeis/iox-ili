@@ -37,13 +37,27 @@ class PolygonizeDirectedEdge
   {
     super(from, to, directionPt, edgeDirection);
   }
+  protected void adjustDirectionPt(double dist)
+  {
+		Coordinate directionPt = null;
+		PolygonizeEdge edge = (PolygonizeEdge) getEdge();
+		CompoundCurve line = (CompoundCurve) edge.getLine();
+		directionPt = CompoundCurve.getDirectionPt(line, getEdgeDirection(),dist);
+
+		p1 = new Coordinate(directionPt);
+		double dx = p1.x - p0.x;
+		double dy = p1.y - p0.y;
+		quadrant = Quadrant.quadrant(dx, dy);
+		angle = Math.atan2(dy, dx);
+	  
+  }
   protected void adjustDirectionPt()
   {
 	  if(true){
 		  Coordinate directionPt=null;
 			 PolygonizeEdge edge=(PolygonizeEdge)getEdge();
 			 CompoundCurve line = (CompoundCurve)edge.getLine();
-		  directionPt=CompoundCurve.getDirectionPt(line,getEdgeDirection());		  
+		  directionPt=CompoundCurve.getDirectionPt(line,getEdgeDirection(),0.0);		  
 		  
 		  p1=new Coordinate(directionPt);
 		    double dx = p1.x - p0.x;
@@ -53,6 +67,11 @@ class PolygonizeDirectedEdge
 		  
 	  }
   }
+  public boolean isArc() {
+		 PolygonizeEdge edge=(PolygonizeEdge)getEdge();
+		 CompoundCurve line = (CompoundCurve)edge.getLine();
+		return CompoundCurve.isArc(line,getEdgeDirection());
+	}
   /**
    * Returns the identifier attached to this directed edge.
    */

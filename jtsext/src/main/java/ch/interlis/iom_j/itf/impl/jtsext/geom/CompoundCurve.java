@@ -339,7 +339,7 @@ public class CompoundCurve extends LineString {
 		
 	}
 
-	public static Coordinate getDirectionPt(LineString line, boolean atStart) {
+	public static Coordinate getDirectionPt(LineString line, boolean atStart,double dist) {
 		if(line instanceof CompoundCurveRing){
 			if(atStart){
 				line=((CompoundCurveRing)line).getLines().get(0);
@@ -362,18 +362,45 @@ public class CompoundCurve extends LineString {
 					return seg.getStartPoint();
 				}
 			}
-			Coordinate directionPt=((ArcSegment)seg).getDirectionPt(atStart);
+			Coordinate directionPt=((ArcSegment)seg).getDirectionPt(atStart,dist);
 			return directionPt;
 		}	
 		
 	    Coordinate[] linePts = CoordinateArrays.removeRepeatedPoints(line.getCoordinates());
 		if(atStart){
-		    Coordinate startPt = linePts[0];
+		    Coordinate startPt = linePts[1];
 		    return startPt;
 		}else{
-		    Coordinate endPt = linePts[linePts.length - 1];			    
+		    Coordinate endPt = linePts[linePts.length - 2];			    
 		    return endPt;
 		}
+	}
+	public static boolean isArc(LineString line, boolean atStart) {
+		if(line instanceof CompoundCurveRing){
+			if(atStart){
+				line=((CompoundCurveRing)line).getLines().get(0);
+			}else{
+				ArrayList<CompoundCurve> lines = ((CompoundCurveRing)line).getLines();
+				line=lines.get(lines.size()-1);
+			}
+		}
+		if(line instanceof CompoundCurve){
+			ArrayList<CurveSegment> segs = ((CompoundCurve) line).getSegments();
+			CurveSegment seg=null;
+			if(atStart){
+				seg=segs.get(0);
+				if(seg instanceof StraightSegment){
+					return false;
+				}
+			}else{
+				seg=segs.get(segs.size()-1);
+				if(seg instanceof StraightSegment){
+					return false;
+				}
+			}
+			return true;
+		}	
+		return false;
 	}
 
 }

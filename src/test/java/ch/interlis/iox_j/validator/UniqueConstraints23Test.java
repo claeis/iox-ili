@@ -22,6 +22,7 @@ public class UniqueConstraints23Test {
 	// BID
 	private final static String OID1 = "o1";
 	private final static String OID2 = "o2";
+	private final static String OID3 = "o3";
 	// BID
 	private final static String BID = "b1";
 	// TOPIC
@@ -414,7 +415,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigens erstellte Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist, wenn validationConfig msg nicht leer ist.
@@ -470,7 +471,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn der Text Unique und identisch ist.
@@ -497,7 +498,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn Number Unique ist und beide Values identisch sind.
@@ -524,7 +525,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values 20 already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn Text Unique und Nummber Unique ist. Dabei die Nummer identisch ist.
@@ -551,7 +552,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values 20 already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn der Text Unique und die Nummer Unique ist. Dabei ist der Text identisch und die Nummer verschieden.
@@ -578,7 +579,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn der Text Unique ist und die Nummer Unique ist. Dabei beide Values identisch sind.
@@ -605,8 +606,8 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Unique is violated! Values 20 already exist in Object: o2", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn der Text und die Nummer Unique sind und die Nummer Unique ist. Dabei sind die Values der Nummer identisch.
@@ -633,7 +634,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values 20 already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn der Text und die Nummer Unique sind und die Nummer Unique ist. Dabei beide Values identisch sind.
@@ -660,8 +661,8 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Unique is violated! Values 20 already exist in Object: o2", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(1).getEventMsg());
 	}
 
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn der Text Unique ist und die Nummer Unique ist. Dabei beide Values identisch sind.
@@ -688,8 +689,8 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Unique is violated! Values 20 already exist in Object: o2", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Warning anstelle einer Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist und validationConfig check auf off geschalten ist.
@@ -746,6 +747,6 @@ public class UniqueConstraints23Test {
 		// Asserts.
 		assertTrue(logger.getErrs().size()==0);
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o2", logger.getWarn().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
 	}
 }

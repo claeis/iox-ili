@@ -30,6 +30,7 @@ public class MandatoryConstraints23 {
 	private final static String ILI_CLASSCONSTANTE=TOPIC+".ClassConstantE";
 	private final static String ILI_CLASSCONSTANTF=TOPIC+".ClassConstantF";
 	private final static String ILI_CLASSCONSTANTG=TOPIC+".ClassConstantG";
+	private final static String ILI_CLASSCONSTANTJ=TOPIC+".ClassConstantJ";
 	// ATTRIBUTES EQUALATION (==) SUCCESS AND FAIL
 	private final static String ILI_CLASSEQUALATIONA=TOPIC+".ClassEqualationA";
 	private final static String ILI_CLASSEQUALATIONB=TOPIC+".ClassEqualationB";
@@ -100,6 +101,23 @@ public class MandatoryConstraints23 {
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	@Test
+	public void constantEnumerationSub_Ok(){
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSCONSTANTJ, OID);
+		objValue.setattrvalue("aufzaehlung1", "mehr.vier");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(objValue));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
@@ -254,27 +272,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn diese Aufzählungen miteinander übereinstimmen.
-	@Test
-	public void enumerationEquality_Ok(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSEQUALATIONH, OID);
-		objValue.setattrvalue("aufzaehlung1", "null");
-		objValue.setattrvalue("aufzaehlung2", "null");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(objValue));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
+	}	
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählungen mit der Unter-Hierarchie übereinstimmen.
 	@Test

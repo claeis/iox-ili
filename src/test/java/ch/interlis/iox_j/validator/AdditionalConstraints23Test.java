@@ -600,7 +600,7 @@ public class AdditionalConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg nicht leer ist.
