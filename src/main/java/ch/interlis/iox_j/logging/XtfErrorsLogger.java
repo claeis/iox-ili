@@ -64,7 +64,7 @@ public class XtfErrorsLogger implements LogListener {
 			IoxLogEvent ioxEvent=(IoxLogEvent)event;
 			iomObj.setObjTag(ioxEvent.getSourceObjectTag());
 			iomObj.setTid(ioxEvent.getSourceObjectXtfId());
-			iomObj.setTechtId(ioxEvent.getSourceObjectTechId());
+			iomObj.setTechId(ioxEvent.getSourceObjectTechId());
 			iomObj.setUserId(ioxEvent.getSourceObjectUsrId()); 
 			iomObj.setIliQName(ioxEvent.getModelEleQName());
 			iomObj.setDataSource(ioxEvent.getDataSource());

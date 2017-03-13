@@ -1,0 +1,152 @@
+INTERLIS 2.3;
+
+MODEL Association23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
+	TOPIC Topic=
+		CLASS ClassA =
+		   attrA1 : TEXT*10;
+		END ClassA;
+		
+		CLASS ClassB =
+		   attrB1 : TEXT*10;
+		END ClassB;
+		
+		CLASS ClassC =
+		   attrC1 : TEXT*10;
+		END ClassC;
+		
+		CLASS ClassD =
+		   attrD1 : TEXT*10;
+		END ClassD;
+		
+		CLASS ClassE =
+		   attrE1 : TEXT*10;
+		END ClassE;
+		
+		CLASS ClassF =
+		   attrF1 : TEXT*10;
+		END ClassF;
+		
+		CLASS ClassG =
+		   attrG1 : TEXT*10;
+		END ClassG;
+		
+		CLASS ClassH =
+		   attrH1 : TEXT*10;
+		END ClassH;
+		
+		CLASS ClassI =
+		   attrI1 : TEXT*10;
+		END ClassI;
+		
+		CLASS ClassJ =
+		   attrJ1 : TEXT*10;
+		END ClassJ;
+		
+		CLASS ClassAp EXTENDS ClassA =
+		END ClassAp;
+		
+		CLASS ClassAq EXTENDS ClassA =
+		END ClassAq;
+		
+		CLASS ClassBp EXTENDS ClassB =
+		END ClassBp;
+		
+		CLASS ClassBq EXTENDS ClassB =
+		END ClassBq;
+		
+		CLASS ClassCp EXTENDS ClassC =
+		END ClassCp;
+		
+		CLASS ClassCq EXTENDS ClassC =
+		END ClassCq;
+		
+		ASSOCIATION ab1 =
+		  a1 -- {0..1} ClassA;
+		  b1 -- {0..1} ClassB;
+		END ab1;
+		
+		ASSOCIATION ab2 =
+		  a2 -- {0..*} ClassA;
+		  b2 -- {0..*} ClassB;
+		END ab2;
+		
+		ASSOCIATION ef1 =
+		  e1 -- {1..*} ClassE;
+		  f1 -- {1..*} ClassF;
+		END ef1;
+		
+		ASSOCIATION gh1 =
+		  g1 -- {1..1} ClassG;
+		  h1 -- {1..1} ClassH;
+		END gh1;
+		
+		ASSOCIATION ab3 =
+		  a3 -- {0..1} ClassA;
+		  b3 -- {0..*} ClassB;
+		END ab3;
+		
+		ASSOCIATION ab4 =
+		  a4 -- {1..5} ClassI;
+		  b4 -- {0..1} ClassJ;
+		END ab4;
+		
+		ASSOCIATION abp1 =
+		  ap1 -- {0..1} ClassA RESTRICTION(ClassAp);
+		  bp1 -- {0..1} ClassB RESTRICTION(ClassBp);
+		END abp1;
+		
+		ASSOCIATION abp2 =
+		  ap2 -- {0..*} ClassA RESTRICTION(ClassAp);
+		  bp2 -- {0..*} ClassB RESTRICTION(ClassBp);
+		END abp2;
+
+		ASSOCIATION abp3 =
+		  ap3 -- {0..1} ClassA RESTRICTION(ClassAp);
+		  bp3 -- {0..*} ClassB RESTRICTION(ClassBp);
+		END abp3;
+		
+		ASSOCIATION abd1 =
+		  ad1 -- {0..1} ClassA OR ClassD;
+		  bd1 -- {0..1} ClassB OR ClassD;
+		END abd1;
+
+		ASSOCIATION abd2 =
+		  ad2 -- {0..*} ClassA OR ClassD;
+		  bd2 -- {0..*} ClassB OR ClassD;
+		END abd2;
+		
+		ASSOCIATION abd3 =
+		  ad3 -- {0..1} ClassA OR ClassD;
+		  bd3 -- {0..*} ClassB OR ClassD;
+		END abd3;
+	END Topic;
+
+	TOPIC TopicB=
+		CLASS ClassE =
+		   attrE1 : TEXT*10;
+		END ClassE;
+		
+		CLASS ClassF =
+		   attrF1 : TEXT*10;
+		END ClassF;
+		
+		CLASS ClassG =
+		   attrG1 : TEXT*10;
+		END ClassG;
+		
+		CLASS ClassH =
+		   attrH1 : TEXT*10;
+		END ClassH;
+				
+		ASSOCIATION gh1 =
+		  g1 (EXTERNAL) -- {1..1} ClassG;
+		  h1 (EXTERNAL) -- {1..1} ClassH;
+		END gh1;
+
+		ASSOCIATION ef1 =
+		  e1 (EXTERNAL) -- {1..*} ClassE;
+		  f1 (EXTERNAL) -- {1..*} ClassF;
+		END ef1;
+	END TopicB;
+END Association23.

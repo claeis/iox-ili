@@ -25,8 +25,11 @@ package ch.interlis.iom_j.itf;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.ehi.iox.objpool.impl.JavaSerializer;
 import ch.interlis.iox_j.*;
+import ch.interlis.iox_j.logging.Log2EhiLogger;
 import ch.interlis.iox_j.logging.LogEventFactory;
+import ch.interlis.iox_j.validator.ValidationConfig;
 import ch.interlis.iox.IoxDataPool;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
@@ -56,7 +59,8 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 	private ObjectPoolManager objPool=null;
 	private ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
 	private boolean ignorePolygonBuildingErrors=false;
-	private IoxDataPool ioxDataPool=null;
+	private PipelinePool ioxDataPool=null;
+	private LogEventFactory errFact=null;
 	/** Creates a new reader.
 	 * @param in Input stream to read from.
 	 * @throws IoxException
@@ -64,12 +68,14 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 	public ItfReader2(java.io.InputStream in,boolean ignorePolygonBuildingErrors1)
 	throws IoxException
 	{
-		rawReader=new ItfReader(in);
+		initErrFact(null);
+		rawReader=new ItfReader(in,errFact);
 		init(ignorePolygonBuildingErrors1);
 	}
-	public ItfReader2(java.io.InputStream in,LogEventFactory errFact,boolean ignorePolygonBuildingErrors1)
+	public ItfReader2(java.io.InputStream in,LogEventFactory errFact1,boolean ignorePolygonBuildingErrors1)
 	throws IoxException
 	{
+		initErrFact(errFact1);
 		rawReader=new ItfReader(in,errFact);
 		init(ignorePolygonBuildingErrors1);
 	}
@@ -80,18 +86,31 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 	public ItfReader2(java.io.File in,boolean ignorePolygonBuildingErrors1)
 	throws IoxException
 	{
-		rawReader=new ItfReader(in);
+		initErrFact(null);
+		rawReader=new ItfReader(in,errFact);
 		init(ignorePolygonBuildingErrors1);
 	}
-	public ItfReader2(java.io.File in,LogEventFactory errFact,boolean ignorePolygonBuildingErrors1)
+	public ItfReader2(java.io.File in,LogEventFactory errFact1,boolean ignorePolygonBuildingErrors1)
 	throws IoxException
 	{
+		initErrFact(errFact1);
 		rawReader=new ItfReader(in,errFact);
 		init(ignorePolygonBuildingErrors1);
 	}
 	private void init(boolean ignorePolygonBuildingErrors1){
 		objPool=new ObjectPoolManager();
 		ignorePolygonBuildingErrors=ignorePolygonBuildingErrors1;
+	}
+	private void initErrFact(LogEventFactory errFact) {
+		if(errFact==null){
+			this.errFact=new LogEventFactory();
+			this.errFact.setLogger(new Log2EhiLogger());
+		}else{
+			this.errFact=errFact;
+			if(errFact.getLogger()==null){
+				this.errFact.setLogger(new Log2EhiLogger());
+			}
+		}
 	}
 	@Override
 	public void close() throws IoxException {
@@ -218,7 +237,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 				// maintable
 				surfaceOrAreaAttr=null;
 				//mainObjs=new HashMap<String,IomObject>();
-				currentMainObjs=objPool.newObjectPool();
+				currentMainObjs=objPool.newObjectPoolImpl2(new JavaSerializer());
 				iliQName=aclass.getScopedName(null);
 				while(true){
 					  // collect objects
@@ -310,6 +329,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 				// FOR all area attrs: polygonize and add polygon to main object
 				for(AttributeDef areaAttr : currentAreaAttrs.keySet()){
 					String areaAttrName=areaAttr.getName();
+					setTopologyValidationDone(areaAttr);
 					ItfAreaLinetable2Polygon polygonizer=currentAreaAttrs.get(areaAttr);
 					try {
 						polygonizer.buildSurfaces();
@@ -317,12 +337,14 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 					} catch (IoxInvalidDataException e) {
 						dataerrs.addAll(polygonizer.getDataerrs());
 						dataerrs.add(new IoxInvalidDataException("failed to build polygons of "+aclass.getScopedName(null)+"."+areaAttrName,e));
+						setTopologyValidationFailed(areaAttr);
 						continue;
 					}
 				}
 				// FOR all surface attrs: polygonize and add polygon to main object
 				for(AttributeDef surfaceAttr : currentSurfaceAttrs.keySet()){
 					String surfaceAttrName=surfaceAttr.getName();
+					setTopologyValidationDone(surfaceAttr);
 					ItfSurfaceLinetable2Polygon polygonizer=currentSurfaceAttrs.get(surfaceAttr);
 					try {
 						polygonizer.buildSurfaces();
@@ -330,6 +352,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 					} catch (IoxInvalidDataException e) {
 						dataerrs.addAll(polygonizer.getDataerrs());
 						dataerrs.add( new IoxInvalidDataException("failed to build polygons of "+aclass.getScopedName(null)+"."+surfaceAttrName,e));
+						setTopologyValidationFailed(surfaceAttr);
 						continue;
 					}
 				}
@@ -355,12 +378,22 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 		}else if(rawEvent instanceof EndTransferEvent){
 			if(dataerrs.size()>0){
         		for(IoxInvalidDataException dataerr:dataerrs){
-        			EhiLogger.logError(dataerr);
+        			errFact.addEvent(errFact.logError(dataerr));
         		}
 				throw new IoxInvalidDataException("failed to build polygons");
 			}
 		}
 		return rawEvent;
+	}
+	private void setTopologyValidationDone(AttributeDef attr) {
+		if(ioxDataPool!=null){
+			ioxDataPool.setIntermediateValue(attr, ValidationConfig.TOPOLOGY, this);
+		}
+	}
+	private void setTopologyValidationFailed(AttributeDef attr) {
+		if(ioxDataPool!=null){
+			ioxDataPool.setIntermediateValue(attr, ValidationConfig.TOPOLOGY_VALIDATION_OK, new Boolean(false));
+		}
 	}
 	private void closePolygonizers() {
 		if(currentAreaAttrs!=null){
@@ -495,6 +528,6 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 		return ioxDataPool;
 	}
 	public void setIoxDataPool(IoxDataPool ioxDataPool) {
-		this.ioxDataPool = ioxDataPool;
+		this.ioxDataPool = (PipelinePool)ioxDataPool;
 	}
 }

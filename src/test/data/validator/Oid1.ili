@@ -1,0 +1,24 @@
+TRANSFER Ili1FmtTest;
+
+MODEL Oid1
+
+	TOPIC Topic=
+	
+		TABLE ClassB =
+		   	attrB1 : OPTIONAL TEXT*10;
+			NO IDENT
+		END ClassB;
+
+		TABLE ClassC =
+		   	attrC1 : OPTIONAL TEXT*10;
+			NO IDENT
+		END ClassC;
+		
+	END Topic.
+	
+END Oid1.
+
+FORMAT FREE;
+	CODE BLANK = DEFAULT, UNDEFINED = DEFAULT, CONTINUE = DEFAULT;
+	TID = ANY;
+END.

@@ -3,58 +3,135 @@ INTERLIS 2.3;
 MODEL Datatypes23
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" =
 	TOPIC Topic=
-
-		DOMAIN 
+		UNIT
+			DEGREE;
+		DOMAIN
+			!! Enumeration
+			ord = (unten, oben) ORDERED;
+			circu = (Werktage, Sonntag) CIRCULAR;
+			allauf = ALL OF circu;
+			circuEx EXTENDS circu = (Sonntag (Morgen, Nachmittag));
+			ordEx EXTENDS ord = (unten (mitte));
+			ordFinal = (eins : FINAL);
+			ordFinalEx EXTENDS ordFinal = (eins (zwei));
+			
+			!! Numeric
+			numerictype = 0.0 .. 9.9 CIRCULAR;
+			!!numericCounterClockwise = MANDATORY 0.0 .. 359.9 CIRCULAR [DEGREE] COUNTERCLOCKWISE;
+			!!numericCounterClock = MANDATORY 0.0 .. 359.9 CIRCULAR [DEGREE] COUNTERCLOCK;
+			
+			!! Class
+			!!bClass : CLASS;
+			
+			!! Coord
 			Skoord = COORD 480000.000 .. 850000.000 [INTERLIS.m];
 			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
-					70000.000 .. 310000.000 [INTERLIS.m],
-						ROTATION 2 -> 1;
+					        70000.000 .. 310000.000 [INTERLIS.m],
+						   ROTATION 2 -> 1;
 			Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
-					70000.000 .. 310000.000 [INTERLIS.m],
-					0.000 .. 5000.000 [INTERLIS.m];
-			
+					        70000.000 .. 310000.000 [INTERLIS.m],
+					              0.000 .. 5000.000 [INTERLIS.m];
+					              
 		CLASS ClassA =
+		   !! EnumerationType
+		   aufzaehlung : (null, eins, zwei, drei, mehr ( vier, fuenf, sechs, sieben, acht ,neun, zehn)); !! == zwei Stellen
+		   aufzaehlungAll : allauf;						
+		   aufzaehlungCircular : circu;
+		   aufzaehlungOrdered : ord;
+		   aufzaehlungCircularEx : circuEx;
+		   aufzaehlungOrderedEx : ordEx;
+		   aufzaehlungFinal : ordFinal;
+		   
+		   !! OIDType
+		   aI32id : INTERLIS.I32OID;
+		   !!aAnyid : INTERLIS.ANYOID;
+		   aUuid : INTERLIS.UUIDOID;
+		   aStandardid : INTERLIS.STANDARDOID;
+		   
 		   !! TextType
 		   textLimited : TEXT*10;
 		   textUnlimited : TEXT;
 		   mtextLimited : MTEXT*10;
 		   mtextUnlimited : MTEXT;
-		   !! EnumerationType
-		   aufzaehlung : (null, eins, zwei, drei, mehr ( vier, fuenf, sechs, sieben, acht ,neun, zehn)); !! == zwei Stellen
+		   nametext : NAME;
+		   uritext : URI;
+		   
 		   !! AlignmentType
 		   horizAlignment : HALIGNMENT;
 		   vertAlignment : VALIGNMENT;
+		   
 		   !! BooleanType
 		   aBoolean : BOOLEAN;
+		   
 		   !! NumericType
 		   numericInt : 0 .. 10;
 		   numericDec : 0.0 .. 10.0;
-		   !! FormattedType		   
+		   numericNum : numerictype;
+		   !!numCountClockWise : numericCounterClockwise;
+		   !!numCountClock : numericCounterClock;
+		   
+		   !! FormattedType
+		   !!basedOn : time1;
+		   !!basedOn2 : time2;
+		   !!extendsBaseOn : time3;
+		   
+		   !! Datum und Zeit
 		   aTime : INTERLIS.XMLTime;
 		   aDate : INTERLIS.XMLDate;
 		   aDateTime : INTERLIS.XMLDateTime;
-		   !! CoordinateType
+		   
+		   !! CoordinateType (s=1d, l=2d, h=3d)
 		   scoord : Skoord;
 		   lcoord : Lkoord;
 		   hcoord : Hkoord;
-		   !! OIDType
-		   aOid : OID TEXT*30;
-		   aUuid : INTERLIS.UUIDOID;
+		   
+		   !! BlackBoxType
+		   !!box1 : BLACKBOX XML;
+		   !!box2 : BLACKBOX BINARY;
+		   
 		   !! ClassType
 		   aClass : CLASS;
+		   !!STRUCTURE : bClass;
+		   !!ATTRIBUTE OF bClass;
+		   !!(RESTRICTION)
 		END ClassA;
+		
 		CLASS ClassB =
 		   !! Linientyp
-		   aline : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		   straights2d : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		   straights3d : POLYLINE WITH (STRAIGHTS) VERTEX Hkoord;
+		   arcs2d : POLYLINE WITH (ARCS) VERTEX Lkoord;
+		   arcs3d : POLYLINE WITH (ARCS) VERTEX Hkoord;
+		   straightsarcs2d : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Lkoord;
+		   straightsarcs3d : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
+		   arcsstraights2d : POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Lkoord;
+		   
+		   !! Linientyp (without overlaps is optional for polyline)
+		   straights2dWithoutOverlaps : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   !!straights3dWithoutOverlaps : POLYLINE WITH (STRAIGHTS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
 		END ClassB;
+		
+		CLASS ClassBDirected =
+		   !! Linientyp directed polyline
+		   !!straights2dWithoutOverlaps : DIRECTED POLYLINE WITH (STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   !!straights3dWithoutOverlaps : DIRECTED POLYLINE WITH (STRAIGHTS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		   !!arcs2dWithoutOverlaps : DIRECTED POLYLINE WITH (ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   !!arcs3dWithoutOverlaps : DIRECTED POLYLINE WITH (ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		   !!straightsarcs2dWithoutOverlaps : DIRECTED POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   !!straightsarcs3dWithoutOverlaps : DIRECTED POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		   !!arcsstraights2dWithoutOverlaps : DIRECTED POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END ClassBDirected;
+		
 		CLASS ClassC =
-		   !! Flaechentyp
-		   asurface : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   !! Surfacetype (without overlaps is obligatory for individual surfaces)
+		   surface2d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   surface3d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
 		END ClassC;
+		
 		CLASS ClassD =
-		   !! Flaechentyp
-		   anarea : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   !! Areatype (without overlaps is obligatory for individual areas)
+		   area2d : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   area3d : AREA WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
 		END ClassD;
 	END Topic;
 END Datatypes23.
-

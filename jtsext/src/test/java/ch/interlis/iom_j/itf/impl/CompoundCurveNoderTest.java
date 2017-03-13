@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +45,7 @@ public class CompoundCurveNoderTest {
 	    String wktB = "LINESTRING(10 10, 20 10, 20 40, 10 40, 10 10)";
 	    CompoundCurve B = fact.createCompoundCurve((LineString)wktRdr.read(wktB));
 	    
-	    Collection<CompoundCurve> segs=new ArrayList<CompoundCurve>();
+	    List<CompoundCurve> segs=new ArrayList<CompoundCurve>();
 	    segs.add(B);
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
 		validator.checkValid();
@@ -61,7 +62,7 @@ public class CompoundCurveNoderTest {
 	    String wktB = "LINESTRING(10 10, 20 10, 20 40, 10 40, 10 10)";
 	    CompoundCurve A = fact.createCompoundCurve((LineString)wktRdr.read(wktA));
 	    CompoundCurve B = fact.createCompoundCurve((LineString)wktRdr.read(wktB));
-	    Collection<CompoundCurve> segs=new ArrayList<CompoundCurve>();
+	    List<CompoundCurve> segs=new ArrayList<CompoundCurve>();
 	    segs.add(A);
 	    segs.add(B);
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
@@ -78,7 +79,7 @@ public class CompoundCurveNoderTest {
 	    String wktB = "LINESTRING(10 10, 20 10, 20 40, 10 40)";
 	    
 	    CompoundCurve B = fact.createCompoundCurve((LineString)wktRdr.read(wktB));
-	    Collection<CompoundCurve> segs=new ArrayList<CompoundCurve>();
+	    List<CompoundCurve> segs=new ArrayList<CompoundCurve>();
 	    segs.add(B);
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
 		validator.checkValid();
@@ -93,7 +94,7 @@ public class CompoundCurveNoderTest {
 	    String wktB = "LINESTRING(0 10, 10 10, 20 10, 20 40, 10 40, 10 10)";
 	    
 	    CompoundCurve B = fact.createCompoundCurve((LineString)wktRdr.read(wktB));
-	    Collection<CompoundCurve> segs=new ArrayList<CompoundCurve>();
+	    List<CompoundCurve> segs=new ArrayList<CompoundCurve>();
 	    segs.add(B);
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
 		validator.checkValid();
@@ -110,7 +111,7 @@ public class CompoundCurveNoderTest {
 	    
 	    CompoundCurve A = fact.createCompoundCurve((LineString)wktRdr.read(wktA));
 	    CompoundCurve B = fact.createCompoundCurve((LineString)wktRdr.read(wktB));
-	    Collection<CompoundCurve> segs=new ArrayList<CompoundCurve>();
+	    List<CompoundCurve> segs=new ArrayList<CompoundCurve>();
 	    segs.add(A);
 	    segs.add(B);
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
@@ -126,7 +127,7 @@ public class CompoundCurveNoderTest {
 	    String wktB = "LINESTRING(10 10, 20 10, 20 40, 10 40, 15 10)";
 	    
 	    CompoundCurve B = fact.createCompoundCurve((LineString)wktRdr.read(wktB));
-	    Collection<CompoundCurve> segs=new ArrayList<CompoundCurve>();
+	    ArrayList<CompoundCurve> segs=new ArrayList<CompoundCurve>();
 	    segs.add(B);
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
 		try{
@@ -145,7 +146,7 @@ public class CompoundCurveNoderTest {
 	    
 	    CompoundCurve A = fact.createCompoundCurve((LineString)wktRdr.read(wktA));
 	    CompoundCurve B = fact.createCompoundCurve((LineString)wktRdr.read(wktB));
-	    Collection<CompoundCurve> segs=new ArrayList<CompoundCurve>();
+	    List<CompoundCurve> segs=new ArrayList<CompoundCurve>();
 	    segs.add(A);
 	    segs.add(B);
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
@@ -163,7 +164,7 @@ public class CompoundCurveNoderTest {
 	    String wktB = "LINESTRING(20 10, 15 40, 10 10, 15 0, 20 10, 25 40, 30 10, 25 0, 20 10)";
 	    
 	    CompoundCurve B = fact.createCompoundCurve((LineString)wktRdr.read(wktB));
-	    Collection<CompoundCurve> segs=new ArrayList<CompoundCurve>();
+	    List<CompoundCurve> segs=new ArrayList<CompoundCurve>();
 	    segs.add(B);
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
 		validator.checkValid();
@@ -180,7 +181,7 @@ public class CompoundCurveNoderTest {
 	    
 	    CompoundCurve A = fact.createCompoundCurve((LineString)wktRdr.read(wktA));
 	    CompoundCurve B = fact.createCompoundCurve((LineString)wktRdr.read(wktB));
-	    Collection<CompoundCurve> segs=new ArrayList<CompoundCurve>();
+	    List<CompoundCurve> segs=new ArrayList<CompoundCurve>();
 	    segs.add(A);
 	    segs.add(B);
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
@@ -196,7 +197,7 @@ public class CompoundCurveNoderTest {
 	    String wktB = "LINESTRING(20 10, 15 30, 15 10, 20 10, 20 40, 10 40, 10 0, 20 0, 20 10)";
 	    
 	    CompoundCurve B = fact.createCompoundCurve((LineString)wktRdr.read(wktB));
-	    Collection<CompoundCurve> segs=new ArrayList<CompoundCurve>();
+	    List<CompoundCurve> segs=new ArrayList<CompoundCurve>();
 	    segs.add(B);
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
 		validator.checkValid();
@@ -222,7 +223,7 @@ public class CompoundCurveNoderTest {
 	    l.add(new StraightSegment(new Coordinate(112, 120),new Coordinate(110,110)));
 	    CompoundCurve A = fact.createCompoundCurve(l);
 
-	    Collection<CompoundCurve> segs=new ArrayList<CompoundCurve>();
+	    List<CompoundCurve> segs=new ArrayList<CompoundCurve>();
 	    segs.add(B);
 	    segs.add(A);
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);

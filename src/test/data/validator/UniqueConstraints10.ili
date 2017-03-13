@@ -1,0 +1,43 @@
+TRANSFER Ili1FmtTest;
+
+MODEL UniqueConstraints10
+	TOPIC Topic=
+	
+		DOMAIN Lkoord = COORD2 1.00 100.0 9.99 999.9;
+		
+		TABLE TableA =
+			a1 : OPTIONAL TEXT*30;
+			a2 : OPTIONAL TEXT*30;
+			IDENT
+			a1;
+		END TableA;
+		
+		TABLE TableB =
+			b1 : OPTIONAL TEXT*30;
+			b2 : OPTIONAL -> TableA;
+			IDENT
+			b2;
+		END TableB;
+		
+		TABLE TableC =
+			c1 : OPTIONAL TEXT*30;
+			c2 : OPTIONAL TEXT*30;
+			IDENT
+			c1,c2;
+		END TableC;
+		
+		TABLE TableD =
+			d1 : OPTIONAL TEXT*30;
+			d2 : OPTIONAL -> TableA;
+			IDENT
+			d1,d2;
+		END TableD;
+		
+	END Topic.
+	
+END UniqueConstraints10.
+
+FORMAT FREE;
+	CODE BLANK = DEFAULT, UNDEFINED = DEFAULT, CONTINUE = DEFAULT;
+	TID = ANY;
+END.

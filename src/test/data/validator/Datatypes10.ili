@@ -1,51 +1,80 @@
 TRANSFER Ili1FmtTest;
-
 MODEL Datatypes10
+	DOMAIN Lkoord = COORD2 480000.000 70000.000 850000.000 310000.000;
+		   Hkoord = COORD3 480000.000 70000.000 0.000 850000.000 310000.000 5000.000;
 	TOPIC Topic=
-		DOMAIN Lkoord = COORD2 1.00 100.0 9.99 999.9;
 		TABLE Table =
-			!! Koord2
 			koord2 : OPTIONAL COORD2 1.00 100.0 9.99 999.9;
-			!! Koord3
 			koord3 : OPTIONAL COORD3 1.00 100.0 1000 9.99 999.9 9999;
-			!! Laenge
-			dim1 : OPTIONAL DIM1 1.0 9.9;
-			!! Flaechenmass
-			dim2 : OPTIONAL DIM2 1.0 9.9;
-			!! Winkel
-			radians : OPTIONAL RADIANS 0.0 6.2;
-			grads : OPTIONAL GRADS 0.0 399.9;
-			degrees : OPTIONAL DEGREES 0.0 359.9;
-			!! Bereich
-			bereich : OPTIONAL [0.0 .. 9.9 ];
-			!! Text
+			
+			laenge : OPTIONAL DIM1 1.0 9.9; !! == Eine Stelle nach dem Komma
+			laenge2 : OPTIONAL DIM1 0.000 1000.999; !! == Drei Stellen nach dem Komma
+			
 			text : OPTIONAL TEXT*10;
-			!! Datum
+			text2 : OPTIONAL TEXT*100;
+			
+			bereich : OPTIONAL [0.0 .. 9.9 ];
+			bereich2 : OPTIONAL [0.000 .. 9.999];
+			
+			aufzaehlung : OPTIONAL (null, eins, zwei, drei, mehr ( vier, fuenf, sechs, sieben, acht ,neun, zehn)); !!zwei Stellen
+			aufzaehlungVerschachtelung : OPTIONAL (null (eins (zwei (drei (vier (fuenf)))))); !!fuenf Stellen
+			aufzaehlung2Oberauszaehlungen : OPTIONAL (meter (mm, cm, dm, m), liter (ml, cl, dl, l)); !!2 Aufzaehlungen
+			
+			flaeche : OPTIONAL DIM2 1.0 9.9;
+			flaeche2 : OPTIONAL DIM2 1.000 99.000;
+			
+			radians : OPTIONAL RADIANS 1.0 10.0;
+			grads : OPTIONAL GRADS 1.0 10.0;
+			
+			degrees : OPTIONAL DEGREES 1.0 10.0;
+			
 			datum : OPTIONAL DATE;
-			!! Aufzaehlung
-			aufzaehlung : OPTIONAL (null, eins, zwei, drei, mehr ( vier, fuenf, sechs, sieben, acht ,neun, zehn)); !! == zwei Stellen
-			!! HorizAlignment
+			
 			horizAlignment : OPTIONAL HALIGNMENT;
-			!! VertAlignment
 			vertAlignment : OPTIONAL VALIGNMENT;
-			!! Linientyp
-			linientyp : OPTIONAL POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
-			!! Flaechentyp
-			surface : OPTIONAL SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord;
-			area : OPTIONAL AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.0
-					LINEATTR =
-						attr : TEXT*20;
-					END;
-		NO IDENT
+			NO IDENT
 		END Table;
+		
+		TABLE LineTable =
+			straights2d : OPTIONAL POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+			straights3d : OPTIONAL POLYLINE WITH (STRAIGHTS) VERTEX Hkoord;
+
+			arcs2d : OPTIONAL POLYLINE WITH (ARCS) VERTEX Lkoord;
+			arcs3d : OPTIONAL POLYLINE WITH (ARCS) VERTEX Hkoord;
+
+			straightsarcs2d : OPTIONAL POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Lkoord;
+			straightsarcs3d : OPTIONAL POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Hkoord;
+
+			lineWithoutOverlaps2d : OPTIONAL POLYLINE WITH (STRAIGHTS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
+			lineWithoutOverlaps3d : OPTIONAL POLYLINE WITH (STRAIGHTS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
+
+			lineWithoutOverlaps2dArc : OPTIONAL POLYLINE WITH (ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
+			lineWithoutOverlaps3dArc : OPTIONAL POLYLINE WITH (ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
+
+			lineWithoutOverlaps2dArcStraights : OPTIONAL POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
+			lineWithoutOverlaps3dArcStraights : OPTIONAL POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
+			NO IDENT
+		END LineTable;
+			
+		TABLE FlaechenTable =	
+			surface2d : OPTIONAL SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord;
+		   	surface3d : OPTIONAL SURFACE WITH (STRAIGHTS,ARCS) VERTEX Hkoord;
+
+			surfaceWithoutOverlaps2d : OPTIONAL SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
+		   	surfaceWithoutOverlaps3d : OPTIONAL SURFACE WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
+
+			areaWithoutOverlaps2d : OPTIONAL AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.1;
+		   	areaWithoutOverlaps3d : OPTIONAL AREA WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.1;
+			NO IDENT
+		END FlaechenTable;
+		
 		TABLE OtherTable =
-			!! BezAttribut
+			!! Bezug Attribut
 			main : -> Table;
 		NO IDENT
 		END OtherTable;
 	END Topic.
 END Datatypes10.
-
 FORMAT FREE;
 CODE BLANK = DEFAULT, UNDEFINED = DEFAULT, CONTINUE = DEFAULT;
 TID = ANY;

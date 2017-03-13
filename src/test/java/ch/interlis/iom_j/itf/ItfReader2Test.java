@@ -22,15 +22,27 @@ import ch.interlis.iom_j.itf.ItfReader2;
 import ch.interlis.iox.*;
 import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.jts.Iox2jtsException;
+import ch.interlis.iox_j.logging.LogEventImpl;
 
 public class ItfReader2Test {
 
 	private TransferDescription td=null;
 	private LogCollector errs=null;
-	private void assertError(String expected)
+	private void assertError(String expected,String tid)
 	{
+		LogEvent foundErr=null;
 		for(LogEvent err:errs.getErrs()){
-			if(expected.equals(err.getEventMsg()) || expected.equals(err.getException().getMessage())){
+			if(expected.equals(err.getEventMsg())){
+				foundErr=err;
+				break;
+			}
+			if(err.getException()!=null && expected.equals(err.getException().getMessage())){
+				foundErr=err;
+				break;
+			}
+		}
+		if(foundErr!=null && foundErr instanceof LogEventImpl){
+			if(tid!=null && tid.equals(((LogEventImpl) foundErr).getSourceObjectXtfId())){
 				return;
 			}
 		}
@@ -116,7 +128,57 @@ public class ItfReader2Test {
 			 }while(!(event instanceof EndTransferEvent));
 			 fail();
 		}catch(IoxInvalidDataException ex){
-			 assertError("Test1.TopicA.TableA_Form: empty line (tid 1)");
+			 assertError("empty line","1");
+		}
+	}
+	@Test
+	public void testSURFACEnoMainObj() throws Iox2jtsException, IoxException {
+		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceNoMainObj.itf"),false);
+		reader.setModel(td);
+		IoxEvent event=null;
+		HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
+		try{
+			 do{
+			        event=reader.read();
+			        if(event instanceof StartTransferEvent){
+			        }else if(event instanceof StartBasketEvent){
+			        }else if(event instanceof ObjectEvent){
+			        	IomObject iomObj=((ObjectEvent)event).getIomObject();
+			    		System.out.println(iomObj);
+			    		assertNotNull(iomObj.getobjectoid());
+			    		objs.put(iomObj.getobjectoid(), iomObj);
+			        }else if(event instanceof EndBasketEvent){
+			        }else if(event instanceof EndTransferEvent){
+			        }
+			 }while(!(event instanceof EndTransferEvent));
+			 fail();
+		}catch(IoxInvalidDataException ex){
+			 assertError("no main obj","1");
+		}
+	}
+	@Test
+	public void testSURFACEnoMainTable() throws Iox2jtsException, IoxException {
+		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceNoMainTable.itf"),false);
+		reader.setModel(td);
+		IoxEvent event=null;
+		HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
+		try{
+			 do{
+			        event=reader.read();
+			        if(event instanceof StartTransferEvent){
+			        }else if(event instanceof StartBasketEvent){
+			        }else if(event instanceof ObjectEvent){
+			        	IomObject iomObj=((ObjectEvent)event).getIomObject();
+			    		System.out.println(iomObj);
+			    		assertNotNull(iomObj.getobjectoid());
+			    		objs.put(iomObj.getobjectoid(), iomObj);
+			        }else if(event instanceof EndBasketEvent){
+			        }else if(event instanceof EndTransferEvent){
+			        }
+			 }while(!(event instanceof EndTransferEvent));
+			 fail();
+		}catch(IoxInvalidDataException ex){
+			 assertError("no main table","1");
 		}
 	}
 
@@ -186,7 +248,57 @@ public class ItfReader2Test {
 			 }while(!(event instanceof EndTransferEvent));
 			 fail();
 		}catch(IoxInvalidDataException ex){
-			 assertError("Test1.TopicB.TableB_Form: empty line (tid 1)");
+			 assertError("empty line","1");
+		}
+	}
+	@Test
+	public void testAREAnoMainObj() throws Iox2jtsException, IoxException {
+		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/AreaNoMainObj.itf"),false);
+		reader.setModel(td);
+		IoxEvent event=null;
+		HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
+		try{
+			 do{
+			        event=reader.read();
+			        if(event instanceof StartTransferEvent){
+			        }else if(event instanceof StartBasketEvent){
+			        }else if(event instanceof ObjectEvent){
+			        	IomObject iomObj=((ObjectEvent)event).getIomObject();
+			    		System.out.println(iomObj);
+			    		assertNotNull(iomObj.getobjectoid());
+			    		objs.put(iomObj.getobjectoid(), iomObj);
+			        }else if(event instanceof EndBasketEvent){
+			        }else if(event instanceof EndTransferEvent){
+			        }
+			 }while(!(event instanceof EndTransferEvent));
+			 fail();
+		}catch(IoxInvalidDataException ex){
+			 assertError("no main obj","1");
+		}
+	}
+	@Test
+	public void testAREAnoMainTable() throws Iox2jtsException, IoxException {
+		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/AreaNoMainTable.itf"),false);
+		reader.setModel(td);
+		IoxEvent event=null;
+		HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
+		try{
+			 do{
+			        event=reader.read();
+			        if(event instanceof StartTransferEvent){
+			        }else if(event instanceof StartBasketEvent){
+			        }else if(event instanceof ObjectEvent){
+			        	IomObject iomObj=((ObjectEvent)event).getIomObject();
+			    		System.out.println(iomObj);
+			    		assertNotNull(iomObj.getobjectoid());
+			    		objs.put(iomObj.getobjectoid(), iomObj);
+			        }else if(event instanceof EndBasketEvent){
+			        }else if(event instanceof EndTransferEvent){
+			        }
+			 }while(!(event instanceof EndTransferEvent));
+			 fail();
+		}catch(IoxInvalidDataException ex){
+			 assertError("no main table","1");
 		}
 	}
 	@Test

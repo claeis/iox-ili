@@ -1,0 +1,35 @@
+TRANSFER Ili1FmtTest;
+
+MODEL ReferenceType10
+
+	TOPIC TopicA=
+	
+		TABLE ClassA =
+		   attrA1 : OPTIONAL TEXT*10;
+		NO IDENT
+		END ClassA;
+
+		TABLE ClassB =
+		   attrB1 : OPTIONAL TEXT*10;
+		NO IDENT
+		END ClassB;
+
+		TABLE ClassC =
+		   attrC1 : -> ClassA;
+		   attrC2 : OPTIONAL -> ClassB;
+		NO IDENT
+		END ClassC;
+		
+		OPTIONAL TABLE ClassD =
+		   attrC1 : -> ClassA;
+		NO IDENT
+		END ClassD;
+		
+	END TopicA.
+	
+END ReferenceType10.
+
+FORMAT FREE;
+	CODE BLANK = DEFAULT, UNDEFINED = DEFAULT, CONTINUE = DEFAULT;
+	TID = ANY;
+END.

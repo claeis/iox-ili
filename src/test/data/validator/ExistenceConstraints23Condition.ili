@@ -1,0 +1,55 @@
+INTERLIS 2.3;
+
+MODEL ExistenceConstraints23Condition
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" =
+  
+	STRUCTURE structure=
+		attr1 : TEXT*10;
+	END structure;
+	
+	TOPIC Topic=
+	
+		DOMAIN
+			Skoord = COORD 480000.000 .. 850000.000 [INTERLIS.m];
+			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					        70000.000 .. 310000.000 [INTERLIS.m],
+						   ROTATION 2 -> 1;
+			Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					        70000.000 .. 310000.000 [INTERLIS.m],
+					              0.000 .. 5000.000 [INTERLIS.m];
+		CLASS ConditionClass =
+			attr1 : TEXT*10;
+		END ConditionClass;
+		
+		CLASS ConditionClassStructure =
+			attr1 : structure;
+		END ConditionClassStructure;
+		
+		CLASS ConditionClassCoord =
+			attr0 : Skoord;
+			attr1 : Lkoord;
+			attr2 : Hkoord;
+		END ConditionClassCoord;
+		
+		CLASS ConditionClassLine =
+		   straights2d : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		   straights3d : POLYLINE WITH (STRAIGHTS) VERTEX Hkoord;
+		   arcs2d : POLYLINE WITH (ARCS) VERTEX Lkoord;
+		   arcs3d : POLYLINE WITH (ARCS) VERTEX Hkoord;
+		   arcsstraights2d : POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Lkoord;
+		   arcsstraights3d : POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Hkoord;
+		END ConditionClassLine;
+		
+		CLASS ConditionClassSurface =
+		   surface2d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   surface3d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		END ConditionClassSurface;
+		
+		CLASS ConditionClassArea =
+		   area2d : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   area3d : AREA WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		END ConditionClassArea;
+		
+	END Topic;
+	
+END ExistenceConstraints23Condition.

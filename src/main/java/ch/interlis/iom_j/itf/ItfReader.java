@@ -478,10 +478,11 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 	 * @param propStartIdx index of first primive value in prop list (prop[propStartIdx] describedBy attrlist[0])
 	 * @throws IoxException
 	 */
-	private void setPrimAttrs(IomObject iomObj,String prop[],List attrlist,int propStartIdx)
+	private void setPrimAttrs(IomObject iomObj,String prop[],List attrlist,int propStartIdx0)
 	throws IoxException
 	{
 
+		int propStartIdx=propStartIdx0;
 		  Iterator iter = attrlist.iterator();
 
 		  while (iter.hasNext ()){
@@ -609,7 +610,9 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 				}
 			}
 		  }
-
+		  if(prop.length!=propStartIdx){
+				throw new IoxException(itfLine.getLineNumber(),"unexpected number of attribute values on logical line");
+		  }
 	}
 	private String[] splitItfLine(String line)
 	{
