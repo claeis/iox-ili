@@ -2,6 +2,10 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.15.0 (2017-03-17)
+-----------------------------
+- branch feature/validator1 merged
+
 iox-ili 1.14.0-feature/validator1 (2017-03-10)
 -----------------------------
 - validator: changed API of user defined functions
