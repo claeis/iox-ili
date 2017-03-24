@@ -1774,6 +1774,27 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	// Wenn Type validierung auf OFF steht, aber nur Multplicity auf OFF stehen darf, werden trotzdem Typfehler ausgegeben.
+	@Test
+	public void configOFFtextTextIsNotANumberFail(){
+		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+		objTest.setattrvalue("grads", "1.5 5.2");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Datatypes10.Topic.Table.grads", ValidationConfig.TYPE,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_RELAXED_MULTIPLICITY, Validator.CONFIG_RELAXED_MULTIPLICITY_ALLOW);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+		validator.validate(new ObjectEvent(objTest));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value <1.5 5.2> is not a number",logger.getErrs().get(0).getEventMsg());
+	}
 	
 	// Eine Warnung wird ausgegeben, wenn Grads keine Nummer ist, wenn config Type eingeschalten wurde und ValidationConfig auf Warning steht.
 	@Test

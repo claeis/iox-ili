@@ -97,6 +97,8 @@ import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
+	public static final String CONFIG_RELAXED_MULTIPLICITY_ALLOW="ch.interlis.iox_j.validator.RestrictToMultiplicityReduction";
+	public static final String CONFIG_RELAXED_MULTIPLICITY="restricted";
 	public static final String CONFIG_DO_ITF_LINETABLES="ch.interlis.iox_j.validator.doItfLinetables";
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
@@ -115,6 +117,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private boolean doItfOidPerTable=false;
 	private Settings config=null;
 	private boolean validationOff=false;
+	private boolean enforceTypeValidation=false;
+	private boolean enforceConstraintValidation=false;
+	private boolean enforceTargetValidation=false;
 	private String currentBasketId = null;
 	private String currentMainOid=null;
 	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
@@ -158,6 +163,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(config.getValue(CONFIG_DO_ITF_OIDPERTABLE));
+		boolean allowRelaxedMultiplicity=CONFIG_RELAXED_MULTIPLICITY_ALLOW.equals(config.getValue(CONFIG_RELAXED_MULTIPLICITY));
+		errs.addEvent(errFact.logInfoMsg("only multiplicity validation relaxable"));
+		enforceConstraintValidation=allowRelaxedMultiplicity;
+		enforceTypeValidation=allowRelaxedMultiplicity;
+		enforceTargetValidation=allowRelaxedMultiplicity;
 		if(doItfLineTables){
 			tag2class=ch.interlis.iom_j.itf.ModelUtilities.getTagMap(td);
 		}else{
@@ -293,7 +303,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					// constraint off
 					Constraint constraint = (Constraint) constraintObj;
 					String check = getScopedName(constraint);
-					checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
+					checkConstraint=null;
+					if(!enforceConstraintValidation){
+						checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
+					}
 					if(ValidationConfig.OFF.equals(checkConstraint)){
 						if(!validationConfigOff.contains(ValidationConfig.CHECK)){
 							validationConfigOff.add(ValidationConfig.CHECK);
@@ -360,7 +373,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				Object modelElement=tag2class.get(iomObj.getobjecttag());
 				Viewable currentClass= (Viewable) modelElement;
 				String check = getScopedName(currentClass);
-				checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
+				checkConstraint=null;
+				if(!enforceConstraintValidation){
+					checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
+				}
 				if(ValidationConfig.OFF.equals(checkConstraint)){
 					if(!validationConfigOff.contains(ValidationConfig.CHECK)){
 						validationConfigOff.add(ValidationConfig.CHECK);
@@ -500,7 +516,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void validatePlausibilityConstraints(){
 		for (Entry<PlausibilityConstraint, PlausibilityPoolValue> constraintEntry : plausibilityConstraints.entrySet()){
 			String check = getScopedName(constraintEntry.getKey());
-			checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
+			checkConstraint=null;
+			if(!enforceConstraintValidation){
+				checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
+			}
 			if(ValidationConfig.OFF.equals(checkConstraint)){
 				if(!validationConfigOff.contains(ValidationConfig.CHECK)){
 					validationConfigOff.add(ValidationConfig.CHECK);
@@ -1418,8 +1437,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	private void validateRoleReference(RoleDef role, IomObject iomObj) {
 		String roleQName = getScopedName(role);
-		String validateTarget=validationConfig.getConfigValue(roleQName, ValidationConfig.TARGET);
-		if(validateTarget!=null && ValidationConfig.OFF.equals(validateTarget)){
+		String validateTarget=null;
+		if(!enforceTargetValidation){
+			validateTarget=validationConfig.getConfigValue(roleQName, ValidationConfig.TARGET);
+		}
+		if(ValidationConfig.OFF.equals(validateTarget)){
 			if(!validationConfigOff.contains(ValidationConfig.TARGET)){
 				validationConfigOff.add(ValidationConfig.TARGET);
 				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration target=off", roleQName, iomObj.getobjectoid()));
@@ -2223,7 +2245,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			 attrPath=attrPath+"/"+attrName;
 		 }
 		 String validateMultiplicity=validationConfig.getConfigValue(attrQName, ValidationConfig.MULTIPLICITY);
-		 validateType=validationConfig.getConfigValue(attrQName, ValidationConfig.TYPE);
+		 validateType=null;
+		 if(!enforceTypeValidation){
+			 validateType=validationConfig.getConfigValue(attrQName, ValidationConfig.TYPE);
+		 }
+		 
 		Type type0 = attr.getDomain();
 		Type type = attr.getDomainResolvingAliases();
 		if (type instanceof CompositionType){
