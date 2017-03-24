@@ -59,15 +59,12 @@ public class ItfAreaPolygon2Linetable {
 		}
 	}
 
-	public void validate() throws IoxException {
+	public List<Intersection> validate()  {
 		CompoundCurveNoder noder=new CompoundCurveNoder(recman,(java.util.List)lines,false);
 		if(!noder.isValid()){
-			for(Intersection is:noder.getIntersections()){
-				EhiLogger.logError("intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
-				EhiLogger.traceState("overlap "+is.getOverlap()+", seg1 "+is.getSegment1()+", seg2 "+is.getSegment2());
-			}
-			throw new IoxException("intersections");
+			return noder.getIntersections();
 		}
+		return null;
 	}
 	public java.util.List<IomObject> getLines() throws IoxException {
 		if(ioxlines==null){

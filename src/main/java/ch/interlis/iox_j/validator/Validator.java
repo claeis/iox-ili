@@ -16,6 +16,7 @@ import javax.xml.ws.Holder;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
@@ -117,6 +118,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private boolean doItfOidPerTable=false;
 	private Settings config=null;
 	private boolean validationOff=false;
+	private String areaOverlapValidation=null;
 	private boolean enforceTypeValidation=false;
 	private boolean enforceConstraintValidation=false;
 	private boolean enforceTargetValidation=false;
@@ -164,7 +166,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(config.getValue(CONFIG_DO_ITF_OIDPERTABLE));
 		boolean allowRelaxedMultiplicity=CONFIG_RELAXED_MULTIPLICITY_ALLOW.equals(config.getValue(CONFIG_RELAXED_MULTIPLICITY));
-		errs.addEvent(errFact.logInfoMsg("only multiplicity validation relaxable"));
+		if(allowRelaxedMultiplicity){
+			errs.addEvent(errFact.logInfoMsg("only multiplicity validation relaxable"));
+		}
 		enforceConstraintValidation=allowRelaxedMultiplicity;
 		enforceTypeValidation=allowRelaxedMultiplicity;
 		enforceTargetValidation=allowRelaxedMultiplicity;
@@ -175,6 +179,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		unknownTypev=new HashSet<String>();
 		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
+		areaOverlapValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.AREA_OVERLAP_VALIDATION);
 		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class,objPoolManager);
 		linkPool=new LinkPool();
 		String additionalModels=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS);
@@ -324,10 +329,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		for(AttributeDef attr:areaAttrs.keySet()){
 			errs.addEvent(errFact.logInfoMsg("validate AREA {0}...", getScopedName(attr)));
 			ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
-			try {
-				allLines.validate();
-			} catch (IoxException e) {
-				errs.addEvent(errFact.logErrorMsg("failed to validate AREA {0}", getScopedName(attr)));
+			List<Intersection> intersections=allLines.validate();
+			if(intersections!=null){
+				for(Intersection is:intersections){
+					//logMsg(areaOverlapValidation,"intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
+					EhiLogger.logError("intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
+					EhiLogger.traceState("overlap "+is.getOverlap()+", seg1 "+is.getSegment1()+", seg2 "+is.getSegment2());
+				}
+				logMsg(areaOverlapValidation,"failed to validate AREA {0}", getScopedName(attr));
 			}
 		}
 	}
@@ -1213,12 +1222,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							}
 						}
 					}
-					try {
-						polygonPool.validate();
-					} catch (IoxException e) {
-						return new Value(false); // if lines are empty, return false
+					List<Intersection> intersections=polygonPool.validate();
+					if(intersections!=null){
+						return new Value(false); // not a valid area topology
 					}
-					return new Value(true); // if there where some lines, return true
+					return new Value(true); // valid areas
 				} else {
 					// if surfaceBag is defined
 					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(objPoolManager);
@@ -1267,9 +1275,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							}
 						}
 					}
-					try {
-						polygonPool.validate();
-					} catch (IoxException e) {
+					List<Intersection> intersections=polygonPool.validate();
+					if(intersections!=null) {
 						return new Value(false);
 					}
 					return new Value(true);
@@ -2420,12 +2427,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 										validateSurfaceTopology(validateType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
 									}else{
 										validateSurfaceTopology(validateType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
-										ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
-										if(allLines==null){
-											allLines=new ItfAreaPolygon2Linetable(objPoolManager); 
-											areaAttrs.put(attr,allLines);
+										if(!ValidationConfig.OFF.equals(areaOverlapValidation)){
+											ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
+											if(allLines==null){
+												allLines=new ItfAreaPolygon2Linetable(objPoolManager); 
+												areaAttrs.put(attr,allLines);
+											}
+											validateAreaTopology(validateType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
 										}
-										validateAreaTopology(validateType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
 									}
 								}
 							}

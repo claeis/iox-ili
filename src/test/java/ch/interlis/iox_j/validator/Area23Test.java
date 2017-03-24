@@ -803,6 +803,64 @@ public class Area23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	// Es wird getestet, ob 2 Polygone die sich ueberlappen mit ausgeschalteter AREA Topologyvalidierung akzeptiert werden
+	@Test
+	public void area2polygonThatOverlap2d_Ok(){
+		Iom_jObject polygon1=new Iom_jObject(ILI_CLASSD, OID1);
+		IomObject multisurfaceValue=polygon1.addattrobj("area2d", "MULTISURFACE");
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		// outer boundary
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "77000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "550000.000");
+		endSegment.setattrvalue("C2", "77000.000");
+		IomObject endSegment2=segments.addattrobj("segment", "COORD");
+		endSegment2.setattrvalue("C1", "550000.000");
+		endSegment2.setattrvalue("C2", "78000.000");
+		IomObject endSegment3=segments.addattrobj("segment", "COORD");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "77000.000");
+		// inner boundary
+		Iom_jObject polygon2=new Iom_jObject(ILI_CLASSD, OID2);
+		IomObject multisurfaceValue2=polygon2.addattrobj("area2d", "MULTISURFACE");
+		IomObject surfaceValue2 = multisurfaceValue2.addattrobj("surface", "SURFACE");
+		IomObject innerBoundary = surfaceValue2.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValueInner = innerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segmentsInner=polylineValueInner.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegmentInner=segmentsInner.addattrobj("segment", "COORD");
+		startSegmentInner.setattrvalue("C1", "500000.000");
+		startSegmentInner.setattrvalue("C2", "70000.000");
+		IomObject endSegmentInner=segmentsInner.addattrobj("segment", "COORD");
+		endSegmentInner.setattrvalue("C1", "500000.000");
+		endSegmentInner.setattrvalue("C2", "80000.000");
+		IomObject endSegment2Inner=segmentsInner.addattrobj("segment", "COORD");
+		endSegment2Inner.setattrvalue("C1", "505000.000");
+		endSegment2Inner.setattrvalue("C2", "80000.000");
+		IomObject endSegment3Inner=segmentsInner.addattrobj("segment", "COORD");
+		endSegment3Inner.setattrvalue("C1", "500000.000");
+		endSegment3Inner.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.AREA_OVERLAP_VALIDATION, ValidationConfig.OFF);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(polygon1));
+		validator.validate(new ObjectEvent(polygon2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 	
 	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er 1 Boundary beinhaltet.
 	@Test

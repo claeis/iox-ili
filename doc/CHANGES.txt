@@ -6,6 +6,7 @@ iox-ili 1.16.0 (2017-03-xx)
 -----------------------------
 - ItfReader: generate BID as $dataset.$topicname if datasetName known
 - validator: restrict customization of validation related to "multiplicity" 
+- validator: allow to disable AREA validation
 
 iox-ili 1.15.0 (2017-03-17)
 -----------------------------
