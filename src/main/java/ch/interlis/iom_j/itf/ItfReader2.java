@@ -503,6 +503,10 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 	{
 		rawReader.setModel(td);
 	}
+	public void setBidPrefix(String prefix)
+	{
+		rawReader.setBidPrefix(prefix);
+	}
 	public boolean isRenumberTids() {
 		return rawReader.isRenumberTids();
 	}

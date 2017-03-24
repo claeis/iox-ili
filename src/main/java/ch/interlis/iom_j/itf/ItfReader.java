@@ -51,6 +51,7 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 	private String topicName=null;
 	private String className=null;
 	private int basketCount=0;
+	private String bidPrefix=null;
 	private TransferDescription td=null;
 	private HashMap tag2class=null;
 	private java.io.InputStream inStream=null;
@@ -219,7 +220,11 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 							tid2tid=new HashMap();
 						}
 						state=50;
-						event=new StartBasketEvent(modelName+"."+topicName,"itf"+Integer.toString(basketCount++));
+						if(bidPrefix==null){
+							event=new StartBasketEvent(modelName+"."+topicName,"itf"+Integer.toString(basketCount++));
+						}else{
+							event=new StartBasketEvent(modelName+"."+topicName,bidPrefix+"."+topicName);
+						}
 						return event;
 					}else if(kind==ItfLineKind.EMOD){
 						state=120;
@@ -646,6 +651,10 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 		}catch(java.io.UnsupportedEncodingException ex){
 			EhiLogger.logError(ex);
 		}
+	}
+	public void setBidPrefix(String bidPrefix)
+	{
+		this.bidPrefix=bidPrefix;
 	}
 	public IomObject createIomObject(String type, String oid) throws IoxException {
 		return factory.createIomObject(type, oid);
