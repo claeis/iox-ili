@@ -1784,7 +1784,7 @@ public class Datatypes10Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
-		settings.setValue(Validator.CONFIG_RELAXED_MULTIPLICITY, Validator.CONFIG_RELAXED_MULTIPLICITY_ALLOW);
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ALLOW_ONLY_MULTIPLICITY_REDUCTION,ValidationConfig.ON);
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));

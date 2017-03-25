@@ -333,9 +333,14 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 					ItfAreaLinetable2Polygon polygonizer=currentAreaAttrs.get(areaAttr);
 					try {
 						polygonizer.buildSurfaces();
-						dataerrs.addAll(polygonizer.getDataerrs());
+						ArrayList<IoxInvalidDataException> dataerrs2 = polygonizer.getDataerrs();
+						dataerrs.addAll(dataerrs2);
+						if(dataerrs2.size()>0){
+							setTopologyValidationFailed(areaAttr);
+						}
 					} catch (IoxInvalidDataException e) {
-						dataerrs.addAll(polygonizer.getDataerrs());
+						ArrayList<IoxInvalidDataException> dataerrs2 = polygonizer.getDataerrs();
+						dataerrs.addAll(dataerrs2);
 						dataerrs.add(new IoxInvalidDataException("failed to build polygons of "+aclass.getScopedName(null)+"."+areaAttrName,e));
 						setTopologyValidationFailed(areaAttr);
 						continue;
@@ -348,9 +353,14 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 					ItfSurfaceLinetable2Polygon polygonizer=currentSurfaceAttrs.get(surfaceAttr);
 					try {
 						polygonizer.buildSurfaces();
-						dataerrs.addAll(polygonizer.getDataerrs());
+						ArrayList<IoxInvalidDataException> dataerrs2 = polygonizer.getDataerrs();
+						dataerrs.addAll(dataerrs2);
+						if(dataerrs2.size()>0){
+							setTopologyValidationFailed(surfaceAttr);
+						}
 					} catch (IoxInvalidDataException e) {
-						dataerrs.addAll(polygonizer.getDataerrs());
+						ArrayList<IoxInvalidDataException> dataerrs2 = polygonizer.getDataerrs();
+						dataerrs.addAll(dataerrs2);
 						dataerrs.add( new IoxInvalidDataException("failed to build polygons of "+aclass.getScopedName(null)+"."+surfaceAttrName,e));
 						setTopologyValidationFailed(surfaceAttr);
 						continue;

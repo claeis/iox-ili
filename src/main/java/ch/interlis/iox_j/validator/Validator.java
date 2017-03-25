@@ -98,8 +98,6 @@ import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
-	public static final String CONFIG_RELAXED_MULTIPLICITY_ALLOW="ch.interlis.iox_j.validator.RestrictToMultiplicityReduction";
-	public static final String CONFIG_RELAXED_MULTIPLICITY="restricted";
 	public static final String CONFIG_DO_ITF_LINETABLES="ch.interlis.iox_j.validator.doItfLinetables";
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
@@ -166,13 +164,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(config.getValue(CONFIG_DO_ITF_OIDPERTABLE));
-		boolean allowRelaxedMultiplicity=CONFIG_RELAXED_MULTIPLICITY_ALLOW.equals(config.getValue(CONFIG_RELAXED_MULTIPLICITY));
-		if(allowRelaxedMultiplicity){
+		boolean allowOnlyRelaxedMultiplicity=ValidationConfig.ON.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ALLOW_ONLY_MULTIPLICITY_REDUCTION));
+		if(allowOnlyRelaxedMultiplicity){
 			errs.addEvent(errFact.logInfoMsg("only multiplicity validation relaxable"));
 		}
-		enforceConstraintValidation=allowRelaxedMultiplicity;
-		enforceTypeValidation=allowRelaxedMultiplicity;
-		enforceTargetValidation=allowRelaxedMultiplicity;
+		enforceConstraintValidation=allowOnlyRelaxedMultiplicity;
+		enforceTypeValidation=allowOnlyRelaxedMultiplicity;
+		enforceTargetValidation=allowOnlyRelaxedMultiplicity;
 		if(doItfLineTables){
 			tag2class=ch.interlis.iom_j.itf.ModelUtilities.getTagMap(td);
 		}else{
@@ -2313,8 +2311,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration multiplicity=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 				}
 			}else{
-				Boolean topologyValidationOk=(Boolean)pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY_VALIDATION_OK);
-				if(topologyValidationOk==null || topologyValidationOk){
+				Object topologyDone=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
+				if(topologyDone==null){
 					 int structc=iomObj.getattrvaluecount(attrName);
 					 if(attr.getDomain().isMandatoryConsideringAliases() && structc==0){
 						 if(doItfLineTables && type instanceof SurfaceType){
@@ -2323,6 +2321,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							 logMsg(validateMultiplicity,"Attribute {0} requires a value", attrPath);
 						 }
 					 }
+				}else{
+					Boolean topologyValidationOk=(Boolean)pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY_VALIDATION_OK);
+					if(topologyValidationOk==null || topologyValidationOk){
+						 int structc=iomObj.getattrvaluecount(attrName);
+						 if(attr.getDomain().isMandatoryConsideringAliases() && structc==0){
+							 logMsg(validateMultiplicity,"Attribute {0} requires a value", attrPath);
+						 }
+					}else{
+						// topology validation failed
+						// ignore missing values
+					}
 				}
 			}
 			if(ValidationConfig.OFF.equals(validateType)){
