@@ -2173,6 +2173,26 @@ public class Datatypes23Test {
 		assertEquals("Attribute uritext is length restricted to 1023", logger.getErrs().get(0).getEventMsg());
 	}
 
+	@Test
+	public void coordType2DRangeFail(){
+		Iom_jObject obj1=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		IomObject coordValue=obj1.addattrobj("lcoord", "COORD");
+		coordValue.setattrvalue("C1", "480000.000");
+		coordValue.setattrvalue("C2", "10000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value 10000.000 is out of range", logger.getErrs().get(0).getEventMsg());
+	}
 	// Es wird ein Fehler ausgegeben, weil die Koordinate nicht 4 Dimensional sein darf.
 	@Test
 	public void coordType4DimensionsFail(){
@@ -2257,5 +2277,46 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
 		assertEquals("value <undecided> is not a BOOLEAN", logger.getWarn().get(0).getEventMsg());
+	}
+	@Test
+	public void coordType2DRangeConfigGeomDefaultOffOk(){
+		Iom_jObject obj1=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		IomObject coordValue=obj1.addattrobj("lcoord", "COORD");
+		coordValue.setattrvalue("C1", "480000.000");
+		coordValue.setattrvalue("C2", "10000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION, ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	@Test
+	public void coordType2DRangeConfigGeomDefaultWarningFail(){
+		Iom_jObject obj1=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		IomObject coordValue=obj1.addattrobj("lcoord", "COORD");
+		coordValue.setattrvalue("C1", "480000.000");
+		coordValue.setattrvalue("C2", "10000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION, ValidationConfig.WARNING);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getWarn().size()==1);
+		assertEquals("value 10000.000 is out of range",logger.getWarn().get(0).getEventMsg());
 	}
 }

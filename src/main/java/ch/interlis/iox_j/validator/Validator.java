@@ -119,6 +119,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private Settings config=null;
 	private boolean validationOff=false;
 	private String areaOverlapValidation=null;
+	private String defaultGeometryTypeValidation=null;
 	private boolean enforceTypeValidation=false;
 	private boolean enforceConstraintValidation=false;
 	private boolean enforceTargetValidation=false;
@@ -180,6 +181,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		unknownTypev=new HashSet<String>();
 		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
 		areaOverlapValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.AREA_OVERLAP_VALIDATION);
+		defaultGeometryTypeValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION);
 		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class,objPoolManager);
 		linkPool=new LinkPool();
 		String additionalModels=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS);
@@ -2253,8 +2255,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		 }
 		 String validateMultiplicity=validationConfig.getConfigValue(attrQName, ValidationConfig.MULTIPLICITY);
 		 validateType=null;
+		 String validateGeometryType=null;
 		 if(!enforceTypeValidation){
 			 validateType=validationConfig.getConfigValue(attrQName, ValidationConfig.TYPE);
+			 if(validateType==null){
+				 validateGeometryType=defaultGeometryTypeValidation;
+			 }
 		 }
 		 
 		Type type0 = attr.getDomain();
@@ -2397,9 +2403,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					PolylineType polylineType=(PolylineType)type;
 					IomObject polylineValue=iomObj.getattrobj(attrName, 0);
 					if (polylineValue != null){
-						boolean isValid=validatePolyline(validateType, polylineType, polylineValue);
+						boolean isValid=validatePolyline(validateGeometryType, polylineType, polylineValue);
 						if(isValid){
-							validatePolylineTopology(attrPath,validateType, polylineType, polylineValue);
+							validatePolylineTopology(attrPath,validateGeometryType, polylineType, polylineValue);
 						}
 					}
 				}else if(type instanceof SurfaceOrAreaType){
@@ -2415,7 +2421,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						SurfaceOrAreaType surfaceOrAreaType=(SurfaceOrAreaType)type;
 						IomObject surfaceValue=iomObj.getattrobj(attrName,0);
 						if (surfaceValue != null){
-							boolean isValid = validatePolygon(validateType,surfaceOrAreaType, surfaceValue);
+							boolean isValid = validatePolygon(validateGeometryType,surfaceOrAreaType, surfaceValue);
 							if(isValid){
 								Object attrValidator=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
 								if(attrValidator==null){
@@ -2424,16 +2430,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								}
 								if(attrValidator==this){
 									if(surfaceOrAreaType instanceof SurfaceType){
-										validateSurfaceTopology(validateType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
+										validateSurfaceTopology(validateGeometryType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
 									}else{
-										validateSurfaceTopology(validateType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
+										validateSurfaceTopology(validateGeometryType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
 										if(!ValidationConfig.OFF.equals(areaOverlapValidation)){
 											ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
 											if(allLines==null){
 												allLines=new ItfAreaPolygon2Linetable(objPoolManager); 
 												areaAttrs.put(attr,allLines);
 											}
-											validateAreaTopology(validateType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
+											validateAreaTopology(validateGeometryType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
 										}
 									}
 								}
@@ -2443,7 +2449,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}else if(type instanceof CoordType){
 					IomObject coord=iomObj.getattrobj(attrName, 0);
 					if (coord!=null){
-						validateCoordType(validateType, (CoordType)type, coord);
+						validateCoordType(validateGeometryType, (CoordType)type, coord);
 					}
 				}else if(type instanceof NumericType){
 					String valueStr=iomObj.getattrvalue(attrName);
@@ -2767,7 +2773,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
 	private void logMsg(String validateKind,String msg,String... args){
-		 if(ValidationConfig.WARNING.equals(validateKind)){
+		 if(ValidationConfig.OFF.equals(validateKind)){
+			 // skip it
+		 }else if(ValidationConfig.WARNING.equals(validateKind)){
 			 errs.addEvent(errFact.logWarningMsg(msg, args));
 		 }else{
 			 errs.addEvent(errFact.logErrorMsg(msg, args));
