@@ -2,7 +2,7 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
-iox-ili 1.16.0 (2017-03-xx)
+iox-ili 1.16.0 (2017-03-26)
 -----------------------------
 - ItfReader: generate BID as $dataset.$topicname if datasetName known
 - validator: restrict customization of validation related to "multiplicity" 
