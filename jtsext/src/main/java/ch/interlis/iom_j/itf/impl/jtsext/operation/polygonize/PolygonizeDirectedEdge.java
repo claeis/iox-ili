@@ -37,26 +37,41 @@ class PolygonizeDirectedEdge
   {
     super(from, to, directionPt, edgeDirection);
   }
+  protected void adjustDirectionPt(double dist)
+  {
+		Coordinate directionPt = null;
+		PolygonizeEdge edge = (PolygonizeEdge) getEdge();
+		CompoundCurve line = (CompoundCurve) edge.getLine();
+		directionPt = CompoundCurve.getDirectionPt(line, getEdgeDirection(),dist);
+
+		p1 = new Coordinate(directionPt);
+		double dx = p1.x - p0.x;
+		double dy = p1.y - p0.y;
+		quadrant = Quadrant.quadrant(dx, dy);
+		angle = Math.atan2(dy, dx);
+	  
+  }
   protected void adjustDirectionPt()
   {
-	  Coordinate directionPt=null;
+	  if(true){
+		  Coordinate directionPt=null;
+			 PolygonizeEdge edge=(PolygonizeEdge)getEdge();
+			 CompoundCurve line = (CompoundCurve)edge.getLine();
+		  directionPt=CompoundCurve.getDirectionPt(line,getEdgeDirection(),0.0);		  
+		  
+		  p1=new Coordinate(directionPt);
+		    double dx = p1.x - p0.x;
+		    double dy = p1.y - p0.y;
+		    quadrant = Quadrant.quadrant(dx, dy);
+		    angle = Math.atan2(dy, dx);
+		  
+	  }
+  }
+  public boolean isArc() {
 		 PolygonizeEdge edge=(PolygonizeEdge)getEdge();
 		 CompoundCurve line = (CompoundCurve)edge.getLine();
-	Coordinate[] linePts = CoordinateArrays.removeRepeatedPoints(line.getCoordinates());
-
-	  if(getEdgeDirection()){
-		 directionPt=linePts[1];
-	  }else{
-		  directionPt=linePts[linePts.length - 2];
-	  }
-	  
-	  
-	  p1=new Coordinate(directionPt);
-	    double dx = p1.x - p0.x;
-	    double dy = p1.y - p0.y;
-	    quadrant = Quadrant.quadrant(dx, dy);
-	    angle = Math.atan2(dy, dx);
-  }
+		return CompoundCurve.isArc(line,getEdgeDirection());
+	}
   /**
    * Returns the identifier attached to this directed edge.
    */

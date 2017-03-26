@@ -34,7 +34,7 @@ public class ItfSurfaceLinetable2PolygonIli2cTest {
 	{
 		// compile model
 		Configuration ili2cConfig=new Configuration();
-		FileEntry fileEntry=new FileEntry("test/data/Test1.ili", FileEntryKind.ILIMODELFILE);
+		FileEntry fileEntry=new FileEntry("src/test/data/Test1.ili", FileEntryKind.ILIMODELFILE);
 		ili2cConfig.addFileEntry(fileEntry);
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
@@ -49,7 +49,7 @@ public class ItfSurfaceLinetable2PolygonIli2cTest {
 		String tableAName=tableA.getScopedName(null);
 		String formAttrTableName=tableA.getContainer().getScopedName(null)+"."+tableA.getName()+"_"+formAttr.getName();
 		ItfSurfaceLinetable2Polygon builder=new ItfSurfaceLinetable2Polygon(formAttr,false);
-		ItfReader reader=new ItfReader(new File("test/data/Test1.itf"));
+		ItfReader reader=new ItfReader(new File("src/test/data/Test1.itf"));
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{
@@ -77,7 +77,7 @@ public class ItfSurfaceLinetable2PolygonIli2cTest {
 		String tableAName=tableA.getScopedName(null);
 		String formAttrTableName=tableA.getContainer().getScopedName(null)+"."+tableA.getName()+"_"+formAttr.getName();
 		ItfSurfaceLinetable2Polygon builder=new ItfSurfaceLinetable2Polygon(formAttr,false);
-		ItfReader reader=new ItfReader(new File("test/data/Test1b.itf"));
+		ItfReader reader=new ItfReader(new File("src/test/data/Test1b.itf"));
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{

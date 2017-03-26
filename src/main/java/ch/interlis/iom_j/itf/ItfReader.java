@@ -25,6 +25,8 @@ package ch.interlis.iom_j.itf;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.iox_j.*;
+import ch.interlis.iox_j.logging.LogEventFactory;
+import ch.interlis.iox.IoxDataPool;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
 import ch.interlis.iom_j.itf.impl.ItfLineCursor;
@@ -49,6 +51,7 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 	private String topicName=null;
 	private String className=null;
 	private int basketCount=0;
+	private String bidPrefix=null;
 	private TransferDescription td=null;
 	private HashMap tag2class=null;
 	private java.io.InputStream inStream=null;
@@ -56,6 +59,7 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 	private boolean readEnumValAsItfCode=false;
 	private boolean renumberTids=false;
 	private HashMap tid2tid=null; // map<String oldTid,String newTid>
+	private IoxDataPool ioxDataPool=null;
 
 	/** Creates a new reader.
 	 * @param in Input stream to read from.
@@ -74,11 +78,42 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 		itfLine=new ItfLineCursor();
 		state=10;
 	}
+	public ItfReader(java.io.InputStream in,LogEventFactory errFact)
+	throws IoxException
+	{
+		try{
+			scanner=new ItfScanner(in);
+		}catch(java.io.UnsupportedEncodingException ex){
+			throw new IoxException(ex);
+		}catch(java.io.IOException ex){
+			throw new IoxException(ex);
+		}
+		itfLine=new ItfLineCursor();
+		state=10;
+	}
 	/** Creates a new reader.
 	 * @param inFile File to read from.
 	 * @throws IoxException
 	 */
 	public ItfReader(java.io.File inFile)
+	throws IoxException
+	{
+		try{
+			inStream=new java.io.FileInputStream(inFile);
+		}catch(java.io.FileNotFoundException ex){
+			throw new IoxException(ex);
+		}
+		try{
+			scanner=new ItfScanner(inStream);
+		}catch(java.io.UnsupportedEncodingException ex){
+			throw new IoxException(ex);
+		}catch(java.io.IOException ex){
+			throw new IoxException(ex);
+		}
+		itfLine=new ItfLineCursor();
+		state=10;
+	}
+	public ItfReader(java.io.File inFile,LogEventFactory errFact)
 	throws IoxException
 	{
 		try{
@@ -185,7 +220,11 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 							tid2tid=new HashMap();
 						}
 						state=50;
-						event=new StartBasketEvent(modelName+"."+topicName,"itf"+Integer.toString(basketCount++));
+						if(bidPrefix==null){
+							event=new StartBasketEvent(modelName+"."+topicName,"itf"+Integer.toString(basketCount++));
+						}else{
+							event=new StartBasketEvent(modelName+"."+topicName,bidPrefix+"."+topicName);
+						}
 						return event;
 					}else if(kind==ItfLineKind.EMOD){
 						state=120;
@@ -444,10 +483,11 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 	 * @param propStartIdx index of first primive value in prop list (prop[propStartIdx] describedBy attrlist[0])
 	 * @throws IoxException
 	 */
-	private void setPrimAttrs(IomObject iomObj,String prop[],List attrlist,int propStartIdx)
+	private void setPrimAttrs(IomObject iomObj,String prop[],List attrlist,int propStartIdx0)
 	throws IoxException
 	{
 
+		int propStartIdx=propStartIdx0;
 		  Iterator iter = attrlist.iterator();
 
 		  while (iter.hasNext ()){
@@ -575,7 +615,9 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 				}
 			}
 		  }
-
+		  if(prop.length!=propStartIdx){
+				throw new IoxException(itfLine.getLineNumber(),"unexpected number of attribute values on logical line");
+		  }
 	}
 	private String[] splitItfLine(String line)
 	{
@@ -609,6 +651,10 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 		}catch(java.io.UnsupportedEncodingException ex){
 			EhiLogger.logError(ex);
 		}
+	}
+	public void setBidPrefix(String bidPrefix)
+	{
+		this.bidPrefix=bidPrefix;
 	}
 	public IomObject createIomObject(String type, String oid) throws IoxException {
 		return factory.createIomObject(type, oid);
@@ -707,5 +753,11 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 	public Object mapIliQName2Class(String iliQName)
 	{
 		return tag2class.get(iliQName);
+	}
+	public IoxDataPool getIoxDataPool() {
+		return ioxDataPool;
+	}
+	public void setIoxDataPool(IoxDataPool ioxDataPool) {
+		this.ioxDataPool = ioxDataPool;
 	}
 }

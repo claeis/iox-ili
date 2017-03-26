@@ -12,7 +12,7 @@ public class ArcSegment extends CurveSegment {
 	private Coordinate endPoint=null;
 	private Coordinate centerPoint=null;
 	private com.vividsolutions.jts.geom.CoordinateList ret=null;
-	
+	private static final double EPSILON=0.00000001;
 
 	public ArcSegment(Object userData,Coordinate startPoint, Coordinate midPoint,
 			Coordinate endPoint) {
@@ -251,5 +251,37 @@ public class ArcSegment extends CurveSegment {
 			getCenterPoint();
 		}
 		return sign;
+	}
+	public Coordinate getDirectionPt(boolean atStart,double dist) {
+		if(dist>0){
+			double radius=getRadius();
+			Coordinate center=getCenterPoint();
+			if(atStart){
+				// Zentriwinkel zwischen start und directionPt
+				double alpha=2.0*Math.asin(dist/2.0/Math.abs(radius));
+				double ri=Math.atan2(startPoint.x-center.x,startPoint.y-center.y);
+				ri=ri+alpha*sign;
+				double pti_re=center.x + Math.abs(radius) * Math.sin(ri);
+				double pti_ho=center.y + Math.abs(radius) * Math.cos(ri);
+				Coordinate directionPt=new Coordinate(pti_re,pti_ho);
+				return directionPt;
+			}else{
+				// Zentriwinkel zwischen end und directionPt
+				double alpha=2.0*Math.asin(dist/2.0/Math.abs(radius));
+				double ri=Math.atan2(endPoint.x-center.x,endPoint.y-center.y)-alpha*sign;
+				double pti_re=center.x + Math.abs(radius) * Math.sin(ri);
+				double pti_ho=center.y + Math.abs(radius) * Math.cos(ri);
+				Coordinate directionPt=new Coordinate(pti_re,pti_ho);
+				return directionPt;
+			}
+			
+		}
+		if(atStart){
+			Coordinate directionPt=CompoundCurve.calcKleinp(getCenterPoint(), startPoint, radius, 1.0*-sign);
+			return directionPt;
+		}else{
+			Coordinate directionPt=CompoundCurve.calcKleinp(getCenterPoint(), endPoint, radius, -1.0*-sign);
+			return directionPt;
+		}
 	}
 }

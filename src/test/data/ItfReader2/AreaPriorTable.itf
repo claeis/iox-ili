@@ -6,7 +6,7 @@ MTID Test1
 MODL Test1
 TOPI TopicD
 TABL TableD0
-OBJE 30
+OBJE 30 @
 ETAB
 TABL TableD_Form
 OBJE 1

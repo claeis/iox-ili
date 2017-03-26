@@ -1,0 +1,284 @@
+INTERLIS 2.3;
+MODEL Function23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
+	TOPIC Topic=
+		DOMAIN
+			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					    70000.000 .. 310000.000 [INTERLIS.m],
+						ROTATION 2 -> 1;
+			Enumeration = (eins, mehr);
+			Enumeration2 EXTENDS Enumeration = (mehr(vier, fuenf));
+			Enumeration3 = (eins, zwei, drei, vier, fuenf) ORDERED;
+			Enumeration6 = (eins, zwei, drei, vier, fuenf);
+			Enumeration4 = (eins(eins, zwei), zwei(eins, zwei, drei), drei(eins, zwei)) ORDERED;
+			
+		CLASS ClassA1 =
+			attr1: TEXT;
+			attr2: 0..10;
+			MANDATORY CONSTRAINT
+				(INTERLIS.len (attr1)) == (attr2);
+		END ClassA1;
+		
+		CLASS ClassA2 =
+			attr2: 0..10;
+			MANDATORY CONSTRAINT
+				(INTERLIS.len ("x"))==attr2;
+		END ClassA2;
+		
+		CLASS ClassA3 =
+			attr1: TEXT;
+			attr2: 0..10;
+			MANDATORY CONSTRAINT
+				INTERLIS.len (INTERLIS.trim (attr1))==attr2;
+		END ClassA3;
+		
+		CLASS ClassB1 =
+			attr1: MTEXT;
+			attr2: 0..10;
+			MANDATORY CONSTRAINT
+				(INTERLIS.lenM (attr1)) == (attr2);
+		END ClassB1;
+		
+		CLASS ClassB2 =
+			attr2: 0..10;
+			MANDATORY CONSTRAINT
+				(INTERLIS.len ("x"))==attr2;
+		END ClassB2;
+		
+		CLASS ClassB3 =
+			attr1: MTEXT;
+			attr2: 0..10;
+			MANDATORY CONSTRAINT
+				INTERLIS.len (INTERLIS.trim (attr1))==attr2;
+		END ClassB3;
+		
+		CLASS ClassC1 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				(INTERLIS.trim (attr1)) == (attr2);
+		END ClassC1;
+		
+		CLASS ClassC2 =
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				(INTERLIS.trim (" abcdefghij "))==attr2;
+		END ClassC2;
+		
+		CLASS ClassC3 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				INTERLIS.trim (INTERLIS.trim (attr1))==attr2;
+		END ClassC3;
+		
+		CLASS ClassD1 =
+			attr1: MTEXT;
+			attr2: MTEXT;
+			MANDATORY CONSTRAINT
+				(INTERLIS.trimM (attr1)) == (attr2);
+		END ClassD1;
+		
+		CLASS ClassD2 =
+			attr2: MTEXT;
+			MANDATORY CONSTRAINT
+				(INTERLIS.trimM (" abcdef\\nhij "))==attr2;
+		END ClassD2;
+		
+		CLASS ClassD3 =
+			attr1: MTEXT;
+			attr2: MTEXT;
+			MANDATORY CONSTRAINT
+				INTERLIS.trimM (INTERLIS.trimM (attr1))==attr2;
+		END ClassD3;
+		
+		CLASS ClassG =
+			attr1 : Enumeration;
+			attr2 : Enumeration2;
+			MANDATORY CONSTRAINT
+				INTERLIS.isEnumSubVal (attr2, attr1);
+		END ClassG;
+		
+		CLASS ClassH =
+			attr01 : Enumeration3;
+			attr02 : Enumeration3;
+			attr03 : Enumeration3;
+			MANDATORY CONSTRAINT
+				INTERLIS.inEnumRange(attr01, attr02, attr03);
+		END ClassH;
+		
+		CLASS ClassI =
+			attr11 : Enumeration4;
+			attr12 : Enumeration4;
+			attr13 : Enumeration4;
+			MANDATORY CONSTRAINT
+				INTERLIS.inEnumRange (attr11, attr12, attr13);
+		END ClassI;
+		
+		CLASS ClassK =
+			attr11 : Enumeration3;
+			attr21 : Enumeration4;
+			attr31 : Enumeration4;
+			MANDATORY CONSTRAINT
+				INTERLIS.inEnumRange (attr11, attr21, attr31);
+		END ClassK;
+		
+		CLASS ClassL =
+			attr01 : Enumeration6;
+			attr02 : Enumeration6;
+			attr03 : Enumeration6;
+			MANDATORY CONSTRAINT
+				INTERLIS.inEnumRange (attr01, attr02, attr03);
+		END ClassL;
+		
+		STRUCTURE StructM =
+		END StructM;
+		
+		CLASS ClassN =
+		   attrbag1 : BAG {0..*} OF StructM;
+		   attr2 : 0..10;
+		   MANDATORY CONSTRAINT
+		   		(INTERLIS.elementCount(attrbag1)) == attr2;
+		END ClassN;
+		
+		CLASS ClassO =
+		   attrlist1 : LIST OF StructM;
+		   attr2 : 0..10;
+		   MANDATORY CONSTRAINT
+		   		(INTERLIS.elementCount(attrlist1)) == attr2;
+		END ClassO;
+		
+		CLASS ClassQ =
+			Art: (a, b, c);
+			SET CONSTRAINT WHERE Art == #a : (INTERLIS.objectCount(ALL)) == 2;
+		END ClassQ;
+		
+		CLASS ClassR =
+		END ClassR;
+		
+		CLASS ClassS =
+		END ClassS;
+		
+		CLASS ClassT =
+		END ClassT;
+		
+		ASSOCIATION ST1 =
+		  s1 -- {0..*} ClassS;
+		  t1 -- {0..*} ClassT;
+		END ST1;
+		
+		CONSTRAINTS OF ClassS =
+			MANDATORY CONSTRAINT
+		   		(INTERLIS.objectCount(t1)) == 2;
+		END;
+		
+		STRUCTURE StructA =
+        END StructA;
+        
+        STRUCTURE StructAp EXTENDS StructA =
+        END StructAp;
+        
+        CLASS ClassU =
+           attrU1 : BAG {1..*} OF StructA;
+           MANDATORY CONSTRAINT INTERLIS.isOfClass(attrU1[1],>StructAp);
+        END ClassU;
+        
+        CLASS ClassUA =
+           attrU1 : BAG {1..*} OF StructA;
+           MANDATORY CONSTRAINT INTERLIS.isOfClass(INTERLIS.myClass(attrU1[1]),>StructAp);
+        END ClassUA;
+        
+        STRUCTURE StructB =
+        END StructB;
+        
+        STRUCTURE StructBp EXTENDS StructB =
+        END StructBp;
+        
+        CLASS ClassV =
+           attrV1 : BAG {1..*} OF StructB;
+           MANDATORY CONSTRAINT INTERLIS.isOfClass(attrV1[1],>StructAp);
+        END ClassV;
+        
+        CLASS ClassW =
+           MANDATORY CONSTRAINT INTERLIS.isSubClass(>StructB,>StructBp);
+        END ClassW;
+        
+        CLASS ClassWA =
+       		attrWA1 : BAG {1..*} OF StructB;
+           MANDATORY CONSTRAINT INTERLIS.isSubClass(INTERLIS.myClass(attrWA1[1]),>StructBp);
+        END ClassWA;
+        
+        CLASS ClassWB =
+       		attrWA1 : BAG {1..*} OF StructA;
+           MANDATORY CONSTRAINT INTERLIS.isSubClass(INTERLIS.myClass(attrWA1[1]),>StructBp);
+        END ClassWB;
+        
+        CLASS ClassX =
+           MANDATORY CONSTRAINT INTERLIS.isSubClass(>StructA,>StructBp);
+        END ClassX;
+        
+        CLASS ClassY =
+           attrY1 : BAG {1..*} OF StructB;
+           MANDATORY CONSTRAINT INTERLIS.myClass(attrY1[1]) == >StructBp;
+        END ClassY;
+        
+        CLASS ClassZ =
+           attrZ1 : BAG {1..*} OF StructB;
+           MANDATORY CONSTRAINT INTERLIS.myClass(attrZ1[1]) == >StructAp;
+        END ClassZ;
+        
+        CLASS ClassZA =
+			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			Art: (a, b, c);
+			SET CONSTRAINT WHERE Art == #a : INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie);
+		END ClassZA;
+		
+        CLASS ClassZB =
+			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZB, UNDEFINED, >> Geometrie);
+		END ClassZB;
+		
+        CLASS ClassZD =
+			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZD, UNDEFINED, >> Geometrie);
+			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZA, UNDEFINED, >> Geometrie);
+		END ClassZD;
+		
+		CLASS ClassZZ =
+			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END ClassZZ;
+		
+        CLASS ClassZE =
+			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZZ, UNDEFINED, >> Geometrie);
+			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZE, UNDEFINED, >> Geometrie);
+		END ClassZE;
+        
+        STRUCTURE StructF =
+			Surface: SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END StructF;
+		
+		CLASS ClassZF =
+			Numbers: BAG {1..*} OF StructF;
+			Art: (a, b, c);
+			SET CONSTRAINT WHERE Art == #a : INTERLIS.areAreas(ALL, >> Numbers, >> StructF->Surface);
+		END ClassZF;
+		
+		CLASS ClassZI =
+			Numbers: BAG {1..*} OF StructF;
+			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZI, >> Numbers, >> StructF->Surface);
+		END ClassZI;
+		
+		CLASS ClassZG =
+			Numbers: BAG {1..*} OF StructF;
+			MANDATORY CONSTRAINT INTERLIS.areAreas(ALL, >> Numbers, >> StructF->Surface);
+		END ClassZG;
+		
+		CLASS ClassZH =
+			MANDATORY CONSTRAINT
+				INTERLIS.convertUnit(5);
+		END ClassZH;
+		
+	END Topic;
+	
+END Function23.

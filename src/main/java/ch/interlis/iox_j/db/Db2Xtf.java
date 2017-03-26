@@ -48,7 +48,6 @@ public class Db2Xtf {
 	{
 		String val=DbUtility.getStringOrNull(rs,colName,isOptional,recInfo);
 		if(val!=null){
-			EhiLogger.debug("pre date <"+val+">");
 			int startPos=val.indexOf('.');
 			int startPos2=val.indexOf('.',startPos+1);
 			java.text.DecimalFormat digit4 = new java.text.DecimalFormat("0000");
@@ -78,7 +77,6 @@ public class Db2Xtf {
 					val=null;
 				}
 			}
-			EhiLogger.debug("post date <"+val+">");
 			if(val==null){
 				EhiLogger.logError(recInfo+": illegal value <"+val+"> for column "+colName+"; ignored");
 			}else{
