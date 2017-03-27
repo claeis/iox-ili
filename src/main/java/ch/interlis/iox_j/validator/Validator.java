@@ -125,7 +125,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String currentMainOid=null;
 	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
 	private String checkConstraint=null;
-	private String validateType=null;
 	private Map<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	private HashMap<Constraint,Viewable> additionalConstraints=new HashMap<Constraint,Viewable>();
 	private Map<PlausibilityConstraint, PlausibilityPoolValue> plausibilityConstraints=new LinkedHashMap<PlausibilityConstraint, PlausibilityPoolValue>();
@@ -524,15 +523,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	
 	private void validatePlausibilityConstraints(){
 		for (Entry<PlausibilityConstraint, PlausibilityPoolValue> constraintEntry : plausibilityConstraints.entrySet()){
-			String check = getScopedName(constraintEntry.getKey());
+			String constraintName = getScopedName(constraintEntry.getKey());
 			checkConstraint=null;
 			if(!enforceConstraintValidation){
-				checkConstraint=validationConfig.getConfigValue(check, ValidationConfig.CHECK);
+				checkConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
 			}
 			if(ValidationConfig.OFF.equals(checkConstraint)){
 				if(!validationConfigOff.contains(ValidationConfig.CHECK)){
 					validationConfigOff.add(ValidationConfig.CHECK);
-					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", check));
+					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName));
 				}
 			}else{
 				String msg=validationConfig.getConfigValue(getScopedName(constraintEntry.getKey()), ValidationConfig.MSG);
@@ -2252,7 +2251,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			 attrPath=attrPath+"/"+attrName;
 		 }
 		 String validateMultiplicity=validationConfig.getConfigValue(attrQName, ValidationConfig.MULTIPLICITY);
-		 validateType=null;
+		 String validateType=null;
 		 String validateGeometryType=null;
 		 if(!enforceTypeValidation){
 			 validateType=validationConfig.getConfigValue(attrQName, ValidationConfig.TYPE);
