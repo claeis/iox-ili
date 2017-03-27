@@ -2592,7 +2592,7 @@ public class MandatoryConstraints23 {
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassEqualationI", ValidationConfig.CHECK,ValidationConfig.WARNING);
+		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassEqualationI.Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -2603,6 +2603,7 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
+		assertTrue(logger.getErrs().size()==0);
 		assertTrue(logger.getWarn().size()==1);
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationI.Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
 	}

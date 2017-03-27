@@ -2006,7 +2006,7 @@ public class ExistenceConstraints23Test {
 		objA.setattrvalue("attr5", "lars");
 		objA.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassA", ValidationConfig.CHECK,ValidationConfig.WARNING);
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassA.Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -2018,8 +2018,8 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getWarn().size()==1);
 		assertTrue(logger.getErrs().size()==0);
+		assertTrue(logger.getWarn().size()==1);
 		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
 	}
 	
@@ -2032,7 +2032,7 @@ public class ExistenceConstraints23Test {
 		objB.setattrvalue("attr1", "ben");
 		objB.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassB", ValidationConfig.CHECK,ValidationConfig.WARNING);
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassB.Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -2064,7 +2064,10 @@ public class ExistenceConstraints23Test {
 		objC.setattrvalue("attr3", "this");
 		objC.setattrvalue("attr4", "this");
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC", ValidationConfig.CHECK,ValidationConfig.WARNING);
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC.Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC.Constraint2", ValidationConfig.CHECK,ValidationConfig.WARNING);
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC.Constraint3", ValidationConfig.CHECK,ValidationConfig.WARNING);
+		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC.Constraint4", ValidationConfig.CHECK,ValidationConfig.WARNING);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
