@@ -2059,7 +2059,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassInEqualationG.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Bereiche nicht ungleich sind.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polygone nicht ungleich sind.
 	@Test
 	public void area2DInEqual_False(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONH, OID);

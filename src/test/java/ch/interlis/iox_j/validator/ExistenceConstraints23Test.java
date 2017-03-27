@@ -1811,7 +1811,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute surface3d of ExistenceConstraints23Coords.Topic.ClassSurface3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Bereiche constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polygone constraint Attribute nicht übereinstimmen.
 	@Test
 	public void diffModels2dArea_Fail(){
 		Iom_jObject objSurfaceSuccessCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassArea", OID1);

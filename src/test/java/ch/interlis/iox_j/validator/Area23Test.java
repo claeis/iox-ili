@@ -46,7 +46,7 @@ public class Area23Test {
 	//////////////////////////////// SUCCESSFUL Tests ////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn an 1 Punkt sich der Bereich selber berührt.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn an 1 Punkt sich der Polygon selber berührt.
 	@Test
 	public void area2dOuterboundaryTouchesOwnLineOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -124,7 +124,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich die 2 Innerboundaries nicht berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die 2 Innerboundaries nicht berühren.
 	@Test
 	public void area2dWith2Innerboundaries_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -231,7 +231,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn der Innerboundary den anderen Innerboundary an 1 Punkt berührt.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn der Innerboundary den anderen Innerboundary an 1 Punkt berührt.
 	@Test
 	public void area2dInnerTouchesOuterboundaryOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -338,7 +338,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob ein 3d Bereich erstellt werden kann, wenn der Innerboundary, den Outerboundary an 1 Punkt berührt.
+	// Es wird getestet, ob ein 3d Polygon erstellt werden kann, wenn der Innerboundary, den Outerboundary an 1 Punkt berührt.
 	@Test
 	public void area3dInnerTouchesOuterboundaryOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -428,7 +428,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er 2 Innerboundaries beinhaltet, welche sich nicht berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er 2 Innerboundaries beinhaltet, welche sich nicht berühren.
 	@Test
 	public void area3dWith2Innerboundaries_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -553,7 +553,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die beiden Innerboundaries sich an 1 Punkt berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die beiden Innerboundaries sich an 1 Punkt berühren.
 	@Test
 	public void area3dIntersectionOf2InnerboundariesOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -678,7 +678,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er 1 Boundary beinhaltet.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er 1 Boundary beinhaltet.
 	@Test
 	public void area1Boundary2d_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -726,7 +726,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er 2 Boundaries beinhaltet.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er 2 Boundaries beinhaltet.
 	@Test
 	public void area2Boundaries2d_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -862,7 +862,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er 1 Boundary beinhaltet.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er 1 Boundary beinhaltet.
 	@Test
 	public void area2d_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -910,7 +910,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn ein Bereich mit einem Kreisbogen erstellt wird.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn ein Polygon mit einem Kreisbogen erstellt wird.
 	@Test
 	public void areaWithArc2d_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -946,7 +946,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein 3d Bereich erstellt werden kann, wenn er 1 Boundary beinhaltet.
+	// Es wird getestet, ob ein 3d Polygon erstellt werden kann, wenn er 1 Boundary beinhaltet.
 	@Test
 	public void area1Boundary3d_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1000,7 +1000,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein 3d Bereich erstellt werden kann, wenn er 2 Boundaries beinhaltet.
+	// Es wird getestet, ob ein 3d Polygon erstellt werden kann, wenn er 2 Boundaries beinhaltet.
 	@Test
 	public void areaWith2Boundaries3d_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1090,7 +1090,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein 3d Bereich erstellt werden kann, wenn er einen Kreisbogen beinhaltet. 
+	// Es wird getestet, ob ein 3d Polygon erstellt werden kann, wenn er einen Kreisbogen beinhaltet. 
 	@Test
 	public void areaWithArc3d_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1129,7 +1129,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die 2 Bereiche sich auf einer Linie an drei Punkten berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone sich auf einer Linie an drei Punkten berühren.
 	// Senkrecht: x--------x--------x  Beide Punkte liegen aufeinander und habe beide dieselben Segmentpunkte.
 	@Test
 	public void area2dIntersectIn1LineOnSame3Points_Ok(){
@@ -1230,7 +1230,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die 2 Bereiche aus einem Kreisbogen sich auf einer Linie an den gleichen Punkten berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone aus einem Kreisbogen sich auf einer Linie an den gleichen Punkten berühren.
 	// x--------x--------x  Beide Kreisboegen liegen aufeinander und haben beide dieselben Segmentpunkte.
 	@Test
 	public void area3dArcsBothAllSegmentPointsSame_Ok(){
@@ -1297,7 +1297,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die 2 Bereiche genau aufeinander liegen.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone genau aufeinander liegen.
 	// x--------x--------x  Alle Punkte liegen aufeinander.
 	@Test
 	public void area2dBothAreasSamePoints_Ok(){
@@ -1402,7 +1402,7 @@ public class Area23Test {
 	///////////////////////////////// FAILING Tests //////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////	
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich die eigenen Outerboundaries überschneiden.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die eigenen Outerboundaries überschneiden.
 	@Test
 	public void area2dIntersectionOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1481,7 +1481,7 @@ public class Area23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich die 2 Innerboundaries überschneiden.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die 2 Innerboundaries überschneiden.
 	@Test
 	public void area2dIntersectionOfInnerboundaries_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1589,7 +1589,7 @@ public class Area23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}	
 	
-	// Es wird getestet, ob ein 3d Bereich erstellt werden kann, wenn die 2 Linien der eigenen Outerboundary überschneiden.
+	// Es wird getestet, ob ein 3d Polygon erstellt werden kann, wenn die 2 Linien der eigenen Outerboundary überschneiden.
 	@Test
 	public void area3dIntersectionOfOwnOuterboundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1680,7 +1680,7 @@ public class Area23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich die Innerboundaries überschneiden.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die Innerboundaries überschneiden.
 	@Test
 	public void area3dIntersectionOfInnerboundaries_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1806,7 +1806,7 @@ public class Area23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein 3d Bereich erstellt werden kann, wenn sich die Innerboundaries überschneiden.
+	// Es wird getestet, ob ein 3d Polygon erstellt werden kann, wenn sich die Innerboundaries überschneiden.
 	@Test
 	public void area3dIntersectionOfOuterboundaries_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1897,7 +1897,7 @@ public class Area23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich die Innerboundary mit der Outerboundary überschneidet.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die Innerboundary mit der Outerboundary überschneidet.
 	@Test
 	public void area2dInnerIntersectOuterboundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1976,7 +1976,7 @@ public class Area23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er aus 3d Koordinaten erstellt wird, obwohl er in 2d Koordinaten definiert wurde.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er aus 3d Koordinaten erstellt wird, obwohl er in 2d Koordinaten definiert wurde.
 	@Test
 	public void area2dWith3dImplementation_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2026,7 +2026,7 @@ public class Area23Test {
 		assertEquals("Wrong COORD structure, C3 not expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn aus 2d Koordinaten besteht, obwohl er aus 3d Koordinaten definiert ist.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn aus 2d Koordinaten besteht, obwohl er aus 3d Koordinaten definiert ist.
 	@Test
 	public void area3dWith2dImplementation_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2080,7 +2080,7 @@ public class Area23Test {
 		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die Value eines Segmentes nicht gültig ist.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die Value eines Segmentes nicht gültig ist.
 	@Test
 	public void area3dInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2137,7 +2137,7 @@ public class Area23Test {
 		assertEquals("value 10000.000 is out of range", logger.getErrs().get(2).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die Value eines Segmentes nicht gültig ist.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die Value eines Segmentes nicht gültig ist.
 	@Test
 	public void area2dInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2187,7 +2187,7 @@ public class Area23Test {
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er einen Kreisbogen beinahltet, welcher ein ungültiges Segment beinhaltet.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er einen Kreisbogen beinahltet, welcher ein ungültiges Segment beinhaltet.
 	@Test
 	public void area3dWithARCInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2245,7 +2245,7 @@ public class Area23Test {
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er einen Kreisbogen beinhaltet, welcher ein ungültiges Segment beinhaltet.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er einen Kreisbogen beinhaltet, welcher ein ungültiges Segment beinhaltet.
 	@Test
 	public void area2dWithARCInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2297,7 +2297,7 @@ public class Area23Test {
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn der Type area nicht vom Type Multisurface ist.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn der Type area nicht vom Type Multisurface ist.
 	@Test
 	public void invalidAreaType_Fail(){
 		Iom_jObject objAreaMultisurface=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2317,7 +2317,7 @@ public class Area23Test {
 		assertEquals("unexpected Type AREA; MULTISURFACE expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er Komplett ist, jedoch aus 2 Bereichen besteht.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er Komplett ist, jedoch aus 2 Polygone besteht.
 	@Test
 	public void areaTypeCompleteWith2Areas_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2340,7 +2340,7 @@ public class Area23Test {
 		assertEquals("invalid number of surfaces in COMPLETE basket", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn 2 Coords nacheinander die selbe Position haben.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn 2 Coords nacheinander die selbe Position haben.
 	@Test
 	public void areaType2DRepeatedCoord_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2391,7 +2391,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()>0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die 2 Bereiche sich auf einer Linie an drei Punkten berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone sich auf einer Linie an drei Punkten berühren.
 	// area1: x--------x--------x
 	// area2: x-----------------x
 	// Beide Areas liegen aufeinander, area2 hat keinen Mittelpunkt.
@@ -2486,7 +2486,7 @@ public class Area23Test {
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die 2 Bereiche aus einem Kreisbogen sich auf einer Linie an 1 Punkt nicht berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone aus einem Kreisbogen sich auf einer Linie an 1 Punkt nicht berühren.
 	// x--------x--------x  Beide Kreisboegen liegen aufeinander und unterscheiden sich nur von 1 Segment der 2.ten Area.
 	@Test
 	public void area3d1AreaArcPointOther_Fail(){
