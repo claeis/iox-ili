@@ -1372,27 +1372,6 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn config auf off gestellt wurde und die Booleans nicht übereinstimmen.
-	@Test
-	public void configOFFbooleanInEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
-		iomObjA.setattrvalue("attr1", "true");
-		iomObjA.setattrvalue("attr2", "false");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassEqualationI", ValidationConfig.CHECK,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
 	//#########################################################//
 	//########### FAIL MANDATORY CONSTRAINTS ##################//
 	//#########################################################//
@@ -2583,72 +2562,5 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassDefinedB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassDefinedB.Constraint2 is not true.", logger.getErrs().get(1).getEventMsg());
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassDefinedB.Constraint3 is not true.", logger.getErrs().get(2).getEventMsg());
-	}
-	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn config auf Warning eingestellt ist und die boolean nicht übereinstimmen.
-	@Test
-	public void configWarningON_booleanNotEqual_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
-		iomObjA.setattrvalue("attr1", "true");
-		iomObjA.setattrvalue("attr2", "false");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("MandatoryConstraints23.Topic.ClassEqualationI.Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationI.Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
-	}
-	
-	// Es wird getestet, ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn ValidationConfig.MSG nicht leer ist.
-	@Test
-	public void configMSGNotEmpty_ownMessageOut_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
-		iomObjA.setattrvalue("attr1", "true");
-		iomObjA.setattrvalue("attr2", "false");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(ILI_CLASSEQUALATIONI+".Constraint1", ValidationConfig.MSG, "This is my own error message!");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This is my own error message!", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es wird getestet, ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn ValidationConfig.MSG leer ist.
-	@Test
-	public void configMSGNotEmpty_ownMessageEmpty_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
-		iomObjA.setattrvalue("attr1", "true");
-		iomObjA.setattrvalue("attr2", "false");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(ILI_CLASSEQUALATIONI+"Constraint1", ValidationConfig.MSG, "");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualationI.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 }

@@ -420,27 +420,6 @@ public class PlausibilityConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und >= 50% erreicht werden muss und ValidationConfig auf OFF steht.
-	@Test
-	public void targetResultLessThanPercentage_1object_validationConfigOFF_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
-		iomObjA.setattrvalue("attr1", "5");
-		iomObjA.setattrvalue("attr2", "7");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(ILI_CLASSA+".Constraint1", ValidationConfig.CHECK,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
 	//#########################################################//
 	//########### FAIL PLAUSIBILITY CONSTRAINTS ##################//
 	//#########################################################//
@@ -750,72 +729,5 @@ public class PlausibilityConstraints23Test {
 		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassG.Constraint2 is not true.", logger.getErrs().get(1).getEventMsg());
 		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassG.Constraint3 is not true.", logger.getErrs().get(2).getEventMsg());
 		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassG.Constraint4 is not true.", logger.getErrs().get(3).getEventMsg());
-	}
-	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und >= 50% erreicht werden muss und ValidationConfig WARNING eingeschalten ist.
-	@Test
-	public void targetResultLessThanPercentage_1object_ValidationConfigWARNING_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
-		iomObjA.setattrvalue("attr1", "5");
-		iomObjA.setattrvalue("attr2", "7");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(ILI_CLASSA+".Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassA.Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
-	}
-	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und >= 50% erreicht werden muss und ValidationConfig MSG nicht leer ist.
-	@Test
-	public void targetResultLessThanPercentage_1object_ValidationConfigMSG_NotEmpty_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
-		iomObjA.setattrvalue("attr1", "5");
-		iomObjA.setattrvalue("attr2", "7");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(ILI_CLASSA+".Constraint1", ValidationConfig.MSG, "This is my own error message!");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This is my own error message!", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und >= 50% erreicht werden muss und ValidationConfig MSG definiert ist, jedoch nicht leer ist.
-	@Test
-	public void targetResultLessThanPercentage_1object_ValidationConfigMSG_Empty_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
-		iomObjA.setattrvalue("attr1", "5");
-		iomObjA.setattrvalue("attr2", "7");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(ILI_CLASSA+".Constraint1", ValidationConfig.MSG, "");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 }

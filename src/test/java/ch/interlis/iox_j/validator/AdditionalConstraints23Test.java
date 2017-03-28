@@ -279,53 +279,7 @@ public class AdditionalConstraints23Test {
 		assertEquals("Mandatory Constraint AddManConModel.AddManConTopic.AddManConView.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
-	// ein MandatoryConstraint false ergibt und validationConfig msg nicht leer ist.
-	@Test
-	public void mandatoryConstraint_NotEqual_MSGNotEmpty_Fail(){
-		Iom_jObject obj1=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
-		obj1.setattrvalue("attr1", "5");
-		obj1.setattrvalue("attr2", "10");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("AddManConModel.AddManConTopic.AddManConView"+".Constraint1", ValidationConfig.MSG, "This is my own error message!");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddManConModel");
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This is my own error message!", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
-	// ein MandatoryConstraint false ergibt und validationConfig msg leer ist.
-	@Test
-	public void mandatoryConstraint_NotEqual_MSGIsEmpty_Fail(){
-		Iom_jObject obj1=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASS, OBJ_OID1);
-		obj1.setattrvalue("attr1", "5");
-		obj1.setattrvalue("attr2", "10");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("AddManConModel.AddManConTopic.AddManConView"+".Constraint1", ValidationConfig.MSG, "");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddManConModel");
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint AddManConModel.AddManConTopic.AddManConView.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-	}
+
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die VIEW ausserhalb des Models nicht gefunden wird.
 	@Test
@@ -441,68 +395,6 @@ public class AdditionalConstraints23Test {
 		assertEquals("Set Constraint AdditionalConstraints23Zusatz4.BodenbedeckungZusatz.PrivatGebaeude.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob die eigens erstellte Fehlermeldung ausgegeben wird, wenn in einer VIEW ausserhalb des Models
-	// ein SetConstraint false ergibt und validationConfig msg einen Text enthält.
-	@Test
-	public void setConstraint_BagOfStructWrongNumber_MSGNotEmpty_Fail(){
-		Iom_jObject iomObjStruct=new Iom_jObject(ILI_STRUCTC, null);
-		Iom_jObject iomObjStruct2=new Iom_jObject(ILI_STRUCTC, null);
-		Iom_jObject iomObjStruct3=new Iom_jObject(ILI_STRUCTC, null);
-		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
-		iomObj.addattrobj("Numbers", iomObjStruct);
-		iomObj.addattrobj("Numbers", iomObjStruct2);
-		iomObj.addattrobj("Numbers", iomObjStruct3);
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("AdditionalConstraints23Zusatz4.BodenbedeckungZusatz.PrivatGebaeude"+".Constraint1", ValidationConfig.MSG, "My own Set Constraint Error Message.");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz4");
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjStruct));
-		validator.validate(new ObjectEvent(iomObjStruct2));
-		validator.validate(new ObjectEvent(iomObjStruct3));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("My own Set Constraint Error Message.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es wird getestet ob die eigens erstellte Fehlermeldung ausgegeben wird, wenn in einer VIEW ausserhalb des Models
-	// ein SetConstraint false ergibt und validationConfig msg definiert ist, jedoch keinen Text enthält.
-	@Test
-	public void setConstraint_BagOfStructWrongNumber_MSGEmpty_Fail(){
-		Iom_jObject iomObjStruct=new Iom_jObject(ILI_STRUCTC, null);
-		Iom_jObject iomObjStruct2=new Iom_jObject(ILI_STRUCTC, null);
-		Iom_jObject iomObjStruct3=new Iom_jObject(ILI_STRUCTC, null);
-		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
-		iomObj.addattrobj("Numbers", iomObjStruct);
-		iomObj.addattrobj("Numbers", iomObjStruct2);
-		iomObj.addattrobj("Numbers", iomObjStruct3);
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("AdditionalConstraints23Zusatz4.BodenbedeckungZusatz.PrivatGebaeude"+".Constraint1", ValidationConfig.MSG, "");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalConstraints23Zusatz4");
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjStruct));
-		validator.validate(new ObjectEvent(iomObjStruct2));
-		validator.validate(new ObjectEvent(iomObjStruct3));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Set Constraint AdditionalConstraints23Zusatz4.BodenbedeckungZusatz.PrivatGebaeude.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-	}
-	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann.
 	@Test
 	public void existenceConstraint_AttrsNotEqual_Fail() throws Exception{
@@ -511,56 +403,6 @@ public class AdditionalConstraints23Test {
 		Iom_jObject obj1=new Iom_jObject(ILI_EXISTENCECONSTRAINT_CLASS, OBJ_OID2);
 		obj1.setattrvalue("subAttr", "Andreas");
 		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddExConModel");
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(conditionObj));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute subAttr of AdditionalConstraints23.Bodenbedeckung.ExConClass was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg nicht leer ist.
-	@Test
-	public void existenceConstraint_AttrsNotEqual_MSGNotEmpty_Fail() throws Exception{
-		Iom_jObject conditionObj=new Iom_jObject(ILI_EXISTENCECONSTRAINT_CONDITION, OBJ_OID1);
-		conditionObj.setattrvalue("superAttr", "lars");
-		Iom_jObject obj1=new Iom_jObject(ILI_EXISTENCECONSTRAINT_CLASS, OBJ_OID2);
-		obj1.setattrvalue("subAttr", "Andreas");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("AddExConModel.AddExConTopic.AddExConView"+".Constraint1", ValidationConfig.MSG, "This is my own Existence Constraint Error Message.");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddExConModel");
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(conditionObj));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This is my own Existence Constraint Error Message.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg definiert, jedoch leer ist.
-	@Test
-	public void existenceConstraint_AttrsNotEqual_MSGEmpty_Fail() throws Exception{
-		Iom_jObject conditionObj=new Iom_jObject(ILI_EXISTENCECONSTRAINT_CONDITION, OBJ_OID1);
-		conditionObj.setattrvalue("superAttr", "lars");
-		Iom_jObject obj1=new Iom_jObject(ILI_EXISTENCECONSTRAINT_CLASS, OBJ_OID2);
-		obj1.setattrvalue("subAttr", "Andreas");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("AddExConModel.AddExConTopic.AddExConView"+".Constraint1", ValidationConfig.MSG, "");
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -601,32 +443,5 @@ public class AdditionalConstraints23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg nicht leer ist.
-	@Test
-	public void uniquenessConstraint_AttrsNotEqual_MSGNotEmpty_Fail() throws Exception{
-		Iom_jObject obj1=new Iom_jObject("AdditionalConstraints23.Bodenbedeckung.ClassB", OBJ_OID1);
-		obj1.setattrvalue("attr1", "Ralf");
-		obj1.setattrvalue("attr2", "20");
-		Iom_jObject obj2=new Iom_jObject("AdditionalConstraints23.Bodenbedeckung.ClassB", OBJ_OID2);
-		obj2.setattrvalue("attr1", "Ralf");
-		obj2.setattrvalue("attr2", "20");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("AdditionalConstraints23Un.BodenbedeckungZusatzUn.PrivatGebaeudeUn.Constraint1", ValidationConfig.MSG, "My Error Message.");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalConstraints23Un");
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("My Error Message.", logger.getErrs().get(0).getEventMsg());
 	}
 }

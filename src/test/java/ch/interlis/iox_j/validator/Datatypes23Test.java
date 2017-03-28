@@ -1165,26 +1165,6 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-
-	// Wenn ValidationConfig auf TYPE und auf OFF steht, darf kein Fehler ausgegeben werden.
-	@Test
-	public void booleanTestConfigOFF_Ok(){
-		Iom_jObject objTrue=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objTrue.setattrvalue("aBoolean", "undecided");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("Datatypes23.Topic.ClassA.aBoolean", ValidationConfig.TYPE,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objTrue));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////// FAILING Tests //////////////////////////////////////
@@ -2256,67 +2236,5 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <undecided> is not a BOOLEAN", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Wenn ValidationConfig TYPE und WARNING definiert wurde, wird kein Fehler, sondern eine Warnung ausgegeben.
-	@Test
-	public void booleanTestConfigWARNINGFail(){
-		Iom_jObject objTrue=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objTrue.setattrvalue("aBoolean", "undecided");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("Datatypes23.Topic.ClassA.aBoolean", ValidationConfig.TYPE,ValidationConfig.WARNING);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objTrue));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("value <undecided> is not a BOOLEAN", logger.getWarn().get(0).getEventMsg());
-	}
-	@Test
-	public void coordType2DRangeConfigGeomDefaultOffOk(){
-		Iom_jObject obj1=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		IomObject coordValue=obj1.addattrobj("lcoord", "COORD");
-		coordValue.setattrvalue("C1", "480000.000");
-		coordValue.setattrvalue("C2", "10000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION, ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	@Test
-	public void coordType2DRangeConfigGeomDefaultWarningFail(){
-		Iom_jObject obj1=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		IomObject coordValue=obj1.addattrobj("lcoord", "COORD");
-		coordValue.setattrvalue("C1", "480000.000");
-		coordValue.setattrvalue("C2", "10000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION, ValidationConfig.WARNING);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("value 10000.000 is out of range",logger.getWarn().get(0).getEventMsg());
 	}
 }
