@@ -389,7 +389,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						validationConfigOff.add(ValidationConfig.CHECK);
 						errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", check, iomObj.getobjectoid()));
 					}
-					}else{
+				}else{
 					// additional constraint
 					Viewable classValue=null;
 					for (Map.Entry<Constraint,Viewable> constraintValue : additionalConstraints.entrySet()) {
@@ -491,7 +491,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				loggedObjects.add(setConstraint);
 				errs.addEvent(errFact.logInfoMsg("validate set constraint {0}...",getScopedName(setConstraint)));
 			}
-			validateSetConstraint(setConstraint);
+			if(ValidationConfig.OFF.equals(setConstraint)){
+				if(!validationConfigOff.contains(ValidationConfig.CHECK)){
+					validationConfigOff.add(ValidationConfig.CHECK);
+					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", getScopedName(setConstraint)));
+				}
+			}else{
+				validateSetConstraint(setConstraint);
+			}
 		}
 	}
 
@@ -639,6 +646,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void validateSetConstraint(SetConstraint setConstraintObj) {
 		Collection<String> objs=setConstraints.get(setConstraintObj);
 		String constraintName = getScopedName(setConstraintObj);
+		String checkConstraint = null;
+		if(!enforceConstraintValidation){
+			checkConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
+		}
 		if(objs!=null && objs.size()>0){
 			for(String oid:objs){
 				allObjIterator=objs.iterator();
@@ -659,7 +670,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(msg!=null && msg.length()>0){
 						logMsg(constraintName,msg);
 					} else {
-						logMsg(constraintName,"Set Constraint {0} is not true.", getScopedName(setConstraintObj));
+						logMsg(checkConstraint,"Set Constraint {0} is not true.", constraintName);
 					}
 				}
 			}
@@ -2267,6 +2278,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		 }
 		 String validateMultiplicity=validationConfig.getConfigValue(attrQName, ValidationConfig.MULTIPLICITY);
 		 String validateType=null;
+		 String validateTarget=null;
 		 String validateGeometryType=null;
 		 if(!enforceTypeValidation){
 			 validateType=validationConfig.getConfigValue(attrQName, ValidationConfig.TYPE);
