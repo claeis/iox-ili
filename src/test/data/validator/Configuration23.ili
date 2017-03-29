@@ -114,6 +114,32 @@ MODEL Configuration23 AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" 
 		CLASS ClassP =
 			lcoord : Lkoord;
 		END ClassP;
+		
+		CLASS ClassQ =
+		   attrA1 : TEXT*10;
+		END ClassQ;
+		
+		CLASS ClassR =
+		   attrB1 : TEXT*10;
+		END ClassR;
+		
+		CLASS ClassS =
+		   attr1 : TEXT*10;
+		END ClassS;
+		
+		CLASS ClassT =
+		   attr1 : TEXT*10;
+		END ClassT;
+		
+		ASSOCIATION qr1 =
+		  q1 -- {0..1} ClassQ OR ClassD;
+		  r1 -- {0..*} ClassR OR ClassD;
+		END qr1;
+		
+		ASSOCIATION st1 =
+		  s1 -- {1..1} ClassS;
+		  t1 -- {1..1} ClassT;
+		END st1;
 	END Topic;
 END Configuration23.
 

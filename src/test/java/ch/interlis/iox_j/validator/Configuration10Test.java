@@ -26,6 +26,7 @@ public class Configuration10Test {
 	// OID
 	private final static String OID1 ="o1";
 	private final static String OID2 ="o2";
+	private final static String OID3 ="o3";
 	// MODEL.TOPIC
 	private final static String TOPIC="Configuration10.Topic";
 	// CLASS

@@ -2,6 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -33,6 +34,8 @@ public class Configuration23Test {
 	private final static String OID1 ="o1";
 	private final static String OID2 ="o2";
 	private final static String OID3 ="o3";
+	private final static String OID4 ="o4";
+	private final static String OID5 ="o5";
 	// MODEL.TOPIC
 	private final static String TOPIC="Configuration23.Topic";
 	// MODEL.TOPIC.CLASS
@@ -52,6 +55,13 @@ public class Configuration23Test {
 	private final static String CLASSN=TOPIC+".ClassN";
 	private final static String CLASSO=TOPIC+".ClassO";
 	private final static String CLASSP=TOPIC+".ClassP";
+	private final static String CLASSQ=TOPIC+".ClassQ";
+	private final static String CLASSR=TOPIC+".ClassR";
+	private final static String CLASSS=TOPIC+".ClassS";
+	private final static String CLASST=TOPIC+".ClassT";
+	// ASSOCIATION
+	private final static String ASSOC_QR1_Q1="q1";
+	private final static String ASSOC_QR1_R1="r1";
 	// STRUCTURE
 	private final static String STRUCTA=TOPIC+".StructA";
 	// START BASKET EVENT
@@ -1059,5 +1069,243 @@ public class Configuration23Test {
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
 		assertEquals("value 10000.000 is out of range",logger.getWarn().get(0).getEventMsg());
+	}
+	
+	// target=on. Erwarte den Fehler:
+	// t1 should associate 1 to 1 target objects (instead of 3)
+	@Test
+	public void association_TargetAndCardinalityWrong_TargetON(){
+		Iom_jObject iomObjG=new Iom_jObject(CLASSS, OID1);
+		Iom_jObject iomObjH1=new Iom_jObject(CLASST, OID2);
+		iomObjH1.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjH2=new Iom_jObject(CLASST, OID3);
+		iomObjH2.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjH3=new Iom_jObject(CLASST, OID4);
+		iomObjH3.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjG));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new ObjectEvent(iomObjH2));
+		validator.validate(new ObjectEvent(iomObjH3));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("t1 should associate 1 to 1 target objects (instead of 3)",logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// target=WARNING.
+	// Es soll keine Fehlermeldung ausgegeben werden.
+	// Es soll eine Warnung ausgegeben werden.
+	@Test
+	public void association_noTargetObject_TargetWARN(){
+		Iom_jObject iomObjA=new Iom_jObject(CLASSQ, OID1);
+		Iom_jObject iomObjB=new Iom_jObject(CLASSR, OID2);
+		iomObjB.addattrobj(ASSOC_QR1_Q1, "REF").setobjectrefoid(OID3);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Configuration23.Topic.qr1.q1", ValidationConfig.TARGET,ValidationConfig.WARNING);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+		assertTrue(logger.getWarn().size()==1);
+		assertEquals("No object found with OID o3.", logger.getWarn().get(0).getEventMsg());
+	}
+	
+	// target=OFF.
+	// folgende Info muss ausgegeben werden:
+	// Info: Configuration23.Topic.qr1.q1 not validated, validation configuration target=off
+	@Test
+	public void association_noTargetObject_TargetOFF(){
+		Iom_jObject iomObjA=new Iom_jObject(CLASSQ, OID1);
+		Iom_jObject iomObjB=new Iom_jObject(CLASSR, OID2);
+		iomObjB.addattrobj(ASSOC_QR1_Q1, "REF").setobjectrefoid(OID3);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Configuration23.Topic.qr1.q1", ValidationConfig.TARGET,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+		assertTrue(logger.getWarn().size()==0);
+	}
+	
+	// target=on. Erwarte den Fehler:
+	// t1 should associate 1 to 1 target objects (instead of 3)
+	@Test
+	public void association_TargetAndCardinalityWrong_MultiplicityON(){
+		Iom_jObject iomObjG=new Iom_jObject(CLASSS, OID1);
+		Iom_jObject iomObjH1=new Iom_jObject(CLASST, OID2);
+		iomObjH1.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjH2=new Iom_jObject(CLASST, OID3);
+		iomObjH2.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjH3=new Iom_jObject(CLASST, OID4);
+		iomObjH3.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjG));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new ObjectEvent(iomObjH2));
+		validator.validate(new ObjectEvent(iomObjH3));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("t1 should associate 1 to 1 target objects (instead of 3)",logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// target=WARNING.
+	// Es soll keine Fehlermeldung ausgegeben werden.
+	// Es soll eine Warnung ausgegeben werden.
+	@Test
+	public void association_noTargetObject_MultiplicityWARN(){
+		Iom_jObject iomObjG=new Iom_jObject(CLASSS, OID1);
+		Iom_jObject iomObjH1=new Iom_jObject(CLASST, OID2);
+		iomObjH1.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjH2=new Iom_jObject(CLASST, OID3);
+		iomObjH2.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjH3=new Iom_jObject(CLASST, OID4);
+		iomObjH3.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Configuration23.Topic.st1.t1", ValidationConfig.MULTIPLICITY,ValidationConfig.WARNING);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjG));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new ObjectEvent(iomObjH2));
+		validator.validate(new ObjectEvent(iomObjH3));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+		assertTrue(logger.getWarn().size()==1);
+		assertEquals("t1 should associate 1 to 1 target objects (instead of 3)", logger.getWarn().get(0).getEventMsg());
+	}
+	
+	// target=OFF.
+	// folgende Info muss ausgegeben werden:
+	// Info: Configuration23.Topic.st1.t1 not validated, validation configuration multiplicity=off
+	@Test
+	public void association_noTargetObject_MultiplicityOFF(){
+		Iom_jObject iomObjG=new Iom_jObject(CLASSS, OID1);
+		Iom_jObject iomObjH1=new Iom_jObject(CLASST, OID2);
+		iomObjH1.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjH2=new Iom_jObject(CLASST, OID3);
+		iomObjH2.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjH3=new Iom_jObject(CLASST, OID4);
+		iomObjH3.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Configuration23.Topic.st1.t1", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjG));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new ObjectEvent(iomObjH2));
+		validator.validate(new ObjectEvent(iomObjH3));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+		assertTrue(logger.getWarn().size()==0);
+	}		
+	
+	// wenn die configuration: multiplicity=off und target=off gemacht wird, dürfen keine Fehler und Warnungen ausgegeben werden.
+	// Es müssen 2 Info-Meldungen ausgegeben werden.
+	@Test
+	public void association_TargetAndCardinalityWrong_MultiplicityOFF_TargetOFF(){
+		Iom_jObject iomObjG=new Iom_jObject(CLASSS, OID1);
+		Iom_jObject iomObjH1=new Iom_jObject(CLASST, OID2);
+		iomObjH1.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjH2=new Iom_jObject(CLASST, OID3);
+		iomObjH2.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjH3=new Iom_jObject(CLASST, OID4);
+		iomObjH3.addattrobj("s1", "REF").setobjectrefoid(OID5);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Configuration23.Topic.st1.s1", ValidationConfig.TARGET,ValidationConfig.OFF);
+		modelConfig.setConfigValue("Configuration23.Topic.st1.t1", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjG));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new ObjectEvent(iomObjH2));
+		validator.validate(new ObjectEvent(iomObjH3));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+		assertTrue(logger.getWarn().size()==0);
+	}
+	
+	// wenn die configuration: multiplicity=warning und target=warning configuriert wird, dürfen keine Fehler ausgegeben werden.
+	// Es müssen 2 Warningen ausgegeben werden:
+	// Info: No object found with OID o5.
+	// Info: t1 should associate 1 to 1 target objects (instead of 2)
+	@Test
+	public void association_TargetAndCardinalityWrong_MultiplicityWARN_TargetWARN(){
+		Iom_jObject iomObjG=new Iom_jObject(CLASSS, OID1);
+		Iom_jObject iomObjH1=new Iom_jObject(CLASST, OID2);
+		iomObjH1.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjH2=new Iom_jObject(CLASST, OID3);
+		iomObjH2.addattrobj("s1", "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjH3=new Iom_jObject(CLASST, OID4);
+		iomObjH3.addattrobj("s1", "REF").setobjectrefoid(OID5);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("Configuration23.Topic.st1.s1", ValidationConfig.TARGET,ValidationConfig.WARNING);
+		modelConfig.setConfigValue("Configuration23.Topic.st1.t1", ValidationConfig.MULTIPLICITY,ValidationConfig.WARNING);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjG));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new ObjectEvent(iomObjH2));
+		validator.validate(new ObjectEvent(iomObjH3));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+		assertTrue(logger.getWarn().size()==2);
+		assertEquals("No object found with OID o5.",logger.getWarn().get(0).getEventMsg());
+		assertEquals("t1 should associate 1 to 1 target objects (instead of 2)",logger.getWarn().get(1).getEventMsg());
 	}
 }
