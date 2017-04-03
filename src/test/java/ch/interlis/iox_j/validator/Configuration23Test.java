@@ -85,7 +85,7 @@ public class Configuration23Test {
 		Iom_jObject objC=new Iom_jObject(CLASSA, OID2);
 		objC.setattrvalue("attrText", "this");
 		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("Configuration23.Topic.ClassA", ValidationConfig.CHECK,ValidationConfig.OFF);
+		modelConfig.setConfigValue("Configuration23.Topic.ClassA.Constraint1", ValidationConfig.CHECK,ValidationConfig.OFF);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -147,6 +147,30 @@ public class Configuration23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("My own error message.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht übereinstimmen, check=OFF und msg=NotEmpty.
+	@Test
+	public void existenceConstraint_AttrsNotEqual_MSGNotEmpty__CheckOFF_Fail() throws Exception{
+		Iom_jObject objBedingung=new Iom_jObject(CONDITIONTEXTCLASS, OID1);
+		objBedingung.setattrvalue("attrText", "other");
+		Iom_jObject objA=new Iom_jObject(CLASSA, OID2);
+		objA.setattrvalue("attrText", "lars");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(CLASSA+".Constraint1", ValidationConfig.MSG, "My own error message.");
+		modelConfig.setConfigValue(CLASSA+".Constraint1", ValidationConfig.CHECK,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(objBedingung));
+		validator.validate(new ObjectEvent(objA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
 	}
 
 	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht übereinstimmen und validationConfig msg leer ist.
@@ -327,6 +351,31 @@ public class Configuration23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird wenn:
+	// config: check=OFF
+	// config: msg=NotEmpty
+	// Es soll keine Nachricht ausgegeben werden, da check=off ist.
+	@Test
+	public void mandatoryConstraint_Boolean_CheckOFF_MSGNotEmpty(){
+		Iom_jObject iomObjA=new Iom_jObject(CLASSE, OID1);
+		iomObjA.setattrvalue("attr1", "true");
+		iomObjA.setattrvalue("attr2", "false");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(CLASSE+".Constraint1", ValidationConfig.CHECK,ValidationConfig.OFF);
+		modelConfig.setConfigValue(CLASSE+".Constraint1", ValidationConfig.MSG, "This is my own error message!");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn config auf Warning eingestellt ist und die boolean nicht übereinstimmen.
 	@Test
 	public void mandatoryConstraint_BooleanNotEqual_CheckWarning(){
@@ -439,6 +488,28 @@ public class Configuration23Test {
 		assertEquals("This is my own error message!", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und >= 50% erreicht werden muss, check=off, msg=notEmpty.
+	@Test
+	public void plausibilityConstraint_TargetResultLessThanPercentage_CheckOFF_msgNotEmpty(){
+		Iom_jObject iomObjA=new Iom_jObject(CLASSF, OID1);
+		iomObjA.setattrvalue("attr1", "5");
+		iomObjA.setattrvalue("attr2", "7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(CLASSF+".Constraint1", ValidationConfig.MSG, "This is my own error message!");
+		modelConfig.setConfigValue(CLASSF+".Constraint1", ValidationConfig.CHECK,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und >= 50% erreicht werden muss und ValidationConfig MSG definiert ist, jedoch nicht leer ist.
 	@Test
 	public void plausibilityConstraint_TargetResultLessThanPercentage_MSGEmpty(){
@@ -544,6 +615,27 @@ public class Configuration23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn der Pre-Constraint true ist und die Funktion: ObjectCount(ALL) false ist und die Config check=off und msgNotEmpty definiert ist.
+	@Test
+	public void setConstraint_SecondConstraintFalse_CheckOFF_msgNotEmpty(){
+		Iom_jObject iomObj=new Iom_jObject(CLASSG, OID1);
+		iomObj.setattrvalue("Art", "a");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(CLASSG+".Constraint1", ValidationConfig.CHECK, ValidationConfig.OFF);
+		modelConfig.setConfigValue(CLASSG+".Constraint1", ValidationConfig.MSG, "My own Set Constraint.");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
 	// Es wird getestet eine Fehlermeldung ausgegeben wird, wenn der Pre-Constraint true ist und die Funktion: ObjectCount(ALL) false ist und die Config check=warning definiert ist.
 	@Test
 	public void setConstraint_SecondConstraintFalse_CheckWarn(){
@@ -634,6 +726,35 @@ public class Configuration23Test {
 		objA.setattrvalue("attr2", "20");
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(CLASSH+".Constraint1", ValidationConfig.CHECK,ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(objA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getErrs().size()==0);
+		assertTrue(logger.getWarn().size()==0);
+	}
+	
+	// Es wird getestet ob eine Warning anstelle einer Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist und validationConfig check=off und msgNotEmpty geschalten ist.
+	@Test
+	public void uniqueConstraint_NumberUniqueSameNumber_checkOFF_msgNotEmpty(){
+		// Set object.
+		Iom_jObject obj1=new Iom_jObject(CLASSH,OID1);
+		obj1.setattrvalue("attr1", "Ralf");
+		obj1.setattrvalue("attr2", "20");
+		Iom_jObject objA=new Iom_jObject(CLASSH,OID2);
+		objA.setattrvalue("attr1", "Ralf");
+		objA.setattrvalue("attr2", "20");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(CLASSH+".Constraint1", ValidationConfig.MSG, "My own Set Constraint.");
 		modelConfig.setConfigValue(CLASSH+".Constraint1", ValidationConfig.CHECK,ValidationConfig.OFF);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -912,6 +1033,33 @@ public class Configuration23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("My Error Message.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann, msg=NotEmpty, check=off.
+	@Test
+	public void additionalConstraint_UniquenessConstraint_AttrsNotEqual_msgNotEmpty_checkOFF() throws Exception{
+		Iom_jObject obj1=new Iom_jObject("Configuration23.Topic.ClassM", OID1);
+		obj1.setattrvalue("attr1", "Ralf");
+		obj1.setattrvalue("attr2", "20");
+		Iom_jObject obj2=new Iom_jObject("Configuration23.Topic.ClassM", OID2);
+		obj2.setattrvalue("attr1", "Ralf");
+		obj2.setattrvalue("attr2", "20");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue("AddUnConModel.AddUnConTopic.AddUnConView.Constraint1", ValidationConfig.MSG, "My Error Message.");
+		modelConfig.setConfigValue("AddUnConModel.AddUnConTopic.AddUnConView"+".Constraint1", ValidationConfig.CHECK, ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddUnConModel");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(obj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg leer ist.

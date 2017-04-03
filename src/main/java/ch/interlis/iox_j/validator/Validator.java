@@ -128,6 +128,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private HashMap<Constraint,Viewable> additionalConstraints=new HashMap<Constraint,Viewable>();
 	private Map<PlausibilityConstraint, PlausibilityPoolValue> plausibilityConstraints=new LinkedHashMap<PlausibilityConstraint, PlausibilityPoolValue>();
 	private HashSet<String> validationConfigOff =new HashSet<String>();
+	private HashSet<String> constraints=new HashSet<String>();
+	private HashSet<String> abstractLeafElement=new HashSet<String>();
 	
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -367,10 +369,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	private void iterateThroughAllObjects(){
 		errs.addEvent(errFact.logInfoMsg("second validation pass..."));
-		HashSet<Constraint> constraints=new HashSet<Constraint>();
 		HashSet<Type> types=new HashSet<Type>();
 		HashSet<Viewable> viewables=new HashSet<Viewable>();
-		HashSet<AbstractLeafElement> abstractLeafElement=new HashSet<AbstractLeafElement>();
 		for (String basketId : objectPool.getBasketIds()){
 			// iterate through iomObjects
 			Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
@@ -378,80 +378,55 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				IomObject iomObj = objectIterator.next();
 				setCurrentMainObj(iomObj);
 				Object modelElement=tag2class.get(iomObj.getobjecttag());
-				Viewable currentClass= (Viewable) modelElement;
-				String className = getScopedName(currentClass);
-				String checkConstraint=null;
-				if(!enforceConstraintValidation){
-					checkConstraint=validationConfig.getConfigValue(className, ValidationConfig.CHECK);
-				}
-				if(ValidationConfig.OFF.equals(checkConstraint)){
-					if(!validationConfigOff.contains(ValidationConfig.CHECK+":"+className)){
-						validationConfigOff.add(ValidationConfig.CHECK+":"+className);
-						errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", className, iomObj.getobjectoid()));
-					}
-				}else{
-					// additional constraint
-					Viewable classValue=null;
-					for (Map.Entry<Constraint,Viewable> constraintValue : additionalConstraints.entrySet()) {
-						Constraint constraintObj = constraintValue.getKey();
-						classValue = constraintValue.getValue();
-						if(currentClass.isExtending(classValue)) {
-							if(constraintObj instanceof ExistenceConstraint) {
-								ExistenceConstraint existenceConstraint = (ExistenceConstraint) constraintObj;
-								validateExistenceConstraint(iomObj, existenceConstraint);
-							} else if(constraintObj instanceof MandatoryConstraint){
-								MandatoryConstraint mandatoryConstraint = (MandatoryConstraint) constraintObj;
-								validateMandatoryConstraint(iomObj, mandatoryConstraint);
-							} else if(constraintObj instanceof SetConstraint){
-								SetConstraint setConstraint = (SetConstraint) constraintObj;
-								collectSetConstraintObjs(iomObj, setConstraint);
-							} else if(constraintObj instanceof UniquenessConstraint){
-								UniquenessConstraint uniquenessConstraint = (UniquenessConstraint) constraintObj;
-								validateUniquenessConstraint(iomObj, uniquenessConstraint);
-							} else if(constraintObj instanceof PlausibilityConstraint){
-								PlausibilityConstraint plausibilityConstraint = (PlausibilityConstraint) constraintObj;
-								fillOfPlausibilityConstraintMap(plausibilityConstraint, iomObj);
-							}
-						}
-					}
-					Iterator constraintIterator=currentClass.iterator();
-					while (constraintIterator.hasNext()) {
-						Object constraintObj = constraintIterator.next();
-						// existence constraint
-						if(constraintObj instanceof ExistenceConstraint){
-							ExistenceConstraint existenceConstraint=(ExistenceConstraint) constraintObj;
-							if(!constraints.contains(existenceConstraint)){
-								constraints.add(existenceConstraint);
-								errs.addEvent(errFact.logInfoMsg("validate existence constraint {0}...",getScopedName(existenceConstraint)));
-							}
+				Viewable classOfCurrentObj= (Viewable) modelElement;
+				// additional constraint
+				for (Map.Entry<Constraint,Viewable> additionalConstraintsEntry : additionalConstraints.entrySet()) {
+					Constraint additionalConstraint = additionalConstraintsEntry.getKey();
+					Viewable classOfAdditionalConstraint = additionalConstraintsEntry.getValue();
+					if(classOfCurrentObj.isExtending(classOfAdditionalConstraint)) {
+						if(additionalConstraint instanceof ExistenceConstraint) {
+							ExistenceConstraint existenceConstraint = (ExistenceConstraint) additionalConstraint;
 							validateExistenceConstraint(iomObj, existenceConstraint);
-						}
-						// mandatory constraint
-						if(constraintObj instanceof MandatoryConstraint){
-							MandatoryConstraint mandatoryConstraint=(MandatoryConstraint) constraintObj;
-							if(!constraints.contains(mandatoryConstraint)){
-								constraints.add(mandatoryConstraint);
-								errs.addEvent(errFact.logInfoMsg("validate mandatory constraint {0}...",getScopedName(mandatoryConstraint)));
-							}
+						} else if(additionalConstraint instanceof MandatoryConstraint){
+							MandatoryConstraint mandatoryConstraint = (MandatoryConstraint) additionalConstraint;
 							validateMandatoryConstraint(iomObj, mandatoryConstraint);
-						}
-						// set constraint
-						if(constraintObj instanceof SetConstraint){
-							SetConstraint setConstraint=(SetConstraint) constraintObj;
+						} else if(additionalConstraint instanceof SetConstraint){
+							SetConstraint setConstraint = (SetConstraint) additionalConstraint;
 							collectSetConstraintObjs(iomObj, setConstraint);
-						}
-						// plausibility constraint
-						if(constraintObj instanceof PlausibilityConstraint){
-							PlausibilityConstraint plausibilityConstraint=(PlausibilityConstraint) constraintObj;
-							if(!constraints.contains(plausibilityConstraint)){
-								constraints.add(plausibilityConstraint);
-								errs.addEvent(errFact.logInfoMsg("validate plausibility constraint {0}...",getScopedName(plausibilityConstraint)));
-							}
+						} else if(additionalConstraint instanceof UniquenessConstraint){
+							UniquenessConstraint uniquenessConstraint = (UniquenessConstraint) additionalConstraint;
+							validateUniquenessConstraint(iomObj, uniquenessConstraint);
+						} else if(additionalConstraint instanceof PlausibilityConstraint){
+							PlausibilityConstraint plausibilityConstraint = (PlausibilityConstraint) additionalConstraint;
 							fillOfPlausibilityConstraintMap(plausibilityConstraint, iomObj);
 						}
 					}
 				}
-				Iterator<ViewableTransferElement> attrIterator=currentClass.getAttributesAndRoles2();
+				Iterator constraintIterator=classOfCurrentObj.iterator();
+				while (constraintIterator.hasNext()) {
+					Object constraintObj = constraintIterator.next();
+					// existence constraint
+					if(constraintObj instanceof ExistenceConstraint){
+						ExistenceConstraint existenceConstraint=(ExistenceConstraint) constraintObj;
+						validateExistenceConstraint(iomObj, existenceConstraint);
+					}
+					// mandatory constraint
+					if(constraintObj instanceof MandatoryConstraint){
+						MandatoryConstraint mandatoryConstraint=(MandatoryConstraint) constraintObj;
+						validateMandatoryConstraint(iomObj, mandatoryConstraint);
+					}
+					// set constraint
+					if(constraintObj instanceof SetConstraint){
+						SetConstraint setConstraint=(SetConstraint) constraintObj;
+						collectSetConstraintObjs(iomObj, setConstraint);
+					}
+					// plausibility constraint
+					if(constraintObj instanceof PlausibilityConstraint){
+						PlausibilityConstraint plausibilityConstraint=(PlausibilityConstraint) constraintObj;
+						fillOfPlausibilityConstraintMap(plausibilityConstraint, iomObj);
+					}
+				}
+				Iterator<ViewableTransferElement> attrIterator=classOfCurrentObj.getAttributesAndRoles2();
 				while (attrIterator.hasNext()) {
 					ViewableTransferElement objA = attrIterator.next();
 					if (objA.obj instanceof LocalAttribute){
@@ -465,15 +440,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 					}else if(objA.obj instanceof RoleDef){
 						RoleDef roleDef = (RoleDef) objA.obj;
-						if(!abstractLeafElement.contains(roleDef)){
-							abstractLeafElement.add(roleDef);
-							errs.addEvent(errFact.logInfoMsg("validate role reference {0}...",getScopedName(roleDef)));
-						}
 						validateRoleReference(roleDef, iomObj);
 					}
 				}
-				if(currentClass instanceof AbstractClassDef){
-					AbstractClassDef abstractClassDef = (AbstractClassDef) currentClass;
+				if(classOfCurrentObj instanceof AbstractClassDef){
+					AbstractClassDef abstractClassDef = (AbstractClassDef) classOfCurrentObj;
 					if(!viewables.contains(abstractClassDef)){
 						viewables.add(abstractClassDef);
 						errs.addEvent(errFact.logInfoMsg("validate role references of {0}...",abstractClassDef.getScopedName(null)));
@@ -502,33 +473,34 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private void fillOfPlausibilityConstraintMap(PlausibilityConstraint currentConstraint, IomObject iomObj){
-		Evaluable condition = (Evaluable) currentConstraint.getCondition();
+	private void fillOfPlausibilityConstraintMap(PlausibilityConstraint constraint, IomObject iomObj){
+		Evaluable condition = (Evaluable) constraint.getCondition();
 		Value conditionValue = evaluateExpression(iomObj, condition);
-		if(plausibilityConstraints.containsKey(currentConstraint)){
-			PlausibilityPoolValue poolConstraintValues = plausibilityConstraints.get(currentConstraint);
+		if(plausibilityConstraints.containsKey(constraint)){
+			PlausibilityPoolValue poolConstraintValues = plausibilityConstraints.get(constraint);
 			double successfulResults = poolConstraintValues.getSuccessfulResults();
 			double totalSumOfConstraints = poolConstraintValues.getTotalSumOfConstraints();
 			if (conditionValue.isTrue()){
-				plausibilityConstraints.remove(currentConstraint);
-				plausibilityConstraints.put(currentConstraint, new PlausibilityPoolValue(successfulResults+1.0, totalSumOfConstraints+1.0));
+				plausibilityConstraints.remove(constraint);
+				plausibilityConstraints.put(constraint, new PlausibilityPoolValue(successfulResults+1.0, totalSumOfConstraints+1.0));
 			} else {
 				// error, undefined, false
-				plausibilityConstraints.remove(currentConstraint);
-				plausibilityConstraints.put(currentConstraint, new PlausibilityPoolValue(successfulResults, totalSumOfConstraints+1.0));
+				plausibilityConstraints.remove(constraint);
+				plausibilityConstraints.put(constraint, new PlausibilityPoolValue(successfulResults, totalSumOfConstraints+1.0));
 			}
 		} else {
 			if (conditionValue.isTrue()){
-				plausibilityConstraints.put(currentConstraint, new PlausibilityPoolValue(1.0, 1.0));
+				plausibilityConstraints.put(constraint, new PlausibilityPoolValue(1.0, 1.0));
 			} else {
 				// error, undefined, false
-				plausibilityConstraints.put(currentConstraint, new PlausibilityPoolValue(0.0, 1.0));
+				plausibilityConstraints.put(constraint, new PlausibilityPoolValue(0.0, 1.0));
 			}
 		}
 	}
 	
 	private void validatePlausibilityConstraints(){
 		for (Entry<PlausibilityConstraint, PlausibilityPoolValue> constraintEntry : plausibilityConstraints.entrySet()){
+			PlausibilityConstraint constraint = constraintEntry.getKey();
 			String constraintName = getScopedName(constraintEntry.getKey());
 			String checkConstraint=null;
 			if(!enforceConstraintValidation){
@@ -540,6 +512,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName));
 				}
 			}else{
+				if(!constraints.contains(constraint+":"+constraintName)){
+					constraints.add(constraint+":"+constraintName);
+					errs.addEvent(errFact.logInfoMsg("validate plausibility constraint {0}...",getScopedName(constraintEntry.getKey())));
+				}
 				String msg=validationConfig.getConfigValue(getScopedName(constraintEntry.getKey()), ValidationConfig.MSG);
 				if(constraintEntry.getKey().getDirection()==0){ // >=
 					if(((constraintEntry.getValue().getSuccessfulResults()/constraintEntry.getValue().getTotalSumOfConstraints())*100) >= constraintEntry.getKey().getPercentage()){
@@ -568,7 +544,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	
 	private void validateUniquenessConstraint(IomObject iomObj, UniquenessConstraint uniquenessConstraint) {
 		String constraintName = getScopedName(uniquenessConstraint);
-		String checkUniqueConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
+		String checkUniqueConstraint=null;
+		if(!enforceConstraintValidation){
+			checkUniqueConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
+		}
 		if(ValidationConfig.OFF.equals(checkUniqueConstraint)){
 			if(!validationConfigOff.contains(ValidationConfig.CHECK+":"+constraintName)){
 				validationConfigOff.add(ValidationConfig.CHECK+":"+constraintName);
@@ -650,27 +629,38 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(!enforceConstraintValidation){
 			checkConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
 		}
-		if(objs!=null && objs.size()>0){
-			for(String oid:objs){
-				allObjIterator=objs.iterator();
-				IomObject iomObj=objectPool.getObject(oid, null, null);
-				Evaluable condition = (Evaluable) setConstraintObj.getCondition();
-				Value constraintValue = evaluateExpression(iomObj, condition);
-				if (constraintValue.isNotYetImplemented()){
-					logMsg(constraintName,"Function in set constraint {0} is not yet implemented.",getScopedName(setConstraintObj));
-					return;
-				}
-				if (constraintValue.skipEvaluation()){
-					return;
-				}
-				if (constraintValue.isTrue()){
-					// ok
-				} else {
-					String msg=validationConfig.getConfigValue(getScopedName(setConstraintObj), ValidationConfig.MSG);
-					if(msg!=null && msg.length()>0){
-						logMsg(constraintName,msg);
+		if(ValidationConfig.OFF.equals(checkConstraint)){
+			if(!validationConfigOff.contains(ValidationConfig.CHECK+":"+getScopedName(setConstraintObj))){
+				validationConfigOff.add(ValidationConfig.CHECK+":"+getScopedName(setConstraintObj));
+				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", getScopedName(setConstraintObj)));
+			}
+		}else{
+			if(!constraints.contains(setConstraintObj+":"+constraintName)){
+				constraints.add(setConstraintObj+":"+constraintName);
+				errs.addEvent(errFact.logInfoMsg("validate plausibility constraint {0}...",getScopedName(setConstraintObj)));
+			}
+			if(objs!=null && objs.size()>0){
+				for(String oid:objs){
+					allObjIterator=objs.iterator();
+					IomObject iomObj=objectPool.getObject(oid, null, null);
+					Evaluable condition = (Evaluable) setConstraintObj.getCondition();
+					Value constraintValue = evaluateExpression(iomObj, condition);
+					if (constraintValue.isNotYetImplemented()){
+						logMsg(constraintName,"Function in set constraint {0} is not yet implemented.",getScopedName(setConstraintObj));
+						return;
+					}
+					if (constraintValue.skipEvaluation()){
+						return;
+					}
+					if (constraintValue.isTrue()){
+						// ok
 					} else {
-						logMsg(checkConstraint,"Set Constraint {0} is not true.", constraintName);
+						String msg=validationConfig.getConfigValue(getScopedName(setConstraintObj), ValidationConfig.MSG);
+						if(msg!=null && msg.length()>0){
+							logMsg(constraintName,msg);
+						} else {
+							logMsg(checkConstraint,"Set Constraint {0} is not true.", constraintName);
+						}
 					}
 				}
 			}
@@ -679,31 +669,45 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	
 	private void validateMandatoryConstraint(IomObject iomObj, MandatoryConstraint mandatoryConstraintObj) {
 		String constraintName = getScopedName(mandatoryConstraintObj);
-		String checkMandatoryConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
-		Evaluable condition = (Evaluable) mandatoryConstraintObj.getCondition();
-		Value conditionValue = evaluateExpression(iomObj, condition);
-		if (!conditionValue.isNotYetImplemented()){
-			if (!conditionValue.skipEvaluation()){
-				if (conditionValue.isTrue()){
-					// ok
-				} else {
-					String msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
-					if(msg!=null && msg.length()>0){
-						logMsg(constraintName,msg);
-					} else {
-						logMsg(checkMandatoryConstraint,"Mandatory Constraint {0} is not true.", constraintName);
-					}
-				}
+		String checkConstraint = null;
+		if(!enforceConstraintValidation){
+			checkConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
+		}
+		if(ValidationConfig.OFF.equals(checkConstraint)){
+			if(!validationConfigOff.contains(ValidationConfig.CHECK+":"+constraintName)){
+				validationConfigOff.add(ValidationConfig.CHECK+":"+constraintName);
+				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName));
 			}
 		} else {
-			if(condition instanceof FunctionCall){
-				FunctionCall functionCallObj = (FunctionCall) condition;
-				Function function = functionCallObj.getFunction();
-				logMsg(constraintName,"Function {0} is not yet implemented.", function.getScopedName(null));
-				Value.createNotYetImplemented();
+			if(!constraints.contains(mandatoryConstraintObj+":"+constraintName)){
+				constraints.add(mandatoryConstraintObj+":"+constraintName);
+				errs.addEvent(errFact.logInfoMsg("validate mandatory constraint {0}...",getScopedName(mandatoryConstraintObj)));
+			}
+			Evaluable condition = (Evaluable) mandatoryConstraintObj.getCondition();
+			Value conditionValue = evaluateExpression(iomObj, condition);
+			if (!conditionValue.isNotYetImplemented()){
+				if (!conditionValue.skipEvaluation()){
+					if (conditionValue.isTrue()){
+						// ok
+					} else {
+						String msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
+						if(msg!=null && msg.length()>0){
+							logMsg(constraintName,msg);
+						} else {
+							logMsg(checkConstraint,"Mandatory Constraint {0} is not true.", constraintName);
+						}
+					}
+				}
 			} else {
-				logMsg(constraintName,"MandatoryConstraint {0} of {1} is not yet implemented.", mandatoryConstraintObj.getScopedName(null), iomObj.getobjecttag());
-				Value.createNotYetImplemented();
+				if(condition instanceof FunctionCall){
+					FunctionCall functionCallObj = (FunctionCall) condition;
+					Function function = functionCallObj.getFunction();
+					logMsg(constraintName,"Function {0} is not yet implemented.", function.getScopedName(null));
+					Value.createNotYetImplemented();
+				} else {
+					logMsg(constraintName,"MandatoryConstraint {0} of {1} is not yet implemented.", mandatoryConstraintObj.getScopedName(null), iomObj.getobjecttag());
+					Value.createNotYetImplemented();
+				}
 			}
 		}
 	}
@@ -1469,6 +1473,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration target=off", roleQName, iomObj.getobjectoid()));
 			}
 		}else{
+			if(!abstractLeafElement.contains(role+":"+roleQName)){
+				abstractLeafElement.add(role+":"+roleQName);
+				errs.addEvent(errFact.logInfoMsg("validate role reference {0}...",getScopedName(role)));
+			}
 			String targetOid = null;
 			// role of iomObj
 			IomObject roleDefValue = iomObj.getattrobj(role.getName(), 0);
@@ -1603,65 +1611,70 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				validationConfigOff.add(ValidationConfig.CHECK+":"+constraintName);
 				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName));
 			}
-		}
-		if (iomObj.getattrcount() == 0){
-			return;
-		}
-		String restrictedAttrName = existenceConstraint.getRestrictedAttribute().getLastPathEl().getName();
-		if(iomObj.getattrvaluecount(restrictedAttrName)==0){
-			return;
-		}
-		Type type = existenceConstraint.getRestrictedAttribute().getType();
-		// if type of alias, cast type to TypeAlias
-		if (type instanceof TypeAlias){
-			TypeAlias aliasType = (TypeAlias) type;
-			Domain domainAliasing = (Domain) aliasType.getAliasing();
-			type = (Type) domainAliasing.getType();
-		}
-		Iterator<ObjectPath> requiredInIterator = existenceConstraint.iteratorRequiredIn();
-		boolean valueExists = false;
-		Table classA = null;
-		Table otherClass = null;
-		while (requiredInIterator.hasNext()) {
-			classA = null;
-			ObjectPath attrName = (ObjectPath)requiredInIterator.next();
-			otherClass = (Table) attrName.getRoot();
-			String otherAttrName = attrName.toString();
-			String attrValueThisObj = iomObj.getattrvalue(otherAttrName);
-			for (String basketId : objectPool.getBasketIds()){
-				// iterate through iomObjects
-				Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
-				while (objectIterator.hasNext()){
-					IomObject otherIomObj = objectIterator.next();
-					if (otherIomObj.getattrcount() == 0){
-					// do not validate.
-					} else {
-						Object modelElement=tag2class.get(otherIomObj.getobjecttag());
-						classA= (Table) modelElement;
-						// otherAttr defined?
-						if(otherIomObj.getattrvaluecount(otherAttrName)>0){
-							// validate if otherClass is extending by classA
-							if (classA.isExtending(otherClass)){
-								// if type is type of alias, validate instance of
-								if(type instanceof ReferenceType){
-									ReferenceType referenceType = (ReferenceType) type;
-									valueExists = equalsReferenceValue(iomObj, referenceType, otherIomObj, otherAttrName, restrictedAttrName);
-								} else if (type instanceof CoordType){
-									CoordType coordType = (CoordType) type;
-									valueExists = equalsCoordValue(iomObj, coordType, otherIomObj, otherAttrName, restrictedAttrName);
-								} else if (type instanceof PolylineType){
-									PolylineType polylineType = (PolylineType) type;
-									valueExists = equalsPolylineValue(iomObj, polylineType, otherIomObj, otherAttrName, restrictedAttrName);
-								} else if (type instanceof SurfaceOrAreaType){
-									SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
-									valueExists = equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, otherAttrName, restrictedAttrName);
-								} else if (type instanceof CompositionType){
-									CompositionType compositionType = (CompositionType) type;
-									valueExists = equalsCompositionValue(iomObj, compositionType, otherIomObj, otherAttrName, restrictedAttrName);
-								} else {
-									// if type is not type of alias, validate attribute names
-									if(otherIomObj.getattrvalue(otherAttrName).equals(iomObj.getattrvalue(restrictedAttrName))){
-										valueExists = true;
+		} else {
+			if (iomObj.getattrcount() == 0){
+				return;
+			}
+			if(!constraints.contains(existenceConstraint+":"+constraintName)){
+				constraints.add(existenceConstraint+":"+constraintName);
+				errs.addEvent(errFact.logInfoMsg("validate existence constraint {0}...",getScopedName(existenceConstraint)));
+			}
+			String restrictedAttrName = existenceConstraint.getRestrictedAttribute().getLastPathEl().getName();
+			if(iomObj.getattrvaluecount(restrictedAttrName)==0){
+				return;
+			}
+			Type type = existenceConstraint.getRestrictedAttribute().getType();
+			// if type of alias, cast type to TypeAlias
+			if (type instanceof TypeAlias){
+				TypeAlias aliasType = (TypeAlias) type;
+				Domain domainAliasing = (Domain) aliasType.getAliasing();
+				type = (Type) domainAliasing.getType();
+			}
+			Iterator<ObjectPath> requiredInIterator = existenceConstraint.iteratorRequiredIn();
+			boolean valueExists = false;
+			Table classA = null;
+			Table otherClass = null;
+			while (requiredInIterator.hasNext()) {
+				classA = null;
+				ObjectPath attrName = (ObjectPath)requiredInIterator.next();
+				otherClass = (Table) attrName.getRoot();
+				String otherAttrName = attrName.toString();
+				String attrValueThisObj = iomObj.getattrvalue(otherAttrName);
+				for (String basketId : objectPool.getBasketIds()){
+					// iterate through iomObjects
+					Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
+					while (objectIterator.hasNext()){
+						IomObject otherIomObj = objectIterator.next();
+						if (otherIomObj.getattrcount() == 0){
+						// do not validate.
+						} else {
+							Object modelElement=tag2class.get(otherIomObj.getobjecttag());
+							classA= (Table) modelElement;
+							// otherAttr defined?
+							if(otherIomObj.getattrvaluecount(otherAttrName)>0){
+								// validate if otherClass is extending by classA
+								if (classA.isExtending(otherClass)){
+									// if type is type of alias, validate instance of
+									if(type instanceof ReferenceType){
+										ReferenceType referenceType = (ReferenceType) type;
+										valueExists = equalsReferenceValue(iomObj, referenceType, otherIomObj, otherAttrName, restrictedAttrName);
+									} else if (type instanceof CoordType){
+										CoordType coordType = (CoordType) type;
+										valueExists = equalsCoordValue(iomObj, coordType, otherIomObj, otherAttrName, restrictedAttrName);
+									} else if (type instanceof PolylineType){
+										PolylineType polylineType = (PolylineType) type;
+										valueExists = equalsPolylineValue(iomObj, polylineType, otherIomObj, otherAttrName, restrictedAttrName);
+									} else if (type instanceof SurfaceOrAreaType){
+										SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
+										valueExists = equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, otherAttrName, restrictedAttrName);
+									} else if (type instanceof CompositionType){
+										CompositionType compositionType = (CompositionType) type;
+										valueExists = equalsCompositionValue(iomObj, compositionType, otherIomObj, otherAttrName, restrictedAttrName);
+									} else {
+										// if type is not type of alias, validate attribute names
+										if(otherIomObj.getattrvalue(otherAttrName).equals(iomObj.getattrvalue(restrictedAttrName))){
+											valueExists = true;
+										}
 									}
 								}
 							}
@@ -1669,13 +1682,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 				}
 			}
-		}
-		if (!valueExists){
-			String msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
-			if(msg!=null && msg.length()>0){
-				logMsg(checkConstraint,msg);
-			} else {
-				logMsg(checkConstraint,"The value of the attribute {0} of {1} was not found in the condition class.", restrictedAttrName.toString(), iomObj.getobjecttag().toString());
+			if (!valueExists){
+				String msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
+				if(msg!=null && msg.length()>0){
+					logMsg(checkConstraint,msg);
+				} else {
+					logMsg(checkConstraint,"The value of the attribute {0} of {1} was not found in the condition class.", restrictedAttrName.toString(), iomObj.getobjecttag().toString());
+				}
 			}
 		}
 	}
