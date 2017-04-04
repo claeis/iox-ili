@@ -127,9 +127,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private Map<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	private HashMap<Constraint,Viewable> additionalConstraints=new HashMap<Constraint,Viewable>();
 	private Map<PlausibilityConstraint, PlausibilityPoolValue> plausibilityConstraints=new LinkedHashMap<PlausibilityConstraint, PlausibilityPoolValue>();
-	private HashSet<String> validationConfigOff =new HashSet<String>();
-	private HashSet<String> constraints=new HashSet<String>();
-	private HashSet<String> abstractLeafElement=new HashSet<String>();
+	private HashSet<String> configOffOufputReduction =new HashSet<String>();
+	private HashSet<String> constraintOutputReduction=new HashSet<String>();
+	private HashSet<String> datatypesOutputReduction=new HashSet<String>();
 	
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -313,8 +313,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						checkConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
 					}
 					if(ValidationConfig.OFF.equals(checkConstraint)){
-						if(!validationConfigOff.contains(ValidationConfig.CHECK+":"+constraintName)){
-							validationConfigOff.add(ValidationConfig.CHECK+":"+constraintName);
+						if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
+							configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
 							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check= off", constraintName));
 						}
 					}else{
@@ -352,19 +352,29 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String getScopedName(Viewable viewable) {
 		return viewable.getContainer().getScopedName(null)+"."+viewable.getName();
 	}
-	private boolean isBasketSame(RoleDef role, ReferenceType ref,String bidOfTargetObject){
-		if(!currentBasketId.equals(bidOfTargetObject)){
-			if(role != null){
-				if(role.isExternal()){
-					return false;
-				}
-			} else if(ref != null){
-				if(ref.isExternal()){
-					return false;
-				}
+	
+	private boolean isBasketSame(String bidOfTargetObject, IomObject iomObj){
+		if(iomObj==null){
+			return false;
+		}
+		Object modelElement=tag2class.get(iomObj.getobjecttag());
+		Viewable classOfCurrentObj = (Viewable) modelElement;
+		String oid = iomObj.getobjectoid();
+		// instanceof association
+		if(oid==null){
+			oid=ObjectPool.getAssociationId(iomObj, (AssociationDef) modelElement);
+		}
+		String objectBid = objectPool.getBidOfObject(oid, classOfCurrentObj);		
+		if(objectBid==null){
+			return false;
+		} else {
+			if(objectBid.equals(bidOfTargetObject)){
+				// bid's are same
+				return true;
 			}
 		}
-		return true;
+		// bid's are different
+		return false;
 	}
 
 	private void iterateThroughAllObjects(){
@@ -430,13 +440,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				while (attrIterator.hasNext()) {
 					ViewableTransferElement objA = attrIterator.next();
 					if (objA.obj instanceof LocalAttribute){
-						Type type = ((LocalAttribute)objA.obj).getDomain();
+						LocalAttribute attr = (LocalAttribute)objA.obj;
+						String attrName=attr.getName();
+						Type type = attr.getDomain();
 						// composition
 						if (type instanceof CompositionType){
-							IomObject structValue = iomObj.getattrobj(iomObj.getattrname(0), 0);
 							CompositionType compositionType = (CompositionType) type;
 							Table structure = compositionType.getComponentType();
-							validateReferenceAttrs(structValue, structure);
+							// bid of iomObject
+							String objectBid = objectPool.getBidOfObject(iomObj.getobjectoid(), classOfCurrentObj);
+							int structc=iomObj.getattrvaluecount(attrName);
+							 for(int structi=0;structi<structc;structi++){
+								 IomObject structValue=iomObj.getattrobj(attrName, structi);
+								validateReferenceAttrs(structValue, structure, objectBid);
+							}
 						}
 					}else if(objA.obj instanceof RoleDef){
 						RoleDef roleDef = (RoleDef) objA.obj;
@@ -463,8 +480,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				errs.addEvent(errFact.logInfoMsg("validate set constraint {0}...",getScopedName(setConstraint)));
 			}
 			if(ValidationConfig.OFF.equals(setConstraint)){
-				if(!validationConfigOff.contains(ValidationConfig.CHECK+":"+getScopedName(setConstraint))){
-					validationConfigOff.add(ValidationConfig.CHECK+":"+getScopedName(setConstraint));
+				if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+getScopedName(setConstraint))){
+					configOffOufputReduction.add(ValidationConfig.CHECK+":"+getScopedName(setConstraint));
 					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", getScopedName(setConstraint)));
 				}
 			}else{
@@ -507,13 +524,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				checkConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
 			}
 			if(ValidationConfig.OFF.equals(checkConstraint)){
-				if(!validationConfigOff.contains(ValidationConfig.CHECK+":"+constraintName)){
-					validationConfigOff.add(ValidationConfig.CHECK+":"+constraintName);
+				if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
+					configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
 					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName));
 				}
 			}else{
-				if(!constraints.contains(constraint+":"+constraintName)){
-					constraints.add(constraint+":"+constraintName);
+				if(!constraintOutputReduction.contains(constraint+":"+constraintName)){
+					constraintOutputReduction.add(constraint+":"+constraintName);
 					errs.addEvent(errFact.logInfoMsg("validate plausibility constraint {0}...",getScopedName(constraintEntry.getKey())));
 				}
 				String msg=validationConfig.getConfigValue(getScopedName(constraintEntry.getKey()), ValidationConfig.MSG);
@@ -549,8 +566,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			checkUniqueConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
 		}
 		if(ValidationConfig.OFF.equals(checkUniqueConstraint)){
-			if(!validationConfigOff.contains(ValidationConfig.CHECK+":"+constraintName)){
-				validationConfigOff.add(ValidationConfig.CHECK+":"+constraintName);
+			if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
+				configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
 				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
 			}
 		}else{
@@ -630,13 +647,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			checkConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
 		}
 		if(ValidationConfig.OFF.equals(checkConstraint)){
-			if(!validationConfigOff.contains(ValidationConfig.CHECK+":"+getScopedName(setConstraintObj))){
-				validationConfigOff.add(ValidationConfig.CHECK+":"+getScopedName(setConstraintObj));
+			if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+getScopedName(setConstraintObj))){
+				configOffOufputReduction.add(ValidationConfig.CHECK+":"+getScopedName(setConstraintObj));
 				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", getScopedName(setConstraintObj)));
 			}
 		}else{
-			if(!constraints.contains(setConstraintObj+":"+constraintName)){
-				constraints.add(setConstraintObj+":"+constraintName);
+			if(!constraintOutputReduction.contains(setConstraintObj+":"+constraintName)){
+				constraintOutputReduction.add(setConstraintObj+":"+constraintName);
 				errs.addEvent(errFact.logInfoMsg("validate plausibility constraint {0}...",getScopedName(setConstraintObj)));
 			}
 			if(objs!=null && objs.size()>0){
@@ -674,13 +691,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			checkConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
 		}
 		if(ValidationConfig.OFF.equals(checkConstraint)){
-			if(!validationConfigOff.contains(ValidationConfig.CHECK+":"+constraintName)){
-				validationConfigOff.add(ValidationConfig.CHECK+":"+constraintName);
+			if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
+				configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
 				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName));
 			}
 		} else {
-			if(!constraints.contains(mandatoryConstraintObj+":"+constraintName)){
-				constraints.add(mandatoryConstraintObj+":"+constraintName);
+			if(!constraintOutputReduction.contains(mandatoryConstraintObj+":"+constraintName)){
+				constraintOutputReduction.add(mandatoryConstraintObj+":"+constraintName);
 				errs.addEvent(errFact.logInfoMsg("validate mandatory constraint {0}...",getScopedName(mandatoryConstraintObj)));
 			}
 			Evaluable condition = (Evaluable) mandatoryConstraintObj.getCondition();
@@ -1440,8 +1457,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		roleQName = getScopedName(role);
 		String multiplicity=validationConfig.getConfigValue(roleQName, ValidationConfig.MULTIPLICITY);
 		if(multiplicity != null && ValidationConfig.OFF.equals(multiplicity)){
-			if(!validationConfigOff.contains(ValidationConfig.MULTIPLICITY+":"+roleQName)){
-				validationConfigOff.add(ValidationConfig.MULTIPLICITY+":"+roleQName);
+			if(!configOffOufputReduction.contains(ValidationConfig.MULTIPLICITY+":"+roleQName)){
+				configOffOufputReduction.add(ValidationConfig.MULTIPLICITY+":"+roleQName);
 				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration multiplicity=off", roleQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 			}
 		}else{
@@ -1461,21 +1478,23 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private void validateRoleReference(RoleDef role, IomObject iomObj) {
+	private void validateRoleReference(RoleDef role, IomObject iomObj){
+		Object modelElement=tag2class.get(iomObj.getobjecttag());
+		Viewable classObj = (Viewable) modelElement;
 		String roleQName = getScopedName(role);
 		String validateTarget=null;
 		if(!enforceTargetValidation){
 			validateTarget=validationConfig.getConfigValue(roleQName, ValidationConfig.TARGET);
 		}
 		if(ValidationConfig.OFF.equals(validateTarget)){
-			if(!validationConfigOff.contains(ValidationConfig.TARGET+":"+roleQName)){
-				validationConfigOff.add(ValidationConfig.TARGET+":"+roleQName);
-				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration target=off", roleQName, iomObj.getobjectoid()));
+			if(!configOffOufputReduction.contains(ValidationConfig.TARGET+":"+roleQName)){
+				configOffOufputReduction.add(ValidationConfig.TARGET+":"+roleQName);
+				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration target=off", roleQName));
 			}
 		}else{
-			if(!abstractLeafElement.contains(role+":"+roleQName)){
-				abstractLeafElement.add(role+":"+roleQName);
-				errs.addEvent(errFact.logInfoMsg("validate role reference {0}...",getScopedName(role)));
+			if(!datatypesOutputReduction.contains(roleQName)){
+				datatypesOutputReduction.add(roleQName);
+				errs.addEvent(errFact.logInfoMsg("validate role reference {0}...",roleQName));
 			}
 			String targetOid = null;
 			// role of iomObj
@@ -1492,6 +1511,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			ArrayList<Viewable> destinationClasses = new ArrayList<Viewable>();
 			StringBuffer possibleTargetClasses=new StringBuffer();
 			String sep="";
+			// find target classes.
 			while(targetClassIterator.hasNext()){
 				Viewable roleDestinationClass = (Viewable) targetClassIterator.next();
 				destinationClasses.add(roleDestinationClass);
@@ -1499,11 +1519,36 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				sep=",";
 				possibleTargetClasses.append(roleDestinationClass.getScopedName(null));
 			}
-			Holder<String> bid = new Holder<String>();
-			IomObject targetObj = (IomObject) objectPool.getObject(targetOid, destinationClasses, bid);
+			Holder<String> bidOfTargetObj = new Holder<String>();
+			IomObject targetObj = (IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
+			String oid = iomObj.getobjectoid();
+			if(oid==null){
+				oid=ObjectPool.getAssociationId(iomObj, (AssociationDef) modelElement);
+			}
+			String bidOfObj = objectPool.getBidOfObject(oid, classObj);
+			if(!role.isExternal()){
+				if(targetOid!=null){
+					if(isBasketSame(bidOfObj, targetObj)){
+						if(targetObj!=null){
+							// target object exists.
+						} else {
+							// no object with this oid found
+							logMsg(validateTarget,"No object found with OID {0}.", targetOid);
+							return;
+						}
+					} else {
+						// no object with this oid found
+						logMsg(validateTarget,"No object found with OID {0} in basket {1}.", targetOid,bidOfObj);
+						return;
+					}
+				}
+			}else{
+				// EXTERNAL
+				// call custom function to verify in external data pool
+			}
 			if(targetObj != null){
-				Object modelElement=tag2class.get(targetObj.getobjecttag());
-				Viewable targetObjClass = (Viewable) modelElement;
+				Object modelEle=tag2class.get(targetObj.getobjecttag());
+				Viewable targetObjClass = (Viewable) modelEle;
 				for(Viewable destinationClass : destinationClasses){
 					if(targetObjClass.equals(destinationClass)){
 						// target is ok
@@ -1515,83 +1560,99 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 					}
 				}
-				if(isBasketSame(role, null,bid.value)){
-					// object found, but wrong class
-					logMsg(validateTarget,"Object {1} with OID {0} must be of {2}", targetOid,targetObj.getobjecttag(),possibleTargetClasses.toString());
-					return;
-				}
-			}
-			if(isBasketSame(role, null,bid.value)){
-				// no object with this oid found
-				logMsg(validateTarget,"No object found with OID {0}.", targetOid);
+				//wrong class of target object (typ false)
+				logMsg(validateTarget,"wrong class {0} of target object {1} for role {2}.", getScopedName(targetObjClass),targetOid, getScopedName(role));
+				return;
 			}
 		}
 	}
 	
-	private void validateReferenceAttrs(IomObject structValue, Table structure) {
+	private void validateReferenceAttrs(IomObject iomStruct, Table structure, String bidOfObj){
 		Iterator attrIter=structure.getAttributesAndRoles();
 		while (attrIter.hasNext()){
 			Object refAttrO = attrIter.next();
 			if (refAttrO instanceof LocalAttribute){
-				Type type = ((LocalAttribute)refAttrO).getDomain();
-				// ReferenceType validation
+				LocalAttribute refAttr = (LocalAttribute)refAttrO;
+				Type type = refAttr.getDomain();
 				if (type instanceof ReferenceType){
-					// targettype
 					ReferenceType refAttrType = (ReferenceType) type;
-					AbstractClassDef targetClass = refAttrType.getReferred();
-					Viewable targetViewable = (Viewable) targetClass;
-					ArrayList<Viewable> destinationClasses = new ArrayList<Viewable>();
-					destinationClasses.add(targetViewable);
-					String refAttrName = ((Element) refAttrO).getName();
-					IomObject refAttrValue = structValue.getattrobj(refAttrName, 0);
-					if (refAttrValue != null){
-						String targetOid = refAttrValue.getobjectrefoid();
-						String targetObjOid = null;
+					String validateTarget=null;
+					String attrQName=getScopedName(refAttr);
+					if(!enforceTargetValidation){
+						validateTarget=validationConfig.getConfigValue(attrQName, ValidationConfig.TARGET);
+					}
+					if(ValidationConfig.OFF.equals(validateTarget)){
+						if(!configOffOufputReduction.contains(ValidationConfig.TARGET+":"+attrQName)){
+							configOffOufputReduction.add(ValidationConfig.TARGET+":"+attrQName);
+							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration target=off", attrQName));
+						}
+					}else{
+						if(!datatypesOutputReduction.contains(attrQName)){
+							datatypesOutputReduction.add(attrQName);
+							errs.addEvent(errFact.logInfoMsg("validate reference attr {0}...",attrQName));
+						}
+						AbstractClassDef targetClass = refAttrType.getReferred();
+						ArrayList<Viewable> destinationClasses = new ArrayList<Viewable>();
+						destinationClasses.add(targetClass);
+						IomObject refAttrStruct = iomStruct.getattrobj(refAttr.getName(), 0);
+						String targetOid = null;
+						if(refAttrStruct!=null){
+							targetOid=refAttrStruct.getobjectrefoid();
+						}
 						String targetObjClassStr = null;
-						Holder<String> bid = new Holder<String>();
-						IomObject iomObj = (IomObject) objectPool.getObject(targetOid, destinationClasses, bid);
-						if(iomObj != null){
-							Object modelElement=tag2class.get(iomObj.getobjecttag());
-							Table targetObjClass = (Table) modelElement;
-							targetObjClassStr = iomObj.getobjecttag();
-							targetObjOid = iomObj.getobjectoid().toString();
-							Iterator refAttrIter = refAttrType.iteratorRestrictedTo();
-							// if refAttrIter restricted to class
-							if(refAttrIter.hasNext()){
-								StringBuffer classNames=new StringBuffer();
-								String sep="";
-								while (refAttrIter.hasNext()){
-									Object refAttr = refAttrIter.next();
-									targetClass = (Table) refAttr;
-									// compare class
-									if (targetObjClass.isExtending(targetClass)){
-										// ok
-										return;
+						Holder<String> bidOfTargetObj = new Holder<String>();
+						IomObject targetObject = null;
+						if(targetOid!=null){
+							targetObject=(IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
+						}
+						// EXTERNAL
+						if(!refAttrType.isExternal()){
+							if(targetOid!=null){
+								if(targetObject!=null){
+									if(isBasketSame(bidOfObj, targetObject)){
+										// target object exists in correct basket
 									} else {
-										// try next restriction
+										// no object with this oid found
+										logMsg(validateTarget,"No object found with OID {0} in basket {1}.", targetOid,bidOfObj);
+										return;
 									}
-									classNames.append(sep);
-									classNames.append(targetClass.getScopedName(null));
-									sep=", ";
-								}
-								if(isBasketSame(null, refAttrType,bid.value)){
-									errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,classNames.toString(),refAttrName));
+								}else{
+									// no object with this oid found
+									logMsg(validateTarget,"No object found with OID {0}.", targetOid);
 									return;
 								}
-							}else{
+							}
+						} else {
+							// EXTERNAL true.
+						}
+						if(targetObject != null){
+							// target object exist
+							Object modelEle=tag2class.get(targetObject.getobjecttag());
+							Table targetObjClass = (Table) modelEle;
+							targetObjClassStr = targetObject.getobjecttag();
+							// if refAttrIter restricted to class
+							StringBuffer classNames=new StringBuffer();
+							String sep="";
+							Iterator refAttrRestrictionIter = refAttrType.iteratorRestrictedTo();
+							while (refAttrRestrictionIter.hasNext()){
+								Object refAttrRestriction = refAttrRestrictionIter.next();
+								targetClass = (Table) refAttrRestriction;
 								// compare class
 								if (targetObjClass.isExtending(targetClass)){
 									// ok
+									return;
 								} else {
-									if(isBasketSame(null, refAttrType,bid.value)){
-										errs.addEvent(errFact.logErrorMsg("object {0} with OID {1} referenced by {3} is not an instance of {2}.", targetObjClassStr,targetObjOid,targetClass.getScopedName(null),refAttrName));
-									}
+									// try next restriction
 								}
-								return;
+								classNames.append(sep);
+								classNames.append(targetClass.getScopedName(null));
+								sep=", ";
 							}
-						} else {
-							if(isBasketSame(null, refAttrType,bid.value)){
-								errs.addEvent(errFact.logErrorMsg("attribute {1} references an inexistent object with OID {0}.", targetOid,refAttrName));
+							// compare class
+							if (targetObjClass.isExtending(targetClass) || targetObjClass.equals(targetClass)){
+								// ok
+							} else {
+								logMsg(validateTarget,"wrong class {0} of target object {1} for reference attr {2}.", getScopedName(targetObjClass),targetOid, getScopedName(refAttr));
 							}
 						}
 					}
@@ -1607,16 +1668,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			checkConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
 		}
 		if(ValidationConfig.OFF.equals(checkConstraint)){
-			if(!validationConfigOff.contains(ValidationConfig.CHECK+":"+constraintName)){
-				validationConfigOff.add(ValidationConfig.CHECK+":"+constraintName);
+			if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
+				configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
 				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName));
 			}
 		} else {
 			if (iomObj.getattrcount() == 0){
 				return;
 			}
-			if(!constraints.contains(existenceConstraint+":"+constraintName)){
-				constraints.add(existenceConstraint+":"+constraintName);
+			if(!constraintOutputReduction.contains(existenceConstraint+":"+constraintName)){
+				constraintOutputReduction.add(existenceConstraint+":"+constraintName);
 				errs.addEvent(errFact.logInfoMsg("validate existence constraint {0}...",getScopedName(existenceConstraint)));
 			}
 			String restrictedAttrName = existenceConstraint.getRestrictedAttribute().getLastPathEl().getName();
@@ -2308,8 +2369,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if (type instanceof CompositionType){
 			 int structc=iomObj.getattrvaluecount(attrName);
 				if(ValidationConfig.OFF.equals(validateMultiplicity)){
-					if(!validationConfigOff.contains(ValidationConfig.MULTIPLICITY+":"+attrQName)){
-						validationConfigOff.add(ValidationConfig.MULTIPLICITY+":"+attrQName);
+					if(!configOffOufputReduction.contains(ValidationConfig.MULTIPLICITY+":"+attrQName)){
+						configOffOufputReduction.add(ValidationConfig.MULTIPLICITY+":"+attrQName);
 						errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration multiplicity=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 					}
 				}else{
@@ -2321,8 +2382,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			 for(int structi=0;structi<structc;structi++){
 				 IomObject structEle=iomObj.getattrobj(attrName, structi);
 					if(ValidationConfig.OFF.equals(validateType)){
-						if(!validationConfigOff.contains(ValidationConfig.TYPE+":"+attrQName)){
-							validationConfigOff.add(ValidationConfig.TYPE+":"+attrQName);
+						if(!configOffOufputReduction.contains(ValidationConfig.TYPE+":"+attrQName)){
+							configOffOufputReduction.add(ValidationConfig.TYPE+":"+attrQName);
 							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration type=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 						}
 					}else{
@@ -2348,8 +2409,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			 }
 		}else{
 			if(ValidationConfig.OFF.equals(validateMultiplicity)){
-				if(!validationConfigOff.contains(ValidationConfig.MULTIPLICITY+":"+attrQName)){
-					validationConfigOff.add(ValidationConfig.MULTIPLICITY+":"+attrQName);
+				if(!configOffOufputReduction.contains(ValidationConfig.MULTIPLICITY+":"+attrQName)){
+					configOffOufputReduction.add(ValidationConfig.MULTIPLICITY+":"+attrQName);
 					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration multiplicity=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 				}
 			}else{
@@ -2377,8 +2438,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 			if(ValidationConfig.OFF.equals(validateType)){
-				if(!validationConfigOff.contains(ValidationConfig.TYPE+":"+attrQName)){
-					validationConfigOff.add(ValidationConfig.TYPE+":"+attrQName);
+				if(!configOffOufputReduction.contains(ValidationConfig.TYPE+":"+attrQName)){
+					configOffOufputReduction.add(ValidationConfig.TYPE+":"+attrQName);
 					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration type=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 				}
 			}else{

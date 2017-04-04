@@ -101,7 +101,25 @@ public class ObjectPool {
 	public Set<String> getBasketIds(){
 		return collectionOfBaskets.keySet();
 	}
-
+	
+	public String getBidOfObject(String oid, Viewable classObj){
+		for(String basketId : collectionOfBaskets.keySet()){
+			Map<ObjectPoolKey, IomObject> collectionOfObjects = collectionOfBaskets.get(basketId);
+			if(doItfOidPerTable){
+				IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, classObj, basketId));
+				if(object != null){
+					return basketId;
+				}
+			} else {
+				IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, null, basketId));
+				if(object != null){
+					return basketId;
+				}
+			}
+		}
+		return null;
+	}
+	
 	public IomObject getObject(String oid, ArrayList<Viewable> classes, Holder<String> retBasketId) {
 		for(String basketId : collectionOfBaskets.keySet()){
 			Map<ObjectPoolKey, IomObject> collectionOfObjects = collectionOfBaskets.get(basketId);

@@ -90,7 +90,7 @@ public class Configuration10Test {
 		// Asserts
 		assertEquals(0, logger.getErrs().size());
 		assertEquals(1, logger.getWarn().size());
-		assertEquals("No object found with OID o1.", logger.getWarn().get(0).getEventMsg());
+		assertEquals("No object found with OID o1 in basket b1.", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler geworfen wird, wenn die Klasse nicht gefunden werden kann und die multiplicität auf off gestellt ist.

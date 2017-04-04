@@ -223,35 +223,6 @@ public class Association23Test {
 		// Asserts
 		assertEquals(0,logger.getErrs().size());
 	}
-
-	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE über den Rollennamen: e1,
-	// Von der KlasseE eine Beziehung zur KlasseF über den Rollennamen: f1,
-	// je, 1 Mal besteht soll eine Fehlermeldung ausgegeben werden,
-	// wenn die Objekte sich in unterschiedlichen Baskets befinden und External false ist.
-	@Test
-	public void standAloneExternalFalse_False(){ //FIXME Sollte False ergeben.
-		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OBJ_OID1);
-		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OBJ_OID2);
-		Iom_jObject iomLinkEF=new Iom_jObject(ILI_ASSOC_EF1, null);
-		iomLinkEF.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
-		iomLinkEF.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjE));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID2));
-		validator.validate(new ObjectEvent(iomObjF));
-		validator.validate(new ObjectEvent(iomLinkEF));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertEquals(0,logger.getErrs().size());
-	}
 	
 	// Wenn in einer Stand Alone Association von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a1,
 	// Von der Klasse A eine Beziehung zur KlasseB über den Rollennamen: b1,
@@ -333,12 +304,10 @@ public class Association23Test {
 	}
 	
 	// Wenn in einer Embedded Association von der KlasseH eine Beziehung zur KlasseG über den Rollennamen: g1,
-	// 1 Mal besteht soll eine Fehlermeldung ausgegeben werden,
-	// wenn die Objekte sich in unterschiedlichen Baskets befinden und External false ist.
+	// die Klasse nicht gefunden werden kann, die Rolle: External=True ist, soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void embeddedExternalFalseDiffBasket_False(){ //FIXME Soll false sein.
-		Iom_jObject iomObjG=new Iom_jObject(ILI_CLASSG, OBJ_OID1);
-		Iom_jObject iomObjH1=new Iom_jObject(ILI_CLASSH, OBJ_OID2);
+	public void embeddedExternalTrue_Ok(){ //FIXME darf keinen Fehler ergeben! --> ok
+		Iom_jObject iomObjH1=new Iom_jObject("Association23.TopicB.ClassH", OBJ_OID2);
 		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -347,14 +316,60 @@ public class Association23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjG));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID2));
 		validator.validate(new ObjectEvent(iomObjH1));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(0,logger.getErrs().size());
+	}
+	
+	// External=true, Objects in different Baskets.
+	// Ergibt einen Fehler! Da jedoch External=true ist, wird dieser nicht ausgegeben.
+	@Test
+	public void embeddedExternalTrueDiffBasket_Ok(){ //FIXME darf keinen Fehler ergeben! --> ok.
+		Iom_jObject iomObjG1=new Iom_jObject("Association23.TopicB.ClassG", OBJ_OID1);
+		Iom_jObject iomObjH1=new Iom_jObject("Association23.TopicB.ClassH", OBJ_OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjG1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
+	}
+	
+	// External=false, Objects in different Baskets.
+	// Ergibt einen Fehler!
+	@Test
+	public void embeddedExternalFalseDiffBasket_False(){ //FIXME muss einen Fehler ergeben! --> ok
+		Iom_jObject iomObjG1=new Iom_jObject("Association23.Topic.ClassG", OBJ_OID1);
+		Iom_jObject iomObjH1=new Iom_jObject("Association23.Topic.ClassH", OBJ_OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjG1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("No object found with OID o1 in basket b1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE über den Rollennamen: e1,
@@ -466,6 +481,36 @@ public class Association23Test {
 	//#########################################################//
 	//############# FAIL EMBEDDED CARDINALITY #################//
 	//#########################################################//		
+	
+	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE über den Rollennamen: e1,
+	// Von der KlasseE eine Beziehung zur KlasseF über den Rollennamen: f1,
+	// je, 1 Mal besteht soll eine Fehlermeldung ausgegeben werden,
+	// wenn die Objekte sich in unterschiedlichen Baskets befinden und External false ist.
+	@Test
+	public void standAloneExternalFalse_False(){
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OBJ_OID1);
+		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OBJ_OID2);
+		Iom_jObject iomLinkEF=new Iom_jObject(ILI_ASSOC_EF1, null);
+		iomLinkEF.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
+		iomLinkEF.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjF));
+		validator.validate(new ObjectEvent(iomLinkEF));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1,logger.getErrs().size());
+		assertEquals("No object found with OID o1 in basket b2.", logger.getErrs().get(0).getEventMsg());
+	}	
 	
 	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a1, 0 bis 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
 	@Test
@@ -651,7 +696,7 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Object Association23.Topic.ClassD with OID o1 must be of Association23.Topic.ClassA", logger.getErrs().get(0).getEventMsg());
+		assertEquals("wrong class Association23.Topic.ClassD of target object o1 for role Association23.Topic.ab1.a1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird eine Fehlermeldung ausgegeben wenn in einer StandAlone Association eine falsche Kardinalität von e1 erstellt wurde.
@@ -694,7 +739,7 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("No object found with OID o3 in basket b1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Die KlasseA mit der OID a1, verbindet über die Klasse: classBp mit der OID b1.
@@ -717,7 +762,7 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Object Association23.Topic.ClassCp with OID o1 must be of Association23.Topic.ClassA", logger.getErrs().get(0).getEventMsg());
+		assertEquals("wrong class Association23.Topic.ClassCp of target object o1 for role Association23.Topic.abp1.ap1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die Klasse der referenzierten oid: oid3, der Association abp3, nicht exisitiert.
@@ -739,7 +784,7 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("No object found with OID o3 in basket b1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Die Klasse der von der Association referenzierten oid2, existiert nicht.
@@ -764,7 +809,7 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("No object found with OID o3 in basket b1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Multiplizität der Rolle Maximal 1 sein darf, jedoch 5 Objekte erstellt wurden.

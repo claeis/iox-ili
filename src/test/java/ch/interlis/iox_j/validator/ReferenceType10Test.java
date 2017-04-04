@@ -133,7 +133,7 @@ public class ReferenceType10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1, logger.getErrs().size());
-		assertEquals("No object found with OID o1.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("No object found with OID o1 in basket b1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Referenzklasse falsch ist.
@@ -158,7 +158,7 @@ public class ReferenceType10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1, logger.getErrs().size());
-		assertEquals("No object found with OID o2.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("No object found with OID o2 in basket b1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn eine Klasse mit einer Referenz zu 3 Mal der gleichen Klasse referenziert.
@@ -208,7 +208,7 @@ public class ReferenceType10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1, logger.getErrs().size());
-		assertEquals("No object found with OID o1.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("No object found with OID o1 in basket b1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler geworfen wird, wenn multiplicity eingeschalten wird und die Oid's identisch sind.
@@ -262,7 +262,7 @@ public class ReferenceType10Test {
 		// Asserts
 		assertEquals(3, logger.getErrs().size());
 		assertEquals("The OID o2 of object 'ReferenceType10.TopicA.ClassC oid o2 {attrC1 -> o1 REF {}}' already exists in CLASS ReferenceType10.TopicA.ClassC.", logger.getErrs().get(0).getEventMsg());
-		assertEquals("No object found with OID o1.", logger.getErrs().get(1).getEventMsg());
+		assertEquals("No object found with OID o1 in basket b1.", logger.getErrs().get(1).getEventMsg());
 		assertEquals("attrC1 should associate 1 to 1 target objects (instead of 2)", logger.getErrs().get(2).getEventMsg());
 	}
 }

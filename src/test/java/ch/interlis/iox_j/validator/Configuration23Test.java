@@ -254,7 +254,7 @@ public class Configuration23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Object Configuration23.Topic.ClassA with OID o3 must be of Configuration23.Topic.ClassC", logger.getWarn().get(0).getEventMsg());
+		assertEquals("wrong class Configuration23.Topic.ClassA of target object o3 for role Configuration23.Topic.cd1.c1.", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Config MULTIPLICITY=warning. Es soll eine Warnung ausgegeben werden.
@@ -1271,7 +1271,7 @@ public class Configuration23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("No object found with OID o3.", logger.getWarn().get(0).getEventMsg());
+		assertEquals("No object found with OID o3 in basket b1.", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// target=OFF.
@@ -1453,7 +1453,7 @@ public class Configuration23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 		assertTrue(logger.getWarn().size()==2);
-		assertEquals("No object found with OID o5.",logger.getWarn().get(0).getEventMsg());
+		assertEquals("No object found with OID o5 in basket b1.",logger.getWarn().get(0).getEventMsg());
 		assertEquals("t1 should associate 1 to 1 target objects (instead of 2)",logger.getWarn().get(1).getEventMsg());
 	}
 }
