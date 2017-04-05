@@ -2,6 +2,12 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.16.0-master (2017-04-05)
+-----------------------------
+- validator: fixed: switching constraint check off
+- validator: fixed: role EXTERNAL handling in cardinality and reference
+- validator: optimized: constraint error messages
+
 iox-ili 1.16.0 (2017-03-26)
 -----------------------------
 - ItfReader: generate BID as $dataset.$topicname if datasetName known
