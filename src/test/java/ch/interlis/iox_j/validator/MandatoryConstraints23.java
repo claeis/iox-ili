@@ -38,6 +38,7 @@ public class MandatoryConstraints23 {
 	private final static String ILI_CLASSEQUALATIOND=TOPIC+".ClassEqualationD";
 	private final static String ILI_CLASSEQUALATIONE=TOPIC+".ClassEqualationE";
 	private final static String ILI_CLASSEQUALATIONF=TOPIC+".ClassEqualationF";
+	private final static String ILI_CLASSEQUALATIONF2=TOPIC+".ClassEqualationF2";
 	private final static String ILI_CLASSEQUALATIONG=TOPIC+".ClassEqualationG";
 	private final static String ILI_CLASSEQUALATIONH=TOPIC+".ClassEqualationH";
 	private final static String ILI_CLASSEQUALATIONI=TOPIC+".ClassEqualationI";
@@ -260,6 +261,23 @@ public class MandatoryConstraints23 {
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}	
+	@Test
+	public void decEqual_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF2, OID);
+		iomObjA.setattrvalue("attr1", "2.0");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();

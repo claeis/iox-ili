@@ -107,6 +107,11 @@ MODEL MandatoryConstraints23
 			MANDATORY CONSTRAINT
 			attr1 == attr2;
 		END ClassEqualationF;
+		CLASS ClassEqualationF2 =
+			attr1 : 0.0..10.0;
+			MANDATORY CONSTRAINT
+			attr1 == 2.0;
+		END ClassEqualationF2;
 		
 		CLASS ClassEqualationNot =
 			attr1 : 0..10;
