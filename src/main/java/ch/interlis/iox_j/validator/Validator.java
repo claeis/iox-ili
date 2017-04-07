@@ -986,7 +986,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			} else if (constantObj instanceof Constant.Numeric){
 				Constant.Numeric numericConstant = (Constant.Numeric) constantObj;
 				if(numericConstant!=null){
-					return new Value(Integer.valueOf(numericConstant.getValue().toString()));
+					return new Value(texttype, numericConstant.getValue().toString());
 				}
 			} else if (constantObj instanceof Constant.Class){
 				Constant.Class classConstant = (Constant.Class) constantObj;
@@ -2316,7 +2316,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	// viewable aClass
 	private String validateUnique(IomObject currentObject,ArrayList<String>uniqueAttrs, Holder<AttributeArray> values) {
-		
+				
 		int sizeOfUniqueAttribute = uniqueAttrs.size();
 		ArrayList<String> accu = new ArrayList<String>();
 		for (int i=1;i<sizeOfUniqueAttribute;i++){

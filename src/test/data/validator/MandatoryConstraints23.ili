@@ -62,149 +62,150 @@ MODEL MandatoryConstraints23
 			aufzaehlung1 == #mehr.vier;
 		END ClassConstantJ;
 		
-		CLASS ClassEqualationA =
+		CLASS ClassEqualA =
 			straightsarcs1 : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
 			arcsstraights2 : POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Hkoord;
 			MANDATORY CONSTRAINT
 		   straightsarcs1 == arcsstraights2;
-		END ClassEqualationA;
+		END ClassEqualA;
 		
-		CLASS ClassEqualationB =
+		CLASS ClassEqualB =
 			surface1 : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 			surface2 : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 			MANDATORY CONSTRAINT
 		    surface1 == surface2;
-		END ClassEqualationB;
+		END ClassEqualB;
 		
-		CLASS ClassEqualationC =
+		CLASS ClassEqualC =
 			area1 : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 			area2 : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 			MANDATORY CONSTRAINT
 		    area1 == area2;
-		END ClassEqualationC;
+		END ClassEqualC;
 		
-		CLASS ClassEqualationD =
+		CLASS ClassEqualD =
 		   straights2d1 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
 		   straights2d2 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
 		   arcs2d1 : POLYLINE WITH (ARCS) VERTEX Lkoord;
 		   arcs2d2 : POLYLINE WITH (ARCS) VERTEX Lkoord;
 		   MANDATORY CONSTRAINT
 		   (straights2d1 == straights2d2) == (arcs2d1 == arcs2d2);
-		END ClassEqualationD;
+		END ClassEqualD;
 		
-		CLASS ClassEqualationE =
+		CLASS ClassEqualE =
 			attr1 : Lkoord;
 			attr2 : Lkoord;
 			attr3 : Lkoord;
 			attr4 : Lkoord;
 			MANDATORY CONSTRAINT
 			(attr1 == attr2) == (attr3 == attr4);
-		END ClassEqualationE;
+		END ClassEqualE;
 		
-		CLASS ClassEqualationF =
-			attr1 : 0..10;
-			attr2 : 0..10;
+		CLASS ClassEqualF =
+			attr1 : 0.0..10.0;
+			attr2 : 0.0..10.0;
 			MANDATORY CONSTRAINT
 			attr1 == attr2;
-		END ClassEqualationF;
-		CLASS ClassEqualationF2 =
+		END ClassEqualF;
+		
+		CLASS ClassEqualF2 =
 			attr1 : 0.0..10.0;
 			MANDATORY CONSTRAINT
 			attr1 == 2.0;
-		END ClassEqualationF2;
+		END ClassEqualF2;
 		
-		CLASS ClassEqualationNot =
+		CLASS ClassEqualNot =
 			attr1 : 0..10;
 			attr2 : 0..10;
 			MANDATORY CONSTRAINT
 			attr1 == attr2;
-		END ClassEqualationNot;
+		END ClassEqualNot;
 		
-		CLASS ClassEqualationG =
+		CLASS ClassEqualG =
 			attr1 : TEXT*10;
 			attr2 : TEXT*10;
 			MANDATORY CONSTRAINT
 			attr1 == attr2;
-		END ClassEqualationG;
+		END ClassEqualG;
 		
-		CLASS ClassEqualationH =
+		CLASS ClassEqualH =
 			aufzaehlung1 : enumeration;
 			aufzaehlung2 : enumeration;
 			MANDATORY CONSTRAINT
 			aufzaehlung1 == aufzaehlung2;
-		END ClassEqualationH;
+		END ClassEqualH;
 		
-		CLASS ClassEqualationI =
+		CLASS ClassEqualI =
 			attr1 : BOOLEAN;
 			attr2 : BOOLEAN;
 			MANDATORY CONSTRAINT
 			attr1 == attr2;
-		END ClassEqualationI;
+		END ClassEqualI;
 		
-		CLASS ClassInEqualationA =
+		CLASS ClassUnEqualA =
 			attr1 : TEXT*10;
 			attr2 : TEXT*10;
 			MANDATORY CONSTRAINT
 			attr1 != attr2;
-		END ClassInEqualationA;
+		END ClassUnEqualA;
 				
-		CLASS ClassInEqualationB =
+		CLASS ClassUnEqualB =
 			attr1 : 0..10;
 			attr2 : 0..10;
 			MANDATORY CONSTRAINT
 			attr1 != attr2;
-		END ClassInEqualationB;
+		END ClassUnEqualB;
 		
-		CLASS ClassInEqualationC =
+		CLASS ClassUnEqualC =
 			aufzaehlung1 : enumeration;
 			aufzaehlung2 : enumeration;
 			MANDATORY CONSTRAINT
 			aufzaehlung1 != aufzaehlung2;
-		END ClassInEqualationC;
+		END ClassUnEqualC;
 		
-		CLASS ClassInEqualationD =
+		CLASS ClassUnEqualD =
 			attr1 : Lkoord;
 			attr2 : Lkoord;
 			attr3 : Lkoord;
 			attr4 : Lkoord;
 			MANDATORY CONSTRAINT
 			(attr1 == attr2) != (attr3 == attr4);
-		END ClassInEqualationD;
+		END ClassUnEqualD;
 		
-		CLASS ClassInEqualationE =
+		CLASS ClassUnEqualE =
 		   straights2d1 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
 		   straights2d2 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
 		   MANDATORY CONSTRAINT
 		   (straights2d1 != straights2d2);
-		END ClassInEqualationE;
+		END ClassUnEqualE;
 		
-		CLASS ClassInEqualationF =
+		CLASS ClassUnEqualF =
 			straightsarcs1 : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
 			arcsstraights2 : POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Hkoord;
 			MANDATORY CONSTRAINT
 		   straightsarcs1 != arcsstraights2;
-		END ClassInEqualationF;
+		END ClassUnEqualF;
 		
-		CLASS ClassInEqualationG =
+		CLASS ClassUnEqualG =
 			surface1 : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 			surface2 : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 			MANDATORY CONSTRAINT
 		    surface1 != surface2;
-		END ClassInEqualationG;
+		END ClassUnEqualG;
 		
-		CLASS ClassInEqualationH =
+		CLASS ClassUnEqualH =
 			area1 : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 			area2 : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 			MANDATORY CONSTRAINT
 		    area1 != area2;
-		END ClassInEqualationH;
+		END ClassUnEqualH;
 		
-		CLASS ClassInEqualationI =
+		CLASS ClassUnEqualI =
 			attr1 : BOOLEAN;
 			attr2 : BOOLEAN;
 			MANDATORY CONSTRAINT
 			attr1 <> attr2;
-		END ClassInEqualationI;
+		END ClassUnEqualI;
 
 		CLASS ClassGreaterThanA =
 			attr1 : 0..10;
