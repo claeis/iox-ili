@@ -28,6 +28,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	public static final String TARGET="target";
 	public static final String MSG="msg";
 	public static final String CHECK = "check";
+	public static final String KEYMSG = "keymsg";
 	public static final String ILI_METAATTR_PREFIX="ilivalid.";
 	// SETTINGS
 	public static final String WARNING="warning";

@@ -155,6 +155,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(errFact.getLogger()==null){
 			errFact.setLogger(errs);
 		}
+		if(errFact.getValidationConfig()==null){
+			errFact.setValidationConfig(validationConfig);
+		}
+		
 		this.config=config;
 		this.pipelinePool=pipelinePool;
 		objPoolManager=new ObjectPoolManager();

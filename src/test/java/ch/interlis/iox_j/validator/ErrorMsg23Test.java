@@ -1,8 +1,10 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -10,6 +12,7 @@ import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iox.IoxLogEvent;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
@@ -25,12 +28,18 @@ public class ErrorMsg23Test {
 	// CLASSES
 	private final static String ILI_CLASSA="ErrorMsgTest23.Topic.ClassA";
 	private static final String ILI_CLASSA_ATTRA = "attrA";
+	private static final String ILI_CLASSA_ATTRA2 = "attrA2";
 	private final static String ILI_CLASSA_POINT="point";
 	private final static String ILI_CLASSA_LINE="line";
 	private final static String ILI_CLASSA_SURFACE="surface";
 	private static final String ILI_CLASSC = "ErrorMsgTest23.Topic.ClassC";
 	private static final String ILI_CLASSC_ATTRC1 = "attrC1";
 	private static final String ILI_CLASSC_ATTRC2 = "attrC2";
+	private static final String ILI_CLASSC_ATTRC3 = "attrC3";
+	private final static String ILI_CLASSD="ErrorMsgTest23.Topic.ClassD";
+	private static final String ILI_CLASSD_ATTRA = "attrA";
+	private static final String ILI_CLASSD_ATTRA2 = "attrA2";
+	private static final String ILI_CLASSD_CONSTRA = ILI_CLASSD+".constrA";
 	// STRUCTS
 	private static final String ILI_STRUCTB = "ErrorMsgTest23.Topic.StructB";
 	private static final String ILI_STRUCTB_POINT = "point";
@@ -199,4 +208,47 @@ public class ErrorMsg23Test {
 		assertEquals(new Double(480001.000),logger.getErrs().get(0).getGeomC1());
 		assertEquals(new Double(70001.000),logger.getErrs().get(0).getGeomC2());
 	}
+	@Test
+	public void keymsgParam_Fail(){
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
+		iomObj.setattrvalue(ILI_CLASSA_ATTRA, "true");
+		iomObj.setattrvalue(ILI_CLASSA_ATTRA2, "TestKey");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ILI_CLASSA, ValidationConfig.KEYMSG, "Key {"+ILI_CLASSA_ATTRA2+"}");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		IoxLogEvent err = logger.getErrs().get(0);
+		assertEquals("Key TestKey",err.getSourceObjectUsrId());
+	}
+	@Test
+	public void msgParam_Fail(){
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSD, OID);
+		iomObj.setattrvalue(ILI_CLASSD_ATTRA, "0");
+		iomObj.setattrvalue(ILI_CLASSD_ATTRA2, "TestKey");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ILI_CLASSD_CONSTRA, ValidationConfig.MSG, "Msg {"+ILI_CLASSD_ATTRA2+"}");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		IoxLogEvent err = logger.getErrs().get(0);
+		assertEquals("Msg TestKey",err.getEventMsg());
+	}
+
 }

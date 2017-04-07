@@ -5,7 +5,9 @@ import java.util.Date;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxLogEvent;
 import ch.interlis.iox.IoxLogging;
+import ch.interlis.iox.IoxValidationConfig;
 import ch.interlis.iox_j.IoxInvalidDataException;
+import ch.interlis.iox_j.validator.ValidationConfig;
 
 public class LogEventFactory {
 	private String dataSource=null;
@@ -14,6 +16,20 @@ public class LogEventFactory {
 	private Double coordX=null;
 	private Double coordY=null;
 	private Double coordZ=null;
+	IoxValidationConfig validConfig=null;
+	public LogEventFactory()
+	{
+	}
+	public LogEventFactory(IoxValidationConfig validConfig)
+	{
+		this.validConfig=validConfig;
+	}
+	public void setValidationConfig(IoxValidationConfig validConfig){
+		this.validConfig=validConfig;
+	}
+	public IoxValidationConfig getValidationConfig(){
+		return validConfig;
+	}
 	public void setDataSource(String dataSource) {
 		this.dataSource = dataSource;
 	}
@@ -114,7 +130,13 @@ public class LogEventFactory {
 		return new LogEventImpl(dataSource,new Date(),eventId,eventKind,msg,ex.getCause(),lineNumber,iliqName,null,null,tid,null,coordX,coordY,coordZ,getCallerOrigin());
 	}
 	private String getObjectUsrId(IomObject iomObj) {
-		// TODO Auto-generated method stub
+		String keymsg=null;
+		if(validConfig!=null){
+			keymsg=validConfig.getConfigValue(iomObj.getobjecttag(), ValidationConfig.KEYMSG);
+		}
+		if(keymsg!=null){
+			return formatMessage(keymsg, iomObj);
+		}
 		return null;
 	}
 	private String getObjectTechId(IomObject iomObj) {
