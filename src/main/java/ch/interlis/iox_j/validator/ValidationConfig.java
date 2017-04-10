@@ -21,18 +21,21 @@ import com.moandjiezana.toml.Toml;
 
 public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	private HashMap<String,HashMap<String,String>> data=new HashMap<String,HashMap<String,String>>();
+	// CONFIG
 	public static final String MULTIPLICITY="multiplicity";
 	public static final String TYPE="type";
 	public static final String TOPOLOGY="topology";
 	public static final String TARGET="target";
 	public static final String MSG="msg";
+	public static final String CHECK = "check";
+	public static final String KEYMSG = "keymsg";
+	public static final String ILI_METAATTR_PREFIX="ilivalid.";
+	// SETTINGS
 	public static final String WARNING="warning";
 	public static final String OFF="off";
 	public static final String ON="on";
-	public static final String CHECK = "check";
-	public static final String ILI_METAATTR_PREFIX="ilivalid.";
-	public static final String PARAMETER = "PARAMETER";
 	// PARAMETER
+	public static final String PARAMETER = "PARAMETER";
 	public static final String VALIDATION = "validation";
 	public static final String AREA_OVERLAP_VALIDATION = "areaOverlapValidation";
 	public static final String DEFAULT_GEOMETRY_TYPE_VALIDATION = "defaultGeometryTypeValidation";

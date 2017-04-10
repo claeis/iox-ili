@@ -996,84 +996,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn 4 Mal die falschen Attribute erstellt werden.
-	@Test
-	public void configOFFConstraintFalseAttrs_Ok() throws Exception{
-		Iom_jObject objCondition=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", OID1);
-		objCondition.setattrvalue("attr1", "other");
-		Iom_jObject objCondition2=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass2", OID2);
-		objCondition2.setattrvalue("attr1", "other");
-		Iom_jObject objC=new Iom_jObject("ExistenceConstraints23.Topic.ClassC", OID3);
-		objC.setattrvalue("attr1", "this");
-		objC.setattrvalue("attr2", "this");
-		objC.setattrvalue("attr3", "this");
-		objC.setattrvalue("attr4", "this");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC", ValidationConfig.CHECK,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
-		validator.validate(new ObjectEvent(objCondition));
-		validator.validate(new ObjectEvent(objCondition2));
-		validator.validate(new ObjectEvent(objC));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht übereinstimmen und die Konfiguration der Constraints auf OFF steht.
-	@Test
-	public void configOFFConstraintFalseInSameModel_Ok() throws Exception{
-		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass",OID1);
-		objBedingung.setattrvalue("attr1", "other");
-		Iom_jObject objA=new Iom_jObject("ExistenceConstraints23.Topic.ClassA", OID2);
-		objA.setattrvalue("attr5", "lars");
-		objA.setattrvalue("attr2", "20");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassA", ValidationConfig.CHECK,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
-		validator.validate(new ObjectEvent(objBedingung));
-		validator.validate(new ObjectEvent(objA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	// Es soll getestet werden, ob eine Fehlermeldung, wenn die beiden constraint Attribute nicht übereinstimmen und die Konfiguration Constraints auf OFF gestellt wurde.
-	@Test
-	public void confingOFFConstraintInOtherModel_Ok() throws Exception {
-		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClass", OID1);
-		objBedingung.setattrvalue("attr1", "lars");
-		Iom_jObject objB=new Iom_jObject("ExistenceConstraints23.Topic.ClassB", OID2);
-		objB.setattrvalue("attr1", "ben");
-		objB.setattrvalue("attr2", "20");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassB", ValidationConfig.CHECK,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic",BID1));
-		validator.validate(new ObjectEvent(objBedingung));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID2));
-		validator.validate(new ObjectEvent(objB));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
+
 	//############################################################
 	//################ FAIL TESTS ################################
 	//############################################################
@@ -1087,56 +1010,6 @@ public class ExistenceConstraints23Test {
 		objA.setattrvalue("attr5", "lars");
 		objA.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
-		validator.validate(new ObjectEvent(objBedingung));
-		validator.validate(new ObjectEvent(objA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht übereinstimmen und validationConfig msg nicht leer ist.
-	@Test
-	public void sameModelDifferentAttrs_MSGNotEmpty_Fail() throws Exception{
-		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", OID1);
-		objBedingung.setattrvalue("attr1", "other");
-		Iom_jObject objA=new Iom_jObject("ExistenceConstraints23.Topic.ClassA", OID2);
-		objA.setattrvalue("attr5", "lars");
-		objA.setattrvalue("attr2", "20");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassA"+".Constraint1", ValidationConfig.MSG, "My own error message.");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
-		validator.validate(new ObjectEvent(objBedingung));
-		validator.validate(new ObjectEvent(objA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("My own error message.", logger.getErrs().get(0).getEventMsg());
-	}
-
-	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht übereinstimmen und validationConfig msg leer ist.
-	@Test
-	public void sameModelDifferentAttrs_MSGIsEmpty_Fail() throws Exception{
-		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", OID1);
-		objBedingung.setattrvalue("attr1", "other");
-		Iom_jObject objA=new Iom_jObject("ExistenceConstraints23.Topic.ClassA", OID2);
-		objA.setattrvalue("attr5", "lars");
-		objA.setattrvalue("attr2", "20");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassA", ValidationConfig.MSG, "");
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1811,7 +1684,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute surface3d of ExistenceConstraints23Coords.Topic.ClassSurface3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Bereiche constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polygone constraint Attribute nicht übereinstimmen.
 	@Test
 	public void diffModels2dArea_Fail(){
 		Iom_jObject objSurfaceSuccessCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassArea", OID1);
@@ -1995,93 +1868,5 @@ public class ExistenceConstraints23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("The value of the attribute area3d of ExistenceConstraints23Coords.Topic.ClassArea3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es soll getestet werden, ob eine Fehlermeldung oder eine Warnung ausgegeben wird, wenn die beiden constraint Attribute nicht übereinstimmen und die Konfiguration Warning eingeschalten wurde.
-	@Test
-	public void configWARNINGConstraintFalseInSameModel_Fail() throws Exception{
-		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", OID1);
-		objBedingung.setattrvalue("attr1", "other");
-		Iom_jObject objA=new Iom_jObject("ExistenceConstraints23.Topic.ClassA", OID2);
-		objA.setattrvalue("attr5", "lars");
-		objA.setattrvalue("attr2", "20");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassA", ValidationConfig.CHECK,ValidationConfig.WARNING);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
-		validator.validate(new ObjectEvent(objBedingung));
-		validator.validate(new ObjectEvent(objA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertTrue(logger.getErrs().size()==0);
-		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
-	}
-	
-	// Es soll getestet werden, ob eine Fehlermeldung oder eine Warnung ausgegeben wird, wenn die beiden constraint Attribute nicht übereinstimmen und die Konfiguration Warning eingeschalten wurde.
-	@Test
-	public void configWARNINGConstraintInOtherModel_Fail() throws Exception {
-		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClass", OID1);
-		objBedingung.setattrvalue("attr1", "lars");
-		Iom_jObject objB=new Iom_jObject("ExistenceConstraints23.Topic.ClassB", OID2);
-		objB.setattrvalue("attr1", "ben");
-		objB.setattrvalue("attr2", "20");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassB", ValidationConfig.CHECK,ValidationConfig.WARNING);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic",BID1));
-		validator.validate(new ObjectEvent(objBedingung));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID2));
-		validator.validate(new ObjectEvent(objB));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertTrue(logger.getErrs().size()==0);
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
-	}
-	
-	// Es soll getestet werden, ob eine Fehlermeldung oder eine Warnung ausgegeben wird, wenn 4 constraint Attribute nicht übereinstimmen und die Konfiguration Warning eingeschalten wurde.
-	@Test
-	public void configWARNINGConstraint4Fails_Fail() throws Exception{
-		Iom_jObject objCondition=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", OID1);
-		objCondition.setattrvalue("attr1", "other");
-		Iom_jObject objCondition2=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass2", OID2);
-		objCondition2.setattrvalue("attr1", "other");
-		Iom_jObject objC=new Iom_jObject("ExistenceConstraints23.Topic.ClassC", OID3);
-		objC.setattrvalue("attr1", "this");
-		objC.setattrvalue("attr2", "this");
-		objC.setattrvalue("attr3", "this");
-		objC.setattrvalue("attr4", "this");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("ExistenceConstraints23.Topic.ClassC", ValidationConfig.CHECK,ValidationConfig.WARNING);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
-		validator.validate(new ObjectEvent(objCondition));
-		validator.validate(new ObjectEvent(objCondition2));
-		validator.validate(new ObjectEvent(objC));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getWarn().size()==4);
-		assertTrue(logger.getErrs().size()==0);
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassC was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
-		assertEquals("The value of the attribute attr2 of ExistenceConstraints23.Topic.ClassC was not found in the condition class.", logger.getWarn().get(1).getEventMsg());
-		assertEquals("The value of the attribute attr3 of ExistenceConstraints23.Topic.ClassC was not found in the condition class.", logger.getWarn().get(2).getEventMsg());
-		assertEquals("The value of the attribute attr4 of ExistenceConstraints23.Topic.ClassC was not found in the condition class.", logger.getWarn().get(3).getEventMsg());
 	}
 }

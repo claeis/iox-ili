@@ -16,7 +16,7 @@ public class Value {
 	private boolean booleanIsDefined=false;
 	private boolean booleanValue;
 	// numeric
-	private int numeric=0;
+	private double numeric=0;
 	private boolean numericIsDefined=false;
 	// type & value
 	private Type type=null;
@@ -36,7 +36,7 @@ public class Value {
 		booleanIsDefined = true;
 	}
 	
-	public Value(int numeric){
+	public Value(double numeric){
 		this.numeric = numeric;
 		numericIsDefined = true;
 	}
@@ -102,7 +102,7 @@ public class Value {
 		return value;
 	}
 	
-	public int getNumeric(){
+	public double getNumeric(){
 		if(skipEvaluation()){
 			throw new IllegalArgumentException();
 		}
@@ -161,7 +161,7 @@ public class Value {
 	}
 	
 	// compare in appropriate type.
-	public int compareTo(Value other){
+	public double compareTo(Value other){
 		// if value is error, return exception.
 		if(skipEvaluation() || other.skipEvaluation()){
 			throw new IllegalArgumentException();
@@ -189,7 +189,7 @@ public class Value {
 		// intercept value
 		if(this.value!=null && other.value!=null){
 			if(type instanceof NumericType){
-				return Integer.valueOf(value).compareTo(Integer.valueOf(other.value));
+				return Double.valueOf(value).compareTo(Double.valueOf(other.value));
 			// intercept text
 			} else if(type instanceof TextType){
 				return value.compareTo(other.value);
@@ -203,7 +203,7 @@ public class Value {
 				if(enumeration.isOrdered() && !enumeration.isCircular()){
 					int thisIndex = enumeration.getValues().indexOf(this.value);
 					int otherIndex = enumeration.getValues().indexOf(other.value);
-					return compareInteger(thisIndex, otherIndex);
+					return compareDouble(thisIndex, otherIndex);
 				} else {
 					// if ordered = false (==, !=, <>)
 					return this.value.compareTo(other.value);
@@ -211,11 +211,11 @@ public class Value {
 			}
 		// intercept numeric
 		} else if(this.numericIsDefined && other.numericIsDefined){
-			return compareInteger(numeric, other.numeric);
+			return compareDouble(numeric, other.numeric);
 		} else if(this.numericIsDefined && other.value!=null){
-			return compareInteger(numeric, Integer.valueOf(other.value));
+			return compareDouble(numeric, Double.valueOf(other.value));
 		} else if(this.value!=null && other.numericIsDefined){
-			return compareInteger(Integer.valueOf(this.value), other.numeric);
+			return compareDouble(Double.valueOf(this.value), other.numeric);
 		} else if(this.viewable!=null && other.viewable!=null){
 			return compareViewable(this.viewable, other.viewable);
 		}else if(this.value==null && other.value==null){
@@ -233,7 +233,7 @@ public class Value {
 		return (otherValue == thisValue ? 0 : (thisValue ? 1 : -1));
 	}
 
-	private int compareInteger(int thisVal, int anotherVal) {
+	private double compareDouble(double thisVal, double anotherVal) {
 		return (thisVal<anotherVal ? -1 : (thisVal==anotherVal ? 0 : 1));
 	}
 

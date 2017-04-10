@@ -72,6 +72,7 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 	private HashMap<String,StartBasketEvent> startBasketEvents=new HashMap<String,StartBasketEvent>();
 	private HashMap<String,EndBasketEvent> endBasketEvents=new HashMap<String,EndBasketEvent>();
 	private String currentTopic=null;
+	private Model currentModel=null;
 	
 	/** Creates a new writer.
 	 * @param out Output stream to write to
@@ -141,9 +142,10 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 			currentTopic = ((StartBasketEvent)event).getType();
 			if(topics==null){
 				topics=new HashSet<String>();
-				Model model=td.getLastModel();
+				String currentModelName=currentTopic.substring(0,currentTopic.indexOf('.'));
+				currentModel=(Model) td.getElement(Model.class,currentModelName);
 				// FORALL topics
-				Iterator topici=model.iterator();
+				Iterator topici=currentModel.iterator();
 				while(topici.hasNext()){
 				  Object tObj=topici.next();
 				  if (tObj instanceof Topic){
@@ -190,123 +192,124 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 			endBasketEvents.put(currentTopic,(EndBasketEvent)event);
 			currentTopic=null;
 		}else if(event instanceof EndTransferEvent){
-			Model model=td.getLastModel();
-			String modelName=model.getName();
-			// FORALL topics
-			Iterator topici=model.iterator();
-			while(topici.hasNext()){
-			  Object tObj=topici.next();
-			  if (tObj instanceof Topic){
-				  Topic topic=(Topic)tObj;
-				  String topicName=topic.getName();
-				  String topicQName=topic.getScopedName(null);
-				  if(startBasketEvents.containsKey(topicQName)){
-						// write saved StartBasketEvent
-					  	out.write(startBasketEvents.get(topicQName));
-						// setup list of itf tables
-						itftablev=ModelUtilities.getItfTables(td,modelName,topicName);
-						// FORALL tables
-						for(Object tableo:itftablev){
-							if(!(tableo instanceof Table)){
-								continue;
-							}
-							Table table=(Table)tableo;
-							String tableQName=table.getScopedName(null);
-							ArrayList<AttributeDef> areaAttrs=new ArrayList<AttributeDef>();
-							ArrayList<AttributeDef> surfaceAttrs=new ArrayList<AttributeDef>();
-							getPolygonAttrs(table,areaAttrs, surfaceAttrs);
-							// IF Table without surface or area attrs
-							if(areaAttrs.size()==0 && surfaceAttrs.size()==0){
-								// write objects
-								java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-								for(String poolId : pool.keySet()){
-									IomObject iomObj=pool.get(poolId);
-									out.write(new ObjectEvent(iomObj));
+			if(currentModel!=null){
+				String modelName=currentModel.getName();
+				// FORALL topics
+				Iterator topici=currentModel.iterator();
+				while(topici.hasNext()){
+				  Object tObj=topici.next();
+				  if (tObj instanceof Topic){
+					  Topic topic=(Topic)tObj;
+					  String topicName=topic.getName();
+					  String topicQName=topic.getScopedName(null);
+					  if(startBasketEvents.containsKey(topicQName)){
+							// write saved StartBasketEvent
+						  	out.write(startBasketEvents.get(topicQName));
+							// setup list of itf tables
+							itftablev=ModelUtilities.getItfTables(td,modelName,topicName);
+							// FORALL tables
+							for(Object tableo:itftablev){
+								if(!(tableo instanceof Table)){
+									continue;
 								}
-							}else{
-								// write area helper tables
-								// FORALL area attrs
-								for(AttributeDef attr:areaAttrs){
-									String attrName=attr.getName();
-									String lineTableName=tableQName+"_"+attrName;
-									EhiLogger.logState("build linetable "+lineTableName+"...");
-									ItfAreaPolygon2Linetable allLines=new ItfAreaPolygon2Linetable(recman);
-									// FORALL main objects
-									java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-									for(String mainObjTid : pool.keySet()){
-										IomObject iomObj=pool.get(mainObjTid);
-										IomObject iomPolygon=iomObj.getattrobj(attrName, 0);
-										if(iomPolygon!=null){
-											String internalTid=iomObj.getattrvalue(INTERNAL_T_ID);
-											// get lines
-											ArrayList<IomObject> lines=ItfAreaPolygon2Linetable.getLinesFromPolygon(iomPolygon);
-											allLines.addLines(mainObjTid,internalTid,lines);
-										}
-									}
-									// nodes it / check noding
-									// polygonize
-									// write line objects
-									for(IomObject line:allLines.getLines()){
-										IomObject lineTableObj=new Iom_jObject(lineTableName, Long.toString(++maxOid));
-										String iomAttrName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableGeomAttrName(attr);
-										lineTableObj.addattrobj(iomAttrName, line);
-										out.write(new ObjectEvent(lineTableObj));
-									}
-								}
-								// write main table
-								{
-									// FORALL main objects
+								Table table=(Table)tableo;
+								String tableQName=table.getScopedName(null);
+								ArrayList<AttributeDef> areaAttrs=new ArrayList<AttributeDef>();
+								ArrayList<AttributeDef> surfaceAttrs=new ArrayList<AttributeDef>();
+								getPolygonAttrs(table,areaAttrs, surfaceAttrs);
+								// IF Table without surface or area attrs
+								if(areaAttrs.size()==0 && surfaceAttrs.size()==0){
+									// write objects
 									java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
 									for(String poolId : pool.keySet()){
 										IomObject iomObj=pool.get(poolId);
-										// FORALL area attrs
-										for(AttributeDef attr:areaAttrs){
-											String attrName=attr.getName();
-											// set georef into main object
-											IomObject iomPolygon=iomObj.getattrobj(attrName, 0);
-											if(iomPolygon!=null){
-												// calc geo ref
-												Polygon polygon=Iox2jtsext.surface2JTS(iomPolygon, 0.0);
-												Coordinate geoRef=polygon.getInteriorPoint().getCoordinate();
-												iomObj.changeattrobj(attrName, 0,Jtsext2iox.JTS2coord(geoRef));
-											}
-										}
-										// write main object
 										out.write(new ObjectEvent(iomObj));
 									}
-								}
-								// write surface helper tables
-								// FORALL surface attrs
-								for(AttributeDef attr:surfaceAttrs){
-									String attrName=attr.getName();
-									String lineTableName=tableQName+"_"+attrName;
-									EhiLogger.logState("build linetable "+lineTableName+"...");
-									// FORALL main objects
-									java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
-									for(String poolId : pool.keySet()){
-										IomObject iomObj=pool.get(poolId);
+								}else{
+									// write area helper tables
+									// FORALL area attrs
+									for(AttributeDef attr:areaAttrs){
+										String attrName=attr.getName();
+										String lineTableName=tableQName+"_"+attrName;
+										EhiLogger.logState("build linetable "+lineTableName+"...");
+										ItfAreaPolygon2Linetable allLines=new ItfAreaPolygon2Linetable(recman);
+										// FORALL main objects
+										java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
+										for(String mainObjTid : pool.keySet()){
+											IomObject iomObj=pool.get(mainObjTid);
+											IomObject iomPolygon=iomObj.getattrobj(attrName, 0);
+											if(iomPolygon!=null){
+												String internalTid=iomObj.getattrvalue(INTERNAL_T_ID);
+												// get lines
+												ArrayList<IomObject> lines=ItfAreaPolygon2Linetable.getLinesFromPolygon(iomPolygon);
+												allLines.addLines(mainObjTid,internalTid,lines);
+											}
+										}
+										// nodes it / check noding
+										// polygonize
 										// write line objects
-										IomObject polygon=iomObj.getattrobj(attrName, 0);
-										if(polygon!=null){
-											ArrayList<IomObject> lines=ItfAreaPolygon2Linetable.getLinesFromPolygon(polygon);
-											for(IomObject line:lines){
-												IomObject lineTableObj=new Iom_jObject(lineTableName, Long.toString(++maxOid));
-												String iomAttrName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableGeomAttrName(attr);
-												String fkName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableMainTableRef(attr);
-												lineTableObj.addattrobj(iomAttrName, line);
-												IomObject refvalue=lineTableObj.addattrobj(fkName,"REF");
-												refvalue.setobjectrefoid(iomObj.getobjectoid());
-												out.write(new ObjectEvent(lineTableObj));
+										for(IomObject line:allLines.getLines()){
+											IomObject lineTableObj=new Iom_jObject(lineTableName, Long.toString(++maxOid));
+											String iomAttrName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableGeomAttrName(attr);
+											lineTableObj.addattrobj(iomAttrName, line);
+											out.write(new ObjectEvent(lineTableObj));
+										}
+									}
+									// write main table
+									{
+										// FORALL main objects
+										java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
+										for(String poolId : pool.keySet()){
+											IomObject iomObj=pool.get(poolId);
+											// FORALL area attrs
+											for(AttributeDef attr:areaAttrs){
+												String attrName=attr.getName();
+												// set georef into main object
+												IomObject iomPolygon=iomObj.getattrobj(attrName, 0);
+												if(iomPolygon!=null){
+													// calc geo ref
+													Polygon polygon=Iox2jtsext.surface2JTS(iomPolygon, 0.0);
+													Coordinate geoRef=polygon.getInteriorPoint().getCoordinate();
+													iomObj.changeattrobj(attrName, 0,Jtsext2iox.JTS2coord(geoRef));
+												}
+											}
+											// write main object
+											out.write(new ObjectEvent(iomObj));
+										}
+									}
+									// write surface helper tables
+									// FORALL surface attrs
+									for(AttributeDef attr:surfaceAttrs){
+										String attrName=attr.getName();
+										String lineTableName=tableQName+"_"+attrName;
+										EhiLogger.logState("build linetable "+lineTableName+"...");
+										// FORALL main objects
+										java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
+										for(String poolId : pool.keySet()){
+											IomObject iomObj=pool.get(poolId);
+											// write line objects
+											IomObject polygon=iomObj.getattrobj(attrName, 0);
+											if(polygon!=null){
+												ArrayList<IomObject> lines=ItfAreaPolygon2Linetable.getLinesFromPolygon(polygon);
+												for(IomObject line:lines){
+													IomObject lineTableObj=new Iom_jObject(lineTableName, Long.toString(++maxOid));
+													String iomAttrName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableGeomAttrName(attr);
+													String fkName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableMainTableRef(attr);
+													lineTableObj.addattrobj(iomAttrName, line);
+													IomObject refvalue=lineTableObj.addattrobj(fkName,"REF");
+													refvalue.setobjectrefoid(iomObj.getobjectoid());
+													out.write(new ObjectEvent(lineTableObj));
+												}
 											}
 										}
 									}
 								}
 							}
-						}
-						// write saved EndBasketEvent
-					  	out.write(endBasketEvents.get(topicQName));
+							// write saved EndBasketEvent
+						  	out.write(endBasketEvents.get(topicQName));
+					  }
 				  }
-			  }
+				}
 			}
 			// write EndTransferEvent
 			out.write(event);

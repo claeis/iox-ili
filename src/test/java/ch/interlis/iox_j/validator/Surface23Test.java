@@ -44,7 +44,7 @@ public class Surface23Test {
 	//////////////////////////////// SUCCESSFUL Tests ////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn diese an einem Punkt sich überschneidet.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn diese an einem Punkt sich überschneidet.
 	@Test
 	public void surfaceOberlabedOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -122,7 +122,7 @@ public class Surface23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn  sie 2 Innerboundaries besitzt, welche sich nicht überschneiden.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn  sie 2 Innerboundaries besitzt, welche sich nicht überschneiden.
 	@Test
 	public void surface2Innerboundaries_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -229,7 +229,7 @@ public class Surface23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn  sie 2 Innerboundaries besitzt, welche sich nur an einem Punkt berühren.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn  sie 2 Innerboundaries besitzt, welche sich nur an einem Punkt berühren.
 	@Test
 	public void surfaceInnerboundariesTouchOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -336,7 +336,7 @@ public class Surface23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn sie an einem Punkt sich berührt.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn sie an einem Punkt sich berührt.
 	@Test
 	public void surfaceOberlabedOn1Point3d_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -426,7 +426,7 @@ public class Surface23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn  sie 2 innerboundaries besitzt, welche sich nicht berühren.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn  sie 2 innerboundaries besitzt, welche sich nicht berühren.
 	@Test
 	public void surface3d2Innerboundaries_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -551,7 +551,7 @@ public class Surface23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn  sie 2 Innerboundaries besitzt, welche sich an 1 Punkt berühren.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn  sie 2 Innerboundaries besitzt, welche sich an 1 Punkt berühren.
 	@Test
 	public void surface3dTouchOfInnerboundariesOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -676,7 +676,7 @@ public class Surface23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn  sie 2 Boundaries beinhaltet.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn  sie 2 Boundaries beinhaltet.
 	@Test
 	public void surface2Boundaries2d_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -754,7 +754,7 @@ public class Surface23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden in 2d.
+	// Es wird getestet, ob eine Polygon erstellt werden in 2d.
 	@Test
 	public void surface2D_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -802,7 +802,7 @@ public class Surface23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Oberfläche mit einem Kreisbogen erstellt werden kann.
+	// Es wird getestet, ob eine Polygon mit einem Kreisbogen erstellt werden kann.
 	@Test
 	public void surfaceWithArc2d_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -838,7 +838,7 @@ public class Surface23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn  sie eine Boundary besitzt.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn  sie eine Boundary besitzt.
 	@Test
 	public void surfaceWith1Boundary3d_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -892,7 +892,7 @@ public class Surface23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn  sie 2 Boundaries 3d beinhaltet.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn  sie 2 Boundaries 3d beinhaltet.
 	@Test
 	public void surfaceWith2Boundaries3d_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -982,7 +982,7 @@ public class Surface23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Oberfläche in 3d erstellt werden kann.
+	// Es wird getestet, ob eine Polygon in 3d erstellt werden kann.
 	@Test
 	public void surface3d_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1036,7 +1036,7 @@ public class Surface23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn  dise einen Kreisbogen beinhaltet.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn  dise einen Kreisbogen beinhaltet.
 	@Test
 	public void surfaceWithArc3d_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1078,7 +1078,7 @@ public class Surface23Test {
 	///////////////////////////////// FAILING Tests //////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn sie sich an sich selber überschneidet.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn sie sich an sich selber überschneidet.
 	@Test
 	public void surface2dOverlabOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1157,7 +1157,7 @@ public class Surface23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn sie 2 Innerboundaries besitzt, welche sich überschneiden.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn sie 2 Innerboundaries besitzt, welche sich überschneiden.
 	@Test
 	public void surface2dIntersectionOfInnerboundaries_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1265,7 +1265,7 @@ public class Surface23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}	
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn  sie 2 Boundaries beinhaltet, welche sich überschneiden.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn  sie 2 Boundaries beinhaltet, welche sich überschneiden.
 	@Test
 	public void surface2DIntersectionErrs_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1344,7 +1344,7 @@ public class Surface23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn sich 2 Linien überschneiden.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn sich 2 Linien überschneiden.
 	@Test
 	public void surface3dOverlabOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1435,7 +1435,7 @@ public class Surface23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn  sich die 2 Innerboundaries überschneiden.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn  sich die 2 Innerboundaries überschneiden.
 	@Test
 	public void surface3dInvalidRingLines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1561,7 +1561,7 @@ public class Surface23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}	
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn  sich die Innerboundary mit der Outerboundary überschneidet.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn  sich die Innerboundary mit der Outerboundary überschneidet.
 	@Test
 	public void surface3dIntersectionOfInnerOuterBoundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1652,7 +1652,7 @@ public class Surface23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn der Typ der Oberfläche nicht vom Typ Multisurface ist.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn der Typ der Polygon nicht vom Typ Multisurface ist.
 	public void invalidSurfaceType_Fail(){
 		Iom_jObject objNotMultisurface=new Iom_jObject(ILI_CLASSC, OID1);
 		IomObject surfaceValue=objNotMultisurface.addattrobj("surface2d", "SURFACE");
@@ -1671,7 +1671,7 @@ public class Surface23Test {
 		assertEquals("unexpected Type SURFACE; MULTISURFACE expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn die Oberfläche Komplett ist, jedoch 2 Oberflächen erstellt wurden.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn die Polygon Komplett ist, jedoch 2 Polygon erstellt wurden.
 	@Test
 	public void completeWith2Surfaces_Fail(){
 		Iom_jObject objCompleteMultisurface=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1694,7 +1694,7 @@ public class Surface23Test {
 		assertEquals("invalid number of surfaces in COMPLETE basket", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn sie 2d ist und in 3d erstellt wird.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn sie 2d ist und in 3d erstellt wird.
 	@Test
 	public void surface2dWith3dImplementation_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1744,7 +1744,7 @@ public class Surface23Test {
 		assertEquals("Wrong COORD structure, C3 not expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn sie 3d ist und in 2d erstellt wird.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn sie 3d ist und in 2d erstellt wird.
 	@Test
 	public void surface3dWith2dImplementation_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1798,7 +1798,7 @@ public class Surface23Test {
 		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn das Startsegment der ersten Polyline eine ungültige Zahl ist.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn das Startsegment der ersten Polyline eine ungültige Zahl ist.
 	@Test
 	public void surface3dInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1855,7 +1855,7 @@ public class Surface23Test {
 		assertEquals("value 10000.000 is out of range", logger.getErrs().get(2).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn das Startsegment der ersten Polyline eine ungültige Zahl ist.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn das Startsegment der ersten Polyline eine ungültige Zahl ist.
 	@Test
 	public void surface2dInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1905,7 +1905,7 @@ public class Surface23Test {
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn das Startsegment des ersten Kreisbogens eine ungültige Zahl ist.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn das Startsegment des ersten Kreisbogens eine ungültige Zahl ist.
 	@Test
 	public void surface3dWithARCInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1963,7 +1963,7 @@ public class Surface23Test {
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Oberfläche erstellt werden kann, wenn das Startsegment des ersten Kreisbogens eine ungültige Zahl ist.
+	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn das Startsegment des ersten Kreisbogens eine ungültige Zahl ist.
 	@Test
 	public void surface2dWithARCInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);

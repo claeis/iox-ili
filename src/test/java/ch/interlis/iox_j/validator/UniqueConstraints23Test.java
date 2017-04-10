@@ -418,61 +418,7 @@ public class UniqueConstraints23Test {
 		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob die eigens erstellte Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist, wenn validationConfig msg nicht leer ist.
-	@Test
-	public void numberUniqueSameNumber_MSGNotEmpty_Fail(){
-		// Set object.
-		Iom_jObject obj1=new Iom_jObject(CLASSB,OID1);
-		obj1.setattrvalue("attr1", "Ralf");
-		obj1.setattrvalue("attr2", "20");
-		Iom_jObject objA=new Iom_jObject(CLASSB,OID2);
-		objA.setattrvalue("attr1", "Ralf");
-		objA.setattrvalue("attr2", "20");
-		// Create and run validator.
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(CLASSB+".Constraint1", ValidationConfig.MSG, "My own Set Constraint.");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(objA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("My own Set Constraint.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es wird getestet ob die eigens erstellte Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist, wenn validationConfig msg leer ist.
-	@Test
-	public void numberUniqueSameNumber_MSGIsEmpty_Fail(){
-		// Set object.
-		Iom_jObject obj1=new Iom_jObject(CLASSB,OID1);
-		obj1.setattrvalue("attr1", "Ralf");
-		obj1.setattrvalue("attr2", "20");
-		Iom_jObject objA=new Iom_jObject(CLASSB,OID2);
-		objA.setattrvalue("attr1", "Ralf");
-		objA.setattrvalue("attr2", "20");
-		// Create and run validator.
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(CLASSB, ValidationConfig.MSG, "");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(objA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
-	}
+
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn der Text Unique und identisch ist.
 	@Test
@@ -691,62 +637,5 @@ public class UniqueConstraints23Test {
 		assertTrue(logger.getErrs().size()==2);
 		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(1).getEventMsg());
-	}
-	
-	// Es wird getestet ob eine Warning anstelle einer Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist und validationConfig check auf off geschalten ist.
-	@Test
-	public void numberUniqueSameNumber_ConfigCheckOFF_Fail(){
-		// Set object.
-		Iom_jObject obj1=new Iom_jObject(CLASSB,OID1);
-		obj1.setattrvalue("attr1", "Ralf");
-		obj1.setattrvalue("attr2", "20");
-		Iom_jObject objA=new Iom_jObject(CLASSB,OID2);
-		objA.setattrvalue("attr1", "Ralf");
-		objA.setattrvalue("attr2", "20");
-		// Create and run validator.
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(CLASSB+".Constraint1", ValidationConfig.CHECK,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(objA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts.
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==0);
-	}
-	
-	// Es wird getestet ob eine Warning anstelle einer Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist und validationConfig check auf warning geschalten ist.
-	@Test
-	public void numberUniqueSameNumber_ConfigCheckWARN_Fail(){
-		// Set object.
-		Iom_jObject obj1=new Iom_jObject(CLASSB,OID1);
-		obj1.setattrvalue("attr1", "Ralf");
-		obj1.setattrvalue("attr2", "20");
-		Iom_jObject objA=new Iom_jObject(CLASSB,OID2);
-		objA.setattrvalue("attr1", "Ralf");
-		objA.setattrvalue("attr2", "20");
-		// Create and run validator.
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(CLASSB+".Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(objA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts.
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
 	}
 }

@@ -994,27 +994,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassG.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der höheren Hierarchie nicht übereinstimmt und validationConfig.MSG nicht leer ist.
-	@Test
-	public void isEnumSubVal_MehrVierIsNotSubValOfEins_MSGNotEmpty_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSG, OBJ_OID1);
-		iomObjA.setattrvalue(OBJ_ATTR1, "eins");
-		iomObjA.setattrvalue(OBJ_ATTR2, "mehr.vier");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue(ILI_CLASSG+".Constraint1", ValidationConfig.MSG, "This Function Error is written by my own.");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This Function Error is written by my own.", logger.getErrs().get(0).getEventMsg());
-	}
+
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: inEnumRange, keine Ordnung besteht.
 	@Test

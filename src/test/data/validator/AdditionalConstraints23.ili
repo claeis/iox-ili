@@ -67,10 +67,10 @@ CONTRACTED MODEL AddUnConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
 		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
 		
 		VIEW AddUnConView
-			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ExConClass;
+			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ClassB;
 			=
-			ALL OF ExConClass;
-			EXISTENCE CONSTRAINT subAttr REQUIRED IN AdditionalConstraints23.Bodenbedeckung.ExConCondition : superAttr;
+			ALL OF ClassB;
+			UNIQUE attr1;
 		END AddUnConView;
 
 	END AddUnConTopic;

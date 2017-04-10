@@ -1,13 +1,16 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
+import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
@@ -1721,6 +1724,29 @@ public class Datatypes10Test {
 	@Test
 	public void koord2WrongDimensionsFail(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+		IomObject coordValue=objHighestDay.addattrobj("koord2", "COORD");
+		coordValue.setattrvalue("C1", "5.55");
+		coordValue.setattrvalue("C2", "200.6");
+		coordValue.setattrvalue("C3", "9999");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+		validator.validate(new ObjectEvent(objHighestDay));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Wrong COORD structure, C3 not expected", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird ein Fehler ausgegeben, wenn es sich nicht um eine Koordinate handelt.
+	@Test
+	public void koord2WrongTypeFail(){
+		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
 		objHighestDay.setattrvalue("koord2", "5.55 200.6 9999");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1740,7 +1766,9 @@ public class Datatypes10Test {
 	@Test
 	public void koord3WrongDimensionsFail(){
 		Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objSuccessFormat.setattrvalue("koord3", "5.55, 200.6");
+		IomObject coordValue=objSuccessFormat.addattrobj("koord3", "COORD");
+		coordValue.setattrvalue("C1", "5.55");
+		coordValue.setattrvalue("C2", "200.6");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1752,68 +1780,9 @@ public class Datatypes10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Wenn ValidationConfig Type definiert wurde und ValidationConfig auf OFF steht, werden keine Warnungen oder Fehler ausgegeben.
-	@Test
-	public void configOFFtextTextIsNotANumberOk(){
-		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("grads", "1.5 5.2");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("Datatypes10.Topic.Table.grads", ValidationConfig.TYPE,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objTest));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	// Wenn Type validierung auf OFF steht, aber nur Multplicity auf OFF stehen darf, werden trotzdem Typfehler ausgegeben.
-	@Test
-	public void configOFFtextTextIsNotANumberFail(){
-		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("grads", "1.5 5.2");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("Datatypes10.Topic.Table.grads", ValidationConfig.TYPE,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ALLOW_ONLY_MULTIPLICITY_REDUCTION,ValidationConfig.ON);
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objTest));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <1.5 5.2> is not a number",logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Eine Warnung wird ausgegeben, wenn Grads keine Nummer ist, wenn config Type eingeschalten wurde und ValidationConfig auf Warning steht.
-	@Test
-	public void configWARNINGtextTextIsNotANumberFail(){
-		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("grads", "1.5 5.2");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("Datatypes10.Topic.Table.grads", ValidationConfig.TYPE,ValidationConfig.WARNING);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objTest));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("value <1.5 5.2> is not a number", logger.getWarn().get(0).getEventMsg());
-	}
+
 }

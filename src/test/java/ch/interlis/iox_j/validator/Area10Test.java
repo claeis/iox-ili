@@ -1,8 +1,10 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -44,7 +46,81 @@ public class Area10Test {
 	//########## SUCCESSFUL TESTS ################################/
 	//############################################################/
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn 1 Punkt des Innerboundary den Outerboundary berührt.
+	@Test
+	public void area2d_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("areaWithoutOverlaps2d", "MULTISURFACE");
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "500000.000");
+		endSegment.setattrvalue("C2", "80000.000");
+		IomObject endSegment2=segments.addattrobj("segment", "COORD");
+		endSegment2.setattrvalue("C1", "550000.000");
+		endSegment2.setattrvalue("C2", "90000.000");
+		IomObject endSegment3=segments.addattrobj("segment", "COORD");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// prueft, dass der Validator auch mit Linientabellen (wie in der ITF-Datei vorhanden) umgehen kann
+	@Test
+	public void area2dlineTable_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
+		IomObject georef=objSurfaceSuccess.addattrobj("areaWithoutOverlaps2d", "COORD");
+		georef.setattrvalue("C1", "480005.000");
+		georef.setattrvalue("C2", "70005.000");
+		IomObject objPolyline = new Iom_jObject(ILI_CLASSFLAECHENTABLE+"_areaWithoutOverlaps2d", OID1);
+		// polyline
+		IomObject polylineValue = objPolyline.addattrobj("_itf_geom_FlaechenTable", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "500000.000");
+		endSegment.setattrvalue("C2", "80000.000");
+		IomObject endSegment2=segments.addattrobj("segment", "COORD");
+		endSegment2.setattrvalue("C1", "550000.000");
+		endSegment2.setattrvalue("C2", "90000.000");
+		IomObject endSegment3=segments.addattrobj("segment", "COORD");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_LINETABLES, Validator.CONFIG_DO_ITF_LINETABLES_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(objPolyline));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn 1 Punkt des Innerboundary den Outerboundary berührt.
 	@Test
 	public void area2dInnerTouchesOuterboundaryOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -122,7 +198,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn er 2 Innerboundaries hat, welche sich nicht berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er 2 Innerboundaries hat, welche sich nicht berühren.
 	@Test
 	public void area2dWith2Innerboundaries_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -229,7 +305,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn der Innerboundary den Outerboundary an einem Punkt berührt.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn der Innerboundary den Outerboundary an einem Punkt berührt.
 	@Test
 	public void area3dInnerTouchesOuterboundaryOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -319,7 +395,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die 2 Bereiche sich auf einer Linie an drei Punkten berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone sich auf einer Linie an drei Punkten berühren.
 	// Senkrecht: x--------x--------x  Beide Punkte liegen aufeinander und habe beide dieselben Segmentpunkte.
 	@Test
 	public void area2dIntersectIn1LineOnSame3Points_Ok(){
@@ -420,7 +496,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die 2 Bereiche aus einem Kreisbogen sich auf einer Linie an den gleichen Punkten berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone aus einem Kreisbogen sich auf einer Linie an den gleichen Punkten berühren.
 	// x--------x--------x  Beide Kreisboegen liegen aufeinander und haben beide dieselben Segmentpunkte.
 	@Test
 	public void area3dArcsBothAllSegmentPointsSame_Ok(){
@@ -487,7 +563,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die 2 Bereiche genau aufeinander liegen.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone genau aufeinander liegen.
 	// x--------x--------x  Alle Punkte liegen aufeinander.
 	@Test
 	public void area2dBothAreasSamePoints_Ok(){
@@ -588,7 +664,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich die 2 Innerboundaries nicht berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die 2 Innerboundaries nicht berühren.
 	@Test
 	public void area3dWith2Innerboundaries_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -713,7 +789,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn der Innerboundary die Outerboundary an einem Punkt berührt. 
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn der Innerboundary die Outerboundary an einem Punkt berührt. 
 	@Test
 	public void area3dInnerboundaryTouchesOuterboundaryOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -838,7 +914,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die Linien des Bereiches sich überschneiden.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die Linien des Polygons sich überschneiden.
 	@Test
 	public void area2dOverlapOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -917,7 +993,7 @@ public class Area10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich die 2 Innerboundaries überschneiden.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die 2 Innerboundaries überschneiden.
 	@Test
 	public void area2dInnerboundariesOverlapEachOther_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1025,7 +1101,7 @@ public class Area10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}	
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich 2 Linien an 4 Ecken überschneiden.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich 2 Linien an 4 Ecken überschneiden.
 	@Test
 	public void area3dOverlapOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1116,7 +1192,7 @@ public class Area10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich 2 Innerboundaries des Bereiches überschneiden.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich 2 Innerboundaries des Polygons überschneiden.
 	@Test
 	public void area3dIntersectionOfInnerboundaries_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1242,7 +1318,7 @@ public class Area10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn sich die Innerboundary mit der Outerboundary überschneidet.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die Innerboundary mit der Outerboundary überschneidet.
 	@Test
 	public void area3dInnerboundaryIntersectOuterboundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1333,7 +1409,7 @@ public class Area10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein 2d Bereich erstellt werden kann, wenn der Innerboundary die Outerboundary überschneidet.
+	// Es wird getestet, ob ein 2d Polygon erstellt werden kann, wenn der Innerboundary die Outerboundary überschneidet.
 	@Test
 	public void area2dInnerboundaryIntersectOuterboundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1412,7 +1488,7 @@ public class Area10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die 2 Bereiche sich auf einer Linie an drei Punkten berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone sich auf einer Linie an drei Punkten berühren.
 	// area1: x--------x--------x
 	// area2: x-----------------x
 	// Beide Areas liegen aufeinander, area2 hat keinen Mittelpunkt.
@@ -1507,7 +1583,7 @@ public class Area10Test {
 		assertEquals("failed to validate AREA Datatypes10.Topic.FlaechenTable.areaWithoutOverlaps2d", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Bereich erstellt werden kann, wenn die 2 Bereiche aus einem Kreisbogen sich auf einer Linie an 1 Punkt nicht berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone aus einem Kreisbogen sich auf einer Linie an 1 Punkt nicht berühren.
 	// x--------x--------x  Beide Kreisboegen liegen aufeinander und unterscheiden sich nur von 1 Segment der 2.ten Area.
 	@Test
 	public void area3d1AreaArcPointOther_Fail(){

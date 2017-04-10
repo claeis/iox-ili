@@ -264,7 +264,7 @@ public class ReferenceType23Test {
 	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Rolle nicht External ist und die Klasse sich in einer anderen Bid befindet.
 	@Test
-	public void differentBasket_Fail(){ //TODO --> Fail
+	public void differentBasket_Fail(){
 		String objTargetId=OID1;
 		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, objTargetId);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
@@ -287,7 +287,8 @@ public class ReferenceType23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("No object found with OID o1 in basket b2.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn das Referenzierte Objekt nicht gefunden werden kann.
@@ -315,7 +316,7 @@ public class ReferenceType23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("attribute attrC2 references an inexistent object with OID o1.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("No object found with OID o1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die targetclass nicht gefunden werden kann.
@@ -342,7 +343,7 @@ public class ReferenceType23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("object ReferenceType23.Topic.ClassB with OID o1 referenced by attrC2 is not an instance of ReferenceType23.Topic.ClassA.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("wrong class ReferenceType23.Topic.ClassB of target object o1 for reference attr ReferenceType23.Topic.StructC.attrC2.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Klasse welche durch eine andere Klasse extended wird, nicht gefunden wird.
@@ -369,7 +370,7 @@ public class ReferenceType23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("object ReferenceType23.Topic.ClassA with OID o1 referenced by attrC3 is not an instance of ReferenceType23.Topic.ClassAp.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("wrong class ReferenceType23.Topic.ClassA of target object o1 for reference attr ReferenceType23.Topic.StructC.attrC3.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Beschränkung einer Klasse nicht die Ziel Klasse ist.
@@ -396,7 +397,7 @@ public class ReferenceType23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("object ReferenceType23.Topic.ClassA with OID o1 referenced by attrC4 is not an instance of ReferenceType23.Topic.ClassAp.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("wrong class ReferenceType23.Topic.ClassA of target object o1 for reference attr ReferenceType23.Topic.StructC.attrC4.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn eine ungültige Zielklasse sich in der Referenz befindet.
@@ -423,6 +424,6 @@ public class ReferenceType23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("object ReferenceType23.Topic.ClassAq with OID o1 referenced by attrC4 is not an instance of ReferenceType23.Topic.ClassAp.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("wrong class ReferenceType23.Topic.ClassAq of target object o1 for reference attr ReferenceType23.Topic.StructC.attrC4.", logger.getErrs().get(0).getEventMsg());
 	}
 }

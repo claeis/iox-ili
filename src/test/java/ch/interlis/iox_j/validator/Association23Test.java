@@ -1,8 +1,10 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -221,35 +223,6 @@ public class Association23Test {
 		// Asserts
 		assertEquals(0,logger.getErrs().size());
 	}
-
-	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE über den Rollennamen: e1,
-	// Von der KlasseE eine Beziehung zur KlasseF über den Rollennamen: f1,
-	// je, 1 Mal besteht soll eine Fehlermeldung ausgegeben werden,
-	// wenn die Objekte sich in unterschiedlichen Baskets befinden und External false ist.
-	@Test
-	public void standAloneExternalFalse_False(){ //FIXME Sollte False ergeben.
-		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OBJ_OID1);
-		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OBJ_OID2);
-		Iom_jObject iomLinkEF=new Iom_jObject(ILI_ASSOC_EF1, null);
-		iomLinkEF.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
-		iomLinkEF.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjE));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID2));
-		validator.validate(new ObjectEvent(iomObjF));
-		validator.validate(new ObjectEvent(iomLinkEF));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertEquals(0,logger.getErrs().size());
-	}
 	
 	// Wenn in einer Stand Alone Association von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a1,
 	// Von der Klasse A eine Beziehung zur KlasseB über den Rollennamen: b1,
@@ -331,12 +304,10 @@ public class Association23Test {
 	}
 	
 	// Wenn in einer Embedded Association von der KlasseH eine Beziehung zur KlasseG über den Rollennamen: g1,
-	// 1 Mal besteht soll eine Fehlermeldung ausgegeben werden,
-	// wenn die Objekte sich in unterschiedlichen Baskets befinden und External false ist.
+	// die Klasse nicht gefunden werden kann, die Rolle: External=True ist, soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void embeddedExternalFalseDiffBasket_False(){ //FIXME Soll false sein.
-		Iom_jObject iomObjG=new Iom_jObject(ILI_CLASSG, OBJ_OID1);
-		Iom_jObject iomObjH1=new Iom_jObject(ILI_CLASSH, OBJ_OID2);
+	public void embeddedExternalTrue_Ok(){ //FIXME darf keinen Fehler ergeben! --> ok
+		Iom_jObject iomObjH1=new Iom_jObject("Association23.TopicB.ClassH", OBJ_OID2);
 		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -345,14 +316,60 @@ public class Association23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjG));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID2));
 		validator.validate(new ObjectEvent(iomObjH1));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(0,logger.getErrs().size());
+	}
+	
+	// External=true, Objects in different Baskets.
+	// Ergibt einen Fehler! Da jedoch External=true ist, wird dieser nicht ausgegeben.
+	@Test
+	public void embeddedExternalTrueDiffBasket_Ok(){ //FIXME darf keinen Fehler ergeben! --> ok.
+		Iom_jObject iomObjG1=new Iom_jObject("Association23.TopicB.ClassG", OBJ_OID1);
+		Iom_jObject iomObjH1=new Iom_jObject("Association23.TopicB.ClassH", OBJ_OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjG1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
+	}
+	
+	// External=false, Objects in different Baskets.
+	// Ergibt einen Fehler!
+	@Test
+	public void embeddedExternalFalseDiffBasket_False(){ //FIXME muss einen Fehler ergeben! --> ok
+		Iom_jObject iomObjG1=new Iom_jObject("Association23.Topic.ClassG", OBJ_OID1);
+		Iom_jObject iomObjH1=new Iom_jObject("Association23.Topic.ClassH", OBJ_OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjG1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("No object found with OID o1 in basket b1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE über den Rollennamen: e1,
@@ -464,6 +481,36 @@ public class Association23Test {
 	//#########################################################//
 	//############# FAIL EMBEDDED CARDINALITY #################//
 	//#########################################################//		
+	
+	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE über den Rollennamen: e1,
+	// Von der KlasseE eine Beziehung zur KlasseF über den Rollennamen: f1,
+	// je, 1 Mal besteht soll eine Fehlermeldung ausgegeben werden,
+	// wenn die Objekte sich in unterschiedlichen Baskets befinden und External false ist.
+	@Test
+	public void standAloneExternalFalse_False(){
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OBJ_OID1);
+		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OBJ_OID2);
+		Iom_jObject iomLinkEF=new Iom_jObject(ILI_ASSOC_EF1, null);
+		iomLinkEF.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
+		iomLinkEF.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjF));
+		validator.validate(new ObjectEvent(iomLinkEF));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1,logger.getErrs().size());
+		assertEquals("No object found with OID o1 in basket b2.", logger.getErrs().get(0).getEventMsg());
+	}	
 	
 	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a1, 0 bis 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
 	@Test
@@ -649,7 +696,7 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Object Association23.Topic.ClassD with OID o1 must be of Association23.Topic.ClassA", logger.getErrs().get(0).getEventMsg());
+		assertEquals("wrong class Association23.Topic.ClassD of target object o1 for role Association23.Topic.ab1.a1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird eine Fehlermeldung ausgegeben wenn in einer StandAlone Association eine falsche Kardinalität von e1 erstellt wurde.
@@ -692,7 +739,7 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("No object found with OID o3 in basket b1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Die KlasseA mit der OID a1, verbindet über die Klasse: classBp mit der OID b1.
@@ -715,7 +762,7 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Object Association23.Topic.ClassCp with OID o1 must be of Association23.Topic.ClassA", logger.getErrs().get(0).getEventMsg());
+		assertEquals("wrong class Association23.Topic.ClassCp of target object o1 for role Association23.Topic.abp1.ap1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die Klasse der referenzierten oid: oid3, der Association abp3, nicht exisitiert.
@@ -737,7 +784,7 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("No object found with OID o3 in basket b1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Die Klasse der von der Association referenzierten oid2, existiert nicht.
@@ -762,7 +809,7 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("No object found with OID o3 in basket b1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Multiplizität der Rolle Maximal 1 sein darf, jedoch 5 Objekte erstellt wurden.
@@ -797,177 +844,5 @@ public class Association23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("h1 should associate 1 to 1 target objects (instead of 5)", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	//#########################################################//
-	//################# CONFIG ON/OFF TEST ####################//
-	//#########################################################//
-	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn Multiplicity eingeschalten ist und die Referenz einen Fehler ergibt.
-	@Test
-	public void configMultiplicityONAssociationFail_Fail(){
-		Iom_jObject iomObjI=new Iom_jObject(ILI_CLASSI, OBJ_OID1);
-		Iom_jObject iomObjJ=new Iom_jObject(ILI_CLASSJ, OBJ_OID2);
-		iomObjJ.addattrobj(ILI_ASSOC_AB4_A4, "REF").setobjectrefoid(OBJ_OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjI));
-		validator.validate(new ObjectEvent(iomObjJ));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("unknown property <a4>", logger.getErrs().get(0).getEventMsg());
-		assertEquals("a4 should associate 1 to 5 target objects (instead of 0)", logger.getErrs().get(1).getEventMsg());
-	}
-	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Konfiguration Target Objects eingeschalten ist und das Target Object nicht gefunden werden kann.
-	@Test
-	public void configTargetONNoTargetObjectFound_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		iomObjB.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID3);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new ObjectEvent(iomObjB));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Konfiguration Multiplicity ausgeschalten wird und die Anzahl die referenzierten Objekte nicht stimmt. 
-	@Test
-	public void configMultiplicityOFFObjectCountWrong_Ok(){
-		Iom_jObject iomObjI=new Iom_jObject(ILI_CLASSI, OBJ_OID1);
-		Iom_jObject iomObjJ=new Iom_jObject(ILI_CLASSJ, OBJ_OID2);
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("Association23.Topic.ab4.a4", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjI));
-		validator.validate(new ObjectEvent(iomObjJ));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Konfiguration Multiplicity und Target ausgeschalten wird und das referenzierte Objekt nicht gefunden wird.
-	@Test
-	public void configTargetOFFMultiplicityOFF_Ok(){
-		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID2);
-		Iom_jObject iomObjB3=new Iom_jObject(ILI_CLASSB, OBJ_OID5);
-		iomObjB3.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID6);
-		ValidationConfig modelConfig=new ValidationConfig();
-		// Wenn multiplicity eingeschalten wird, so wird info: target ausgegeben.
-		modelConfig.setConfigValue("Association23.Topic.ab3.a3", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
-		modelConfig.setConfigValue("Association23.Topic.ab3.a3", ValidationConfig.TARGET,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjD));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new ObjectEvent(iomObjB3));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Konfiguration Target Objects ausgeschalten worden ist und keine referenzierten Objekte gefunden worden sind.
-	@Test
-	public void configTargetOFFNoTargetObjectFound_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		iomObjB.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID3);
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("Association23.Topic.ab3.a3", ValidationConfig.TARGET,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new ObjectEvent(iomObjB));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Multiplicity und die TargetObjects Konfiguration ausgeschalten worden ist und
-	// es einen Fehler in der Objektmenge und der Referenz Objekte gibt.
-	@Test
-	public void configTargetAndMultiplicityOFFEmbeddedFail_Ok(){
-		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID2);
-		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OBJ_OID3);
-		iomObjB2.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID2);
-		Iom_jObject iomObjB3=new Iom_jObject(ILI_CLASSB, OBJ_OID5);
-		iomObjB3.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID6);
-		Iom_jObject iomObjB4=new Iom_jObject(ILI_CLASSB, OBJ_OID7);
-		iomObjB4.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("Association23.Topic.ab3.a3", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
-		modelConfig.setConfigValue("Association23.Topic.ab3.a3", ValidationConfig.TARGET,ValidationConfig.OFF);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjD));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new ObjectEvent(iomObjB2));
-		validator.validate(new ObjectEvent(iomObjB3));
-		validator.validate(new ObjectEvent(iomObjB4));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Multiplicity auf Warning gestellt wird und das referenzierte Objekt nicht gefunden werden kann.
-	@Test
-	public void configMultiplicityWarningONFail_Fail(){
-		Iom_jObject iomObjI=new Iom_jObject(ILI_CLASSI, OBJ_OID1);
-		Iom_jObject iomObjJ=new Iom_jObject(ILI_CLASSJ, OBJ_OID2);
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.setConfigValue("Association23.Topic.ab4.a4", ValidationConfig.MULTIPLICITY,ValidationConfig.WARNING);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjI));
-		validator.validate(new ObjectEvent(iomObjJ));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertTrue(logger.getErrs().size()==0);
-		assertEquals("a4 should associate 1 to 5 target objects (instead of 0)", logger.getWarn().get(0).getEventMsg());
 	}
 }

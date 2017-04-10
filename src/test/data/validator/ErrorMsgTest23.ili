@@ -10,6 +10,7 @@ MODEL ErrorMsgTest23
 						   
 		CLASS ClassA =
 		   attrA : 0.0 .. 10.0;
+		   attrA2 : TEXT;
 		   point : Lkoord;
 		   line : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Lkoord;
 		   surface : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
@@ -25,7 +26,19 @@ MODEL ErrorMsgTest23
 		CLASS ClassC =
 		   attrC1 : 0.0 .. 10.0;
 		   attrC2 : BAG {0..*} OF StructB;
+		   attrC3 : TEXT;
 		END ClassC;
+
+		CLASS ClassD =
+		   attrA : 0 .. 10;
+		   attrA2 : TEXT;
+		   point : Lkoord;
+		   line : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Lkoord;
+		   surface : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		   !!@name=constrA
+		   MANDATORY CONSTRAINT attrA>5;
+		END ClassD;
+
 		
 	END Topic;
 END ErrorMsgTest23.
