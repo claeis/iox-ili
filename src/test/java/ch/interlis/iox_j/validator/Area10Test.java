@@ -1,8 +1,10 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -43,6 +45,80 @@ public class Area10Test {
 	//############################################################/
 	//########## SUCCESSFUL TESTS ################################/
 	//############################################################/
+	
+	@Test
+	public void area2d_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("areaWithoutOverlaps2d", "MULTISURFACE");
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "500000.000");
+		endSegment.setattrvalue("C2", "80000.000");
+		IomObject endSegment2=segments.addattrobj("segment", "COORD");
+		endSegment2.setattrvalue("C1", "550000.000");
+		endSegment2.setattrvalue("C2", "90000.000");
+		IomObject endSegment3=segments.addattrobj("segment", "COORD");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// prueft, dass der Validator auch mit Linientabellen (wie in der ITF-Datei vorhanden) umgehen kann
+	@Test
+	public void area2dlineTable_Ok(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
+		IomObject georef=objSurfaceSuccess.addattrobj("areaWithoutOverlaps2d", "COORD");
+		georef.setattrvalue("C1", "480005.000");
+		georef.setattrvalue("C2", "70005.000");
+		IomObject objPolyline = new Iom_jObject(ILI_CLASSFLAECHENTABLE+"_areaWithoutOverlaps2d", OID1);
+		// polyline
+		IomObject polylineValue = objPolyline.addattrobj("_itf_geom_FlaechenTable", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "500000.000");
+		endSegment.setattrvalue("C2", "80000.000");
+		IomObject endSegment2=segments.addattrobj("segment", "COORD");
+		endSegment2.setattrvalue("C1", "550000.000");
+		endSegment2.setattrvalue("C2", "90000.000");
+		IomObject endSegment3=segments.addattrobj("segment", "COORD");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		settings.setValue(Validator.CONFIG_DO_ITF_LINETABLES, Validator.CONFIG_DO_ITF_LINETABLES_DO);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(objPolyline));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 	
 	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn 1 Punkt des Innerboundary den Outerboundary berührt.
 	@Test

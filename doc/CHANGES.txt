@@ -6,6 +6,7 @@ iox-ili 1.17.0 (2017-04-10)
 -----------------------------
 - support ITF output if more than one ili1 model loaded
 - added filter to handle TRANSLATION OF
+- validator: fixed OID check if in line table mode
 
 iox-ili 1.16.0-master (2017-04-05)
 -----------------------------
