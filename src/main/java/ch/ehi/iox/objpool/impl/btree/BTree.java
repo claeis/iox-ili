@@ -89,9 +89,9 @@ public class BTree<Key, Value>  {
 			throw new IllegalStateException(e);
 		}
 	}    	
-    protected Node getNode(NodeId nodeId)
+    protected Node<Key, Value> getNode(NodeId nodeId)
     {
-    	Node ret=cache.get(nodeId);
+    	Node<Key, Value> ret=cache.get(nodeId);
     	if(ret!=null){
     		return ret;
     	}

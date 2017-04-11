@@ -2156,38 +2156,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(isObject){
 			setCurrentMainObj(iomObj);
 		}
-		// validate class, structure and association on existence of OID
-		boolean addToPool = true;
-		if (isObject){
-			Object modelElementOidValidate = tag2class.get(iomObj.getobjecttag());
-			Viewable classValueOidValidate = (Viewable) modelElementOidValidate;
-			// association
-			if (modelElementOidValidate instanceof AssociationDef){
-				AssociationDef modelAssociationDef = (AssociationDef) modelElementOidValidate;
-				Domain oidType=((AbstractClassDef) modelAssociationDef).getOid();
-				if (modelAssociationDef.isIdentifiable() || oidType!=null){
-					if (iomObj.getobjectoid() == null){
-						errs.addEvent(errFact.logErrorMsg("Association {0} has to have an OID", iomObj.getobjecttag()));
-						addToPool = false;
-					}
-				} 
-			} else if (classValueOidValidate instanceof Table){
-				Table classValueTable = (Table) classValueOidValidate;
-				// class
-				if (classValueTable.isIdentifiable()){
-					if (iomObj.getobjectoid() == null){
-						errs.addEvent(errFact.logErrorMsg("Class {0} has to have an OID", iomObj.getobjecttag()));
-						addToPool = false;
-					}
-				// structure	
-				} else {
-					addToPool = false;
-					if (iomObj.getobjectoid() != null){
-						errs.addEvent(errFact.logErrorMsg("Structure {0} has not to have an OID", iomObj.getobjecttag()));
-					}
-				}
-			}
-		}
+
 		
 		String tag=iomObj.getobjecttag();
 		//EhiLogger.debug("tag "+tag);
@@ -2208,12 +2177,41 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		// ASSERT: an ordinary class/table
 		Viewable aclass1=(Viewable)modelele;
 		
+		boolean addToPool = true;
 		if(isObject){
 			errFact.setDefaultCoord(getDefaultCoord(iomObj));
 			// validate that object is instance of a concrete class
 			if(aclass1.isAbstract()){
 				errs.addEvent(errFact.logErrorMsg("Object must be a non-abstract class"));
 			}
+			
+			// association
+			if (aclass1 instanceof AssociationDef){
+				AssociationDef modelAssociationDef = (AssociationDef) aclass1;
+				Domain oidType=((AbstractClassDef) modelAssociationDef).getOid();
+				if (modelAssociationDef.isIdentifiable() || oidType!=null){
+					if (iomObj.getobjectoid() == null){
+						errs.addEvent(errFact.logErrorMsg("Association {0} has to have an OID", iomObj.getobjecttag()));
+						addToPool = false;
+					}
+				} 
+			} else if (aclass1 instanceof Table){
+				Table classValueTable = (Table) aclass1;
+				// class
+				if (classValueTable.isIdentifiable()){
+					if (iomObj.getobjectoid() == null){
+						errs.addEvent(errFact.logErrorMsg("Class {0} has to have an OID", iomObj.getobjecttag()));
+						addToPool = false;
+					}
+				// structure	
+				} else {
+					addToPool = false;
+					if (iomObj.getobjectoid() != null){
+						errs.addEvent(errFact.logErrorMsg("Structure {0} has not to have an OID", iomObj.getobjecttag()));
+					}
+				}
+			}
+			
 			if(aclass1 instanceof AbstractClassDef){
 				Domain oidType=((AbstractClassDef) aclass1).getOid();
 				if(oidType!=null && oidType==td.INTERLIS.UUIDOID){
