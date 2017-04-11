@@ -99,12 +99,8 @@ public class UniqueConstraints10Test {
 	public void differentRefValues_Ok(){
 		Iom_jObject objA1=new Iom_jObject(TABLEA, OID1);
 		objA1.setattrvalue("a1", "Anna");
-		Iom_jObject objA2=new Iom_jObject(TABLEA, OID2);
-		objA2.setattrvalue("a1", "Berta");
 		Iom_jObject objB1=new Iom_jObject(TABLEB, OID3);
 		objB1.addattrobj("b2", "REF").setobjectrefoid(OID1);
-		Iom_jObject objB2=new Iom_jObject(TABLEB, OID4);
-		objB2.addattrobj("b2", "REF").setobjectrefoid(OID2);
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -114,9 +110,7 @@ public class UniqueConstraints10Test {
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objA1));
-		validator.validate(new ObjectEvent(objA2));
 		validator.validate(new ObjectEvent(objB1));
-		validator.validate(new ObjectEvent(objB2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
@@ -180,13 +174,11 @@ public class UniqueConstraints10Test {
 	@Test
 	public void refOfUniqueValueExistsTwice_Fail(){
 		Iom_jObject objA1=new Iom_jObject(TABLEA, OID1);
-		objA1.setattrvalue("a1", "Anna");
 		Iom_jObject objA2=new Iom_jObject(TABLEA, OID2);
-		objA2.setattrvalue("a1", "Berta");
 		Iom_jObject objB1=new Iom_jObject(TABLEB, OID3);
 		objB1.addattrobj("b2", "REF").setobjectrefoid(OID1);
 		Iom_jObject objB2=new Iom_jObject(TABLEB, OID4);
-		objB2.addattrobj("b2", "REF").setobjectrefoid(OID1);
+		objB2.addattrobj("b2", "REF").setobjectrefoid(OID2);
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -203,6 +195,6 @@ public class UniqueConstraints10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values o1 already exist in Object: o3",logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values b2 already exist in Object: o3",logger.getErrs().get(0).getEventMsg());
 	}
 }

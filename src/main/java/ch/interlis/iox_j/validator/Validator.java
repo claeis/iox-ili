@@ -390,90 +390,92 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
 			while (objectIterator.hasNext()){
 				IomObject iomObj = objectIterator.next();
-				setCurrentMainObj(iomObj);
-				Object modelElement=tag2class.get(iomObj.getobjecttag());
-				Viewable classOfCurrentObj= (Viewable) modelElement;
-				// additional constraint
-				for (Map.Entry<Constraint,Viewable> additionalConstraintsEntry : additionalConstraints.entrySet()) {
-					Constraint additionalConstraint = additionalConstraintsEntry.getKey();
-					Viewable classOfAdditionalConstraint = additionalConstraintsEntry.getValue();
-					if(classOfCurrentObj.isExtending(classOfAdditionalConstraint)) {
-						if(additionalConstraint instanceof ExistenceConstraint) {
-							ExistenceConstraint existenceConstraint = (ExistenceConstraint) additionalConstraint;
+				if(iomObj!=null){
+					setCurrentMainObj(iomObj);
+					Object modelElement=tag2class.get(iomObj.getobjecttag());
+					Viewable classOfCurrentObj= (Viewable) modelElement;
+					// additional constraint
+					for (Map.Entry<Constraint,Viewable> additionalConstraintsEntry : additionalConstraints.entrySet()) {
+						Constraint additionalConstraint = additionalConstraintsEntry.getKey();
+						Viewable classOfAdditionalConstraint = additionalConstraintsEntry.getValue();
+						if(classOfCurrentObj.isExtending(classOfAdditionalConstraint)) {
+							if(additionalConstraint instanceof ExistenceConstraint) {
+								ExistenceConstraint existenceConstraint = (ExistenceConstraint) additionalConstraint;
+								validateExistenceConstraint(iomObj, existenceConstraint);
+							} else if(additionalConstraint instanceof MandatoryConstraint){
+								MandatoryConstraint mandatoryConstraint = (MandatoryConstraint) additionalConstraint;
+								validateMandatoryConstraint(iomObj, mandatoryConstraint);
+							} else if(additionalConstraint instanceof SetConstraint){
+								SetConstraint setConstraint = (SetConstraint) additionalConstraint;
+								collectSetConstraintObjs(iomObj, setConstraint);
+							} else if(additionalConstraint instanceof UniquenessConstraint){
+								UniquenessConstraint uniquenessConstraint = (UniquenessConstraint) additionalConstraint; // uniquenessConstraint not null.
+								validateUniquenessConstraint(iomObj, uniquenessConstraint);
+							} else if(additionalConstraint instanceof PlausibilityConstraint){
+								PlausibilityConstraint plausibilityConstraint = (PlausibilityConstraint) additionalConstraint;
+								fillOfPlausibilityConstraintMap(plausibilityConstraint, iomObj);
+							}
+						}
+					}
+					Iterator constraintIterator=classOfCurrentObj.iterator();
+					while (constraintIterator.hasNext()) {
+						Object constraintObj = constraintIterator.next();
+						// existence constraint
+						if(constraintObj instanceof ExistenceConstraint){
+							ExistenceConstraint existenceConstraint=(ExistenceConstraint) constraintObj;
 							validateExistenceConstraint(iomObj, existenceConstraint);
-						} else if(additionalConstraint instanceof MandatoryConstraint){
-							MandatoryConstraint mandatoryConstraint = (MandatoryConstraint) additionalConstraint;
+						}
+						// mandatory constraint
+						if(constraintObj instanceof MandatoryConstraint){
+							MandatoryConstraint mandatoryConstraint=(MandatoryConstraint) constraintObj;
 							validateMandatoryConstraint(iomObj, mandatoryConstraint);
-						} else if(additionalConstraint instanceof SetConstraint){
-							SetConstraint setConstraint = (SetConstraint) additionalConstraint;
+						}
+						// set constraint
+						if(constraintObj instanceof SetConstraint){
+							SetConstraint setConstraint=(SetConstraint) constraintObj;
 							collectSetConstraintObjs(iomObj, setConstraint);
-						} else if(additionalConstraint instanceof UniquenessConstraint){
-							UniquenessConstraint uniquenessConstraint = (UniquenessConstraint) additionalConstraint;
-							validateUniquenessConstraint(iomObj, uniquenessConstraint);
-						} else if(additionalConstraint instanceof PlausibilityConstraint){
-							PlausibilityConstraint plausibilityConstraint = (PlausibilityConstraint) additionalConstraint;
+						}
+						// plausibility constraint
+						if(constraintObj instanceof PlausibilityConstraint){
+							PlausibilityConstraint plausibilityConstraint=(PlausibilityConstraint) constraintObj;
 							fillOfPlausibilityConstraintMap(plausibilityConstraint, iomObj);
 						}
 					}
-				}
-				Iterator constraintIterator=classOfCurrentObj.iterator();
-				while (constraintIterator.hasNext()) {
-					Object constraintObj = constraintIterator.next();
-					// existence constraint
-					if(constraintObj instanceof ExistenceConstraint){
-						ExistenceConstraint existenceConstraint=(ExistenceConstraint) constraintObj;
-						validateExistenceConstraint(iomObj, existenceConstraint);
-					}
-					// mandatory constraint
-					if(constraintObj instanceof MandatoryConstraint){
-						MandatoryConstraint mandatoryConstraint=(MandatoryConstraint) constraintObj;
-						validateMandatoryConstraint(iomObj, mandatoryConstraint);
-					}
-					// set constraint
-					if(constraintObj instanceof SetConstraint){
-						SetConstraint setConstraint=(SetConstraint) constraintObj;
-						collectSetConstraintObjs(iomObj, setConstraint);
-					}
-					// plausibility constraint
-					if(constraintObj instanceof PlausibilityConstraint){
-						PlausibilityConstraint plausibilityConstraint=(PlausibilityConstraint) constraintObj;
-						fillOfPlausibilityConstraintMap(plausibilityConstraint, iomObj);
-					}
-				}
-				Iterator<ViewableTransferElement> attrIterator=classOfCurrentObj.getAttributesAndRoles2();
-				while (attrIterator.hasNext()) {
-					ViewableTransferElement objA = attrIterator.next();
-					if (objA.obj instanceof LocalAttribute){
-						LocalAttribute attr = (LocalAttribute)objA.obj;
-						String attrName=attr.getName();
-						Type type = attr.getDomain();
-						// composition
-						if (type instanceof CompositionType){
-							CompositionType compositionType = (CompositionType) type;
-							Table structure = compositionType.getComponentType();
-							// bid of iomObject
-							String objectBid = objectPool.getBidOfObject(iomObj.getobjectoid(), classOfCurrentObj);
-							int structc=iomObj.getattrvaluecount(attrName);
-							 for(int structi=0;structi<structc;structi++){
-								 IomObject structValue=iomObj.getattrobj(attrName, structi);
-								validateReferenceAttrs(structValue, structure, objectBid);
+					Iterator<ViewableTransferElement> attrIterator=classOfCurrentObj.getAttributesAndRoles2();
+					while (attrIterator.hasNext()) {
+						ViewableTransferElement objA = attrIterator.next();
+						if (objA.obj instanceof LocalAttribute){
+							LocalAttribute attr = (LocalAttribute)objA.obj;
+							String attrName=attr.getName();
+							Type type = attr.getDomain();
+							// composition
+							if (type instanceof CompositionType){
+								CompositionType compositionType = (CompositionType) type;
+								Table structure = compositionType.getComponentType();
+								// bid of iomObject
+								String objectBid = objectPool.getBidOfObject(iomObj.getobjectoid(), classOfCurrentObj);
+								int structc=iomObj.getattrvaluecount(attrName);
+								 for(int structi=0;structi<structc;structi++){
+									 IomObject structValue=iomObj.getattrobj(attrName, structi);
+									validateReferenceAttrs(structValue, structure, objectBid);
+								}
 							}
+						}else if(objA.obj instanceof RoleDef){
+							RoleDef roleDef = (RoleDef) objA.obj;
+							validateRoleReference(roleDef, iomObj);
 						}
-					}else if(objA.obj instanceof RoleDef){
-						RoleDef roleDef = (RoleDef) objA.obj;
-						validateRoleReference(roleDef, iomObj);
 					}
-				}
-				if(classOfCurrentObj instanceof AbstractClassDef){
-					AbstractClassDef abstractClassDef = (AbstractClassDef) classOfCurrentObj;
-					if(!viewables.contains(abstractClassDef)){
-						viewables.add(abstractClassDef);
-						errs.addEvent(errFact.logInfoMsg("validate role references of {0}...",abstractClassDef.getScopedName(null)));
-					}
-					Iterator<RoleDef> targetRoleIterator=abstractClassDef.getOpposideRoles();
-					while(targetRoleIterator.hasNext()){
-						RoleDef role=targetRoleIterator.next();
-						validateRoleCardinality(role, iomObj);
+					if(classOfCurrentObj instanceof AbstractClassDef){
+						AbstractClassDef abstractClassDef = (AbstractClassDef) classOfCurrentObj;
+						if(!viewables.contains(abstractClassDef)){
+							viewables.add(abstractClassDef);
+							errs.addEvent(errFact.logInfoMsg("validate role references of {0}...",abstractClassDef.getScopedName(null)));
+						}
+						Iterator<RoleDef> targetRoleIterator=abstractClassDef.getOpposideRoles();
+						while(targetRoleIterator.hasNext()){
+							RoleDef role=targetRoleIterator.next();
+							validateRoleCardinality(role, iomObj);
+						}
 					}
 				}
 			}
@@ -564,49 +566,182 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
 	private void validateUniquenessConstraint(IomObject iomObj, UniquenessConstraint uniquenessConstraint) {
-		String constraintName = getScopedName(uniquenessConstraint);
 		String checkUniqueConstraint=null;
 		if(!enforceConstraintValidation){
-			checkUniqueConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
+			checkUniqueConstraint=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.CHECK);
 		}
+		// validation configuration (CHECK=OFF)
 		if(ValidationConfig.OFF.equals(checkUniqueConstraint)){
-			if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
-				configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
+			if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+getScopedName(uniquenessConstraint))){
+				configOffOufputReduction.add(ValidationConfig.CHECK+":"+getScopedName(uniquenessConstraint));
+				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", getScopedName(uniquenessConstraint), iomObj.getobjectoid()));
 			}
 		}else{
-			Object modelElement=tag2class.get(iomObj.getobjecttag());
-			Viewable aClass1= (Viewable) modelElement;
+			// log message (CHECK)
 			if(!loggedObjects.contains(uniquenessConstraint)){
 				loggedObjects.add(uniquenessConstraint);
 				errs.addEvent(errFact.logInfoMsg("validate unique constraint {0}...",getScopedName(uniquenessConstraint)));
 			}
-			StringBuilder contentUniqueAttrs = new StringBuilder();
-			ArrayList<String> uniqueConstraintAttrs=new ArrayList<String>();
-			// gets all constraint attribute-names.
-			Iterator iter = uniquenessConstraint.getElements().iteratorAttribute();
-			uniqueConstraintAttrs.add(aClass1.toString());
-			while (iter.hasNext()){
-				ObjectPath object = (ObjectPath)iter.next();
-				uniqueConstraintAttrs.add(object.getLastPathEl().getName());
-				contentUniqueAttrs.append(object.getLastPathEl().getName());
+			// preCondition (UNIQUE WHERE)
+			if(uniquenessConstraint.getPreCondition()!=null){
+				Value preConditionValue = evaluateExpression(iomObj, uniquenessConstraint.getPreCondition());
+				if (preConditionValue.isNotYetImplemented()){
+					logMsg(getScopedName(uniquenessConstraint),"Function {0} in uniqueness constraint is not yet implemented.",getScopedName(uniquenessConstraint));
+					return;
+				}
+				if (preConditionValue.skipEvaluation()){
+					return;
+				}
+				if (!preConditionValue.isTrue()){
+					// ignore this object in uniqueness constraint
+					return;
+				}
 			}
-			if (!listOfUniqueObj.contains(uniqueConstraintAttrs)){
-				listOfUniqueObj.add(uniqueConstraintAttrs);
+			//////////////////////////////////////////////////////////////////
+			//////////////////////// UNIQUENESS CONSTRAINT ///////////////////
+			//////////////////////////////////////////////////////////////////
+			Object objecttag=tag2class.get(iomObj.getobjecttag());
+			Viewable constraintClass= (Viewable) objecttag;
+			Iterator uniqueAttrIter = uniquenessConstraint.getElements().iteratorAttribute();
+			ArrayList<String> uniqueAttrObjects=new ArrayList<String>();
+			while (uniqueAttrIter.hasNext()){
+				ObjectPath uniqueAttribute = (ObjectPath)uniqueAttrIter.next();
+				uniqueAttrObjects.add(uniqueAttribute.toString());
 			}
-			Holder<AttributeArray> values = new Holder<AttributeArray>();
-			String returnValue = validateUnique(iomObj,uniqueConstraintAttrs, values);
-			if (returnValue == null){
+			if (!uniqueObjects.contains(uniqueAttrObjects)){
+				uniqueObjects.add(uniqueAttrObjects);
+			}
+			ArrayList<String> uniqueValues = new ArrayList<String>();
+			////////////////////////// TABLE ////////////////////////////
+			String returnValue=null;
+			// get through all unique attributes
+			for (int i=0;i<uniqueAttrObjects.size();i++){
+				String attrName = uniqueAttrObjects.get(i);
+				String attrValue=iomObj.getattrvalue(attrName.toString());
+				if(attrValue!=null){
+					if(uniqueAttrObjects.contains(attrName)){
+						uniqueValues.add(attrValue);
+					}
+				}else{
+					//////////////////////// STRUCTURE ////////////////////////
+					for(int j=0;j<iomObj.getattrcount();j++){
+						String currentAttrName = iomObj.getattrname(j);
+						attrValue = iomObj.getattrvalue(currentAttrName);
+						IomObject tempObject = iomObj;
+						IomObject object=null;
+						while(tempObject.getattrobj(currentAttrName, 0)!=null){
+							object = tempObject.getattrobj(currentAttrName, 0);
+							if(object.getobjecttag().equals("MULTISURFACE")){
+								//////////////// SURFACE OR AREA ////////////////////
+								attrValue = object.toString();
+								if(uniqueAttrObjects.contains(currentAttrName)){
+									uniqueValues.add(attrValue);
+								}
+							} else if(object.getobjecttag().equals("REF")){
+								/////////////// ASSOCIATION EMBEDDED ////////////////
+								if(uniqueAttrObjects.contains(currentAttrName)){   // currentAttrName+"-"+object.getobjectrefoid()
+									attrValue = currentAttrName;
+									if(!uniqueValues.contains(attrValue)){
+										uniqueValues.add(attrValue);
+									}
+								}
+							} else {
+								// no reference anymore
+								for(int l=0;l<object.getattrcount();l++){
+									String structAttrName = object.getattrname(l);
+									if(object.getattrobj(structAttrName, 0)!=null){
+										currentAttrName = structAttrName;
+									}
+								}
+							} 
+							// if getAttrObject found, search with sub object
+							if(object!=null){
+								// change sub object to main object
+								tempObject = object;
+							}
+						}
+						// end object. no sub element found
+						if(object!=null){
+							for(int k=0;k<object.getattrcount();k++){
+								String targetAttrName = object.getattrname(k);
+								if(targetAttrName.equals(attrName)){
+									attrValue = object.getattrvalue(targetAttrName);
+									if(attrValue!=null){
+										if(uniqueAttrObjects.contains(targetAttrName)){
+											uniqueValues.add(attrValue);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				///////////////// ASSOCIATION STAND ALONE ///////////////////
+				if(objecttag instanceof AssociationDef){
+					AssociationDef association = (AssociationDef) constraintClass;
+					Iterator  iterator = association.getAttributesAndRoles();
+					while(iterator.hasNext()){
+						Object attr = iterator.next();
+						if(attr instanceof RoleDef){
+							RoleDef role = (RoleDef) attr;
+							if(role!=null){
+								if(uniqueAttrObjects.contains(role.getName())){
+									attrValue=role.getName();
+									if(!uniqueValues.contains(attrValue)){
+										uniqueValues.add(attrValue);
+									}
+								}
+							}
+						}
+					}
+				} else if(objecttag instanceof Viewable){
+					// TABLE or VIEWABLE
+					Viewable classObj = (Viewable) objecttag;
+					Iterator  iterator = classObj.getAttributesAndRoles();
+					while(iterator.hasNext()){
+						Object attr = iterator.next();
+						if(attr instanceof RoleDef){
+							RoleDef role = (RoleDef) attr;
+							if(role!=null){
+								if(uniqueAttrObjects.contains(role.getName())){
+									attrValue=role.getName();
+									uniqueValues.add(attrValue);
+								}
+							}
+						}
+					}
+				}
+				// attrValue was not found
+				if(attrValue==null){
+					return;
+				}
+			}
+			///////////// validation of uniqueness constraints ///////////////
+			returnValue = validateUnique(iomObj, uniqueAttrObjects, uniqueValues);
+			StringBuilder uniqueValueString = new StringBuilder();
+			String comma = "";
+			for(int u=0;u<uniqueValues.size();u++){
+				uniqueValueString.append(comma);
+				uniqueValueString.append(uniqueValues.get(u));
+				comma = ", ";
+			}
+			//////////////////////////////////////////////////////////////////
+			//////////////////////// RESULT EVALUATION ///////////////////////
+			//////////////////////////////////////////////////////////////////
+			// evaluation of results
+			if (returnValue==null){
 				// ok
 			} else {
+				// validation configuration (CHECK WARNING)
 				if(ValidationConfig.WARNING.equals(checkUniqueConstraint)){
-					logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), returnValue);
+						logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", uniqueValueString.toString(), returnValue);
 				} else {
+					// validation configuration (MSG)
 					String msg=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.MSG);
 					if(msg!=null && msg.length()>0){
-						logMsg(constraintName,msg);
+						logMsg(getScopedName(uniquenessConstraint),msg);
 					} else {
-						logMsg(constraintName,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), returnValue);
+							logMsg(getScopedName(uniquenessConstraint),"Unique is violated! Values {0} already exist in Object: {1}", uniqueValueString.toString(), returnValue);
 					}
 				}
 			}
@@ -2010,7 +2145,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	// HashMap of unique constraints.
 	HashMap<ArrayList<String>, HashMap<AttributeArray, String>> seenUniqueConstraintValues = new HashMap<ArrayList<String>, HashMap<AttributeArray, String>>();
 	// List of all arrayLists of unique attributes and classes.
-	ArrayList<ArrayList<String>> listOfUniqueObj = new ArrayList<ArrayList<String>>();
+	ArrayList<ArrayList<String>> uniqueObjects = new ArrayList<ArrayList<String>>();
 	// List of all object Oid's and associated classPath's of uniqueness validate of Oid's.
 	Map<String , String> uniqueObjectIDs = new HashMap<String, String>();
 	HashSet<Object> loggedObjects=new HashSet<Object>();
@@ -2100,7 +2235,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			while (attrI.hasNext()) {
 				Object obj1 = attrI.next();
 				if(obj1 instanceof UniquenessConstraint){
-					UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) obj1;
+					UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) obj1; // uniquenessConstraint not null.
 					validateUniquenessConstraint(iomObj, uniquenessConstraint);
 				}
 			}
@@ -2314,36 +2449,108 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return null;
 	}
 
-	// viewable aClass
-	private String validateUnique(IomObject currentObject,ArrayList<String>uniqueAttrs, Holder<AttributeArray> values) {
-				
-		int sizeOfUniqueAttribute = uniqueAttrs.size();
-		ArrayList<String> accu = new ArrayList<String>();
-		for (int i=1;i<sizeOfUniqueAttribute;i++){
-			String attrValue=currentObject.getattrvalue(uniqueAttrs.get(i));
-			if(attrValue==null){
-				IomObject refObj=currentObject.getattrobj(uniqueAttrs.get(i),0);
-				if(refObj!=null){
-					attrValue=refObj.getobjectrefoid();
-				}
-			}
-			if(attrValue==null){
-				return null;
-			}
-			accu.add(attrValue);
+//		ArrayList<String> uniqueValues = new ArrayList<String>();
+//		
+//		if(constraintClass instanceof AssociationDef){
+//			AssociationDef association = (AssociationDef) constraintClass;
+//			uniqueValues.add(constraintClass.toString());
+//			Iterator  iterator = association.getAttributesAndRoles();
+//			if(iterator.hasNext()){
+//				Object attr = iterator.next();
+//				if(attr instanceof RoleDef){
+//					RoleDef role = (RoleDef) attr;
+//					if(uniqueAttrs.contains(role.getName())){
+//						uniqueValues.add(role.getName());
+//					}
+//				}
+//			}
+//		} else {
+//			// get through all unique attributes
+//			for (int uniquePosition=1;uniquePosition<uniqueAttrs.size();uniquePosition++){
+//				String attrName = uniqueAttrs.get(uniquePosition);
+//				String attrValue=currentObject.getattrvalue(attrName);
+//				if(attrValue!=null){
+//					// unique is in base class
+//					uniqueValues.add(attrValue);
+//				} else {
+//					// extends structure or association.
+//					for(int objectPosition=0;objectPosition<currentObject.getattrcount();objectPosition++){
+//						String currentAttrName = currentObject.getattrname(objectPosition);
+//						attrValue = currentObject.getattrvalue(currentAttrName);
+//						IomObject tempObject = currentObject;
+//						IomObject object=null;
+//						
+//						while(tempObject.getattrobj(currentAttrName, 0)!=null){
+//							object = tempObject.getattrobj(currentAttrName, 0);
+//							if(object.getobjecttag().equals("SURFACE")){
+//								attrValue = object.toString();
+//								uniqueValues.add(attrValue);
+//							} else if(object.getobjecttag().equals("AREA")){
+//								attrValue = object.toString();
+//								uniqueValues.add(attrValue);
+//							} else
+//							if(object.getobjecttag().equals("REF")){
+//							attrValue = object.getobjectrefoid();
+//							for(int g=0; g<currentObject.getattrcount();g++){
+//								String attrName2 = currentObject.getattrname(g);
+//								for(int h=1; h<uniqueAttrs.size();h++){
+//									String attrName3 = uniqueAttrs.get(h);
+//									if(attrName2.equals(attrName3)){
+//										attrValue = attrName3;
+//										uniqueValues.add(attrValue);
+//									}
+//								}
+//							}
+//						} else {
+//								// normal attribute
+//								for(int l=0;l<object.getattrcount();l++){
+//									String structAttrName = object.getattrname(l);
+//									if(object.getattrobj(structAttrName, 0)!=null){
+//										currentAttrName = structAttrName;
+//									}
+//								}
+//						}
+//							// if object was not null
+//							if(object!=null){
+//								tempObject = object;
+//							}
+//						}
+//						if(object!=null){
+//							for(int k=0;k<object.getattrcount();k++){
+//								String targetAttrName = object.getattrname(k);
+//								if(targetAttrName.equals(attrName)){
+//									attrValue = object.getattrvalue(targetAttrName);
+//									if(attrValue!=null){
+//										uniqueValues.add(attrValue);
+//									}
+//								}
+//							}
+//						}
+//					}
+//				}
+//				if(attrValue==null){
+//					return null;
+//				}
+//			}
+//		}
+	private String validateUnique(IomObject iomObj,ArrayList<String>uniqueAttrs,ArrayList<String>uniqueValues){
+		String oid = iomObj.getobjectoid();
+		if(oid==null){
+			oid = iomObj.getobjecttag();
 		}
-		values.value=new AttributeArray(currentObject.getobjectoid(), accu);
+		// id to identify uniqueness values
+		AttributeArray attrs =new AttributeArray(oid, uniqueValues);
 		HashMap<AttributeArray, String> allValues = null;
 		if (seenUniqueConstraintValues.containsKey(uniqueAttrs)){
 			allValues = seenUniqueConstraintValues.get(uniqueAttrs);
-			if (allValues.containsKey(values.value)){
-				return allValues.get(values.value);
+			if (allValues.containsKey(attrs)){
+				return allValues.get(attrs);
 			} else {
-				allValues.put(values.value, currentObject.getobjectoid());
+				allValues.put(attrs, oid);
 			}
 		} else {
 			allValues = new HashMap<AttributeArray, String>();
-			allValues.put(values.value, currentObject.getobjectoid());
+			allValues.put(attrs, oid);
 			seenUniqueConstraintValues.put(uniqueAttrs, allValues);
 		}
 		return null;
