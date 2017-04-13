@@ -29,7 +29,6 @@ public class FunctionsExt23Test {
 	// CLASS
 	private final static String ILI_CLASSA=ILI_TOPIC+".ClassA";
 	private final static String ILI_CLASSB=ILI_TOPIC+".ClassB";
-	private final static String ILI_CLASSC=ILI_TOPIC+".ClassC";
 	// START BASKET EVENT
 	private final static String BID1="b1";
 	
@@ -47,9 +46,9 @@ public class FunctionsExt23Test {
 	//######## SUCCESS FUNCTIONS ##############################//
 	//#########################################################//	
 	
-	// Es wird getestet ob ein Fehler ausgegeben wird, wenn eine neue Funktion (subString) erstellt wird. Dabei alles richtg erstellt wird.
+	// testet eine Benutzerdefinierte Funktion mit einfachen (String, Zahlen) Argumenten
 	@Test
-	public void newFunctionSubString_Ok(){
+	public void simpleArguments_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
 		iomObjA.setattrvalue("text", "0123456789");
 		iomObjA.setattrvalue("from", "2");
@@ -73,9 +72,9 @@ public class FunctionsExt23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Anzahl der elemente mit dem attr2 übereinstimmen.
+	// testet eine Benutzerdefinierte Funktion mit Strukturen als Argument
 	@Test
-	public void elementCountTrue_Ok(){
+	public void structureArguments_Ok(){
 		Iom_jObject iomObjM=new Iom_jObject("FunctionsExt23.Topic.StructA", null);
 		Iom_jObject iomObjM2=new Iom_jObject("FunctionsExt23.Topic.StructA", null);
 		Iom_jObject iomObjM3=new Iom_jObject("FunctionsExt23.Topic.StructA", null);
@@ -109,9 +108,9 @@ public class FunctionsExt23Test {
 	//######## FAILING FUNCTIONS ##############################//
 	//#########################################################//	
 	
-	// Es wird getestet ob ein Fehler ausgegeben wird, wenn eine neue Funktion (substring) erstellt wird und der SubString nicht analog attr2 ist.
+	// testet ob der Rueckgabewert der Benutzedefinierten Funktion ausgewertet wird
 	@Test
-	public void newFunctionSubString_Fail(){
+	public void returnsFalse_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
 		iomObjA.setattrvalue("text", "123456789");
 		iomObjA.setattrvalue("from", "2");
@@ -136,12 +135,9 @@ public class FunctionsExt23Test {
 		assertEquals("Mandatory Constraint FunctionsExt23.Topic.ClassA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob ein Fehler ausgegeben wird, wenn eine neue Funktion (SubString) erstellt wird.
-	// Jedoch die Klasse SuperText zwar einen Verweis hat, jedoch keine gültige Klassenreferenz aufweist.
-	// Das heisst dass die Constraint nicht als Funktion angeschaut werden kann, da diese nicht einmal die Referenz auf die Function finden kann.
-	// Somit ist der Fehler keine Inexistenz der Funktion, sondern des MandatoryConstraints.
+	// testet eine Funktion, die im ili-Modell definiert wurde, aber keine Implementierung hat
 	@Test
-	public void newFunctionSubStringValidClassRefNotFound_Fail(){
+	public void noImplmenetation_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
 		iomObjA.setattrvalue("text", "0123456789");
 		iomObjA.setattrvalue("from", "2");
@@ -159,32 +155,8 @@ public class FunctionsExt23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("MandatoryConstraint FunctionsExt23.Topic.Constraint1 of FunctionsExt23.Topic.ClassB is not yet implemented.", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getWarn().size()==1);
+		assertEquals("MandatoryConstraint FunctionsExt23.Topic.Constraint1 of FunctionsExt23.Topic.ClassB is not yet implemented.", logger.getWarn().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die neue Funktion (noText) keine Referenz findet.
-	// Da der Constraint nicht unmittelbar als Function identifiziert werden kann, wird die Meldung MandatoryConstraint: .... ausgegeben.
-	@Test
-	public void newFunctionNoTextNotDefined_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC, OBJ_OID1);
-		iomObjA.setattrvalue("text", "0123456789");
-		iomObjA.setattrvalue("from", "2");
-		iomObjA.setattrvalue("to", "8");
-		iomObjA.setattrvalue("attr2", "234567");
-		ValidationConfig modelConfig=new ValidationConfig();
-		modelConfig.mergeIliMetaAttrs(td);
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("MandatoryConstraint FunctionsExt23.Topic.Constraint1 of FunctionsExt23.Topic.ClassC is not yet implemented.", logger.getErrs().get(0).getEventMsg());
-	}
 }
