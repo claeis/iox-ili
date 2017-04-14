@@ -71,7 +71,7 @@ import java.util.Map;
 	 */
     public class Iligml10Writer implements ch.interlis.iox.IoxWriter
     {
-        private XMLStreamWriter xout=null;
+		private XMLStreamWriter xout=null;
     	private ObjectPoolManager recman = null;
         private ViewableProperties mapping = null;
     	private XtfModel xtfModels[]=null;
@@ -342,7 +342,7 @@ import java.util.Map;
 						String attrName=attr.getName();
 						String lineTableName=tableQName+"."+attrName;
 						EhiLogger.logState("build linetable "+lineTableName+"...");
-						ItfAreaPolygon2Linetable allLines=new ItfAreaPolygon2Linetable();
+						ItfAreaPolygon2Linetable allLines=new ItfAreaPolygon2Linetable(recman);
 						// FORALL main objects
 						java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
 						for(String poolId : pool.keySet()){

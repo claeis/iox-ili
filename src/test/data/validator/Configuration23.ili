@@ -1,0 +1,197 @@
+INTERLIS 2.3;
+
+MODEL Configuration23 AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" =
+  	
+	TOPIC Topic=
+	
+	DOMAIN
+		Enumeration = (eins, mehr);
+		Enumeration2 EXTENDS Enumeration = (mehr(vier, fuenf));
+		Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					   70000.000 .. 310000.000 [INTERLIS.m],
+				 	   ROTATION 2 -> 1;
+		
+	
+		CLASS ConditionTextClass =
+			attrText : TEXT*10;
+		END ConditionTextClass;
+		
+		CLASS ConditionNumberClass =
+			attrNumber : 0..10;
+		END ConditionNumberClass;
+		
+		CLASS ClassA =
+			attrText : TEXT*10;
+			EXISTENCE CONSTRAINT attrText REQUIRED IN Configuration23.Topic.ConditionTextClass : attrText;
+		END ClassA;
+		
+		CLASS ClassB =
+			attrText1 : TEXT*10;
+			attrText2 : TEXT*10;
+			attrText3 : TEXT*10;
+			attrText4 : TEXT*10;
+			EXISTENCE CONSTRAINT attrText1 REQUIRED IN Configuration23.Topic.ConditionTextClass : attrText;
+			EXISTENCE CONSTRAINT attrText2 REQUIRED IN Configuration23.Topic.ConditionTextClass : attrText;
+			EXISTENCE CONSTRAINT attrText3 REQUIRED IN Configuration23.Topic.ConditionTextClass : attrText;
+			EXISTENCE CONSTRAINT attrText4 REQUIRED IN Configuration23.Topic.ConditionTextClass : attrText;
+		END ClassB;
+		
+		CLASS ClassC =
+		  	attrI1 : TEXT*10;
+		END ClassC;
+		
+		CLASS ClassD =
+		  	attrJ1 : TEXT*10;
+		END ClassD;
+		
+		ASSOCIATION cd1 =
+		 	c1 -- {0..1} ClassC;
+		 	d1 -- {0..1} ClassD;
+		END cd1;
+		
+		CLASS ClassE =
+			attr1 : BOOLEAN;
+			attr2 : BOOLEAN;
+			MANDATORY CONSTRAINT
+			attr1 == attr2;
+		END ClassE;
+		
+		CLASS ClassF =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			CONSTRAINT >= 50%
+			attr1 >= attr2;
+		END ClassF;
+		
+		CLASS ClassG =
+			Art: (a, b, c);
+			SET CONSTRAINT WHERE Art == #a :
+				INTERLIS.objectCount(ALL) == 5;
+		END ClassG;
+		
+		CLASS ClassH =
+		  attr1 : TEXT*10;
+		  attr2 : 0 .. 100;
+		  UNIQUE attr1, attr2;
+		END ClassH;
+		
+		CLASS ClassI =
+			attr1 : 0..10;
+			attr2 : 0..10;
+		END ClassI;
+		
+		STRUCTURE StructA =
+		END StructA;
+		
+		CLASS ClassJ =
+			Numbers: BAG {1..*} OF StructA;
+		END ClassJ;
+		
+		CLASS ClassK =
+			superAttr : TEXT*10;
+		END ClassK;
+		
+		CLASS ClassL =
+			subAttr : TEXT*10;
+		END ClassL;
+		
+		CLASS ClassM =
+		 	attr1 : TEXT*10;
+		 	attr2 : 0 .. 100;
+		END ClassM;
+		
+		CLASS ClassN =
+			attr1 : Enumeration;
+			attr2 : Enumeration2;
+			MANDATORY CONSTRAINT
+				INTERLIS.isEnumSubVal (attr2, attr1);
+		END ClassN;
+		
+		CLASS ClassO =
+			aBoolean : BOOLEAN;
+		END ClassO;
+		
+		CLASS ClassP =
+			lcoord : Lkoord;
+		END ClassP;
+		
+		CLASS ClassQ =
+		   attrA1 : TEXT*10;
+		END ClassQ;
+		
+		CLASS ClassR =
+		   attrB1 : TEXT*10;
+		END ClassR;
+		
+		CLASS ClassS =
+		   attr1 : TEXT*10;
+		END ClassS;
+		
+		CLASS ClassT =
+		   attr1 : TEXT*10;
+		END ClassT;
+		
+		ASSOCIATION qr1 =
+		  q1 -- {0..1} ClassQ OR ClassD;
+		  r1 -- {0..*} ClassR OR ClassD;
+		END qr1;
+		
+		ASSOCIATION st1 =
+		  s1 -- {1..1} ClassS;
+		  t1 -- {1..1} ClassT;
+		END st1;
+	END Topic;
+END Configuration23.
+
+CONTRACTED MODEL AddManConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS Configuration23;
+	VIEW TOPIC AddManConTopic =
+		DEPENDS ON Configuration23.Topic;
+		VIEW AddManConView
+			PROJECTION OF Configuration23.Topic.ClassI;
+			WHERE ClassI->attr1==5;
+			=
+			ALL OF ClassI;
+			MANDATORY CONSTRAINT attr1 == attr2;
+		END AddManConView;
+	END AddManConTopic;
+END AddManConModel.
+
+CONTRACTED MODEL AddSetConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS Configuration23;
+	VIEW TOPIC AddSetConTopic =
+		DEPENDS ON Configuration23.Topic;
+		VIEW AddSetConView
+			PROJECTION OF Configuration23.Topic.ClassJ;
+			=
+			ALL OF ClassJ;
+			SET CONSTRAINT INTERLIS.objectCount(Numbers) == 2;
+		END AddSetConView;
+	END AddSetConTopic;
+END AddSetConModel.
+
+CONTRACTED MODEL AddExConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS Configuration23;	
+	VIEW TOPIC AddExConTopic =
+		DEPENDS ON Configuration23.Topic;		
+		VIEW AddExConView
+			PROJECTION OF Configuration23.Topic.ClassL;
+			=
+			ALL OF ClassL;
+			EXISTENCE CONSTRAINT subAttr REQUIRED IN Configuration23.Topic.ClassK : superAttr;
+		END AddExConView;
+	END AddExConTopic;
+END AddExConModel.
+
+CONTRACTED MODEL AddUnConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS Configuration23;
+	VIEW TOPIC AddUnConTopic =
+		DEPENDS ON Configuration23.Topic;
+		VIEW AddUnConView
+			PROJECTION OF Configuration23.Topic.ClassM;
+			=
+			ALL OF ClassM;
+			UNIQUE attr1;
+		END AddUnConView;
+	END AddUnConTopic;
+END AddUnConModel.

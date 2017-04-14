@@ -12,16 +12,23 @@ import ch.interlis.iox.IoxLogEvent;
 
 public class LogCollector implements ch.interlis.iox.IoxLogging {
 	private ArrayList<IoxLogEvent> errs=new ArrayList<IoxLogEvent>();
+	private ArrayList<IoxLogEvent> warn=new ArrayList<IoxLogEvent>();
 
 	@Override
 	public void addEvent(IoxLogEvent event) {
 		EhiLogger.getInstance().logEvent((LogEvent) event);
-		errs.add(event);
+		if(event.getEventKind()==IoxLogEvent.ERROR){
+			errs.add(event);
+		}else if(event.getEventKind()==IoxLogEvent.WARNING){
+			warn.add(event);
+		}
 	}
 
 	public ArrayList<IoxLogEvent> getErrs() {
 		return errs;
 	}
-
-
+	
+	public ArrayList<IoxLogEvent> getWarn() {
+		return warn;
+	}
 }

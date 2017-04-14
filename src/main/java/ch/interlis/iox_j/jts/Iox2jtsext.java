@@ -24,6 +24,8 @@ package ch.interlis.iox_j.jts;
 
 import java.util.ArrayList;
 
+import javax.xml.ws.Holder;
+
 import com.vividsolutions.jts.geom.Coordinate;
 
 import ch.ehi.basics.logging.EhiLogger;
@@ -36,6 +38,9 @@ import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
 import ch.interlis.iox.IoxException;
+import ch.interlis.iox_j.logging.Log2EhiLogger;
+import ch.interlis.iox_j.logging.LogEventFactory;
+import ch.interlis.iox_j.validator.ValidationConfig;
 
 /** Utility to convert from INTERLIS to JTS geometry types.
  * @author ceis
@@ -165,6 +170,19 @@ public class Iox2jtsext {
 		if(polylineObj==null){
 			return null;
 		}
+		Log2EhiLogger logger=new Log2EhiLogger();
+		LogEventFactory errs=new LogEventFactory();
+		errs.setLogger(logger);
+		Holder<Boolean> foundErrs=new Holder<Boolean>();
+		return polyline2JTS(polylineObj, isSurfaceOrArea, p,foundErrs,errs,0.0,ValidationConfig.WARNING,ValidationConfig.WARNING);
+	}
+	public static CompoundCurve polyline2JTS(IomObject polylineObj,boolean isSurfaceOrArea,double p,Holder<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType,String degeneratedArcValidationType)
+	throws IoxException
+	{
+		foundErrs.value=false;
+		if(polylineObj==null){
+			return null;
+		}
 		ArrayList<CurveSegment> ret=new ArrayList<CurveSegment>();
 		// is POLYLINE?
 		if(isSurfaceOrArea){
@@ -199,22 +217,45 @@ public class Iox2jtsext {
 						lastSegmentEndpoint=coord2JTS(segment);
 					}else{
 						Coordinate newSegEndPt=coord2JTS(segment);
-						curve=new StraightSegment(lastSegmentEndpoint,newSegEndPt);
-						ret.add(curve);
-						lastSegmentEndpoint=curve.getEndPoint();
+						if(lastSegmentEndpoint.equals2D(newSegEndPt, tolerance)){
+							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegEndPt.toString());
+						}else{
+							curve=new StraightSegment(lastSegmentEndpoint,newSegEndPt);
+							ret.add(curve);
+							lastSegmentEndpoint=curve.getEndPoint();
+						}
 					}
 				}else if(segment.getobjecttag().equals("ARC")){
 					// ARC
 					//arc2JTS(ret,segment,p);
 					Coordinate newSegMidPt=getArcMidPt(segment);
 					Coordinate newSegEndPt=getArcEndPt(segment);
-					curve=new ArcSegment(lastSegmentEndpoint,newSegMidPt,newSegEndPt);
-					if(((ArcSegment) curve).isStraight()){
-						EhiLogger.logAdaption("arc convertet to straight at "+((ArcSegment) curve).getMidPoint());
-						curve=new StraightSegment(curve.getStartPoint(),curve.getEndPoint());
+					if(lastSegmentEndpoint==null){
+						throw new IoxException("unexpected ARC");
 					}
-					ret.add(curve);
-					lastSegmentEndpoint=curve.getEndPoint();
+					if(lastSegmentEndpoint.equals2D(newSegMidPt, tolerance)){
+						if(newSegMidPt.equals2D(newSegEndPt, tolerance)){
+							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegEndPt.toString());
+						}else{
+							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegMidPt.toString());
+							curve=new StraightSegment(lastSegmentEndpoint,newSegEndPt);
+							ret.add(curve);
+							lastSegmentEndpoint=curve.getEndPoint();
+						}
+					}else if(newSegMidPt.equals2D(newSegEndPt, tolerance)){
+						foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegMidPt.toString());
+						curve=new StraightSegment(lastSegmentEndpoint,newSegMidPt);
+						ret.add(curve);
+						lastSegmentEndpoint=curve.getEndPoint();
+					}else{
+						curve=new ArcSegment(lastSegmentEndpoint,newSegMidPt,newSegEndPt);
+						if(((ArcSegment) curve).isStraight()){
+							foundErrs.value = foundErrs.value || logMsg(errs,degeneratedArcValidationType,"arc is straight at {0}",((ArcSegment) curve).getMidPoint().toString());
+							curve=new StraightSegment(curve.getStartPoint(),curve.getEndPoint());
+						}
+						ret.add(curve);
+						lastSegmentEndpoint=curve.getEndPoint();
+					}
 				}else{
 					// custum line form
 					throw new IoxException("custom line form not supported");
@@ -229,6 +270,15 @@ public class Iox2jtsext {
 		}
 		return new CompoundCurve(ret,new JtsextGeometryFactory());
 	}
+	private static boolean logMsg(LogEventFactory errs,String validateKind,String msg,String... args){
+		 if(ValidationConfig.WARNING.equals(validateKind)){
+			 errs.addEvent(errs.logWarningMsg(msg, args));
+			 return false;
+		 }else{
+			 errs.addEvent(errs.logErrorMsg(msg, args));
+			 return true;
+		 }
+	}
 	/** Converts a SURFACE to a JTS Polygon.
 	 * @param obj INTERLIS SURFACE structure
 	 * @param strokeP maximum stroke to use when removing ARCs
@@ -238,6 +288,16 @@ public class Iox2jtsext {
 	public static com.vividsolutions.jts.geom.Polygon surface2JTS(IomObject obj,double strokeP) //SurfaceOrAreaType type)
 	throws IoxException
 	{
+		Log2EhiLogger logger=new Log2EhiLogger();
+		LogEventFactory errs=new LogEventFactory();
+		errs.setLogger(logger);
+		Holder<Boolean> foundErrs=new Holder<Boolean>();
+		return surface2JTS(obj,strokeP,foundErrs,errs,0.0,ValidationConfig.WARNING);
+	}
+	public static com.vividsolutions.jts.geom.Polygon surface2JTS(IomObject obj,double strokeP, Holder<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType) //SurfaceOrAreaType type)
+	throws IoxException
+	{
+		foundErrs.value=false;
 		if(obj==null){
 			return null;
 		}
@@ -247,7 +307,15 @@ public class Iox2jtsext {
 		if(clipped){
 			throw new IoxException("clipped surface not supported");
 		}
-		for(int surfacei=0;surfacei<obj.getattrvaluecount("surface");surfacei++){
+		String tag=obj.getobjecttag();
+		if(!"MULTISURFACE".equals(tag)){
+			throw new IoxException("unexpected Type "+tag+"; MULTISURFACE expected");
+		}
+		int surfacec=obj.getattrvaluecount("surface");
+		if(surfacec==0){
+			throw new IoxException("at least one element surface expected");
+		}
+		for(int surfacei=0;surfacei<surfacec;surfacei++){
 			if(clipped){
 				//out.startElement("CLIPPED",0,0);
 			}else{
@@ -265,15 +333,20 @@ public class Iox2jtsext {
 			}
 			for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
 				IomObject boundary=surface.getattrobj("boundary",boundaryi);
-				ArrayList<CompoundCurve> jtsLine=new ArrayList<CompoundCurve>();
+				ArrayList<CompoundCurve> jtsLines=new ArrayList<CompoundCurve>();
 				for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
 					IomObject polyline=boundary.getattrobj("polyline",polylinei);
-					jtsLine.add(polyline2JTS(polyline,true,strokeP));
+					Holder<Boolean> lineErrs=new Holder<Boolean>();
+					CompoundCurve jtsLine=polyline2JTS(polyline,true,strokeP,lineErrs,errs,tolerance,validationType,ValidationConfig.WARNING);
+					if(lineErrs.value){
+						foundErrs.value=foundErrs.value || lineErrs.value;
+					}
+					jtsLines.add(jtsLine);
 				}
 				if(boundaryi==0){
-					shell=new CompoundCurveRing(jtsLine,new JtsextGeometryFactory());
+					shell=new CompoundCurveRing(jtsLines,new JtsextGeometryFactory());
 				}else{
-					holes[boundaryi-1]=new CompoundCurveRing(jtsLine,new JtsextGeometryFactory());
+					holes[boundaryi-1]=new CompoundCurveRing(jtsLines,new JtsextGeometryFactory());
 				}
 				//bndries.append(fmeLine);
 			}

@@ -14,22 +14,35 @@ import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.Constraint;
 import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.Element;
-import ch.interlis.ili2c.metamodel.Model;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 
 import com.moandjiezana.toml.Toml;
 
-
 public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	private HashMap<String,HashMap<String,String>> data=new HashMap<String,HashMap<String,String>>();
+	// CONFIG
 	public static final String MULTIPLICITY="multiplicity";
 	public static final String TYPE="type";
-	public static final String WARNING="warning";
-	public static final String OFF="off"; 
+	public static final String TOPOLOGY="topology";
+	public static final String TARGET="target";
+	public static final String MSG="msg";
+	public static final String CHECK = "check";
+	public static final String KEYMSG = "keymsg";
 	public static final String ILI_METAATTR_PREFIX="ilivalid.";
+	// SETTINGS
+	public static final String WARNING="warning";
+	public static final String OFF="off";
+	public static final String ON="on";
+	// PARAMETER
 	public static final String PARAMETER = "PARAMETER";
 	public static final String VALIDATION = "validation";
+	public static final String AREA_OVERLAP_VALIDATION = "areaOverlapValidation";
+	public static final String DEFAULT_GEOMETRY_TYPE_VALIDATION = "defaultGeometryTypeValidation";
+	public static final String ADDITIONAL_MODELS="additionalModels";
+	public static final String ALLOW_ONLY_MULTIPLICITY_REDUCTION="allowOnlyMultiplicityReduction";
+	// PipelinePool
+	public static final String TOPOLOGY_VALIDATION_OK="topologyValidationOk";
 	public void mergeIliMetaAttrs(TransferDescription td){
 		mergeIliMetaAttrsHelper(td);
 	}
@@ -103,8 +116,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 							}
 						}
 				  }
-				}
-			
+			}
 		}finally{
 			if(in!=null){
 				try {
@@ -114,7 +126,6 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 				in=null;
 			}
 		}
-		
 	}
 	static public ValidationConfig readFromConfigFile(java.io.File file) throws FileNotFoundException
 	{
@@ -169,5 +180,4 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 		}
 		modelele.put(configParam, value);
 	}
-
 }

@@ -1,0 +1,40 @@
+INTERLIS 2.3;
+CONTRACTED MODEL FunctionsExt23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
+  
+  	FUNCTION subText (text: TEXT; from: NUMERIC; to: NUMERIC): TEXT;
+  	
+  	FUNCTION superText (text: TEXT; from: NUMERIC; to: NUMERIC): TEXT;
+  	
+  	FUNCTION elementCount (bag: BAG OF ANYSTRUCTURE): BOOLEAN;
+  	
+	TOPIC Topic=
+	
+		STRUCTURE StructA =
+    	END StructA;
+    	
+		CLASS ClassD =
+			attr2 : BOOLEAN;
+			attr3 : BAG {0..*} OF StructA;
+			MANDATORY CONSTRAINT elementCount(attr3) == attr2;
+		END ClassD;
+    	
+		CLASS ClassA =
+			text : TEXT;
+			from : 0..10;
+			to : 0..10;
+			attr2 : TEXT;
+			MANDATORY CONSTRAINT subText(text,from,to) == attr2;
+		END ClassA;
+
+		CLASS ClassB =
+			text : TEXT;
+			from : 0..10;
+			to : 0..10;
+			attr2 : TEXT;
+			MANDATORY CONSTRAINT superText(text,from,to) == attr2;
+		END ClassB;
+		
+	END Topic;
+	
+END FunctionsExt23.

@@ -1,0 +1,329 @@
+INTERLIS 2.3;
+
+MODEL MandatoryConstraints23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
+	
+	TOPIC Topic=
+	
+		DOMAIN
+			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					        70000.000 .. 310000.000 [INTERLIS.m],
+						   ROTATION 2 -> 1;
+			Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					        70000.000 .. 310000.000 [INTERLIS.m],
+					              0.000 .. 5000.000 [INTERLIS.m];
+			enumeration = (null, eins, zwei, drei, mehr (vier));
+			enumerationOrdered = (null, eins, zwei, drei, mehr (vier)) ORDERED;
+			attrRef1 = TEXT*12;	
+		
+		CLASS ClassConstantA =
+			MANDATORY CONSTRAINT
+			#true;
+		END ClassConstantA;
+		
+		CLASS ClassConstantB =
+			MANDATORY CONSTRAINT
+			NOT(# false);
+		END ClassConstantB;
+		
+		CLASS ClassConstantD =
+			MANDATORY CONSTRAINT
+			DEFINED(#true);
+		END ClassConstantD;
+		
+		CLASS ClassConstantE =
+			MANDATORY CONSTRAINT
+			(#true AND (#true AND (#true AND (#true)))) AND #true AND (#true AND (#true));
+		END ClassConstantE;
+		
+		CLASS ClassConstantF =
+			MANDATORY CONSTRAINT
+			#false OR #false OR #false OR(#false OR (#false OR (#false OR (#true))));
+		END ClassConstantF;
+		
+		CLASS ClassConstantG =
+			MANDATORY CONSTRAINT
+			(#true == #true) == (#true == #true);
+		END ClassConstantG;
+		
+		CLASS ClassConstantH =
+			MANDATORY CONSTRAINT
+			(#true AND #true) != (#true AND #false);
+		END ClassConstantH;
+		
+		CLASS ClassConstantI =
+			MANDATORY CONSTRAINT
+			(#true <> #true) <> (#true <> (#true <> (#false)));
+		END ClassConstantI;
+
+		CLASS ClassConstantJ =
+			aufzaehlung1 : enumeration;
+			MANDATORY CONSTRAINT
+			aufzaehlung1 == #mehr.vier;
+		END ClassConstantJ;
+		
+		CLASS ClassEqualA =
+			straightsarcs1 : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
+			arcsstraights2 : POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Hkoord;
+			MANDATORY CONSTRAINT
+		   straightsarcs1 == arcsstraights2;
+		END ClassEqualA;
+		
+		CLASS ClassEqualB =
+			surface1 : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			surface2 : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT
+		    surface1 == surface2;
+		END ClassEqualB;
+		
+		CLASS ClassEqualC =
+			area1 : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			area2 : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT
+		    area1 == area2;
+		END ClassEqualC;
+		
+		CLASS ClassEqualD =
+		   straights2d1 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		   straights2d2 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		   arcs2d1 : POLYLINE WITH (ARCS) VERTEX Lkoord;
+		   arcs2d2 : POLYLINE WITH (ARCS) VERTEX Lkoord;
+		   MANDATORY CONSTRAINT
+		   (straights2d1 == straights2d2) == (arcs2d1 == arcs2d2);
+		END ClassEqualD;
+		
+		CLASS ClassEqualE =
+			attr1 : Lkoord;
+			attr2 : Lkoord;
+			attr3 : Lkoord;
+			attr4 : Lkoord;
+			MANDATORY CONSTRAINT
+			(attr1 == attr2) == (attr3 == attr4);
+		END ClassEqualE;
+		
+		CLASS ClassEqualF =
+			attr1 : 0.0..10.0;
+			attr2 : 0.0..10.0;
+			MANDATORY CONSTRAINT
+			attr1 == attr2;
+		END ClassEqualF;
+		
+		CLASS ClassEqualF2 =
+			attr1 : 0.0..10.0;
+			MANDATORY CONSTRAINT
+			attr1 == 2.0;
+		END ClassEqualF2;
+		
+		CLASS ClassEqualNot =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			MANDATORY CONSTRAINT
+			attr1 == attr2;
+		END ClassEqualNot;
+		
+		CLASS ClassEqualG =
+			attr1 : TEXT*10;
+			attr2 : TEXT*10;
+			MANDATORY CONSTRAINT
+			attr1 == attr2;
+		END ClassEqualG;
+		
+		CLASS ClassEqualH =
+			aufzaehlung1 : enumeration;
+			aufzaehlung2 : enumeration;
+			MANDATORY CONSTRAINT
+			aufzaehlung1 == aufzaehlung2;
+		END ClassEqualH;
+		
+		CLASS ClassEqualI =
+			attr1 : BOOLEAN;
+			attr2 : BOOLEAN;
+			MANDATORY CONSTRAINT
+			attr1 == attr2;
+		END ClassEqualI;
+		
+		CLASS ClassUnEqualA =
+			attr1 : TEXT*10;
+			attr2 : TEXT*10;
+			MANDATORY CONSTRAINT
+			attr1 != attr2;
+		END ClassUnEqualA;
+				
+		CLASS ClassUnEqualB =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			MANDATORY CONSTRAINT
+			attr1 != attr2;
+		END ClassUnEqualB;
+		
+		CLASS ClassUnEqualC =
+			aufzaehlung1 : enumeration;
+			aufzaehlung2 : enumeration;
+			MANDATORY CONSTRAINT
+			aufzaehlung1 != aufzaehlung2;
+		END ClassUnEqualC;
+		
+		CLASS ClassUnEqualD =
+			attr1 : Lkoord;
+			attr2 : Lkoord;
+			attr3 : Lkoord;
+			attr4 : Lkoord;
+			MANDATORY CONSTRAINT
+			(attr1 == attr2) != (attr3 == attr4);
+		END ClassUnEqualD;
+		
+		CLASS ClassUnEqualE =
+		   straights2d1 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		   straights2d2 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		   MANDATORY CONSTRAINT
+		   (straights2d1 != straights2d2);
+		END ClassUnEqualE;
+		
+		CLASS ClassUnEqualF =
+			straightsarcs1 : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
+			arcsstraights2 : POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Hkoord;
+			MANDATORY CONSTRAINT
+		   straightsarcs1 != arcsstraights2;
+		END ClassUnEqualF;
+		
+		CLASS ClassUnEqualG =
+			surface1 : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			surface2 : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT
+		    surface1 != surface2;
+		END ClassUnEqualG;
+		
+		CLASS ClassUnEqualH =
+			area1 : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			area2 : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			MANDATORY CONSTRAINT
+		    area1 != area2;
+		END ClassUnEqualH;
+		
+		CLASS ClassUnEqualI =
+			attr1 : BOOLEAN;
+			attr2 : BOOLEAN;
+			MANDATORY CONSTRAINT
+			attr1 <> attr2;
+		END ClassUnEqualI;
+
+		CLASS ClassGreaterThanA =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			MANDATORY CONSTRAINT
+			attr1 > attr2;
+		END ClassGreaterThanA;
+		
+		CLASS ClassGreaterThanB =
+			aufzaehlung1 : enumerationOrdered;
+			aufzaehlung2 : enumerationOrdered;
+			MANDATORY CONSTRAINT
+			aufzaehlung1 > aufzaehlung2;
+		END ClassGreaterThanB;
+		
+		CLASS ClassGreaterThanC =
+			attr1 : TEXT*10;
+			attr2 : TEXT*10;
+			MANDATORY CONSTRAINT
+			attr1 > attr2;
+		END ClassGreaterThanC;
+		
+		CLASS ClassLessThanA =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			MANDATORY CONSTRAINT
+			attr1 < attr2;
+		END ClassLessThanA;
+		
+		CLASS ClassLessThanB =
+			aufzaehlung1 : enumerationOrdered;
+			aufzaehlung2 : enumerationOrdered;
+			MANDATORY CONSTRAINT
+			aufzaehlung1 < aufzaehlung2;
+		END ClassLessThanB;
+		
+		CLASS ClassLessThanC =
+			attr1 : TEXT*10;
+			attr2 : TEXT*10;
+			MANDATORY CONSTRAINT
+			attr1 < attr2;
+		END ClassLessThanC;
+		
+		CLASS ClassGreaterThanOrEqualA =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			MANDATORY CONSTRAINT
+			attr1 >= attr2;
+		END ClassGreaterThanOrEqualA;
+		
+		CLASS ClassGreaterThanOrEqualB =
+			aufzaehlung1 : enumerationOrdered;
+			aufzaehlung2 : enumerationOrdered;
+			MANDATORY CONSTRAINT
+			aufzaehlung1 >= aufzaehlung2;
+		END ClassGreaterThanOrEqualB;
+		
+		CLASS ClassGreaterThanOrEqualC =
+			attr1 : TEXT*10;
+			attr2 : TEXT*10;
+			MANDATORY CONSTRAINT
+			attr1 >= attr2;
+		END ClassGreaterThanOrEqualC;
+		
+		CLASS ClassLessThanOrEqualA =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			MANDATORY CONSTRAINT
+			attr1 <= attr2;
+		END ClassLessThanOrEqualA;
+		
+		CLASS ClassLessThanOrEqualB =
+			aufzaehlung1 : enumerationOrdered;
+			aufzaehlung2 : enumerationOrdered;
+			MANDATORY CONSTRAINT
+			aufzaehlung1 <= aufzaehlung2;
+		END ClassLessThanOrEqualB;
+		
+		CLASS ClassLessThanOrEqualC =
+			attr1 : TEXT*10;
+			attr2 : TEXT*10;
+			MANDATORY CONSTRAINT
+			attr1 <= attr2;
+		END ClassLessThanOrEqualC;
+		
+		CLASS ClassDefinedA =
+			straightsarcs1 : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
+			MANDATORY CONSTRAINT
+			DEFINED(straightsarcs1);
+		END ClassDefinedA;
+		
+		CLASS ClassDefinedB =
+			attr1 : attrRef1;
+			MANDATORY CONSTRAINT
+			DEFINED(attr1);
+			MANDATORY CONSTRAINT
+			DEFINED(attr1);
+			MANDATORY CONSTRAINT
+			DEFINED(attr1);
+		END ClassDefinedB;
+		
+		CLASS ClassFormattedTypeA =
+			attr1: FORMAT INTERLIS.XMLDateTime "2000-01-01T00:00:00.000" ..	"2005-12-31T23:59:59.999";
+			attr2: FORMAT INTERLIS.XMLDateTime "2000-01-01T00:00:00.000" ..	"2005-12-31T23:59:59.999";
+			MANDATORY CONSTRAINT
+			attr1 == attr2;
+		END ClassFormattedTypeA;
+		
+		CLASS ClassDiffExpressions =
+			Geometrie_Punkt : BOOLEAN;
+			Geometrie_Linie : BOOLEAN;
+			Geometrie_Polygon : BOOLEAN;
+			MANDATORY CONSTRAINT
+			(DEFINED(Geometrie_Punkt) AND NOT (DEFINED(Geometrie_Linie)) AND NOT (DEFINED(Geometrie_Polygon))) OR
+            (DEFINED(Geometrie_Linie) AND NOT (DEFINED(Geometrie_Punkt)) AND NOT (DEFINED(Geometrie_Polygon))) OR
+            (DEFINED(Geometrie_Polygon) AND NOT (DEFINED(Geometrie_Punkt)) AND NOT (DEFINED(Geometrie_Linie)));
+		END ClassDiffExpressions;
+		
+	END Topic;
+
+END MandatoryConstraints23.

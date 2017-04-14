@@ -1,0 +1,45 @@
+TRANSFER Ili1FmtTest;
+MODEL Configuration10
+	DOMAIN Lkoord = COORD2 480000.000 70000.000 850000.000 310000.000;
+		   Hkoord = COORD3 480000.000 70000.000 0.000 850000.000 310000.000 5000.000;
+	TOPIC Topic=
+		
+		TABLE ClassA =
+		   attrA1 : OPTIONAL TEXT*10;
+		NO IDENT
+		END ClassA;
+
+		TABLE ClassB =
+		   attrB1 : OPTIONAL TEXT*10;
+		NO IDENT
+		END ClassB;
+		
+		TABLE ClassC =
+		   attrC1 : -> ClassA;
+		   attrC2 : OPTIONAL -> ClassB;
+		NO IDENT
+		END ClassC;
+		
+		OPTIONAL TABLE ClassD =
+		   attrC1 : -> ClassA;
+		NO IDENT
+		END ClassD;
+		
+		TABLE ClassE =
+			attr1 : OPTIONAL GRADS 1.0 10.0;
+		NO IDENT
+		END ClassE;
+		
+		TABLE ClassF =
+			a1 : OPTIONAL TEXT*30;
+			a2 : OPTIONAL TEXT*30;
+			IDENT
+			a1;
+		END ClassF;
+		
+	END Topic.
+END Configuration10.
+FORMAT FREE;
+	CODE BLANK = DEFAULT, UNDEFINED = DEFAULT, CONTINUE = DEFAULT;
+	TID = ANY;
+END.
