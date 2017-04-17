@@ -3,8 +3,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class AttributeArray {
-	private String[] values;
-	private String oid;
+	private Object[] values;
 	
 	@Override
 	public int hashCode() {
@@ -26,22 +25,18 @@ public class AttributeArray {
 			return false;
 		return true;
 	}
-	public AttributeArray(String oid, ArrayList<String> values){
-		this.values = values.toArray(new String[values.size()]);
-		this.oid = oid;
+	
+	public AttributeArray(ArrayList<Object> values){
+		this.values = values.toArray(new Object[values.size()]);
 	}
 	
-	public String getOid() {
-		return oid;
-	}
-	
-	private String[] getValues() {
+	private Object[] getValues() {
 		return values;
 	}
 	public String valuesAsString() {
 		StringBuilder ret=new StringBuilder();
 		String sep="";
-		for(String v: values){
+		for(Object v: values){
 			ret.append(sep);
 			ret.append(v);
 			sep=", ";

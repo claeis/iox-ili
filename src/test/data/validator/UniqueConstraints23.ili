@@ -132,28 +132,6 @@ MODEL UniqueConstraints23
 		  UNIQUE (LOCAL) attr1 -> attr1h -> attr1i : attr1j;
 		END ClassM;
 
-		CLASS ClassN =
-		  attrw1 : 0 .. 10;
-		  attrw2 : 0 .. 10;
-		  attrw3 : 0 .. 10;
-		  UNIQUE WHERE attrw1 > attrw2 : attrw3;
-		END ClassN;
-		
-		CLASS ClassN2 =
-		  attrw1 : 0 .. 10;
-		  attrw2 : 0 .. 10;
-		  attrw3 : 0 .. 10;
-		  UNIQUE WHERE attrw1 < attrw2 : attrw3;
-		END ClassN2;
-		
-		CLASS ClassN3 =
-			attr01 : Enumeration3;
-			attr02 : Enumeration3;
-			attr03 : Enumeration3;
-			attr04 : TEXT*10;
-			UNIQUE WHERE INTERLIS.inEnumRange(attr01, attr02, attr03) : attr04;
-		END ClassN3;
-
 		CLASS ClassO =
 		  surface2d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 		  UNIQUE surface2d;
@@ -242,6 +220,19 @@ MODEL UniqueConstraints23
 		CONSTRAINTS OF assoC =
 			UNIQUE e1, attr1;
 		END;
+		
+		CLASS ClassUndefined =
+			attr1 : 0..30;
+			attr2 : 0..30;
+			UNIQUE attr1, attr2;
+			UNIQUE attr1;
+		END ClassUndefined;
+		
+		CLASS ClassUndefinedB =
+			attr1 : TEXT*20;
+			attr2 : TEXT*20;
+			UNIQUE attr1, attr2;
+		END ClassUndefinedB;
 		
 	END Topic;
 END UniqueConstraints23.

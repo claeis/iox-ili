@@ -566,182 +566,46 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
 	private void validateUniquenessConstraint(IomObject iomObj, UniquenessConstraint uniquenessConstraint) {
+		String constraintName = getScopedName(uniquenessConstraint);
 		String checkUniqueConstraint=null;
 		if(!enforceConstraintValidation){
-			checkUniqueConstraint=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.CHECK);
+			checkUniqueConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
 		}
-		// validation configuration (CHECK=OFF)
 		if(ValidationConfig.OFF.equals(checkUniqueConstraint)){
-			if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+getScopedName(uniquenessConstraint))){
-				configOffOufputReduction.add(ValidationConfig.CHECK+":"+getScopedName(uniquenessConstraint));
-				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", getScopedName(uniquenessConstraint), iomObj.getobjectoid()));
+			if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
+				configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
+				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
 			}
 		}else{
-			// log message (CHECK)
+			Object modelElement=tag2class.get(iomObj.getobjecttag());
+			Viewable aClass1= (Viewable) modelElement;
 			if(!loggedObjects.contains(uniquenessConstraint)){
 				loggedObjects.add(uniquenessConstraint);
 				errs.addEvent(errFact.logInfoMsg("validate unique constraint {0}...",getScopedName(uniquenessConstraint)));
 			}
-			// preCondition (UNIQUE WHERE)
-			if(uniquenessConstraint.getPreCondition()!=null){
-				Value preConditionValue = evaluateExpression(iomObj, uniquenessConstraint.getPreCondition());
-				if (preConditionValue.isNotYetImplemented()){
-					logMsg(getScopedName(uniquenessConstraint),"Function {0} in uniqueness constraint is not yet implemented.",getScopedName(uniquenessConstraint));
-					return;
-				}
-				if (preConditionValue.skipEvaluation()){
-					return;
-				}
-				if (!preConditionValue.isTrue()){
-					// ignore this object in uniqueness constraint
-					return;
-				}
+			StringBuilder contentUniqueAttrs = new StringBuilder();
+			ArrayList<String> uniqueConstraintAttrs=new ArrayList<String>();
+			// gets all constraint attribute-names.
+			Iterator iter = uniquenessConstraint.getElements().iteratorAttribute();
+			uniqueConstraintAttrs.add(aClass1.toString());
+			while (iter.hasNext()){
+				ObjectPath object = (ObjectPath)iter.next();
+				uniqueConstraintAttrs.add(object.getLastPathEl().getName());
+				contentUniqueAttrs.append(object.getLastPathEl().getName());
 			}
-			//////////////////////////////////////////////////////////////////
-			//////////////////////// UNIQUENESS CONSTRAINT ///////////////////
-			//////////////////////////////////////////////////////////////////
-			Object objecttag=tag2class.get(iomObj.getobjecttag());
-			Viewable constraintClass= (Viewable) objecttag;
-			Iterator uniqueAttrIter = uniquenessConstraint.getElements().iteratorAttribute();
-			ArrayList<String> uniqueAttrObjects=new ArrayList<String>();
-			while (uniqueAttrIter.hasNext()){
-				ObjectPath uniqueAttribute = (ObjectPath)uniqueAttrIter.next();
-				uniqueAttrObjects.add(uniqueAttribute.toString());
-			}
-			if (!uniqueObjects.contains(uniqueAttrObjects)){
-				uniqueObjects.add(uniqueAttrObjects);
-			}
-			ArrayList<String> uniqueValues = new ArrayList<String>();
-			////////////////////////// TABLE ////////////////////////////
-			String returnValue=null;
-			// get through all unique attributes
-			for (int i=0;i<uniqueAttrObjects.size();i++){
-				String attrName = uniqueAttrObjects.get(i);
-				String attrValue=iomObj.getattrvalue(attrName.toString());
-				if(attrValue!=null){
-					if(uniqueAttrObjects.contains(attrName)){
-						uniqueValues.add(attrValue);
-					}
-				}else{
-					//////////////////////// STRUCTURE ////////////////////////
-					for(int j=0;j<iomObj.getattrcount();j++){
-						String currentAttrName = iomObj.getattrname(j);
-						attrValue = iomObj.getattrvalue(currentAttrName);
-						IomObject tempObject = iomObj;
-						IomObject object=null;
-						while(tempObject.getattrobj(currentAttrName, 0)!=null){
-							object = tempObject.getattrobj(currentAttrName, 0);
-							if(object.getobjecttag().equals("MULTISURFACE")){
-								//////////////// SURFACE OR AREA ////////////////////
-								attrValue = object.toString();
-								if(uniqueAttrObjects.contains(currentAttrName)){
-									uniqueValues.add(attrValue);
-								}
-							} else if(object.getobjecttag().equals("REF")){
-								/////////////// ASSOCIATION EMBEDDED ////////////////
-								if(uniqueAttrObjects.contains(currentAttrName)){   // currentAttrName+"-"+object.getobjectrefoid()
-									attrValue = currentAttrName;
-									if(!uniqueValues.contains(attrValue)){
-										uniqueValues.add(attrValue);
-									}
-								}
-							} else {
-								// no reference anymore
-								for(int l=0;l<object.getattrcount();l++){
-									String structAttrName = object.getattrname(l);
-									if(object.getattrobj(structAttrName, 0)!=null){
-										currentAttrName = structAttrName;
-									}
-								}
-							} 
-							// if getAttrObject found, search with sub object
-							if(object!=null){
-								// change sub object to main object
-								tempObject = object;
-							}
-						}
-						// end object. no sub element found
-						if(object!=null){
-							for(int k=0;k<object.getattrcount();k++){
-								String targetAttrName = object.getattrname(k);
-								if(targetAttrName.equals(attrName)){
-									attrValue = object.getattrvalue(targetAttrName);
-									if(attrValue!=null){
-										if(uniqueAttrObjects.contains(targetAttrName)){
-											uniqueValues.add(attrValue);
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				///////////////// ASSOCIATION STAND ALONE ///////////////////
-				if(objecttag instanceof AssociationDef){
-					AssociationDef association = (AssociationDef) constraintClass;
-					Iterator  iterator = association.getAttributesAndRoles();
-					while(iterator.hasNext()){
-						Object attr = iterator.next();
-						if(attr instanceof RoleDef){
-							RoleDef role = (RoleDef) attr;
-							if(role!=null){
-								if(uniqueAttrObjects.contains(role.getName())){
-									attrValue=role.getName();
-									if(!uniqueValues.contains(attrValue)){
-										uniqueValues.add(attrValue);
-									}
-								}
-							}
-						}
-					}
-				} else if(objecttag instanceof Viewable){
-					// TABLE or VIEWABLE
-					Viewable classObj = (Viewable) objecttag;
-					Iterator  iterator = classObj.getAttributesAndRoles();
-					while(iterator.hasNext()){
-						Object attr = iterator.next();
-						if(attr instanceof RoleDef){
-							RoleDef role = (RoleDef) attr;
-							if(role!=null){
-								if(uniqueAttrObjects.contains(role.getName())){
-									attrValue=role.getName();
-									uniqueValues.add(attrValue);
-								}
-							}
-						}
-					}
-				}
-				// attrValue was not found
-				if(attrValue==null){
-					return;
-				}
-			}
-			///////////// validation of uniqueness constraints ///////////////
-			returnValue = validateUnique(iomObj, uniqueAttrObjects, uniqueValues);
-			StringBuilder uniqueValueString = new StringBuilder();
-			String comma = "";
-			for(int u=0;u<uniqueValues.size();u++){
-				uniqueValueString.append(comma);
-				uniqueValueString.append(uniqueValues.get(u));
-				comma = ", ";
-			}
-			//////////////////////////////////////////////////////////////////
-			//////////////////////// RESULT EVALUATION ///////////////////////
-			//////////////////////////////////////////////////////////////////
-			// evaluation of results
-			if (returnValue==null){
+			Holder<AttributeArray> values = new Holder<AttributeArray>();
+			String returnValue = validateUnique(iomObj,uniquenessConstraint, values);
+			if (returnValue == null){
 				// ok
 			} else {
-				// validation configuration (CHECK WARNING)
 				if(ValidationConfig.WARNING.equals(checkUniqueConstraint)){
-						logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", uniqueValueString.toString(), returnValue);
+					logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), returnValue);
 				} else {
-					// validation configuration (MSG)
 					String msg=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.MSG);
 					if(msg!=null && msg.length()>0){
-						logMsg(getScopedName(uniquenessConstraint),msg);
+						logMsg(constraintName,msg);
 					} else {
-							logMsg(getScopedName(uniquenessConstraint),"Unique is violated! Values {0} already exist in Object: {1}", uniqueValueString.toString(), returnValue);
+						logMsg(constraintName,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), returnValue);
 					}
 				}
 			}
@@ -2143,9 +2007,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	// Declaration of the uniqueness of Oid's.
 	String uniquenessOfOid = null;
 	// HashMap of unique constraints.
-	HashMap<ArrayList<String>, HashMap<AttributeArray, String>> seenUniqueConstraintValues = new HashMap<ArrayList<String>, HashMap<AttributeArray, String>>();
-	// List of all arrayLists of unique attributes and classes.
-	ArrayList<ArrayList<String>> uniqueObjects = new ArrayList<ArrayList<String>>();
+	HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenUniqueConstraintValues = new HashMap<UniquenessConstraint, HashMap<AttributeArray, String>>();
 	// List of all object Oid's and associated classPath's of uniqueness validate of Oid's.
 	Map<String , String> uniqueObjectIDs = new HashMap<String, String>();
 	HashSet<Object> loggedObjects=new HashSet<Object>();
@@ -2446,110 +2308,66 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		return null;
 	}
-
-//		ArrayList<String> uniqueValues = new ArrayList<String>();
-//		
-//		if(constraintClass instanceof AssociationDef){
-//			AssociationDef association = (AssociationDef) constraintClass;
-//			uniqueValues.add(constraintClass.toString());
-//			Iterator  iterator = association.getAttributesAndRoles();
-//			if(iterator.hasNext()){
-//				Object attr = iterator.next();
-//				if(attr instanceof RoleDef){
-//					RoleDef role = (RoleDef) attr;
-//					if(uniqueAttrs.contains(role.getName())){
-//						uniqueValues.add(role.getName());
-//					}
-//				}
-//			}
-//		} else {
-//			// get through all unique attributes
-//			for (int uniquePosition=1;uniquePosition<uniqueAttrs.size();uniquePosition++){
-//				String attrName = uniqueAttrs.get(uniquePosition);
-//				String attrValue=currentObject.getattrvalue(attrName);
-//				if(attrValue!=null){
-//					// unique is in base class
-//					uniqueValues.add(attrValue);
-//				} else {
-//					// extends structure or association.
-//					for(int objectPosition=0;objectPosition<currentObject.getattrcount();objectPosition++){
-//						String currentAttrName = currentObject.getattrname(objectPosition);
-//						attrValue = currentObject.getattrvalue(currentAttrName);
-//						IomObject tempObject = currentObject;
-//						IomObject object=null;
-//						
-//						while(tempObject.getattrobj(currentAttrName, 0)!=null){
-//							object = tempObject.getattrobj(currentAttrName, 0);
-//							if(object.getobjecttag().equals("SURFACE")){
-//								attrValue = object.toString();
-//								uniqueValues.add(attrValue);
-//							} else if(object.getobjecttag().equals("AREA")){
-//								attrValue = object.toString();
-//								uniqueValues.add(attrValue);
-//							} else
-//							if(object.getobjecttag().equals("REF")){
-//							attrValue = object.getobjectrefoid();
-//							for(int g=0; g<currentObject.getattrcount();g++){
-//								String attrName2 = currentObject.getattrname(g);
-//								for(int h=1; h<uniqueAttrs.size();h++){
-//									String attrName3 = uniqueAttrs.get(h);
-//									if(attrName2.equals(attrName3)){
-//										attrValue = attrName3;
-//										uniqueValues.add(attrValue);
-//									}
-//								}
-//							}
-//						} else {
-//								// normal attribute
-//								for(int l=0;l<object.getattrcount();l++){
-//									String structAttrName = object.getattrname(l);
-//									if(object.getattrobj(structAttrName, 0)!=null){
-//										currentAttrName = structAttrName;
-//									}
-//								}
-//						}
-//							// if object was not null
-//							if(object!=null){
-//								tempObject = object;
-//							}
-//						}
-//						if(object!=null){
-//							for(int k=0;k<object.getattrcount();k++){
-//								String targetAttrName = object.getattrname(k);
-//								if(targetAttrName.equals(attrName)){
-//									attrValue = object.getattrvalue(targetAttrName);
-//									if(attrValue!=null){
-//										uniqueValues.add(attrValue);
-//									}
-//								}
-//							}
-//						}
-//					}
-//				}
-//				if(attrValue==null){
-//					return null;
-//				}
-//			}
-//		}
-	private String validateUnique(IomObject iomObj,ArrayList<String>uniqueAttrs,ArrayList<String>uniqueValues){
-		String oid = iomObj.getobjectoid();
-		if(oid==null){
-			oid = iomObj.getobjecttag();
+	
+	private String validateUnique(IomObject currentObject,UniquenessConstraint constraint, Holder<AttributeArray> values) {
+		ArrayList<Object> accu = new ArrayList<Object>();
+		String oid=null;
+		IomObject subLevelObj=null;
+		Iterator constraintIter = constraint.getElements().iteratorAttribute();
+		IomObject sourceObject = currentObject;
+		while(constraintIter.hasNext()){
+			Object uniqueAttrName = constraintIter.next();
+			Object attrValue=currentObject.getattrvalue(uniqueAttrName.toString());
+			if(attrValue==null){
+				for(int i=0;i<currentObject.getattrcount();i++){
+					IomObject uniqueAttrObj=null;
+					while(currentObject.getattrobj(currentObject.getattrname(i),0)!=null){
+						subLevelObj=currentObject.getattrobj(currentObject.getattrname(i),0);
+						if(subLevelObj!=null){
+							if(subLevelObj.getobjecttag().equals("REF")){
+								attrValue = uniqueAttrName;
+								break;
+							} else if(subLevelObj.getobjecttag().equals("MULTISURFACE") || subLevelObj.getobjecttag().equals("SURFACE") || subLevelObj.getobjecttag().equals("AREA")){
+								attrValue = subLevelObj.toString();
+								break;
+							} else {
+								attrValue = subLevelObj.getattrvalue(uniqueAttrName.toString());
+							}
+							currentObject=subLevelObj;
+						}
+					}
+					if(uniqueAttrObj!=null){
+						break;
+					}
+				}
+			}
+			if(attrValue!=null && !attrValue.toString().isEmpty()){
+				accu.add(attrValue);
+				oid = sourceObject.getobjectoid();
+				if(oid==null){
+					oid = sourceObject.getobjecttag();
+				}
+			}
 		}
-		// id to identify uniqueness values
-		AttributeArray attrs =new AttributeArray(oid, uniqueValues);
+		if(accu.isEmpty()){
+			return null;
+		}
+		values.value=new AttributeArray(accu);
 		HashMap<AttributeArray, String> allValues = null;
-		if (seenUniqueConstraintValues.containsKey(uniqueAttrs)){
-			allValues = seenUniqueConstraintValues.get(uniqueAttrs);
-			if (allValues.containsKey(attrs)){
-				return allValues.get(attrs);
+		if (seenUniqueConstraintValues.containsKey(constraint)){
+			allValues = seenUniqueConstraintValues.get(constraint);
+			Map.Entry<AttributeArray, String> entry=allValues.entrySet().iterator().next();
+			AttributeArray key = entry.getKey();
+			String value = entry.getValue();
+			if (key.valuesAsString().contains(values.value.valuesAsString())){
+				return value;
 			} else {
-				allValues.put(attrs, oid);
+				allValues.put(values.value, oid);
 			}
 		} else {
 			allValues = new HashMap<AttributeArray, String>();
-			allValues.put(attrs, oid);
-			seenUniqueConstraintValues.put(uniqueAttrs, allValues);
+			allValues.put(values.value, oid);
+			seenUniqueConstraintValues.put(constraint, allValues);
 		}
 		return null;
 	}
