@@ -135,7 +135,7 @@ public class FunctionsExt23Test {
 		assertEquals("Mandatory Constraint FunctionsExt23.Topic.ClassA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// testet eine Funktion, die im ili-Modell definiert wurde, aber keine Implementierung hat
+	// testet eine Funktion, die im ili-Modell definiert wurde, aber keine Implementierung hat.
 	@Test
 	public void noImplmenetation_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB, OBJ_OID1);

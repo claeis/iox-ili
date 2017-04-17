@@ -737,10 +737,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(condition instanceof FunctionCall){
 					FunctionCall functionCallObj = (FunctionCall) condition;
 					Function function = functionCallObj.getFunction();
-					logMsg(constraintName,"Function {0} is not yet implemented.", function.getScopedName(null));
+					errs.addEvent(errFact.logWarningMsg("Function {0} is not yet implemented.", function.getScopedName(null)));
 					Value.createNotYetImplemented();
 				} else {
-					logMsg(constraintName,"MandatoryConstraint {0} of {1} is not yet implemented.", mandatoryConstraintObj.getScopedName(null), iomObj.getobjecttag());
+					errs.addEvent(errFact.logWarningMsg("MandatoryConstraint {0} of {1} is not yet implemented.", mandatoryConstraintObj.getScopedName(null), iomObj.getobjecttag()));
 					Value.createNotYetImplemented();
 				}
 			}
