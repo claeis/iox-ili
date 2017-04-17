@@ -234,5 +234,27 @@ MODEL UniqueConstraints23
 			UNIQUE attr1, attr2;
 		END ClassUndefinedB;
 		
+		CLASS ClassN =
+		  attrw1 : 0 .. 10;
+		  attrw2 : 0 .. 10;
+		  attrw3 : 0 .. 10;
+		  UNIQUE WHERE attrw1 > attrw2 : attrw3;
+		END ClassN;
+		
+		CLASS ClassN2 =
+		  attrw1 : 0 .. 10;
+		  attrw2 : 0 .. 10;
+		  attrw3 : 0 .. 10;
+		  UNIQUE WHERE attrw1 < attrw2 : attrw3;
+		END ClassN2;
+		
+		CLASS ClassN3 =
+			attr01 : Enumeration3;
+			attr02 : Enumeration3;
+			attr03 : Enumeration3;
+			attr04 : TEXT*10;
+			UNIQUE WHERE INTERLIS.inEnumRange(attr01, attr02, attr03) : attr04;
+		END ClassN3;
+		
 	END Topic;
 END UniqueConstraints23.

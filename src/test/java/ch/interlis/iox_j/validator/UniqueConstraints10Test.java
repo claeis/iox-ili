@@ -1,8 +1,10 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -31,6 +33,7 @@ public class UniqueConstraints10Test {
 	// CLASS
 	private final static String TABLEA=TOPIC+".TableA";
 	private final static String TABLEB=TOPIC+".TableB";
+	private final static String TABLEE=TOPIC+".TableE";
 	
 	@Before
 	public void setUp() throws Exception {
@@ -167,8 +170,6 @@ public class UniqueConstraints10Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Unique is violated! Values Anna already exist in Object: o1",logger.getErrs().get(0).getEventMsg());
 	}
-	
-
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die Referenz auf ein bereits existierendes unique Attribute verweist.
 	@Test

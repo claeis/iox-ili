@@ -83,6 +83,8 @@ public class UniqueConstraints23Test {
 	private final static String STRUCTK=TOPIC+".StructK";
 	private final static String STRUCTO=TOPIC+".StructO";
 	private final static String STRUCTP=TOPIC+".StructP";
+	private final static String UNDEFINED=TOPIC+".ClassUndefined";
+	private final static String UNDEFINEDB=TOPIC+".ClassUndefinedB";
 	
 	@Before
 	public void setUp() throws Exception {
@@ -911,9 +913,9 @@ public class UniqueConstraints23Test {
 	// Es soll keine Fehlermeldung ausgegeben werden.
 	@Test
 	public void att1Undefinedattr2Different_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject("UniqueConstraints23.Topic.ClassUndefined", OID1);
+		Iom_jObject iomObjA=new Iom_jObject(UNDEFINED, OID1);
 		iomObjA.setattrvalue("attr2", "20");
-		Iom_jObject iomObjB=new Iom_jObject("UniqueConstraints23.Topic.ClassUndefined", OID2);
+		Iom_jObject iomObjB=new Iom_jObject(UNDEFINED, OID2);
 		iomObjB.setattrvalue("attr2", "15");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -935,9 +937,9 @@ public class UniqueConstraints23Test {
 	// Es soll nur eine Fehlermeldung für die Unique Verletzung von attr2 ausgegeben werden.
 	@Test
 	public void att1Undefinedattr2Same_False(){
-		Iom_jObject iomObjA=new Iom_jObject("UniqueConstraints23.Topic.ClassUndefined", OID1);
+		Iom_jObject iomObjA=new Iom_jObject(UNDEFINED, OID1);
 		iomObjA.setattrvalue("attr2", "20");
-		Iom_jObject iomObjB=new Iom_jObject("UniqueConstraints23.Topic.ClassUndefined", OID2);
+		Iom_jObject iomObjB=new Iom_jObject(UNDEFINED, OID2);
 		iomObjB.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -959,10 +961,10 @@ public class UniqueConstraints23Test {
 	// Es soll keine Fehlermeldung ausgegeben werden.
 	@Test
 	public void att1UndefinedBattr2Different_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject("UniqueConstraints23.Topic.ClassUndefinedB", OID1);
+		Iom_jObject iomObjA=new Iom_jObject(UNDEFINEDB, OID1);
 		iomObjA.setattrvalue("attr1", "");
 		iomObjA.setattrvalue("attr2", "text1");
-		Iom_jObject iomObjB=new Iom_jObject("UniqueConstraints23.Topic.ClassUndefinedB", OID2);
+		Iom_jObject iomObjB=new Iom_jObject(UNDEFINEDB, OID2);
 		iomObjB.setattrvalue("attr1", "");
 		iomObjB.setattrvalue("attr2", "text2");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1239,6 +1241,181 @@ public class UniqueConstraints23Test {
 		// Asserts.
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: inEnumRange das ZielAttribute zwischen min und max enum in der Enumeration sich befindet.
+	// und die Attribute unterschiedliche Values enthalten.
+	@Test
+	public void preConditionFunctionTrue_Different_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(CLASSN3, OID1);
+		iomObjA.setattrvalue("attr01", "zwei");
+		iomObjA.setattrvalue("attr02", "eins");
+		iomObjA.setattrvalue("attr03", "vier");
+		iomObjA.setattrvalue("attr04", "gleich");
+		Iom_jObject iomObjB=new Iom_jObject(CLASSN3, OID2);
+		iomObjB.setattrvalue("attr01", "zwei");
+		iomObjB.setattrvalue("attr02", "eins");
+		iomObjB.setattrvalue("attr03", "vier");
+		iomObjB.setattrvalue("attr04", "ungleich");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: inEnumRange das ZielAttribute nicht zwischen min und max enum in der Enumeration sich befindet.
+	// und die Attribute die Selben Values enthalten.
+	@Test
+	public void preConditionFalse_SameValues_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(CLASSN3, OID1);
+		iomObjA.setattrvalue("attr01", "eins");
+		iomObjA.setattrvalue("attr02", "zwei");
+		iomObjA.setattrvalue("attr03", "vier");
+		iomObjA.setattrvalue("attr04", "gleich");
+		Iom_jObject iomObjB=new Iom_jObject(CLASSN3, OID2);
+		iomObjB.setattrvalue("attr01", "eins");
+		iomObjB.setattrvalue("attr02", "zwei");
+		iomObjB.setattrvalue("attr03", "vier");
+		iomObjB.setattrvalue("attr04", "gleich");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: inEnumRange das ZielAttribute nicht zwischen min und max enum in der Enumeration sich befindet.
+	// und die Attribute unterschiedliche Values enthalten.
+	@Test
+	public void preConditionFalse_DifferentValues_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(CLASSN3, OID1);
+		iomObjA.setattrvalue("attr01", "eins");
+		iomObjA.setattrvalue("attr02", "zwei");
+		iomObjA.setattrvalue("attr03", "vier");
+		iomObjA.setattrvalue("attr04", "gleich");
+		Iom_jObject iomObjB=new Iom_jObject(CLASSN3, OID2);
+		iomObjB.setattrvalue("attr01", "eins");
+		iomObjB.setattrvalue("attr02", "zwei");
+		iomObjB.setattrvalue("attr03", "vier");
+		iomObjB.setattrvalue("attr04", "ungleich");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
+	// wenn die PreCondition true ist und die Attribute welche unique sind, mit unterschiedlichen Values erstellt wurden.
+	@Test
+	public void preConditionTrue_Different_ok(){
+		// Set object.
+		Iom_jObject obj1=new Iom_jObject(CLASSN,OID1);
+		obj1.setattrvalue("attrw1", "5");
+		obj1.setattrvalue("attrw2", "3");
+		obj1.setattrvalue("attrw3", "2");
+		Iom_jObject obj2=new Iom_jObject(CLASSN,OID2);
+		obj2.setattrvalue("attrw1", "9");
+		obj2.setattrvalue("attrw2", "6");
+		obj2.setattrvalue("attrw3", "1");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(obj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
+	// wenn die PreCondition false ist und die Attribute welche unique sind, mit unterschiedlichen Values erstellt wurden.
+	@Test
+	public void preConditionFalse_Different_ok(){
+		// Set object.
+		Iom_jObject obj1=new Iom_jObject(CLASSN2,OID1);
+		obj1.setattrvalue("attrw1", "5");
+		obj1.setattrvalue("attrw2", "3");
+		obj1.setattrvalue("attrw3", "2");
+		Iom_jObject obj2=new Iom_jObject(CLASSN2,OID2);
+		obj2.setattrvalue("attrw1", "9");
+		obj2.setattrvalue("attrw2", "6");
+		obj2.setattrvalue("attrw3", "1");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(obj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
+	// wenn die PreCondition false ist und die Attribute welche unique sind, mit den Selben Values erstellt wurden.
+	@Test
+	public void preConditionFalse_Same_Ok(){
+		// Set object.
+		Iom_jObject obj1=new Iom_jObject(CLASSN2,OID1);
+		obj1.setattrvalue("attrw1", "5");
+		obj1.setattrvalue("attrw2", "3");
+		obj1.setattrvalue("attrw3", "1");
+		Iom_jObject obj2=new Iom_jObject(CLASSN2,OID2);
+		obj2.setattrvalue("attrw1", "9");
+		obj2.setattrvalue("attrw2", "6");
+		obj2.setattrvalue("attrw3", "1");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(obj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
 	//############################################################/
 	//########## FAILING TESTS ###################################/
 	//############################################################/
@@ -1694,8 +1871,6 @@ public class UniqueConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-
-	
 	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint und einen GLOBAL Uniqueness Constraint.
 	// In beiden Objekten wird je auf ein attribute einer unterschiedlichen Struktur verwiesen, die Attribute wurden mit gleichen Values erstellt.
 	// Somit müssen 2 Fehlermeldungen ausgegeben werden, da attr2 Unique ist und in StructE attr1 und attr2 Unique ist.
@@ -1901,10 +2076,10 @@ public class UniqueConstraints23Test {
 	// Es soll nur eine Fehlermeldung für die Unique Verletzung von attr2 ausgegeben werden.
 	@Test
 	public void att1UndefinedBattr2Same_False(){
-		Iom_jObject iomObjA=new Iom_jObject("UniqueConstraints23.Topic.ClassUndefinedB", OID1);
+		Iom_jObject iomObjA=new Iom_jObject(UNDEFINEDB, OID1);
 		iomObjA.setattrvalue("attr1", "");
 		iomObjA.setattrvalue("attr2", "text1");
-		Iom_jObject iomObjB=new Iom_jObject("UniqueConstraints23.Topic.ClassUndefinedB", OID2);
+		Iom_jObject iomObjB=new Iom_jObject(UNDEFINEDB, OID2);
 		iomObjB.setattrvalue("attr1", "");
 		iomObjB.setattrvalue("attr2", "text1");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2305,5 +2480,65 @@ public class UniqueConstraints23Test {
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Unique is violated! Values MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.000, C2 70000.000}, COORD {C1 500000.000, C2 80000.000}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 500000.000, C2 80000.000}, COORD {C1 550000.000, C2 90000.000}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 550000.000, C2 90000.000}, COORD {C1 480000.000, C2 70000.000}]}}]}}} already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: inEnumRange das ZielAttribute zwischen min und max enum in der Enumeration sich befindet.
+	// und die Attribute die Selben Values enthalten.
+	@Test
+	public void preConditionFunctionTrue_Same_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(CLASSN3, OID1);
+		iomObjA.setattrvalue("attr01", "zwei");
+		iomObjA.setattrvalue("attr02", "eins");
+		iomObjA.setattrvalue("attr03", "vier");
+		iomObjA.setattrvalue("attr04", "gleich");
+		Iom_jObject iomObjB=new Iom_jObject(CLASSN3, OID2);
+		iomObjB.setattrvalue("attr01", "zwei");
+		iomObjB.setattrvalue("attr02", "eins");
+		iomObjB.setattrvalue("attr03", "vier");
+		iomObjB.setattrvalue("attr04", "gleich");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Unique is violated! Values gleich already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
+	// wenn die PreCondition true ist und die Attribute welche unique sind, mit den Selben Values erstellt wurden.
+	@Test
+	public void preConditionTrue_Same_False(){
+		// Set object.
+		Iom_jObject obj1=new Iom_jObject(CLASSN,OID1);
+		obj1.setattrvalue("attrw1", "5");
+		obj1.setattrvalue("attrw2", "3");
+		obj1.setattrvalue("attrw3", "1");
+		Iom_jObject obj2=new Iom_jObject(CLASSN,OID2);
+		obj2.setattrvalue("attrw1", "9");
+		obj2.setattrvalue("attrw2", "6");
+		obj2.setattrvalue("attrw3", "1");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(obj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Unique is violated! Values 1 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 }

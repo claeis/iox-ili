@@ -577,6 +577,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
 			}
 		}else{
+			// preCondition (UNIQUE WHERE)
+			if(uniquenessConstraint.getPreCondition()!=null){
+				Value preConditionValue = evaluateExpression(iomObj, uniquenessConstraint.getPreCondition());
+				if (preConditionValue.isNotYetImplemented()){
+					logMsg(getScopedName(uniquenessConstraint),"Function {0} in uniqueness constraint is not yet implemented.",getScopedName(uniquenessConstraint));
+					return;
+				}
+				if (preConditionValue.skipEvaluation()){
+					return;
+				}
+				if (!preConditionValue.isTrue()){
+					// ignore this object in uniqueness constraint
+					return;
+				}
+			}
 			Object modelElement=tag2class.get(iomObj.getobjecttag());
 			Viewable aClass1= (Viewable) modelElement;
 			if(!loggedObjects.contains(uniquenessConstraint)){
