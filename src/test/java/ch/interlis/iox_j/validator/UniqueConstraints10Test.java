@@ -196,6 +196,6 @@ public class UniqueConstraints10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values b2 already exist in Object: o3",logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values REF {} already exist in Object: o3",logger.getErrs().get(0).getEventMsg());
 	}
 }

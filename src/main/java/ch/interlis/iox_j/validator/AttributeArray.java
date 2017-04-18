@@ -2,6 +2,8 @@ package ch.interlis.iox_j.validator;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import ch.interlis.iom.IomObject;
+
 public class AttributeArray {
 	private Object[] values;
 	
@@ -12,6 +14,7 @@ public class AttributeArray {
 		result = prime * result + Arrays.hashCode(values);
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -21,11 +24,28 @@ public class AttributeArray {
 		if (getClass() != obj.getClass())
 			return false;
 		AttributeArray other = (AttributeArray) obj;
-		if (!Arrays.equals(values, other.values))
-			return false;
+		if(values.length==other.values.length){
+			for(Object object : values){
+				if(object instanceof IomObject){
+					for(Object objectOther : other.values){
+						if(objectOther instanceof IomObject){
+							if (!object.toString().equals(objectOther.toString())){
+								return false;
+							}
+						}
+					}
+				} else {
+					for(Object objectOther : other.values){
+						if (!objectOther.toString().equals(object.toString())){
+							return false;
+						}
+					}
+				}
+			}
+		}
 		return true;
 	}
-	
+
 	public AttributeArray(ArrayList<Object> values){
 		this.values = values.toArray(new Object[values.size()]);
 	}
@@ -33,6 +53,7 @@ public class AttributeArray {
 	private Object[] getValues() {
 		return values;
 	}
+	
 	public String valuesAsString() {
 		StringBuilder ret=new StringBuilder();
 		String sep="";
