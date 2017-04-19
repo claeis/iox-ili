@@ -10,6 +10,6 @@ import ch.interlis.iox_j.plugins.IoxPlugin;
 
 public interface InterlisFunction extends IoxPlugin {
 	public void init(TransferDescription td,Settings settings,IoxValidationConfig validationConfig, ObjectPool objectPool, LogEventFactory logEventFactory);
-	public Value evaluate(IomObject mainObj, Value[] actualArguments);
+	public Value evaluate(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments);
 	public String getQualifiedIliName();
 }

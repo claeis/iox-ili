@@ -19,7 +19,7 @@ public class SubText implements InterlisFunction {
 	}
 
 	@Override
-	public Value evaluate(IomObject mainObj, Value[] args) {
+	public Value evaluate(String validationKind, String usageScope, IomObject mainObj, Value[] args) {
 		if (args[0].skipEvaluation()){
 			return args[0];
 		}
