@@ -2,6 +2,10 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.18.1 (2017-04-20)
+-----------------------------
+- validator: fixed implementation of uniqueness constraint
+
 iox-ili 1.18.0 (2017-04-19)
 -----------------------------
 - iox-ili: fixed: missing custom functions should not report an error
