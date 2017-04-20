@@ -2,6 +2,9 @@ package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,6 +43,7 @@ public class ErrorMsg23Test {
 	private static final String ILI_CLASSD_ATTRA = "attrA";
 	private static final String ILI_CLASSD_ATTRA2 = "attrA2";
 	private static final String ILI_CLASSD_CONSTRA = ILI_CLASSD+".constrA";
+	private static final String ILI_CLASSE = "ErrorMsgTest23.Topic.ClassE";
 	// STRUCTS
 	private static final String ILI_STRUCTB = "ErrorMsgTest23.Topic.StructB";
 	private static final String ILI_STRUCTB_POINT = "point";
@@ -52,8 +56,10 @@ public class ErrorMsg23Test {
 	public void setUp() throws Exception {
 		// ili-datei lesen
 		Configuration ili2cConfig=new Configuration();
-		FileEntry fileEntry=new FileEntry("src/test/data/validator/ErrorMsgTest23.ili", FileEntryKind.ILIMODELFILE);
+		FileEntry fileEntry=new FileEntry("src/test/data/validator/FunctionsExt23.ili", FileEntryKind.ILIMODELFILE);
 		ili2cConfig.addFileEntry(fileEntry);
+		FileEntry fileEntry2=new FileEntry("src/test/data/validator/ErrorMsgTest23.ili", FileEntryKind.ILIMODELFILE);
+		ili2cConfig.addFileEntry(fileEntry2);
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
 	}
@@ -251,4 +257,29 @@ public class ErrorMsg23Test {
 		assertEquals("Msg TestKey",err.getEventMsg());
 	}
 
+	// die Geometry Error Message muss die unten genannten Inhalte der Koordinaten: C1 und C2 enthalten.
+	@Test
+	public void geometryErrorMessage_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSE, OID);
+		IomObject coord=objSurfaceSuccess.addattrobj("Geometry", "COORD");
+		coord.setattrvalue("C1", "510000.000");
+		coord.setattrvalue("C2", "80000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Map<String,Class> newFunctions=new HashMap<String,Class>();
+		newFunctions.put("FunctionsExt23.subText",SubText.class);
+		settings.setTransientObject(Validator.CONFIG_CUSTOM_FUNCTIONS, newFunctions);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals(new Double(510000.000),logger.getErrs().get(0).getGeomC1());
+		assertEquals(new Double(80000.000),logger.getErrs().get(0).getGeomC2());
+	}	
 }

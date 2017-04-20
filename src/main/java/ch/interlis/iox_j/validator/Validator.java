@@ -392,6 +392,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				IomObject iomObj = objectIterator.next();
 				if(iomObj!=null){
 					setCurrentMainObj(iomObj);
+					errFact.setDefaultCoord(getDefaultCoord(iomObj));
 					Object modelElement=tag2class.get(iomObj.getobjecttag());
 					Viewable classOfCurrentObj= (Viewable) modelElement;
 					// additional constraint
@@ -712,6 +713,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					allObjIterator=objs.iterator();
 					IomObject iomObj=objectPool.getObject(oid, null, null);
 					setCurrentMainObj(iomObj);
+					errFact.setDefaultCoord(getDefaultCoord(iomObj));
 					Evaluable condition = (Evaluable) setConstraintObj.getCondition();
 					Value constraintValue = evaluateExpression(checkConstraint, constraintName, iomObj, condition);
 					if (constraintValue.isNotYetImplemented()){
