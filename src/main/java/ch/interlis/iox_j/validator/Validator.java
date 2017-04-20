@@ -618,7 +618,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(uniquenessConstraint.getPreCondition()!=null){
 				Value preConditionValue = evaluateExpression(checkUniqueConstraint, constraintName, iomObj, uniquenessConstraint.getPreCondition());
 				if (preConditionValue.isNotYetImplemented()){
-					errs.addEvent(errFact.logWarningMsg("Function {0} in uniqueness constraint is not yet implemented.", getScopedName(uniquenessConstraint)));
+					errs.addEvent(errFact.logWarningMsg("Function {0} in uniqueness constraint is not yet implemented.", constraintName));
 					return;
 				}
 				if (preConditionValue.skipEvaluation()){
@@ -650,15 +650,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if (returnValue == null){
 				// ok
 			} else {
-				if(ValidationConfig.WARNING.equals(checkUniqueConstraint)){
-					logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), returnValue);
+				String msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
+				if(msg!=null && msg.length()>0){
+					logMsg(checkUniqueConstraint,msg);
 				} else {
-					String msg=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.MSG);
-					if(msg!=null && msg.length()>0){
-						logMsg(constraintName,msg);
-					} else {
-						logMsg(constraintName,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), returnValue);
-					}
+					logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), returnValue);
 				}
 			}
 		}
@@ -729,7 +725,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					} else {
 						String msg=validationConfig.getConfigValue(getScopedName(setConstraintObj), ValidationConfig.MSG);
 						if(msg!=null && msg.length()>0){
-							logMsg(constraintName,msg);
+							logMsg(checkConstraint,msg);
 						} else {
 							logMsg(checkConstraint,"Set Constraint {0} is not true.", constraintName);
 						}
@@ -764,7 +760,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					} else {
 						String msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
 						if(msg!=null && msg.length()>0){
-							logMsg(constraintName,msg);
+							logMsg(checkConstraint,msg);
 						} else {
 							logMsg(checkConstraint,"Mandatory Constraint {0} is not true.", constraintName);
 						}
@@ -2381,7 +2377,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			IomObject structValue=null;
 			structValue=currentObject.getattrobj(uniqueAttrName,0);
 			if(structValue!=null){
-				attrValue=structValue;
+				// ref == oid als attrValue. sonst iomobject als attrvalue.
+				if(structValue.getobjectrefoid()!=null){
+					attrValue = structValue.getobjectrefoid();
+				} else {
+					attrValue=structValue;
+				}
 			} else {
 				attrValue=currentObject.getattrvalue(uniqueAttrName);
 			}
@@ -2395,20 +2396,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		HashMap<AttributeArray, String> allValues = null;
 		if (seenUniqueConstraintValues.containsKey(constraint)){
 			allValues = seenUniqueConstraintValues.get(constraint);
-			for(Entry<AttributeArray, String> objValue : allValues.entrySet()){
-				if(objValue.getKey().valuesAsString().equals(values.value.valuesAsString())){
-					if(objValue.getValue()==null){
-						if(originObj.getobjectoid()==null){
-							// origin object is reference, association or structure
-							return originObj.getobjecttag();
-						} else {
-							return originObj.getobjectoid();
-						}
-					} else {
-						return objValue.getValue();
-					}
-				}
+			
+			
+			String oidOfNonUniqueObj = allValues.get(values.value);
+			if(oidOfNonUniqueObj!=null){
+				// duplicate found.
+				return oidOfNonUniqueObj;
 			}
+			// values not yet seen.
+			// keep oid for futher error messages.
 			allValues.put(values.value, originObj.getobjectoid());
 		} else {
 			allValues = new HashMap<AttributeArray, String>();
