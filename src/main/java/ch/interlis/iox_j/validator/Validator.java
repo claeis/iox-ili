@@ -711,6 +711,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				for(String oid:objs){
 					allObjIterator=objs.iterator();
 					IomObject iomObj=objectPool.getObject(oid, null, null);
+					setCurrentMainObj(iomObj);
 					Evaluable condition = (Evaluable) setConstraintObj.getCondition();
 					Value constraintValue = evaluateExpression(checkConstraint, constraintName, iomObj, condition);
 					if (constraintValue.isNotYetImplemented()){
