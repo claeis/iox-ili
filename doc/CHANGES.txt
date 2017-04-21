@@ -2,6 +2,11 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.19.0 (2017-xx-xx)
+-----------------------------
+- validator: fixed Missing coordinate in xtflog for errors detected by a custom function
+- validator: fixed INTERLIS.areAreas() not working in views
+
 iox-ili 1.18.1 (2017-04-20)
 -----------------------------
 - validator: fixed implementation of uniqueness constraint
