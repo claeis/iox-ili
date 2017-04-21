@@ -64,7 +64,8 @@ public class ErrorMsg23Test {
 		assertNotNull(td);
 	}
 	
-	// Es wird getestet ob es möglich ist, einen anderen Wert als eine Nummer zu definieren.
+	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
+	// wenn dieser Test eine Fehlermeldung ausgibt, jedoch kein Objekt mit Koordinaten erstellt wurde. 
 	@Test
 	public void noCoord_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -85,7 +86,8 @@ public class ErrorMsg23Test {
 		assertEquals(null,logger.getErrs().get(0).getGeomC2());
 	}
 	
-	// Es wird getestet ob es möglich ist, einen anderen Wert des Punktes LKoord zu definieren, welche keine Nummer ist.
+	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl des Punktes überschreiten.
 	@Test
 	public void coordFromPoint_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -110,7 +112,8 @@ public class ErrorMsg23Test {
 		assertEquals(new Double(70001.000),logger.getErrs().get(0).getGeomC2());
 	}
 	
-	// Es wird getestet ob die falsche Definition eines Koords innerhalb einer Linie zu einem Fehler führt.
+	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl der Linie überschreiten.
 	@Test
 	public void coordFromLine_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -144,7 +147,8 @@ public class ErrorMsg23Test {
 		assertEquals(new Double(70001.000),logger.getErrs().get(0).getGeomC2());
 	}
 	
-	// Es wird getestet ob die falsche Definition eines Koords in einer Oberfläche zu einem Fehler führt.
+	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl der Oberfläche überschreiten.
 	@Test
 	public void coordFromSurface_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -188,7 +192,8 @@ public class ErrorMsg23Test {
 		assertEquals(new Double(70001.000),logger.getErrs().get(0).getGeomC2());
 	}
 	
-	// Es wird getestet ob die falsche Definition einer Koord innerhalb einer Struktur zu einem Fehler führt.
+	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl des Punktes innerhalb der Struktur überschreiten.
 	@Test
 	public void coordFromStructAttrPoint_Fail(){
 		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTB, null);
@@ -214,6 +219,9 @@ public class ErrorMsg23Test {
 		assertEquals(new Double(480001.000),logger.getErrs().get(0).getGeomC1());
 		assertEquals(new Double(70001.000),logger.getErrs().get(0).getGeomC2());
 	}
+	
+	// Es wird getestet ob der erstellte Key, mit dem Attribute Wert: TestKey in der Fehlermeldung ausgegeben wird.
+	// zweitens wird getestet ob dieser Wert innerhalb der BenutzerID abgelegt wird.
 	@Test
 	public void keymsgParam_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -235,6 +243,9 @@ public class ErrorMsg23Test {
 		IoxLogEvent err = logger.getErrs().get(0);
 		assertEquals("Key TestKey",err.getSourceObjectUsrId());
 	}
+	
+	// Es wird getestet ob die erstellte Message, mit dem Attribute Wert: TestKey in der Fehlermeldung ausgegeben wird.
+	// zweitens wird getestet ob dieser Wert innerhalb der Event Message abgelegt wird.
 	@Test
 	public void msgParam_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSD, OID);
