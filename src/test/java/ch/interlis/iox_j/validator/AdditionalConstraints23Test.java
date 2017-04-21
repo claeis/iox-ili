@@ -1,8 +1,10 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -32,6 +34,9 @@ public class AdditionalConstraints23Test {
 	private final static String ILI_CLASSC=ILI_TOPIC+".ClassC";
 	private final static String ILI_EXISTENCECONSTRAINT_CLASS=ILI_TOPIC+".ExConClass";
 	private final static String ILI_EXISTENCECONSTRAINT_CONDITION=ILI_TOPIC+".ExConCondition";
+	private final static String ILI_MANDATORYCONSTRAINT_SURFACECLASS=ILI_TOPIC+".SurfaceClass";
+	private final static String ILI_MANDATORYCONSTRAINT_CLASSD=ILI_TOPIC+".ClassD";
+	private final static String ILI_MANDATORYCONSTRAINT_STRUCTD=ILI_TOPIC+".StructD";
 	// START BASKET EVENT
 	private final static String BID="b1";
 	
@@ -443,5 +448,150 @@ public class AdditionalConstraints23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei die Funktion: areArea,
+	// über eine additional constraint via set constraint ausgeführt werden kann.
+	// 1 object. Objects=ALL, SurfaceBAG=UNDEFINED, SurfaceAttr=Geometrie.
+	@Test
+	public void mandatoryConstraint_FunctionAreArea_Ok(){
+		Iom_jObject function1=new Iom_jObject(ILI_MANDATORYCONSTRAINT_SURFACECLASS, OBJ_OID1);
+		// Geometrie 1
+		IomObject multisurfaceValue=function1.addattrobj("Geometrie", "MULTISURFACE");
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "483000.000");
+		endSegment.setattrvalue("C2", "70000.000");
+		// polyline 2
+		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+		startSegment2.setattrvalue("C1", "483000.000");
+		startSegment2.setattrvalue("C2", "70000.000");
+		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+		endSegment2.setattrvalue("C1", "480000.000");
+		endSegment2.setattrvalue("C2", "73000.000");
+		// polyline 3
+		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
+		startSegment3.setattrvalue("C1", "480000.000");
+		startSegment3.setattrvalue("C2", "73000.000");
+		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
+		function1.setattrvalue("attr1", "8");
+		function1.setattrvalue("attr2", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "FunctionAreAreasModel");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(function1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei die Funktion: areArea,
+	// über eine additional constraint via set constraint ausgeführt werden kann und die Objekte verschiedene Values enthalten.
+	// 1 object. Objects=ALL, SurfaceBAG=>> Numbers, SurfaceAttr=>> AdditionalConstraints23.Bodenbedeckung.StructD->Surface.
+	@Test
+	public void mandatoryConstraint_FunctionAreArea_Fail(){
+		Iom_jObject iomObjStruct=new Iom_jObject(ILI_MANDATORYCONSTRAINT_STRUCTD, null);
+		// Geometrie 1
+		IomObject multisurfaceValue=iomObjStruct.addattrobj("Surface", "MULTISURFACE");
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment=segments.addattrobj("segment", "COORD");
+		startSegment.setattrvalue("C1", "480000.000");
+		startSegment.setattrvalue("C2", "70000.000");
+		IomObject endSegment=segments.addattrobj("segment", "COORD");
+		endSegment.setattrvalue("C1", "483000.000");
+		endSegment.setattrvalue("C2", "70000.000");
+		// polyline 2
+		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+		startSegment2.setattrvalue("C1", "483000.000");
+		startSegment2.setattrvalue("C2", "70000.000");
+		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+		endSegment2.setattrvalue("C1", "480000.000");
+		endSegment2.setattrvalue("C2", "73000.000");
+		// polyline 3
+		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
+		startSegment3.setattrvalue("C1", "480000.000");
+		startSegment3.setattrvalue("C2", "73000.000");
+		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
+		endSegment3.setattrvalue("C1", "480000.000");
+		endSegment3.setattrvalue("C2", "70000.000");
+		// Geometrie 2
+		Iom_jObject iomObjStruct2=new Iom_jObject(ILI_MANDATORYCONSTRAINT_STRUCTD, null);
+		IomObject multisurfaceValue2=iomObjStruct2.addattrobj("Surface", "MULTISURFACE");
+		IomObject surfaceValue2 = multisurfaceValue2.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary2 = surfaceValue2.addattrobj("boundary", "BOUNDARY");
+		// polyline
+		IomObject polylineValue5 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments5=polylineValue5.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment5=segments5.addattrobj("segment", "COORD");
+		startSegment5.setattrvalue("C1", "484000.000");
+		startSegment5.setattrvalue("C2", "70000.000");
+		IomObject endSegment5=segments5.addattrobj("segment", "COORD");
+		endSegment5.setattrvalue("C1", "484000.000");
+		endSegment5.setattrvalue("C2", "72500.000");
+		// polyline 2
+		IomObject polylineValue4 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments4=polylineValue4.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment4=segments4.addattrobj("segment", "COORD");
+		startSegment4.setattrvalue("C1", "484000.000");
+		startSegment4.setattrvalue("C2", "72500.000");
+		IomObject endSegment4=segments4.addattrobj("segment", "COORD");
+		endSegment4.setattrvalue("C1", "480500.000");
+		endSegment4.setattrvalue("C2", "70500.000");
+		// polyline 3
+		IomObject polylineValue6 = outerBoundary2.addattrobj("polyline", "POLYLINE");
+		IomObject segments6=polylineValue6.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment6=segments6.addattrobj("segment", "COORD");
+		startSegment6.setattrvalue("C1", "480500.000");
+		startSegment6.setattrvalue("C2", "70500.000");
+		IomObject endSegment6=segments6.addattrobj("segment", "COORD");
+		endSegment6.setattrvalue("C1", "484000.000");
+		endSegment6.setattrvalue("C2", "70000.000");
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_MANDATORYCONSTRAINT_CLASSD, OBJ_OID1);
+		objSurfaceSuccess.addattrobj("Numbers", iomObjStruct);
+		objSurfaceSuccess.addattrobj("Numbers", iomObjStruct2);
+		objSurfaceSuccess.setattrvalue("Art", "a");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "FunctionAreAreasModel2");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjStruct));
+		validator.validate(new ObjectEvent(iomObjStruct2));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Set Constraint FunctionAreAreasModel2.FunctionAreAreasTopic.FunctionAreAreasView.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 }

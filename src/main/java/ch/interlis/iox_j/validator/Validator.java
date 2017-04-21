@@ -409,7 +409,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							} else if(additionalConstraint instanceof SetConstraint){
 								SetConstraint setConstraint = (SetConstraint) additionalConstraint;
 								String constraintName = getScopedName(setConstraint);
-								collectSetConstraintObjs(constraintName, iomObj, setConstraint);
+								String checkAdditionalConstraint=null;
+								if(!enforceConstraintValidation){
+									checkAdditionalConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
+								}
+								if(ValidationConfig.OFF.equals(checkAdditionalConstraint)){
+									if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
+										configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
+										errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
+									}
+								} else {
+									collectSetConstraintObjs(checkAdditionalConstraint, constraintName, iomObj, setConstraint);
+								}
 							} else if(additionalConstraint instanceof UniquenessConstraint){
 								UniquenessConstraint uniquenessConstraint = (UniquenessConstraint) additionalConstraint; // uniquenessConstraint not null.
 								validateUniquenessConstraint(iomObj, uniquenessConstraint);
@@ -458,7 +469,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
 								}
 							} else {
-								collectSetConstraintObjs(checkSetConstraint, iomObj, setConstraint);
+								collectSetConstraintObjs(checkSetConstraint, constraintName, iomObj, setConstraint);
 							}
 						}
 						// plausibility constraint
@@ -664,8 +675,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private HashMap<SetConstraint,Collection<String>> setConstraints=new HashMap<SetConstraint,Collection<String>>();
 	private Iterator<String> allObjIterator=null;
 	
-	private void collectSetConstraintObjs(String validationKind, IomObject iomObj, SetConstraint setConstraintObj) {
-		String constraintName = getScopedName(setConstraintObj);
+	private void collectSetConstraintObjs(String validationKind, String constraintName, IomObject iomObj, SetConstraint setConstraintObj) {
 		Evaluable preCondition = (Evaluable) setConstraintObj.getPreCondition();
 		if(preCondition != null){
 			Value preConditionValue = evaluateExpression(validationKind, constraintName, iomObj, preCondition);
@@ -1475,7 +1485,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Iterator<String> objectIterator = allObjIterator;
 			List<IomObject> listOfIomObjects = new ArrayList<IomObject>();
 			if(allObjIterator==null){
-				 throw new IllegalStateException("allObjIterator==null");
+				 throw new IllegalStateException("argument ALL requires a SET CONSTRAINT.");
 			}
 			while(objectIterator.hasNext()){
 				String oid=objectIterator.next();

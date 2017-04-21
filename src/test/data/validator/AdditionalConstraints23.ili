@@ -29,10 +29,6 @@ CONTRACTED MODEL AdditionalConstraints23 AT "mailto:ceis@localhost" VERSION "201
 			attr4 : Hkoord;
 		END ManConClassCoord;
 		
-		!!CLASS ClassZA =
-		!!	Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-		!!END ClassZA;
-		
 		!! set constraints
 		STRUCTURE StructC =
 		END StructC;
@@ -51,6 +47,22 @@ CONTRACTED MODEL AdditionalConstraints23 AT "mailto:ceis@localhost" VERSION "201
 			attr1 : 0..10;
 			attr2 : 0..10;
 		END PlConClass;
+		
+		!! mandatory constraints function are areas
+		CLASS SurfaceClass =
+			attr1 : 0..10;
+			attr2 : 0..10;
+			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END SurfaceClass;
+		
+		STRUCTURE StructD =
+			Surface: SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END StructD;
+		
+		CLASS ClassD =
+			Numbers: BAG {1..*} OF StructD;
+			Art: (a, b, c);
+		END ClassD;
 		
 		CLASS ExConClass =
 			subAttr : TEXT*10;
@@ -98,23 +110,17 @@ END AddExConModel.
 
 !! VIEW Mandatory Constraint
 CONTRACTED MODEL AddManConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
-
 	IMPORTS AdditionalConstraints23;
-	
 	VIEW TOPIC AddManConTopic =
 		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-		
 		VIEW AddManConView
 			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ManConClass;
 			WHERE ManConClass->attr1==5;
 			=
 			ALL OF ManConClass;
 			MANDATORY CONSTRAINT attr1 == attr2;
-
 		END AddManConView;
-
 	END AddManConTopic;
-
 END AddManConModel.
 
 
@@ -137,19 +143,6 @@ CONTRACTED MODEL AddManConCoordModel AT "mailto:ceis@localhost" VERSION "2016-03
 
 END AddManConCoordModel.
 
-
-!!CONTRACTED MODEL AdditionalConstraints23Zusatz3 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
-!!  IMPORTS AdditionalConstraints23;
-!!  VIEW TOPIC BodenbedeckungZusatz =
-!!  	DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-!!        VIEW PrivatGebaeude
-!!   	PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ClassZA;
-!!    	=
-!!       ALL OF ClassZA;
-!!        MANDATORY CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie);
-!!    END PrivatGebaeude;
-!!  END BodenbedeckungZusatz;
-!!END AdditionalConstraints23Zusatz3.
 
 CONTRACTED MODEL AdditionalConstraints23Un AT "mailto:ceis@localhost" VERSION "2016-03-29" =
 	IMPORTS AdditionalConstraints23;
@@ -200,3 +193,31 @@ CONTRACTED MODEL AddPlConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
 	END AddPlConTopic;
 
 END AddPlConModel.
+
+
+!! mandatory constraint function: are areas
+CONTRACTED MODEL FunctionAreAreasModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+  IMPORTS AdditionalConstraints23;
+  VIEW TOPIC FunctionAreAreasTopic =
+  	DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+        VIEW FunctionAreAreasView
+   	PROJECTION OF AdditionalConstraints23.Bodenbedeckung.SurfaceClass;
+    	=
+       ALL OF SurfaceClass;
+		SET CONSTRAINT WHERE attr1 > attr2 : INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie);
+    END FunctionAreAreasView;
+  END FunctionAreAreasTopic;
+END FunctionAreAreasModel.
+
+CONTRACTED MODEL FunctionAreAreasModel2 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+  IMPORTS AdditionalConstraints23;
+  VIEW TOPIC FunctionAreAreasTopic =
+  	DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
+        VIEW FunctionAreAreasView
+   	PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ClassD;
+    	=
+       ALL OF ClassD;
+		SET CONSTRAINT WHERE Art == #a : INTERLIS.areAreas(ALL, >> Numbers, >> AdditionalConstraints23.Bodenbedeckung.StructD->Surface);
+    END FunctionAreAreasView;
+  END FunctionAreAreasTopic;
+END FunctionAreAreasModel2.
