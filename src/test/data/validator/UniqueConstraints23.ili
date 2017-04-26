@@ -228,11 +228,11 @@ MODEL UniqueConstraints23
 			UNIQUE attr1;
 		END ClassUndefined;
 		
-		CLASS ClassUndefinedB =
+		CLASS ClassEmptyText =
 			attr1 : TEXT*20;
 			attr2 : TEXT*20;
 			UNIQUE attr1, attr2;
-		END ClassUndefinedB;
+		END ClassEmptyText;
 		
 		CLASS ClassN =
 		  attrw1 : 0 .. 10;
