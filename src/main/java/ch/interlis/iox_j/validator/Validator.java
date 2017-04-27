@@ -1722,7 +1722,23 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								}
 							}
 						} else {
-							// EXTERNAL true.
+							// EXTERNAL
+							// not found in internal pool?
+							if(targetObject==null){
+								if(extObjResolvers!=null){
+									boolean extObjFound=false;
+									// call custom function to verify in external data pools
+									for(ExternalObjectResolver extObjResolver:extObjResolvers){
+										if(extObjResolver.objectExists(targetOid, destinationClasses)){
+											extObjFound=true;
+											break;
+										}
+									}
+									if(!extObjFound){
+										logMsg(validateTarget,"No object found with OID {0}.", targetOid);
+									}
+								}
+							}
 						}
 						if(targetObject != null){
 							// target object exist
