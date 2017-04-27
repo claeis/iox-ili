@@ -103,6 +103,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE_DO="doItfOidPerTable";
 	public static final String CONFIG_CUSTOM_FUNCTIONS="ch.interlis.iox_j.validator.customFunctions";
+	public static final String CONFIG_OBJECT_RESOLVERS="ch.interlis.iox_j.validator.objectResolvers";
 	private ObjectPoolManager objPoolManager=null;
 	private ObjectPool objectPool = null;
 	private LinkPool linkPool;
@@ -125,6 +126,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String currentMainOid=null;
 	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
 	private Map<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
+	private List<ExternalObjectResolver> extObjResolvers=null; // java class that implements ExternalObjectResolver
 	private HashMap<Constraint,Viewable> additionalConstraints=new HashMap<Constraint,Viewable>();
 	private Map<PlausibilityConstraint, PlausibilityPoolValue> plausibilityConstraints=new LinkedHashMap<PlausibilityConstraint, PlausibilityPoolValue>();
 	private HashSet<String> configOffOufputReduction =new HashSet<String>();
@@ -166,6 +168,24 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(cf!=null){
 			customFunctions=cf;
 		}
+		List<Class> resolverClasses=(List<Class>) config.getTransientObject(CONFIG_OBJECT_RESOLVERS);
+		if(resolverClasses!=null){
+			extObjResolvers=new ArrayList<ExternalObjectResolver>();
+			for(Class resolverClass:resolverClasses){
+				ExternalObjectResolver resolver=null;
+				try {
+					resolver = (ExternalObjectResolver) resolverClass.newInstance();
+				} catch (InstantiationException e) {
+					throw new IllegalStateException(e);
+				} catch (IllegalAccessException e) {
+					throw new IllegalStateException(e);
+				}
+				resolver.init(td,config,validationConfig, objectPool, errFact);
+				extObjResolvers.add(resolver);
+			}
+		}
+		
+		
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(config.getValue(CONFIG_DO_ITF_OIDPERTABLE));
 		boolean allowOnlyRelaxedMultiplicity=ValidationConfig.ON.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ALLOW_ONLY_MULTIPLICITY_REDUCTION));
@@ -1608,7 +1628,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}else{
 				// EXTERNAL
-				// call custom function to verify in external data pool
+				// not found in internal pool?
+				if(targetObj==null){
+					if(extObjResolvers!=null){
+						boolean extObjFound=false;
+						// call custom function to verify in external data pools
+						for(ExternalObjectResolver extObjResolver:extObjResolvers){
+							if(extObjResolver.objectExists(targetOid, destinationClasses)){
+								extObjFound=true;
+								break;
+							}
+						}
+						if(!extObjFound){
+							logMsg(validateTarget,"No object found with OID {0}.", targetOid);
+						}
+					}
+				}
 			}
 			if(targetObj != null){
 				Object modelEle=tag2class.get(targetObj.getobjecttag());

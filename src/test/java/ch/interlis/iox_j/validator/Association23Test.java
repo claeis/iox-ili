@@ -1,10 +1,10 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
-
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -23,8 +23,8 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 // a1 -- {0..1} ClassA;
 // a1 (Rollenname)
 // {} (Beinhaltet die Kardinalität)
-// 0 (Die Minimal gesetzte Zulässige Kardinalität.
-// 1 (Die Maximal gesetzte Zulässige Kardinalität.
+// 0 (Die Minimal gesetzte Zulässige Kardinalität).
+// 1 (Die Maximal gesetzte Zulässige Kardinalität).
 // ClassA (Die Klasse, welche durch die Rolle a1, minimal 0 und maximal 1 Mal von einer anderen Klasse referenziert werden darf.
 // Die Beziehung einer beliebigen Klasse: Klasse_A kann über den Rollenaufruf_a1 von der Klasse_B minimal_0 Mal, bis und mit maximal_1 Mal bestehen, sonst wird ein Fehler ausgegeben.
 //
@@ -40,9 +40,9 @@ public class Association23Test {
 
 	private TransferDescription td=null;
 	// OID
-	private final static String OBJ_OID1 ="o1";
-	private final static String OBJ_OID2 ="o2";
-	private final static String OBJ_OID3 ="o3";
+	private final static String OID1 ="o1";
+	private final static String OID2 ="o2";
+	private final static String OID3 ="o3";
 	private final static String OBJ_OID4 ="o4";
 	private final static String OBJ_OID5 ="o5";
 	private final static String OBJ_OID6 ="o6";
@@ -102,11 +102,15 @@ public class Association23Test {
 	private final static String ILI_ASSOC_EF1_E1="e1";
 	private final static String ILI_ASSOC_EF1_F1="f1";
 	
+	private final static String ILI_ASSOC_GH1_G1="g1";
+	private final static String ILI_ASSOC_GH1_H1="h1";
+	
 	// ASSOCIATION CLASS
 	private final static String ILI_ASSOC_AB2=ILI_TOPIC+".ab2";
 	private final static String ILI_ASSOC_ABP2=ILI_TOPIC+".abp2";
 	private final static String ILI_ASSOC_ABD2=ILI_TOPIC+".abd2";
 	private final static String ILI_ASSOC_EF1=ILI_TOPIC+".ef1";
+	private final static String ILI_ASSOC_GH1=ILI_TOPICB+".gh1";
 	private final static String ILI_TOPICB_ASSOC_EF1=ILI_TOPICB+".ef1";
 	private final static String ILI_TOPICB_ASSOC_EF1_E1="e1";
 	private final static String ILI_TOPICB_ASSOC_EF1_F1="f1";
@@ -130,10 +134,10 @@ public class Association23Test {
 
 	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a1, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
 	@Test
-	public void aEmbeddedAssociation_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(OBJ_OID1);
+	public void embeddedAsso_TargetClassFound_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OID2);
+		iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -152,10 +156,10 @@ public class Association23Test {
 	// Wenn von der KlasseB, welche über KlasseBP eine Beziehung zur KlasseA über die KlasseAP über den Rollennamen: a1,
 	// 1 Mal besteht soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void aEmbeddedAssociationOverRestriction_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAP, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSBP, OBJ_OID2);
-		iomObjB.addattrobj(ILI_ASSOC_ABP1_AP1, "REF").setobjectrefoid(OBJ_OID1);
+	public void embeddedAsso_RestrictionTargetClassFound_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAP, OID1);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSBP, OID2);
+		iomObjB.addattrobj(ILI_ASSOC_ABP1_AP1, "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -175,13 +179,13 @@ public class Association23Test {
 	// Von der KlasseB eine Beziehung zur KlasseD über den Rollennamen: ad1,
 	// je, 0-1 Mal besteht und eine davon richtig ist, soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void embeddedAssociationWithOR_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID3);
-		iomObjB.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(OBJ_OID1);
+	public void embeddedAsso_BooleanOperatorOR_TargetClassFound_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OID2);
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OID3);
+		iomObjB.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(OID1);
 		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OBJ_OID4);
-		iomObjB2.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(OBJ_OID3);
+		iomObjB2.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(OID3);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -203,10 +207,10 @@ public class Association23Test {
 	// 1 Mal besteht soll. Die Klasse jedoch in unterschiedlichen Baskets sich befinden.
 	// keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void embedeedExternalRoleDifferentBaskets_Ok(){
-		Iom_jObject iomObjG=new Iom_jObject(ILI_TOPICB_CLASSG, OBJ_OID1);
-		Iom_jObject iomObjH1=new Iom_jObject(ILI_TOPICB_CLASSH, OBJ_OID2);
-		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+	public void external_RoleEmbeddedAsso_DifferentBaskets_TargetObjectFound_Ok(){
+		Iom_jObject iomObjG=new Iom_jObject(ILI_TOPICB_CLASSG, OID1);
+		Iom_jObject iomObjH1=new Iom_jObject(ILI_TOPICB_CLASSH, OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -228,12 +232,12 @@ public class Association23Test {
 	// Von der Klasse A eine Beziehung zur KlasseB über den Rollennamen: b1,
 	// je, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void standAlone0toN_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
+	public void standAloneAsso_0toN_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OID2);
 		Iom_jObject iomObjAB=new Iom_jObject(ILI_ASSOC_AB2, null);
-		iomObjAB.addattrobj(ILI_ASSOC_AB2_A2, "REF").setobjectrefoid(OBJ_OID1);
-		iomObjAB.addattrobj(ILI_ASSOC_AB2_B2, "REF").setobjectrefoid(OBJ_OID2);
+		iomObjAB.addattrobj(ILI_ASSOC_AB2_A2, "REF").setobjectrefoid(OID1);
+		iomObjAB.addattrobj(ILI_ASSOC_AB2_B2, "REF").setobjectrefoid(OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -254,12 +258,12 @@ public class Association23Test {
 	// Von der KlasseE eine Beziehung zur KlasseF über den Rollennamen: f1,
 	// je, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void standAlone1toN_Ok(){
-		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OBJ_OID1);
-		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OBJ_OID2);
+	public void standAloneAsso_1toN_Ok(){
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OID1);
+		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OID2);
 		Iom_jObject iomLinkEF=new Iom_jObject(ILI_ASSOC_EF1, null);
-		iomLinkEF.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
-		iomLinkEF.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+		iomLinkEF.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OID1);
+		iomLinkEF.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -281,12 +285,12 @@ public class Association23Test {
 	// je, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden,
 	// wenn die Objekte sich in der gleichen Basket befinden und External true ist.	
 	@Test
-	public void standAloneExternalTrueSameBasket_Ok(){
-		Iom_jObject iomObjE=new Iom_jObject(ILI_TOPICB_CLASSE, OBJ_OID1);
-		Iom_jObject iomObjF=new Iom_jObject(ILI_TOPICB_CLASSF, OBJ_OID2);
+	public void external_StandAloneAsso_SameBasket_Ok(){
+		Iom_jObject iomObjE=new Iom_jObject(ILI_TOPICB_CLASSE, OID1);
+		Iom_jObject iomObjF=new Iom_jObject(ILI_TOPICB_CLASSF, OID2);
 		Iom_jObject iomLinkEF=new Iom_jObject(ILI_TOPICB_ASSOC_EF1, null);
-		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
-		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_E1, "REF").setobjectrefoid(OID1);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_F1, "REF").setobjectrefoid(OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -306,9 +310,9 @@ public class Association23Test {
 	// Wenn in einer Embedded Association von der KlasseH eine Beziehung zur KlasseG über den Rollennamen: g1,
 	// die Klasse nicht gefunden werden kann, die Rolle: External=True ist, soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void embeddedExternalTrue_Ok(){ //FIXME darf keinen Fehler ergeben! --> ok
-		Iom_jObject iomObjH1=new Iom_jObject("Association23.TopicB.ClassH", OBJ_OID2);
-		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+	public void external_EmbeddedAsso_Ok(){
+		Iom_jObject iomObjH1=new Iom_jObject("Association23.TopicB.ClassH", OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -326,10 +330,10 @@ public class Association23Test {
 	// External=true, Objects in different Baskets.
 	// Ergibt einen Fehler! Da jedoch External=true ist, wird dieser nicht ausgegeben.
 	@Test
-	public void embeddedExternalTrueDiffBasket_Ok(){ //FIXME darf keinen Fehler ergeben! --> ok.
-		Iom_jObject iomObjG1=new Iom_jObject("Association23.TopicB.ClassG", OBJ_OID1);
-		Iom_jObject iomObjH1=new Iom_jObject("Association23.TopicB.ClassH", OBJ_OID2);
-		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+	public void external_EmbeddedAsso_DiffBasket_Ok(){
+		Iom_jObject iomObjG1=new Iom_jObject("Association23.TopicB.ClassG", OID1);
+		Iom_jObject iomObjH1=new Iom_jObject("Association23.TopicB.ClassH", OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -347,42 +351,17 @@ public class Association23Test {
 		assertEquals(0,logger.getErrs().size());
 	}
 	
-	// External=false, Objects in different Baskets.
-	// Ergibt einen Fehler!
-	@Test
-	public void embeddedExternalFalseDiffBasket_False(){ //FIXME muss einen Fehler ergeben! --> ok
-		Iom_jObject iomObjG1=new Iom_jObject("Association23.Topic.ClassG", OBJ_OID1);
-		Iom_jObject iomObjH1=new Iom_jObject("Association23.Topic.ClassH", OBJ_OID2);
-		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjH1));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID2));
-		validator.validate(new ObjectEvent(iomObjG1));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("No object found with OID o1 in basket b1.", logger.getErrs().get(0).getEventMsg());
-	}
-	
 	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE über den Rollennamen: e1,
 	// Von der KlasseE eine Beziehung zur KlasseF über den Rollennamen: f1,
 	// je, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden,
 	// wenn die Objekte sich in unterschiedlichen Baskets befinden und External true ist.
 	@Test
-	public void standAloneExternalTrueDiffBasket_Ok(){
-		Iom_jObject iomObjE=new Iom_jObject(ILI_TOPICB_CLASSE, OBJ_OID1);
-		Iom_jObject iomObjF=new Iom_jObject(ILI_TOPICB_CLASSF, OBJ_OID2);
+	public void external_StandAloneAsso_DiffBasket_Ok(){
+		Iom_jObject iomObjE=new Iom_jObject(ILI_TOPICB_CLASSE, OID1);
+		Iom_jObject iomObjF=new Iom_jObject(ILI_TOPICB_CLASSF, OID2);
 		Iom_jObject iomLinkEF=new Iom_jObject(ILI_TOPICB_ASSOC_EF1, null);
-		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
-		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_E1, "REF").setobjectrefoid(OID1);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_F1, "REF").setobjectrefoid(OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -406,11 +385,11 @@ public class Association23Test {
 	// je, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden,
 	// wenn die Objekte sich im gleichen Basket befindet und External true ist.
 	@Test
-	public void standAloneExternalTrueSameBasketNtoN_Ok(){
-		Iom_jObject iomObjF=new Iom_jObject(ILI_TOPICB_CLASSF, OBJ_OID2);
+	public void external_StandAloneAsso_SameBasketNtoN_Ok(){
+		Iom_jObject iomObjF=new Iom_jObject(ILI_TOPICB_CLASSF, OID2);
 		Iom_jObject iomLinkEF=new Iom_jObject(ILI_TOPICB_ASSOC_EF1, null);
-		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
-		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_E1, "REF").setobjectrefoid(OID1);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_F1, "REF").setobjectrefoid(OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -430,12 +409,12 @@ public class Association23Test {
 	// von der KlasseA, welche über KlasseAP eine Beziehung zur KlasseB über die KlasseBP über den Rollennamen: b1,
 	// je, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. Gleicher Basket, External false.
 	@Test
-	public void standAloneRestriction_Ok(){	
-		Iom_jObject iomObjAp=new Iom_jObject(ILI_CLASSAP, OBJ_OID1);
-		Iom_jObject iomObjBp=new Iom_jObject(ILI_CLASSBP, OBJ_OID2);
+	public void standAloneAsso_RestrictionTargetClassFound_Ok(){	
+		Iom_jObject iomObjAp=new Iom_jObject(ILI_CLASSAP, OID1);
+		Iom_jObject iomObjBp=new Iom_jObject(ILI_CLASSBP, OID2);
 		Iom_jObject iomObjABP=new Iom_jObject(ILI_ASSOC_ABP2, null);
-		iomObjABP.addattrobj(ILI_ASSOC_ABP2_AP2, "REF").setobjectrefoid(OBJ_OID1);
-		iomObjABP.addattrobj(ILI_ASSOC_ABP2_BP2, "REF").setobjectrefoid(OBJ_OID2);
+		iomObjABP.addattrobj(ILI_ASSOC_ABP2_AP2, "REF").setobjectrefoid(OID1);
+		iomObjABP.addattrobj(ILI_ASSOC_ABP2_BP2, "REF").setobjectrefoid(OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -456,12 +435,12 @@ public class Association23Test {
 	// Von der KlasseB eine Beziehung zur KlasseD über den Rollennamen: ad2,
 	// je, 1 Mal besteht und eine davon richtig ist, soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void standAloneWithOR_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
+	public void standAloneAsso_BooleanOperatorOR_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OID2);
 		Iom_jObject iomObjAB=new Iom_jObject(ILI_ASSOC_ABD2, null);
-		iomObjAB.addattrobj(ILI_ASSOC_ABD2_AD2, "REF").setobjectrefoid(OBJ_OID1);
-		iomObjAB.addattrobj(ILI_ASSOC_ABD2_BD2, "REF").setobjectrefoid(OBJ_OID2);
+		iomObjAB.addattrobj(ILI_ASSOC_ABD2_AD2, "REF").setobjectrefoid(OID1);
+		iomObjAB.addattrobj(ILI_ASSOC_ABD2_BD2, "REF").setobjectrefoid(OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -478,21 +457,107 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
+	// - Die role e1 (EXTERNAL true) und f1 (EXTERNAL true) der Association EF1 aufgerufen wird.
+	// - Die target class E, innerhalb der basket nicht gefunden werden kann.
+	// - Die target class in der Basket b2 existiert.
+	@Test
+	public void resolver_StandAloneAsso_ObjectFound_Ok(){
+		Iom_jObject iomObjE=new Iom_jObject(ILI_TOPICB_CLASSE, OID1);
+		Iom_jObject iomObjF=new Iom_jObject(ILI_TOPICB_CLASSF, OID2);
+		Iom_jObject iomLinkEF=new Iom_jObject(ILI_TOPICB_ASSOC_EF1, null);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_E1, "REF").setobjectrefoid(ExternalObjResolverMock.OID1);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_F1, "REF").setobjectrefoid(OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		List<Class> resolverClasses=new ArrayList<Class>();
+		resolverClasses.add(ExternalObjResolverMock.class);
+		settings.setTransientObject(Validator.CONFIG_OBJECT_RESOLVERS, resolverClasses);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjF));
+		validator.validate(new ObjectEvent(iomLinkEF));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1,logger.getErrs().size());
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
+	// - Die role g1 (EXTERNAL true) der Association GH1 aufgerufen wird.
+	// - Die target class G, innerhalb der basket nicht gefunden werden kann.
+	// - Die target class in der Basket b2 existiert.
+	@Test
+	public void resolver_EmbeddedAsso_ObjectFound_Ok(){
+		Iom_jObject iomObjG=new Iom_jObject(ILI_TOPICB_CLASSG, OID1);
+		Iom_jObject iomObjH1=new Iom_jObject(ILI_TOPICB_CLASSH, OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(ExternalObjResolverMock.OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		List<Class> resolverClasses=new ArrayList<Class>();
+		resolverClasses.add(ExternalObjResolverMock.class);
+		settings.setTransientObject(Validator.CONFIG_OBJECT_RESOLVERS, resolverClasses);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjG));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1,logger.getErrs().size());
+	}
+	
 	//#########################################################//
 	//############# FAIL EMBEDDED CARDINALITY #################//
 	//#########################################################//		
+	
+	// External=false, Objects in different Baskets.
+	// Ergibt einen Fehler!
+	@Test
+	public void embeddedAsso_DifferentBaskets_False(){
+		Iom_jObject iomObjG1=new Iom_jObject("Association23.Topic.ClassG", OID1);
+		Iom_jObject iomObjH1=new Iom_jObject("Association23.Topic.ClassH", OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjG1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("No object found with OID o1 in basket b1.", logger.getErrs().get(0).getEventMsg());
+	}
 	
 	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE über den Rollennamen: e1,
 	// Von der KlasseE eine Beziehung zur KlasseF über den Rollennamen: f1,
 	// je, 1 Mal besteht soll eine Fehlermeldung ausgegeben werden,
 	// wenn die Objekte sich in unterschiedlichen Baskets befinden und External false ist.
 	@Test
-	public void standAloneExternalFalse_False(){
-		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OBJ_OID1);
-		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OBJ_OID2);
+	public void standAloneAsso_DifferentBaskets_False(){
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OID1);
+		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OID2);
 		Iom_jObject iomLinkEF=new Iom_jObject(ILI_ASSOC_EF1, null);
-		iomLinkEF.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
-		iomLinkEF.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+		iomLinkEF.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OID1);
+		iomLinkEF.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -514,12 +579,12 @@ public class Association23Test {
 	
 	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a1, 0 bis 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
 	@Test
-	public void embeddedAssociationCardinality_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		Iom_jObject iomObjB1=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		iomObjB1.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(OBJ_OID1);
-		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OBJ_OID3);
-		iomObjB2.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(OBJ_OID1);
+	public void embeddedAsso_WrongCardinality_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
+		Iom_jObject iomObjB1=new Iom_jObject(ILI_CLASSB, OID2);
+		iomObjB1.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OID3);
+		iomObjB2.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -537,41 +602,15 @@ public class Association23Test {
 		assertEquals("b1 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a3, 0 bis 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
-	@Test
-	public void embeddedAssociationCardinality2_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		Iom_jObject iomObjB1=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		iomObjB1.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID1);
-		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		iomObjB2.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new ObjectEvent(iomObjB1));
-		validator.validate(new ObjectEvent(iomObjB2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("The OID o2 of object 'Association23.Topic.ClassB oid o2 {a3 -> o1 REF {}}' already exists in CLASS Association23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
-		assertEquals("a3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(1).getEventMsg());
-	}
-	
 	// Wenn von der KlasseB, welche über KlasseBP eine Beziehung zur KlasseA über die KlasseAP über den Rollennamen: a1,
 	// 1 Mal besteht soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void embeddedAssociationCardinalityExtendedClass_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAP, OBJ_OID1);
-		Iom_jObject iomObjB1=new Iom_jObject(ILI_CLASSBP, OBJ_OID2);
-		iomObjB1.addattrobj(ILI_ASSOC_ABP1_AP1, "REF").setobjectrefoid(OBJ_OID1);
-		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSBP, OBJ_OID3);
-		iomObjB2.addattrobj(ILI_ASSOC_ABP1_AP1, "REF").setobjectrefoid(OBJ_OID1);
+	public void embeddedAsso_CardinalityExtendedClass_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAP, OID1);
+		Iom_jObject iomObjB1=new Iom_jObject(ILI_CLASSBP, OID2);
+		iomObjB1.addattrobj(ILI_ASSOC_ABP1_AP1, "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSBP, OID3);
+		iomObjB2.addattrobj(ILI_ASSOC_ABP1_AP1, "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -589,42 +628,15 @@ public class Association23Test {
 		assertEquals("bp1 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Wenn von der KlasseB, welche über KlasseBP eine Beziehung zur KlasseA über die KlasseAP über den Rollennamen: a1,
-	// 1 Mal besteht soll keine Fehlermeldung ausgegeben werden.
-	@Test
-	public void embeddedAssociationCardinalityExtendedClass2_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAP, OBJ_OID1);
-		Iom_jObject iomObjB1=new Iom_jObject(ILI_CLASSBP, OBJ_OID2);
-		iomObjB1.addattrobj(ILI_ASSOC_ABP3_AP3, "REF").setobjectrefoid(OBJ_OID1);
-		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSBP, OBJ_OID2);
-		iomObjB2.addattrobj(ILI_ASSOC_ABP3_AP3, "REF").setobjectrefoid(OBJ_OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new ObjectEvent(iomObjB1));
-		validator.validate(new ObjectEvent(iomObjB2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("The OID o2 of object 'Association23.Topic.ClassBp oid o2 {ap3 -> o1 REF {}}' already exists in CLASS Association23.Topic.ClassBp.", logger.getErrs().get(0).getEventMsg());
-		assertEquals("ap3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(1).getEventMsg());
-	}
-	
 	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: ad1,
 	// Von der KlasseB eine Beziehung zur KlasseD über den Rollennamen: ad1,
 	// je, 0-1 Mal besteht und eine davon richtig ist, soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void embeddedAssociationWithOR_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
+	public void embeddedAsso_BooleanOperatorOR_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
 		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID4);
-		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		iomObjB2.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(OBJ_OID1);
+		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OID2);
+		iomObjB2.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(OID1);
 		iomObjB2.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(OBJ_OID4);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -642,36 +654,6 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("ad1 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(0).getEventMsg());
 	}
-	
-	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: ad3,
-	// Von der KlasseB eine Beziehung zur KlasseD über den Rollennamen: ad3,
-	// je, 0-1 Mal besteht und eine davon richtig ist, soll keine Fehlermeldung ausgegeben werden.
-	@Test
-	public void embeddedAssociationWithOR2_Fail(){
-		Iom_jObject iomObjA1=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		// 1. reference success (0..1 == 1)
-		iomObjB.addattrobj(ILI_ASSOC_ABD3_AD3, "REF").setobjectrefoid(OBJ_OID1);
-		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		// 2. reference fail (0..1 == 2)
-		iomObjB2.addattrobj(ILI_ASSOC_ABD3_AD3, "REF").setobjectrefoid(OBJ_OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
-		validator.validate(new ObjectEvent(iomObjA1));
-		validator.validate(new ObjectEvent(iomObjB));
-		validator.validate(new ObjectEvent(iomObjB2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("The OID o2 of object 'Association23.Topic.ClassB oid o2 {ad3 -> o1 REF {}}' already exists in CLASS Association23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
-		assertEquals("ad3 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(1).getEventMsg());
-	}
 		
 	//#########################################################//
 	//################# FAIL TARGETCLASS TEST #################//
@@ -679,10 +661,10 @@ public class Association23Test {
 	
 	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a1, 0 bis 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
 	@Test
-	public void wrongTargetClass_Fail(){
-		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(OBJ_OID1);
+	public void embeddedAsso_TargetClassWrong_Fail(){
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OID1);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OID2);
+		iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -701,10 +683,10 @@ public class Association23Test {
 	
 	// Es wird eine Fehlermeldung ausgegeben wenn in einer StandAlone Association eine falsche Kardinalität von e1 erstellt wurde.
 	@Test
-	public void standAloneAssociationWrongCardinality_Fail(){
-		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OBJ_OID2);
+	public void standAloneAsso_CardinalityWrong_Fail(){
+		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OID2);
 		Iom_jObject iomObjAp=new Iom_jObject(ILI_ASSOC_EF1, null);
-		iomObjAp.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+		iomObjAp.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -722,10 +704,10 @@ public class Association23Test {
 	
 	// Die OID a1 der Klasse A, welche von der Klasse B mit der Rolle b1 Verbunden wird, existiert nicht.
 	@Test
-	public void noTargetObject_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
-		iomObjB.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OBJ_OID3);
+	public void embeddedAsso_OIDNotFound_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OID2);
+		iomObjB.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(OID3);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -745,10 +727,10 @@ public class Association23Test {
 	// Die KlasseA mit der OID a1, verbindet über die Klasse: classBp mit der OID b1.
 	// Es soll eine Fehlermeldung ausgegeben werden, wenn diese Klasse nicht existiert.
 	@Test
-	public void wrongExtendedClass_Fail(){
-		Iom_jObject iomObjC=new Iom_jObject(ILI_CLASSCP, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSBP, OBJ_OID2);
-		iomObjB.addattrobj(ILI_ASSOC_ABP1_AP1, "REF").setobjectrefoid(OBJ_OID1);
+	public void embeddedAsso_WrongTargetClass_Fail(){
+		Iom_jObject iomObjC=new Iom_jObject(ILI_CLASSCP, OID1);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSBP, OID2);
+		iomObjB.addattrobj(ILI_ASSOC_ABP1_AP1, "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -767,10 +749,10 @@ public class Association23Test {
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die Klasse der referenzierten oid: oid3, der Association abp3, nicht exisitiert.
 	@Test
-	public void noTargetObjectOfExtendedClassFound_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAP, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSBP, OBJ_OID2);
-		iomObjB.addattrobj(ILI_ASSOC_ABP3_AP3, "REF").setobjectrefoid(OBJ_OID3);
+	public void embeddedAsso_TargetExtendedOIDNotFound_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAP, OID1);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSBP, OID2);
+		iomObjB.addattrobj(ILI_ASSOC_ABP3_AP3, "REF").setobjectrefoid(OID3);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -789,12 +771,12 @@ public class Association23Test {
 	
 	// Die Klasse der von der Association referenzierten oid2, existiert nicht.
 	@Test
-	public void noTargetObjectOfExtendedClassFound2_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAP, OBJ_OID1);
-		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSBP, OBJ_OID2);
+	public void standAloneAsso_TargetExtendedOIDNotFound_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAP, OID1);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSBP, OID2);
 		Iom_jObject iomObjAp=new Iom_jObject(ILI_ASSOC_ABP2, null);
-		iomObjAp.addattrobj(ILI_ASSOC_ABP2_AP2, "REF").setobjectrefoid(OBJ_OID1);
-		iomObjAp.addattrobj(ILI_ASSOC_ABP2_BP2, "REF").setobjectrefoid(OBJ_OID3);
+		iomObjAp.addattrobj(ILI_ASSOC_ABP2_AP2, "REF").setobjectrefoid(OID1);
+		iomObjAp.addattrobj(ILI_ASSOC_ABP2_BP2, "REF").setobjectrefoid(OID3);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -814,18 +796,18 @@ public class Association23Test {
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Multiplizität der Rolle Maximal 1 sein darf, jedoch 5 Objekte erstellt wurden.
 	@Test
-	public void objectRangeOfMultiplicityExceeded_Fail(){
-		Iom_jObject iomObjG=new Iom_jObject(ILI_CLASSG, OBJ_OID1);
-		Iom_jObject iomObjH1=new Iom_jObject(ILI_CLASSH, OBJ_OID2);
-		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
-		Iom_jObject iomObjH2=new Iom_jObject(ILI_CLASSH, OBJ_OID3);
-		iomObjH2.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+	public void embeddedAsso_ObjectRangeOfMultiplicityExceeded_Fail(){
+		Iom_jObject iomObjG=new Iom_jObject(ILI_CLASSG, OID1);
+		Iom_jObject iomObjH1=new Iom_jObject(ILI_CLASSH, OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OID1);
+		Iom_jObject iomObjH2=new Iom_jObject(ILI_CLASSH, OID3);
+		iomObjH2.addattrobj("g1", "REF").setobjectrefoid(OID1);
 		Iom_jObject iomObjH3=new Iom_jObject(ILI_CLASSH, OBJ_OID4);
-		iomObjH3.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		iomObjH3.addattrobj("g1", "REF").setobjectrefoid(OID1);
 		Iom_jObject iomObjH4=new Iom_jObject(ILI_CLASSH, OBJ_OID5);
-		iomObjH4.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		iomObjH4.addattrobj("g1", "REF").setobjectrefoid(OID1);
 		Iom_jObject iomObjH5=new Iom_jObject(ILI_CLASSH, OBJ_OID6);
-		iomObjH5.addattrobj("g1", "REF").setobjectrefoid(OBJ_OID1);
+		iomObjH5.addattrobj("g1", "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -844,5 +826,68 @@ public class Association23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("h1 should associate 1 to 1 target objects (instead of 5)", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
+	// - Die role e1 (EXTERNAL true) und f1 (EXTERNAL true) der Association EF1 aufgerufen wird.
+	// - Die target class E, innerhalb der basket nicht gefunden werden kann.
+	// - Die target class E in keiner anderen basket existiert.
+	@Test
+	public void resolver_StandAloneAsso_TargetOIDNotFound_False(){
+		Iom_jObject iomObjE=new Iom_jObject(ILI_TOPICB_CLASSE, OID1);
+		Iom_jObject iomObjF=new Iom_jObject(ILI_TOPICB_CLASSF, OID2);
+		Iom_jObject iomLinkEF=new Iom_jObject(ILI_TOPICB_ASSOC_EF1, null);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_E1, "REF").setobjectrefoid(OID3);
+		iomLinkEF.addattrobj(ILI_TOPICB_ASSOC_EF1_F1, "REF").setobjectrefoid(OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		List<Class> resolverClasses=new ArrayList<Class>();
+		resolverClasses.add(ExternalObjResolverMock.class);
+		settings.setTransientObject(Validator.CONFIG_OBJECT_RESOLVERS, resolverClasses);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjF));
+		validator.validate(new ObjectEvent(iomLinkEF));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(2,logger.getErrs().size());
+		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
+	// - Die role g1 (EXTERNAL true) der Association GH1 aufgerufen wird.
+	// - Die target class G, innerhalb der basket nicht gefunden werden kann.
+	// - Die target class in der Basket b2 existiert.
+	@Test
+	public void resolver_EmbeddedAsso_TargetOIDNotFound_Fail(){
+		Iom_jObject iomObjG=new Iom_jObject(ILI_TOPICB_CLASSG, OID1);
+		Iom_jObject iomObjH1=new Iom_jObject(ILI_TOPICB_CLASSH, OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OID3);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		List<Class> resolverClasses=new ArrayList<Class>();
+		resolverClasses.add(ExternalObjResolverMock.class);
+		settings.setTransientObject(Validator.CONFIG_OBJECT_RESOLVERS, resolverClasses);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPICB,BASKET_ID2));
+		validator.validate(new ObjectEvent(iomObjG));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(2,logger.getErrs().size());
+		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
 	}
 }
