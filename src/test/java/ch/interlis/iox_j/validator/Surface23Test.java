@@ -1,8 +1,10 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -1678,7 +1680,9 @@ public class Surface23Test {
 		IomObject multisurfaceValue=objCompleteMultisurface.addattrobj("surface2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_COMPLETE);
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		IomObject surfaceValue2 = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary2 = surfaceValue2.addattrobj("boundary", "BOUNDARY");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -2013,5 +2017,71 @@ public class Surface23Test {
 		assertTrue(logger.getErrs().size()==2);
 		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei einer AREA oder SURFACE die outerboundary
+	// (welche minimal 1 Mal existieren muss) nicht gefunden wird.
+	// Dafür sollte eine klare Fehlermeldung erscheinen:
+	// dass bei einem Surface oder einer Area mindestens ein Outerboundary deklariert sein muss.
+	@Test
+	public void missingOuterBoundaryInSurface_False(){
+		// external object
+		Iom_jObject externalObject=new Iom_jObject(ILI_CLASSC, OID1);
+		IomObject externalMultisurface=externalObject.addattrobj("surface2d", "MULTISURFACE");
+		IomObject surfaceValue = externalMultisurface.addattrobj("surface", "SURFACE");
+		{
+			// outer boundary of external object
+			//IomObject outerBoundaryExternalObj = surfaceValue.addattrobj("boundary", "BOUNDARY");
+			// polyline 1
+			IomObject polyline1 = surfaceValue.addattrobj("polyline", "POLYLINE");
+			IomObject segments=polyline1.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "500000.000");
+			startSegment.setattrvalue("C2", "100000.000");
+			IomObject endSegment=segments.addattrobj("segment", "COORD");
+			endSegment.setattrvalue("C1", "600000.000");
+			endSegment.setattrvalue("C2", "100000.000");
+			// polyline 2
+			IomObject polyline2 = surfaceValue.addattrobj("polyline", "POLYLINE");
+			IomObject segments2=polyline2.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+			startSegment2.setattrvalue("C1", "600000.000");
+			startSegment2.setattrvalue("C2", "100000.000");
+			IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+			endSegment2.setattrvalue("C1", "600000.000");
+			endSegment2.setattrvalue("C2", "200000.000");
+			// polyline 3
+			IomObject polyline3 = surfaceValue.addattrobj("polyline", "POLYLINE");
+			IomObject segments3=polyline3.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment3=segments3.addattrobj("segment", "COORD");
+			startSegment3.setattrvalue("C1", "600000.000");
+			startSegment3.setattrvalue("C2", "200000.000");
+			IomObject endSegment3=segments3.addattrobj("segment", "COORD");
+			endSegment3.setattrvalue("C1", "500000.000");
+			endSegment3.setattrvalue("C2", "200000.000");
+			// polyline 4
+			IomObject polyline4 = surfaceValue.addattrobj("polyline", "POLYLINE");
+			IomObject segments4=polyline4.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment4=segments4.addattrobj("segment", "COORD");
+			startSegment4.setattrvalue("C1", "500000.000");
+			startSegment4.setattrvalue("C2", "200000.000");
+			IomObject endSegment4=segments4.addattrobj("segment", "COORD");
+			endSegment4.setattrvalue("C1", "500000.000");
+			endSegment4.setattrvalue("C2", "100000.000");
+		}
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(externalObject));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getWarn().size()==0);
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("missing outerboundary in surface2d of object o1.", logger.getErrs().get(0).getEventMsg());
 	}
 }

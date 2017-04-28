@@ -2666,7 +2666,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						SurfaceOrAreaType surfaceOrAreaType=(SurfaceOrAreaType)type;
 						IomObject surfaceValue=iomObj.getattrobj(attrName,0);
 						if (surfaceValue != null){
-							boolean isValid = validatePolygon(validateGeometryType,surfaceOrAreaType, surfaceValue);
+							boolean isValid = validatePolygon(validateGeometryType,surfaceOrAreaType, surfaceValue, iomObj, attrName);
 							if(isValid){
 								Object attrValidator=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
 								if(attrValidator==null){
@@ -2807,7 +2807,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	/* returns true, if polygon is valid
 	 * 
 	 */
-	private boolean validatePolygon(String validateType, SurfaceOrAreaType surfaceOrAreaType, IomObject surfaceValue) {
+	private boolean validatePolygon(String validateType, SurfaceOrAreaType surfaceOrAreaType, IomObject surfaceValue, IomObject currentIomObj, String attrName) {
 		if (surfaceValue.getobjecttag().equals("MULTISURFACE")){
 			boolean clipped = surfaceValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
 			for(int surfacei=0;surfacei< surfaceValue.getattrvaluecount("surface");surfacei++){
@@ -2818,19 +2818,29 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 				IomObject surface= surfaceValue.getattrobj("surface",surfacei);
 				int boundaryc=surface.getattrvaluecount("boundary");
-				for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
-					IomObject boundary=surface.getattrobj("boundary",boundaryi);
-					if(boundaryi==0){
-						// shell
-					}else{
-					    // hole
-					}    
-					for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
-						IomObject polyline=boundary.getattrobj("polyline",polylinei);
-						validatePolyline(validateType, surfaceOrAreaType, polyline);
-						// add line to shell or hole
+				// a multisurface consists of at least one boundary.
+				if(boundaryc==0){
+					String objectIdentification = currentIomObj.getobjectoid();
+					if(objectIdentification==null){
+						objectIdentification = currentIomObj.getobjecttag();
 					}
-				    // add shell or hole to surface
+					logMsg(validateType,"missing outerboundary in {0} of object {1}.", attrName, objectIdentification);
+					return false;
+				} else {
+					for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
+						IomObject boundary=surface.getattrobj("boundary",boundaryi);
+						if(boundaryi==0){
+							// shell
+						}else{
+						    // hole
+						}    
+						for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
+							IomObject polyline=boundary.getattrobj("polyline",polylinei);
+							validatePolyline(validateType, surfaceOrAreaType, polyline);
+							// add line to shell or hole
+						}
+					    // add shell or hole to surface
+					}
 				}
 			}
 		} else {
