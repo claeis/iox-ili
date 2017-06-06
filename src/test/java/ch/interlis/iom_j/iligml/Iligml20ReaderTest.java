@@ -3,6 +3,7 @@ package ch.interlis.iom_j.iligml;
 import static org.junit.Assert.*;
 
 import java.io.File;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,8 +12,7 @@ import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
-import ch.interlis.iox.IoxException;
-import ch.interlis.iox_j.jts.Iox2jtsException;
+import ch.interlis.iox.*;
 
 public class Iligml20ReaderTest {
 
@@ -30,13 +30,15 @@ public class Iligml20ReaderTest {
 	}
 	
 	@Test
-	public void testEmptyTransfer() throws Iox2jtsException, IoxException {
+	public void testEmptyTransfer() throws IoxException {
 		Iligml20Reader reader=new Iligml20Reader(new File(TEST_IN,"EmptyTransfer.gml"));
+		assertTrue(reader.read() instanceof StartTransferEvent);
+		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	@Test
-	public void testWrongTopEleName() throws Iox2jtsException, IoxException {
+	public void testWrongTopEleName() throws IoxException {
 		Iligml20Reader reader=new Iligml20Reader(new File(TEST_IN,"WrongTopEleName.gml"));
 		try{
 			reader.read();
@@ -48,7 +50,7 @@ public class Iligml20ReaderTest {
 		reader=null;
 	}
 	@Test
-	public void testWrongTopEleNamespace() throws Iox2jtsException, IoxException {
+	public void testWrongTopEleNamespace() throws IoxException {
 		Iligml20Reader reader=new Iligml20Reader(new File(TEST_IN,"WrongTopEleNamespace.gml"));
 		try{
 			reader.read();
@@ -60,49 +62,61 @@ public class Iligml20ReaderTest {
 		reader=null;
 	}
 	@Test
-	public void testEmptyBasket() throws Iox2jtsException, IoxException {
+	public void testEmptyBasket() throws IoxException {
 		Iligml20Reader reader=new Iligml20Reader(new File(TEST_IN,"EmptyBasket.gml"));
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent); // ("Test1.TopicF","bid1"));
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	@Test
-	public void testEmptyObjects() throws Iox2jtsException, IoxException {
+	public void testEmptyObjects() throws IoxException {
 		Iligml20Reader reader=new Iligml20Reader(new File(TEST_IN,"EmptyObjects.gml"));
+		assertTrue(reader.read() instanceof   StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent); //("Test1.TopicF","bid1"));
+		assertTrue(reader.read() instanceof  ObjectEvent); //(new Iom_jObject("Test1.TopicF.TableF0","10")));
+		assertTrue(reader.read() instanceof  ObjectEvent); //(new Iom_jObject("Test1.TopicF.TableF1","20")));
+		assertTrue(reader.read() instanceof  ObjectEvent); //(new Iom_jObject("Test1.TopicF.TableF0","11")));
+		assertTrue(reader.read() instanceof  ObjectEvent); // (new Iom_jObject("Test1.TopicF.TableF1","21")));
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	@Test
-	public void testUndefinedSurface() throws Iox2jtsException, IoxException {
+	public void testUndefinedSurface() throws IoxException {
 		Iligml20Reader reader=new Iligml20Reader(new File(TEST_IN,"UndefinedSurface.gml"));
 		reader.close();
 		reader=null;
 	}
 	@Test
-	public void testSurface() throws Iox2jtsException, IoxException {
+	public void testSurface() throws IoxException {
 		Iligml20Reader reader=new Iligml20Reader(new File(TEST_IN,"Surface.gml"));
 		reader.close();
 		reader=null;
 	}
 	@Test
-	public void testUndefinedArea() throws Iox2jtsException, IoxException {
+	public void testUndefinedArea() throws IoxException {
 		Iligml20Reader reader=new Iligml20Reader(new File(TEST_IN,"UndefinedArea.gml"));
 		reader.close();
 		reader=null;
 	}
 	@Test
-	public void testArea() throws Iox2jtsException, IoxException {
+	public void testArea() throws IoxException {
 		Iligml20Reader reader=new Iligml20Reader(new File(TEST_IN,"Area.gml"));
 		reader.close();
 		reader=null;
 	}
 	@Test
-	public void testUndefinedReference() throws Iox2jtsException, IoxException {
+	public void testUndefinedReference() throws IoxException {
 		Iligml20Reader reader=new Iligml20Reader(new File(TEST_IN,"UndefinedReference.gml"));
 		reader.close();
 		reader=null;
 	}
 	@Test
-	public void testReference() throws Iox2jtsException, IoxException {
+	public void testReference() throws IoxException {
 		Iligml20Reader reader=new Iligml20Reader(new File(TEST_IN,"Reference.gml"));
 		reader.close();
 		reader=null;
