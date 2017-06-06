@@ -92,6 +92,7 @@ import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxLogging;
 import ch.interlis.iox.IoxValidationConfig;
+import ch.interlis.iox.StartBasketEvent;
 import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.PipelinePool;
 import ch.interlis.iox_j.jts.Iox2jtsext;
@@ -132,6 +133,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private HashSet<String> configOffOufputReduction =new HashSet<String>();
 	private HashSet<String> constraintOutputReduction=new HashSet<String>();
 	private HashSet<String> datatypesOutputReduction=new HashSet<String>();
+	private Map<String, String> uniquenessOfBid = new HashMap<String, String>();
 	
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -247,8 +249,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		if (event instanceof ch.interlis.iox.StartTransferEvent){
 			errs.addEvent(errFact.logInfoMsg("first validation pass..."));
+			uniquenessOfBid.clear();
 		} else if (event instanceof ch.interlis.iox.StartBasketEvent){
+			StartBasketEvent startBasketEvent = ((ch.interlis.iox.StartBasketEvent) event);
 			currentBasketId = ((ch.interlis.iox.StartBasketEvent) event).getBid();
+			validateUniqueBasketId(startBasketEvent);
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=((ch.interlis.iox.ObjectEvent)event).getIomObject();
 			try {
@@ -261,6 +266,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			iterateThroughAllObjects();
 			validateAllAreas();
 			validatePlausibilityConstraints();
+		}
+	}
+	
+	private void validateUniqueBasketId(StartBasketEvent startBasketEvent) {
+		// check if basket id is unique in transfer file
+		if(currentBasketId != null){
+			if(uniquenessOfBid.containsKey(currentBasketId)){
+				errs.addEvent(errFact.logErrorMsg("BID {0} of {1} already exists in {2}", currentBasketId, startBasketEvent.getType().toString(), uniquenessOfBid.get(currentBasketId)));
+			} else {
+				uniquenessOfBid.put(currentBasketId, startBasketEvent.getType());
+			}
 		}
 	}
 	
@@ -2216,11 +2232,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(isObject){
 			if(addToPool){
 				{
+					// check if object id is unique in transferfile
 					IomObject objectValue = objectPool.addObject(iomObj,currentBasketId);
 					if(objectValue!=null){
 						Object modelElement=tag2class.get(objectValue.getobjecttag());
 						Viewable classValueOfKey= (Viewable) modelElement;
-						errs.addEvent(errFact.logErrorMsg("The OID {0} of object '{1}' already exists in {2}.", objectValue.getobjectoid(), iomObj.toString(), classValueOfKey.toString()));
+						errs.addEvent(errFact.logErrorMsg("OID {0} of object {1} already exists in {2}.", objectValue.getobjectoid(), iomObj.getobjecttag(), classValueOfKey.toString()));
 					}
 				}
 			}
@@ -2602,7 +2619,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				} else if (attr.isDomainBoolean()) {
 					// Value has to be not null and ("true" or "false")
 					String valueStr = iomObj.getattrvalue(attrName);
-					if (valueStr == null || valueStr.matches("^(true|false)$")) {
+					if (valueStr == null || valueStr.equals("true") || valueStr.equals("false")){
 						// Value okay, skip it
 					} else {
 						logMsg(validateType, "value <{0}> is not a BOOLEAN", valueStr);
@@ -2619,30 +2636,36 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					// Value matches regex and is not null and is in range of type.
 					String valueStr = iomObj.getattrvalue(attrName);
 					FormattedType subType = (FormattedType) type;
-					if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr)) {
-						// Value okay, skip it
-					} else {
-						logMsg(validateType, "value <{0}> is not a valid Date", valueStr);
+					if (valueStr != null){
+						if (!valueStr.matches(subType.getRegExp())) {
+							logMsg(validateType, "invalid format of date value <{0}>", valueStr);
+						} else if(!subType.isValueInRange(valueStr)){
+							logMsg(validateType, "date value <{0}> is not in range", valueStr);
+						}
 					}
 				} else if (attr.isDomainIli2Time()) {
 					// Value is not null and matches 0:0:0.000-23:59:59.999
 					String valueStr = iomObj.getattrvalue(attrName);
 					FormattedType subType = (FormattedType) type;
 					// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
-					if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr) && valueStr.length() >= 9 && valueStr.length() <= 12) {
-						// Value okay, skip it
-					} else {
-						logMsg(validateType, "value <{0}> is not a valid Time", valueStr);
+					if (valueStr != null){
+						if (!valueStr.matches(subType.getRegExp()) || valueStr.length() < 9 || valueStr.length() > 12){
+							logMsg(validateType, "invalid format of time value <{0}>", valueStr);
+						} else if(!subType.isValueInRange(valueStr)){
+							logMsg(validateType, "time value <{0}> is not in range", valueStr);
+						}
 					}
 				} else if (attr.isDomainIli2DateTime()) {
 					// Value is not null
 					String valueStr = iomObj.getattrvalue(attrName);
 					FormattedType subType = (FormattedType) type;
 					// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
-					if (valueStr == null || valueStr.matches(subType.getRegExp()) && subType.isValueInRange(valueStr) && valueStr.length() >= 18 && valueStr.length() <= 23) {
-						// Value okay, skip it
-					} else {
-						logMsg(validateType, "value <{0}> is not a valid DateTime", valueStr);
+					if (valueStr != null){
+						if (!valueStr.matches(subType.getRegExp()) || valueStr.length() < 18 || valueStr.length() > 23) {
+							logMsg(validateType, "invalid format of datetime value <{0}>", valueStr);
+						} else if(!subType.isValueInRange(valueStr)){
+							logMsg(validateType, "datetime value <{0}> is not in range", valueStr);
+						}
 					}
 				}else if (type instanceof PolylineType){
 					PolylineType polylineType=(PolylineType)type;
