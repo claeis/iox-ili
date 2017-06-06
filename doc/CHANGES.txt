@@ -6,6 +6,8 @@ iox-ili 1.19.0 (2017-xx-xx)
 -----------------------------
 - validator: fixed Missing coordinate in xtflog for errors detected by a custom function
 - validator: fixed INTERLIS.areAreas() not working in views
+- validator: fixed Check FORMAT INTERLIS.XMLDate
+- validator: fixed failed to validate uniqueness of BID
 - ili2c-4.7.3
 
 iox-ili 1.18.1 (2017-04-20)
