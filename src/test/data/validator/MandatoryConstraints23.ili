@@ -15,6 +15,7 @@ MODEL MandatoryConstraints23
 			enumeration = (null, eins, zwei, drei, mehr (vier));
 			enumerationOrdered = (null, eins, zwei, drei, mehr (vier)) ORDERED;
 			attrRef1 = TEXT*12;	
+			NumType  = 1..10;
 		
 		CLASS ClassConstantA =
 			MANDATORY CONSTRAINT
@@ -113,6 +114,12 @@ MODEL MandatoryConstraints23
 			MANDATORY CONSTRAINT
 			attr1 == 2.0;
 		END ClassEqualF2;
+		
+		CLASS ClassEqualF3 =
+			attr1 : NumType;
+			MANDATORY CONSTRAINT
+			attr1 == 2.0;
+		END ClassEqualF3;
 		
 		CLASS ClassEqualNot =
 			attr1 : 0..10;

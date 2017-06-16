@@ -1062,7 +1062,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				Constant.Text textConstant = (Constant.Text) constantObj;
 				if(textConstant!=null){
 					return new Value(texttype, textConstant.getValue());
-			}
+				}
 			} else if (constantObj instanceof Constant.Numeric){
 				Constant.Numeric numericConstant = (Constant.Numeric) constantObj;
 				if(numericConstant!=null){
@@ -1461,30 +1461,31 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 				}
 			} else if(pathEl instanceof AttributeRef){
-			AttributeRef attrRef = (AttributeRef) pathEl;
-			Type type = attrRef.getAttr().getDomain();
-			String attrName = objectPathObj.getLastPathEl().getName();
-			if(iomObj.getattrvaluecount(attrName)==0){
-				return Value.createUndefined();
-			}else{
-				String objValue = iomObj.getattrvalue(attrName);
-				if(objValue != null){
-					if (objValue.equals("true")){
-						return new Value(true);
-					} else if (objValue.equals("false")){
-						return new Value(false);
-						// if null, then complex value.
-					} else {
-							Type aliasType=null;
-						if (type instanceof TypeAlias){
-							TypeAlias typeAlias = (TypeAlias) type;
-								aliasType = typeAlias.getAliasing().getType();
-								if (aliasType instanceof EnumerationType){
-									String refTypeName = typeAlias.getAliasing().getName();
-									return new Value(aliasType, objValue, refTypeName);
+				AttributeRef attrRef = (AttributeRef) pathEl;
+				Type type = attrRef.getAttr().getDomain();
+				String attrName = objectPathObj.getLastPathEl().getName();
+				if (iomObj.getattrvaluecount(attrName) == 0) {
+					return Value.createUndefined();
+				} else {
+					String objValue = iomObj.getattrvalue(attrName);
+					if (objValue != null) {
+						if (objValue.equals("true")) {
+							return new Value(true);
+						} else if (objValue.equals("false")) {
+							return new Value(false);
+							// if null, then complex value.
+						} else {
+							if (type instanceof TypeAlias) {
+								Type aliasedType = ((TypeAlias) type).getAliasing().getType();
+								if (aliasedType instanceof EnumerationType) {
+									String refTypeName = ((TypeAlias) type)
+											.getAliasing().getName();
+									return new Value(aliasedType, objValue,
+											refTypeName);
 								}
+								return new Value(aliasedType, objValue);
 							}
-							if (type instanceof EnumerationType){
+							if (type instanceof EnumerationType) {
 								return new Value(type, objValue);
 							}
 						}
@@ -1493,7 +1494,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						List<IomObject> objects = new ArrayList<IomObject>();
 						int attrValueCount = iomObj.getattrvaluecount(attrName);
 						// iterate, because it's a list of attrObjects.
-						for(int i=0;i<attrValueCount;i++){
+						for (int i = 0; i < attrValueCount; i++) {
 							objects.add(iomObj.getattrobj(attrName, i));
 						}
 						return new Value(objects);
