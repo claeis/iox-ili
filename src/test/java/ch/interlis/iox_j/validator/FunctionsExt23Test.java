@@ -156,7 +156,7 @@ public class FunctionsExt23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("MandatoryConstraint FunctionsExt23.Topic.Constraint1 of FunctionsExt23.Topic.ClassB is not yet implemented.", logger.getWarn().get(0).getEventMsg());
+		assertEquals("MandatoryConstraint FunctionsExt23.Topic.ClassB.Constraint1 of FunctionsExt23.Topic.ClassB is not yet implemented.", logger.getWarn().get(0).getEventMsg());
 	}
 	
 }
