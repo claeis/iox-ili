@@ -2557,11 +2557,12 @@ public class Area23Test {
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area3d", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird ein äusseres Objekt (externalObject) mit einem äusseren und einem inneren Boundary erstellt.
-	// Danach wird ein zweites inneres Objekt (internalObject) mit nur einem äusseren Boundary, innerhalb dem äusseren Objekt erstellt.
-	// Das innere Objekt überlapped an nur einem Punkt, dem Innerboundary des äusseren Objektes.
+	// Es wird ein aeusseres Objekt (externalObject) mit einem aeusseren und einem inneren Rand erstellt.
+	// Danach wird ein zweites, inneres Objekt (internalObject) mit nur einem aeusseren Rand erstellt 
+	// (innerhalb des inneren Randes des aeusseren Objekts).
+	// Das innere Objekt beruehrt den inneren Rand des aeusseren Objektes auf einer Strecke.
 	@Test
-	public void area2dIntersectionOfBoundaries_False(){
+	public void area2dIntersectionOfBoundaries_False(){ // current implementation fails
 		// external object
 		Iom_jObject externalObject=new Iom_jObject(ILI_CLASSD, OID1);
 		IomObject externalMultisurface=externalObject.addattrobj("area2d", "MULTISURFACE");
