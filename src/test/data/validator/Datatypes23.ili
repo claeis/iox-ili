@@ -71,9 +71,11 @@ MODEL Datatypes23
 		   !!numCountClock : numericCounterClock;
 		   
 		   !! FormattedType
-		   !!basedOn : time1;
-		   !!basedOn2 : time2;
-		   !!extendsBaseOn : time3;
+		   anInterlisXMLDateFormat : FORMAT INTERLIS.XMLDate "2010-1-1" .. "2110-1-1";
+		   !!aDateTimeFormat : FORMAT INTERLIS.XMLDateTime "2000-01-01T00:00:00.000" .. "2005-12-31T23:59:59.999";
+		   !!aXMLTime = FORMAT BASED ON UTC "12:30:35";
+		   !!aXMLDate = FORMAT BASED ON GregorianDate "2010-1-1";
+		   !!aXMLDateTime EXTENDS XMLDate = FORMAT BASED ON GregorianDateTime INHERITANCE "T" "12:30:35";
 		   
 		   !! Datum und Zeit
 		   aTime : INTERLIS.XMLTime;

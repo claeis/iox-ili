@@ -216,7 +216,7 @@ public class Oid23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The OID b1 of object 'Oid23.Topic.ClassB oid b1 {}' already exists in CLASS Oid23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("OID b1 of object Oid23.Topic.ClassB already exists in CLASS Oid23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die Definition von einer gleichen Oid in verschiedenen Tables möglich ist.
@@ -238,7 +238,7 @@ public class Oid23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The OID b1 of object 'Oid23.Topic.ClassC oid b1 {}' already exists in CLASS Oid23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("OID b1 of object Oid23.Topic.ClassC already exists in CLASS Oid23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die Definition einer undefinierten oid welche zu einer Klasse refereziert wird, möglich sein kann.
