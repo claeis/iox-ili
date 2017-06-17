@@ -125,6 +125,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private boolean enforceTargetValidation=false;
 	private String currentBasketId = null;
 	private String currentMainOid=null;
+	private boolean autoSecondPass=false;
 	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
 	private Map<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	private List<ExternalObjectResolver> extObjResolvers=null; // java class that implements ExternalObjectResolver
@@ -263,10 +264,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
-			iterateThroughAllObjects();
-			validateAllAreas();
-			validatePlausibilityConstraints();
+			if(autoSecondPass){
+				doSecondPass();
+			}
 		}
+	}
+	public void doSecondPass() {
+		errs.addEvent(errFact.logInfoMsg("second validation pass..."));
+		iterateThroughAllObjects();
+		validateAllAreas();
+		validatePlausibilityConstraints();
 	}
 	
 	private void validateUniqueBasketId(StartBasketEvent startBasketEvent) {
@@ -418,7 +425,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	private void iterateThroughAllObjects(){
-		errs.addEvent(errFact.logInfoMsg("second validation pass..."));
 		HashSet<Type> types=new HashSet<Type>();
 		HashSet<Viewable> viewables=new HashSet<Viewable>();
 		for (String basketId : objectPool.getBasketIds()){
@@ -3063,5 +3069,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 	private void validateItfLineTableObject(IomObject iomObj, AttributeDef modelele) {
 		// validate if line table object
+	}
+	public boolean isAutoSecondPass() {
+		return autoSecondPass;
+	}
+	public void setAutoSecondPass(boolean autoSecondPass) {
+		this.autoSecondPass = autoSecondPass;
 	}
 }
