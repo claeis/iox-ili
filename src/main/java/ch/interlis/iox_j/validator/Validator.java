@@ -135,6 +135,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private HashSet<String> constraintOutputReduction=new HashSet<String>();
 	private HashSet<String> datatypesOutputReduction=new HashSet<String>();
 	private Map<String, String> uniquenessOfBid = new HashMap<String, String>();
+	private String globalMultiplicity=null;
 	
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -205,6 +206,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		unknownTypev=new HashSet<String>();
 		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
+		globalMultiplicity=validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.MULTIPLICITY);
+		if(globalMultiplicity!=null && ValidationConfig.ON.equals(globalMultiplicity)){
+			globalMultiplicity=null;
+		}
 		areaOverlapValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.AREA_OVERLAP_VALIDATION);
 		defaultGeometryTypeValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION);
 		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class,objPoolManager);
@@ -426,7 +431,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	private void iterateThroughAllObjects(){
 		HashSet<Type> types=new HashSet<Type>();
-		HashSet<Viewable> viewables=new HashSet<Viewable>();
 		for (String basketId : objectPool.getBasketIds()){
 			// iterate through iomObjects
 			Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
@@ -558,10 +562,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 					if(classOfCurrentObj instanceof AbstractClassDef){
 						AbstractClassDef abstractClassDef = (AbstractClassDef) classOfCurrentObj;
-						if(!viewables.contains(abstractClassDef)){
-							viewables.add(abstractClassDef);
-							errs.addEvent(errFact.logInfoMsg("validate role references of {0}...",abstractClassDef.getScopedName(null)));
-						}
 						Iterator<RoleDef> targetRoleIterator=abstractClassDef.getOpposideRoles();
 						while(targetRoleIterator.hasNext()){
 							RoleDef role=targetRoleIterator.next();
@@ -1563,12 +1563,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		String roleQName = null;
 		roleQName = getScopedName(role);
 		String multiplicity=validationConfig.getConfigValue(roleQName, ValidationConfig.MULTIPLICITY);
+		 if(multiplicity==null){
+			 multiplicity=globalMultiplicity;
+		 }
 		if(multiplicity != null && ValidationConfig.OFF.equals(multiplicity)){
 			if(!configOffOufputReduction.contains(ValidationConfig.MULTIPLICITY+":"+roleQName)){
 				configOffOufputReduction.add(ValidationConfig.MULTIPLICITY+":"+roleQName);
-				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration multiplicity=off", roleQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
+				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration multiplicity=off", roleQName));
 			}
 		}else{
+			if(!configOffOufputReduction.contains(ValidationConfig.MULTIPLICITY+":"+roleQName)){
+				configOffOufputReduction.add(ValidationConfig.MULTIPLICITY+":"+roleQName);
+				errs.addEvent(errFact.logInfoMsg("validate multiplicity of role {0}...",roleQName));
+			}
 			int nrOfTargetObjs=linkPool.getTargetObjectCount(iomObj,role,doItfOidPerTable);
 			long cardMin=role.getCardinality().getMinimum();
 			long cardMax=role.getCardinality().getMaximum();
@@ -1601,7 +1608,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}else{
 			if(!datatypesOutputReduction.contains(roleQName)){
 				datatypesOutputReduction.add(roleQName);
-				errs.addEvent(errFact.logInfoMsg("validate role reference {0}...",roleQName));
+				errs.addEvent(errFact.logInfoMsg("validate target of role {0}...",roleQName));
 			}
 			String targetOid = null;
 			// role of iomObj
@@ -2511,6 +2518,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			 attrPath=attrPath+"/"+attrName;
 		 }
 		 String validateMultiplicity=validationConfig.getConfigValue(attrQName, ValidationConfig.MULTIPLICITY);
+		 if(validateMultiplicity==null){
+			 validateMultiplicity=globalMultiplicity;
+		 }
 		 String validateType=null;
 		 String validateTarget=null;
 		 String validateGeometryType=null;
