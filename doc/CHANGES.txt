@@ -2,6 +2,10 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.19.1 (2017-06-19)
+-----------------------------
+- added iox2wkb/wkb2iox MultiLine support 
+
 iox-ili 1.19.0 (2017-06-17)
 -----------------------------
 - validator: fixed Missing coordinate in xtflog for errors detected by a custom function

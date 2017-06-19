@@ -46,6 +46,8 @@ import com.vividsolutions.jts.io.ByteOrderValues;
 
 public class Wkb2iox
 {
+	static final public String ATTR_POLYLINE="polyline";
+	static final public String OBJ_MULTIPOLYLINE="MULTIPOLYLINE";
   /**
    * Converts a hexadecimal string to a byte array.
    *
@@ -159,6 +161,10 @@ public class Wkb2iox
         return readLineString();
       case WKBConstants.wkbCompoundCurve :
           return readCompoundCurve();
+      case WKBConstants.wkbMultiLineString :
+          return readMultiCurve(false);
+        case WKBConstants.wkbMultiCurve :
+            return readMultiCurve(true);
       case WKBConstants.wkbPolygon :
         return readPolygon();
       case WKBConstants.wkbCurvePolygon :
@@ -386,6 +392,42 @@ public class Wkb2iox
 	        	IomObject surface=poly.getattrobj("surface", 0);
 		    	ret.addattrobj("surface",surface);
 	        }
+	    }
+	    return ret;
+  }
+  private IomObject readMultiCurve(boolean allowCurve) throws IOException, ParseException
+  {
+/*
+<multicurve binary representation> ::=
+<byte order> <wkbmulticurve> 
+     [ <num> <curve binary representation>... ]
+| <multilinestring binary representation>
+
+
+<multilinestring binary representation> ::=
+<byte order> <wkbmultilinestring>
+[ <num> <linestring binary representation>... ]
+
+*/
+		IomObject ret=new ch.interlis.iom_j.Iom_jObject(OBJ_MULTIPOLYLINE,null);
+	    int curvec = dis.readInt();
+	    for(int curvei=0;curvei<curvec;curvei++){
+	        byte byteOrder = dis.readByte();
+	        int typeInt = dis.readInt();
+	        int geometryType = typeInt & 0xff;
+	        if(geometryType==WKBConstants.wkbLineString){
+	    	    throw new IllegalStateException("Unexpected WKB type " + geometryType);
+	        }else if(allowCurve && geometryType==WKBConstants.wkbCompoundCurve){
+	        }else{
+	    	    throw new IllegalStateException("Unexpected WKB type " + geometryType);
+	        }
+        	IomObject polyline=null;
+	        if(geometryType==WKBConstants.wkbLineString){
+	        	polyline=readLineString();
+	        }else{
+	        	polyline=readCompoundCurve();
+	        }
+	    	ret.addattrobj(ATTR_POLYLINE,polyline);
 	    }
 	    return ret;
   }
