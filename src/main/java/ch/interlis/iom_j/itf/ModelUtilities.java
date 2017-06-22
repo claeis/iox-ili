@@ -435,7 +435,7 @@ public class ModelUtilities {
 		  if (subEnum != null)
 		  {
 			// ee is not leaf, add its name to prefix and add sub elements to accu
-			buildEnumList(accu,prefix+ee.getName(),subEnum);
+			buildEnumElementList(accu,prefix+ee.getName(),subEnum);
 		  }else{
 			// ee is a leaf, add it to accu
 			accu.add(new java.util.AbstractMap.SimpleEntry<String,ch.interlis.ili2c.metamodel.Enumeration.Element>(prefix+ee.getName(),ee));
