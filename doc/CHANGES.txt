@@ -2,6 +2,10 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.19.2 (2017-06-22)
+-----------------------------
+- added ModelUtilities.buildEnumElementList() to get list of enum eles (not only names)
+
 iox-ili 1.19.1 (2017-06-19)
 -----------------------------
 - added iox2wkb/wkb2iox MultiLine support 

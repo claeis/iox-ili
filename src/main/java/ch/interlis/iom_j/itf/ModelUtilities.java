@@ -412,6 +412,36 @@ public class ModelUtilities {
 		  }
 		}
 	}
+	/** Builds a list of elements of an enumeration.
+	 * 	<pre><code>
+	 *    java.util.List<java.util.Map.Entry<String,ch.interlis.ili2c.metamodel.Enumeration.Element>> ev=new java.util.ArrayList<java.util.Map.Entry<String,ch.interlis.ili2c.metamodel.Enumeration.Element>>();
+	 *    ModelUtilities.buildEnumElementList(ev,"",type.getConsolidatedEnumeration());
+	 *  </code></pre>
+	 *  The resulting list contains the qualified element names with the elements, so that the first entry 
+	 *  represents ITF code 0 of the given enumeration.
+	 * @param accu list to populate
+	 * @param prefix1 prefix to add in front of each element
+	 * @param enumer enumeration to collect elements of.
+	 */
+	public static void buildEnumElementList(java.util.List<java.util.Map.Entry<String,ch.interlis.ili2c.metamodel.Enumeration.Element>> accu,String prefix1,ch.interlis.ili2c.metamodel.Enumeration enumer){
+		Iterator iter = enumer.getElements();
+		String prefix="";
+		if(prefix1.length()>0){
+		  prefix=prefix1+".";
+		}
+		while (iter.hasNext()) {
+		  ch.interlis.ili2c.metamodel.Enumeration.Element ee=(ch.interlis.ili2c.metamodel.Enumeration.Element) iter.next();
+		  ch.interlis.ili2c.metamodel.Enumeration subEnum = ee.getSubEnumeration();
+		  if (subEnum != null)
+		  {
+			// ee is not leaf, add its name to prefix and add sub elements to accu
+			buildEnumList(accu,prefix+ee.getName(),subEnum);
+		  }else{
+			// ee is a leaf, add it to accu
+			accu.add(new java.util.AbstractMap.SimpleEntry<String,ch.interlis.ili2c.metamodel.Enumeration.Element>(prefix+ee.getName(),ee));
+		  }
+		}
+	}
 	public static String getHelperTableMainTableRef(AttributeDef attr)
 	{
 		return HELPER_TABLE_MAIN_TABLE_REF_PREFIX+attr.getContainer().getName();
