@@ -4,6 +4,7 @@ ideas/open issues
 
 iox-ili 1.19.0 (2017-xx-xx)
 -----------------------------
+- iox-ili: implement a GML reader
 - validator: fixed Missing coordinate in xtflog for errors detected by a custom function
 - validator: fixed INTERLIS.areAreas() not working in views
 - ili2c-4.7.3
