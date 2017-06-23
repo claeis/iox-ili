@@ -416,7 +416,6 @@ public class Wkb2iox
 	        int typeInt = dis.readInt();
 	        int geometryType = typeInt & 0xff;
 	        if(geometryType==WKBConstants.wkbLineString){
-	    	    throw new IllegalStateException("Unexpected WKB type " + geometryType);
 	        }else if(allowCurve && geometryType==WKBConstants.wkbCompoundCurve){
 	        }else{
 	    	    throw new IllegalStateException("Unexpected WKB type " + geometryType);
