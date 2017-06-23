@@ -1,0 +1,120 @@
+INTERLIS 2.3;
+
+MODEL ili23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-16" =
+	
+	TOPIC TopicA =
+	
+  		DOMAIN
+  			InterlisAttributeRef = ATTRIBUTE;
+  		
+  			BuchungsDatum = FORMAT INTERLIS.XMLDate "2002-01-01" .. "2007-12-31";
+			StartZeit = FORMAT INTERLIS.XMLTime "00:00:00.000" .. "23:59:59.999";
+			MessZeitpunkt = FORMAT INTERLIS.XMLDateTime "2002-01-01T00:00:00.000" .. "2007-12-31T23:59:59.999";
+			!!EigenesDatum = FORMAT BASED ON GregorianDate ( Year "Y" Month "M" Day "D");
+			
+  			FarbeFinal (FINAL) = (rot, gelb, gruen);
+			Farbe = (rot, gelb, gruen);
+			FarbePlus EXTENDS Farbe=(rot(dunkel,hell));
+			
+  			Skoord = COORD 480000.000 .. 850000.000 [INTERLIS.m];
+			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					        70000.000 .. 310000.000 [INTERLIS.m],
+						   ROTATION 2 -> 1;
+			Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					        70000.000 .. 310000.000 [INTERLIS.m],
+					              0.000 .. 5000.000 [INTERLIS.m];
+					              
+		STRUCTURE StructA =
+			attr2 : TEXT*30;
+		END StructA;
+		
+		STRUCTURE GregorianDate =
+			Year: 1582 .. 2999;
+			SUBDIVISION Month: 1 .. 12;
+			SUBDIVISION Day: 1 .. 31;
+		END GregorianDate;
+		
+		CLASS ClassA =
+			attr1 : BAG {1..*} OF StructA;
+		END ClassA;
+		
+		CLASS ClassB =
+			attr1 : Lkoord;
+		END ClassB;
+		
+		CLASS ClassC =
+			attr1 : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		END ClassC;
+		
+		CLASS ClassD =
+			attr1 : POLYLINE WITH (ARCS) VERTEX Hkoord;
+		END ClassD;
+		
+		CLASS ClassE =
+			attr1 : POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Hkoord;
+		END ClassE;
+		
+		CLASS ClassF =
+			Form : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END ClassF;
+		
+		CLASS ClassG =
+			Form : AREA WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		END ClassG;
+		
+		CLASS ClassA1 =
+			text : TEXT;
+			textLen : TEXT*10;
+			mText : MTEXT;
+			mTextLen : MTEXT*10;
+			uri : URI;
+			name : NAME;
+		END ClassA1;
+		
+		CLASS ClassB1 =
+			myNumber : 0.0 .. 10.0;
+		END ClassB1;
+		
+		CLASS ClassC1 =
+			myBoolean : BOOLEAN;
+		END ClassC1;
+		
+		CLASS ClassD1 =
+			myAlignment : HALIGNMENT;
+		END ClassD1;
+		
+		CLASS ClassE1 =
+			myFormatted : INTERLIS.XMLDate;
+		END ClassE1;
+		
+		CLASS ClassF1 =
+			myEnumeration : (null, eins, zwei, drei, mehr ( vier, fuenf, sechs, sieben, acht ,neun, zehn));
+		END ClassF1;
+		
+		CLASS Fahrzeug =
+			CarrosserieFarbe : Farbe;
+		END Fahrzeug;
+		
+		CLASS Auto EXTENDS Fahrzeug =
+			CarrosserieFarbe (EXTENDED) : FarbePlus;
+		END Auto;
+
+		CLASS ClassG1 =
+			myEnumTree : (null, eins, zwei, drei, mehr ( vier, fuenf, sechs, sieben, acht ,neun, zehn));
+		END ClassG1;
+		
+		CLASS ClassH1 =
+			TestInt : 1 .. 10;
+			TestDec : 1.0 .. 10.0;
+			TestDouble : 0.123e1 .. 0.234e1;
+		END ClassH1;
+		
+		CLASS ClassI1 =
+			BlackboxXml : BLACKBOX XML;
+			BlackboxBinary : BLACKBOX BINARY;
+		END ClassI1;
+		
+	END TopicA;
+	
+END ili23.

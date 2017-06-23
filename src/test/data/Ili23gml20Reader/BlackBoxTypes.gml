@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><ili:TRANSFER xmlns:ili="http://www.interlis.ch/ILIGML-2.0/INTERLIS" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.interlis.ch/ILIGML-2.0/Ili23" gml:id="iox1">
+	<ili:baskets>
+		<TopicA gml:id="bid1"> !! nicht richtiges Format
+			<member>
+				<ClassI1 gml:id="x10">
+					<xsd:complexType name="BlackboxXml">
+						<xsd:sequence>
+							<xsd:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+						</xsd:sequence>
+					</xsd:complexType>
+					<xsd:simpleType name="BlackboxBinary">
+						<xsd:restriction base="xsd:base64Binary">
+						</xsd:restriction>
+					</xsd:simpleType>
+				</ClassI1>
+			</member>
+		</TopicA>
+	</ili:baskets>
+</ili:TRANSFER>
