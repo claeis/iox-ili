@@ -30,6 +30,7 @@ public class Area23Test {
 	private final static String ILI_TOPIC="Datatypes23.Topic";
 	// CLASS
 	private final static String ILI_CLASSD=ILI_TOPIC+".ClassD";
+	private final static String ILI_CLASSE=ILI_TOPIC+".ClassE";
 	// START BASKET EVENT
 	private final static String BID="b1";
 	
@@ -46,7 +47,7 @@ public class Area23Test {
 	//////////////////////////////// SUCCESSFUL Tests ////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn an 1 Punkt sich der Polygon selber berührt.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn an 1 Punkt sich der Polygon selber beruehrt.
 	@Test
 	public void area2dOuterboundaryTouchesOwnLineOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -124,7 +125,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die 2 Innerboundaries nicht berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die 2 Innerboundaries nicht beruehren.
 	@Test
 	public void area2dWith2Innerboundaries_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -231,7 +232,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn der Innerboundary den anderen Innerboundary an 1 Punkt berührt.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn der Innerboundary den anderen Innerboundary an 1 Punkt beruehrt.
 	@Test
 	public void area2dInnerTouchesOuterboundaryOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -338,7 +339,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob ein 3d Polygon erstellt werden kann, wenn der Innerboundary, den Outerboundary an 1 Punkt berührt.
+	// Es wird getestet, ob ein 3d Polygon erstellt werden kann, wenn der Innerboundary, den Outerboundary an 1 Punkt beruehrt.
 	@Test
 	public void area3dInnerTouchesOuterboundaryOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -428,7 +429,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er 2 Innerboundaries beinhaltet, welche sich nicht berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er 2 Innerboundaries beinhaltet, welche sich nicht beruehren.
 	@Test
 	public void area3dWith2Innerboundaries_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -553,7 +554,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die beiden Innerboundaries sich an 1 Punkt berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die beiden Innerboundaries sich an 1 Punkt beruehren.
 	@Test
 	public void area3dIntersectionOf2InnerboundariesOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1129,7 +1130,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone sich auf einer Linie an drei Punkten berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone sich auf einer Linie an drei Punkten beruehren.
 	// Senkrecht: x--------x--------x  Beide Punkte liegen aufeinander und habe beide dieselben Segmentpunkte.
 	@Test
 	public void area2dIntersectIn1LineOnSame3Points_Ok(){
@@ -1230,7 +1231,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone aus einem Kreisbogen sich auf einer Linie an den gleichen Punkten berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone aus einem Kreisbogen sich auf einer Linie an den gleichen Punkten beruehren.
 	// x--------x--------x  Beide Kreisboegen liegen aufeinander und haben beide dieselben Segmentpunkte.
 	@Test
 	public void area3dArcsBothAllSegmentPointsSame_Ok(){
@@ -1402,7 +1403,7 @@ public class Area23Test {
 	///////////////////////////////// FAILING Tests //////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////	
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die eigenen Outerboundaries überschneiden.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die eigenen Outerboundaries ueberschneiden.
 	@Test
 	public void area2dIntersectionOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1481,7 +1482,7 @@ public class Area23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die 2 Innerboundaries überschneiden.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die 2 Innerboundaries ueberschneiden.
 	@Test
 	public void area2dIntersectionOfInnerboundaries_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1589,7 +1590,7 @@ public class Area23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}	
 	
-	// Es wird getestet, ob ein 3d Polygon erstellt werden kann, wenn die 2 Linien der eigenen Outerboundary überschneiden.
+	// Es wird getestet, ob ein 3d Polygon erstellt werden kann, wenn die 2 Linien der eigenen Outerboundary ueberschneiden.
 	@Test
 	public void area3dIntersectionOfOwnOuterboundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1680,7 +1681,7 @@ public class Area23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die Innerboundaries überschneiden.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die Innerboundaries ueberschneiden.
 	@Test
 	public void area3dIntersectionOfInnerboundaries_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1806,7 +1807,7 @@ public class Area23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein 3d Polygon erstellt werden kann, wenn sich die Innerboundaries überschneiden.
+	// Es wird getestet, ob ein 3d Polygon erstellt werden kann, wenn sich die Innerboundaries ueberschneiden.
 	@Test
 	public void area3dIntersectionOfOuterboundaries_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1897,7 +1898,7 @@ public class Area23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die Innerboundary mit der Outerboundary überschneidet.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die Innerboundary mit der Outerboundary ueberschneidet.
 	@Test
 	public void area2dInnerIntersectOuterboundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2080,7 +2081,7 @@ public class Area23Test {
 		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die Value eines Segmentes nicht gültig ist.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die Value eines Segmentes nicht gueltig ist.
 	@Test
 	public void area3dInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2137,7 +2138,7 @@ public class Area23Test {
 		assertEquals("value 10000.000 is out of range", logger.getErrs().get(2).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die Value eines Segmentes nicht gültig ist.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die Value eines Segmentes nicht gueltig ist.
 	@Test
 	public void area2dInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2187,7 +2188,7 @@ public class Area23Test {
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er einen Kreisbogen beinahltet, welcher ein ungültiges Segment beinhaltet.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er einen Kreisbogen beinahltet, welcher ein ungueltiges Segment beinhaltet.
 	@Test
 	public void area3dWithARCInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2245,7 +2246,7 @@ public class Area23Test {
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er einen Kreisbogen beinhaltet, welcher ein ungültiges Segment beinhaltet.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er einen Kreisbogen beinhaltet, welcher ein ungueltiges Segment beinhaltet.
 	@Test
 	public void area2dWithARCInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2324,7 +2325,9 @@ public class Area23Test {
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area2d", "MULTISURFACE");
 		multisurfaceValue.setobjectconsistency(IomConstants.IOM_COMPLETE);
 		IomObject areaValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = areaValue.addattrobj("boundary", "BOUNDARY");
 		IomObject areaValue2 = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary2 = areaValue2.addattrobj("boundary", "BOUNDARY");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -2391,7 +2394,7 @@ public class Area23Test {
 		assertTrue(logger.getErrs().size()>0);
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone sich auf einer Linie an drei Punkten berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone sich auf einer Linie an drei Punkten beruehren.
 	// area1: x--------x--------x
 	// area2: x-----------------x
 	// Beide Areas liegen aufeinander, area2 hat keinen Mittelpunkt.
@@ -2486,7 +2489,7 @@ public class Area23Test {
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone aus einem Kreisbogen sich auf einer Linie an 1 Punkt nicht berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone aus einem Kreisbogen sich auf einer Linie an 1 Punkt nicht beruehren.
 	// x--------x--------x  Beide Kreisboegen liegen aufeinander und unterscheiden sich nur von 1 Segment der 2.ten Area.
 	@Test
 	public void area3d1AreaArcPointOther_Fail(){
@@ -2552,5 +2555,202 @@ public class Area23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area3d", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird ein aeusseres Objekt (externalObject) mit einem aeusseren und einem inneren Rand erstellt.
+	// Danach wird ein zweites, inneres Objekt (internalObject) mit nur einem aeusseren Rand erstellt 
+	// (innerhalb des inneren Randes des aeusseren Objekts).
+	// Das innere Objekt beruehrt den inneren Rand des aeusseren Objektes auf einer Strecke.
+	@Test
+	public void area2dIntersectionOfBoundaries_False(){ // current implementation fails
+		// external object
+		Iom_jObject externalObject=new Iom_jObject(ILI_CLASSD, OID1);
+		IomObject externalMultisurface=externalObject.addattrobj("area2d", "MULTISURFACE");
+		IomObject surfaceValue = externalMultisurface.addattrobj("surface", "SURFACE");
+		{
+			// outer boundary of external object
+			IomObject outerBoundaryExternalObj = surfaceValue.addattrobj("boundary", "BOUNDARY");
+			// polyline 1
+			IomObject polyline1 = outerBoundaryExternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments=polyline1.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "500000.000");
+			startSegment.setattrvalue("C2", "100000.000");
+			IomObject endSegment=segments.addattrobj("segment", "COORD");
+			endSegment.setattrvalue("C1", "600000.000");
+			endSegment.setattrvalue("C2", "100000.000");
+			// polyline 2
+			IomObject polyline2 = outerBoundaryExternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments2=polyline2.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+			startSegment2.setattrvalue("C1", "600000.000");
+			startSegment2.setattrvalue("C2", "100000.000");
+			IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+			endSegment2.setattrvalue("C1", "600000.000");
+			endSegment2.setattrvalue("C2", "200000.000");
+			// polyline 3
+			IomObject polyline3 = outerBoundaryExternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments3=polyline3.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment3=segments3.addattrobj("segment", "COORD");
+			startSegment3.setattrvalue("C1", "600000.000");
+			startSegment3.setattrvalue("C2", "200000.000");
+			IomObject endSegment3=segments3.addattrobj("segment", "COORD");
+			endSegment3.setattrvalue("C1", "500000.000");
+			endSegment3.setattrvalue("C2", "200000.000");
+			// polyline 4
+			IomObject polyline4 = outerBoundaryExternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments4=polyline4.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment4=segments4.addattrobj("segment", "COORD");
+			startSegment4.setattrvalue("C1", "500000.000");
+			startSegment4.setattrvalue("C2", "200000.000");
+			IomObject endSegment4=segments4.addattrobj("segment", "COORD");
+			endSegment4.setattrvalue("C1", "500000.000");
+			endSegment4.setattrvalue("C2", "100000.000");
+		}
+		// inner boundary of external object
+		IomObject innerBoundaryExternalObj = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		{
+			// polyline 1
+			IomObject polyline1 = innerBoundaryExternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segmentsInner=polyline1.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegmentInner=segmentsInner.addattrobj("segment", "COORD");
+			startSegmentInner.setattrvalue("C1", "545000.000");
+			startSegmentInner.setattrvalue("C2", "110000.000");
+			IomObject endSegmentInner=segmentsInner.addattrobj("segment", "COORD");
+			endSegmentInner.setattrvalue("C1", "585000.000");
+			endSegmentInner.setattrvalue("C2", "185000.000");
+			// polyline 2
+			IomObject polyline2 = innerBoundaryExternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments2Inner=polyline2.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
+			startSegment2Inner.setattrvalue("C1", "585000.000");
+			startSegment2Inner.setattrvalue("C2", "185000.000");
+			IomObject endSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
+			endSegment2Inner.setattrvalue("C1", "515000.000");
+			endSegment2Inner.setattrvalue("C2", "185000.000");
+			// polyline 3
+			IomObject polyline3 = innerBoundaryExternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments3Inner=polyline3.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
+			startSegment3Inner.setattrvalue("C1", "515000.000");
+			startSegment3Inner.setattrvalue("C2", "185000.000");
+			IomObject endSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
+			endSegment3Inner.setattrvalue("C1", "545000.000");
+			endSegment3Inner.setattrvalue("C2", "110000.000");
+		}
+		// internal object
+		Iom_jObject internalObject=new Iom_jObject(ILI_CLASSD, OID2);
+		IomObject internalMultisurface=internalObject.addattrobj("area2d", "MULTISURFACE");
+		IomObject internalSurface = internalMultisurface.addattrobj("surface", "SURFACE");
+		// outer boundary of internal object
+		IomObject outerBoundaryInternalObj = internalSurface.addattrobj("boundary", "BOUNDARY");
+		{
+			// polyline 1
+			IomObject polyline1 = outerBoundaryInternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments=polyline1.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "545000.000");
+			startSegment.setattrvalue("C2", "130000.000");
+			IomObject endSegment=segments.addattrobj("segment", "COORD");
+			endSegment.setattrvalue("C1", "585000.000");
+			endSegment.setattrvalue("C2", "185000.000");
+			// polyline 2
+			IomObject polyline2 = outerBoundaryInternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments2=polyline2.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+			startSegment2.setattrvalue("C1", "585000.000");
+			startSegment2.setattrvalue("C2", "185000.000");
+			IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+			endSegment2.setattrvalue("C1", "515000.000");
+			endSegment2.setattrvalue("C2", "185000.000");
+			// polyline 3
+			IomObject polyline3 = outerBoundaryInternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments3=polyline3.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment3=segments3.addattrobj("segment", "COORD");
+			startSegment3.setattrvalue("C1", "515000.000");
+			startSegment3.setattrvalue("C2", "185000.000");
+			IomObject endSegment3=segments3.addattrobj("segment", "COORD");
+			endSegment3.setattrvalue("C1", "545000.000");
+			endSegment3.setattrvalue("C2", "130000.000");
+		}
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(externalObject));
+		validator.validate(new ObjectEvent(internalObject));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei einer AREA oder SURFACE die outerboundary
+	// (welche minimal 1 Mal existieren muss) nicht gefunden wird.
+	// Dafuer sollte eine klare Fehlermeldung erscheinen:
+	// dass bei einem Surface oder einer Area mindestens ein Outerboundary deklariert sein muss.
+	@Test
+	public void missingOuterBoundaryInArea_False(){
+		// external object
+		Iom_jObject externalObject=new Iom_jObject(ILI_CLASSD, OID1);
+		IomObject externalMultisurface=externalObject.addattrobj("area2d", "MULTISURFACE");
+		IomObject surfaceValue = externalMultisurface.addattrobj("surface", "SURFACE");
+		{
+			// outer boundary of external object
+			//IomObject outerBoundaryExternalObj = surfaceValue.addattrobj("boundary", "BOUNDARY");
+			// polyline 1
+			IomObject polyline1 = surfaceValue.addattrobj("polyline", "POLYLINE");
+			IomObject segments=polyline1.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "500000.000");
+			startSegment.setattrvalue("C2", "100000.000");
+			IomObject endSegment=segments.addattrobj("segment", "COORD");
+			endSegment.setattrvalue("C1", "600000.000");
+			endSegment.setattrvalue("C2", "100000.000");
+			// polyline 2
+			IomObject polyline2 = surfaceValue.addattrobj("polyline", "POLYLINE");
+			IomObject segments2=polyline2.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+			startSegment2.setattrvalue("C1", "600000.000");
+			startSegment2.setattrvalue("C2", "100000.000");
+			IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+			endSegment2.setattrvalue("C1", "600000.000");
+			endSegment2.setattrvalue("C2", "200000.000");
+			// polyline 3
+			IomObject polyline3 = surfaceValue.addattrobj("polyline", "POLYLINE");
+			IomObject segments3=polyline3.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment3=segments3.addattrobj("segment", "COORD");
+			startSegment3.setattrvalue("C1", "600000.000");
+			startSegment3.setattrvalue("C2", "200000.000");
+			IomObject endSegment3=segments3.addattrobj("segment", "COORD");
+			endSegment3.setattrvalue("C1", "500000.000");
+			endSegment3.setattrvalue("C2", "200000.000");
+			// polyline 4
+			IomObject polyline4 = surfaceValue.addattrobj("polyline", "POLYLINE");
+			IomObject segments4=polyline4.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment4=segments4.addattrobj("segment", "COORD");
+			startSegment4.setattrvalue("C1", "500000.000");
+			startSegment4.setattrvalue("C2", "200000.000");
+			IomObject endSegment4=segments4.addattrobj("segment", "COORD");
+			endSegment4.setattrvalue("C1", "500000.000");
+			endSegment4.setattrvalue("C2", "100000.000");
+		}
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(externalObject));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getWarn().size()==0);
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("missing outerboundary in area2d of object o1.", logger.getErrs().get(0).getEventMsg());
 	}
 }

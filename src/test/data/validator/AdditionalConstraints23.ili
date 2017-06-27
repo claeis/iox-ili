@@ -1,7 +1,7 @@
 INTERLIS 2.3;
 
 CONTRACTED MODEL AdditionalConstraints23 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
-	TOPIC Bodenbedeckung =
+	TOPIC Topic =
 		DOMAIN
 			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
 						   70000.000 .. 310000.000 [INTERLIS.m],
@@ -11,192 +11,185 @@ CONTRACTED MODEL AdditionalConstraints23 AT "mailto:ceis@localhost" VERSION "201
 						              0.000 .. 5000.000 [INTERLIS.m];
 			enumerationOrdered = (null, eins, zwei, drei, mehr (vier)) ORDERED;
 			attrRef1 = TEXT*12;
+			
+		STRUCTURE StructA =
+		END StructA;
 		
-		!! UniquenessConstraints
-		CLASS ClassB =
+		STRUCTURE StructB =
+			Surface: SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END StructB;
+		
+		CLASS ClassA =
 		  attr1 : TEXT*10;
 		  attr2 : 0 .. 100;
-		END ClassB;
-		
-		!! mandatory constraints
-		CLASS ManConClass =
-			attr1 : 0..10;
-			attr2 : 0..10;
-		END ManConClass;
-		
-		CLASS ManConClassCoord =
-			attr3 : Hkoord;
-			attr4 : Hkoord;
-		END ManConClassCoord;
-		
-		!!CLASS ClassZA =
-		!!	Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-		!!END ClassZA;
-		
-		!! set constraints
-		STRUCTURE StructC =
-		END StructC;
+		END ClassA;
 		
 		CLASS ClassC =
-			Numbers: BAG {1..*} OF StructC;
+			Numbers: BAG {1..*} OF StructA;
 		END ClassC;
 		
-		!! existence constraints
-		CLASS ExConCondition =
-			superAttr : TEXT*10;
-		END ExConCondition;
-		
-		!! plausibility constraints
-		CLASS PlConClass =
+		CLASS ClassB =
 			attr1 : 0..10;
 			attr2 : 0..10;
-		END PlConClass;
+		END ClassB;
 		
-		CLASS ExConClass =
+		CLASS ClassD =
+			Numbers: BAG {1..*} OF StructB;
+			Art: (a, b, c);
+		END ClassD;
+		
+		CLASS ClassE =
+			attr3 : Hkoord;
+			attr4 : Hkoord;
+		END ClassE;
+		
+		CLASS ClassF =
+			attr1 : 0..10;
+			attr2 : 0..10;
+		END ClassF;
+		
+		CLASS ClassG =
 			subAttr : TEXT*10;
-		END ExConClass;
-	END Bodenbedeckung;
+		END ClassG;
+		
+		CLASS ClassH =
+			superAttr : TEXT*10;
+		END ClassH;
+		
+		CLASS ClassI =
+			Geometrie : MANDATORY SURFACE WITH (STRAIGHTS, ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.050;
+		END ClassI;
+		
+		CLASS ClassJ =
+			Geometrie : MANDATORY AREA WITH (STRAIGHTS, ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.050;
+		END ClassJ;
+	END Topic;
 END AdditionalConstraints23.
 
 
-!! VIEW Uniqueness Constraint
-CONTRACTED MODEL AddUnConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+CONTRACTED MODEL AdditionalModelA AT "mailto:ceis@localhost" VERSION "2016-03-29" =
 	IMPORTS AdditionalConstraints23;
-	
-	VIEW TOPIC AddUnConTopic =
-		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-		
-		VIEW AddUnConView
-			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ClassB;
+	VIEW TOPIC AdditionalTopicA =
+		DEPENDS ON AdditionalConstraints23.Topic;
+		VIEW AdditionalClassA
+			PROJECTION OF AdditionalConstraints23.Topic.ClassA;
 			=
-			ALL OF ClassB;
+			ALL OF ClassA;
 			UNIQUE attr1;
-		END AddUnConView;
+		END AdditionalClassA;
+	END AdditionalTopicA;
+END AdditionalModelA.
 
-	END AddUnConTopic;
 
-END AddUnConModel.
-
-!! VIEW Existence Constraint
-CONTRACTED MODEL AddExConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+CONTRACTED MODEL AdditionalModelB AT "mailto:ceis@localhost" VERSION "2016-03-29" =
 	IMPORTS AdditionalConstraints23;
-	
-	VIEW TOPIC AddExConTopic =
-		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-		
-		VIEW AddExConView
-			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ExConClass;
+	VIEW TOPIC AdditionalTopicB =
+		DEPENDS ON AdditionalConstraints23.Topic;
+		VIEW AdditionalClassB
+			PROJECTION OF AdditionalConstraints23.Topic.ClassG;
 			=
-			ALL OF ExConClass;
-			EXISTENCE CONSTRAINT subAttr REQUIRED IN AdditionalConstraints23.Bodenbedeckung.ExConCondition : superAttr;
-		END AddExConView;
-
-	END AddExConTopic;
-
-END AddExConModel.
+			ALL OF ClassG;
+			EXISTENCE CONSTRAINT subAttr REQUIRED IN AdditionalConstraints23.Topic.ClassH : superAttr;
+		END AdditionalClassB;
+	END AdditionalTopicB;
+END AdditionalModelB.
 
 
-!! VIEW Mandatory Constraint
-CONTRACTED MODEL AddManConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
-
+CONTRACTED MODEL AdditionalModelC AT "mailto:ceis@localhost" VERSION "2016-03-29" =
 	IMPORTS AdditionalConstraints23;
-	
-	VIEW TOPIC AddManConTopic =
-		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-		
-		VIEW AddManConView
-			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ManConClass;
-			WHERE ManConClass->attr1==5;
-			=
-			ALL OF ManConClass;
-			MANDATORY CONSTRAINT attr1 == attr2;
-
-		END AddManConView;
-
-	END AddManConTopic;
-
-END AddManConModel.
-
-
-!! VIEW Mandatory Constraint Coords
-CONTRACTED MODEL AddManConCoordModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
-	IMPORTS AdditionalConstraints23;
-	
-	VIEW TOPIC AddManConCoordTopic =
-		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-		
-		VIEW AddManConCoordView
-			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ManConClassCoord;
-			=
-			ALL OF ManConClassCoord;
-			MANDATORY CONSTRAINT (attr3 != attr4);
-
-		END AddManConCoordView;
-
-	END AddManConCoordTopic;
-
-END AddManConCoordModel.
-
-
-!!CONTRACTED MODEL AdditionalConstraints23Zusatz3 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
-!!  IMPORTS AdditionalConstraints23;
-!!  VIEW TOPIC BodenbedeckungZusatz =
-!!  	DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-!!        VIEW PrivatGebaeude
-!!   	PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ClassZA;
-!!    	=
-!!       ALL OF ClassZA;
-!!        MANDATORY CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie);
-!!    END PrivatGebaeude;
-!!  END BodenbedeckungZusatz;
-!!END AdditionalConstraints23Zusatz3.
-
-CONTRACTED MODEL AdditionalConstraints23Un AT "mailto:ceis@localhost" VERSION "2016-03-29" =
-	IMPORTS AdditionalConstraints23;
-	VIEW TOPIC BodenbedeckungZusatzUn =
-		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-		VIEW PrivatGebaeudeUn
-			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ClassB;
+	VIEW TOPIC AdditionalTopicC =
+		DEPENDS ON AdditionalConstraints23.Topic;
+		VIEW AdditionalClassC
+			PROJECTION OF AdditionalConstraints23.Topic.ClassB;
+			WHERE ClassB->attr1==5;
 			=
 			ALL OF ClassB;
-			UNIQUE attr1, attr2;
-		END PrivatGebaeudeUn;
-	END BodenbedeckungZusatzUn;
-END AdditionalConstraints23Un.
+			MANDATORY CONSTRAINT attr1 == attr2;
+		END AdditionalClassC;
+	END AdditionalTopicC;
+END AdditionalModelC.
 
-CONTRACTED MODEL AdditionalConstraints23Zusatz4 AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+
+CONTRACTED MODEL AdditionalModelD AT "mailto:ceis@localhost" VERSION "2016-03-29" =
 	IMPORTS AdditionalConstraints23;
-	
-	VIEW TOPIC BodenbedeckungZusatz =
-		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-		
-		VIEW PrivatGebaeude
-			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.ClassC;
+	VIEW TOPIC AdditionalTopicD =
+		DEPENDS ON AdditionalConstraints23.Topic;
+		VIEW AdditionalClassD
+			PROJECTION OF AdditionalConstraints23.Topic.ClassE;
+			=
+			ALL OF ClassE;
+			MANDATORY CONSTRAINT (attr3 != attr4);
+		END AdditionalClassD;
+	END AdditionalTopicD;
+END AdditionalModelD.
+
+
+CONTRACTED MODEL AdditionalModelE AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS AdditionalConstraints23;
+	VIEW TOPIC AdditionalTopicE =
+		DEPENDS ON AdditionalConstraints23.Topic;
+		VIEW AdditionalClassE
+			PROJECTION OF AdditionalConstraints23.Topic.ClassA;
+			=
+			ALL OF ClassA;
+			UNIQUE attr1, attr2;
+		END AdditionalClassE;
+	END AdditionalTopicE;
+END AdditionalModelE.
+
+
+CONTRACTED MODEL AdditionalModelF AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS AdditionalConstraints23;	
+	VIEW TOPIC AdditionalTopicF =
+		DEPENDS ON AdditionalConstraints23.Topic;
+		VIEW AdditionalClassF
+			PROJECTION OF AdditionalConstraints23.Topic.ClassC;
 			=
 			ALL OF ClassC;
 			SET CONSTRAINT INTERLIS.objectCount(Numbers) == 2;
-		END PrivatGebaeude;
-	
-	END BodenbedeckungZusatz;
-	
-END AdditionalConstraints23Zusatz4.
+		END AdditionalClassF;
+	END AdditionalTopicF;
+END AdditionalModelF.
 
-!! VIEW Plausibility Constraint
-CONTRACTED MODEL AddPlConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" =
-	IMPORTS AdditionalConstraints23;
-	
-	VIEW TOPIC AddPlConTopic =
-		DEPENDS ON AdditionalConstraints23.Bodenbedeckung;
-		
-		VIEW AddPlConView
-			PROJECTION OF AdditionalConstraints23.Bodenbedeckung.PlConClass;
+
+CONTRACTED MODEL AdditionalModelG AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+	IMPORTS AdditionalConstraints23;	
+	VIEW TOPIC AdditionalTopicG =
+		DEPENDS ON AdditionalConstraints23.Topic;
+		VIEW AdditionalClassG
+			PROJECTION OF AdditionalConstraints23.Topic.ClassF;
 			=
-			ALL OF PlConClass;
+			ALL OF ClassF;
 			CONSTRAINT >= 50%
 			attr1 >= attr2;
+		END AdditionalClassG;
+	END AdditionalTopicG;
+END AdditionalModelG.
 
-		END AddPlConView;
 
-	END AddPlConTopic;
+CONTRACTED MODEL AdditionalModelH AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+  IMPORTS AdditionalConstraints23;
+  VIEW TOPIC AdditionalTopicH =
+  	DEPENDS ON AdditionalConstraints23.Topic;
+        VIEW AdditionalClassH
+   			PROJECTION OF AdditionalConstraints23.Topic.ClassI;
+    	=
+       ALL OF ClassI;
+    	SET CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie);
+    END AdditionalClassH;
+  END AdditionalTopicH;
+END AdditionalModelH.
 
-END AddPlConModel.
+
+CONTRACTED MODEL AdditionalModelI AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+  IMPORTS AdditionalConstraints23;
+  VIEW TOPIC AdditionalTopicI =
+  	DEPENDS ON AdditionalConstraints23.Topic;
+        VIEW AdditionalClassI
+   	PROJECTION OF AdditionalConstraints23.Topic.ClassD;
+    	=
+       ALL OF ClassD;
+		SET CONSTRAINT WHERE Art == #a : INTERLIS.areAreas(ALL, >> Numbers, >> AdditionalConstraints23.Topic.StructB->Surface);
+    END AdditionalClassI;
+  END AdditionalTopicI;
+END AdditionalModelI.

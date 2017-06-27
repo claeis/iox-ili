@@ -2,6 +2,9 @@ package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,6 +43,7 @@ public class ErrorMsg23Test {
 	private static final String ILI_CLASSD_ATTRA = "attrA";
 	private static final String ILI_CLASSD_ATTRA2 = "attrA2";
 	private static final String ILI_CLASSD_CONSTRA = ILI_CLASSD+".constrA";
+	private static final String ILI_CLASSE = "ErrorMsgTest23.Topic.ClassE";
 	// STRUCTS
 	private static final String ILI_STRUCTB = "ErrorMsgTest23.Topic.StructB";
 	private static final String ILI_STRUCTB_POINT = "point";
@@ -52,13 +56,16 @@ public class ErrorMsg23Test {
 	public void setUp() throws Exception {
 		// ili-datei lesen
 		Configuration ili2cConfig=new Configuration();
-		FileEntry fileEntry=new FileEntry("src/test/data/validator/ErrorMsgTest23.ili", FileEntryKind.ILIMODELFILE);
+		FileEntry fileEntry=new FileEntry("src/test/data/validator/FunctionsExt23.ili", FileEntryKind.ILIMODELFILE);
 		ili2cConfig.addFileEntry(fileEntry);
+		FileEntry fileEntry2=new FileEntry("src/test/data/validator/ErrorMsgTest23.ili", FileEntryKind.ILIMODELFILE);
+		ili2cConfig.addFileEntry(fileEntry2);
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
 	}
 	
-	// Es wird getestet ob es möglich ist, einen anderen Wert als eine Nummer zu definieren.
+	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
+	// wenn dieser Test eine Fehlermeldung ausgibt, jedoch kein Objekt mit Koordinaten erstellt wurde. 
 	@Test
 	public void noCoord_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -79,7 +86,8 @@ public class ErrorMsg23Test {
 		assertEquals(null,logger.getErrs().get(0).getGeomC2());
 	}
 	
-	// Es wird getestet ob es möglich ist, einen anderen Wert des Punktes LKoord zu definieren, welche keine Nummer ist.
+	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl des Punktes überschreiten.
 	@Test
 	public void coordFromPoint_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -104,7 +112,8 @@ public class ErrorMsg23Test {
 		assertEquals(new Double(70001.000),logger.getErrs().get(0).getGeomC2());
 	}
 	
-	// Es wird getestet ob die falsche Definition eines Koords innerhalb einer Linie zu einem Fehler führt.
+	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl der Linie überschreiten.
 	@Test
 	public void coordFromLine_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -138,7 +147,8 @@ public class ErrorMsg23Test {
 		assertEquals(new Double(70001.000),logger.getErrs().get(0).getGeomC2());
 	}
 	
-	// Es wird getestet ob die falsche Definition eines Koords in einer Oberfläche zu einem Fehler führt.
+	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl der Oberfläche überschreiten.
 	@Test
 	public void coordFromSurface_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -182,7 +192,8 @@ public class ErrorMsg23Test {
 		assertEquals(new Double(70001.000),logger.getErrs().get(0).getGeomC2());
 	}
 	
-	// Es wird getestet ob die falsche Definition einer Koord innerhalb einer Struktur zu einem Fehler führt.
+	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl des Punktes innerhalb der Struktur überschreiten.
 	@Test
 	public void coordFromStructAttrPoint_Fail(){
 		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTB, null);
@@ -208,6 +219,9 @@ public class ErrorMsg23Test {
 		assertEquals(new Double(480001.000),logger.getErrs().get(0).getGeomC1());
 		assertEquals(new Double(70001.000),logger.getErrs().get(0).getGeomC2());
 	}
+	
+	// Es wird getestet ob der erstellte Key, mit dem Attribute Wert: TestKey in der Fehlermeldung ausgegeben wird.
+	// zweitens wird getestet ob dieser Wert innerhalb der BenutzerID abgelegt wird.
 	@Test
 	public void keymsgParam_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -229,6 +243,9 @@ public class ErrorMsg23Test {
 		IoxLogEvent err = logger.getErrs().get(0);
 		assertEquals("Key TestKey",err.getSourceObjectUsrId());
 	}
+	
+	// Es wird getestet ob die erstellte Message, mit dem Attribute Wert: TestKey in der Fehlermeldung ausgegeben wird.
+	// zweitens wird getestet ob dieser Wert innerhalb der Event Message abgelegt wird.
 	@Test
 	public void msgParam_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSD, OID);
@@ -251,4 +268,29 @@ public class ErrorMsg23Test {
 		assertEquals("Msg TestKey",err.getEventMsg());
 	}
 
+	// die Geometry Error Message muss die unten genannten Inhalte der Koordinaten: C1 und C2 enthalten.
+	@Test
+	public void geometryErrorMessage_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSE, OID);
+		IomObject coord=objSurfaceSuccess.addattrobj("Geometry", "COORD");
+		coord.setattrvalue("C1", "510000.000");
+		coord.setattrvalue("C2", "80000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Map<String,Class> newFunctions=new HashMap<String,Class>();
+		newFunctions.put("FunctionsExt23.subText",SubText.class);
+		settings.setTransientObject(Validator.CONFIG_CUSTOM_FUNCTIONS, newFunctions);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals(new Double(510000.000),logger.getErrs().get(0).getGeomC1());
+		assertEquals(new Double(80000.000),logger.getErrs().get(0).getGeomC2());
+	}	
 }

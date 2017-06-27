@@ -2,6 +2,39 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.19.4 (2017-06-27)
+-----------------------------
+- fixed wkb2iox "Unexpected WKB type 2" if MULTILINESTRING 
+
+iox-ili 1.19.3 (2017-06-22)
+-----------------------------
+- added ModelUtilities.buildEnumElementList() to get list of enum eles (not only names)
+
+iox-ili 1.19.1 (2017-06-19)
+-----------------------------
+- added iox2wkb/wkb2iox MultiLine support 
+
+iox-ili 1.19.0 (2017-06-17)
+-----------------------------
+- validator: fixed Missing coordinate in xtflog for errors detected by a custom function
+- validator: fixed INTERLIS.areAreas() not working in views
+- validator: fixed Check FORMAT INTERLIS.XMLDate
+- validator: fixed failed to validate uniqueness of BID
+- validator: fixed comparison of attributes with DomainRef as datatype 
+- validator: enable multi file validation
+- validator: enable to set a "multiplicity" default
+- ili2c-4.7.3
+
+iox-ili 1.18.1 (2017-04-20)
+-----------------------------
+- validator: fixed implementation of uniqueness constraint
+
+iox-ili 1.18.0 (2017-04-19)
+-----------------------------
+- iox-ili: fixed: missing custom functions should not report an error
+- validator: added: implement UNIQUE (LOCAL)
+- validator: added: implement UNIQUE WHERE expression
+
 iox-ili 1.17.0 (2017-04-10)
 -----------------------------
 - support ITF output if more than one ili1 model loaded

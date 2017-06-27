@@ -1,8 +1,13 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -43,6 +48,7 @@ public class ReferenceType23Test {
 	// OID
 	private static final String OID1 = "o1";
 	private static final String OID2 = "o2";
+	private static final String OID3 = "o3";
 	private static final String OID5 = "o5";
 	// BID
 	private static final String BID1 = "b1";
@@ -425,5 +431,68 @@ public class ReferenceType23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("wrong class ReferenceType23.Topic.ClassAq of target object o1 for reference attr ReferenceType23.Topic.StructC.attrC4.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Referenz External true ist und die Klasse A gefunden wird.
+	@Test
+	public void external_TargetObjFound_Ok(){
+		String objTargetId=ExternalObjResolverMock.OID1;
+		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, OID1);
+		Iom_jObject o1Ref=new Iom_jObject("REF", null);
+		o1Ref.setobjectrefoid(objTargetId);
+		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTG, null);
+		iomStruct.addattrobj(ILI_STRUCTG_ATTRG2, o1Ref);
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSH, OID2);
+		iomObj.addattrobj(ILI_CLASSH_ATTRH2, iomStruct);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		List<Class> resolverClasses=new ArrayList<Class>();
+		resolverClasses.add(ExternalObjResolverMock.class);
+		settings.setTransientObject(Validator.CONFIG_OBJECT_RESOLVERS, resolverClasses);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjtarget));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID2));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
+	}
+	
+	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Referenz External true ist und die Klasse A in keinem anderen Basket gefunden wird.
+	@Test
+	public void external_TargetObjNotFound_False(){
+		String objTargetId=OID1;
+		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, OID3);
+		Iom_jObject o1Ref=new Iom_jObject("REF", null);
+		o1Ref.setobjectrefoid(objTargetId);
+		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTG, null);
+		iomStruct.addattrobj(ILI_STRUCTG_ATTRG2, o1Ref);
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSH, OID2);
+		iomObj.addattrobj(ILI_CLASSH_ATTRH2, iomStruct);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		List<Class> resolverClasses=new ArrayList<Class>();
+		resolverClasses.add(ExternalObjResolverMock.class);
+		settings.setTransientObject(Validator.CONFIG_OBJECT_RESOLVERS, resolverClasses);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjtarget));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID2));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1,logger.getErrs().size());
+		assertEquals("No object found with OID o1.", logger.getErrs().get(0).getEventMsg());
 	}
 }

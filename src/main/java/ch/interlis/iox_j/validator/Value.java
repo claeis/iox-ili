@@ -166,37 +166,37 @@ public class Value {
 		if(skipEvaluation() || other.skipEvaluation()){
 			throw new IllegalArgumentException();
 		}
-		// intercept complex value
+		// compare complex value
 		if (this.complexObjects != null && other.complexObjects != null){
 			for(IomObject iomObj : this.complexObjects){
 				for(IomObject iomObjOther : other.complexObjects){
-					// intercept coords and arcs
+					// compare coords and arcs
 					if((iomObj.getobjecttag().equals("COORD") && iomObjOther.getobjecttag().equals("COORD"))
 							|| (iomObj.getobjecttag().equals("ARC") && iomObjOther.getobjecttag().equals("ARC"))){
 						return compareCoordsTo(iomObj, iomObjOther);
 					}
-					// intercept polylines
+					// compare polylines
 					if(iomObj.getobjecttag().equals("POLYLINE") && iomObjOther.getobjecttag().equals("POLYLINE")){
 						return comparePolylineTo(iomObj, iomObjOther);
 					}
-					// intercept surfaces and areas
+					// compare surfaces and areas
 					if(iomObj.getobjecttag().equals("MULTISURFACE") && iomObjOther.getobjecttag().equals("MULTISURFACE")){
 						return compareSurfaceOrAreaTo(iomObj, iomObjOther);
 					}
 				}
 			}
 		}
-		// intercept value
+		// compare simple value
 		if(this.value!=null && other.value!=null){
 			if(type instanceof NumericType){
 				return Double.valueOf(value).compareTo(Double.valueOf(other.value));
-			// intercept text
+			// compare text
 			} else if(type instanceof TextType){
 				return value.compareTo(other.value);
-			// intercept formatted type
+			// compare formatted type
 			} else if(type instanceof FormattedType){
 				return value.compareTo(other.value);
-			// enumeration type
+			// compare enumeration type
 			} else if(type instanceof EnumerationType){
 				EnumerationType enumeration = (EnumerationType) type;
 				// if ordered = true (>,<,>=,<=)
@@ -209,7 +209,7 @@ public class Value {
 					return this.value.compareTo(other.value);
 				}
 			}
-		// intercept numeric
+		// compare numeric
 		} else if(this.numericIsDefined && other.numericIsDefined){
 			return compareDouble(numeric, other.numeric);
 		} else if(this.numericIsDefined && other.value!=null){

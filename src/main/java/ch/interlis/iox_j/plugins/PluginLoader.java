@@ -38,7 +38,8 @@ public class PluginLoader {
 			//System.err.println(path);
 			try
 			{
-				new JARClassLoader(path,this);
+				JARClassLoader loader=new JARClassLoader(path,this);
+				loader.loadAllPlugins();
 			}
 			catch(java.io.IOException io)
 			{

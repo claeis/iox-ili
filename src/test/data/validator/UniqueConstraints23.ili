@@ -3,13 +3,13 @@ MODEL UniqueConstraints23
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-09-13" =
 	
 	TOPIC Topic=
-		DOMAIN 
+		DOMAIN
+			Enumeration3 = (eins, zwei, drei, vier, fuenf) ORDERED;
 			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
 					        70000.000 .. 310000.000 [INTERLIS.m],
 						   ROTATION 2 -> 1;	
 		
 		CLASS ClassA =
-		  !! uniqueConstraint
 		  attr1 : TEXT*10;
 		  attr2 : 0 .. 100;
 		END ClassA;
@@ -46,6 +46,215 @@ MODEL UniqueConstraints23
 		  UNIQUE attr2;
 		END ClassE;
 		
-	END Topic;
+		STRUCTURE StructJ =
+		  attr1j : 0..10;
+		END StructJ;
+		
+		STRUCTURE StructI =
+		  attr1i : BAG {1..*} OF StructJ;
+		END StructI;
+		
+		STRUCTURE StructH =
+		  attr1h : BAG {1..*} OF StructI;
+		END StructH;
+		
+		STRUCTURE StructE =
+		  attr1 : 0..10;
+		  attr2 : 0..10;
+		END StructE;
+		
+		STRUCTURE StructD =
+		  attr1d : 0..10;
+		  attr2d : 0..10;
+		END StructD;
+		
+		STRUCTURE StructC =
+		  attr1c : BAG {1..*} OF StructD;
+		  attr2c : LIST {1..*} OF StructD;
+		END StructC;
+		
+		STRUCTURE StructG =
+			attr1g : 0 .. 10;
+		END StructG;
+		
+		STRUCTURE StructB =
+		  attr1 : 0 .. 10;
+		  attr2 : 0 .. 10;
+		  attr4b : BAG {1..*} OF StructC;
+		  attr5b : LIST {1..*} OF StructC;
+		END StructB;
+		
+		STRUCTURE StructF =
+			attr1f : BAG {1..*} OF StructG;
+			!!attr4a : LIST {1..*} OF StructG;
+		END StructF;
+		
+		STRUCTURE StructA =
+		  attr1 : 0..10;
+		  attr2 : 0..10;
+		END StructA;
+		
+		CLASS ClassG =
+		  attr2 : BAG {1..*} OF StructA;
+		  UNIQUE (LOCAL) attr2 : attr1;
+		END ClassG;
+		
+		CLASS ClassH =
+		  attr2 : BAG {1..*} OF StructA;
+		  UNIQUE (LOCAL) attr2 : attr1, attr2;
+		END ClassH;
+		
+		CLASS ClassI =
+		  attr1 : BAG {1..*} OF StructA;
+		  UNIQUE (LOCAL) attr1 : attr1;
+		END ClassI;
+		
+		CLASS ClassJ =
+		  attr2 : BAG {1..*} OF StructA;
+		  UNIQUE (LOCAL) attr2 : attr1, attr2;
+		  UNIQUE (LOCAL) attr2 : attr1;
+		END ClassJ;
+		
+		CLASS ClassK =
+		  attr1 : LIST {1..*} OF StructE;
+		  attr2 : 0..10;
+		  UNIQUE (LOCAL) attr1 : attr1;
+		  UNIQUE attr2;
+		END ClassK;
+		
+		CLASS ClassL =
+		  attr1 : BAG {1..*} OF StructF;
+		  UNIQUE (LOCAL) attr1 -> attr1f: attr1g;
+		END ClassL;
+		
+		CLASS ClassM =
+		  attr1 : BAG {1..*} OF StructH;
+		  UNIQUE (LOCAL) attr1 -> attr1h -> attr1i : attr1j;
+		END ClassM;
 
+		CLASS ClassO =
+		  surface2d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		  UNIQUE surface2d;
+		END ClassO;
+		
+		STRUCTURE StructO =
+			surface2d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END StructO;
+		
+		CLASS ClassO2 =
+		  attro2 : BAG {1..*} OF StructO;
+		  UNIQUE (LOCAL) attro2 : surface2d;
+		END ClassO2;
+		
+		STRUCTURE StructP =
+			area2d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END StructP;
+		
+		CLASS ClassP2 =
+		  attr1 : BAG {1..*} OF StructP;
+		  UNIQUE (LOCAL) attr1 : area2d;
+		END ClassP2;
+		
+		CLASS ClassP =
+		  area2d : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		  UNIQUE area2d;
+		END ClassP;
+		
+		CLASS ClassA1 =
+		   attrA1 : TEXT*10;
+		END ClassA1;
+		
+		CLASS ClassB1 =
+		   attrB1 : TEXT*10;
+		END ClassB1;
+		
+		ASSOCIATION assoA =
+		  a1 -- {0..2} ClassA1;
+		  b1 -- {0..2} ClassB1;
+		  attr1 : TEXT*10;
+		  UNIQUE attr1;
+		END assoA;
+		
+		CONSTRAINTS OF ClassA1 =
+			UNIQUE attrA1;
+		END;
+		
+		CLASS ClassC1 =
+			attr1 : TEXT*10;
+		END ClassC1;
+		
+		CLASS ClassD1 =
+			attr1 : TEXT*10;
+		END ClassD1;
+		
+		STRUCTURE StructC1 =
+			attr1 : REFERENCE TO ClassC1;
+			!!UNIQUE attr1;
+		END StructC1;
+		
+		CLASS ClassEE =
+			attr1 : BAG {0..*} OF StructC1;
+		END ClassEE;
+		
+		ASSOCIATION assoB =
+		  c1 -- {0..1} ClassC1;
+		  d1 -- {0..2} ClassD1;
+		  UNIQUE c1;
+		END assoB;
+
+		CLASS ClassE1 =
+		   attrE1 : TEXT*10;
+		END ClassE1;
+		
+		CLASS ClassF1 =
+		   attrF1 : TEXT*10;
+		END ClassF1;
+		
+		ASSOCIATION assoC =
+		  e1 -- {0..2} ClassE1;
+		  f1 -- {0..2} ClassF1;
+		  attr1 : TEXT*10;
+		  UNIQUE attr1;
+		END assoC;
+		
+		CONSTRAINTS OF assoC =
+			UNIQUE e1, attr1;
+		END;
+		
+		CLASS ClassUndefined =
+			attr1 : 0..30;
+			attr2 : 0..30;
+			UNIQUE attr1, attr2;
+			UNIQUE attr1;
+		END ClassUndefined;
+		
+		CLASS ClassEmptyText =
+			attr1 : TEXT*20;
+			attr2 : TEXT*20;
+			UNIQUE attr1, attr2;
+		END ClassEmptyText;
+		
+		CLASS ClassN =
+		  attrw1 : 0 .. 10;
+		  attrw2 : 0 .. 10;
+		  attrw3 : 0 .. 10;
+		  UNIQUE WHERE attrw1 > attrw2 : attrw3;
+		END ClassN;
+		
+		CLASS ClassN2 =
+		  attrw1 : 0 .. 10;
+		  attrw2 : 0 .. 10;
+		  attrw3 : 0 .. 10;
+		  UNIQUE WHERE attrw1 < attrw2 : attrw3;
+		END ClassN2;
+		
+		CLASS ClassN3 =
+			attr01 : Enumeration3;
+			attr02 : Enumeration3;
+			attr03 : Enumeration3;
+			attr04 : TEXT*10;
+			UNIQUE WHERE INTERLIS.inEnumRange(attr01, attr02, attr03) : attr04;
+		END ClassN3;
+		
+	END Topic;
 END UniqueConstraints23.

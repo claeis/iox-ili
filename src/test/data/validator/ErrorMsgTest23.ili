@@ -2,6 +2,7 @@ INTERLIS 2.3;
 
 MODEL ErrorMsgTest23
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-04" =
+  	IMPORTS FunctionsExt23;
 	TOPIC Topic=
 		DOMAIN
 			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
@@ -38,7 +39,11 @@ MODEL ErrorMsgTest23
 		   !!@name=constrA
 		   MANDATORY CONSTRAINT attrA>5;
 		END ClassD;
-
+		
+		CLASS ClassE =
+			Geometry : Lkoord;
+			MANDATORY CONSTRAINT "aText" == "aDifferentText";
+		END ClassE;
 		
 	END Topic;
 END ErrorMsgTest23.

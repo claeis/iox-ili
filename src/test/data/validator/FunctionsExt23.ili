@@ -5,7 +5,6 @@ CONTRACTED MODEL FunctionsExt23
   	FUNCTION subText (text: TEXT; from: NUMERIC; to: NUMERIC): TEXT;
   	
   	FUNCTION superText (text: TEXT; from: NUMERIC; to: NUMERIC): TEXT;
-  	FUNCTION noText (text: TEXT; from: NUMERIC; to: NUMERIC): TEXT;
   	
   	FUNCTION elementCount (bag: BAG OF ANYSTRUCTURE): BOOLEAN;
   	
@@ -35,14 +34,6 @@ CONTRACTED MODEL FunctionsExt23
 			attr2 : TEXT;
 			MANDATORY CONSTRAINT superText(text,from,to) == attr2;
 		END ClassB;
-		
-		CLASS ClassC =
-			text : TEXT;
-			from : 0..10;
-			to : 0..10;
-			attr2 : TEXT;
-			MANDATORY CONSTRAINT noText(text,from,to) == attr2;
-		END ClassC;
 		
 	END Topic;
 	

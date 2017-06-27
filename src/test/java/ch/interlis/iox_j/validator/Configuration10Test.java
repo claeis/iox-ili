@@ -309,4 +309,60 @@ public class Configuration10Test {
 		assertTrue(logger.getWarn().size()==1);
 		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
 	}
+	
+	// Es wird getestet ob der eigens erstellte Fehler ausgegeben wird,
+	// wenn beide Values von einem Unique Attribute identisch sind,
+	// validationConfig msg nicht leer ist und check auf warning konfiguriert ist.
+	@Test
+	public void uniqueConstraint_MSGNotEmptyAndWarning(){
+		Iom_jObject objA1=new Iom_jObject(CLASSF, OID1);
+		objA1.setattrvalue("a1", "Anna");
+		Iom_jObject objA2=new Iom_jObject(CLASSF, OID2);
+		objA2.setattrvalue("a1", "Anna");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(CLASSF+".Constraint1", ValidationConfig.CHECK, ValidationConfig.WARNING);
+		modelConfig.setConfigValue(CLASSF+".Constraint1", ValidationConfig.MSG, "My own Set Constraint.");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(objA1));
+		validator.validate(new ObjectEvent(objA2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getWarn().size()==1);
+		assertEquals("My own Set Constraint.",logger.getWarn().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet ob der eigens erstellte Fehler ausgegeben wird
+	// wenn beide Values von einem Unique Attribute identisch sind,
+	// validationConfig msg leer ist und check auf warning konfiguriert ist.
+	@Test
+	public void uniqueConstraint_MSGEmptyAndWarning(){
+		Iom_jObject objA1=new Iom_jObject(CLASSF, OID1);
+		objA1.setattrvalue("a1", "Anna");
+		Iom_jObject objA2=new Iom_jObject(CLASSF, OID2);
+		objA2.setattrvalue("a1", "Anna");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(CLASSF+".Constraint1", ValidationConfig.CHECK, ValidationConfig.WARNING);
+		modelConfig.setConfigValue(CLASSF+".Constraint1", ValidationConfig.MSG, "");
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(objA1));
+		validator.validate(new ObjectEvent(objA2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getWarn().size()==1);
+		assertEquals("Unique is violated! Values Anna already exist in Object: o1",logger.getWarn().get(0).getEventMsg());
+	}
 }

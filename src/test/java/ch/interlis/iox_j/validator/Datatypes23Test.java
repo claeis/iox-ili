@@ -187,6 +187,44 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Dies ist ein Muster Datum, welches funktionieren muss.
+	@Test
+	public void dateValidOk(){
+		Iom_jObject objMinYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMinYear.setattrvalue("aDate", "2017-06-15");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objMinYear));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Dieses Datum wird über Interlis.xmlDate ausgeführt.
+	@Test
+	public void formatXMLDateOk(){
+		Iom_jObject objMinYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMinYear.setattrvalue("anInterlisXMLDateFormat", "2017-06-15");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objMinYear));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
 	// Das höchste Jahr wird getetstet.
 	@Test
 	public void dateMaxYearOk(){
@@ -1328,7 +1366,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <1580-2-15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <1580-2-15> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die Eingabe des Jahres in einem gültigen Bereich ist. Maximaler Test.
@@ -1348,7 +1386,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <3000-2-15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <3000-2-15> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Monat von Datum zu klein.
@@ -1368,7 +1406,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016-0-15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <2016-0-15> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Monat von Datum zu gross.
@@ -1388,7 +1426,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016-13-15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <2016-13-15> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Tag von Datum zu klein.
@@ -1408,7 +1446,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016-2-0> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <2016-2-0> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Tag von Datum zu gross.
@@ -1428,7 +1466,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016-2-32> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <2016-2-32> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Datenformat mit Punkten unzulässig.
@@ -1448,7 +1486,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016.2.15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of date value <2016.2.15>", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Datenformat mit Slash unzulässig.
@@ -1468,7 +1506,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016/2/15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of date value <2016/2/15>", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Eingabe des Datum mit zu kleinem Jahresdatum (jjjj) unzulässig.
@@ -1488,7 +1526,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <216-2-2> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <216-2-2> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Eingabe des Datum Jahres zu lang (jjjj). Eingabe unzulässig.
@@ -1509,7 +1547,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <20016-12-15> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <20016-12-15> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Zeitangabe Stunde zu lang. unzulässig.
@@ -1529,7 +1567,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <24:59:59.999> is not a valid Time", logger.getErrs().get(0).getEventMsg());
+		assertEquals("time value <24:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Zeitangabe Minute zu gross. Fehler.
@@ -1549,7 +1587,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <23:60:59.999> is not a valid Time", logger.getErrs().get(0).getEventMsg());
+		assertEquals("time value <23:60:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Zeitangabe Sekunde zu gross. Fehler.
@@ -1569,7 +1607,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <23:59:60.000> is not a valid Time", logger.getErrs().get(0).getEventMsg());
+		assertEquals("time value <23:59:60.000> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Zeitangabe allgemein zu kurz. Fehler.
@@ -1589,7 +1627,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <5:5:5.55> is not a valid Time", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of time value <5:5:5.55>", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Zeitangabe zu lang. Fehler.
@@ -1609,9 +1647,29 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <23:59:59.9990> is not a valid Time", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of time value <23:59:59.9990>", logger.getErrs().get(0).getEventMsg());
 	}
 
+	// Dieses Datum wird über Interlis.xmlDate ausgeführt und ist kleiner als der definierte Bereich.
+	@Test
+	public void formatDateToSmallFail(){
+		Iom_jObject objMinYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		objMinYear.setattrvalue("anInterlisXMLDateFormat", "2000-06-15");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objMinYear));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("date value <2000-06-15> is not in range", logger.getErrs().get(0).getEventMsg());
+	}
+	
 	// Jahr Format bei DatumZeit zu kurz. Fehler.
 	@Test
 	public void dateTimeYearToLowFail(){
@@ -1629,7 +1687,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <1581-2-29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <1581-2-29T12:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Jahr Format bie DatumZeit zu lang. Fehler.
@@ -1649,7 +1707,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <3000-2-29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <3000-2-29T12:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Monat bei DatumZeit zu kurz.
@@ -1669,7 +1727,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016-0-29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <2016-0-29T12:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Monats Angabe zu gross.
@@ -1689,7 +1747,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016-13-29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <2016-13-29T12:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Tages Angabe zu klein.
@@ -1709,7 +1767,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016-2-0T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <2016-2-0T12:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Tages Angabe zu gross.
@@ -1729,7 +1787,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016-2-32T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <2016-2-32T12:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Stunde zu gross.
@@ -1749,7 +1807,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016-2-29T24:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <2016-2-29T24:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Minute zu gross.
@@ -1769,7 +1827,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016-2-29T12:60:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <2016-2-29T12:60:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Sekunden Angabe zu gross.
@@ -1789,7 +1847,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016-2-29T12:59:60.000> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <2016-2-29T12:59:60.000> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Länge zu kurz.
@@ -1809,7 +1867,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016-2-2T2:2:2.99> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of datetime value <2016-2-2T2:2:2.99>", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Länge zu gross.
@@ -1829,7 +1887,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016-12-29T12:59:59.9999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of datetime value <2016-12-29T12:59:59.9999>", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Format mit Punkten unzulässig.
@@ -1849,7 +1907,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016.2.29T12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of datetime value <2016.2.29T12:59:59.999>", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit ohne T unzulässig.
@@ -1870,7 +1928,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016-2-29V12:59:59.999> is not a valid DateTime", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of datetime value <2016-2-29V12:59:59.999>", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Falsches Format bei NumericType unzulässig.

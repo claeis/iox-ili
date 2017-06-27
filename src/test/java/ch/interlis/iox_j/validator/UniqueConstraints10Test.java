@@ -1,8 +1,10 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -31,6 +33,7 @@ public class UniqueConstraints10Test {
 	// CLASS
 	private final static String TABLEA=TOPIC+".TableA";
 	private final static String TABLEB=TOPIC+".TableB";
+	private final static String TABLEE=TOPIC+".TableE";
 	
 	@Before
 	public void setUp() throws Exception {
@@ -99,12 +102,8 @@ public class UniqueConstraints10Test {
 	public void differentRefValues_Ok(){
 		Iom_jObject objA1=new Iom_jObject(TABLEA, OID1);
 		objA1.setattrvalue("a1", "Anna");
-		Iom_jObject objA2=new Iom_jObject(TABLEA, OID2);
-		objA2.setattrvalue("a1", "Berta");
 		Iom_jObject objB1=new Iom_jObject(TABLEB, OID3);
 		objB1.addattrobj("b2", "REF").setobjectrefoid(OID1);
-		Iom_jObject objB2=new Iom_jObject(TABLEB, OID4);
-		objB2.addattrobj("b2", "REF").setobjectrefoid(OID2);
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -114,9 +113,7 @@ public class UniqueConstraints10Test {
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(objA1));
-		validator.validate(new ObjectEvent(objA2));
 		validator.validate(new ObjectEvent(objB1));
-		validator.validate(new ObjectEvent(objB2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
@@ -174,15 +171,11 @@ public class UniqueConstraints10Test {
 		assertEquals("Unique is violated! Values Anna already exist in Object: o1",logger.getErrs().get(0).getEventMsg());
 	}
 	
-
-	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die Referenz auf ein bereits existierendes unique Attribute verweist.
 	@Test
-	public void refOfUniqueValueExistsTwice_Fail(){
+	public void ref_Fail(){
 		Iom_jObject objA1=new Iom_jObject(TABLEA, OID1);
-		objA1.setattrvalue("a1", "Anna");
 		Iom_jObject objA2=new Iom_jObject(TABLEA, OID2);
-		objA2.setattrvalue("a1", "Berta");
 		Iom_jObject objB1=new Iom_jObject(TABLEB, OID3);
 		objB1.addattrobj("b2", "REF").setobjectrefoid(OID1);
 		Iom_jObject objB2=new Iom_jObject(TABLEB, OID4);
@@ -202,7 +195,32 @@ public class UniqueConstraints10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("Unique is violated! Values o1 already exist in Object: o3",logger.getErrs().get(0).getEventMsg());
+	}
+	@Test
+	public void ref_Ok(){
+		Iom_jObject objA1=new Iom_jObject(TABLEA, OID1);
+		Iom_jObject objA2=new Iom_jObject(TABLEA, OID2);
+		Iom_jObject objB1=new Iom_jObject(TABLEB, OID3);
+		objB1.addattrobj("b2", "REF").setobjectrefoid(OID1);
+		Iom_jObject objB2=new Iom_jObject(TABLEB, OID4);
+		objB2.addattrobj("b2", "REF").setobjectrefoid(OID2);
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(objA1));
+		validator.validate(new ObjectEvent(objA2));
+		validator.validate(new ObjectEvent(objB1));
+		validator.validate(new ObjectEvent(objB2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertEquals(0,logger.getErrs().size());
 	}
 }
