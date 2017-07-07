@@ -3,19 +3,14 @@
 	<ili:baskets>
 		<TopicA gml:id="bid1">
 			<member>
-				<gml:Definition gml:id="f1">
-					<gml:identifier>rot</gml:identifier>
-				</gml:Definition>
+				<Fahrzeug gml:id="o1">
+					<CarrosserieFarbe>rot</CarrosserieFarbe>
+				</Fahrzeug>
 			</member>
 			<member>
-				<gml:Definition gml:id="f2">
-					<gml:identifier>gelb</gml:identifier>
-				</gml:Definition>
-			</member>
-			<member>
-				<gml:Definition gml:id="f3">
-					<gml:identifier>gruen</gml:identifier>
-				</gml:Definition>
+				<Auto gml:id="o2">
+					<CarrosserieFarbe>rot.dunkel</CarrosserieFarbe>
+				</Auto>
 			</member>
 		</TopicA>
 	</ili:baskets>

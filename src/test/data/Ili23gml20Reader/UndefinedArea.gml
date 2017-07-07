@@ -3,12 +3,12 @@
 	<ili:baskets>
 		<TopicB gml:id="bid1">
 			<member>
-				<TableB gml:id="x10">
+				<ClassB gml:id="x10" srsDimension="3">
 					<Form>
 						<gml:Polygon gml:id="iox2" srsName="EPSG:21781">
 						</gml:Polygon>
 					</Form>
-				</TableB>
+				</ClassB>
 			</member>
 		</TopicB>
 	</ili:baskets>

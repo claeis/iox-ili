@@ -1,11 +1,8 @@
-TRANSFER ili10Model;
-
-  	DOMAIN
-	    LKoord = COORD2 100.00 100.00
-	                    300.00 300.00;
-
-	MODEL ili10Model
-	
+TRANSFER Ili10;
+	MODEL Ili10
+	  	DOMAIN
+		    LKoord = COORD2 100.00 100.00
+		                    300.00 300.00;
 	  TOPIC TopicA =
 	    TABLE TableA =
 	      Form: OPTIONAL SURFACE WITH (STRAIGHTS, ARCS) VERTEX LKoord
@@ -87,7 +84,33 @@ TRANSFER ili10Model;
 	    END ClassG3;  
 	  END TopicG.
 	
-	END ili10Model.
+	  TOPIC TopicH =
+		TABLE TableA1 =
+			myText : OPTIONAL TEXT*10;
+			NO IDENT
+		END TableA1;
+		
+		TABLE TableB1 =
+			myNumber : OPTIONAL [0 .. 20 ];
+			NO IDENT
+		END TableB1;
+		
+		TABLE TableD1 =
+			myAlignment : OPTIONAL HALIGNMENT;
+			NO IDENT
+		END TableD1;
+		
+		TABLE TableF1 =
+			myEnumeration : OPTIONAL (null, eins, zwei, drei, mehr ( vier, fuenf, sechs, sieben, acht ,neun, zehn));
+			NO IDENT
+		END TableF1;
+	
+		TABLE TableG1 =
+			myEnumTree : OPTIONAL (null, eins, zwei, drei, mehr ( vier, fuenf, sechs, sieben, acht ,neun, zehn));
+			NO IDENT
+		END TableG1;
+	  END TopicH.
+	END Ili10.
 
 	FORMAT FREE;
 	CODE BLANK = DEFAULT, UNDEFINED = DEFAULT, CONTINUE = DEFAULT;
