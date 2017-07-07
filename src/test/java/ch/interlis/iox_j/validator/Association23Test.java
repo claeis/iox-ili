@@ -18,24 +18,6 @@ import ch.interlis.iox_j.StartBasketEvent;
 import ch.interlis.iox_j.StartTransferEvent;
 import ch.interlis.iox_j.logging.LogEventFactory;
 
-// EMBEDDED ASSOCIATION (Eingebettete Verbindung)
-// bsp.
-// a1 -- {0..1} ClassA;
-// a1 (Rollenname)
-// {} (Beinhaltet die Kardinalität)
-// 0 (Die Minimal gesetzte Zulässige Kardinalität).
-// 1 (Die Maximal gesetzte Zulässige Kardinalität).
-// ClassA (Die Klasse, welche durch die Rolle a1, minimal 0 und maximal 1 Mal von einer anderen Klasse referenziert werden darf.
-// Die Beziehung einer beliebigen Klasse: Klasse_A kann über den Rollenaufruf_a1 von der Klasse_B minimal_0 Mal, bis und mit maximal_1 Mal bestehen, sonst wird ein Fehler ausgegeben.
-//
-// STAND ALONE ASSOCIATION (Eigenständige Verbindung) Besteht immer aus 2 Rollen.
-// bsp.
-// a1 -- {0..1} ClassA;
-// b1 -- {0..1} ClassB;
-// In diesem Falle müssen die Klassen ClassA und ClassB Verbindungen zueinander erstellen.
-// Dabei kann die Beziehung der Klasse_A über den Rollennamen: a1, minimal_0 Mal und maximal_1 Mal bestehen.
-// Die Beziehung der Klasse_B über den Rollennamen: b1 kann somit minimal_0 Mal und maximal_1 Mal bestehen.
-
 public class Association23Test {
 
 	private TransferDescription td=null;
@@ -128,13 +110,10 @@ public class Association23Test {
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
 	}
-	//#########################################################//
-	//########### SUCCESS EMBEDDED CARDINALITY ################//
-	//#########################################################//
 
 	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a1, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
 	@Test
-	public void embeddedAsso_TargetClassFound_Ok(){
+	public void embeddedAsso_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
 		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OID2);
 		iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(OID1);
@@ -518,9 +497,6 @@ public class Association23Test {
 		assertEquals(1,logger.getErrs().size());
 	}
 	
-	//#########################################################//
-	//############# FAIL EMBEDDED CARDINALITY #################//
-	//#########################################################//		
 	
 	// External=false, Objects in different Baskets.
 	// Ergibt einen Fehler!
@@ -655,10 +631,6 @@ public class Association23Test {
 		assertEquals("ad1 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(0).getEventMsg());
 	}
 		
-	//#########################################################//
-	//################# FAIL TARGETCLASS TEST #################//
-	//#########################################################//	
-	
 	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a1, 0 bis 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
 	@Test
 	public void embeddedAsso_TargetClassWrong_Fail(){

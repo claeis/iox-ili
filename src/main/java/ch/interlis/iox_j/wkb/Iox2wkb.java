@@ -817,6 +817,32 @@ public class Iox2wkb {
 		}
 		return os.toByteArray();
 	}
+	public byte[] multiline2wkb(IomObject obj,boolean asCurve,double strokeP)
+	throws Iox2wkbException
+	{
+		if(obj==null){
+			return null;
+		}
+	    try {
+			writeByteOrder();
+			if(asCurve){
+				writeGeometryType(WKBConstants.wkbMultiCurve);
+			}else{
+				writeGeometryType(WKBConstants.wkbMultiLineString);
+			}
+			int polylinec=obj.getattrvaluecount(Wkb2iox.ATTR_POLYLINE);
+			os.writeInt(polylinec);
+
+			for(int polylinei=0;polylinei<polylinec;polylinei++){
+				IomObject polyline=obj.getattrobj("polyline",polylinei);
+				Iox2wkb helper=new Iox2wkb(outputDimension,os.order());
+				os.write(helper.polyline2wkb(polyline,false,asCurve,strokeP));
+			}
+		} catch (IOException e) {
+	        throw new RuntimeException("Unexpected IO exception: " + e.getMessage());
+		}
+		return os.toByteArray();
+	}
 
 	  private void writeByteOrder() throws IOException
 	  {
