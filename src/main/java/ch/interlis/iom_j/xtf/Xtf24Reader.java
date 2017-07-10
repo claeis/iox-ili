@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
@@ -56,6 +57,11 @@ public class Xtf24Reader implements IoxReader {
     private static final int END_HEADERSECTION=6;
     // datasection
     private static final int INSIDE_DATASECTION=7;
+    private static final int INSIDE_BASKETS=17;
+    private static final int INSIDE_BASKET=18;
+    private static final int END_BASKET=19;
+    private static final int INSIDE_MEMBER=20;
+    private static final int END_MEMBER=21;
     private static final int END_DATASECTION=8;
     // end
     private static final int END_TRANSFER=9;
@@ -76,6 +82,7 @@ public class Xtf24Reader implements IoxReader {
     private static final QName QNAME_XML_MODELS=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"models");
     private static final QName QNAME_XML_MODEL=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"model");
     private static final QName QNAME_XML_SCHEMA=new QName(NAMESPACE_XMLSCHEMA,"xsi");
+    private static final QName QNAME_ID = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "bid");
     
 	public Xtf24Reader(java.io.InputStream in) throws IoxException{
 		init(in);
@@ -412,14 +419,56 @@ public class Xtf24Reader implements IoxReader {
                 		throw new IoxSyntaxException(event2msgtext(event));
                 	}
                 }else if(event.isStartElement()){
-                	// TODO baskets
+                	// new basket
+                    StartElement element = (StartElement) event;
+                    Topic topic=getIliTopic(element.getName());
+                    if(topic==null){
+                    	throw new IoxSyntaxException(event2msgtext(event));
+                    }
+                    QName gmlId = QNAME_ID;
+                    Attribute bid = event.asStartElement().getAttributeByName(gmlId);
+                    if(bid!=null){
+                        state=INSIDE_BASKET;
+                        return new ch.interlis.iox_j.StartBasketEvent(topic.getScopedName(), bid.getValue());
+                    }
                 }else if(event.isCharacters()){
                     Characters characters = (Characters) event;
                     if(!characters.isWhiteSpace()){
                     	 throw new IoxSyntaxException(event2msgtext(event));
                     }
                 }
-            // TODO inside baskets
+            // start before member
+            }else if(state==INSIDE_BASKET){
+                if(event.isEndElement()){
+                    state=END_BASKET;
+                    return new ch.interlis.iox_j.EndBasketEvent();
+                }else if(event.isStartElement()){
+                    state=INSIDE_MEMBER;
+                    continue;
+                }else if(event.isCharacters()){
+                    Characters characters = (Characters) event;
+                    if(!characters.isWhiteSpace()){
+                    	 throw new IoxSyntaxException(event2msgtext(event));
+                    }
+                }else{
+                	throw new IoxSyntaxException(event2msgtext(event));
+                }
+            // end basket
+            }else if(state==END_BASKET){
+                if(event.isStartElement()){
+                    state=INSIDE_DATASECTION;
+                    continue;
+                }else if(event.isCharacters()){
+                    Characters characters = (Characters) event;
+                    if(!characters.isWhiteSpace()){
+                    	 throw new IoxSyntaxException(event2msgtext(event));
+                    }
+                }else if(event.isEndElement()){
+                    state=END_DATASECTION;
+                    continue;
+                }else{
+                	throw new IoxSyntaxException(event2msgtext(event));
+                }
             // end data section
             }else if(state==END_DATASECTION){
                 if(event.isEndElement()){
