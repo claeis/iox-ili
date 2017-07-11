@@ -243,7 +243,6 @@ public class Xtf24Reader implements IoxReader {
                     	throw new IoxSyntaxException("expected modelname. "+event2msgtext(event));
                     }else{
                     	models.add(character.getData());
-                    	System.out.println("models.add("+character.getData()+")");
                     	continue;
                     }
                 }
@@ -323,7 +322,6 @@ public class Xtf24Reader implements IoxReader {
                     	throw new IoxSyntaxException("expected sendername. "+event2msgtext(event));
                     }else{
                     	sender=character.getData();
-                    	System.out.println("sender=("+character.getData()+")");
                     	continue;
                     }
                 }
@@ -344,7 +342,6 @@ public class Xtf24Reader implements IoxReader {
                     	throw new IoxSyntaxException("expected a comment. "+event2msgtext(event));
                     }else{
                     	comment=character.getData();
-                    	System.out.println("comment=("+character.getData()+")");
                     	continue;
                     }
                 }

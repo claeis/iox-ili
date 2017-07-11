@@ -12,12 +12,17 @@ import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iox.EndTransferEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.StartTransferEvent;
+import ch.interlis.iox_j.IoxSyntaxException;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 
 public class Xtf24ReaderHeaderTest {
 
 	private final static String TEST_IN_HEADER="src/test/data/Xtf24Reader/headerSection";
-	private final static String TEST_IN="src/test/data/Xtf24Reader";
+	private final static String TEST_IN_MODEL="src/test/data/Xtf24Reader";
+	private static final String SPACE=" ";
+	private static final String START_ELE_FAIL="unexpected start element"+SPACE;
+	private static final String END_ELE_FAIL="unexpected end element"+SPACE;
+	private static final String CHAR_ELE_FAIL="unexpected characters"+SPACE;
 	private TransferDescription td=null;
 	
 	@Before
@@ -25,15 +30,15 @@ public class Xtf24ReaderHeaderTest {
 	{
 		// compile model
 		Configuration ili2cConfig=new Configuration();
-		FileEntry fileEntry=new FileEntry(TEST_IN+"/Test1.ili", FileEntryKind.ILIMODELFILE);
+		FileEntry fileEntry=new FileEntry(TEST_IN_MODEL+"/Test1.ili", FileEntryKind.ILIMODELFILE);
 		ili2cConfig.addFileEntry(fileEntry);
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
 	}
 	
-	// there are comments inside transferfile
+	// Es wird im Header ein Comments erstellt.
 	@Test
-	public void testCommentsInFile_Ok()  throws Iox2jtsException, IoxException {
+	public void testCommentsInFile_Ok() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"CommentsInFile.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof StartTransferEvent);
@@ -88,7 +93,7 @@ public class Xtf24ReaderHeaderTest {
 	
 	// Im Header wird Comments vor Sender erstellt.
 	@Test
-	public void testHeaderCommentsBeforeSender_Fail() throws Iox2jtsException, IoxException {
+	public void testHeaderCommentsBeforeSender_Ok() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"CommentsBeforeSender.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof StartTransferEvent);
@@ -106,8 +111,9 @@ public class Xtf24ReaderHeaderTest {
 		try{
 			reader.read();
 			fail();
-		}catch(IoxException ex){
-			
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(END_ELE_FAIL+"headersection"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;
@@ -122,8 +128,9 @@ public class Xtf24ReaderHeaderTest {
 		try{
 			reader.read();
 			fail();
-		}catch(IoxException ex){
-			
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"datasection"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;
@@ -138,8 +145,9 @@ public class Xtf24ReaderHeaderTest {
 		try{
 			reader.read();
 			fail();
-		}catch(IoxException ex){
-			
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"datasection"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;
@@ -154,8 +162,9 @@ public class Xtf24ReaderHeaderTest {
 		try{
 			reader.read();
 			fail();
-		}catch(IoxException ex){
-			
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(END_ELE_FAIL+"headersection"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;
@@ -170,8 +179,9 @@ public class Xtf24ReaderHeaderTest {
 		try{
 			reader.read();
 			fail();
-		}catch(IoxException ex){
-			
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(CHAR_ELE_FAIL+"Test1"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;
@@ -186,8 +196,9 @@ public class Xtf24ReaderHeaderTest {
 		try{
 			reader.read();
 			fail();
-		}catch(IoxException ex){
-			
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"sender"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;
@@ -202,8 +213,9 @@ public class Xtf24ReaderHeaderTest {
 		try{
 			reader.read();
 			fail();
-		}catch(IoxException ex){
-			
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"comments"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;
@@ -218,8 +230,9 @@ public class Xtf24ReaderHeaderTest {
 		try{
 			reader.read();
 			fail();
-		}catch(IoxException ex){
-			
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"sender"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;
@@ -234,8 +247,9 @@ public class Xtf24ReaderHeaderTest {
 		try{
 			reader.read();
 			fail();
-		}catch(IoxException ex){
-			
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"comments"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;
@@ -250,8 +264,9 @@ public class Xtf24ReaderHeaderTest {
 		try{
 			reader.read();
 			fail();
-		}catch(IoxException ex){
-			
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"sender"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;
@@ -266,8 +281,9 @@ public class Xtf24ReaderHeaderTest {
 		try{
 			reader.read();
 			fail();
-		}catch(IoxException ex){
-			
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(END_ELE_FAIL+"headersection"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;
@@ -282,8 +298,9 @@ public class Xtf24ReaderHeaderTest {
 		try{
 			reader.read();
 			fail();
-		}catch(IoxException ex){
-			
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(END_ELE_FAIL+"headersection"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;
@@ -298,8 +315,9 @@ public class Xtf24ReaderHeaderTest {
 		try{
 			reader.read();
 			fail();
-		}catch(IoxException ex){
-			
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"sender"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;
