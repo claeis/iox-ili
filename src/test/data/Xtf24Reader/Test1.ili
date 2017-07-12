@@ -7,5 +7,15 @@ MODEL Test1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 			attr1 : TEXT*40;
 		END ClassA;
 	END TopicA;
+	
+	TOPIC TopicB =
+		CLASS ClassB =
+		END ClassB;
+	END TopicB;
+	
+	TOPIC TopicC =
+		CLASS ClassC =
+		END ClassC;
+	END TopicC;
 
 END Test1.

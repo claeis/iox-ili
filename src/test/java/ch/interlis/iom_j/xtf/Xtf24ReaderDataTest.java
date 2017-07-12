@@ -12,6 +12,7 @@ import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iox.EndBasketEvent;
 import ch.interlis.iox.EndTransferEvent;
 import ch.interlis.iox.IoxException;
+import ch.interlis.iox.ObjectEvent;
 import ch.interlis.iox.StartBasketEvent;
 import ch.interlis.iox.StartTransferEvent;
 import ch.interlis.iox_j.IoxSyntaxException;
@@ -52,22 +53,62 @@ public class Xtf24ReaderDataTest {
 		reader=null;
 	}
 	
-//	@Test
-//	public void testEmptyObjects_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"EmptyObjects.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent); //("Test1.TopicF","bid1"));
-//		assertTrue(reader.read() instanceof  ObjectEvent); //(new Iom_jObject("Test1.TopicF.TableF1","x21")));
-//		assertTrue(reader.read() instanceof  ObjectEvent); //(new Iom_jObject("Test1.TopicF.TableF1","x20")));
-//		assertTrue(reader.read() instanceof  ObjectEvent); //(new Iom_jObject("Test1.TopicF.TableF0","x10")));
-//		assertTrue(reader.read() instanceof  ObjectEvent); //(new Iom_jObject("Test1.TopicF.TableF0","x11"))); 
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//	
+	// In diesem Test soll getestet werden, ob die topic (basketname, basket ID)
+	// mehrere Male erstellt werden kann, ohne dass dabei eine Fehlermeldung entsteht.
+	@Test
+	public void testMultipleBaskets_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MultipleBaskets.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob leere Objekte ohne Syntaxfehler erstellt werden koennen.
+	@Test
+	public void testEmptyObjects_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"EmptyObjects.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent); // Test1
+		assertTrue(reader.read() instanceof  StartBasketEvent); // Test1.TopicA, bid1
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicA.ClassA oid x21 {}
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicA.ClassA oid x20 {}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob mehrere Baskets mit je 2 Objekten erstellt werden koennen.
+	@Test
+	public void testMultipleBasketsAndObjects_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MultipleBasketsAndObjects.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent); // Test1
+		assertTrue(reader.read() instanceof  StartBasketEvent); // Test1.TopicA, bid1
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicA.ClassA oid x21 {}
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicA.ClassA oid x20 {}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent); // Test1.TopicB, bid2
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicB.ClassB oid x31 {}
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicB.ClassB oid x30 {}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent); // Test1.TopicC, bid3
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicC.ClassC oid x41 {}
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicC.ClassC oid x40 {}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
 //	@Test
 //	public void testSameTopicClassNames_Ok()  throws Iox2jtsException, IoxException {
 //		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"TopicClassSameTest.xml"));
@@ -718,6 +759,43 @@ public class Xtf24ReaderDataTest {
 			fail();
 		}catch(IoxException ioxEx){
 			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"datasection"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// In diesem Test soll getestet werden, ob eine SyntaxException ausgegeben wird,
+	// wenn die Basket Id falsch definiert wurde.
+	@Test
+	public void testWrongBasketId_Fail() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"WrongBasketId.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"TopicA"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// In diesem Test soll getestet werden, ob eine SyntaxException ausgegeben wird,
+	// wenn die Object Id falsch definiert wurde.
+	@Test
+	public void testWrongObjectId_Fail() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"WrongObjectId.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"ClassA"));
 	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
