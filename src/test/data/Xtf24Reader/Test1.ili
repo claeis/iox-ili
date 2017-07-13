@@ -4,7 +4,6 @@ MODEL Test1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 
 	TOPIC TopicA =
 		CLASS ClassA =
-			attr1 : TEXT*40;
 		END ClassA;
 	END TopicA;
 	
@@ -17,5 +16,10 @@ MODEL Test1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 		CLASS ClassC =
 		END ClassC;
 	END TopicC;
+	
+	TOPIC TopicD =
+		CLASS ClassD =
+		END ClassD;
+	END TopicD;
 
 END Test1.

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" xmlns="http://www.interlis.ch/xtf/2.4/DataTest1">
+	<ili:headersection>
+		<ili:models>
+			<ili:model>DataTest1</ili:model>
+		</ili:models>
+	</ili:headersection>
+	<ili:datasection>
+		<TopicA ili:bid="bidA">
+			<ClassF ili:tid="oidF1">
+				<attrF1>rot.dunkelrot</attrF1>
+				<attrF2>unten</attrF2>
+				<attrF3>Werktage.Montag</attrF3>
+				<attrF4>Werktage.Dienstag</attrF4>
+			</ClassF>
+			<ClassF ili:tid="oidF2">
+				<attrF1>gruen.hellgruen</attrF1>
+				<attrF2>mitte</attrF2>
+				<attrF3>Werktage.Sonntag</attrF3>
+				<attrF4>Werktage.Samstag</attrF4>
+			</ClassF>
+			<ClassG ili:tid="oidG1">
+				<attrG1>rot</attrG1>
+				<attrG2>rot.dunkelrot</attrG2>
+				<attrG3>rot</attrG3>
+			</ClassG>
+		</TopicA>
+	</ili:datasection>
+</ili:transfer>

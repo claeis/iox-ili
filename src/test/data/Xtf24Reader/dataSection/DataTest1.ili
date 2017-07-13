@@ -1,0 +1,145 @@
+INTERLIS 2.4;
+
+MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
+
+	UNIT
+		Minute [min] = 60 [INTERLIS.s];
+		Hour [h] = 60 [min];
+		Day [d] = 24 [h];
+		Month [M] EXTENDS INTERLIS.TIME;
+		Year [Y] EXTENDS INTERLIS.TIME;
+
+	DOMAIN
+		abstractNr (ABSTRACT) = NUMERIC;
+		normal = 0.00 .. 7.99;
+		exactly EXTENDS normal = 0.0000 .. 7.9949;
+		
+		uri (FINAL) = TEXT*1023;
+		name (FINAL) = TEXT*255;
+		
+		attrBool (FINAL) = (false, true) ORDERED;
+		
+		halignment (FINAL) = (Left, Center, Right) ORDERED;
+		valignment (FINAL) = (Top, Cap, Half, Base, Bottom) ORDERED;
+		
+		InterlisAttributeRef = ATTRIBUTE;
+	
+		buchungsDatum = FORMAT INTERLIS.XMLDate "2002-01-01" .. "2007-12-31";
+		startZeit = FORMAT INTERLIS.XMLTime "00:00:00.000" .. "23:59:59.999";
+		messZeitpunkt = FORMAT INTERLIS.XMLDateTime "2002-01-01T00:00:00.000" .. "2007-12-31T23:59:59.999";
+		
+		farben = (rot (dunkelrot, orange, karmin), gelb, gruen (hellgruen, dunkelgruen));
+		
+		lage = (unten, mitte, oben) ORDERED;
+		wochentage = (Werktage (Montag, Dienstag, Mittwoch,Donnerstag, Freitag, Samstag),Sonntag) CIRCULAR;
+		wochentagsWerte = ALL OF wochentage;
+		
+		farbe = (rot,gelb,gruen);
+		farbePlus EXTENDS farbe = (rot (dunkelrot, orange, karmin),gruen (hellgruen, dunkelgruen: FINAL),blau);
+		farbePlusPlus EXTENDS farbePlus = (rot (FINAL),blau (hellblau, dunkelblau));
+		
+		NOOID = OID ANY; !! beliebiger, nicht stabiler Identifikator
+		ANYOID EXTENDS NOOID = OID ANY;
+		I32OID EXTENDS ANYOID = OID 0 .. 2147483647; !! positive, 4 Bytes Integerwerte
+		STANDARDOID EXTENDS ANYOID = OID TEXT*16; !! gemäss Anhang F (nur Ziffern und Buchstaben erlaubt)
+		UUIDOID EXTENDS ANYOID = OID TEXT*36;
+		
+		!!undefConst = UNDEFINED;
+		!!numericConst = 50;
+		!!#textConst;
+		!!formattedConst = INTERLIS.DATE;
+		!!enumerationConst = eins.zwei;
+		!!classConst = ClassA;
+		!!attributePathConst = DataTest1.TopicA.ClassA;
+		
+		!!distanz (ABSTRACT) = NUMERIC [Length];
+		!!meterDist (ABSTRACT) EXTENDS distanz = NUMERIC [m];
+		!!fussDist (ABSTRACT) EXTENDS distanz = NUMERIC [ft];
+		!!kurzeMeter EXTENDS meterDist = 0.00 .. 100.00 [m];
+		!!kurzeFuesse EXTENDS fussDist = 0.00 .. 100.00 [ft];
+	
+	TOPIC TopicA =
+		
+		CLASS ClassA =
+			attrText : TEXT*10;
+			attrMText : MTEXT*10;
+			attrUri : uri;
+			attrName : name;
+		END ClassA;
+		
+		CLASS ClassB =
+			attrNrDec : 0.00 .. 10.00;
+			attrWertNormal : normal;
+			attrWertExakt : exactly;
+		END ClassB;
+		
+		CLASS ClassC =
+			attrBoolean1 : BOOLEAN;
+			attrBoolean2 : attrBool;
+		END ClassC;
+		
+		CLASS ClassD =
+			attrH : halignment;
+			attrV : valignment;
+		END ClassD;
+		
+		CLASS ClassE =
+			attrDate : buchungsDatum;
+			attrTime : startZeit;
+			attrDateTime : messZeitpunkt;
+		END ClassE;
+		
+		CLASS ClassF =
+			attrF1 : farben;
+			attrF2 : lage;
+			attrF3 : wochentage;
+			attrF4 : wochentagsWerte;
+		END ClassF;
+		
+		CLASS ClassG =
+			attrG1 : farbe;
+			attrG2 : farbePlus;
+			attrG3 : farbePlusPlus;
+		END ClassG;
+		
+		CLASS ClassH =
+			attrH1 : NOOID;
+			attrH2 : ANYOID;
+			attrH3 : I32OID;
+			attrH4 : STANDARDOID;
+			attrH5 : UUIDOID;
+		END ClassH;
+		
+		CLASS ClassI =
+			attrI1: FORMAT INTERLIS.XMLDateTime "2000-01-01T00:00:00.000" .. "2005-12-31T23:59:59.999";
+			attrI2: FORMAT INTERLIS.XMLDateTime "2002-01-01T00:00:00.000" .. "2007-12-31T23:59:59.999";
+			attrI3: FORMAT INTERLIS.XMLDate "2002-01-01" .. "2007-12-31";
+			attrI4: FORMAT INTERLIS.XMLTime "00:00:00.000" .. "23:59:59.999";
+		END ClassI;
+		
+		CLASS ClassJ =
+			attrBin : BLACKBOX BINARY;
+			attrXml : BLACKBOX XML;
+		END ClassJ;
+		
+		STRUCTURE GregorianDate =
+			Year: 1582 .. 2999;
+			SUBDIVISION Month: 1 .. 12;
+			SUBDIVISION Day: 1 .. 31;
+		END GregorianDate;
+		
+		CLASS ClassK =
+			attrK1 : FORMAT BASED ON GregorianDate ( Year/4 "-" Month/2 "-" Day/2 );
+		END ClassK;
+	
+		STRUCTURE StructA =
+			attrS1 : TEXT*30;
+		END StructA;
+		
+		CLASS ClassL =
+			attrL1 : BAG {1..*} OF StructA;
+		END ClassL;
+	
+	END TopicA;
+	
+END DataTest1.

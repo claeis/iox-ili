@@ -9,8 +9,11 @@ import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
+import ch.interlis.iox.EndBasketEvent;
 import ch.interlis.iox.EndTransferEvent;
 import ch.interlis.iox.IoxException;
+import ch.interlis.iox.ObjectEvent;
+import ch.interlis.iox.StartBasketEvent;
 import ch.interlis.iox.StartTransferEvent;
 import ch.interlis.iox_j.IoxSyntaxException;
 import ch.interlis.iox_j.jts.Iox2jtsException;
@@ -55,6 +58,174 @@ public class Xtf24ReaderTest {
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// In diesem Test soll getestet werden, ob die topic (basketname, basket ID)
+	// mit den richtigen Daten erstellt wird.
+	@Test
+	public void testEmptyBasket_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"EmptyBasket.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// In diesem Test soll getestet werden, ob die topic (basketname, basket ID)
+	// mehrere Male erstellt werden kann, ohne dass dabei eine Fehlermeldung entsteht.
+	@Test
+	public void testMultipleBaskets_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MultipleBaskets.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob leere Objekte ohne Syntaxfehler erstellt werden koennen.
+	@Test
+	public void testEmptyObjects_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"EmptyObjects.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent); // Test1
+		assertTrue(reader.read() instanceof  StartBasketEvent); // Test1.TopicA, bid1
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicA.ClassA oid x21 {}
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicA.ClassA oid x20 {}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob mehrere Baskets mit je 2 Objekten erstellt werden koennen.
+	@Test
+	public void testMultipleBasketsAndObjects_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MultipleBasketsAndObjects.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent); // Test1
+		assertTrue(reader.read() instanceof  StartBasketEvent); // Test1.TopicA, bid1
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicA.ClassA oid x21 {}
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicA.ClassA oid x20 {}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent); // Test1.TopicB, bid2
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicB.ClassB oid x31 {}
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicB.ClassB oid x30 {}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent); // Test1.TopicC, bid3
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicC.ClassC oid x41 {}
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicC.ClassC oid x40 {}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+//	@Test
+//	public void testSameTopicClassNames_Ok()  throws Iox2jtsException, IoxException {
+//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"TopicClassSameTest.xml"));
+//		reader.setModel(td);
+//		assertTrue(reader.read() instanceof  StartTransferEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent);
+//		
+//		IoxEvent event=reader.read();
+//		assertTrue(event instanceof  ObjectEvent); // TopicZ.TopicZ
+//		IomObject iomObjA=((ObjectEvent) event).getIomObject();
+//		String attrtag=iomObjA.getobjecttag();
+//		assertEquals("Ili23.TopicZ.TopicZ", attrtag);
+//		
+//		String oid=iomObjA.getobjectoid();
+//		assertEquals("x10", oid);
+//		
+//		String attrValue=iomObjA.getattrvalue("attr1");
+//		assertEquals("text", attrValue);
+//		
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  EndTransferEvent);
+//		reader.close();
+//		reader=null;
+//	}
+	
+	// In diesem Test soll getestet werden, ob eine SyntaxException ausgegeben wird,
+	// wenn DataSection nicht erstellt wurde.
+	@Test
+	public void testNoDataSectionDefined_Fail() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"NoDataSectionDefined.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(END_ELE_FAIL+"transfer"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// In diesem Test soll getestet werden, ob eine SyntaxException ausgegeben wird,
+	// wenn DataSection mehrere Male hintereinander erstellt wurden.
+	@Test
+	public void testMultipleDataSectionsDefined_Fail() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MultipleDataSectionDefined.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"datasection"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// In diesem Test soll getestet werden, ob eine SyntaxException ausgegeben wird,
+	// wenn die Basket Id falsch definiert wurde.
+	@Test
+	public void testWrongBasketId_Fail() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"WrongBasketId.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"TopicA"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// In diesem Test soll getestet werden, ob eine SyntaxException ausgegeben wird,
+	// wenn die Object Id falsch definiert wurde.
+	@Test
+	public void testWrongObjectId_Fail() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"WrongObjectId.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"ClassA"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
+		}
 		reader.close();
 		reader=null;
 	}
