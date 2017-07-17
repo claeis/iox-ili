@@ -163,7 +163,7 @@ public class Xtf24ReaderHeaderTest {
 			reader.read();
 			fail();
 		}catch(IoxException ioxEx){
-			assertTrue((ioxEx).getMessage().contains(END_ELE_FAIL+"headersection"));
+			assertTrue((ioxEx).getMessage().contains(END_ELE_FAIL+"models"));
 	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
@@ -282,7 +282,7 @@ public class Xtf24ReaderHeaderTest {
 			reader.read();
 			fail();
 		}catch(IoxException ioxEx){
-			assertTrue((ioxEx).getMessage().contains(END_ELE_FAIL+"headersection"));
+			assertTrue((ioxEx).getMessage().contains(END_ELE_FAIL+"models"));
 	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
@@ -299,8 +299,8 @@ public class Xtf24ReaderHeaderTest {
 			reader.read();
 			fail();
 		}catch(IoxException ioxEx){
-			assertTrue((ioxEx).getMessage().contains(END_ELE_FAIL+"headersection"));
-	        assertTrue(ioxEx instanceof IoxSyntaxException);
+			assertTrue((ioxEx).getMessage().contains("expected at least 1 model."));
+	        assertTrue(ioxEx instanceof IoxException);
 		}
 		reader.close();
 		reader=null;
@@ -318,6 +318,57 @@ public class Xtf24ReaderHeaderTest {
 		}catch(IoxException ioxEx){
 			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"sender"));
 	        assertTrue(ioxEx instanceof IoxSyntaxException);
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wurde 1 MODEL innerhalb von MODELS erstellt. Jedoch wurde der Name des MODEL nicht gefunden.
+	@Test
+	public void testNoModelnameFound_Fail() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"NoModelNameFound.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof StartTransferEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains("expected at least 1 model."));
+	        assertTrue(ioxEx instanceof IoxException);
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// SENDER wurde im header erstellt, jedoch wurde keinen Namen des Senders gefunden.
+	@Test
+	public void testNoSendernameFound_Fail() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"NoSenderNameFound.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof StartTransferEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains("sender defined, but empty."));
+	        assertTrue(ioxEx instanceof IoxException);
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// COMMENTS wurde im header erstellt, jedoch wurde keinen COMMENTS Namen gefunden.
+	@Test
+	public void testNoCommentsnameFound_Fail() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"NoCommentsNameFound.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof StartTransferEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains("comments defined, but empty."));
+	        assertTrue(ioxEx instanceof IoxException);
 		}
 		reader.close();
 		reader=null;

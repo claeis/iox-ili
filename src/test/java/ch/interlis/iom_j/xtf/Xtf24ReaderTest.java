@@ -79,7 +79,7 @@ public class Xtf24ReaderTest {
 	// In diesem Test soll getestet werden, ob die topic (basketname, basket ID)
 	// mehrere Male erstellt werden kann, ohne dass dabei eine Fehlermeldung entsteht.
 	@Test
-	public void testMultipleBaskets_Ok()  throws Iox2jtsException, IoxException {
+	public void testMultipleBaskets_Ok() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MultipleBaskets.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
@@ -168,8 +168,8 @@ public class Xtf24ReaderTest {
 			reader.read();
 			fail();
 		}catch(IoxException ioxEx){
-			assertTrue((ioxEx).getMessage().contains(END_ELE_FAIL+"transfer"));
-	        assertTrue(ioxEx instanceof IoxSyntaxException);
+			assertTrue((ioxEx).getMessage().contains("expected data section"));
+	        assertTrue(ioxEx instanceof IoxException);
 		}
 		reader.close();
 		reader=null;

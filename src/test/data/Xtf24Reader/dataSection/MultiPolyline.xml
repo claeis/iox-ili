@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" xmlns="http://www.interlis.ch/xtf/2.4/DataTest1" xmlns:geom="http://www.interlis.ch/geometry/1.0">
+	<ili:headersection>
+		<ili:models>
+			<ili:model>DataTest1</ili:model>
+		</ili:models>
+	</ili:headersection>
+	<ili:datasection>
+		<TopicB ili:bid="bidB">
+			<ClassP ili:tid="oidP">
+				<attrP1>
+					<geom:multipolyline>
+						<geom:c1>480000.000</geom:c1>
+						<geom:c2>70000.000</geom:c2>
+						<geom:c3>5000.000</geom:c3>
+						<geom:c1>490000.000</geom:c1>
+						<geom:c2>80000.000</geom:c2>
+						<geom:c3>5000.000</geom:c3>
+						<geom:c1>480000.000</geom:c1>
+						<geom:c2>70000.000</geom:c2>
+						<geom:c3>5000.000</geom:c3>
+						<geom:a1>480000.000</geom:a1>
+						<geom:a2>70000.000</geom:a2>
+					</geom:multipolyline>
+				</attrP1>
+			</ClassP>
+		</TopicB>
+	</ili:datasection>
+</ili:transfer>

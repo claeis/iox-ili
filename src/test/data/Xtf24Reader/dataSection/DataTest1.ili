@@ -44,6 +44,15 @@ MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 		STANDARDOID EXTENDS ANYOID = OID TEXT*16; !! gemäss Anhang F (nur Ziffern und Buchstaben erlaubt)
 		UUIDOID EXTENDS ANYOID = OID TEXT*36;
 		
+		Mkoord = MULTICOORD 480000.000 .. 850000.000 [INTERLIS.m];
+		Skoord = COORD 480000.000 .. 850000.000 [INTERLIS.m];
+		Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+				        70000.000 .. 310000.000 [INTERLIS.m],
+					   ROTATION 2 -> 1;
+		Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+				        70000.000 .. 310000.000 [INTERLIS.m],
+				              0.000 .. 5000.000 [INTERLIS.m];
+		
 		!!undefConst = UNDEFINED;
 		!!numericConst = 50;
 		!!#textConst;
@@ -141,5 +150,45 @@ MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 		END ClassL;
 	
 	END TopicA;
+	
+	TOPIC TopicB =
+				
+		CLASS Coord1D =
+			attr1 : Skoord;
+		END Coord1D;
+		
+		CLASS Coord2D =
+			attr2 : Lkoord;
+		END Coord2D;
+		
+		CLASS Coord3D =
+			attr3 : Hkoord;
+		END Coord3D;
+		
+		CLASS MultiCoord =
+			attr4 : Mkoord;
+		END MultiCoord;
+		
+		CLASS ClassN =
+			attrN1 : POLYLINE WITH (STRAIGHTS) VERTEX Hkoord;
+		END ClassN;
+		
+		CLASS ClassO =
+			attrO1 : POLYLINE WITH (ARCS) VERTEX Hkoord;
+		END ClassO;
+		
+		CLASS ClassP =
+			attrP1 : POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Hkoord;
+		END ClassP;
+		
+		CLASS ClassQ =
+			FormQ : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		END ClassQ;
+		
+		CLASS ClassR =
+			FormR : AREA WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		END ClassR;
+		
+	END TopicB;
 	
 END DataTest1.

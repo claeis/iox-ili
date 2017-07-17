@@ -37,166 +37,235 @@ public class Xtf24ReaderDataTest {
 		assertNotNull(td);
 	}
 	
+	// Es wird getestet ob Texte ohne Fehler erstellt werden koennen.
 	@Test
 	public void testTextType_Ok()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"TextTypes.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassA oid oidA {attrText normal text, attrUri http://www.interlis.ch, attrName Randomname, attrMText m text}
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	
+	// Es wird getestet ob Aufzaehlungen ohne Fehler erstellt werden koennen.
 	@Test
 	public void testEnumerationType_Ok()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"EnumerationTypes.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassF oid oidF1 {attrF4 Werktage.Dienstag, attrF3 Werktage.Montag, attrF2 unten, attrF1 rot.dunkelrot}
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassF oid oidF2 {attrF4 Werktage.Samstag, attrF3 Werktage.Sonntag, attrF2 mitte, attrF1 gruen.hellgruen}
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassG oid oidG1 {attrG3 rot, attrG2 rot.dunkelrot, attrG1 rot}
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	
+	// Es wird getestet ob Oid's ohne Fehler erstellt werden koennen.
 	@Test
 	public void testOidType_Ok()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"OidTypes.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassH oid oidH {attrH5 123e4567-e89b-12d3-a456-426655440000, attrH4 Interlis12345, attrH3 1234, attrH2 igjH-m_, attrH1 5kidok-_}
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	
+	// Es wird getestet ob Datum und Zeit Typen ohne Fehler erstellt werden koennen.
 	@Test
 	public void testDateAndTimeType_Ok()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"DateTimeTypes.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassI oid oidI {attrI4 12:23:47.111, attrI3 2002-12-10, attrI2 2002-01-01T00:00:00.000, attrI1 2005-12-31T23:59:59.999}
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	
+	// Es wird getestet ob Black Box Typen ohne Fehler erstellt werden koennen.
 	@Test
 	public void testBlackBoxType_Ok()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"BlackBoxTypes.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassJ oid oidJ {attrBin text123, attrXml <?xml version="1.0" encoding="UTF-8"?><xmlAttr1 xmlns="http://www.interlis.ch/xtf/2.4/DataTest1"><xmlAttr2><xmlAttr3>attr1</xmlAttr3></xmlAttr2></xmlAttr1>}
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	
+	// Es wird getestet ob Nummern ohne Fehler erstellt werden koennen.
 	@Test
 	public void testNumericDataTypes_Ok()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"NumericTypes.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassB oid oidB {attrWertNormal 6.15, attrWertExakt 6.15, attrNrDec 6.15}
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	
+	// Es wird getestet ob Boolean Werte ohne Fehler erstellt werden koennen.
 	@Test
 	public void testBooleanDataTypes_Ok()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"BooleanType.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassC oid oidC {attrBoolean2 false, attrBoolean1 true}
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	
+	// Es wird getestet ob Ausrichtungen ohne Fehler erstellt werden koennen.
 	@Test
 	public void testAlignmentDataTypes_Ok()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"AlignmentTypes.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassD oid oidD {attrV Cap, attrH Center}
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	
+	// Es wird getestet ob formatierte Werte ohne Fehler erstellt werden koennen.
 	@Test
 	public void testFormattedDataTypes_Ok()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"FormattedType.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassE oid oidE {attrDate 2003-02-03, attrDateTime 2007-12-31T23:59:59.999, attrTime 23:59:59.999}
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassK oid oidK {attrK1 2003-02-03}
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	
+	// Es wird getestet ob Strukturen ohne Fehler erstellt werden koennen.
 	@Test
 	public void testStructureType_Ok()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Structures.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassL oid oidS {attrL1 StructA {attrS1 text}}
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	
+	// Es wird getestet ob Attributepfade ohne Fehler erstellt werden koennen.
 	//@Test
-	public void testAttributePath_Ok()  throws Iox2jtsException, IoxException {
-		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"AttributePath.xml"));
-		reader.setModel(td);
-		assertTrue(reader.read() instanceof  StartTransferEvent);
-		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent);
-		assertTrue(reader.read() instanceof  EndBasketEvent);
-		assertTrue(reader.read() instanceof  EndTransferEvent);
-		reader.close();
-		reader=null;
-	}
-	
-//	@Test
-//	public void testArea_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Area.xml"));
+//	public void testAttributePath_Ok()  throws Iox2jtsException, IoxException {
+//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"AttributePath.xml"));
 //		reader.setModel(td);
 //		assertTrue(reader.read() instanceof  StartTransferEvent);
 //		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent); //ClassG oid x10 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence [SEGMENTS {segment [COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}, ARC {A2 310000.000, A1 489000.000, C3 5000.000, C1 481000.000, C2 71000.000}]}}}}}
-//		assertTrue(reader.read() instanceof  ObjectEvent); //ClassG oid x11 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}}}}}}
+//		assertTrue(reader.read() instanceof  ObjectEvent);
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  EndTransferEvent);
+//		reader.close();
+//		reader=null;
+//	}
+	
+	// Es wird getestet ob Coordinaten ohne Fehler erstellt werden koennen.
+	@Test
+	public void testCoords_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Coord.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.Coord2D oid oid2D {attr2 SEGMENTS {C1 480000.000, C2 70000.000}}
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.Coord1D oid oid1D {attr1 SEGMENTS {C1 480000.000}}
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.Coord3D oid oid3D {attr3 SEGMENTS {C3 5000.000, C1 480000.000, C2 70000.000}}
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.MultiCoord oid mOid {attr4 SEGMENTS {MULTICOORD 480000.000, 481000.000, 482000.000, 483000.000, 484000.000, 485000.000}}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+//	// Es wird getestet ob eine Gerade vom Typ Polyline ohne Fehler erstellt werden koennen.
+//	@Test
+//	public void testPolylinesWithStraights_Ok()  throws Iox2jtsException, IoxException {
+//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"PolylineWithStraights.xml"));
+//		reader.setModel(td);
+//		assertTrue(reader.read() instanceof  StartTransferEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent);
+//		assertTrue(reader.read() instanceof  ObjectEvent);
 //		assertTrue(reader.read() instanceof  EndBasketEvent);
 //		assertTrue(reader.read() instanceof  EndTransferEvent);
 //		reader.close();
 //		reader=null;
 //	}
 //	
+//	// Es wird getestet ob ein Bogen vom Typ Polyline ohne Fehler erstellt werden koennen.
+//	@Test
+//	public void testPolylinesWithArcs_Ok()  throws Iox2jtsException, IoxException {
+//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"PolylineWithArc.xml"));
+//		reader.setModel(td);
+//		assertTrue(reader.read() instanceof  StartTransferEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent);
+//		assertTrue(reader.read() instanceof  ObjectEvent);
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  EndTransferEvent);
+//		reader.close();
+//		reader=null;
+//	}
+//	
+//	// Es wird getestet ob ein Bogen mit einem Radius vom Typ Polyline ohne Fehler erstellt werden koennen.
+//	@Test
+//	public void testPolylinesWithArcsRadius_Ok()  throws Iox2jtsException, IoxException {
+//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"PolylineWithArcRadius.xml"));
+//		reader.setModel(td);
+//		assertTrue(reader.read() instanceof  StartTransferEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent);
+//		assertTrue(reader.read() instanceof  ObjectEvent);
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  EndTransferEvent);
+//		reader.close();
+//		reader=null;
+//	}
+//	
+//	// Es wird getestet ob eine Gerade mit einem Bogen vom Typ Polyline ohne Fehler erstellt werden koennen.
+//	@Test
+//	public void testMultiPolyline_Ok()  throws Iox2jtsException, IoxException {
+//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MultiPolyline.xml"));
+//		reader.setModel(td);
+//		assertTrue(reader.read() instanceof  StartTransferEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent);
+//		assertTrue(reader.read() instanceof  ObjectEvent);
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  EndTransferEvent);
+//		reader.close();
+//		reader=null;
+//	}
 //	
 //	@Test
 //	public void testSurface_Ok()  throws Iox2jtsException, IoxException {
@@ -206,6 +275,20 @@ public class Xtf24ReaderDataTest {
 //		assertTrue(reader.read() instanceof  StartBasketEvent);
 //		assertTrue(reader.read() instanceof  ObjectEvent); //ClassF oid x10 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence [SEGMENTS {segment [COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}, ARC {A2 310000.000, A1 489000.000, C3 5000.000, C1 481000.000, C2 71000.000}]}}}}}
 //		assertTrue(reader.read() instanceof  ObjectEvent); //ClassF oid x11 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}}}}}}
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  EndTransferEvent);
+//		reader.close();
+//		reader=null;
+//	}
+//
+//	@Test
+//	public void testArea_Ok()  throws Iox2jtsException, IoxException {
+//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Area.xml"));
+//		reader.setModel(td);
+//		assertTrue(reader.read() instanceof  StartTransferEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent);
+//		assertTrue(reader.read() instanceof  ObjectEvent); //ClassG oid x10 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence [SEGMENTS {segment [COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}, ARC {A2 310000.000, A1 489000.000, C3 5000.000, C1 481000.000, C2 71000.000}]}}}}}
+//		assertTrue(reader.read() instanceof  ObjectEvent); //ClassG oid x11 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}}}}}}
 //		assertTrue(reader.read() instanceof  EndBasketEvent);
 //		assertTrue(reader.read() instanceof  EndTransferEvent);
 //		reader.close();
@@ -224,58 +307,9 @@ public class Xtf24ReaderDataTest {
 //		reader.close();
 //		reader=null;
 //	}
-//	
-//	@Test
-//	public void testCoords_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Coord.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent); //ClassB oid x10 {attr1 SEGMENTS {segment [COORD {C1 480000.000, C2 70000.000}, COORD {C1 480000.000, C2 70000.000}, COORD {C1 480000.000, C2 70000.000}, COORD {C1 480000.000, C2 70000.000}, COORD {C1 480000.000, C2 70000.000}]}}
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	@Test
-//	public void testPolylinesWithArcs_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"PolylineWithArc.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent); //ClassD oid x11 {attr1 POLYLINE {sequence ARC {A2 70000.000, A1 481000.000, C1 490000.000, C2 71000.000}}}
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	@Test
-//	public void testPolylinesWithArcsAndStraights_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"PolylineWithArcAndStraights.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent); //ClassD oid x10 {attr1 POLYLINE {sequence [SEGMENTS {segment [COORD {C1 481000.000, C2 70000.000}, COORD {C1 490000.000, C2 71000.000}]}, ARC {A2 70000.000, A1 481000.000, C1 490000.000, C2 71000.000}]}}
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//	@Test
-//	public void testPolylines_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Polyline.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent); //ClassC oid x10 {attr1 POLYLINE {sequence SEGMENTS {segment [COORD {C1 481000.000, C2 70000.000}, COORD {C1 490000.000, C2 71000.000}]}}}
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//	
+
+	
+
 //	// Embedded
 //	@Test
 //	public void testEmbedded_1Assoc_Ok()  throws Iox2jtsException, IoxException {
@@ -454,8 +488,6 @@ public class Xtf24ReaderDataTest {
 //		reader.close();
 //		reader=null;
 //	}
-//	
-//
 //	
 //	@Test
 //	public void testUnsupportedGeometry_Fail()  throws Iox2jtsException, IoxException {
