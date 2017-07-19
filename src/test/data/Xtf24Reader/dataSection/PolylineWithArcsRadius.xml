@@ -9,14 +9,21 @@
 		<TopicB ili:bid="bidB">
 			<ClassO ili:tid="oidO">
 				<attrO1>
-					<geom:arc>
-						<geom:c1>480000.000</geom:c1>
-						<geom:c2>70000.000</geom:c2>
-						<geom:c3>5000.000</geom:c3>
-						<geom:a1>480000.000</geom:a1>
-						<geom:a2>70000.000</geom:a2>
-						<geom:r>45</geom:r>
-					</geom:arc>
+					<geom:polyline>
+						<geom:arc>
+							<geom:c1>480000.000</geom:c1>
+							<geom:c2>70000.000</geom:c2>
+							<geom:c3>5000.000</geom:c3>
+							<geom:a1>480000.000</geom:a1>
+							<geom:a2>70000.000</geom:a2>
+							<geom:r>45</geom:r>
+						</geom:arc>
+						<geom:coord>
+							<geom:c1>480000.000</geom:c1>
+							<geom:c2>70000.000</geom:c2>
+							<geom:c3>5000.000</geom:c3>
+						</geom:coord>
+					</geom:polyline>
 				</attrO1>
 			</ClassO>
 		</TopicB>

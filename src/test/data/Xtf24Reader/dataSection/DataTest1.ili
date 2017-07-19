@@ -181,6 +181,10 @@ MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 			attrP1 : POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Hkoord;
 		END ClassP;
 		
+		CLASS ClassPM =
+			attrPM : MULTIPOLYLINE WITH (STRAIGHTS,ARCS) VERTEX Hkoord;
+		END ClassPM;
+		
 		CLASS ClassQ =
 			FormQ : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
 		END ClassQ;

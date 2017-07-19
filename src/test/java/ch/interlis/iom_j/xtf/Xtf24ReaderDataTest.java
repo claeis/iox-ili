@@ -201,72 +201,72 @@ public class Xtf24ReaderDataTest {
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.Coord2D oid oid2D {attr2 SEGMENTS {C1 480000.000, C2 70000.000}}
-		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.Coord1D oid oid1D {attr1 SEGMENTS {C1 480000.000}}
-		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.Coord3D oid oid3D {attr3 SEGMENTS {C3 5000.000, C1 480000.000, C2 70000.000}}
-		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.MultiCoord oid mOid {attr4 SEGMENTS {MULTICOORD 480000.000, 481000.000, 482000.000, 483000.000, 484000.000, 485000.000}}
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.Coord1D oid oid1D {attr1 COORD {C1 480000.000}}
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.Coord2D oid oid2D {attr2 COORD {C1 480000.000, C2 70000.000}}
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.Coord3D oid oid3D {attr3 COORD {C3 5000.000, C1 480000.000, C2 70000.000}}
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.MultiCoord oid mOid {attr4 SEGMENTS {segment [COORD {C3 5000.111, C1 480000.111, C2 70000.111}, COORD {C3 5000.222, C1 480000.222, C2 70000.222}, COORD {C3 5000.333, C1 480000.333, C2 70000.333}, COORD {C3 5000.444, C1 480000.444, C2 70000.444}, COORD {C3 5000.555, C1 480000.555, C2 70000.555}]}}
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	
-//	// Es wird getestet ob eine Gerade vom Typ Polyline ohne Fehler erstellt werden koennen.
-//	@Test
-//	public void testPolylinesWithStraights_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"PolylineWithStraights.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent);
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	// Es wird getestet ob ein Bogen vom Typ Polyline ohne Fehler erstellt werden koennen.
-//	@Test
-//	public void testPolylinesWithArcs_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"PolylineWithArc.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent);
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	// Es wird getestet ob ein Bogen mit einem Radius vom Typ Polyline ohne Fehler erstellt werden koennen.
-//	@Test
-//	public void testPolylinesWithArcsRadius_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"PolylineWithArcRadius.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent);
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	// Es wird getestet ob eine Gerade mit einem Bogen vom Typ Polyline ohne Fehler erstellt werden koennen.
-//	@Test
-//	public void testMultiPolyline_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MultiPolyline.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent);
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//	
+	// Es wird getestet ob eine Gerade vom Typ Polyline ohne Fehler erstellt werden koennen.
+	@Test
+	public void testPolylinesWithStraights_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"PolylineWithStraights.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.ClassN oid oidN {attrN1 POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 490000.000, C2 80000.000}]}}}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob ein Bogen vom Typ Polyline ohne Fehler erstellt werden koennen.
+	@Test
+	public void testPolylinesWithArcs_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"PolylineWithArcs.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.ClassO oid oidO {attrO1 POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.000, A1 480000.000, A2 70000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}}}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob ein Bogen mit einem Radius vom Typ Polyline ohne Fehler erstellt werden koennen.
+	@Test
+	public void testPolylinesWithArcsRadius_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"PolylineWithArcsRadius.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.ClassO oid oidO {attrO1 POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.000, A1 480000.000, A2 70000.000, r 45, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}}}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob eine Gerade mit einem Bogen vom Typ Polyline ohne Fehler erstellt werden koennen.
+	@Test
+	public void testMultiPolyline_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MultiPolyline.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.ClassPM oid oidP {attrPM MULTIPOLYLINE {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.011, C1 480000.011, C2 70000.011}, COORD {C3 5000.012, C1 490000.012, C2 80000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.021, C1 480000.021, C2 70000.021}, COORD {C3 5000.022, C1 490000.022, C2 80000.022}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.031, A1 480000.031, A2 70000.031, r 31, C1 480000.031, C2 70000.031}, COORD {C3 5000.032, C1 480000.032, C2 70000.032}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.041, C1 480000.041, C2 70000.041}, COORD {C3 5000.042, C1 490000.042, C2 80000.042}]}}]}}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
 //	@Test
 //	public void testSurface_Ok()  throws Iox2jtsException, IoxException {
 //		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Surface.xml"));
