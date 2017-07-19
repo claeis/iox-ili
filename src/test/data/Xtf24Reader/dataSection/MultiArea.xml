@@ -7,8 +7,8 @@
 	</ili:headersection>
 	<ili:datasection>
 		<TopicB ili:bid="bidB">
-			<ClassQM ili:tid="oidC">
-				<formQM>
+			<ClassRM ili:tid="oidRM">
+				<formRM>
 					<geom:multisurface>
 						<geom:surface>
 							<geom:exterior>
@@ -335,8 +335,8 @@
 							</geom:interior>
 						</geom:surface>
 					</geom:multisurface>
-				</formQM>
-			</ClassQM>
+				</formRM>
+			</ClassRM>
 		</TopicB>
 	</ili:datasection>
 </ili:transfer>

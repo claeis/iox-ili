@@ -11,6 +11,7 @@ import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iox.EndTransferEvent;
 import ch.interlis.iox.IoxException;
+import ch.interlis.iox.StartBasketEvent;
 import ch.interlis.iox.StartTransferEvent;
 import ch.interlis.iox_j.IoxSyntaxException;
 import ch.interlis.iox_j.jts.Iox2jtsException;

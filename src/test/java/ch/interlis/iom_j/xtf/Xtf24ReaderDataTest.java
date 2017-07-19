@@ -181,7 +181,7 @@ public class Xtf24ReaderDataTest {
 	}
 	
 	// Es wird getestet ob Attributepfade ohne Fehler erstellt werden koennen.
-	//@Test
+//	@Test
 //	public void testAttributePath_Ok()  throws Iox2jtsException, IoxException {
 //		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"AttributePath.xml"));
 //		reader.setModel(td);
@@ -267,48 +267,61 @@ public class Xtf24ReaderDataTest {
 		reader=null;
 	}
 	
-//	@Test
-//	public void testSurface_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Surface.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent); //ClassF oid x10 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence [SEGMENTS {segment [COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}, ARC {A2 310000.000, A1 489000.000, C3 5000.000, C1 481000.000, C2 71000.000}]}}}}}
-//		assertTrue(reader.read() instanceof  ObjectEvent); //ClassF oid x11 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}}}}}}
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//
-//	@Test
-//	public void testArea_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Area.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent); //ClassG oid x10 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence [SEGMENTS {segment [COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}, ARC {A2 310000.000, A1 489000.000, C3 5000.000, C1 481000.000, C2 71000.000}]}}}}}
-//		assertTrue(reader.read() instanceof  ObjectEvent); //ClassG oid x11 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}}}}}}
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	@Test
-//	public void testSurface2Boundaries_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Surface2Boundaries.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent); //ClassF oid x10 {Form MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline POLYLINE {sequence [SEGMENTS {segment [COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}, ARC {A2 310000.000, A1 489000.000, C3 5000.000, C1 481000.000, C2 71000.000}]}}, BOUNDARY {polyline POLYLINE {sequence [SEGMENTS {segment [COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}, ARC {A2 310000.000, A1 489000.000, C3 5000.000, C1 481000.000, C2 71000.000}]}}]}}}
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
+	// Es wird getestet ob ein Surface mit mehreren boundaries ohne Fehler erstellt werden kann.
+	@Test
+	public void testSurface_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Surface.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.ClassQ oid oidQ {formQ MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.011, C1 480000.011, C2 70000.011}, COORD {C3 5000.012, C1 490000.012, C2 80000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.021, C1 480000.021, C2 70000.021}, COORD {C3 5000.022, C1 490000.022, C2 80000.022}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.031, A1 480000.031, A2 70000.031, r 31, C1 480000.031, C2 70000.031}, COORD {C3 5000.032, C1 480000.032, C2 70000.032}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.041, C1 480000.041, C2 70000.041}, COORD {C3 5000.042, C1 490000.042, C2 80000.042}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.211, C1 480000.211, C2 70000.211}, COORD {C3 5000.212, C1 490000.212, C2 80000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.221, C1 480000.221, C2 70000.221}, COORD {C3 5000.222, C1 490000.222, C2 80000.222}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.231, A1 480000.231, A2 70000.231, r 31, C1 480000.231, C2 70000.231}, COORD {C3 5000.232, C1 480000.232, C2 70000.232}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.241, C1 480000.241, C2 70000.241}, COORD {C3 5000.242, C1 490000.242, C2 80000.242}]}}]}]}}}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
 
+	// Es wird getestet ob eine Area mit mehreren boundaries ohne Fehler erstellt werden kann.
+	@Test
+	public void testArea_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Area.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.ClassR oid oidR {formR MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.011, C1 480000.011, C2 70000.011}, COORD {C3 5000.012, C1 490000.012, C2 80000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.021, C1 480000.021, C2 70000.021}, COORD {C3 5000.022, C1 490000.022, C2 80000.022}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.031, A1 480000.031, A2 70000.031, r 31, C1 480000.031, C2 70000.031}, COORD {C3 5000.032, C1 480000.032, C2 70000.032}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.041, C1 480000.041, C2 70000.041}, COORD {C3 5000.042, C1 490000.042, C2 80000.042}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.211, C1 480000.211, C2 70000.211}, COORD {C3 5000.212, C1 490000.212, C2 80000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.221, C1 480000.221, C2 70000.221}, COORD {C3 5000.222, C1 490000.222, C2 80000.222}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.231, A1 480000.231, A2 70000.231, r 31, C1 480000.231, C2 70000.231}, COORD {C3 5000.232, C1 480000.232, C2 70000.232}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.241, C1 480000.241, C2 70000.241}, COORD {C3 5000.242, C1 490000.242, C2 80000.242}]}}]}]}}}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
 	
+	// Es wird getestet ob mehrere Surface mit mehreren boundaries ohne Fehler erstellt werden koennen.
+	@Test
+	public void testMultiSurface_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MultiSurface.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.ClassQM oid oidC {formQM MULTISURFACE {surface [SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.011, C1 480000.011, C2 70000.011}, COORD {C3 5000.012, C1 490000.012, C2 80000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.021, C1 480000.021, C2 70000.021}, COORD {C3 5000.022, C1 490000.022, C2 80000.022}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.031, A1 480000.031, A2 70000.031, r 31, C1 480000.031, C2 70000.031}, COORD {C3 5000.032, C1 480000.032, C2 70000.032}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.041, C1 480000.041, C2 70000.041}, COORD {C3 5000.042, C1 490000.042, C2 80000.042}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.211, C1 480000.211, C2 70000.211}, COORD {C3 5000.212, C1 490000.212, C2 80000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.221, C1 480000.221, C2 70000.221}, COORD {C3 5000.222, C1 490000.222, C2 80000.222}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.231, A1 480000.231, A2 70000.231, r 31, C1 480000.231, C2 70000.231}, COORD {C3 5000.232, C1 480000.232, C2 70000.232}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.241, C1 480000.241, C2 70000.241}, COORD {C3 5000.242, C1 490000.242, C2 80000.242}]}}]}]}, SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.011, C1 480000.011, C2 70000.011}, COORD {C3 5000.012, C1 490000.012, C2 80000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.021, C1 480000.021, C2 70000.021}, COORD {C3 5000.022, C1 490000.022, C2 80000.022}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.031, A1 480000.031, A2 70000.031, r 31, C1 480000.031, C2 70000.031}, COORD {C3 5000.032, C1 480000.032, C2 70000.032}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.041, C1 480000.041, C2 70000.041}, COORD {C3 5000.042, C1 490000.042, C2 80000.042}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.211, C1 480000.211, C2 70000.211}, COORD {C3 5000.212, C1 490000.212, C2 80000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.221, C1 480000.221, C2 70000.221}, COORD {C3 5000.222, C1 490000.222, C2 80000.222}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.231, A1 480000.231, A2 70000.231, r 31, C1 480000.231, C2 70000.231}, COORD {C3 5000.232, C1 480000.232, C2 70000.232}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.241, C1 480000.241, C2 70000.241}, COORD {C3 5000.242, C1 490000.242, C2 80000.242}]}}]}]}, SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.011, C1 480000.011, C2 70000.011}, COORD {C3 5000.012, C1 490000.012, C2 80000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.021, C1 480000.021, C2 70000.021}, COORD {C3 5000.022, C1 490000.022, C2 80000.022}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.031, A1 480000.031, A2 70000.031, r 31, C1 480000.031, C2 70000.031}, COORD {C3 5000.032, C1 480000.032, C2 70000.032}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.041, C1 480000.041, C2 70000.041}, COORD {C3 5000.042, C1 490000.042, C2 80000.042}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.211, C1 480000.211, C2 70000.211}, COORD {C3 5000.212, C1 490000.212, C2 80000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.221, C1 480000.221, C2 70000.221}, COORD {C3 5000.222, C1 490000.222, C2 80000.222}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.231, A1 480000.231, A2 70000.231, r 31, C1 480000.231, C2 70000.231}, COORD {C3 5000.232, C1 480000.232, C2 70000.232}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.241, C1 480000.241, C2 70000.241}, COORD {C3 5000.242, C1 490000.242, C2 80000.242}]}}]}]}]}}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob mehrere Areas mit mehreren boundaries ohne Fehler erstellt werden koennen.
+	@Test
+	public void testMultiArea_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MultiArea.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.ClassRM oid oidRM {formRM MULTISURFACE {surface [SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.011, C1 480000.011, C2 70000.011}, COORD {C3 5000.012, C1 490000.012, C2 80000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.021, C1 480000.021, C2 70000.021}, COORD {C3 5000.022, C1 490000.022, C2 80000.022}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.031, A1 480000.031, A2 70000.031, r 31, C1 480000.031, C2 70000.031}, COORD {C3 5000.032, C1 480000.032, C2 70000.032}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.041, C1 480000.041, C2 70000.041}, COORD {C3 5000.042, C1 490000.042, C2 80000.042}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.211, C1 480000.211, C2 70000.211}, COORD {C3 5000.212, C1 490000.212, C2 80000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.221, C1 480000.221, C2 70000.221}, COORD {C3 5000.222, C1 490000.222, C2 80000.222}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.231, A1 480000.231, A2 70000.231, r 31, C1 480000.231, C2 70000.231}, COORD {C3 5000.232, C1 480000.232, C2 70000.232}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.241, C1 480000.241, C2 70000.241}, COORD {C3 5000.242, C1 490000.242, C2 80000.242}]}}]}]}, SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.011, C1 480000.011, C2 70000.011}, COORD {C3 5000.012, C1 490000.012, C2 80000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.021, C1 480000.021, C2 70000.021}, COORD {C3 5000.022, C1 490000.022, C2 80000.022}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.031, A1 480000.031, A2 70000.031, r 31, C1 480000.031, C2 70000.031}, COORD {C3 5000.032, C1 480000.032, C2 70000.032}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.041, C1 480000.041, C2 70000.041}, COORD {C3 5000.042, C1 490000.042, C2 80000.042}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.211, C1 480000.211, C2 70000.211}, COORD {C3 5000.212, C1 490000.212, C2 80000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.221, C1 480000.221, C2 70000.221}, COORD {C3 5000.222, C1 490000.222, C2 80000.222}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.231, A1 480000.231, A2 70000.231, r 31, C1 480000.231, C2 70000.231}, COORD {C3 5000.232, C1 480000.232, C2 70000.232}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.241, C1 480000.241, C2 70000.241}, COORD {C3 5000.242, C1 490000.242, C2 80000.242}]}}]}]}, SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.011, C1 480000.011, C2 70000.011}, COORD {C3 5000.012, C1 490000.012, C2 80000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.021, C1 480000.021, C2 70000.021}, COORD {C3 5000.022, C1 490000.022, C2 80000.022}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.031, A1 480000.031, A2 70000.031, r 31, C1 480000.031, C2 70000.031}, COORD {C3 5000.032, C1 480000.032, C2 70000.032}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.041, C1 480000.041, C2 70000.041}, COORD {C3 5000.042, C1 490000.042, C2 80000.042}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.211, C1 480000.211, C2 70000.211}, COORD {C3 5000.212, C1 490000.212, C2 80000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.221, C1 480000.221, C2 70000.221}, COORD {C3 5000.222, C1 490000.222, C2 80000.222}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.231, A1 480000.231, A2 70000.231, r 31, C1 480000.231, C2 70000.231}, COORD {C3 5000.232, C1 480000.232, C2 70000.232}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.241, C1 480000.241, C2 70000.241}, COORD {C3 5000.242, C1 490000.242, C2 80000.242}]}}]}]}]}}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
 
 //	// Embedded
 //	@Test
@@ -488,196 +501,76 @@ public class Xtf24ReaderDataTest {
 //		reader.close();
 //		reader=null;
 //	}
-//	
-//	@Test
-//	public void testUnsupportedGeometry_Fail()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"UnsupportedGeometry.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent); // unsupported geometry OrientableCurve
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		try{
-//			reader.read();
-//			fail();
-//		}catch(IoxException ex){
-//			
-//		}
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	@Test
-//	public void testInterpolationNotValid_Fail()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Interpolation.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent); // unsupported interpolation unknown
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		try{
-//			reader.read();
-//			fail();
-//		}catch(IoxException ex){
-//			
-//		}
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	@Test
-//	public void testUnexpectedEndElement_Fail()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"UndefinedSurface.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent); // unexpected end element polygon
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		try{
-//			reader.read();
-//			fail();
-//		}catch(IoxException ex){
-//			
-//		}
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	@Test
-//	public void testPolygonNoLinesFound_Fail()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"UndefinedSurface2.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent); // no lines found in polygon of Form.
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		try{
-//			reader.read();
-//			fail();
-//		}catch(IoxException ex){
-//			
-//		}
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	@Test
-//	public void testMissingLineCoords_Fail()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MissingLineCoords.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent); // missing coord for 2d values
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		try{
-//			reader.read();
-//			fail();
-//		}catch(IoxException ex){
-//			
-//		}
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	@Test
-//	public void testTooManyLineCoords_Fail()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"TooManyLineCoords.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent); // missing coord values for 2d Coord
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		try{
-//			reader.read();
-//			fail();
-//		}catch(IoxException ex){
-//			
-//		}
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	@Test
-//	public void testMissingArcCoords_Fail()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MissingArcCoords.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent); // missing arc pos values
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		try{
-//			reader.read();
-//			fail();
-//		}catch(IoxException ex){
-//			
-//		}
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	@Test
-//	public void testTooManyArcCoords_Fail()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"TooManyArcCoords.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent); // too many arc pos values
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		try{
-//			reader.read();
-//			fail();
-//		}catch(IoxException ex){
-//			
-//		}
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	@Test
-//	public void testWrongBoundaryOrder_Fail()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"WrongBoundaryOrder.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent); // Syntax error: no exterior ring found
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		try{
-//			reader.read();
-//			fail();
-//		}catch(IoxException ex){
-//			
-//		}
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	@Test
-//	public void testUndefinedArea_Fail()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"UndefinedArea.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent); // SyntaxException: unexpected end element Polygon
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		try{
-//			reader.read();
-//			fail();
-//		}catch(IoxException ex){
-//			
-//		}
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	@Test
-//	public void testUnexpectedCharacters_Fail()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"UnexpectedCharacters.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent); // SyntaxException: unexpected characters: unexpectedText
-//		try{
-//			reader.read();
-//			fail();
-//		}catch(IoxException ex){
-//			
-//		}
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	@Test
-//	public void testUnexpectedEvent_Fail()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"UnexpectedEvent.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent); //IoxSyntaxException: unexpected element: attr1;
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		try{
-//			reader.read();
-//			fail();
-//		}catch(IllegalArgumentException ex){
-//			assertTrue((ioxEx).getMessage().contains(CHAR_ELE_FAIL+"attrBoolean1"));
-//    		assertTrue(ioxEx instanceof IoxSyntaxException);	
-//		}
-//		reader.close();
-//		reader=null;
-//	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn eine im XML definierte Geometrie, noch nicht implementiert wurde.
+	@Test
+	public void testUnsupportedGeometry_Fail()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"UnsupportedGeometry.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent); // unsupported geometry OrientableCurve
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ex){
+			assertTrue((ex).getMessage().contains("unsupported geometry orientablecurve"));
+    		assertTrue(ex instanceof IoxException);
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei einer Surface keine Linien definiert wurden.
+	@Test
+	public void testSurfaceNoLinesFound_Fail()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"UndefinedSurface.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent); // no lines found in polygon of Form.
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ex){
+			assertTrue((ex).getMessage().contains("expected surface"));
+    		assertTrue(ex instanceof IoxException);
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, A1 und A2 bei einer ARC fehlen.
+	@Test
+	public void testMissingCoord_Fail()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MissingCoord.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent); // missing arc pos values
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ex){
+			assertTrue((ex).getMessage().contains("expected coord"));
+    		assertTrue(ex instanceof IoxException);
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn an einer Stelle unerwuenschte Zeichen vorkommen.
+	@Test
+	public void testUnexpectedCharacters_Fail()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"UnexpectedCharacters.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent); // SyntaxException: unexpected characters: unexpectedText
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ex){
+			assertTrue((ex).getMessage().contains(CHAR_ELE_FAIL+"attrBoolean1"));
+    		assertTrue(ex instanceof IoxException);
+		}
+		reader.close();
+		reader=null;
+	}
 }
