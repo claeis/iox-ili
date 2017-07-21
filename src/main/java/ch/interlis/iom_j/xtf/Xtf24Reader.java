@@ -51,7 +51,7 @@ public class Xtf24Reader implements IoxReader {
     private HashMap<Viewable, HashMap<QName, Element>> iliProperties=null;
     
     // segmentType
-    public enum SegmentType {
+    private enum SegmentType {
         C1,C2,C3,A1,A2,R,MULTICOORD
     }
     
@@ -72,6 +72,7 @@ public class Xtf24Reader implements IoxReader {
     private static final int END_HEADERSECTION=12;
     private static final int INSIDE_DATASECTION=13;
     private static final int INSIDE_BASKET=14;
+    private static final int PRE_ENDBASKET=18;
     private static final int END_BASKET=15;
     private static final int END_DATASECTION=16;
     private static final int END_TRANSFER=17;
@@ -104,13 +105,11 @@ public class Xtf24Reader implements IoxReader {
 	private static final QName QNAME_MULTISURFACE = new QName(NAMESPACE_GEOM, "multisurface");
 	private static final QName QNAME_AREA = new QName(NAMESPACE_GEOM, "area");
 	private static final QName QNAME_MULTIAREA = new QName(NAMESPACE_GEOM, "multiarea");
-	private static final QName QNAME_HREF = new QName(NAMESPACE_GEOM, "href");
 	private static final QName QNAME_EXTERIOR = new QName(NAMESPACE_GEOM, "exterior");
 	private static final QName QNAME_INTERIOR = new QName(NAMESPACE_GEOM, "interior");
-	
-    private static final String SEGMENTTYPE_COORD="COORD";
-    private static final String SEGMENTTYPE_ARC="ARC";
-    
+	private static final String SEGMENTTYPE_COORD="COORD";
+	private static final String SEGMENTTYPE_ARC="ARC";
+    private static final QName QNAME_ILI_REF = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "ref"); // ili:ref
 	// header information
     private ArrayList<String> models=new ArrayList<String>();
     private String sender=null;
@@ -185,6 +184,15 @@ public class Xtf24Reader implements IoxReader {
 	 */
 	@Override
 	public IoxEvent read() throws IoxException {
+        if(state==PRE_ENDBASKET && linkIterator!=null){
+			if(linkIterator.hasNext()){
+				IomObject assocObj=linkIterator.next();
+				return new ch.interlis.iox_j.ObjectEvent(assocObj);
+			}
+        	linkIterator=null;
+			state=END_BASKET;
+			return new ch.interlis.iox_j.EndBasketEvent();
+        }
 		while(reader.hasNext()){
 			javax.xml.stream.events.XMLEvent event=null;
 			try{
@@ -572,6 +580,16 @@ public class Xtf24Reader implements IoxReader {
                     	throw new IoxSyntaxException(event2msgtext(event));
                     }
                 }else if(event.isEndElement()){
+                	state=PRE_ENDBASKET;
+                	ArrayList<IomObject> objList= associationBuilder();
+                	if(objList!=null){
+	            		linkIterator = objList.iterator();
+	            		if(linkIterator!=null && linkIterator.hasNext()){
+	            			IomObject assocObj=linkIterator.next();
+	            			return new ch.interlis.iox_j.ObjectEvent(assocObj);
+	            		}
+                	}
+                	linkIterator=null;
                 	state=END_BASKET;
                     // return end basket
                 	return new ch.interlis.iox_j.EndBasketEvent();
@@ -583,6 +601,9 @@ public class Xtf24Reader implements IoxReader {
 					}
             		continue;
                 }
+            // pre end basket
+            }else if(state==PRE_ENDBASKET){
+            	throw new IllegalStateException("state=PRE_ENDBASKET");
             // end basket
             }else if(state==END_BASKET){
             	if(event.isStartElement()){
@@ -1012,7 +1033,7 @@ public class Xtf24Reader implements IoxReader {
     	            		QName subQName=((StartElement) event).getName();
     	            		Viewable iliStruct=getIliClass(subQName);
     	            		if(iliStruct==null){
-    	                    	String xmlCollection = collectXMLElement(reader,event);
+    	                    	String xmlCollection = collectXMLElement(reader,event); // <blackbox></blackbox>
     	            			iomObj.setattrvalue(attrName, xmlCollection);
     	            			attrName=null;
     	            		}else{
@@ -1053,11 +1074,10 @@ public class Xtf24Reader implements IoxReader {
     }
 
 	private IomObject readReference(Viewable aclass,IomObject iomObj, StartElement element, RoleDef role, AssociationDef association) throws IoxException{
-		String refOid=element.getAttributeByName(QNAME_HREF).getValue();
-		if(refOid.length()<=1 || !refOid.startsWith("#")){
+		String refOid=element.getAttributeByName(QNAME_ILI_REF).getValue();
+		if(refOid.length()<=1){
 			throw new IoxException("unexpected reference format "+refOid);
 		}
-		refOid=refOid.substring(1);
 		if(aclass.isExtending(association)){
 			iomObj.addattrobj(role.getName(),"REF").setobjectrefoid(refOid);			
 		}else{

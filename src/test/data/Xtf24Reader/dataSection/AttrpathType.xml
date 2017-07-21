@@ -6,13 +6,10 @@
 		</ili:models>
 	</ili:headersection>
 	<ili:datasection>
-		<TopicA ili:bid="bidA">
-			<ClassJ ili:tid="oidJ">
-				<attrBin>text123</attrBin>
-				<attrXml>
-					<xmlAttr1><xmlAttr2><xmlAttr3>attr1</xmlAttr3></xmlAttr2></xmlAttr1>
-				</attrXml>
-			</ClassJ>
-		</TopicA>
+		<TopicB ili:bid="bidB">
+			<ClassAP1 ili:tid="oid1">
+				<attr1>attribute1</attr1>
+			</ClassAP1>
+		</TopicB>
 	</ili:datasection>
 </ili:transfer>

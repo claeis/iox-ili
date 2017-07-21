@@ -1,0 +1,155 @@
+INTERLIS 2.4;
+
+MODEL Association (de) AT "mailto:ceis@localhost" VERSION "20170703" =
+
+	TOPIC Mensch =
+		CLASS Mann =
+		END Mann;
+		
+		CLASS Frau =
+		END Frau;
+		
+		ASSOCIATION Beziehung =
+			bezMann -- {1} Mann;
+			bezFrau -- {1} Frau;
+		END Beziehung;
+	END Mensch;
+	
+	TOPIC TopicA =
+		CLASS ClassA =
+		END ClassA;
+		
+		CLASS ClassB =
+		END ClassB;
+		
+		ASSOCIATION AssoAB =
+			roleA -- {0..1} ClassA;
+			roleB -- {0..1} ClassB;
+		END AssoAB;
+	END TopicA;
+
+	TOPIC TopicB =
+		CLASS ClassC =
+		END ClassC;
+		
+		CLASS ClassD =
+		END ClassD;
+		
+		ASSOCIATION assocCD =
+			assoC -- {2..4} ClassC;
+			assoD -- {2..4} ClassD;
+		END assocCD;
+	END TopicB;
+
+	TOPIC Schule =
+		CLASS Kinder =
+		END Kinder;
+		
+		CLASS Lehrer =
+		END Lehrer;
+		
+		ASSOCIATION Beziehung =
+			bezKinder -- {1..*} Kinder;
+			bezLehrer -- {1..*} Lehrer;
+		END Beziehung;
+	END Schule;
+
+	TOPIC Atom =
+		CLASS Proton =
+		END Proton;
+		
+		CLASS Neutron =
+		END Neutron;
+		
+		ASSOCIATION NucleusAB =
+			electronA -- {1..1} Proton;
+			electronB -- {1..1} Neutron;
+		END NucleusAB;
+		
+		ASSOCIATION NucleusCD =
+			electronD -- {1..1} Neutron;
+			electronC -- {1..1} Proton;
+		END NucleusCD;
+	END Atom;
+
+	TOPIC Schule2 =
+		CLASS Kinder =
+		END Kinder;
+		
+		CLASS Lehrer =
+		END Lehrer;
+		
+		ASSOCIATION Beziehung =
+			bezKinder(EXTERNAL) -- {1..*} Kinder;
+			bezLehrer(EXTERNAL) -- {1..*} Lehrer;
+		END Beziehung;
+	END Schule2;
+	
+	TOPIC Schule3 =
+		CLASS Kinder3 =
+		END Kinder3;
+		
+		CLASS Lehrer3 =
+		END Lehrer3;
+		
+		ASSOCIATION Beziehung3 =
+			bezKinder3(EXTERNAL) -- {2} Kinder3;
+			bezLehrer3(EXTERNAL) -- {2} Lehrer3;
+		END Beziehung3;
+	END Schule3;
+	
+	TOPIC Schule4 =
+		CLASS Kinder4 =
+		END Kinder4;
+		
+		CLASS Lehrer4 =
+		END Lehrer4;
+		
+		ASSOCIATION Beziehung4 =
+			bezKinder4(EXTERNAL) -- {*} Kinder4;
+			bezLehrer4(EXTERNAL) -- {*} Lehrer4;
+		END Beziehung4;
+	END Schule4;
+
+	TOPIC TopicD =
+		CLASS ClassD1 =
+		END ClassD1;
+		
+		CLASS ClassD2 =
+		END ClassD2;
+		
+		ASSOCIATION assoD12 =
+			assoD1 (EXTERNAL) -- {1..*} ClassD1;
+			assoD2 (ORDERED) -- {1..*} ClassD2;
+		END assoD12;
+	END TopicD;
+
+	TOPIC TopicG =
+		CLASS ClassG1 =
+		END ClassG1;
+		
+		CLASS ClassG2 =
+		END ClassG2;
+		
+		CLASS ClassG3 =
+		END ClassG3;
+		
+		CLASS ClassG4 =
+		END ClassG4;
+		
+		CLASS ClassG3p EXTENDS ClassG4=
+		END ClassG3p;
+		
+		ASSOCIATION assoG =
+			assoG1 (EXTENDED) -- {1..*} ClassG1 OR ClassG2;
+			assoG2 (EXTENDED)-- {1..*} ClassG3 OR ClassG4 RESTRICTION (ClassG3p);
+		END assoG;
+	END TopicG;
+	
+	TOPIC TopicH =
+		!!ASSOCIATION A1 EXTENDS A =
+		!!	K (EXTENDED, HIDING) –- K1;
+		!!	KL (EXTENDED) –- K OR L RESTRICTION (L1, L2);
+		!!END A1;
+	END TopicH;
+END Association.

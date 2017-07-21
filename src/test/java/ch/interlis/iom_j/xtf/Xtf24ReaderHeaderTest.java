@@ -11,7 +11,6 @@ import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iox.EndTransferEvent;
 import ch.interlis.iox.IoxException;
-import ch.interlis.iox.StartBasketEvent;
 import ch.interlis.iox.StartTransferEvent;
 import ch.interlis.iox_j.IoxSyntaxException;
 import ch.interlis.iox_j.jts.Iox2jtsException;
@@ -137,7 +136,7 @@ public class Xtf24ReaderHeaderTest {
 		reader=null;
 	}
 	
-	// DataSection wird über dem HeaderSection definiert.
+	// DataSection wird ueber dem HeaderSection definiert.
 	@Test
 	public void testDataBeforeHeaderSection_Fail()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"DataBeforeHeaderSection.xml"));
@@ -222,7 +221,7 @@ public class Xtf24ReaderHeaderTest {
 		reader=null;
 	}
 	
-	// Im Header wird Sender über Models erstellt.
+	// Im Header wird Sender ueber Models erstellt.
 	@Test
 	public void testHeaderSenderBeforeModels_Fail() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"SenderBeforeModels.xml"));
@@ -239,7 +238,7 @@ public class Xtf24ReaderHeaderTest {
 		reader=null;
 	}
 	
-	// Im Header wird Comments über Models erstellt.
+	// Im Header wird Comments ueber Models erstellt.
 	@Test
 	public void testHeaderCommentsBeforeModels_Fail() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"CommentsBeforeModels.xml"));

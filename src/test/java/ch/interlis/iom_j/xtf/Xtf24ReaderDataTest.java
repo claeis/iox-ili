@@ -181,18 +181,18 @@ public class Xtf24ReaderDataTest {
 	}
 	
 	// Es wird getestet ob Attributepfade ohne Fehler erstellt werden koennen.
-//	@Test
-//	public void testAttributePath_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"AttributePath.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent);
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
+	@Test
+	public void testAttributePath_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"AttrpathType.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.ClassAP1 oid oid1 {attr1 attribute1}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
 	
 	// Es wird getestet ob Coordinaten ohne Fehler erstellt werden koennen.
 	@Test
@@ -322,185 +322,6 @@ public class Xtf24ReaderDataTest {
 		reader.close();
 		reader=null;
 	}
-
-//	// Embedded
-//	@Test
-//	public void testEmbedded_1Assoc_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Embedded.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		
-//		IoxEvent event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // Ili23.Mensch.Mann oid oidM {}
-//		IomObject iomObjA=((ObjectEvent) event).getIomObject();
-//		int attrCountA=iomObjA.getattrcount();
-//		assertEquals(0, attrCountA);
-//		
-//		event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // Ili23.Mensch.Frau oid oidF {bezMann -> oidM REF {}}
-//		IomObject iomObjB=((ObjectEvent) event).getIomObject();
-//		String refOidB=iomObjB.getattrobj("bezMann", 0).getobjectrefoid();
-//		assertEquals("oidM", refOidB);
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	// Embedded 2 associations
-//	@Test
-//	public void testEmbedded_2Assoc_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Embedded1to1.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		
-//		IoxEvent event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // Ili23.Atom.Proton oid oidP {electronD -> oidN REF {}}
-//		IomObject iomObjF=((ObjectEvent) event).getIomObject();
-//		String refOidF=iomObjF.getattrobj("electronD", 0).getobjectrefoid();
-//		assertEquals("oidN", refOidF);
-//		
-//		event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // Ili23.Atom.Neutron oid oidN {electronA -> oidP REF {}}
-//		IomObject iomObjM=((ObjectEvent) event).getIomObject();
-//		String refOidM=iomObjM.getattrobj("electronA", 0).getobjectrefoid();
-//		assertEquals("oidP", refOidM);
-//		
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	// Stand Alone
-//	@Test
-//	public void testStandalone_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"StandAlone.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		
-//		IoxEvent event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // Ili23.Schule.Kinder oid oidK {}
-//		IomObject iomObjK=((ObjectEvent) event).getIomObject();
-//		int attrCountK=iomObjK.getattrcount();
-//		assertEquals(0, attrCountK);
-//		
-//		event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // Ili23.Schule.Lehrer oid oidL {}
-//		IomObject iomObjL=((ObjectEvent) event).getIomObject();
-//		int attrCountL=iomObjL.getattrcount();
-//		assertEquals(0, attrCountL);
-//		
-//		event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); //Ili23.Schule.Beziehung {bezLehrer -> oidL REF {}, bezKinder -> oidK REF {}}
-//		IomObject iomObjA=((ObjectEvent) event).getIomObject();
-//		int attrCountA=iomObjA.getattrcount();
-//		assertEquals(2, attrCountA);
-//		String refOidK=iomObjA.getattrobj("bezLehrer", 0).getobjectrefoid();
-//		assertEquals("oidL", refOidK);
-//		String refOidL=iomObjA.getattrobj("bezKinder", 0).getobjectrefoid();
-//		assertEquals("oidK", refOidL);
-//		
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	// Embedded && Stand Alone
-//	@Test
-//	public void testEmbeddedAndStandAlone_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"RefEmbeddedWithTableBetween.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		
-//		IoxEvent event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // Ili23.TopicC.ClassA11 oid o1 {}
-//		IomObject iomObjA11=((ObjectEvent) event).getIomObject();
-//		int attrCountA11=iomObjA11.getattrcount();
-//		assertEquals(0, attrCountA11);
-//		
-//		event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // Ili23.TopicC.ClassB11 oid o2 {}
-//		IomObject iomObjB11=((ObjectEvent) event).getIomObject();
-//		int attrCountB11=iomObjB11.getattrcount();
-//		assertEquals(0, attrCountB11);
-//		
-//		event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // Ili23.TopicC.assocAB oid y1 {assoA11 -> o1 REF {}, assoB11 -> o2 REF {}}
-//		IomObject iomObjA=((ObjectEvent) event).getIomObject();
-//		int attrCountA=iomObjA.getattrcount();
-//		assertEquals(2, attrCountA);
-//		String refOidL=iomObjA.getattrobj("assoA11", 0).getobjectrefoid();
-//		assertEquals("o1", refOidL);
-//		String refOidK=iomObjA.getattrobj("assoB11", 0).getobjectrefoid();
-//		assertEquals("o2", refOidK);
-//		
-//		event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // Ili23.TopicC.assocAB {assoA11 -> o2 REF {}, assoB11 -> o1 REF {}}
-//		IomObject iomObjB=((ObjectEvent) event).getIomObject();
-//		int attrCountB=iomObjB.getattrcount();
-//		assertEquals(2, attrCountB);
-//		String refOidL2=iomObjB.getattrobj("assoA11", 0).getobjectrefoid();
-//		assertEquals("o2", refOidL2);
-//		String refOidK2=iomObjB.getattrobj("assoB11", 0).getobjectrefoid();
-//		assertEquals("o1", refOidK2);
-//		
-//		assertTrue(reader.read() instanceof  EndBasketEvent); 
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-//	
-//	// Partial Embedded && Stand Alone
-//	@Test
-//	public void testPartialEmbeddedAndStandAlone_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"RefPartialEmbeddedWithTableBetween.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		
-//		IoxEvent event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // Ili23.TopicE.ClassE1 oid o1 {}
-//		IomObject iomObjE1=((ObjectEvent) event).getIomObject();
-//		int attrCountE1=iomObjE1.getattrcount();
-//		assertEquals(0, attrCountE1);
-//		
-//		event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // Ili23.TopicE.ClassE2 oid o2 {}
-//		IomObject iomObjE2=((ObjectEvent) event).getIomObject();
-//		int attrCountE2=iomObjE2.getattrcount();
-//		assertEquals(0, attrCountE2);
-//		
-//		event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // Ili23.TopicE.assoE12 oid e12 {assoE1 -> o1 REF {}, assoE2 -> o2 REF {}}
-//		IomObject iomObjA=((ObjectEvent) event).getIomObject();
-//		int attrCountA=iomObjA.getattrcount();
-//		assertEquals(2, attrCountA);
-//		String refOidE1=iomObjA.getattrobj("assoE1", 0).getobjectrefoid();
-//		assertEquals("o1", refOidE1);
-//		String refOidE2=iomObjA.getattrobj("assoE2", 0).getobjectrefoid();
-//		assertEquals("o2", refOidE2);
-//		
-//		event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // Ili23.TopicE.assoE12 {assoE1 -> o2 REF {}, assoE2 -> o1 REF {}}
-//		IomObject iomObjB=((ObjectEvent) event).getIomObject();
-//		int attrCountB=iomObjB.getattrcount();
-//		assertEquals(2, attrCountB);
-//		String refOidE12=iomObjB.getattrobj("assoE1", 0).getobjectrefoid();
-//		assertEquals("o2", refOidE12);
-//		String refOidE22=iomObjB.getattrobj("assoE2", 0).getobjectrefoid();
-//		assertEquals("o1", refOidE22);
-//		
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn eine im XML definierte Geometrie, noch nicht implementiert wurde.
 	@Test

@@ -132,31 +132,6 @@ public class Xtf24ReaderTest {
 		reader=null;
 	}
 	
-//	@Test
-//	public void testSameTopicClassNames_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"TopicClassSameTest.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		
-//		IoxEvent event=reader.read();
-//		assertTrue(event instanceof  ObjectEvent); // TopicZ.TopicZ
-//		IomObject iomObjA=((ObjectEvent) event).getIomObject();
-//		String attrtag=iomObjA.getobjecttag();
-//		assertEquals("Ili23.TopicZ.TopicZ", attrtag);
-//		
-//		String oid=iomObjA.getobjectoid();
-//		assertEquals("x10", oid);
-//		
-//		String attrValue=iomObjA.getattrvalue("attr1");
-//		assertEquals("text", attrValue);
-//		
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
-	
 	// In diesem Test soll getestet werden, ob eine SyntaxException ausgegeben wird,
 	// wenn DataSection nicht erstellt wurde.
 	@Test

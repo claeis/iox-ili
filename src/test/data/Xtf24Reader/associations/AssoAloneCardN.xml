@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" xmlns="http://www.interlis.ch/xtf/2.4/Association" xmlns:geom="http://www.interlis.ch/geometry/1.0">
+	<ili:headersection>
+		<ili:models>
+			<ili:model>Association</ili:model>
+		</ili:models>
+	</ili:headersection>
+	<ili:datasection>
+		<Schule4 ili:bid="bidSchule">
+			<Kinder4 ili:tid="oid1">
+			</Kinder4>
+			<Lehrer4 ili:tid="oid2">
+			</Lehrer4>
+			<Kinder4 ili:tid="oid3">
+			</Kinder4>
+			<Lehrer4 ili:tid="oid4">
+			</Lehrer4>
+			<Beziehung4 ili:tid="x">
+				<bezKinder4 ili:ref="Schule4.Kinder4"></bezKinder4>
+				<bezLehrer4 ili:ref="Schule4.Lehrer4"></bezLehrer4>
+			</Beziehung4>
+		</Schule4>
+	</ili:datasection>
+</ili:transfer>

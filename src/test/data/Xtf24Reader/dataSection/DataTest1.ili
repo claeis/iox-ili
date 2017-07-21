@@ -205,6 +205,10 @@ MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 			attrS : POLYLINE WITH (STRAIGHTS) VERTEX Hkoord;
 		END ClassS;
 		
+		CLASS ClassAP1 =
+			attr1 : InterlisAttributeRef;
+		END ClassAP1;
+		
 	END TopicB;
 	
 END DataTest1.
