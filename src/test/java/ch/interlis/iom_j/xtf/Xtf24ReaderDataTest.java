@@ -323,6 +323,61 @@ public class Xtf24ReaderDataTest {
 		reader=null;
 	}
 	
+	// Es wird getestet ob eine View, innerhalb eines TopicView, welche nicht transient ist, ohne Fehlermeldung erstellt werden kann.
+	@Test
+	public void testView_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"View.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent); // DataTest1.TopicB, bidA
+		assertTrue(reader.read() instanceof  ObjectEvent); // DataTest1.TopicB.ClassA oid oidA {attr1 text}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent); // DataTest1.AdditionalTopicA, bidB
+		assertTrue(reader.read() instanceof  ObjectEvent); // DataTest1.AdditionalTopicA.AdditionalClassA oid oidB {attr2 te, attr1 text}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob eine View, welche nicht von einer TopicView ist, nicht transient ist, ohne Fehlermeldung erstellt werden kann.
+	@Test
+	public void testViewNotOfTopicView_Fail() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"NotTopicView.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent); // DataTest1.TopicB, bidA
+		assertTrue(reader.read() instanceof  ObjectEvent); // DataTest1.TopicB.ClassA oid oidA {attr1 text2}
+		try{
+			reader.read(); // TopicB != VIEW TOPIC. View1 Failed.
+			fail();
+		}catch(IoxException ex){
+			assertTrue((ex).getMessage().contains("View1"));
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob eine View, welche von einer TopicView ist, jedoch nicht transient, ohne Fehlermeldung erstellt werden kann.
+	@Test
+	public void testViewIsTransient_Fail() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"ViewIsTransient.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent); // DataTest1.TopicB, bidA
+		assertTrue(reader.read() instanceof  ObjectEvent); // DataTest1.TopicB.ClassA oid oidA {attr1 text}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent); // AdditionalClassC == TRANSIENT
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ex){
+			assertTrue((ex).getMessage().contains("AdditionalClassC"));
+		}
+		reader.close();
+		reader=null;
+	}
+	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn eine im XML definierte Geometrie, noch nicht implementiert wurde.
 	@Test
 	public void testUnsupportedGeometry_Fail()  throws Iox2jtsException, IoxException {

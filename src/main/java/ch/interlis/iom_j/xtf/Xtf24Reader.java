@@ -23,8 +23,10 @@ import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.RoleDef;
+import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.ili2c.metamodel.Topic;
 import ch.interlis.ili2c.metamodel.TransferDescription;
+import ch.interlis.ili2c.metamodel.View;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
 import ch.interlis.iom.IomObject;
@@ -42,6 +44,7 @@ public class Xtf24Reader implements IoxReader {
 	private LinkPool linkPool=new LinkPool();
 	private Iterator<IomObject> linkIterator;
 	private java.io.InputStream inputFile=null;
+	
 	private Topic currentTopic=null;
 	private IomObject iomObj=null;
 	
@@ -519,6 +522,7 @@ public class Xtf24Reader implements IoxReader {
                 	if(currentTopic==null){
                 		throw new IoxSyntaxException(event2msgtext(event));
                 	}
+//                	setTransferType(event);
                 	QName gmlId = QNAME_BID;
                 	Attribute bid = element.getAttributeByName(gmlId);
                 	if(bid!=null){
@@ -770,8 +774,20 @@ public class Xtf24Reader implements IoxReader {
 		    		if(!(classObj instanceof Viewable)){
     					continue;
     				}
-    				Viewable viewable = (Viewable) classObj;
-    				String localClassPart=viewable.getName();
+		    		// iliView
+		    		if(classObj instanceof View){
+		    			if(topic.isViewTopic()){
+							View view=(View) classObj;
+							if(!view.isTransient()){
+							}else{
+								continue;
+							}
+		    			}else{
+		    				continue;
+		    			}
+					}
+		    		Viewable viewable = (Viewable) classObj;
+		    		String localClassPart=viewable.getName();
     				String nameSpace=model.getMetaValue(METAATTR_NAMESPACE);
     				if(nameSpace==null){
     					nameSpace=NAMESPACE_ILIXMLBASE+model.getName();

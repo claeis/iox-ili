@@ -209,6 +209,35 @@ MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 			attr1 : InterlisAttributeRef;
 		END ClassAP1;
 		
+		CLASS ClassA =
+		  attr1 : TEXT*10;
+		END ClassA;
+		
+		VIEW View1
+			PROJECTION OF DataTest1.TopicB.ClassA;
+			=
+			ALL OF ClassA;
+			attr2 : TEXT*10 := "fail";
+		END View1;
 	END TopicB;
 	
+	VIEW TOPIC AdditionalTopicA =
+		DEPENDS ON DataTest1.TopicB;
+		VIEW AdditionalClassA
+			PROJECTION OF DataTest1.TopicB.ClassA;
+			=
+			ALL OF ClassA;
+			attr2 : TEXT*10 := "te";
+		END AdditionalClassA;
+	END AdditionalTopicA;
+	
+	VIEW TOPIC AdditionalTopicC =
+		DEPENDS ON DataTest1.TopicB;
+		VIEW AdditionalClassC (TRANSIENT)
+			PROJECTION OF DataTest1.TopicB.ClassA;
+			=
+			ALL OF ClassA;
+			attr3 : TEXT*10 := "te3";
+		END AdditionalClassC;
+	END AdditionalTopicC;
 END DataTest1.
