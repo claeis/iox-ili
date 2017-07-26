@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" xmlns="http://www.interlis.ch/xtf/2.4/Association" xmlns:geom="http://www.interlis.ch/geometry/1.0">
+	<ili:headersection>
+		<ili:models>
+			<ili:model>Association</ili:model>
+		</ili:models>
+	</ili:headersection>
+	<ili:datasection>
+		<Mensch ili:bid="bidB" ili:kind="UPDATE">
+			<Mann ili:tid="oid1">
+				<bezFrau ili:ref="Mensch.Frau"></bezFrau>
+			</Mann>
+			<Frau ili:tid="oid2">
+				<bezMann ili:ref="Mensch.Mann" ili:operation="DELETE" ili:order_pos="6"></bezMann>
+			</Frau>
+		</Mensch>
+	</ili:datasection>
+</ili:transfer>
