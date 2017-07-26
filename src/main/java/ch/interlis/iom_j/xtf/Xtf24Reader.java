@@ -16,7 +16,6 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import ch.ehi.basics.logging.EhiLogger;
-import ch.ehi.iox.objpool.impl.ObjPoolEntry;
 import ch.interlis.ili2c.generator.Iligml20Generator;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.AttributeDef;
@@ -24,7 +23,6 @@ import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.RoleDef;
-import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.ili2c.metamodel.Topic;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.View;
@@ -46,6 +44,7 @@ public class Xtf24Reader implements IoxReader {
 	private LinkPool linkPool=new LinkPool();
 	private Iterator<IomObject> linkIterator;
 	private java.io.InputStream inputFile=null;
+	
 	private Topic currentTopic=null;
 	private IomObject iomObj=null;
 	private Integer transferkind=0;
@@ -77,51 +76,56 @@ public class Xtf24Reader implements IoxReader {
     private static final int END_HEADERSECTION=12;
     private static final int INSIDE_DATASECTION=13;
     private static final int INSIDE_BASKET=14;
-    private static final int PRE_ENDBASKET=18;
-    private static final int END_BASKET=15;
-    private static final int END_DATASECTION=16;
-    private static final int END_TRANSFER=17;
+    private static final int END_DELETE=15;
+    private static final int PRE_ENDBASKET=16;
+    private static final int END_BASKET=17;
+    private static final int END_DATASECTION=18;
+    private static final int END_TRANSFER=19;
+    // enum
+    private static final String SEGMENTTYPE_COORD="COORD";
+    private static final String SEGMENTTYPE_ARC="ARC";
     // namespace
     private static final String NAMESPACE_ILIXMLBASE="http://www.interlis.ch/xtf/2.4/";
     private static final String NAMESPACE_ILIXMLBASE_INTERLIS=NAMESPACE_ILIXMLBASE+"INTERLIS";
-    private static final String METAATTR_NAMESPACE = "ili2.ilixtf24.namespaceName";
+    private static final String NAMESPACE_METAATTR = "ili2.ilixtf24.namespaceName";
     private static final String NAMESPACE_GEOM="http://www.interlis.ch/geometry/1.0";
     private static final String NAMESPACE_XMLSCHEMA="http://www.w3.org/2001/XMLSchema-instance";
-	// qnames
-    private static final QName QNAME_ILI_TRANSFER=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"transfer");
+	// qnames xml
     private static final QName QNAME_XML_HEADERSECTION=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"headersection");
     private static final QName QNAME_XML_SENDER=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"sender");
     private static final QName QNAME_XML_COMMENTS=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"comments");
     private static final QName QNAME_XML_DATASECTION=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"datasection");
     private static final QName QNAME_XML_MODELS=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"models");
     private static final QName QNAME_XML_MODEL=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"model");
-    private static final QName QNAME_BID = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "bid");
-    private static final QName QNAME_TID = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "tid");
-    private static final QName QNAME_ORDERPOS = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "order_pos");
-    private static final QName QNAME_OPERATION = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "operation");
+    // qnames ili
+    private static final QName QNAME_ILI_BID = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "bid");
+    private static final QName QNAME_ILI_TID = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "tid");
+    private static final QName QNAME_ILI_ORDERPOS = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "order_pos");
+    private static final QName QNAME_ILI_OPERATION = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "operation");
+    private static final QName QNAME_ILI_TRANSFER=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"transfer");
+    private static final QName QNAME_ILI_REF = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "ref");
+    private static final QName QNAME_ILI_DELETE=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"delete");
+    private static final QName QNAME_ILI_STARTSTATE=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"startstate");
+    private static final QName QNAME_ILI_ENDSTATE=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"endstate");
+    private static final QName QNAME_ILI_KIND=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"kind");
+    private static final QName QNAME_ILI_DOMAIN=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"domains");
+    private static final QName QNAME_ILI_CONSISTENCY=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"consistency");
+    // qnames geom
     private static final QName QNAME_GEOM_COORD = new QName(NAMESPACE_GEOM, "coord");
     private static final QName QNAME_GEOM_ARC = new QName(NAMESPACE_GEOM, "arc");
-    private static final QName QNAME_MULTICOORD = new QName(NAMESPACE_GEOM, "multicoord");
-    private static final QName QNAME_POLYLINE = new QName(NAMESPACE_GEOM, "polyline");
-    private static final QName QNAME_MULTIPOLYLINE = new QName(NAMESPACE_GEOM, "multipolyline");
-    private static final QName QNAME_LINESTRING = new QName(NAMESPACE_GEOM, "linestring");
-    private static final QName QNAME_BOUNDARY = new QName(NAMESPACE_GEOM, "boundary");
-    private static final QName QNAME_ORIENTABLECURVE = new QName(NAMESPACE_GEOM, "orientablecurve");
-	private static final QName QNAME_COMPOSITECURVE = new QName(NAMESPACE_GEOM, "compositecurve");
-	private static final QName QNAME_SURFACE = new QName(NAMESPACE_GEOM, "surface");
-	private static final QName QNAME_MULTISURFACE = new QName(NAMESPACE_GEOM, "multisurface");
-	private static final QName QNAME_AREA = new QName(NAMESPACE_GEOM, "area");
-	private static final QName QNAME_MULTIAREA = new QName(NAMESPACE_GEOM, "multiarea");
-	private static final QName QNAME_EXTERIOR = new QName(NAMESPACE_GEOM, "exterior");
-	private static final QName QNAME_INTERIOR = new QName(NAMESPACE_GEOM, "interior");
-	private static final String SEGMENTTYPE_COORD="COORD";
-	private static final String SEGMENTTYPE_ARC="ARC";
-    private static final QName QNAME_ILI_REF = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "ref"); // ili:ref
-	
-    private static final QName QNAME_TRANSFERTYPE_SRS=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"srs");
-    private static final QName QNAME_TRANSFERTYPE_KIND=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"kind");
-    private static final QName QNAME_TRANSFERTYPE_DOMAIN=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"domains");
-    private static final QName QNAME_TRANSFERTYPE_CONSISTENCY=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"consistency");
+    private static final QName QNAME_GEOM_MULTICOORD = new QName(NAMESPACE_GEOM, "multicoord");
+    private static final QName QNAME_GEOM_POLYLINE = new QName(NAMESPACE_GEOM, "polyline");
+    private static final QName QNAME_GEOM_MULTIPOLYLINE = new QName(NAMESPACE_GEOM, "multipolyline");
+    private static final QName QNAME_GEOM_LINESTRING = new QName(NAMESPACE_GEOM, "linestring");
+    private static final QName QNAME_GEOM_BOUNDARY = new QName(NAMESPACE_GEOM, "boundary");
+    private static final QName QNAME_GEOM_ORIENTABLECURVE = new QName(NAMESPACE_GEOM, "orientablecurve");
+	private static final QName QNAME_GEOM_COMPOSITECURVE = new QName(NAMESPACE_GEOM, "compositecurve");
+	private static final QName QNAME_GEOM_SURFACE = new QName(NAMESPACE_GEOM, "surface");
+	private static final QName QNAME_GEOM_MULTISURFACE = new QName(NAMESPACE_GEOM, "multisurface");
+	private static final QName QNAME_GEOM_AREA = new QName(NAMESPACE_GEOM, "area");
+	private static final QName QNAME_GEOM_MULTIAREA = new QName(NAMESPACE_GEOM, "multiarea");
+	private static final QName QNAME_GEOM_EXTERIOR = new QName(NAMESPACE_GEOM, "exterior");
+	private static final QName QNAME_GEOM_INTERIOR = new QName(NAMESPACE_GEOM, "interior");
     
     // header information
     private ArrayList<String> models=new ArrayList<String>();
@@ -200,7 +204,6 @@ public class Xtf24Reader implements IoxReader {
         if(state==PRE_ENDBASKET && linkIterator!=null){
 			if(linkIterator.hasNext()){
 				IomObject assocObj=linkIterator.next();
-				System.out.println(assocObj.toString());
 				return new ch.interlis.iox_j.ObjectEvent(assocObj);
 			}
         	linkIterator=null;
@@ -216,8 +219,7 @@ public class Xtf24Reader implements IoxReader {
 				throw new IoxException(ex);
 			}
 			// start
-			// first XML event has to be start document
-			if(state==START){
+			if(state==START){ // first XML event has to be start document
 				if(event.isStartDocument()){
 					state=START_DOCUMENT;
 				}else{
@@ -533,11 +535,10 @@ public class Xtf24Reader implements IoxReader {
                 	if(currentTopic==null){
                 		throw new IoxSyntaxException(event2msgtext(event));
                 	}
-                	QName gmlId = QNAME_BID;
+                	QName gmlId = QNAME_ILI_BID;
                 	Attribute bid = element.getAttributeByName(gmlId);
                 	if(bid!=null){
                 		state=INSIDE_BASKET;
-                		System.out.println(currentTopic.getScopedName()+", "+bid.getValue());
                 		ch.interlis.iox_j.StartBasketEvent newObj=new ch.interlis.iox_j.StartBasketEvent(currentTopic.getScopedName(), bid.getValue());
                 		ch.interlis.iox_j.StartBasketEvent bidObj=setBasketCodingContent(element, newObj);
                 		return bidObj;
@@ -563,6 +564,17 @@ public class Xtf24Reader implements IoxReader {
             // start object inside basket
             }else if(state==INSIDE_BASKET){
             	if(event.isStartElement()){
+            		if(event.asStartElement().getName().equals(QNAME_ILI_DELETE)){
+            			IomObject objToDelete=null;
+        				// delete Object
+            			if(event.asStartElement().getAttributeByName(QNAME_ILI_TID)!=null){
+            				objToDelete=createIomObject("delete", event.asStartElement().getAttributeByName(QNAME_ILI_TID).getValue());
+            				state=END_DELETE;
+            			}else{
+            				throw new IoxException("ili:delete object needs tid");
+            			}
+            			return new ch.interlis.iox_j.ObjectEvent(objToDelete);
+            		}
                 	Viewable viewable=null;
                     StartElement element = (StartElement) event;
                 	String topicName=currentTopic.getName();
@@ -575,7 +587,7 @@ public class Xtf24Reader implements IoxReader {
                     if(viewable==null){
                     	throw new IoxSyntaxException(event2msgtext(event));
                     }
-                    Attribute oid = element.getAttributeByName(QNAME_TID);
+                    Attribute oid = element.getAttributeByName(QNAME_ILI_TID);
                     if(oid!=null){
                     	try{
                     		iomObj=createIomObject(viewable.getScopedName(), oid.getValue());
@@ -586,7 +598,6 @@ public class Xtf24Reader implements IoxReader {
 							iomObj=readObject(event, viewable, iomObj);
 							setAdditionalObjectInfo(element, iomObj);
 							event=reader.nextEvent(); // <object>
-							System.out.println(iomObj.toString());
 	                    	return new ch.interlis.iox_j.ObjectEvent(iomObj);
 						}catch(IoxSyntaxException ex){								
 							throw new IoxSyntaxException(event2msgtext(event)+"\n"+ex);
@@ -603,7 +614,6 @@ public class Xtf24Reader implements IoxReader {
 	            		linkIterator = objList.iterator();
 	            		if(linkIterator!=null && linkIterator.hasNext()){
 	            			IomObject assocObj=linkIterator.next();
-	            			System.out.println(assocObj.toString());
 	            			return new ch.interlis.iox_j.ObjectEvent(assocObj);
 	            		}
                 	}
@@ -619,6 +629,17 @@ public class Xtf24Reader implements IoxReader {
 					}
             		continue;
                 }
+            }else if(state==END_DELETE){
+            	if(event.isEndElement()){
+            		state=INSIDE_BASKET;
+            		if(event.asEndElement().getName().equals(QNAME_ILI_DELETE)){
+            			continue;
+            		}else{
+            			throw new IoxException("expected rolename and role reference tid");
+            		}
+            	}else{
+            		throw new IoxException("ili:delete references are not yet implemented.");
+            	}
             // pre end basket
             }else if(state==PRE_ENDBASKET){
             	throw new IllegalStateException("state=PRE_ENDBASKET");
@@ -668,7 +689,7 @@ public class Xtf24Reader implements IoxReader {
 	}
 
 	private IomObject setAdditionalObjectInfo(StartElement element, IomObject iomObj) {
-		Attribute operation = element.getAttributeByName(QNAME_OPERATION);
+		Attribute operation = element.getAttributeByName(QNAME_ILI_OPERATION);
         if(operation!=null){
         	if(transferkind!=0){
             	Attribute attrValue=(Attribute) operation;
@@ -681,7 +702,7 @@ public class Xtf24Reader implements IoxReader {
             	}
         	}
         }
-        Attribute consistency = element.getAttributeByName(QNAME_TRANSFERTYPE_CONSISTENCY); // not defined in role
+        Attribute consistency = element.getAttributeByName(QNAME_ILI_CONSISTENCY); // not to define in role
         if(consistency!=null){
         	Attribute attrValue=(Attribute) consistency;
         	if(attrValue.getValue().equals("COMPLETE")){
@@ -690,7 +711,7 @@ public class Xtf24Reader implements IoxReader {
         		iomObj.setobjectoperation(IomConstants.IOM_INCOMPLETE); // 1=INCOMPLETE
         	}
         }
-        Attribute orderPos = element.getAttributeByName(QNAME_ORDERPOS);
+        Attribute orderPos = element.getAttributeByName(QNAME_ILI_ORDERPOS);
         if(orderPos!=null){
         	Attribute attrValue=(Attribute) orderPos;
         	if(attrValue.getValue()!=null){
@@ -700,44 +721,42 @@ public class Xtf24Reader implements IoxReader {
         return iomObj;
 	}
 
-	private ch.interlis.iox_j.StartBasketEvent setBasketCodingContent(StartElement element, ch.interlis.iox_j.StartBasketEvent bidObj) {
+	private ch.interlis.iox_j.StartBasketEvent setBasketCodingContent(StartElement element, ch.interlis.iox_j.StartBasketEvent startBasketEvent) throws IoxException {
 		Iterator codingObjIter=element.getAttributes();
-		String[] domainArray=null;
+		String[] genericAndConcreteDomains=null;
 		while(codingObjIter.hasNext()){
 			Attribute codingObj=(Attribute) codingObjIter.next();
-			if(codingObj.getName().equals(QNAME_TRANSFERTYPE_SRS)){ // reference system
-				// srs
-			}else if(codingObj.getName().equals(QNAME_TRANSFERTYPE_KIND)){
+			if(codingObj.getName().equals(QNAME_ILI_STARTSTATE)){
+				startBasketEvent.setStartstate(codingObj.getValue());
+			}else if(codingObj.getName().equals(QNAME_ILI_ENDSTATE)){
+				startBasketEvent.setEndstate(codingObj.getValue());
+			}else if(codingObj.getName().equals(QNAME_ILI_KIND)){
 				if(codingObj.getValue().equals("FULL")){
-					bidObj.setKind(IomConstants.IOM_FULL);
+					startBasketEvent.setKind(IomConstants.IOM_FULL);
 					transferkind=0;
 				}else if(codingObj.getValue().equals("UPDATE")){
-					bidObj.setKind(IomConstants.IOM_UPDATE);
+					startBasketEvent.setKind(IomConstants.IOM_UPDATE);
 					transferkind=1;
 				}else if(codingObj.getValue().equals("INITIAL")){
-					bidObj.setKind(IomConstants.IOM_INITIAL);
+					startBasketEvent.setKind(IomConstants.IOM_INITIAL);
 					transferkind=2;
 				}
-			}else if(codingObj.getName().equals(QNAME_TRANSFERTYPE_DOMAIN)){
+			}else if(codingObj.getName().equals(QNAME_ILI_DOMAIN)){
 				String domainValue=codingObj.getValue();
-				domainArray=domainValue.split(" ");
-				bidObj.setTopicv(domainArray);
-			}else if(codingObj.getName().equals(QNAME_TRANSFERTYPE_CONSISTENCY)){
+				genericAndConcreteDomains=domainValue.split(" "); // genericAndConcreteDomains.getValues(genericDomain=concreteDomain)
+				for(String singleDomain : genericAndConcreteDomains){
+					String[] domains=singleDomain.split("=");
+					startBasketEvent.addDomain(domains[0], domains[1]);
+				}
+			}else if(codingObj.getName().equals(QNAME_ILI_CONSISTENCY)){
 				if(codingObj.getValue().equals("COMPLETE")){
-					bidObj.setConsistency(IomConstants.IOM_COMPLETE);
+					startBasketEvent.setConsistency(IomConstants.IOM_COMPLETE);
 				}else if(codingObj.getValue().equals("INCOMPLETE")){
-					bidObj.setConsistency(IomConstants.IOM_INCOMPLETE);
+					startBasketEvent.setConsistency(IomConstants.IOM_INCOMPLETE);
 				}
 			}
 		}
-		System.out.print("bid("+bidObj.getBid()+"), srs("+"), kind("+bidObj.getKind()+"), domains(");
-		if(domainArray!=null){
-			for(int i=0;i<domainArray.length;i++){
-				System.out.print("["+domainArray[i]+"]");
-			}
-		}
-		System.out.print("), consistency("+bidObj.getConsistency()+");");
-		return bidObj;
+		return startBasketEvent;
 	}
 
 	private static String collectXMLElement(XMLEventReader reader, XMLEvent event) throws XMLStreamException {
@@ -848,7 +867,7 @@ public class Xtf24Reader implements IoxReader {
 				// iliTopic
 				Topic topic = (Topic) topicObj;
 				String localTopicPart=topic.getName();
-				String modelNameSpace=model.getMetaValue(METAATTR_NAMESPACE);
+				String modelNameSpace=model.getMetaValue(NAMESPACE_METAATTR);
 				if(modelNameSpace==null){
 					modelNameSpace=NAMESPACE_ILIXMLBASE+model.getName();
 				}
@@ -875,7 +894,7 @@ public class Xtf24Reader implements IoxReader {
 					}
 		    		Viewable viewable = (Viewable) classObj;
 		    		String localClassPart=viewable.getName();
-    				String nameSpace=model.getMetaValue(METAATTR_NAMESPACE);
+    				String nameSpace=model.getMetaValue(NAMESPACE_METAATTR);
     				if(nameSpace==null){
     					nameSpace=NAMESPACE_ILIXMLBASE+model.getName();
     				}
@@ -1001,6 +1020,9 @@ public class Xtf24Reader implements IoxReader {
 	                if(event.isCharacters() && prop instanceof AttributeDef){ // primitive attribute
 	            		Characters character = (Characters) event;
 	                    String characterValue=character.getData();
+	                    if(characterValue.contains("OTHERS")){
+	                    	throw new IoxException("OTHERS not yet implemented.");
+	                    }
 	            		iomObj.setattrvalue(attrName, characterValue);
 	            		event=reader.nextEvent(); // <characters>
 	            		if(event.isEndElement()){ // check if end attribute
@@ -1011,7 +1033,7 @@ public class Xtf24Reader implements IoxReader {
 	                }else if(event.isEndElement()){
 	                	attrName=null;
 	                	continue;
-            		}else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_COORD)){
+	                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_COORD)){
 	            		event=reader.nextEvent(); // <coords>
 	                    event=skipSpacesAndGetNextEvent(event);
 	                    if(!event.isStartElement()){
@@ -1030,7 +1052,7 @@ public class Xtf24Reader implements IoxReader {
 	                    }else{
 	                    	throw new IoxSyntaxException(event2msgtext(event));
 	                    }
-	                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_MULTICOORD)){
+	                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_MULTICOORD)){
 	                    if(!event.isStartElement()){
 	                    	throw new IoxSyntaxException(event2msgtext(event));
 	                    }
@@ -1054,7 +1076,7 @@ public class Xtf24Reader implements IoxReader {
 	                    }else{
 	                    	throw new IoxSyntaxException(event2msgtext(event));
 	                    }
-	                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_POLYLINE)){
+	                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_POLYLINE)){
 	                    IomObject polyline = preparePolyline(event);
 	                    if(polyline.getattrcount()==0){
 	                    	throw new IoxException("expected polyline. unexpected event: "+event.asStartElement().getName().getLocalPart());
@@ -1068,7 +1090,7 @@ public class Xtf24Reader implements IoxReader {
 	                    }else{
 	                    	throw new IoxSyntaxException(event2msgtext(event));
 	                    }
-	                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_MULTIPOLYLINE)){
+	                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_MULTIPOLYLINE)){
 	                    IomObject multiPolyline = prepareMultiPolyline(event);
 	                    if(multiPolyline.getattrcount()==0){
 	                    	throw new IoxException("expected multipolyline. unexpected event: "+event.asStartElement().getName().getLocalPart());
@@ -1082,11 +1104,11 @@ public class Xtf24Reader implements IoxReader {
 	                    }else{
 	                    	throw new IoxSyntaxException(event2msgtext(event));
 	                    }
-	                }else if((event.isStartElement() && event.asStartElement().getName().equals(QNAME_LINESTRING))
-	                		|| (event.isStartElement() && event.asStartElement().getName().equals(QNAME_ORIENTABLECURVE))
-	                		|| (event.isStartElement() && event.asStartElement().getName().equals(QNAME_COMPOSITECURVE))){
+	                }else if((event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_LINESTRING))
+	                		|| (event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_ORIENTABLECURVE))
+	                		|| (event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_COMPOSITECURVE))){
 	                	throw new IoxException("unsupported geometry "+event.asStartElement().getName().getLocalPart());
-	                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_SURFACE)){
+	                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_SURFACE)){
 	                    // SURFACE (surface/area)
 	                	IomObject multiSurface=createIomObject("MULTISURFACE", null);
 	                	IomObject surface=prepareSurface(event);
@@ -1101,7 +1123,7 @@ public class Xtf24Reader implements IoxReader {
 	                	event=skipSpacesAndGetNextEvent(event);
 	                	iomObj.addattrobj(attrName, multiSurface);
 	                    return iomObj;
-	                }else if(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_MULTISURFACE) || event.asStartElement().getName().equals(QNAME_MULTIAREA))){
+	                }else if(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_GEOM_MULTISURFACE) || event.asStartElement().getName().equals(QNAME_GEOM_MULTIAREA))){
 	                    // MULTISURFACE (surfaces and/or areas)
 	                	IomObject multisurface=prepareMultiSurface(event);
 	                	if(multisurface.getattrcount()==0){
@@ -1206,16 +1228,6 @@ public class Xtf24Reader implements IoxReader {
 		return iomObj;
 	}
 
-    private int getOrderPos(StartElement element) {
-    	int posNumber=0;
-    	Attribute operation = element.getAttributeByName(QNAME_ORDERPOS);
-    	Attribute attrValue=(Attribute) operation;
-    	if(!attrValue.getValue().equals(0)){
-    		return Integer.parseInt(attrValue.getValue());
-    	}
-		return 0;
-	}
-
 	private boolean isEmbeddedRole(RoleDef role) {
 		return role.getOppEnd().isAssociationEmbedded();
 	}   
@@ -1230,7 +1242,7 @@ public class Xtf24Reader implements IoxReader {
     	IomObject multiSurface=createIomObject("MULTISURFACE", null);
     	event=reader.nextEvent();
 		event=skipSpacesAndGetNextEvent(event);
-    	while(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_SURFACE) || event.asStartElement().getName().equals(QNAME_AREA))){
+    	while(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_GEOM_SURFACE) || event.asStartElement().getName().equals(QNAME_GEOM_AREA))){
     		multiSurface.addattrobj("surface", prepareSurface(event));
 	    	event=reader.nextEvent();
 	    	event=skipSpacesAndGetNextEvent(event);
@@ -1248,7 +1260,7 @@ public class Xtf24Reader implements IoxReader {
     	IomObject surface=createIomObject("SURFACE", null);
     	event=reader.nextEvent();
 		event=skipSpacesAndGetNextEvent(event);
-    	while(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_INTERIOR) || event.asStartElement().getName().equals(QNAME_EXTERIOR))){
+    	while(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_GEOM_INTERIOR) || event.asStartElement().getName().equals(QNAME_GEOM_EXTERIOR))){
 	    	surface.addattrobj("boundary", prepareBoundary(event));
 	    	event=reader.nextEvent();
 	    	event=skipSpacesAndGetNextEvent(event);
@@ -1266,7 +1278,7 @@ public class Xtf24Reader implements IoxReader {
     	IomObject boundary=createIomObject("BOUNDARY", null);
     	event=reader.nextEvent();
 		event=skipSpacesAndGetNextEvent(event);
-    	while(event.isStartElement() && event.asStartElement().getName().equals(QNAME_POLYLINE)){
+    	while(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_POLYLINE)){
 	    	boundary.addattrobj("polyline", preparePolyline(event));
 	    	event=reader.nextEvent();
 	    	event=skipSpacesAndGetNextEvent(event);
@@ -1284,7 +1296,7 @@ public class Xtf24Reader implements IoxReader {
     	IomObject multiPolyline=createIomObject("MULTIPOLYLINE", null);
     	event=reader.nextEvent();
 		event=skipSpacesAndGetNextEvent(event);
-    	while(event.isStartElement() && event.asStartElement().getName().equals(QNAME_POLYLINE)){
+    	while(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_POLYLINE)){
 	    	multiPolyline.addattrobj("polyline", preparePolyline(event));
 	    	event=reader.nextEvent();
 	    	event=skipSpacesAndGetNextEvent(event);
@@ -1370,9 +1382,9 @@ public class Xtf24Reader implements IoxReader {
 						break;
 					case A2: segment.setattrvalue("A2", event.asCharacters().getData());
 						break;
-					case R: segment.setattrvalue("R", event.asCharacters().getData());
-						break;
 					case MULTICOORD: segment.setattrvalue("multicoord", event.asCharacters().getData());
+						break;
+					case R: // ignore
 						break;
 					default: throw new IoxSyntaxException(event2msgtext(event));
 				}

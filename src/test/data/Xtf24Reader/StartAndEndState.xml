@@ -6,8 +6,11 @@
 		</ili:models>
 	</ili:headersection>
 	<ili:datasection>
-		<TopicA ili:bid="bid1" ili:srs="urn:ogc:def:crs:EPSG::21781">
-			<ClassA ili:tid="tid1"></ClassA>
+		<TopicA ili:bid="bid1" ili:startstate="state1" ili:endstate="state2">
+			<ClassA ili:tid="12"></ClassA>
+		</TopicA>
+		<TopicA ili:bid="bid1" ili:startstate="state2" ili:endstate="state3">
+			<ClassA ili:tid="23"></ClassA>
 		</TopicA>
 	</ili:datasection>
 </ili:transfer>

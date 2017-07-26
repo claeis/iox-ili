@@ -8,7 +8,6 @@ import ch.interlis.ili2c.Ili2cFailure;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
-import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.EndBasketEvent;
@@ -222,7 +221,7 @@ public class Xtf24ReaderAssociationTest {
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn in einer Stand-Alone-Association:
 	// Die Erste Rolle EXTENDED ist und 1 der 2 moeglichen Zielklassen die Kardinalitaet erfuellt.
-	//Die Erste Rolle EXTENDED ist und 1 der 2 moeglichen Zielklassen die Kardinalitaet erfuellt und die Einschraenkung eingehalten wird.
+	// Die Erste Rolle EXTENDED ist und 1 der 2 moeglichen Zielklassen die Kardinalitaet erfuellt und die Einschraenkung eingehalten wird.
 	@Test
 	public void testStandAlongeExtendedOrRestriction_Ok()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"AssoAlone1tonExtendedOr.xml"));
@@ -412,6 +411,38 @@ public class Xtf24ReaderAssociationTest {
 		
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob ein Delete Object mit einer tid und einer Reference erstellt werden kann.
+	@Test
+	public void testDeleteObjectWithRef_Fail()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"DeleteObjectWithRef.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent); // Association.TopicA, bidA
+		
+		IoxEvent event=reader.read();
+		assertTrue(event instanceof  ObjectEvent); // return Association.TopicA.ClassA oid oid1 {}
+		IomObject iomObjA=((ObjectEvent) event).getIomObject();
+		int attrCount=iomObjA.getattrcount();
+		assertEquals(0, attrCount);
+		
+		event=reader.read();
+		assertTrue(event instanceof  ObjectEvent); // return Association.TopicA.ClassB oid oid2 {roleA -> oid1 REF {}}
+		IomObject iomObjB=((ObjectEvent) event).getIomObject();
+		String refOid=iomObjB.getattrobj("roleA", 0).getobjectrefoid();
+		assertEquals("oid1", refOid);
+		
+		assertTrue(reader.read() instanceof  ObjectEvent); // delete oid 22 {}
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains("ili:delete references are not yet implemented."));
+	        assertTrue(ioxEx instanceof IoxException);
+		}
 		reader.close();
 		reader=null;
 	}

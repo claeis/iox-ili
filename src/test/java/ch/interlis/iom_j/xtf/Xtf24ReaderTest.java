@@ -2,9 +2,9 @@ package ch.interlis.iom_j.xtf;
 
 import static org.junit.Assert.*;
 import java.io.File;
-
-import javax.xml.stream.events.StartElement;
-
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.junit.Before;
 import org.junit.Test;
 import ch.interlis.ili2c.Ili2cFailure;
@@ -114,6 +114,67 @@ public class Xtf24ReaderTest {
 		reader=null;
 	}
 	
+	// Es wird getestet ob ein Delete Object mit einer tid als referenz erstellt werden kann.
+	@Test
+	public void testDeleteObject_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"DeleteObject.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent); // Test1
+		assertTrue(reader.read() instanceof  StartBasketEvent); // Test1.TopicA, bid1
+		assertTrue(reader.read() instanceof  ObjectEvent); // delete oid=22
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicA.ClassA oid 22 {}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob ein Delete Object ohne tid erstellt werden kann.
+	@Test
+	public void testDeleteObjectNoTid_Fail()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"DeleteObjectNoTid.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent); // Test1
+		assertTrue(reader.read() instanceof  StartBasketEvent); // Test1.TopicA, bid1
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains("ili:delete object needs tid"));
+	        assertTrue(ioxEx instanceof IoxException);
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob ein Object mit einem Basket welcher: StartState und EndState als Parameter beinhalten.
+	@Test
+	public void testStartEndState_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"StartAndEndState.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		
+		StartBasketEvent startBasket=(StartBasketEvent) reader.read(); // Test1.TopicA, bid1
+		String startstate=startBasket.getStartstate();
+		assertEquals("state1", startstate); // startstate=state1
+		String endstate=startBasket.getEndstate();
+		assertEquals("state2", endstate); // endstate=state2
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicA.ClassA oid 12 {}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		StartBasketEvent startBasket3=(StartBasketEvent) reader.read(); // Test1.TopicA, bid1
+		String startstate3=startBasket3.getStartstate();
+		assertEquals("state2", startstate3); // startstate=state2
+		String endstate4=startBasket3.getEndstate();
+		assertEquals("state3", endstate4); // endstate=state3
+		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicA.ClassA oid 23 {}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
 	// Es wird getestet ob mehrere Baskets mit je 2 Objekten erstellt werden koennen.
 	@Test
 	public void testMultipleBasketsAndObjects_Ok()  throws Iox2jtsException, IoxException {
@@ -136,20 +197,6 @@ public class Xtf24ReaderTest {
 		reader.close();
 		reader=null;
 	}
-	
-	// In diesem Test soll getestet werden, ob srs aus den Transferinformationen innerhalb von StartBasketEvent gesetzt werden kann.
-//	@Test
-//	public void testBasketWithSRS_Ok() throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"BasketWithSRS.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent); // bid1, SRS
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
 	
 	// In diesem Test soll getestet werden, ob kind aus den Transferinformationen innerhalb von StartBasketEvent gesetzt werden kann.
 	@Test
@@ -184,11 +231,22 @@ public class Xtf24ReaderTest {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"BasketWithDomains.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
-		StartBasketEvent startBasket=(StartBasketEvent) reader.read();
-		String[] transferDomain=startBasket.getTopicv();
-		assertEquals("Test1.TopicA.DOMAIN=Test1.TopicA.DOMAIN", transferDomain[0]);
-		assertEquals("Test1", transferDomain[1]);
-		assertEquals("Test1.TopicB.DOMAIN=Test1.TopicB.DOMAIN", transferDomain[2]);
+		ch.interlis.iox_j.StartBasketEvent startBasket=(ch.interlis.iox_j.StartBasketEvent) reader.read();
+		Map<String, String> transferDomain=startBasket.getDomains();
+		Iterator<Entry<String, String>> domainIter=transferDomain.entrySet().iterator();
+
+		Entry<String, String> domainEntry=domainIter.next();
+		assertEquals("Test1.TopicA.DOMAIN3", domainEntry.getKey());
+		assertEquals("Test1.TopicA.DOMAIN4", domainEntry.getValue());
+		
+		domainEntry=domainIter.next();
+		assertEquals("Test1.TopicA.DOMAIN1", domainEntry.getKey());
+		assertEquals("Test1.TopicA.DOMAIN2", domainEntry.getValue());
+		
+		domainEntry=domainIter.next();
+		assertEquals("Test1.TopicB.DOMAIN5", domainEntry.getKey());
+		assertEquals("Test1.TopicB.DOMAIN6", domainEntry.getValue());
+		
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();

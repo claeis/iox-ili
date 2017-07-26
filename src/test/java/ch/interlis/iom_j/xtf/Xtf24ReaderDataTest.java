@@ -51,6 +51,79 @@ public class Xtf24ReaderDataTest {
 		reader=null;
 	}
 	
+//	// Es wird getestet ob Attribute mit den Selben Namen in unterschiedlichen Klassen ohne Fehler erstellt werden koennen.
+//	@Test
+//	public void testSameAttrNamesInDifClasses_Ok()  throws Iox2jtsException, IoxException {
+//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"SameAttrNames.xml"));
+//		reader.setModel(td);
+//		assertTrue(reader.read() instanceof  StartTransferEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicD1 ili:bid="bidD1">
+//		assertTrue(reader.read() instanceof  ObjectEvent); // <ClassA ili:tid="oid1">
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicD1 ili:bid="bidD2">
+//		assertTrue(reader.read() instanceof  ObjectEvent); // <ClassA ili:tid="oid2">
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicD1 ili:bid="bidD3">
+//		assertTrue(reader.read() instanceof  ObjectEvent); // <ClassA ili:tid="oid3">
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  EndTransferEvent);
+//		reader.close();
+//		reader=null;
+//	}
+	
+//	// Es wird getestet ob Klassen mit den Selben Namen in unterschiedlichen Topics ohne Fehler erstellt werden koennen.
+//	@Test
+//	public void testSameClassNamesInDifTopics_Ok() throws Iox2jtsException, IoxException {
+//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"SameClassNames.xml"));
+//		reader.setModel(td);
+//		assertTrue(reader.read() instanceof  StartTransferEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent);
+//		assertTrue(reader.read() instanceof  ObjectEvent); // <ClassA ili:tid="oid1">
+//		assertTrue(reader.read() instanceof  ObjectEvent); // <ClassA ili:tid="oid2">
+//		assertTrue(reader.read() instanceof  ObjectEvent); // <ClassA ili:tid="oid3">
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  EndTransferEvent);
+//		reader.close();
+//		reader=null;
+//	}
+	
+//	// Es wird getestet ob eine Klasse mit den Selben Namen wie das Topic hat ohne Fehler erstellt werden kann.
+//	@Test
+//	public void testTopicNameLikeClassName_Ok() throws Iox2jtsException, IoxException {
+//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"TopicNameLikeClassName.xml"));
+//		reader.setModel(td);
+//		assertTrue(reader.read() instanceof  StartTransferEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicE ili:bid="bidE1">
+//		assertTrue(reader.read() instanceof  ObjectEvent); // <TopicE ili:tid="oid1">
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicE ili:bid="bidE2">
+//		assertTrue(reader.read() instanceof  ObjectEvent); // <TopicE ili:tid="oid2">
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicE ili:bid="bidE3">
+//		assertTrue(reader.read() instanceof  ObjectEvent); // <TopicE ili:tid="oid3">
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  EndTransferEvent);
+//		reader.close();
+//		reader=null;
+//	}
+	
+//	// Alle Attribute, Klassen und Topics haben die Selben Namen.
+//	@Test
+//	public void testAttrClassTopicNameSame_Ok() throws Iox2jtsException, IoxException {
+//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"SameAttrClassTopicNames.xml"));
+//		reader.setModel(td);
+//		assertTrue(reader.read() instanceof  StartTransferEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicF ili:bid="bidF1">
+//		assertTrue(reader.read() instanceof  ObjectEvent); // <TopicF ili:tid="oid1">
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicF ili:bid="bidF2">
+//		assertTrue(reader.read() instanceof  ObjectEvent); // <TopicF ili:tid="oid2">
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  EndTransferEvent);
+//		reader.close();
+//		reader=null;
+//	}
+	
 	// Es wird getestet ob Aufzaehlungen ohne Fehler erstellt werden koennen.
 	@Test
 	public void testEnumerationType_Ok()  throws Iox2jtsException, IoxException {
@@ -353,6 +426,40 @@ public class Xtf24ReaderDataTest {
 			fail();
 		}catch(IoxException ex){
 			assertTrue((ex).getMessage().contains("View1"));
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob eine Enumeration: OTHERS erstellt werden kann.
+	@Test
+	public void testEnumerationOthers_Fail() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"EnumerationOthers.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ex){
+			assertTrue((ex).getMessage().contains("OTHERS not yet implemented.")); // OTHERS not yet implemented
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob eine Enumeration: enumeration.OTHERS erstellt werden kann.
+	@Test
+	public void testSubEnumerationOthers_Fail() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"subEnumerationOthers.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ex){
+			assertTrue((ex).getMessage().contains("OTHERS not yet implemented.")); // OTHERS not yet implemented
 		}
 		reader.close();
 		reader=null;

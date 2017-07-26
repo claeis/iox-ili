@@ -38,10 +38,10 @@ MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 		farbePlus EXTENDS farbe = (rot (dunkelrot, orange, karmin),gruen (hellgruen, dunkelgruen: FINAL),blau);
 		farbePlusPlus EXTENDS farbePlus = (rot (FINAL),blau (hellblau, dunkelblau));
 		
-		NOOID = OID ANY; !! beliebiger, nicht stabiler Identifikator
+		NOOID = OID ANY;
 		ANYOID EXTENDS NOOID = OID ANY;
-		I32OID EXTENDS ANYOID = OID 0 .. 2147483647; !! positive, 4 Bytes Integerwerte
-		STANDARDOID EXTENDS ANYOID = OID TEXT*16; !! gemäss Anhang F (nur Ziffern und Buchstaben erlaubt)
+		I32OID EXTENDS ANYOID = OID 0 .. 2147483647;
+		STANDARDOID EXTENDS ANYOID = OID TEXT*16;
 		UUIDOID EXTENDS ANYOID = OID TEXT*36;
 		
 		Mkoord = MULTICOORD 480000.000 .. 850000.000 [INTERLIS.m];
@@ -52,20 +52,6 @@ MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 		Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
 				        70000.000 .. 310000.000 [INTERLIS.m],
 				              0.000 .. 5000.000 [INTERLIS.m];
-		
-		!!undefConst = UNDEFINED;
-		!!numericConst = 50;
-		!!#textConst;
-		!!formattedConst = INTERLIS.DATE;
-		!!enumerationConst = eins.zwei;
-		!!classConst = ClassA;
-		!!attributePathConst = DataTest1.TopicA.ClassA;
-		
-		!!distanz (ABSTRACT) = NUMERIC [Length];
-		!!meterDist (ABSTRACT) EXTENDS distanz = NUMERIC [m];
-		!!fussDist (ABSTRACT) EXTENDS distanz = NUMERIC [ft];
-		!!kurzeMeter EXTENDS meterDist = 0.00 .. 100.00 [m];
-		!!kurzeFuesse EXTENDS fussDist = 0.00 .. 100.00 [ft];
 	
 	TOPIC TopicA =
 		
@@ -91,6 +77,10 @@ MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 			attrH : halignment;
 			attrV : valignment;
 		END ClassD;
+		
+		CLASS ClassOthers =
+			attrO : farbe;
+		END ClassOthers;
 		
 		CLASS ClassE =
 			attrDate : buchungsDatum;
@@ -220,6 +210,44 @@ MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 			attr2 : TEXT*10 := "fail";
 		END View1;
 	END TopicB;
+	
+	TOPIC TopicC =
+		CLASS ClassA =
+			attrA : TEXT*10;
+		END ClassA;
+		
+		CLASS ClassB =
+			attrA : TEXT*10;
+		END ClassB;
+		
+		CLASS ClassC =
+			attrA : TEXT*10;
+		END ClassC;
+	END TopicC;
+	
+	TOPIC TopicD1 =
+		CLASS ClassA =
+		END ClassA;
+	END TopicD1;
+	TOPIC TopicD2 =
+		CLASS ClassA =
+		END ClassA;
+	END TopicD2;
+	TOPIC TopicD3 =
+		CLASS ClassA =
+		END ClassA;
+	END TopicD3;
+	
+	TOPIC TopicE =
+		CLASS TopicE =
+		END TopicE;
+	END TopicE;
+	
+	TOPIC TopicF =
+		CLASS TopicF =
+			TopicF : TEXT*10;
+		END TopicF;
+	END TopicF;
 	
 	VIEW TOPIC AdditionalTopicA =
 		DEPENDS ON DataTest1.TopicB;

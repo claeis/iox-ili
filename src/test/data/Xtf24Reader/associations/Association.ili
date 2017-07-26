@@ -145,11 +145,4 @@ MODEL Association (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 			assoG2 (EXTENDED)-- {1..*} ClassG3 OR ClassG4 RESTRICTION (ClassG3p);
 		END assoG;
 	END TopicG;
-	
-	TOPIC TopicH =
-		!!ASSOCIATION A1 EXTENDS A =
-		!!	K (EXTENDED, HIDING) –- K1;
-		!!	KL (EXTENDED) –- K OR L RESTRICTION (L1, L2);
-		!!END A1;
-	END TopicH;
 END Association.
