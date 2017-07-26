@@ -2,6 +2,9 @@ package ch.interlis.iom_j.xtf;
 
 import static org.junit.Assert.*;
 import java.io.File;
+
+import javax.xml.stream.events.StartElement;
+
 import org.junit.Before;
 import org.junit.Test;
 import ch.interlis.ili2c.Ili2cFailure;
@@ -9,8 +12,10 @@ import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
+import ch.interlis.iom.IomObject;
 import ch.interlis.iox.EndBasketEvent;
 import ch.interlis.iox.EndTransferEvent;
+import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.ObjectEvent;
 import ch.interlis.iox.StartBasketEvent;
@@ -127,6 +132,159 @@ public class Xtf24ReaderTest {
 		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicC.ClassC oid x41 {}
 		assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicC.ClassC oid x40 {}
 		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// In diesem Test soll getestet werden, ob srs aus den Transferinformationen innerhalb von StartBasketEvent gesetzt werden kann.
+//	@Test
+//	public void testBasketWithSRS_Ok() throws Iox2jtsException, IoxException {
+//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"BasketWithSRS.xml"));
+//		reader.setModel(td);
+//		assertTrue(reader.read() instanceof  StartTransferEvent);
+//		assertTrue(reader.read() instanceof  StartBasketEvent);
+//		assertTrue(reader.read() instanceof  ObjectEvent); // bid1, SRS
+//		assertTrue(reader.read() instanceof  EndBasketEvent);
+//		assertTrue(reader.read() instanceof  EndTransferEvent);
+//		reader.close();
+//		reader=null;
+//	}
+	
+	// In diesem Test soll getestet werden, ob kind aus den Transferinformationen innerhalb von StartBasketEvent gesetzt werden kann.
+	@Test
+	public void testBasketWithTransferKind_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"BasketWithTransferKind.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		
+		StartBasketEvent startBasket=(StartBasketEvent) reader.read();
+		int transferKind=startBasket.getKind();
+		assertEquals(0, transferKind); // transfer kind: 0 == FULL
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		startBasket=(StartBasketEvent) reader.read();
+		transferKind=startBasket.getKind();
+		assertEquals(1, transferKind); // transfer kind: 1 == UPDATE
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		startBasket=(StartBasketEvent) reader.read();
+		transferKind=startBasket.getKind();
+		assertEquals(2, transferKind); // transfer kind: 2 == INITIAL
+		
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// In diesem Test soll getestet werden, ob die domains auf den Transferinformationen innerhalb von StartBasketEvent gesetzt werden koennen.
+	@Test
+	public void testBasketWithDomains_Ok() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"BasketWithDomains.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		StartBasketEvent startBasket=(StartBasketEvent) reader.read();
+		String[] transferDomain=startBasket.getTopicv();
+		assertEquals("Test1.TopicA.DOMAIN=Test1.TopicA.DOMAIN", transferDomain[0]);
+		assertEquals("Test1", transferDomain[1]);
+		assertEquals("Test1.TopicB.DOMAIN=Test1.TopicB.DOMAIN", transferDomain[2]);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// In diesem Test soll getestet werden, ob constency aus den Transferinformationen innerhalb von StartBasketEvent gesetzt werden kann.
+	@Test
+	public void testBasketWithConsistency_Ok() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"BasketWithConsistency.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		
+		StartBasketEvent startBasket=(StartBasketEvent) reader.read();
+		int transferConsistency=startBasket.getConsistency();
+		assertEquals(0, transferConsistency); // 0 == COMPLETE
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		startBasket=(StartBasketEvent) reader.read();
+		transferConsistency=startBasket.getConsistency();
+		assertEquals(1, transferConsistency); // 1 == INCOMPLETE
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// In diesem Test soll getestet werden, ob die operationen: INSERT, UPDATE und DELETE aus den Objectinformationen innerhalb dem Object gesetzt werden koennen.
+	// Da das Erste Objekt einen transferkind=FULL hat, werden keine operationen dem Objekt uebergeben. Die Standard Einstellung 0 bleibt bestehen.
+	@Test
+	public void testObjectOperationMode_Ok() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"ObjectOperationMode.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		
+		IoxEvent event=reader.read();
+		assertTrue(event instanceof  ObjectEvent);
+		IomObject objectValue=((ObjectEvent) event).getIomObject();
+		int operationMode=objectValue.getobjectoperation();
+		assertEquals(0, operationMode); // 0 == INSERT
+		
+		event=reader.read();
+		assertTrue(event instanceof  ObjectEvent);
+		objectValue=((ObjectEvent) event).getIomObject();
+		operationMode=objectValue.getobjectoperation();
+		assertEquals(0, operationMode); // 0 == INSERT
+		
+		event=reader.read();
+		assertTrue(event instanceof  ObjectEvent);
+		objectValue=((ObjectEvent) event).getIomObject();
+		operationMode=objectValue.getobjectoperation();
+		assertEquals(0, operationMode); // 0 == INSERT
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		event=reader.read();
+		assertTrue(event instanceof  ObjectEvent);
+		objectValue=((ObjectEvent) event).getIomObject();
+		operationMode=objectValue.getobjectoperation();
+		assertEquals(0, operationMode); // 0 == INSERT
+		
+		event=reader.read();
+		assertTrue(event instanceof  ObjectEvent);
+		objectValue=((ObjectEvent) event).getIomObject();
+		operationMode=objectValue.getobjectoperation();
+		assertEquals(1, operationMode); // 1 == UPDATE
+		
+		event=reader.read();
+		assertTrue(event instanceof  ObjectEvent);
+		objectValue=((ObjectEvent) event).getIomObject();
+		operationMode=objectValue.getobjectoperation();
+		assertEquals(2, operationMode); // 2 == DELETE
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		event=reader.read();
+		assertTrue(event instanceof  ObjectEvent);
+		objectValue=((ObjectEvent) event).getIomObject();
+		operationMode=objectValue.getobjectoperation();
+		assertEquals(0, operationMode); // 0 == INSERT
+		
+		event=reader.read();
+		assertTrue(event instanceof  ObjectEvent);
+		objectValue=((ObjectEvent) event).getIomObject();
+		operationMode=objectValue.getobjectoperation();
+		assertEquals(1, operationMode); // 1 == UPDATE
+		
+		event=reader.read();
+		assertTrue(event instanceof  ObjectEvent);
+		objectValue=((ObjectEvent) event).getIomObject();
+		operationMode=objectValue.getobjectoperation();
+		assertEquals(2, operationMode); // 2 == DELETE
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;

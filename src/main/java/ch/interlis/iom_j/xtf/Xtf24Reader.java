@@ -16,6 +16,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.iox.objpool.impl.ObjPoolEntry;
 import ch.interlis.ili2c.generator.Iligml20Generator;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.AttributeDef;
@@ -29,6 +30,7 @@ import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.View;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
+import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.iligml.LinkPool;
 import ch.interlis.iox.IoxEvent;
@@ -44,9 +46,9 @@ public class Xtf24Reader implements IoxReader {
 	private LinkPool linkPool=new LinkPool();
 	private Iterator<IomObject> linkIterator;
 	private java.io.InputStream inputFile=null;
-	
 	private Topic currentTopic=null;
 	private IomObject iomObj=null;
+	private Integer transferkind=0;
 	
 	// ili content
 	private HashMap<QName, Topic> iliTopics=null;
@@ -95,6 +97,8 @@ public class Xtf24Reader implements IoxReader {
     private static final QName QNAME_XML_MODEL=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"model");
     private static final QName QNAME_BID = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "bid");
     private static final QName QNAME_TID = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "tid");
+    private static final QName QNAME_ORDERPOS = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "order_pos");
+    private static final QName QNAME_OPERATION = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "operation");
     private static final QName QNAME_GEOM_COORD = new QName(NAMESPACE_GEOM, "coord");
     private static final QName QNAME_GEOM_ARC = new QName(NAMESPACE_GEOM, "arc");
     private static final QName QNAME_MULTICOORD = new QName(NAMESPACE_GEOM, "multicoord");
@@ -113,7 +117,13 @@ public class Xtf24Reader implements IoxReader {
 	private static final String SEGMENTTYPE_COORD="COORD";
 	private static final String SEGMENTTYPE_ARC="ARC";
     private static final QName QNAME_ILI_REF = new QName(NAMESPACE_ILIXMLBASE_INTERLIS, "ref"); // ili:ref
-	// header information
+	
+    private static final QName QNAME_TRANSFERTYPE_SRS=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"srs");
+    private static final QName QNAME_TRANSFERTYPE_KIND=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"kind");
+    private static final QName QNAME_TRANSFERTYPE_DOMAIN=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"domains");
+    private static final QName QNAME_TRANSFERTYPE_CONSISTENCY=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"consistency");
+    
+    // header information
     private ArrayList<String> models=new ArrayList<String>();
     private String sender=null;
     private String comment=null;
@@ -190,6 +200,7 @@ public class Xtf24Reader implements IoxReader {
         if(state==PRE_ENDBASKET && linkIterator!=null){
 			if(linkIterator.hasNext()){
 				IomObject assocObj=linkIterator.next();
+				System.out.println(assocObj.toString());
 				return new ch.interlis.iox_j.ObjectEvent(assocObj);
 			}
         	linkIterator=null;
@@ -522,12 +533,14 @@ public class Xtf24Reader implements IoxReader {
                 	if(currentTopic==null){
                 		throw new IoxSyntaxException(event2msgtext(event));
                 	}
-//                	setTransferType(event);
                 	QName gmlId = QNAME_BID;
                 	Attribute bid = element.getAttributeByName(gmlId);
                 	if(bid!=null){
                 		state=INSIDE_BASKET;
-                		return new ch.interlis.iox_j.StartBasketEvent(currentTopic.getScopedName(), bid.getValue());
+                		System.out.println(currentTopic.getScopedName()+", "+bid.getValue());
+                		ch.interlis.iox_j.StartBasketEvent newObj=new ch.interlis.iox_j.StartBasketEvent(currentTopic.getScopedName(), bid.getValue());
+                		ch.interlis.iox_j.StartBasketEvent bidObj=setBasketCodingContent(element, newObj);
+                		return bidObj;
                 	}else{
                 		throw new IoxSyntaxException(event2msgtext(event));
                 	}
@@ -562,9 +575,7 @@ public class Xtf24Reader implements IoxReader {
                     if(viewable==null){
                     	throw new IoxSyntaxException(event2msgtext(event));
                     }
-                    Integer srsDimension=null;
-                    QName qName = QNAME_TID;
-                    Attribute oid = element.getAttributeByName(qName);
+                    Attribute oid = element.getAttributeByName(QNAME_TID);
                     if(oid!=null){
                     	try{
                     		iomObj=createIomObject(viewable.getScopedName(), oid.getValue());
@@ -573,7 +584,9 @@ public class Xtf24Reader implements IoxReader {
                     	}
                 		try{
 							iomObj=readObject(event, viewable, iomObj);
+							setAdditionalObjectInfo(element, iomObj);
 							event=reader.nextEvent(); // <object>
+							System.out.println(iomObj.toString());
 	                    	return new ch.interlis.iox_j.ObjectEvent(iomObj);
 						}catch(IoxSyntaxException ex){								
 							throw new IoxSyntaxException(event2msgtext(event)+"\n"+ex);
@@ -590,6 +603,7 @@ public class Xtf24Reader implements IoxReader {
 	            		linkIterator = objList.iterator();
 	            		if(linkIterator!=null && linkIterator.hasNext()){
 	            			IomObject assocObj=linkIterator.next();
+	            			System.out.println(assocObj.toString());
 	            			return new ch.interlis.iox_j.ObjectEvent(assocObj);
 	            		}
                 	}
@@ -651,6 +665,79 @@ public class Xtf24Reader implements IoxReader {
             }
 		}
 		return null;
+	}
+
+	private IomObject setAdditionalObjectInfo(StartElement element, IomObject iomObj) {
+		Attribute operation = element.getAttributeByName(QNAME_OPERATION);
+        if(operation!=null){
+        	if(transferkind!=0){
+            	Attribute attrValue=(Attribute) operation;
+            	if(attrValue.getValue().equals("INSERT")){
+            		iomObj.setobjectoperation(IomConstants.IOM_OP_INSERT); // op(0=insert)
+            	}else if(attrValue.getValue().equals("UPDATE")){
+            		iomObj.setobjectoperation(IomConstants.IOM_OP_UPDATE); // op(1=update)
+            	}else if(attrValue.getValue().equals("DELETE")){
+            		iomObj.setobjectoperation(IomConstants.IOM_OP_DELETE); // op(2=delete)
+            	}
+        	}
+        }
+        Attribute consistency = element.getAttributeByName(QNAME_TRANSFERTYPE_CONSISTENCY); // not defined in role
+        if(consistency!=null){
+        	Attribute attrValue=(Attribute) consistency;
+        	if(attrValue.getValue().equals("COMPLETE")){
+        		iomObj.setobjectoperation(IomConstants.IOM_COMPLETE); // 0=COMPLETE
+        	}else if(attrValue.getValue().equals("INCOMPLETE")){
+        		iomObj.setobjectoperation(IomConstants.IOM_INCOMPLETE); // 1=INCOMPLETE
+        	}
+        }
+        Attribute orderPos = element.getAttributeByName(QNAME_ORDERPOS);
+        if(orderPos!=null){
+        	Attribute attrValue=(Attribute) orderPos;
+        	if(attrValue.getValue()!=null){
+        		iomObj.setobjectreforderpos(Long.parseLong(attrValue.getValue()));
+        	}
+        }
+        return iomObj;
+	}
+
+	private ch.interlis.iox_j.StartBasketEvent setBasketCodingContent(StartElement element, ch.interlis.iox_j.StartBasketEvent bidObj) {
+		Iterator codingObjIter=element.getAttributes();
+		String[] domainArray=null;
+		while(codingObjIter.hasNext()){
+			Attribute codingObj=(Attribute) codingObjIter.next();
+			if(codingObj.getName().equals(QNAME_TRANSFERTYPE_SRS)){ // reference system
+				// srs
+			}else if(codingObj.getName().equals(QNAME_TRANSFERTYPE_KIND)){
+				if(codingObj.getValue().equals("FULL")){
+					bidObj.setKind(IomConstants.IOM_FULL);
+					transferkind=0;
+				}else if(codingObj.getValue().equals("UPDATE")){
+					bidObj.setKind(IomConstants.IOM_UPDATE);
+					transferkind=1;
+				}else if(codingObj.getValue().equals("INITIAL")){
+					bidObj.setKind(IomConstants.IOM_INITIAL);
+					transferkind=2;
+				}
+			}else if(codingObj.getName().equals(QNAME_TRANSFERTYPE_DOMAIN)){
+				String domainValue=codingObj.getValue();
+				domainArray=domainValue.split(" ");
+				bidObj.setTopicv(domainArray);
+			}else if(codingObj.getName().equals(QNAME_TRANSFERTYPE_CONSISTENCY)){
+				if(codingObj.getValue().equals("COMPLETE")){
+					bidObj.setConsistency(IomConstants.IOM_COMPLETE);
+				}else if(codingObj.getValue().equals("INCOMPLETE")){
+					bidObj.setConsistency(IomConstants.IOM_INCOMPLETE);
+				}
+			}
+		}
+		System.out.print("bid("+bidObj.getBid()+"), srs("+"), kind("+bidObj.getKind()+"), domains(");
+		if(domainArray!=null){
+			for(int i=0;i<domainArray.length;i++){
+				System.out.print("["+domainArray[i]+"]");
+			}
+		}
+		System.out.print("), consistency("+bidObj.getConsistency()+");");
+		return bidObj;
 	}
 
 	private static String collectXMLElement(XMLEventReader reader, XMLEvent event) throws XMLStreamException {
@@ -1095,7 +1182,9 @@ public class Xtf24Reader implements IoxReader {
 			throw new IoxException("unexpected reference format "+refOid);
 		}
 		if(aclass.isExtending(association)){
-			iomObj.addattrobj(role.getName(),"REF").setobjectrefoid(refOid);			
+			iomObj.addattrobj(role.getName(),"REF").setobjectrefoid(refOid);
+			IomObject anObject=iomObj.getattrobj(role.getName(), 0);
+			setAdditionalObjectInfo(element, anObject);
 		}else{
 			// tests, if this association has no link object,
 			// but is embedded in a association end object.
@@ -1105,6 +1194,8 @@ public class Xtf24Reader implements IoxReader {
 				if(isEmbeddedRole(role)){
 					// embedded
 					iomObj.addattrobj(role.getName(),"REF").setobjectrefoid(refOid);
+					IomObject aObject=iomObj.getattrobj(role.getName(), 0);
+					setAdditionalObjectInfo(element, aObject);
 				}else{
 					// ignore
 				}
@@ -1115,7 +1206,17 @@ public class Xtf24Reader implements IoxReader {
 		return iomObj;
 	}
 
-    private boolean isEmbeddedRole(RoleDef role) {
+    private int getOrderPos(StartElement element) {
+    	int posNumber=0;
+    	Attribute operation = element.getAttributeByName(QNAME_ORDERPOS);
+    	Attribute attrValue=(Attribute) operation;
+    	if(!attrValue.getValue().equals(0)){
+    		return Integer.parseInt(attrValue.getValue());
+    	}
+		return 0;
+	}
+
+	private boolean isEmbeddedRole(RoleDef role) {
 		return role.getOppEnd().isAssociationEmbedded();
 	}   
     

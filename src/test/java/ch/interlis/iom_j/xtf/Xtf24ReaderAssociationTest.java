@@ -8,6 +8,7 @@ import ch.interlis.ili2c.Ili2cFailure;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
+import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.EndBasketEvent;
@@ -64,6 +65,33 @@ public class Xtf24ReaderAssociationTest {
 		reader=null;
 	}
 	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn eine eine Rolle in einer Embedded Association erstellt wird.
+	// Die Rolle soll zusaetzlich order_pos und operation enthalten.
+	@Test
+	public void testEmbeddedOperationOrderpos_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"AssoEmbeddedOperationOrderpos.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		
+		IoxEvent event=reader.read();
+		assertTrue(event instanceof  ObjectEvent); // return Association.Mensch.Frau oid oid1 {bezFrau -> Mensch.Frau REF {}}
+		
+		event=reader.read();
+		assertTrue(event instanceof  ObjectEvent); // return Association.Mensch.Frau oid oid2 {bezMann -> Mensch.Mann REF {}}
+		IomObject iomObjB2=((ObjectEvent) event).getIomObject();
+		String refOidB2=iomObjB2.getattrobj("bezMann", 0).getobjectrefoid();
+		assertEquals("Mensch.Mann", refOidB2);
+		IomObject objValue2=iomObjB2.getattrobj("bezMann", 0);
+		assertEquals(2, objValue2.getobjectoperation());
+		assertEquals(6, objValue2.getobjectreforderpos());
+	
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn 2 Association Klassen erstellt werden, welche beide auf die Selben Klassen eine Association haben.
 	@Test
 	public void testEmbedded_2Assoc_Ok() throws Iox2jtsException, IoxException {
@@ -84,6 +112,36 @@ public class Xtf24ReaderAssociationTest {
 		String refOidM=iomObjM.getattrobj("electronA", 0).getobjectrefoid();
 		assertEquals("oidP", refOidM);
 		
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn 2 Association Klassen erstellt werden, welche beide auf die Selben Klassen Assoziieren.
+	@Test
+	public void testEmbedded2OperationOrderpos_Ok() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"AssoEmbedded2OperationOrderpos.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		
+		IoxEvent event=reader.read();
+		assertTrue(event instanceof  ObjectEvent); // return Association.Atom.Proton oid oidP {electronD -> oidN REF {}}
+		IomObject iomObjF=((ObjectEvent) event).getIomObject();
+		IomObject objValue2=iomObjF.getattrobj("electronD", 0);
+		assertEquals("oidN", objValue2.getobjectrefoid());
+		assertEquals(0, objValue2.getobjectoperation());
+		assertEquals(2, objValue2.getobjectreforderpos());
+		
+		event=reader.read();
+		assertTrue(event instanceof  ObjectEvent); // return Association.Atom.Neutron oid oidN {electronA -> oidP REF {}}
+		IomObject iomObjF2=((ObjectEvent) event).getIomObject();
+		IomObject objValue3=iomObjF2.getattrobj("electronA", 0);
+		assertEquals("oidP", objValue3.getobjectrefoid());
+		assertEquals(1, objValue3.getobjectoperation());
+		assertEquals(3, objValue3.getobjectreforderpos());
+				
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
