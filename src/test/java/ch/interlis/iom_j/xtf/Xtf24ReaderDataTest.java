@@ -39,7 +39,7 @@ public class Xtf24ReaderDataTest {
 		assertNotNull(td);
 	}
 	
-	// Es wird getestet ob Texte ohne Fehler erstellt werden koennen.
+	// Es wird getestet ob Texte ohne Fehler gelesen werden koennen.
 	@Test
 	public void testTextType_Ok()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"TextTypes.xml"));

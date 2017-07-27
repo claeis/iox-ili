@@ -6,19 +6,12 @@
 		</ili:models>
 	</ili:headersection>
 	<ili:datasection>
-		<TopicB ili:bid="bidB">
-			<ClassC ili:tid="oid1">
-			</ClassC>
-			<ClassD ili:tid="oid2">
-			</ClassD>
-			<ClassC ili:tid="oid3">
-			</ClassC>
-			<ClassD ili:tid="oid4">
-			</ClassD>
-			<assocCD ili:tid="x">
-				<assoC ili:ref="TopicB.ClassC"></assoC>
-				<assoD ili:ref="TopicB.ClassD"></assoD>
-			</assocCD>
-		</TopicB>	
+		<Atom ili:bid="bid">
+			<Proton ili:tid="oidP">
+			</Proton>
+			<Neutron ili:tid="oidN">
+				<electronA ili:ref="oidP"/>
+			</Neutron>
+		</Atom>
 	</ili:datasection>
 </ili:transfer>

@@ -6,13 +6,15 @@
 		</ili:models>
 	</ili:headersection>
 	<ili:datasection>
-		<TopicA ili:bid="bidA">
-			<ClassA ili:tid="oid1">
-				<roleB ili:ref="oid2"></roleB>
-			</ClassA>
-			<ClassB ili:tid="oid2">
-				<roleA ili:ref="oid1"></roleA>
-			</ClassB>
-		</TopicA>
+		<Baum ili:bid="bid">
+			<Ast ili:tid="oid1">
+			</Ast>
+			<Blatt ili:tid="oid2">
+			</Blatt>
+			<Beziehung>
+				<bezAst ili:ref="oid1"/>
+				<bezBlatt ili:ref="oid2"/>
+			</Beziehung>
+		</Baum>
 	</ili:datasection>
 </ili:transfer>

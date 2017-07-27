@@ -6,13 +6,12 @@
 		</ili:models>
 	</ili:headersection>
 	<ili:datasection>
-		<Mensch ili:bid="bidB">
-			<Mann ili:tid="oid1">
-				<bezFrau ili:ref="Mensch.Frau"></bezFrau>
-			</Mann>
-			<Frau ili:tid="oid2">
-				<bezMann ili:ref="Mensch.Mann"></bezMann>
-			</Frau>
-		</Mensch>
+		<Schule ili:bid="bid">
+			<Kinder ili:tid="oid1">
+			</Kinder>
+			<Lehrer ili:tid="oid2">
+				<bezKinder ili:ref="oid1"/>
+			</Lehrer>
+		</Schule>
 	</ili:datasection>
 </ili:transfer>

@@ -294,13 +294,13 @@ public class Xtf24ReaderTest {
 		assertTrue(event instanceof  ObjectEvent);
 		objectValue=((ObjectEvent) event).getIomObject();
 		operationMode=objectValue.getobjectoperation();
-		assertEquals(0, operationMode); // 0 == INSERT
+		assertEquals(1, operationMode); // 1 == UPDATE
 		
 		event=reader.read();
 		assertTrue(event instanceof  ObjectEvent);
 		objectValue=((ObjectEvent) event).getIomObject();
 		operationMode=objectValue.getobjectoperation();
-		assertEquals(0, operationMode); // 0 == INSERT
+		assertEquals(2, operationMode); // 2 == DELETE
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		
 		assertTrue(reader.read() instanceof  StartBasketEvent);

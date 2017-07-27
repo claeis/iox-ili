@@ -6,12 +6,11 @@
 		</ili:models>
 	</ili:headersection>
 	<ili:datasection>
-		<Mensch ili:bid="bidB" ili:kind="UPDATE">
+		<Mensch ili:bid="bid">
 			<Mann ili:tid="oid1">
-				<bezFrau ili:ref="Mensch.Frau"></bezFrau>
 			</Mann>
 			<Frau ili:tid="oid2">
-				<bezMann ili:ref="Mensch.Mann" ili:operation="DELETE" ili:order_pos="6"></bezMann>
+				<bezMann ili:ref="oid1"></bezMann>
 			</Frau>
 		</Mensch>
 	</ili:datasection>

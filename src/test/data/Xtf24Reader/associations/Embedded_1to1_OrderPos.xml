@@ -6,15 +6,12 @@
 		</ili:models>
 	</ili:headersection>
 	<ili:datasection>
-		<Atom ili:bid="oidAtom">
-			<Proton ili:tid="oidP">
-				<electronB ili:ref="oidN"></electronB>
-				<electronD ili:ref="oidN"></electronD>
-			</Proton>
-			<Neutron ili:tid="oidN">
-				<electronA ili:ref="oidP"></electronA>
-				<electronC ili:ref="oidP"></electronC>
-			</Neutron>
-		</Atom>
+		<Transport ili:bid="bid">
+			<Schiff ili:tid="oid1">
+			</Schiff>
+			<Hafen ili:tid="oid2">
+				<bezSchiff ili:ref="oid1" ili:order_pos="6"></bezSchiff>
+			</Hafen>
+		</Transport>
 	</ili:datasection>
 </ili:transfer>
