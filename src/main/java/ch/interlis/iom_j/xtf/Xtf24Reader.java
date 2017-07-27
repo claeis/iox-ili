@@ -44,12 +44,10 @@ public class Xtf24Reader implements IoxReader {
 	private LinkPool linkPool=new LinkPool();
 	private Iterator<IomObject> linkIterator;
 	private java.io.InputStream inputFile=null;
-	
 	private Topic currentTopic=null;
-	private IomObject iomObj=null;
-	private Integer transferkind=0;
+	private Integer transferkind=IomConstants.IOM_FULL;
 	
-	// ili content
+	// ili elements
 	private HashMap<QName, Topic> iliTopics=null;
     private HashMap<QName, Viewable> iliClasses=null;
     private HashMap<Viewable, HashMap<QName, Element>> iliProperties=null;
@@ -589,6 +587,7 @@ public class Xtf24Reader implements IoxReader {
                     }
                     Attribute oid = element.getAttributeByName(QNAME_ILI_TID);
                     if(oid!=null){
+                    	IomObject iomObj=null;
                     	try{
                     		iomObj=createIomObject(viewable.getScopedName(), oid.getValue());
                     	}catch(IoxSyntaxException ioxEx){
@@ -691,7 +690,7 @@ public class Xtf24Reader implements IoxReader {
 	private IomObject setAdditionalObjectInfo(StartElement element, IomObject iomObj) {
 		Attribute operation = element.getAttributeByName(QNAME_ILI_OPERATION);
         if(operation!=null){
-        	if(transferkind!=0){
+        	if(transferkind!=IomConstants.IOM_FULL){
             	Attribute attrValue=(Attribute) operation;
             	if(attrValue.getValue().equals("INSERT")){
             		iomObj.setobjectoperation(IomConstants.IOM_OP_INSERT); // op(0=insert)
@@ -733,13 +732,13 @@ public class Xtf24Reader implements IoxReader {
 			}else if(codingObj.getName().equals(QNAME_ILI_KIND)){
 				if(codingObj.getValue().equals("FULL")){
 					startBasketEvent.setKind(IomConstants.IOM_FULL);
-					transferkind=0;
+					transferkind=IomConstants.IOM_FULL;
 				}else if(codingObj.getValue().equals("UPDATE")){
 					startBasketEvent.setKind(IomConstants.IOM_UPDATE);
-					transferkind=1;
+					transferkind=IomConstants.IOM_UPDATE;
 				}else if(codingObj.getValue().equals("INITIAL")){
 					startBasketEvent.setKind(IomConstants.IOM_INITIAL);
-					transferkind=2;
+					transferkind=IomConstants.IOM_INITIAL;
 				}
 			}else if(codingObj.getName().equals(QNAME_ILI_DOMAIN)){
 				String domainValue=codingObj.getValue();

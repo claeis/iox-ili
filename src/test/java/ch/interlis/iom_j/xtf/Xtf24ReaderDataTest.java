@@ -9,8 +9,10 @@ import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
+import ch.interlis.iom.IomObject;
 import ch.interlis.iox.EndBasketEvent;
 import ch.interlis.iox.EndTransferEvent;
+import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.ObjectEvent;
 import ch.interlis.iox.StartBasketEvent;
@@ -51,78 +53,159 @@ public class Xtf24ReaderDataTest {
 		reader=null;
 	}
 	
-//	// Es wird getestet ob Attribute mit den Selben Namen in unterschiedlichen Klassen ohne Fehler erstellt werden koennen.
-//	@Test
-//	public void testSameAttrNamesInDifClasses_Ok()  throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"SameAttrNames.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicD1 ili:bid="bidD1">
-//		assertTrue(reader.read() instanceof  ObjectEvent); // <ClassA ili:tid="oid1">
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicD1 ili:bid="bidD2">
-//		assertTrue(reader.read() instanceof  ObjectEvent); // <ClassA ili:tid="oid2">
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicD1 ili:bid="bidD3">
-//		assertTrue(reader.read() instanceof  ObjectEvent); // <ClassA ili:tid="oid3">
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
+	// Es wird getestet ob Attribute mit den Selben Namen in unterschiedlichen Klassen ohne Fehler erstellt werden koennen.
+	@Test
+	public void testSameAttrNamesInDifClasses_Ok()  throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"SameAttrNames.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		IoxEvent event=reader.read();
+		assertTrue(event instanceof  ObjectEvent);
+		IomObject iomObj1=((ObjectEvent) event).getIomObject();
+		String className=iomObj1.getobjecttag();
+		assertEquals("DataTest1.TopicC.ClassA", className);
+		String oid=iomObj1.getobjectoid();
+		assertEquals("oid1", oid);
+		String attrValue=iomObj1.getattrvalue("attrA");
+		assertEquals("textOid1", attrValue);
+		
+		IoxEvent event2=reader.read();
+		assertTrue(event2 instanceof  ObjectEvent);
+		IomObject iomObj2=((ObjectEvent) event2).getIomObject();
+		String className2=iomObj2.getobjecttag();
+		assertEquals("DataTest1.TopicC.ClassB", className2);
+		String oid2=iomObj2.getobjectoid();
+		assertEquals("oid2", oid2);
+		String attrValue2=iomObj2.getattrvalue("attrA");
+		assertEquals("textOid2", attrValue2);
+		
+		IoxEvent event3=reader.read();
+		assertTrue(event3 instanceof  ObjectEvent);
+		IomObject iomObj3=((ObjectEvent) event3).getIomObject();
+		String className3=iomObj3.getobjecttag();
+		assertEquals("DataTest1.TopicC.ClassC", className3);
+		String oid3=iomObj3.getobjectoid();
+		assertEquals("oid3", oid3);
+		String attrValue3=iomObj3.getattrvalue("attrA");
+		assertEquals("textOid3", attrValue3);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
 	
-//	// Es wird getestet ob Klassen mit den Selben Namen in unterschiedlichen Topics ohne Fehler erstellt werden koennen.
-//	@Test
-//	public void testSameClassNamesInDifTopics_Ok() throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"SameClassNames.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent);
-//		assertTrue(reader.read() instanceof  ObjectEvent); // <ClassA ili:tid="oid1">
-//		assertTrue(reader.read() instanceof  ObjectEvent); // <ClassA ili:tid="oid2">
-//		assertTrue(reader.read() instanceof  ObjectEvent); // <ClassA ili:tid="oid3">
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
+	// Es wird getestet ob Klassen mit den Selben Namen in unterschiedlichen Topics ohne Fehler erstellt werden koennen.
+	@Test
+	public void testSameClassNamesInDifTopics_Ok() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"SameClassNames.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		IoxEvent event=reader.read();
+		assertTrue(event instanceof  ObjectEvent);
+		IomObject iomObj1=((ObjectEvent) event).getIomObject();
+		String className=iomObj1.getobjecttag();
+		assertEquals("DataTest1.TopicD1.ClassA", className);
+		String oid=iomObj1.getobjectoid();
+		assertEquals("oid1", oid);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		IoxEvent event2=reader.read();
+		assertTrue(event2 instanceof  ObjectEvent);
+		IomObject iomObj2=((ObjectEvent) event2).getIomObject();
+		String className2=iomObj2.getobjecttag();
+		assertEquals("DataTest1.TopicD2.ClassA", className2);
+		String oid2=iomObj2.getobjectoid();
+		assertEquals("oid2", oid2);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		IoxEvent event3=reader.read();
+		assertTrue(event3 instanceof  ObjectEvent);
+		IomObject iomObj3=((ObjectEvent) event3).getIomObject();
+		String className3=iomObj3.getobjecttag();
+		assertEquals("DataTest1.TopicD3.ClassA", className3);
+		String oid3=iomObj3.getobjectoid();
+		assertEquals("oid3", oid3);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
 	
-//	// Es wird getestet ob eine Klasse mit den Selben Namen wie das Topic hat ohne Fehler erstellt werden kann.
-//	@Test
-//	public void testTopicNameLikeClassName_Ok() throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"TopicNameLikeClassName.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicE ili:bid="bidE1">
-//		assertTrue(reader.read() instanceof  ObjectEvent); // <TopicE ili:tid="oid1">
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicE ili:bid="bidE2">
-//		assertTrue(reader.read() instanceof  ObjectEvent); // <TopicE ili:tid="oid2">
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicE ili:bid="bidE3">
-//		assertTrue(reader.read() instanceof  ObjectEvent); // <TopicE ili:tid="oid3">
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
+	// Es wird getestet ob eine Klasse mit den Selben Namen wie das Topic hat ohne Fehler erstellt werden kann.
+	@Test
+	public void testTopicNameLikeClassName_Ok() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"TopicNameLikeClassName.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		IoxEvent event2=reader.read();
+		assertTrue(event2 instanceof  ObjectEvent);
+		IomObject iomObj2=((ObjectEvent) event2).getIomObject();
+		String className2=iomObj2.getobjecttag();
+		assertEquals("DataTest1.TopicE.TopicE", className2);
+		String oid2=iomObj2.getobjectoid();
+		assertEquals("oid1", oid2);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		IoxEvent event3=reader.read();
+		assertTrue(event3 instanceof  ObjectEvent);
+		IomObject iomObj3=((ObjectEvent) event3).getIomObject();
+		String className3=iomObj3.getobjecttag();
+		assertEquals("DataTest1.TopicE.TopicE", className3);
+		String oid3=iomObj3.getobjectoid();
+		assertEquals("oid2", oid3);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
 	
-//	// Alle Attribute, Klassen und Topics haben die Selben Namen.
-//	@Test
-//	public void testAttrClassTopicNameSame_Ok() throws Iox2jtsException, IoxException {
-//		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"SameAttrClassTopicNames.xml"));
-//		reader.setModel(td);
-//		assertTrue(reader.read() instanceof  StartTransferEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicF ili:bid="bidF1">
-//		assertTrue(reader.read() instanceof  ObjectEvent); // <TopicF ili:tid="oid1">
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  StartBasketEvent); // <TopicF ili:bid="bidF2">
-//		assertTrue(reader.read() instanceof  ObjectEvent); // <TopicF ili:tid="oid2">
-//		assertTrue(reader.read() instanceof  EndBasketEvent);
-//		assertTrue(reader.read() instanceof  EndTransferEvent);
-//		reader.close();
-//		reader=null;
-//	}
+	// Alle Attribute, Klassen und Topics haben die Selben Namen.
+	@Test
+	public void testAttrClassTopicNameSame_Ok() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"SameAttrClassTopicNames.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		IoxEvent event=reader.read();
+		assertTrue(event instanceof  ObjectEvent);
+		IomObject iomObj1=((ObjectEvent) event).getIomObject();
+		String className=iomObj1.getobjecttag();
+		assertEquals("DataTest1.TopicF.TopicF", className);
+		String oid=iomObj1.getobjectoid();
+		assertEquals("oid1", oid);
+		String attrValue=iomObj1.getattrvalue("TopicF");
+		assertEquals("textOid1", attrValue);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		IoxEvent event2=reader.read();
+		assertTrue(event2 instanceof  ObjectEvent);
+		IomObject iomObj2=((ObjectEvent) event2).getIomObject();
+		String className2=iomObj2.getobjecttag();
+		assertEquals("DataTest1.TopicF.TopicF", className2);
+		String oid2=iomObj2.getobjectoid();
+		assertEquals("oid2", oid2);
+		String attrValue2=iomObj2.getattrvalue("TopicF");
+		assertEquals("textOid2", attrValue2);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
 	
 	// Es wird getestet ob Aufzaehlungen ohne Fehler erstellt werden koennen.
 	@Test
