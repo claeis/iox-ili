@@ -12,6 +12,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Characters;
+import javax.xml.stream.events.Comment;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
@@ -570,7 +571,7 @@ public class Xtf24Reader implements IoxReader {
                 		viewable=getIliClass(element.getName());
                 	}
                     if(viewable==null){
-                    	throw new IoxSyntaxException(event2msgtext(event));
+                    	throw new IoxException("class or association "+element.getName().getLocalPart()+" not found");
                     }
                     Attribute oid = element.getAttributeByName(QNAME_ILI_TID);
                     if(element.getAttributeByName(QNAME_ILI_BID) != null){
@@ -589,6 +590,9 @@ public class Xtf24Reader implements IoxReader {
             		try{
 						iomObj=readObject(event, viewable, iomObj);
 						setAdditionalObjectInfo(element, iomObj);
+						if(viewable instanceof AssociationDef){
+							associationIsValid(iomObj);
+						}
 						event=reader.nextEvent(); // <object>
                     	return new ch.interlis.iox_j.ObjectEvent(iomObj);
 					}catch(IoxSyntaxException ex){								
@@ -662,6 +666,20 @@ public class Xtf24Reader implements IoxReader {
             }
 		}
 		return null;
+	}
+
+	private void associationIsValid(IomObject iomObj) throws IoxException {
+		int count=0;
+		for(int i=0;i<iomObj.getattrcount();i++){
+			String key=iomObj.getattrname(i);
+			IomObject attrValue=iomObj.getattrobj(key,0);
+			if(attrValue.getobjecttag().equals("REF")){
+				count+=1;
+			}
+		}
+		if(count<2){
+			throw new IoxException("expected at least 2 roles in ASSOCIATION "+iomObj.getobjecttag());
+		}
 	}
 
 	private IomObject setAdditionalObjectInfo(StartElement element, IomObject iomObj) throws IoxException {
@@ -1141,6 +1159,8 @@ public class Xtf24Reader implements IoxReader {
                 }
                 event=reader.nextEvent(); //</attribute>
                 attrName=null;
+            }else if(event instanceof Comment){
+                continue;
             }else{
             	throw new IoxSyntaxException(event2msgtext(event));
             }

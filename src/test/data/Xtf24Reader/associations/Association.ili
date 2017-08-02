@@ -98,4 +98,42 @@ MODEL Association (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 		END Beziehung;
 	END Baum;
 	
+	TOPIC Fail1 =
+		CLASS ClassA =
+		END ClassA;
+		
+		CLASS ClassB =
+		END ClassB;
+		
+		ASSOCIATION Beziehung =
+			roleA -- {1..*} ClassA;
+			roleB -- {1..*} ClassB;
+		END Beziehung;
+	END Fail1;
+	
+	TOPIC Fail2 =
+		CLASS ClassA =
+		END ClassA;
+		
+		CLASS ClassB =
+		END ClassB;
+		
+		ASSOCIATION Beziehung =
+			roleA -- {0..0} ClassA;
+			roleB -- {0..0} ClassB;
+		END Beziehung;
+	END Fail2;
+	
+	TOPIC Fail3 =
+		CLASS Ast =
+		END Ast;
+		
+		CLASS Blatt =
+		END Blatt;
+		
+		ASSOCIATION =
+			bezAst -- {1..*} Ast;
+			bezBlatt -- {1..*} Blatt;
+		END;
+	END Fail3;
 END Association.

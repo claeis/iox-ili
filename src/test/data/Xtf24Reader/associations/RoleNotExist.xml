@@ -6,14 +6,16 @@
 		</ili:models>
 	</ili:headersection>
 	<ili:datasection>
-		<Autos ili:bid="bid">
-			<Auto ili:tid="oid1">
-			</Auto>
-			<Garage ili:tid="oid2">
-			</Garage>
+		<Fail1 ili:bid="bid">
+			<ClassA ili:tid="oid1">
+			</ClassA>
+			<ClassB ili:tid="oid2">
+			</ClassB>
 			<Beziehung>
-				<bezAuto ili:ref="oid1"/>
+				<roleA ili:ref="oid1"/>
+				<roleB ili:ref="oid1"/>
+				<roleC ili:ref="oid2"/>
 			</Beziehung>
-		</Autos>
+		</Fail1>
 	</ili:datasection>
 </ili:transfer>
