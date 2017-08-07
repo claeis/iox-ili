@@ -233,19 +233,15 @@ public class Xtf24ReaderTest {
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		ch.interlis.iox_j.StartBasketEvent startBasket=(ch.interlis.iox_j.StartBasketEvent) reader.read();
 		Map<String, String> transferDomain=startBasket.getDomains();
-		Iterator<Entry<String, String>> domainIter=transferDomain.entrySet().iterator();
 
-		Entry<String, String> domainEntry=domainIter.next();
-		assertEquals("Test1.TopicA.DOMAIN3", domainEntry.getKey());
-		assertEquals("Test1.TopicA.DOMAIN4", domainEntry.getValue());
+		assertTrue(transferDomain.containsKey("Test1.TopicA.DOMAIN1"));
+		assertEquals("Test1.TopicA.DOMAIN2",transferDomain.get("Test1.TopicA.DOMAIN1"));
+
+		assertTrue(transferDomain.containsKey("Test1.TopicA.DOMAIN3"));
+		assertEquals("Test1.TopicA.DOMAIN4",transferDomain.get("Test1.TopicA.DOMAIN3"));
 		
-		domainEntry=domainIter.next();
-		assertEquals("Test1.TopicA.DOMAIN1", domainEntry.getKey());
-		assertEquals("Test1.TopicA.DOMAIN2", domainEntry.getValue());
-		
-		domainEntry=domainIter.next();
-		assertEquals("Test1.TopicB.DOMAIN5", domainEntry.getKey());
-		assertEquals("Test1.TopicB.DOMAIN6", domainEntry.getValue());
+		assertTrue(transferDomain.containsKey("Test1.TopicB.DOMAIN5"));
+		assertEquals("Test1.TopicB.DOMAIN6",transferDomain.get("Test1.TopicB.DOMAIN5"));
 		
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
