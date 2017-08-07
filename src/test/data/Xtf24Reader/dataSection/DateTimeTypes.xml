@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" xmlns="http://www.interlis.ch/xtf/2.4/DataTest1">
+	<ili:headersection>
+		<ili:models>
+			<ili:model>DataTest1</ili:model>
+		</ili:models>
+	</ili:headersection>
+	<ili:datasection>
+		<TopicA ili:bid="bidA">
+			<ClassI ili:tid="oidI">
+				<attrI1>2005-12-31T23:59:59.999</attrI1>
+				<attrI2>2002-01-01T00:00:00.000</attrI2>
+				<attrI3>2002-12-10</attrI3>
+				<attrI4>12:23:47.111</attrI4>
+			</ClassI>
+		</TopicA>
+	</ili:datasection>
+</ili:transfer>

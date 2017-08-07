@@ -1,0 +1,119 @@
+TRANSFER Ili10;
+	MODEL Ili10
+	  	DOMAIN
+		    LKoord = COORD2 100.00 100.00
+		                    300.00 300.00;
+	  TOPIC TopicA =
+	    TABLE TableA =
+	      Form: OPTIONAL SURFACE WITH (STRAIGHTS, ARCS) VERTEX LKoord
+	                 WITHOUT OVERLAPS > 0.10;
+	      NO IDENT
+	    END TableA;
+	  END TopicA.
+	
+	  TOPIC TopicB =
+	    TABLE TableB =
+	      Form: OPTIONAL AREA WITH (STRAIGHTS, ARCS) VERTEX LKoord
+	                 WITHOUT OVERLAPS > 0.10;
+	      NO IDENT
+	    END TableB;
+	  END TopicB.
+	
+	  TOPIC TopicC =
+	    TABLE TableC =
+	      Form: SURFACE WITH (STRAIGHTS, ARCS) VERTEX LKoord
+	                 WITHOUT OVERLAPS > 0.10;
+	      NO IDENT
+	    END TableC;
+	    TABLE TableC0 =
+	      dy: OPTIONAL TEXT*3;
+	      NO IDENT
+	    END TableC0;
+	  END TopicC.
+	
+	  TOPIC TopicD =
+	    TABLE TableD0 =
+	      dy: OPTIONAL TEXT*3;
+	      NO IDENT
+	    END TableD0;
+	    TABLE TableD =
+	      Form: AREA WITH (STRAIGHTS, ARCS) VERTEX LKoord
+	                 WITHOUT OVERLAPS > 0.10;
+	      NO IDENT
+	    END TableD;
+	  END TopicD.
+	
+	  TOPIC TopicE =
+	    TABLE TableE0 =
+	      Form: SURFACE WITH (STRAIGHTS, ARCS) VERTEX LKoord
+	                 WITHOUT OVERLAPS > 0.10;
+	      NO IDENT
+	    END TableE0;
+	    TABLE TableE =
+	      Form: AREA WITH (STRAIGHTS, ARCS) VERTEX LKoord
+	                 WITHOUT OVERLAPS > 0.10;
+	      NO IDENT
+	    END TableE;
+	  END TopicE.
+	  
+	  TOPIC TopicF =
+	    OPTIONAL TABLE TableF0 =
+	      dy: OPTIONAL TEXT*3;
+	      NO IDENT
+	    END TableF0;
+	    OPTIONAL TABLE TableF1 =
+	      dy: OPTIONAL TEXT*3;
+	      NO IDENT
+	    END TableF1;
+	  END TopicF.
+	
+	  TOPIC TopicG =
+	    TABLE ClassG1 =
+	      attrA1 : OPTIONAL TEXT*10;
+	      NO IDENT
+	    END ClassG1;
+	    
+	    OPTIONAL TABLE ClassG2 =
+	      attrRefG1 : -> ClassG1;
+	      NO IDENT
+	    END ClassG2;
+	    
+	    TABLE ClassG3 =
+	      attrRefG1 : OPTIONAL -> ClassG1;
+	      NO IDENT
+	    END ClassG3;  
+	  END TopicG.
+	
+	  TOPIC TopicH =
+		TABLE TableA1 =
+			myText : OPTIONAL TEXT*10;
+			NO IDENT
+		END TableA1;
+		
+		TABLE TableB1 =
+			myNumber : OPTIONAL [0 .. 20 ];
+			NO IDENT
+		END TableB1;
+		
+		TABLE TableD1 =
+			myAlignment : OPTIONAL HALIGNMENT;
+			NO IDENT
+		END TableD1;
+		
+		TABLE TableF1 =
+			myEnumeration : OPTIONAL (null, eins, zwei, drei, mehr ( vier, fuenf, sechs, sieben, acht ,neun, zehn));
+			NO IDENT
+		END TableF1;
+	
+		TABLE TableG1 =
+			myEnumTree : OPTIONAL (null, eins, zwei, drei, mehr ( vier, fuenf, sechs, sieben, acht ,neun, zehn));
+			NO IDENT
+		END TableG1;
+	  END TopicH.
+	END Ili10.
+
+	FORMAT FREE;
+	CODE BLANK = DEFAULT, UNDEFINED = DEFAULT, CONTINUE = DEFAULT;
+	TID = ANY;
+
+END.
