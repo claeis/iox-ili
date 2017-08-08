@@ -252,6 +252,12 @@ public class ArcSegment extends CurveSegment {
 		}
 		return sign;
 	}
+	public double getTheta() {
+		if(centerPoint==null){
+			getCenterPoint();
+		}
+		return deta;
+	}
 	public Coordinate getDirectionPt(boolean atStart,double dist) {
 		if(dist>0){
 			double radius=getRadius();
@@ -283,5 +289,18 @@ public class ArcSegment extends CurveSegment {
 			Coordinate directionPt=CompoundCurve.calcKleinp(getCenterPoint(), endPoint, radius, -1.0*-sign);
 			return directionPt;
 		}
+	}
+	public static Coordinate calcArcPt(Coordinate start, Coordinate end,
+			Coordinate center, double radius, double sign) {
+		Coordinate midPt;
+		// calulate new mid pt
+		// Zentriwinkel zwischen start und end
+		double a=CurveSegment.dist(start.x,start.y,end.x,end.y);
+		// Richtung des Punktes auf dem halben Bogen 
+		double alpha=Math.atan2(start.x-center.x,start.y-center.y)+sign*Math.asin(a/2.0/radius);
+		midPt=new Coordinate();
+		midPt.x=center.x + radius * Math.sin(alpha);
+		midPt.y=center.y + radius * Math.cos(alpha);
+		return midPt;
 	}
 }

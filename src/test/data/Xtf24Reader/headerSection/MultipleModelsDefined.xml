@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" xmlns="http://www.interlis.ch/xtf/2.4/Test1">
+	<ili:headersection>
+		<ili:models>Test1</ili:models>
+		<ili:models>Model2</ili:models>
+		<ili:models>Model3</ili:models>
+		<ili:models>Model4</ili:models>
+		<ili:models>Model5</ili:models>
+	</ili:headersection>
+	<ili:datasection>
+	</ili:datasection>
+</ili:transfer>

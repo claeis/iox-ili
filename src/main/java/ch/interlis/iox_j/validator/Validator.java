@@ -3064,7 +3064,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	public boolean isValidUuid(String valueStr) {
-		return valueStr.length() == 36 && valueStr.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}?");
+		return valueStr.length() == 36 && valueStr.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}?");
 	}
 	
 	private void logMsg(String validateKind,String msg,String... args){

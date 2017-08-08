@@ -2,6 +2,13 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.19.5 (2017-08-xx)
+-----------------------------
+- refactored arcpt calculation
+- added Xtf24Reader
+- added Iligml20Reader
+- validator: fixed UUID validation to accept also uppercase A-F
+
 iox-ili 1.19.4 (2017-06-27)
 -----------------------------
 - fixed wkb2iox "Unexpected WKB type 2" if MULTILINESTRING 
@@ -16,6 +23,7 @@ iox-ili 1.19.1 (2017-06-19)
 
 iox-ili 1.19.0 (2017-06-17)
 -----------------------------
+- iox-ili: implement a GML reader
 - validator: fixed Missing coordinate in xtflog for errors detected by a custom function
 - validator: fixed INTERLIS.areAreas() not working in views
 - validator: fixed Check FORMAT INTERLIS.XMLDate
