@@ -125,7 +125,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private boolean enforceTargetValidation=false;
 	private String currentBasketId = null;
 	private String currentMainOid=null;
-	private boolean autoSecondPass=false;
+	private boolean autoSecondPass=true;
 	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
 	private Map<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	private List<ExternalObjectResolver> extObjResolvers=null; // java class that implements ExternalObjectResolver
