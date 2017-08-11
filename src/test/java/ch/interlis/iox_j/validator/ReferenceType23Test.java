@@ -214,10 +214,110 @@ public class ReferenceType23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Referenz External true ist und die Klasse A in keinem anderen Basket gefunden wird.
-	// Da allObjects per default=false ist und external true gesetzt ist, wird hier keine Fehlermeldung ausgegeben.
+	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn in der Role die Restriction in der Struktur eine gueltige Klasse findet.
 	@Test
-	public void external_TargetObjNotFound_True(){
+	public void referenceRestrictedType_Ok(){
+		String objTargetId=OID1;
+		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSAP, objTargetId);
+		Iom_jObject o1Ref=new Iom_jObject("REF", null);
+		o1Ref.setobjectrefoid(objTargetId);
+		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTC, null);
+		iomStruct.addattrobj(ILI_STRUCTC_ATTRC4, o1Ref);
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSD, OID2);
+		iomObj.addattrobj(ILI_CLASSD_ATTRD2, iomStruct);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new ObjectEvent(iomObjtarget));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die folgenden Einstellungen gemacht werden:
+	// - Das Zielobjekt: classA,o1 befindet sich in der Basket bid2 und wird durch den Resolver gefunden.
+	// - External ist true gesetzt.
+	// - ExtObjectFound=true;
+	// - AllObjectsAccessible ist true gesetzt.
+	@Test
+	public void allObjectsAccessible_external_TargetObjFound_Ok(){
+		String objTargetId=ExternalObjResolverMock.OID1;
+		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, OID1);
+		Iom_jObject o1Ref=new Iom_jObject("REF", null);
+		o1Ref.setobjectrefoid(objTargetId);
+		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTG, null);
+		iomStruct.addattrobj(ILI_STRUCTG_ATTRG2, o1Ref);
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSH, OID2);
+		iomObj.addattrobj(ILI_CLASSH_ATTRH2, iomStruct);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		List<Class> resolverClasses=new ArrayList<Class>();
+		resolverClasses.add(ExternalObjResolverMock.class);
+		settings.setTransientObject(Validator.CONFIG_OBJECT_RESOLVERS, resolverClasses);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjtarget));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID2));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die folgenden Einstellungen gemacht werden:
+	// - Das Zielobjekt: classA,o1 befindet sich in der Basket bid2 und wird durch den Resolver gefunden.
+	// - External ist true gesetzt.
+	// - ExtObjectFound=true.
+	// - AllObjectsAccessible ist false gesetzt.
+	@Test
+	public void external_TargetObjFound_Ok(){
+		String objTargetId=ExternalObjResolverMock.OID1;
+		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, OID1);
+		Iom_jObject o1Ref=new Iom_jObject("REF", null);
+		o1Ref.setobjectrefoid(objTargetId);
+		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTG, null);
+		iomStruct.addattrobj(ILI_STRUCTG_ATTRG2, o1Ref);
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSH, OID2);
+		iomObj.addattrobj(ILI_CLASSH_ATTRH2, iomStruct);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		List<Class> resolverClasses=new ArrayList<Class>();
+		resolverClasses.add(ExternalObjResolverMock.class);
+		settings.setTransientObject(Validator.CONFIG_OBJECT_RESOLVERS, resolverClasses);
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjtarget));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID2));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die folgenden Einstellungen gemacht werden:
+	// - Das Zielobjekt: classA,o3 existiert nicht und wird durch den Resolver auch nicht gefunden.
+	// - External ist true gesetzt.
+	// - ExtObjectFound=false.
+	// - AllObjectsAccessible ist false gesetzt.
+	@Test
+	public void external_TargetObjNotFound_Ok(){
 		String objTargetId=OID1;
 		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, OID3);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
@@ -246,35 +346,46 @@ public class ReferenceType23Test {
 		assertEquals(0,logger.getErrs().size());
 	}
 	
-	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn in der Role die Restriction in der Struktur eine gueltige Klasse findet.
+	//############################################################
+	//################ FAIL TESTS ################################
+	//############################################################
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die folgenden Einstellungen gemacht werden:
+	// - Das Zielobjekt: classA,o3 existiert nicht und wird von Object Resolver auch nicht gefunden.
+	// - External ist true gesetzt.
+	// - ExtObjectFound=false.
+	// - AllObjectsAccessible ist true gesetzt.
 	@Test
-	public void referenceRestrictedType_Ok(){
+	public void allObjectsAccessible_external_TargetObjNotFound_False(){
 		String objTargetId=OID1;
-		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSAP, objTargetId);
+		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, OID3);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
 		o1Ref.setobjectrefoid(objTargetId);
-		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTC, null);
-		iomStruct.addattrobj(ILI_STRUCTC_ATTRC4, o1Ref);
-		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSD, OID2);
-		iomObj.addattrobj(ILI_CLASSD_ATTRD2, iomStruct);
+		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTG, null);
+		iomStruct.addattrobj(ILI_STRUCTG_ATTRG2, o1Ref);
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSH, OID2);
+		iomObj.addattrobj(ILI_CLASSH_ATTRH2, iomStruct);
 		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+		List<Class> resolverClasses=new ArrayList<Class>();
+		resolverClasses.add(ExternalObjResolverMock.class);
+		settings.setTransientObject(Validator.CONFIG_OBJECT_RESOLVERS, resolverClasses);
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObj));
 		validator.validate(new ObjectEvent(iomObjtarget));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID2));
+		validator.validate(new ObjectEvent(iomObj));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertEquals(1,logger.getErrs().size());
+		assertEquals("No object found with OID o1.", logger.getErrs().get(0).getEventMsg());
 	}
-	
-	//############################################################
-	//################ FAIL TESTS ################################
-	//############################################################	
 	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn ein Attribute welches mandatory ist, nicht erstellt wurde.
 	@Test
@@ -460,36 +571,5 @@ public class ReferenceType23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("wrong class ReferenceType23.Topic.ClassAq of target object o1 for reference attr ReferenceType23.Topic.StructC.attrC4.", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Referenz External true ist und die Klasse A gefunden wird.
-	@Test
-	public void external_TargetObjFound_Ok(){
-		String objTargetId=ExternalObjResolverMock.OID1;
-		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, OID1);
-		Iom_jObject o1Ref=new Iom_jObject("REF", null);
-		o1Ref.setobjectrefoid(objTargetId);
-		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTG, null);
-		iomStruct.addattrobj(ILI_STRUCTG_ATTRG2, o1Ref);
-		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSH, OID2);
-		iomObj.addattrobj(ILI_CLASSH_ATTRH2, iomStruct);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		List<Class> resolverClasses=new ArrayList<Class>();
-		resolverClasses.add(ExternalObjResolverMock.class);
-		settings.setTransientObject(Validator.CONFIG_OBJECT_RESOLVERS, resolverClasses);
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjtarget));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID2));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertEquals(0,logger.getErrs().size());
 	}
 }
