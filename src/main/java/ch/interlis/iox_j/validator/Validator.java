@@ -99,6 +99,7 @@ import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
+	public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
 	public static final String CONFIG_DO_ITF_LINETABLES="ch.interlis.iox_j.validator.doItfLinetables";
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
@@ -126,6 +127,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String currentBasketId = null;
 	private String currentMainOid=null;
 	private boolean autoSecondPass=true;
+	private boolean allObjectsAccessible=false;
 	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
 	private Map<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	private List<ExternalObjectResolver> extObjResolvers=null; // java class that implements ExternalObjectResolver
@@ -192,6 +194,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(config.getValue(CONFIG_DO_ITF_OIDPERTABLE));
+		allObjectsAccessible=ValidationConfig.TRUE.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE));
+		if(!allObjectsAccessible){
+			errs.addEvent(errFact.logInfoMsg("assume unknown/external objects"));
+		}
 		boolean allowOnlyRelaxedMultiplicity=ValidationConfig.ON.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ALLOW_ONLY_MULTIPLICITY_REDUCTION));
 		if(allowOnlyRelaxedMultiplicity){
 			errs.addEvent(errFact.logInfoMsg("only multiplicity validation relaxable"));
@@ -1660,8 +1666,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				// EXTERNAL
 				// not found in internal pool?
 				if(targetObj==null){
+					boolean extObjFound=false;
+					// use external object resolver to find external objects.
 					if(extObjResolvers!=null){
-						boolean extObjFound=false;
 						// call custom function to verify in external data pools
 						for(ExternalObjectResolver extObjResolver:extObjResolvers){
 							if(extObjResolver.objectExists(targetOid, destinationClasses)){
@@ -1669,9 +1676,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								break;
 							}
 						}
-						if(!extObjFound){
-							logMsg(validateTarget,"No object found with OID {0}.", targetOid);
-						}
+					}
+					if(allObjectsAccessible && !extObjFound){
+						logMsg(validateTarget,"No object found with OID {0}.", targetOid);
 					}
 				}
 			}
@@ -1755,18 +1762,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							// EXTERNAL
 							// not found in internal pool?
 							if(targetObject==null){
+								boolean extObjFound=false;
+								// use external object resolver to find external objects.
 								if(extObjResolvers!=null){
-									boolean extObjFound=false;
 									// call custom function to verify in external data pools
 									for(ExternalObjectResolver extObjResolver:extObjResolvers){
 										if(extObjResolver.objectExists(targetOid, destinationClasses)){
-											extObjFound=true;
-											break;
+												extObjFound=true;
+												break;
 										}
 									}
-									if(!extObjFound){
-										logMsg(validateTarget,"No object found with OID {0}.", targetOid);
-									}
+								}
+								if(allObjectsAccessible && !extObjFound){
+									logMsg(validateTarget,"No object found with OID {0}.", targetOid);
 								}
 							}
 						}
