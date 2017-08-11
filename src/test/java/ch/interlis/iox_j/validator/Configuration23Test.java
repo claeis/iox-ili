@@ -8,9 +8,13 @@ import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import static org.junit.Assert.*;
+
+import java.util.Iterator;
+
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
@@ -1802,7 +1806,7 @@ public class Configuration23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 		assertTrue(logger.getWarn().size()==2);
-		assertEquals("No object found with OID o5 in basket b1.",logger.getWarn().get(0).getEventMsg());
-		assertEquals("t1 should associate 1 to 1 target objects (instead of 2)",logger.getWarn().get(1).getEventMsg());
+		assertEquals("t1 should associate 1 to 1 target objects (instead of 2)",logger.getWarn().get(0).getEventMsg());
+		assertEquals("No object found with OID o5 in basket b1.",logger.getWarn().get(1).getEventMsg());
 	}
 }

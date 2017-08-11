@@ -101,6 +101,10 @@ public class Association23Test {
 	private final static String BASKET_ID1="b1";
 	private final static String BASKET_ID2="b2";
 	
+	// SETTING PARAMETER
+	private final static String TRUE="true";
+	private final static String FALSE="false";
+	
 	@Before
 	public void setUp() throws Exception {
 		// ili-datei lesen
@@ -111,7 +115,7 @@ public class Association23Test {
 		assertNotNull(td);
 	}
 
-	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a1, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
+	// Wenn von der KlasseB eine Beziehung zur KlasseA ueber den Rollennamen: a1, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
 	@Test
 	public void embeddedAsso_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
@@ -132,7 +136,7 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Wenn von der KlasseB, welche über KlasseBP eine Beziehung zur KlasseA über die KlasseAP über den Rollennamen: a1,
+	// Wenn von der KlasseB, welche ueber KlasseBP eine Beziehung zur KlasseA ueber die KlasseAP ueber den Rollennamen: a1,
 	// 1 Mal besteht soll keine Fehlermeldung ausgegeben werden.
 	@Test
 	public void embeddedAsso_RestrictionTargetClassFound_Ok(){
@@ -154,8 +158,8 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}	
 	
-	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: ad1,
-	// Von der KlasseB eine Beziehung zur KlasseD über den Rollennamen: ad1,
+	// Wenn von der KlasseB eine Beziehung zur KlasseA ueber den Rollennamen: ad1,
+	// Von der KlasseB eine Beziehung zur KlasseD ueber den Rollennamen: ad1,
 	// je, 0-1 Mal besteht und eine davon richtig ist, soll keine Fehlermeldung ausgegeben werden.
 	@Test
 	public void embeddedAsso_BooleanOperatorOR_TargetClassFound_Ok(){
@@ -182,7 +186,7 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Wenn von der KlasseH eine Beziehung zur KlasseG über den Rollennamen: g1 (Welcher EXTERNAL true ist),
+	// Wenn von der KlasseH eine Beziehung zur KlasseG ueber den Rollennamen: g1 (Welcher EXTERNAL true ist),
 	// 1 Mal besteht soll. Die Klasse jedoch in unterschiedlichen Baskets sich befinden.
 	// keine Fehlermeldung ausgegeben werden.
 	@Test
@@ -207,8 +211,8 @@ public class Association23Test {
 		assertEquals(0,logger.getErrs().size());
 	}
 	
-	// Wenn in einer Stand Alone Association von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a1,
-	// Von der Klasse A eine Beziehung zur KlasseB über den Rollennamen: b1,
+	// Wenn in einer Stand Alone Association von der KlasseB eine Beziehung zur KlasseA ueber den Rollennamen: a1,
+	// Von der Klasse A eine Beziehung zur KlasseB ueber den Rollennamen: b1,
 	// je, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden.
 	@Test
 	public void standAloneAsso_0toN_Ok(){
@@ -233,8 +237,8 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE über den Rollennamen: e1,
-	// Von der KlasseE eine Beziehung zur KlasseF über den Rollennamen: f1,
+	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE ueber den Rollennamen: e1,
+	// Von der KlasseE eine Beziehung zur KlasseF ueber den Rollennamen: f1,
 	// je, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden.
 	@Test
 	public void standAloneAsso_1toN_Ok(){
@@ -259,8 +263,8 @@ public class Association23Test {
 		assertEquals(0,logger.getErrs().size());
 	}
 	
-	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE über den Rollennamen: e1,
-	// Von der KlasseE eine Beziehung zur KlasseF über den Rollennamen: f1,
+	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE ueber den Rollennamen: e1,
+	// Von der KlasseE eine Beziehung zur KlasseF ueber den Rollennamen: f1,
 	// je, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden,
 	// wenn die Objekte sich in der gleichen Basket befinden und External true ist.	
 	@Test
@@ -286,13 +290,35 @@ public class Association23Test {
 		assertEquals(0,logger.getErrs().size());
 	}
 	
-	// Wenn in einer Embedded Association von der KlasseH eine Beziehung zur KlasseG über den Rollennamen: g1,
+	// Wenn in einer Embedded Association von der KlasseH eine Beziehung zur KlasseG ueber den Rollennamen: g1,
 	// die Klasse nicht gefunden werden kann, die Rolle: External=True ist, soll keine Fehlermeldung ausgegeben werden.
 	@Test
 	public void external_EmbeddedAsso_Ok(){
 		Iom_jObject iomObjH1=new Iom_jObject("Association23.TopicB.ClassH", OID2);
 		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
+	}
+	
+	// Wenn in einer Embedded Association von der KlasseH eine Beziehung zur KlasseG ueber den Rollennamen: g1,
+	// die Klasse nicht gefunden werden kann, die Rolle: External=True ist,
+	// und das Flag: setting all objects accessible FALSE gesetzt ist, soll keine Fehlermeldung ausgegeben werden.
+	@Test
+	public void allObjectsAccessible_external_EmbeddedAsso_Ok(){
+		Iom_jObject iomObjH1=new Iom_jObject("Association23.TopicB.ClassH", OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.FALSE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -330,8 +356,8 @@ public class Association23Test {
 		assertEquals(0,logger.getErrs().size());
 	}
 	
-	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE über den Rollennamen: e1,
-	// Von der KlasseE eine Beziehung zur KlasseF über den Rollennamen: f1,
+	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE ueber den Rollennamen: e1,
+	// Von der KlasseE eine Beziehung zur KlasseF ueber den Rollennamen: f1,
 	// je, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden,
 	// wenn die Objekte sich in unterschiedlichen Baskets befinden und External true ist.
 	@Test
@@ -359,8 +385,8 @@ public class Association23Test {
 		assertEquals(0,logger.getErrs().size());
 	}
 	
-	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE über den Rollennamen: e1,
-	// Von der KlasseE eine Beziehung zur KlasseF über den Rollennamen: f1,
+	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE ueber den Rollennamen: e1,
+	// Von der KlasseE eine Beziehung zur KlasseF ueber den Rollennamen: f1,
 	// je, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden,
 	// wenn die Objekte sich im gleichen Basket befindet und External true ist.
 	@Test
@@ -384,8 +410,8 @@ public class Association23Test {
 		assertEquals(0,logger.getErrs().size());
 	}
 	
-	// Wenn von einer Stand Alone Association der KlasseB, welche über KlasseBP eine Beziehung zur KlasseA über die KlasseAP über den Rollennamen: a1,
-	// von der KlasseA, welche über KlasseAP eine Beziehung zur KlasseB über die KlasseBP über den Rollennamen: b1,
+	// Wenn von einer Stand Alone Association der KlasseB, welche ueber KlasseBP eine Beziehung zur KlasseA ueber die KlasseAP ueber den Rollennamen: a1,
+	// von der KlasseA, welche ueber KlasseAP eine Beziehung zur KlasseB ueber die KlasseBP ueber den Rollennamen: b1,
 	// je, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. Gleicher Basket, External false.
 	@Test
 	public void standAloneAsso_RestrictionTargetClassFound_Ok(){	
@@ -410,8 +436,8 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Wenn von einer Stand Alone Association von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: ad2,
-	// Von der KlasseB eine Beziehung zur KlasseD über den Rollennamen: ad2,
+	// Wenn von einer Stand Alone Association von der KlasseB eine Beziehung zur KlasseA ueber den Rollennamen: ad2,
+	// Von der KlasseB eine Beziehung zur KlasseD ueber den Rollennamen: ad2,
 	// je, 1 Mal besteht und eine davon richtig ist, soll keine Fehlermeldung ausgegeben werden.
 	@Test
 	public void standAloneAsso_BooleanOperatorOR_Ok(){
@@ -497,7 +523,6 @@ public class Association23Test {
 		assertEquals(1,logger.getErrs().size());
 	}
 	
-	
 	// External=false, Objects in different Baskets.
 	// Ergibt einen Fehler!
 	@Test
@@ -523,8 +548,31 @@ public class Association23Test {
 		assertEquals("No object found with OID o1 in basket b1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE über den Rollennamen: e1,
-	// Von der KlasseE eine Beziehung zur KlasseF über den Rollennamen: f1,
+	// Wenn in einer Embedded Association von der KlasseH eine Beziehung zur KlasseG ueber den Rollennamen: g1,
+	// die Klasse nicht gefunden werden kann, die Rolle: External=True ist,
+	// und das Flag: setting all objects accessible TRUE gesetzt ist, soll eine Fehlermeldung ausgegeben werden.
+	@Test
+	public void allObjectsAccessible_external_EmbeddedAsso_Fail(){
+		Iom_jObject iomObjH1=new Iom_jObject("Association23.TopicB.ClassH", OID2);
+		iomObjH1.addattrobj("g1", "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjH1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("No object found with OID o1.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE ueber den Rollennamen: e1,
+	// Von der KlasseE eine Beziehung zur KlasseF ueber den Rollennamen: f1,
 	// je, 1 Mal besteht soll eine Fehlermeldung ausgegeben werden,
 	// wenn die Objekte sich in unterschiedlichen Baskets befinden und External false ist.
 	@Test
@@ -553,7 +601,7 @@ public class Association23Test {
 		assertEquals("No object found with OID o1 in basket b2.", logger.getErrs().get(0).getEventMsg());
 	}	
 	
-	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a1, 0 bis 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
+	// Wenn von der KlasseB eine Beziehung zur KlasseA ueber den Rollennamen: a1, 0 bis 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
 	@Test
 	public void embeddedAsso_WrongCardinality_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
@@ -578,7 +626,7 @@ public class Association23Test {
 		assertEquals("b1 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Wenn von der KlasseB, welche über KlasseBP eine Beziehung zur KlasseA über die KlasseAP über den Rollennamen: a1,
+	// Wenn von der KlasseB, welche ueber KlasseBP eine Beziehung zur KlasseA ueber die KlasseAP ueber den Rollennamen: a1,
 	// 1 Mal besteht soll keine Fehlermeldung ausgegeben werden.
 	@Test
 	public void embeddedAsso_CardinalityExtendedClass_Fail(){
@@ -604,8 +652,8 @@ public class Association23Test {
 		assertEquals("bp1 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: ad1,
-	// Von der KlasseB eine Beziehung zur KlasseD über den Rollennamen: ad1,
+	// Wenn von der KlasseB eine Beziehung zur KlasseA ueber den Rollennamen: ad1,
+	// Von der KlasseB eine Beziehung zur KlasseD ueber den Rollennamen: ad1,
 	// je, 0-1 Mal besteht und eine davon richtig ist, soll keine Fehlermeldung ausgegeben werden.
 	@Test
 	public void embeddedAsso_BooleanOperatorOR_Fail(){
@@ -631,7 +679,7 @@ public class Association23Test {
 		assertEquals("ad1 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(0).getEventMsg());
 	}
 		
-	// Wenn von der KlasseB eine Beziehung zur KlasseA über den Rollennamen: a1, 0 bis 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
+	// Wenn von der KlasseB eine Beziehung zur KlasseA ueber den Rollennamen: a1, 0 bis 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
 	@Test
 	public void embeddedAsso_TargetClassWrong_Fail(){
 		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OID1);
@@ -653,7 +701,7 @@ public class Association23Test {
 		assertEquals("wrong class Association23.Topic.ClassD of target object o1 for role Association23.Topic.ab1.a1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird eine Fehlermeldung ausgegeben wenn in einer StandAlone Association eine falsche Kardinalität von e1 erstellt wurde.
+	// Es wird eine Fehlermeldung ausgegeben wenn in einer StandAlone Association eine falsche Kardinalitaet von e1 erstellt wurde.
 	@Test
 	public void standAloneAsso_CardinalityWrong_Fail(){
 		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OID2);
@@ -696,7 +744,7 @@ public class Association23Test {
 		assertEquals("No object found with OID o3 in basket b1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Die KlasseA mit der OID a1, verbindet über die Klasse: classBp mit der OID b1.
+	// Die KlasseA mit der OID a1, verbindet ueber die Klasse: classBp mit der OID b1.
 	// Es soll eine Fehlermeldung ausgegeben werden, wenn diese Klasse nicht existiert.
 	@Test
 	public void embeddedAsso_WrongTargetClass_Fail(){
@@ -766,7 +814,7 @@ public class Association23Test {
 		assertEquals("No object found with OID o3 in basket b1.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Multiplizität der Rolle Maximal 1 sein darf, jedoch 5 Objekte erstellt wurden.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die Multiplizitaet der Rolle Maximal 1 sein darf, jedoch 5 Objekte erstellt wurden.
 	@Test
 	public void embeddedAsso_ObjectRangeOfMultiplicityExceeded_Fail(){
 		Iom_jObject iomObjG=new Iom_jObject(ILI_CLASSG, OID1);
@@ -804,8 +852,10 @@ public class Association23Test {
 	// - Die role e1 (EXTERNAL true) und f1 (EXTERNAL true) der Association EF1 aufgerufen wird.
 	// - Die target class E, innerhalb der basket nicht gefunden werden kann.
 	// - Die target class E in keiner anderen basket existiert.
+	// - AllObjectsAccessible per default=false. --> Fehlermeldung: 'target not found' wird nicht ausgegeben.
+	// - Fehlermeldung muss sich auf die cardinality beziehen.
 	@Test
-	public void resolver_StandAloneAsso_TargetOIDNotFound_False(){
+	public void resolver_StandAloneAsso_WrongCardinality_False(){
 		Iom_jObject iomObjE=new Iom_jObject(ILI_TOPICB_CLASSE, OID1);
 		Iom_jObject iomObjF=new Iom_jObject(ILI_TOPICB_CLASSF, OID2);
 		Iom_jObject iomLinkEF=new Iom_jObject(ILI_TOPICB_ASSOC_EF1, null);
@@ -829,14 +879,15 @@ public class Association23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertEquals(2,logger.getErrs().size());
-		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
+		assertEquals(1,logger.getErrs().size());
+		assertEquals("f1 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
 	// - Die role g1 (EXTERNAL true) der Association GH1 aufgerufen wird.
 	// - Die target class G, innerhalb der basket nicht gefunden werden kann.
 	// - Die target class in der Basket b2 existiert.
+	// - Die target oid nicht gefunden wird.
 	@Test
 	public void resolver_EmbeddedAsso_TargetOIDNotFound_Fail(){
 		Iom_jObject iomObjG=new Iom_jObject(ILI_TOPICB_CLASSG, OID1);
@@ -859,7 +910,7 @@ public class Association23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertEquals(2,logger.getErrs().size());
-		assertEquals("No object found with OID o3.", logger.getErrs().get(0).getEventMsg());
+		assertEquals(1,logger.getErrs().size());
+		assertEquals("h1 should associate 1 to 1 target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
 	}
 }
