@@ -5,6 +5,7 @@ ideas/open issues
 iox-ili 1.19.6 (2017-08-21)
 -----------------------------
 - fixed TranslateToOrigin: failed if dest attribute name equals source attrname
+- fixed TranslateToTranslation: failed if dest attribute name equals source attrname
 
 iox-ili 1.19.5 (2017-08-12)
 -----------------------------
