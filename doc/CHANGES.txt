@@ -2,10 +2,12 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
-iox-ili 1.19.6 (2017-08-21)
+iox-ili 1.19.6 (2017-08-24)
 -----------------------------
 - fixed TranslateToOrigin: failed if dest attribute name equals source attrname
 - fixed TranslateToTranslation: failed if dest attribute name equals source attrname
+- added CsvReader
+- added addGenericReader
 
 iox-ili 1.19.5 (2017-08-12)
 -----------------------------
