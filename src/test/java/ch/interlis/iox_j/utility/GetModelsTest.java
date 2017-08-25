@@ -54,8 +54,9 @@ public class GetModelsTest {
 	
 	@Test
 	public void gml20Reader_Ok() throws IoxException {
-		List<String> models=IoxUtility.getModels(new File("src/test/data/Ili23gml20Reader/Area.gml"));
+		List<String> models=IoxUtility.getModels(new File("src/test/data/Ili23gml20Reader/EmptyBasket.gml"));
 		java.util.ArrayList<String> expectedModels=new java.util.ArrayList<String>();
+		expectedModels.add("Ili23");
 		assertEquals(expectedModels,models);
 	}
 	

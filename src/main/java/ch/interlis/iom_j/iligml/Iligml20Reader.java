@@ -45,7 +45,7 @@ public class Iligml20Reader implements IoxReader {
     private HashMap<QName, Viewable> iliClasses=null;
     private HashMap<Viewable, HashMap<QName, Element>> iliProperties=null;
     private Iterator<IomObject> linkIterator;
-    private Topic topic=null;
+    private String topicName=null;
     // events
     private int state = START;
 	private TransferDescription td;
@@ -216,15 +216,16 @@ public class Iligml20Reader implements IoxReader {
                 }else if(event.isStartElement()){
                 	// new basket
                     StartElement element = (StartElement) event;
-                    topic=getIliTopic(element.getName());
-                    if(topic==null){
-                    	throw new IoxSyntaxException(event2msgtext(event));
+                    topicName=element.getName().getLocalPart();
+                    String topicScopedName=getIliTopic(element.getName());
+                    if(topicScopedName==null){
+                    	throw new IoxException(event2msgtext(event));
                     }
                     QName gmlId = QNAME_ID;
                     Attribute bid = event.asStartElement().getAttributeByName(gmlId);
                     if(bid!=null){
                         state=INSIDE_BASKET;
-                        return new ch.interlis.iox_j.StartBasketEvent(topic.getScopedName(), bid.getValue());
+                        return new ch.interlis.iox_j.StartBasketEvent(topicScopedName, bid.getValue());
                     }
                 }else if(event.isCharacters()){
                     Characters characters = (Characters) event;
@@ -264,7 +265,6 @@ public class Iligml20Reader implements IoxReader {
                 	Viewable viewable=null;
                 	// new object
                     StartElement element = (StartElement) event;
-                	String topicName=topic.getName();
                 	String className=element.getName().getLocalPart();
                 	QName extendedQName=new QName(element.getName().getNamespaceURI(), topicName+"."+className);
                 	viewable=getIliClass(extendedQName);
@@ -1032,11 +1032,21 @@ public class Iligml20Reader implements IoxReader {
 		}
     }
     
-    private Topic getIliTopic(QName qName){
+    private String getIliTopic(QName qName){
     	if(iliTopics==null){
     		fillIliMaps();
     	}
-    	return iliTopics.get(qName);
+    	Topic topic=iliTopics.get(qName);
+    	if(topic!=null){
+    		return topic.getScopedName();
+    	}
+    	String topicName=qName.getLocalPart();
+    	String xmlNs=qName.getNamespaceURI();
+    	if(xmlNs.startsWith(NAMESPACE_ILIGMLBASE)){
+    		String modelName=xmlNs.substring(NAMESPACE_ILIGMLBASE.length());
+    		return modelName+"."+topicName;
+    	}
+    	return null;
     }
     
     private Viewable getIliClass(QName qName){
