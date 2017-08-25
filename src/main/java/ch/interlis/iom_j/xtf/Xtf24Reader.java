@@ -82,7 +82,6 @@ public class Xtf24Reader implements IoxReader {
     // namespace
     private static final String NAMESPACE_ILIXMLBASE="http://www.interlis.ch/xtf/2.4/";
     private static final String NAMESPACE_ILIXMLBASE_INTERLIS=NAMESPACE_ILIXMLBASE+"INTERLIS";
-    private static final String NAMESPACE_METAATTR = "ili2.ilixtf24.namespaceName";
     private static final String NAMESPACE_GEOM="http://www.interlis.ch/geometry/1.0";
     private static final String NAMESPACE_XMLSCHEMA="http://www.w3.org/2001/XMLSchema-instance";
 	// qnames xml
@@ -853,7 +852,7 @@ public class Xtf24Reader implements IoxReader {
 				// iliTopic
 				Topic topic = (Topic) topicObj;
 				String localTopicPart=topic.getName();
-				String modelNameSpace=model.getMetaValue(NAMESPACE_METAATTR);
+				String modelNameSpace=model.getXmlns();
 				if(modelNameSpace==null){
 					modelNameSpace=NAMESPACE_ILIXMLBASE+model.getName();
 				}
@@ -880,7 +879,7 @@ public class Xtf24Reader implements IoxReader {
 					}
 		    		Viewable viewable = (Viewable) classObj;
 		    		String localClassPart=viewable.getName();
-    				String nameSpace=model.getMetaValue(NAMESPACE_METAATTR);
+    				String nameSpace=model.getXmlns();
     				if(nameSpace==null){
     					nameSpace=NAMESPACE_ILIXMLBASE+model.getName();
     				}
