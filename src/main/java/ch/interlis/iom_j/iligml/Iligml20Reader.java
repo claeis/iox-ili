@@ -963,6 +963,9 @@ public class Iligml20Reader implements IoxReader {
     	iliTopics=new HashMap<QName, Topic>();
     	iliClasses=new HashMap<QName, Viewable>();
     	iliProperties=new HashMap<Viewable, HashMap<QName, Element>>();
+    	if(td==null){
+    		return;
+    	}
 		Iterator tdIterator = td.iterator();
 		// iliTd
 		while(tdIterator.hasNext()){

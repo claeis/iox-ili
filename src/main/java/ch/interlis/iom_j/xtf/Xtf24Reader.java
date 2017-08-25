@@ -3,6 +3,7 @@ package ch.interlis.iom_j.xtf;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
@@ -16,6 +17,7 @@ import javax.xml.stream.events.Comment;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+
 import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.ili2c.generator.Iligml20Generator;
 import ch.interlis.ili2c.metamodel.AssociationDef;
@@ -199,7 +201,7 @@ public class Xtf24Reader implements IoxReader {
 			javax.xml.stream.events.XMLEvent event=null;
 			try{
 				event=reader.nextEvent();
-				EhiLogger.debug(event.toString());
+				//EhiLogger.debug(event.toString());
 			}catch(javax.xml.stream.XMLStreamException ex){
 				throw new IoxException(ex);
 			}
@@ -216,7 +218,6 @@ public class Xtf24Reader implements IoxReader {
                     StartElement element = (StartElement) event;
                     if(element.getName().equals(QNAME_ILI_TRANSFER)){
                         state=INSIDE_TRANSFER;
-                        return new ch.interlis.iox_j.StartTransferEvent();
                     }else{
                     	throw new IoxSyntaxException(event2msgtext(event));
                     }
@@ -494,7 +495,15 @@ public class Xtf24Reader implements IoxReader {
                 			// no model defined.
                     		throw new IoxException("expected at least 1 model.");
                     	}
-                		continue;
+                		HashMap<String,IomObject> modelx=new HashMap<String,IomObject>();
+                		XtfStartTransferEvent ret=new XtfStartTransferEvent();
+                		for(String modelName:models){
+                            IomObject model=createIomObject(ch.interlis.iom_j.xtf.impl.MyHandler.HEADER_OBJECT_MODELENTRY,hsNextOid());
+                			model.setattrvalue(ch.interlis.iom_j.xtf.impl.MyHandler.HEADER_OBJECT_MODELENTRY_NAME,modelName);
+                			modelx.put(model.getobjectoid(),model);
+                		}
+                		ret.setHeaderObjects(modelx);
+                        return ret;
                 	}else{
                 		// != inside data section
                 		throw new IoxSyntaxException(event2msgtext(event));
@@ -834,6 +843,9 @@ public class Xtf24Reader implements IoxReader {
     	iliTopics=new HashMap<QName, Topic>();
     	iliClasses=new HashMap<QName, Viewable>();
     	iliProperties=new HashMap<Viewable, HashMap<QName, Element>>();
+    	if(td==null){
+    		return;
+    	}
 		Iterator tdIterator = td.iterator();
 		// iliTd
 		while(tdIterator.hasNext()){
@@ -1367,6 +1379,11 @@ public class Xtf24Reader implements IoxReader {
 			event=skipSpacesAndGetNextEvent(event);
 		}
 		return segment;
+	}
+	private int hsOid=0;
+	private String hsNextOid(){
+		hsOid++;
+		return Integer.toString(hsOid);
 	}
     
 	@Override

@@ -350,7 +350,6 @@ public class Xtf24ReaderTest {
 	public void testNoDataSectionDefined_Fail() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"NoDataSectionDefined.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof  StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -440,7 +439,6 @@ public class Xtf24ReaderTest {
 	public void testUnexpectedCharacter_Fail() throws IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"UnexpectedCharacter.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 	        fail();
@@ -458,7 +456,6 @@ public class Xtf24ReaderTest {
 	public void testUnexpectedEvent_Fail()  throws IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"UnexpectedEvent.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof  StartTransferEvent);
 		try{
 			reader.read();
 			fail();

@@ -1,7 +1,15 @@
 package ch.interlis.iox_j;
 
+import java.util.ArrayList;
+
 import ch.ehi.basics.logging.EhiLogger;
+import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.xtf.XtfStartTransferEvent;
+import ch.interlis.iom_j.xtf.impl.MyHandler;
+import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxReader;
+import ch.interlis.iox.StartBasketEvent;
+import ch.interlis.iox_j.utility.ReaderFactory;
 
 public class IoxUtility {
 	private IoxUtility(){}
@@ -29,6 +37,60 @@ public class IoxUtility {
 		}
 		return false;
 	}
+	/** Gets the models used in an XTF file.
+	 * @param xtffile path of XTF file
+	 * @return list of model names (list&lt;String modelname&gt;) 
+	 * @throws ch.interlis.iox.IoxException
+	 */
+	public static java.util.List<String> getModels(java.io.File xtffile)
+		throws ch.interlis.iox.IoxException
+	{
+		ArrayList<String> ret=new ArrayList<String>();
+		IoxReader reader=null;
+		try{
+			reader=new ReaderFactory().open(xtffile, null);
+			IoxEvent event=null;
+			try{
+				while((event=reader.read())!=null){
+					if(event instanceof StartBasketEvent){
+						String topic=((StartBasketEvent)event).getType();
+						String model[]=topic.split("\\.");
+						addModel(ret,model[0]);
+						return ret;
+					}else if(event instanceof XtfStartTransferEvent){
+						XtfStartTransferEvent xtfStart=(XtfStartTransferEvent)event;
+						addModels(ret, xtfStart);
+					}
+				}
+			}catch(ch.interlis.iox.IoxException ex){
+				// ignore it
+			}
+		}finally{
+			if(reader!=null){
+				reader.close();
+			}
+			reader=null;
+		}
+		return ret;
+	}
+	private static void addModels(ArrayList<String> ret, XtfStartTransferEvent xtfStart) {
+		java.util.HashMap<String, IomObject> objs=xtfStart.getHeaderObjects();
+		if(objs!=null){
+			for(String tid:objs.keySet()){
+				IomObject obj=objs.get(tid);
+				if(obj.getobjecttag().equals(MyHandler.HEADER_OBJECT_MODELENTRY)){
+					addModel(ret,obj.getattrvalue(MyHandler.HEADER_OBJECT_MODELENTRY_NAME));
+				}
+			}
+		}
+	}
+	private static void addModel(ArrayList<String> ret, String model) {
+		if(ret.contains(model)){
+			return;
+		}
+		ret.add(model);
+	}
+	@Deprecated
 	public static String getModelFromXtf(String filename)
 	{
 		ch.interlis.iox.StartBasketEvent be=null;
@@ -64,6 +126,7 @@ public class IoxUtility {
 		//EhiLogger.debug("model from xtf <"+model+">");
 		return model;
 	}
+	@Deprecated
 	public static String getModelFromXtf(java.io.InputStream f,String filename)
 	{
 		ch.interlis.iox.StartBasketEvent be=null;
