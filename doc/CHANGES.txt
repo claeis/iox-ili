@@ -5,6 +5,8 @@ ideas/open issues
 LATEST
 -----------------------------
 - Xtf24Reader: fixed xmlns setup
+- Xtf24Reader: added models to StartTransferEvent
+- fixed ReaderFactory to return a Reader state before first event
 
 iox-ili 1.19.6 (2017-08-24)
 -----------------------------

@@ -12,14 +12,15 @@ import ch.interlis.iox.IoxReader;
 import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class ReaderFactory{
-	private static IoxReader reader=null;
 	
 	public IoxReader open(File inputFile, LogEventFactory errFact) throws IoxException {
+		IoxReader reader=null;
 		reader=new ItfReader2(inputFile, null, false);
 		IoxEvent event=null;
 		try{
 			event=reader.read();
 			if(event!=null){
+				reader=new ItfReader2(inputFile, null, false);
 				return reader;
 			}
 		}catch(IoxException ex){
@@ -30,6 +31,7 @@ public class ReaderFactory{
 		try{
 			event2=reader.read();
 			if(event2!=null){
+		        reader=new XtfReader(inputFile);
 				return reader;
 			}
 		}catch(IoxException ex){
@@ -40,6 +42,7 @@ public class ReaderFactory{
 		try{
 			event3=reader.read();
 			if(event3!=null){
+		        reader=new Xtf24Reader(inputFile);
 				return reader;
 			}
 		}catch(IoxException ex){
@@ -50,6 +53,7 @@ public class ReaderFactory{
 		try{
 			event4=reader.read();
 			if(event4!=null){
+		        reader=new Iligml20Reader(inputFile);
 				return reader;
 			}
 		}catch(IoxException ex){
@@ -60,6 +64,7 @@ public class ReaderFactory{
 		try{
 			event5=reader.read();
 			if(event5!=null){
+		        reader=new CsvReader(inputFile);
 				return reader;
 			}
 		}catch(IoxException ex){
