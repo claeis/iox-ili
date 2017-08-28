@@ -31,7 +31,7 @@ import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
 import ch.interlis.iox.IoxReader;
-
+import ch.interlis.iox_j.IoxIliReader;
 import ch.ehi.basics.logging.EhiLogger;
 
 /** This class implements a INTERLIS 2 reader.

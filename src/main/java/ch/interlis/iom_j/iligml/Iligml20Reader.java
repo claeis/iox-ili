@@ -33,9 +33,10 @@ import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
 import ch.interlis.iox.IoxReader;
+import ch.interlis.iox_j.IoxIliReader;
 import ch.interlis.iox_j.IoxSyntaxException;
 
-public class Iligml20Reader implements IoxReader {
+public class Iligml20Reader implements IoxReader,IoxIliReader {
 	
 	private IoxFactoryCollection factory=new ch.interlis.iox_j.DefaultIoxFactoryCollection();
 	private LinkPool linkPool=new LinkPool();
@@ -954,6 +955,7 @@ public class Iligml20Reader implements IoxReader {
     private void ObjectComposition(StartElement element) {
         // ObjectComposition
     }
+    @Override
     public void setModel(TransferDescription td)
 	{
     	this.td = td;

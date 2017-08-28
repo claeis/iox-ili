@@ -38,9 +38,10 @@ import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
 import ch.interlis.iox.IoxReader;
+import ch.interlis.iox_j.IoxIliReader;
 import ch.interlis.iox_j.IoxSyntaxException;
 
-public class Xtf24Reader implements IoxReader {
+public class Xtf24Reader implements IoxReader ,IoxIliReader{
 	private TransferDescription td;
 	private javax.xml.stream.XMLEventReader reader=null;
 	private IoxFactoryCollection factory=new  ch.interlis.iox_j.DefaultIoxFactoryCollection();
@@ -169,9 +170,10 @@ public class Xtf24Reader implements IoxReader {
 		}
 	}
 	
-	/** Sets the model file.
+	/** Sets the Interlis model.
 	 * @param td
 	 */
+	@Override
 	public void setModel(TransferDescription td){
 		this.td=td;
 	}
