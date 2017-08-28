@@ -48,7 +48,7 @@ public class IoxUtility {
 		ArrayList<String> ret=new ArrayList<String>();
 		IoxReader reader=null;
 		try{
-			reader=new ReaderFactory().open(xtffile, null);
+			reader=new ReaderFactory().createReader(xtffile, null);
 			IoxEvent event=null;
 			try{
 				while((event=reader.read())!=null){

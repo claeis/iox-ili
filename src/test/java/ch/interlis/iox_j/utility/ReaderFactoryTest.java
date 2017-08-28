@@ -18,7 +18,7 @@ public class ReaderFactoryTest {
 	public void itfReader2_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/ItfReader2/SurfaceBasic.itf"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/ItfReader2/SurfaceBasic.itf"),null);
 		assertTrue(reader instanceof ItfReader2);
 	}
 	
@@ -28,7 +28,7 @@ public class ReaderFactoryTest {
 	public void itfReader2_txtExtension_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/ReaderFactory/SurfaceBasic.txt"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/SurfaceBasic.txt"),null);
 		assertTrue(reader instanceof ItfReader2);
 	}
 	
@@ -38,7 +38,7 @@ public class ReaderFactoryTest {
 	public void itfReader2_csvExtension_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/ReaderFactory/SurfaceBasic.csv"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/SurfaceBasic.csv"),null);
 		assertTrue(reader instanceof ItfReader2);
 	}
 	
@@ -48,7 +48,7 @@ public class ReaderFactoryTest {
 	public void csvReader_itfExtension_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/ReaderFactory/UnknownFile.itf"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/UnknownFile.itf"),null);
 		assertFalse(reader instanceof ItfReader2);
 		assertTrue(reader instanceof CsvReader);
 	}
@@ -59,7 +59,7 @@ public class ReaderFactoryTest {
 	public void csvReader_EmptyCsvFile_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/ReaderFactory/UnknownFile4.csv"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/UnknownFile4.csv"),null);
 		assertTrue(reader instanceof CsvReader);
 	}
 	
@@ -68,7 +68,7 @@ public class ReaderFactoryTest {
 	public void xtf23Reader_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/Xtf23Reader/SimpleCoord23a.xtf"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/Xtf23Reader/SimpleCoord23a.xtf"),null);
 		assertTrue(reader instanceof XtfReader);
 	}
 	
@@ -78,7 +78,7 @@ public class ReaderFactoryTest {
 	public void xtf23Reader_txtExtension_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/ReaderFactory/SimpleCoord23a.txt"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/SimpleCoord23a.txt"),null);
 		assertTrue(reader instanceof XtfReader);
 	}
 	
@@ -87,7 +87,7 @@ public class ReaderFactoryTest {
 	public void xtf24Reader_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/Xtf24Reader/EmptyObjects.xml"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/Xtf24Reader/EmptyObjects.xml"),null);
 		assertTrue(reader instanceof Xtf24Reader);
 	}
 	
@@ -97,7 +97,7 @@ public class ReaderFactoryTest {
 	public void xtf24Reader_txtExtension_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/ReaderFactory/Coord.txt"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/Coord.txt"),null);
 		assertTrue(reader instanceof Xtf24Reader);
 	}
 	
@@ -106,7 +106,7 @@ public class ReaderFactoryTest {
 	public void csvReader_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/CsvReader/TextType.csv"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/CsvReader/TextType.csv"),null);
 		assertTrue(reader instanceof CsvReader);
 	}
 	
@@ -116,7 +116,7 @@ public class ReaderFactoryTest {
 	public void csvReader_txtExtension_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/ReaderFactory/TextType.txt"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/TextType.txt"),null);
 		assertTrue(reader instanceof CsvReader);
 	}
 	
@@ -125,7 +125,7 @@ public class ReaderFactoryTest {
 	public void gml20Reader_ili10_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/Ili10gml20Reader/Area.gml"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/Ili10gml20Reader/Area.gml"),null);
 		assertTrue(reader instanceof Iligml20Reader);
 	}
 	
@@ -135,7 +135,7 @@ public class ReaderFactoryTest {
 	public void gml20Reader_ili10_csvFile_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/ReaderFactory/Area.csv"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/Area.csv"),null);
 		assertTrue(reader instanceof Iligml20Reader);
 	}
 	
@@ -145,7 +145,7 @@ public class ReaderFactoryTest {
 	public void gml20Reader_ili10_txtExtension_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/ReaderFactory/Area.txt"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/Area.txt"),null);
 		assertTrue(reader instanceof Iligml20Reader);
 	}
 	
@@ -155,7 +155,7 @@ public class ReaderFactoryTest {
 	public void gml20Reader_ili23_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/Ili23gml20Reader/Area.gml"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/Ili23gml20Reader/Area.gml"),null);
 		assertTrue(reader instanceof Iligml20Reader);
 	}
 	
@@ -165,7 +165,7 @@ public class ReaderFactoryTest {
 	public void gml20Reader_ili23_txtExtension_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().open(new File("src/test/data/ReaderFactory/Coord2.txt"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/Coord2.txt"),null);
 		assertTrue(reader instanceof Iligml20Reader);
 	}
 }

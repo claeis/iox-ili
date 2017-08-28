@@ -13,7 +13,7 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class ReaderFactory{
 	
-	public IoxReader open(File inputFile, LogEventFactory errFact) throws IoxException {
+	public IoxReader createReader(File inputFile, LogEventFactory errFact) throws IoxException {
 		IoxReader reader=null;
 		reader=new ItfReader2(inputFile, null, false);
 		IoxEvent event=null;
