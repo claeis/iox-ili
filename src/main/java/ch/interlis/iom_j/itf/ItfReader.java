@@ -43,7 +43,7 @@ import java.util.Iterator;
  * @author ce
  * @version $Revision: 1.0 $ $Date: 23.06.2006 $
  */
-public class ItfReader implements ch.interlis.iox.IoxReader{
+public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 	private ItfScanner scanner=null;
 	private ItfLineCursor itfLine=null;
 	private int state=0;
@@ -638,6 +638,7 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 	/** Sets the model of the the data to be read.
 	 * @param td model as read by the compiler
 	 */
+	@Override
 	public void setModel(TransferDescription td)
 	{
 		this.td=td;

@@ -3,6 +3,7 @@ package ch.interlis.iom_j.xtf;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
@@ -16,6 +17,7 @@ import javax.xml.stream.events.Comment;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+
 import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.ili2c.generator.Iligml20Generator;
 import ch.interlis.ili2c.metamodel.AssociationDef;
@@ -36,9 +38,10 @@ import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
 import ch.interlis.iox.IoxReader;
+import ch.interlis.iox_j.IoxIliReader;
 import ch.interlis.iox_j.IoxSyntaxException;
 
-public class Xtf24Reader implements IoxReader {
+public class Xtf24Reader implements IoxReader ,IoxIliReader{
 	private TransferDescription td;
 	private javax.xml.stream.XMLEventReader reader=null;
 	private IoxFactoryCollection factory=new  ch.interlis.iox_j.DefaultIoxFactoryCollection();
@@ -82,7 +85,6 @@ public class Xtf24Reader implements IoxReader {
     // namespace
     private static final String NAMESPACE_ILIXMLBASE="http://www.interlis.ch/xtf/2.4/";
     private static final String NAMESPACE_ILIXMLBASE_INTERLIS=NAMESPACE_ILIXMLBASE+"INTERLIS";
-    private static final String NAMESPACE_METAATTR = "ili2.ilixtf24.namespaceName";
     private static final String NAMESPACE_GEOM="http://www.interlis.ch/geometry/1.0";
     private static final String NAMESPACE_XMLSCHEMA="http://www.w3.org/2001/XMLSchema-instance";
 	// qnames xml
@@ -168,9 +170,10 @@ public class Xtf24Reader implements IoxReader {
 		}
 	}
 	
-	/** Sets the model file.
+	/** Sets the Interlis model.
 	 * @param td
 	 */
+	@Override
 	public void setModel(TransferDescription td){
 		this.td=td;
 	}
@@ -200,7 +203,7 @@ public class Xtf24Reader implements IoxReader {
 			javax.xml.stream.events.XMLEvent event=null;
 			try{
 				event=reader.nextEvent();
-				EhiLogger.debug(event.toString());
+				//EhiLogger.debug(event.toString());
 			}catch(javax.xml.stream.XMLStreamException ex){
 				throw new IoxException(ex);
 			}
@@ -217,7 +220,6 @@ public class Xtf24Reader implements IoxReader {
                     StartElement element = (StartElement) event;
                     if(element.getName().equals(QNAME_ILI_TRANSFER)){
                         state=INSIDE_TRANSFER;
-                        return new ch.interlis.iox_j.StartTransferEvent();
                     }else{
                     	throw new IoxSyntaxException(event2msgtext(event));
                     }
@@ -495,7 +497,15 @@ public class Xtf24Reader implements IoxReader {
                 			// no model defined.
                     		throw new IoxException("expected at least 1 model.");
                     	}
-                		continue;
+                		HashMap<String,IomObject> modelx=new HashMap<String,IomObject>();
+                		XtfStartTransferEvent ret=new XtfStartTransferEvent();
+                		for(String modelName:models){
+                            IomObject model=createIomObject(ch.interlis.iom_j.xtf.impl.MyHandler.HEADER_OBJECT_MODELENTRY,hsNextOid());
+                			model.setattrvalue(ch.interlis.iom_j.xtf.impl.MyHandler.HEADER_OBJECT_MODELENTRY_NAME,modelName);
+                			modelx.put(model.getobjectoid(),model);
+                		}
+                		ret.setHeaderObjects(modelx);
+                        return ret;
                 	}else{
                 		// != inside data section
                 		throw new IoxSyntaxException(event2msgtext(event));
@@ -835,6 +845,9 @@ public class Xtf24Reader implements IoxReader {
     	iliTopics=new HashMap<QName, Topic>();
     	iliClasses=new HashMap<QName, Viewable>();
     	iliProperties=new HashMap<Viewable, HashMap<QName, Element>>();
+    	if(td==null){
+    		return;
+    	}
 		Iterator tdIterator = td.iterator();
 		// iliTd
 		while(tdIterator.hasNext()){
@@ -853,7 +866,7 @@ public class Xtf24Reader implements IoxReader {
 				// iliTopic
 				Topic topic = (Topic) topicObj;
 				String localTopicPart=topic.getName();
-				String modelNameSpace=model.getMetaValue(NAMESPACE_METAATTR);
+				String modelNameSpace=model.getXmlns();
 				if(modelNameSpace==null){
 					modelNameSpace=NAMESPACE_ILIXMLBASE+model.getName();
 				}
@@ -880,7 +893,7 @@ public class Xtf24Reader implements IoxReader {
 					}
 		    		Viewable viewable = (Viewable) classObj;
 		    		String localClassPart=viewable.getName();
-    				String nameSpace=model.getMetaValue(NAMESPACE_METAATTR);
+    				String nameSpace=model.getXmlns();
     				if(nameSpace==null){
     					nameSpace=NAMESPACE_ILIXMLBASE+model.getName();
     				}
@@ -1368,6 +1381,11 @@ public class Xtf24Reader implements IoxReader {
 			event=skipSpacesAndGetNextEvent(event);
 		}
 		return segment;
+	}
+	private int hsOid=0;
+	private String hsNextOid(){
+		hsOid++;
+		return Integer.toString(hsOid);
 	}
     
 	@Override

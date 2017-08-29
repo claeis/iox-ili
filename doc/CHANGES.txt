@@ -2,6 +2,14 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+LATEST
+-----------------------------
+- Xtf24Reader: fixed xmlns setup
+- Xtf24Reader: added models to StartTransferEvent
+- fixed ReaderFactory to return a Reader state before first event
+- fixed GetModels()
+- added IoxIliReader to make generic clients aware of setModel()
+
 iox-ili 1.19.6 (2017-08-24)
 -----------------------------
 - fixed TranslateToOrigin: failed if dest attribute name equals source attrname

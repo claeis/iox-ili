@@ -20,8 +20,9 @@ import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
 import ch.interlis.iox.IoxReader;
+import ch.interlis.iox_j.IoxIliReader;
 
-public class CsvReader implements IoxReader {
+public class CsvReader implements IoxReader,IoxIliReader {
 	// state
 	private static int state;
 	private static final int START=0;

@@ -107,7 +107,6 @@ public class Xtf24ReaderHeaderTest {
 	public void testNoModelsDefined_Fail()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"NoModelsDefined.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -124,7 +123,6 @@ public class Xtf24ReaderHeaderTest {
 	public void testDataSectionInsideHeaderSection_Fail()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"DataInsideHeaderSection.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -141,7 +139,6 @@ public class Xtf24ReaderHeaderTest {
 	public void testDataBeforeHeaderSection_Fail()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"DataBeforeHeaderSection.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -158,7 +155,6 @@ public class Xtf24ReaderHeaderTest {
 	public void test_MultipleHeaderSection_Fail()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"MultipleHeaderSectionDefined.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -175,7 +171,6 @@ public class Xtf24ReaderHeaderTest {
 	public void test_MultipleModels_Fail()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"MultipleModelsDefined.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -192,7 +187,6 @@ public class Xtf24ReaderHeaderTest {
 	public void test_MultipleSender_Fail() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"HeaderMultipleSender.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -209,7 +203,6 @@ public class Xtf24ReaderHeaderTest {
 	public void test_MultipleComments_Fail() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"HeaderMultipleComments.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -226,7 +219,6 @@ public class Xtf24ReaderHeaderTest {
 	public void testHeaderSenderBeforeModels_Fail() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"SenderBeforeModels.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -243,7 +235,6 @@ public class Xtf24ReaderHeaderTest {
 	public void testHeaderCommentsBeforeModels_Fail() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"CommentsBeforeModels.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -260,7 +251,6 @@ public class Xtf24ReaderHeaderTest {
 	public void testHeaderWrongTypeInsideModels_Fail() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"WrongTypeInModels.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -277,7 +267,6 @@ public class Xtf24ReaderHeaderTest {
 	public void testHeaderNoModelInsideModelsDefined_Fail() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"NoModelInsideModelsDefined.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -294,7 +283,6 @@ public class Xtf24ReaderHeaderTest {
 	public void testNoModelInsideModelDefined_Fail() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"NoModelInsideModelDefined.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -311,7 +299,6 @@ public class Xtf24ReaderHeaderTest {
 	public void testWrongTypeInModel_Fail() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"WrongTypeInModel.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -328,7 +315,6 @@ public class Xtf24ReaderHeaderTest {
 	public void testNoModelnameFound_Fail() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"NoModelNameFound.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -345,7 +331,6 @@ public class Xtf24ReaderHeaderTest {
 	public void testNoSendernameFound_Fail() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"NoSenderNameFound.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
@@ -362,7 +347,6 @@ public class Xtf24ReaderHeaderTest {
 	public void testNoCommentsnameFound_Fail() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"NoCommentsNameFound.xml"));
 		reader.setModel(td);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		try{
 			reader.read();
 			fail();
