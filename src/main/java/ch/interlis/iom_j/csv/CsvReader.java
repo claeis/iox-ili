@@ -6,8 +6,15 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import ch.interlis.ili2c.metamodel.DataModel;
+import ch.interlis.ili2c.metamodel.Element;
+import ch.interlis.ili2c.metamodel.Model;
+import ch.interlis.ili2c.metamodel.Topic;
 import ch.interlis.ili2c.metamodel.TransferDescription;
+import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
@@ -40,21 +47,25 @@ public class CsvReader implements IoxReader {
 	private static final char NEWLINE_LINEFEED='\n';
 	// iox reader parameter
 	private IoxFactoryCollection factory;
-	private static FileReader inputReader=null;
+	private FileReader inputReader=null;
 	private static TransferDescription td=null;
-	private static File inputFile=null;
-	private static int increasingNumber=1;
-	private static BufferedReader reader = null;
+	private File inputFile=null;
+	private int increasingNumber=1;
+	private BufferedReader reader = null;
 	private static String headerDefinition=null;
 	private static String userDefined_Delimiter=null;
 	private static String userDefined_Record_Delimiter=null;
 	// model, topic, class
-	private static String MODEL=null;
-	private static String TOPIC="Topic";
-	private static String CLASS="Class"+increasingNumber;
+	private String modelName=null;
+	private String topicName="Topic";
+	private String className="Class"+increasingNumber;
 	// delimiter
 	private static char currentDelimiter;
 	private static char currentRecordDelimiter;
+	// ili elements
+	private HashMap<Viewable, Topic> iliTopics=null;
+	private HashMap<Viewable, Model> iliClasses=null;
+	private ArrayList<HashMap<Viewable, Model>> listOfIliClasses=null;
 	
 	public CsvReader(File csvFile)throws IoxException{
 		state=START;
@@ -83,7 +94,7 @@ public class CsvReader implements IoxReader {
 	 */
 	@Override
     public IoxEvent read() throws IoxException{
-		IomObject iomObj;
+		IomObject iomObj = null;
 		if(state==START){
 			state=INSIDE_TRANSFER;
 			return new ch.interlis.iox_j.StartTransferEvent();
@@ -94,31 +105,81 @@ public class CsvReader implements IoxReader {
 			state=INSIDE_BASKET;
 		}
 		if(state==INSIDE_BASKET){
-			MODEL=getModelName();
-			String bid="b"+getCount();
-			if(isHeaderDefined()){
-				// read header.
-				List<String> records;
-				try {
-					state=INSIDE_OBJECT;
-					records = readChars(reader, currentRecordDelimiter, currentDelimiter);
-				} catch (IOException e) {
-					throw new IoxException(e);
+			IomObject headerObj=null;
+			// check if td is set
+			if(td==null){
+				// get model name
+				modelName=getNameOfDataFile();
+				// check if header is defined
+				if(isHeaderDefined()){
+					// ignore first record
+					List<String> record;
+					try {
+						state=INSIDE_OBJECT;
+						record = readChars(reader, currentRecordDelimiter, currentDelimiter);
+						int count=1;
+						headerObj=createIomObject(modelName+"."+topicName+"."+className, null);
+						for(String attribute : record){
+							headerObj.setattrvalue("attr"+count, attribute);
+							count+=1;
+						}
+					} catch (IOException e) {
+						throw new IoxException(e);
+					}
+				}
+			}else{
+				// get ili model data
+		    	setupNameMapping();
+		    	
+				// check if header is defined
+				if(isHeaderDefined()){
+					List<String> records;
+					try {
+						state=INSIDE_OBJECT;
+						records = readChars(reader, currentRecordDelimiter, currentDelimiter);
+						Viewable aClassName=getViewableByAttributeNames(records);
+						if(aClassName==null){
+							throw new IoxException("attributes of headerrecord: "+records.toString()+" not found in iliModel: "+modelName);
+						}else{
+							className=aClassName.getName();
+						}
+						int count=1;
+						headerObj=createIomObject(modelName+"."+topicName+"."+className, null);
+						for(String attribute : records){
+							headerObj.setattrvalue("attr"+count, attribute);
+							count+=1;
+						}
+					} catch (IOException e) {
+						throw new IoxException(e);
+					}
 				}
 			}
 			state=INSIDE_OBJECT;
-			return new ch.interlis.iox_j.StartBasketEvent(MODEL+"."+TOPIC, bid);
+			String bid="b"+getCount();
+			return new ch.interlis.iox_j.StartBasketEvent(modelName+"."+topicName, bid);
 		}
 		if(state==INSIDE_OBJECT){
 			try {
 				while(reader.ready()){
-	    			iomObj=createIomObject(MODEL+"."+TOPIC+"."+CLASS, null);
 					// read every record.
-					List<String> records;
-					records = readChars(reader, currentRecordDelimiter, currentDelimiter);	
+					List<String> record;
+					record = readChars(reader, currentRecordDelimiter, currentDelimiter);	
+					// if td!=null
+					if(td!=null){
+						// compare attrCount
+						Viewable iliClass=getViewableByAttributeCount(record.size());
+						if(iliClass==null){
+							throw new IoxException("attribute count of record: "+record.size()+" not found in classes of model: "+modelName);
+						}else{
+							topicName=iliTopics.get(iliClass).getName();
+							iomObj=createIomObject(modelName+"."+topicName+"."+iliClass.getName(), null);
+						}
+					}else{
+						iomObj=createIomObject(modelName+"."+topicName+"."+className, null);
+					}
 					int count=1;
-					for(String record : records){
-						iomObj.setattrvalue("attr"+count, record);
+					for(String attributes : record){
+						iomObj.setattrvalue("attr"+count, attributes);
 						count+=1;
 					}
 					return new ch.interlis.iox_j.ObjectEvent(iomObj);
@@ -138,13 +199,137 @@ public class CsvReader implements IoxReader {
 		}
         return null;
     }
+
+    /** Iterate through ili file
+	 */
+    private void setupNameMapping(){
+    	iliTopics=new HashMap<Viewable, Topic>();
+    	listOfIliClasses=new ArrayList<HashMap<Viewable, Model>>();
+		Iterator tdIterator = td.iterator();
+		while(tdIterator.hasNext()){
+			iliClasses=new HashMap<Viewable, Model>();
+			Object modelObj = tdIterator.next();
+			if(!(modelObj instanceof DataModel)){
+				continue;
+			}
+			// iliModel
+			DataModel model = (DataModel) modelObj;
+			modelName=model.getName();
+			Iterator modelIterator = model.iterator();
+			while(modelIterator.hasNext()){
+				Object topicObj = modelIterator.next();
+				if(!(topicObj instanceof Topic)){
+					continue;
+				}
+				// iliTopic
+				Topic topic = (Topic) topicObj;
+				topicName=topic.getName();
+				// iliClass
+				Iterator classIter=topic.iterator();
+		    	while(classIter.hasNext()){
+		    		Object classObj=classIter.next();
+		    		if(!(classObj instanceof Viewable)){
+    					continue;
+    				}
+		    		Viewable viewable = (Viewable) classObj;
+	    			iliClasses.put(viewable, model);
+	    			iliTopics.put(viewable, topic);
+		    	}
+			}
+			listOfIliClasses.add(iliClasses);
+		}
+    }
+    
+    /** Get Viewable of model, where attributes of records are equal to attribute in model class
+     * @return Viewable
+     * @throws IoxException 
+     */
+    private Viewable getViewableByAttributeNames(List<String> headerAttrs) throws IoxException{
+    	int countOfMatchedViewables=0;
+    	StringBuilder multipleMatchedClasses = new StringBuilder();
+    	Viewable viewable=null;
+    	boolean attrsEqual=false;
+    	if(iliClasses==null){
+    		setupNameMapping();
+    	}
+    	String comma="";
+    	// first last model file.
+    	for(HashMap<Viewable, Model> mapIliClasses : listOfIliClasses){
+    		for(Viewable iliViewable : mapIliClasses.keySet()){
+    			List<String> iliAttrs=new ArrayList<String>();
+    			Iterator attrIter=iliViewable.getAttributes();
+    			while(attrIter.hasNext()){
+    				Element attribute=(Element) attrIter.next();
+    				iliAttrs.add(attribute.getName());
+    			}
+    			if(iliAttrs.size()==headerAttrs.size()){
+    				if(iliAttrs.containsAll(headerAttrs)){
+    					viewable=iliViewable;
+    					modelName=mapIliClasses.get(iliViewable).getName();
+    					countOfMatchedViewables+=1;
+    					attrsEqual=true;
+    					multipleMatchedClasses.append(comma);
+        				multipleMatchedClasses.append(viewable.getName());
+        				comma=",";
+    				}
+    			}
+    		}
+    	}
+    	if(attrsEqual==true && countOfMatchedViewables==1){
+    		return viewable;
+    	}else if(attrsEqual==true && countOfMatchedViewables>1){
+    		throw new IoxException("multiple class candidates: "+multipleMatchedClasses.toString());
+    	}else{
+    		return null;
+    	}
+    }
 	
+    /** Get Viewable of model, where record attribute-count is equal to attribute-count of model class
+     * @return Viewable
+     * @throws IoxException 
+     */
+    private Viewable getViewableByAttributeCount(Integer attrCountOfRecord) throws IoxException{
+    	int attrCountOfMatchedClasses=0;
+    	Viewable matchedIliViewable=null;
+    	StringBuilder multipleMatchedClasses = new StringBuilder();
+    	if(iliClasses==null){
+    		setupNameMapping();
+    	}
+    	String comma="";
+    	// first last model file.
+    	for(HashMap<Viewable, Model> mapIliClasses : listOfIliClasses){
+    		for(Viewable iliViewable : mapIliClasses.keySet()){
+    			List<String> iliAttrs=new ArrayList<String>();
+    			Iterator attrIter=iliViewable.getAttributes();
+    			while(attrIter.hasNext()){
+    				Element attribute=(Element) attrIter.next();
+    				iliAttrs.add(attribute.getName());
+    			}
+    			if(iliAttrs.size()==attrCountOfRecord){
+    				modelName=mapIliClasses.get(iliViewable).getName();
+					attrCountOfMatchedClasses+=1;
+    				matchedIliViewable=iliViewable;
+    				multipleMatchedClasses.append(comma);
+    				multipleMatchedClasses.append(matchedIliViewable.getName());
+    				comma=",";
+    			}
+    		}
+    	}
+    	if(attrCountOfMatchedClasses==1){
+    		return matchedIliViewable;
+    	}else if(attrCountOfMatchedClasses>1){
+    		throw new IoxException("multiple class candidates: "+multipleMatchedClasses.toString());
+    	}else{
+    		return null;
+    	}
+    }
+    
 	/**
 	 * read the path of input csv file and get the single name of csv file.
 	 * @return modelname
 	 * @throws IoxException
 	 */
-	private String getModelName() throws IoxException{
+	private String getNameOfDataFile() throws IoxException{
 		// get path of csv file
 		String path=inputFile.getPath();
 		if(path!=null){
