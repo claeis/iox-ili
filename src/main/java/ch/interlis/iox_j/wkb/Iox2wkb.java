@@ -25,11 +25,13 @@ package ch.interlis.iox_j.wkb;
 import java.io.IOException;
 import java.util.Iterator;
 
-
+import com.vividsolutions.jts.geom.Coordinate;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.itf.impl.hrg.HrgUtility;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 
 /** Utility to convert from INTERLIS to JTS geometry types.
@@ -374,17 +376,18 @@ public class Iox2wkb {
 
 			// Zwischenpunkte erzeugen, so dass maximale Pfeilhoehe nicht 
 			// ueberschritten wird
-			// Distanz zwischen Bogenanfanspunkt und Bogenendpunkt 
-			double c=dist(pt1_re,pt1_ho,pt2_re,pt2_ho);
-			// Radius bestimmen
-			double s=(a+b+c)/2.0;
-			double ds=Math.atan2(pt2_re-arcPt_re,pt2_ho-arcPt_ho)-Math.atan2(pt1_re-arcPt_re,pt1_ho-arcPt_ho);
-			double rSign=(Math.sin(ds)>0.0)?-1.0:1.0;
-			double r=a*b*c/4.0/Math.sqrt(s*(s-a)*(s-b)*(s-c))*rSign;
+			
+			double Z1O[]=new double[1];
+			double Z2O[]=new double[1];
+			double DETAO[]=new double[1];
+			double SIGNO[]=new double[1];
+			HrgUtility.CTRC3P(pt1_re,pt1_ho,  arcPt_re,arcPt_ho,pt2_re,pt2_ho, Z1O,Z2O,DETAO,SIGNO);
+			
 			// Kreismittelpunkt
-			double thetaM=Math.atan2(arcPt_re-pt1_re,arcPt_ho-pt1_ho)+Math.acos(a/2.0/r);
-			double reM=pt1_re+r*Math.sin(thetaM);
-			double hoM=pt1_ho+r*Math.cos(thetaM);
+			double thetaM=DETAO[0];
+			double reM=Z1O[0];
+			double hoM=Z2O[0];
+			double r=CurveSegment.dist(pt1_re,pt1_ho,reM,hoM);
 
 			// mindest Winkelschrittweite
 			double theta=2*Math.acos(1-p/Math.abs(r));
