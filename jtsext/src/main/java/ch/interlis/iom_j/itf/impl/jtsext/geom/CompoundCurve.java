@@ -279,17 +279,11 @@ public class CompoundCurve extends LineString {
 		if( ALFA == BETA || Math.signum(BETA-ALFA)==sign){
 			// old midpt lies inside the new arc
 		}else{
-			// calulate new mid pt
-			// Zentriwinkel zwischen start und end
-			double a=CurveSegment.dist(start.x,start.y,end.x,end.y);
-			// Richtung des Punktes auf dem halben Bogen 
-			double alpha=Math.atan2(start.x-center.x,start.y-center.y)+sign*Math.asin(a/2.0/radius);
-			midPt=new Coordinate();
-			midPt.x=center.x + radius * Math.sin(alpha);
-			midPt.y=center.y + radius * Math.cos(alpha);
+			midPt = ArcSegment.calcArcPt(start, end, center, radius, sign);
 		}
 		return midPt;
 	}
+
 	/** calculate a point from a vector
 	 * @param p0 start point
 	 * @param p1 end point

@@ -1,5 +1,6 @@
 package ch.interlis.iox_j.filter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -154,24 +155,34 @@ public class TranslateToOrigin implements IoxFilter {
 		}
 		AttributeDef destAttr=(AttributeDef)attr.getTranslationOfOrSame();
 		String destAttrName=destAttr.getName();
+		ArrayList<Object> attrValues=new ArrayList<Object>();
 		for(int attri=0;attri<attrc;attri++){
 			String attrValue=iomObj.getattrprim(attrName,attri);
 			if(attrValue!=null){
-				if(isEnumType){
-					attrValue=translateEnumValue(attrValue,enumType,(EnumerationType)destAttr.getDomainResolvingAliases());
-				}
-				iomObj.setattrvalue(destAttrName, attrValue);
+				attrValues.add(attrValue);
 			}else{
 				IomObject structValue=iomObj.getattrobj(attrName,attri);
-				if(structValue!=null){
-					if(isCompType){
-						translateObject(structValue);
-					}
-					iomObj.addattrobj(destAttrName, structValue);
-				}
+				attrValues.add(structValue);
 			}
 		}
 		iomObj.setattrundefined(attrName);
+		for(int attri=0;attri<attrc;attri++){
+			Object attrValue=attrValues.get(attri);
+			if(attrValue!=null){
+				if(attrValue instanceof String){
+					if(isEnumType){
+						attrValue=translateEnumValue((String)attrValue,enumType,(EnumerationType)destAttr.getDomainResolvingAliases());
+					}
+					iomObj.setattrvalue(destAttrName, (String)attrValue);
+				}else{
+					IomObject structValue=(IomObject)attrValue;
+					if(isCompType){
+						translateObject(structValue);
+					}
+					iomObj.addattrobj(destAttrName,structValue);
+				}
+			}
+		}
 	}
 
 	private String translateEnumValue(String attrValue, EnumerationType enumType,EnumerationType destEnumType) {

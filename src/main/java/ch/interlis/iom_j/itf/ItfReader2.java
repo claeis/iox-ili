@@ -47,7 +47,7 @@ import java.util.Iterator;
  * @author ce
  * @version $Revision: 1.0 $ $Date: 23.06.2006 $
  */
-public class ItfReader2 implements ch.interlis.iox.IoxReader{
+public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 
 	static final public String SAVED_GEOREF_PREFIX="_itf_";
 	
@@ -509,6 +509,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader{
 		
 		
 	}
+	@Override
 	public void setModel(TransferDescription td)
 	{
 		rawReader.setModel(td);

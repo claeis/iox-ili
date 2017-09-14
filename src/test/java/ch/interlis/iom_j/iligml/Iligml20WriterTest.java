@@ -22,7 +22,7 @@ import ch.interlis.iox_j.jts.Iox2jtsException;
 
 public class Iligml20WriterTest {
 
-	private final static String TEST_OUT="support/test-out";
+	private final static String TEST_OUT="build";
 	private TransferDescription td=null;
 	private void addArc(IomObject polyline,double xa, double ya,double x, double y){
 		IomObject sequence=polyline.getattrobj("sequence",0);

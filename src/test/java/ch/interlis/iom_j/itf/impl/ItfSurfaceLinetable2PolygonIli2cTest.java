@@ -49,7 +49,7 @@ public class ItfSurfaceLinetable2PolygonIli2cTest {
 		String tableAName=tableA.getScopedName(null);
 		String formAttrTableName=tableA.getContainer().getScopedName(null)+"."+tableA.getName()+"_"+formAttr.getName();
 		ItfSurfaceLinetable2Polygon builder=new ItfSurfaceLinetable2Polygon(formAttr,false);
-		ItfReader reader=new ItfReader(new File("src/test/data/Test1.itf"));
+		ItfReader reader=new ItfReader(new File("src/test/data/Itf/Test1.itf"));
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{
@@ -77,7 +77,7 @@ public class ItfSurfaceLinetable2PolygonIli2cTest {
 		String tableAName=tableA.getScopedName(null);
 		String formAttrTableName=tableA.getContainer().getScopedName(null)+"."+tableA.getName()+"_"+formAttr.getName();
 		ItfSurfaceLinetable2Polygon builder=new ItfSurfaceLinetable2Polygon(formAttr,false);
-		ItfReader reader=new ItfReader(new File("src/test/data/Test1b.itf"));
+		ItfReader reader=new ItfReader(new File("src/test/data/Itf/Test1b.itf"));
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{

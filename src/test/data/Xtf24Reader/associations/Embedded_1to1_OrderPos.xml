@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" xmlns="http://www.interlis.ch/xtf/2.4/Association" xmlns:geom="http://www.interlis.ch/geometry/1.0">
+	<ili:headersection>
+		<ili:models>
+			<ili:model>Association</ili:model>
+		</ili:models>
+	</ili:headersection>
+	<ili:datasection>
+		<Transport ili:bid="bid">
+			<Schiff ili:tid="oid1">
+			</Schiff>
+			<Hafen ili:tid="oid2">
+				<bezSchiff ili:ref="oid1" ili:order_pos="6"></bezSchiff>
+			</Hafen>
+		</Transport>
+	</ili:datasection>
+</ili:transfer>

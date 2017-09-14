@@ -39,6 +39,7 @@ public class XtfUtility {
 	 * @return list of model names (list&lt;String modelname&gt;) 
 	 * @throws ch.interlis.iox.IoxException
 	 */
+	@Deprecated
 	public static ArrayList<String> getModels(java.io.File xtffile)
 		throws ch.interlis.iox.IoxException
 	{
@@ -66,6 +67,7 @@ public class XtfUtility {
 		}
 		return ret;
 	}
+	@Deprecated
 	public static void addModels(ArrayList<String> ret, XtfStartTransferEvent xtfStart) {
 		java.util.HashMap<String, IomObject> objs=xtfStart.getHeaderObjects();
 		if(objs!=null){

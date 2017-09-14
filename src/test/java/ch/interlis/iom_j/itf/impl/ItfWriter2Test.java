@@ -22,6 +22,7 @@ import ch.interlis.iox_j.*;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 
 public class ItfWriter2Test {
+	private final static String TEST_OUT="build";
 
 	private TransferDescription td=null;
 	private void addArc(IomObject polyline,double xa, double ya,double x, double y){
@@ -70,7 +71,7 @@ public class ItfWriter2Test {
 	
 	@Test
 	public void testF1() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File("test-out/TestF1.itf"),td);
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestF1.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new EndTransferEvent());
 		writer.close();
@@ -78,7 +79,7 @@ public class ItfWriter2Test {
 	}
 	@Test
 	public void testF3() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File("test-out/TestF3.itf"),td);
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestF3.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicF","bid1"));
 		writer.write(new EndBasketEvent());
@@ -88,7 +89,7 @@ public class ItfWriter2Test {
 	}
 	@Test
 	public void testF4() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File("test-out/TestF4.itf"),td);
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestF4.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicF","bid1"));
 		writer.write(new ObjectEvent(new Iom_jObject("Test1.TopicF.TableF0","10")));
@@ -102,7 +103,7 @@ public class ItfWriter2Test {
 	}
 	@Test
 	public void testA1() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File("test-out/TestA1.itf"),td);
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestA1.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicA","bid1"));
 		writer.write(new ObjectEvent(new Iom_jObject("Test1.TopicA.TableA","10")));
@@ -114,7 +115,7 @@ public class ItfWriter2Test {
 	}
 	@Test
 	public void testA2() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File("test-out/TestA2.itf"),td);
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestA2.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicA","bid1"));
 		IomObject iomObj=new Iom_jObject("Test1.TopicA.TableA","10");
@@ -144,7 +145,7 @@ public class ItfWriter2Test {
 	}
 	@Test
 	public void testB1() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File("test-out/TestB1.itf"),td);
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestB1.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicB","bid1"));
 		writer.write(new ObjectEvent(new Iom_jObject("Test1.TopicB.TableB","10")));
@@ -156,7 +157,7 @@ public class ItfWriter2Test {
 	}
 	@Test
 	public void testB2() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File("test-out/TestB2.itf"),td);
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestB2.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicB","bid1"));
 		IomObject iomObj=new Iom_jObject("Test1.TopicB.TableB","10");

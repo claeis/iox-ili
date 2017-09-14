@@ -84,20 +84,14 @@ public class ArcSegment extends CurveSegment {
 			double a=CurveSegment.dist(pt1_re,pt1_ho,arcPt_re,arcPt_ho);
 			// Distanz zwischen Zwischenpunkt und Bogenendpunkt 
 			double b=CurveSegment.dist(arcPt_re,arcPt_ho,pt2_re,pt2_ho);
+			
+			getCenterPoint();
 
-			// Zwischenpunkte erzeugen, so dass maximale Pfeilhoehe nicht 
-			// ueberschritten wird
-			// Distanz zwischen Bogenanfanspunkt und Bogenendpunkt 
-			double c=CurveSegment.dist(pt1_re,pt1_ho,pt2_re,pt2_ho);
-			// Radius bestimmen
-			double s=(a+b+c)/2.0;
-			double ds=Math.atan2(pt2_re-arcPt_re,pt2_ho-arcPt_ho)-Math.atan2(pt1_re-arcPt_re,pt1_ho-arcPt_ho);
-			double rSign=(Math.sin(ds)>0.0)?-1.0:1.0;
-			double r=a*b*c/4.0/Math.sqrt(s*(s-a)*(s-b)*(s-c))*rSign;
+			double r=radius;
 			// Kreismittelpunkt
-			double thetaM=Math.atan2(arcPt_re-pt1_re,arcPt_ho-pt1_ho)+Math.acos(a/2.0/r);
-			double reM=pt1_re+r*Math.sin(thetaM);
-			double hoM=pt1_ho+r*Math.cos(thetaM);
+			double thetaM=deta;
+			double reM=centerPoint.x;
+			double hoM=centerPoint.y;
 
 			// mindest Winkelschrittweite
 			double theta=2*Math.acos(1-p/Math.abs(r));
@@ -252,6 +246,12 @@ public class ArcSegment extends CurveSegment {
 		}
 		return sign;
 	}
+	public double getTheta() {
+		if(centerPoint==null){
+			getCenterPoint();
+		}
+		return deta;
+	}
 	public Coordinate getDirectionPt(boolean atStart,double dist) {
 		if(dist>0){
 			double radius=getRadius();
@@ -283,5 +283,18 @@ public class ArcSegment extends CurveSegment {
 			Coordinate directionPt=CompoundCurve.calcKleinp(getCenterPoint(), endPoint, radius, -1.0*-sign);
 			return directionPt;
 		}
+	}
+	public static Coordinate calcArcPt(Coordinate start, Coordinate end,
+			Coordinate center, double radius, double sign) {
+		Coordinate midPt;
+		// calulate new mid pt
+		// Zentriwinkel zwischen start und end
+		double a=CurveSegment.dist(start.x,start.y,end.x,end.y);
+		// Richtung des Punktes auf dem halben Bogen 
+		double alpha=Math.atan2(start.x-center.x,start.y-center.y)+sign*Math.asin(a/2.0/radius);
+		midPt=new Coordinate();
+		midPt.x=center.x + radius * Math.sin(alpha);
+		midPt.y=center.y + radius * Math.cos(alpha);
+		return midPt;
 	}
 }
