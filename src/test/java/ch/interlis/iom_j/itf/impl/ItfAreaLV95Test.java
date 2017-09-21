@@ -43,7 +43,7 @@ public class ItfAreaLV95Test {
 	}
 	
 	@Test
-	public void testDefault_Shape1() throws Iox2jtsException, IoxException {
+	public void testShape1_aP() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
@@ -73,7 +73,7 @@ public class ItfAreaLV95Test {
 	}
 
 	@Test
-	public void testDefault_Shape2() throws Iox2jtsException, IoxException {
+	public void testShape1_bP() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
@@ -104,7 +104,7 @@ public class ItfAreaLV95Test {
 	}
 
 	@Test
-	public void testDefault_Shape3() throws Iox2jtsException, IoxException {
+	public void testShape1_cP() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
@@ -421,7 +421,7 @@ public class ItfAreaLV95Test {
 	}
 	
 	@Test
-	public void testShape2_all_Overlap() throws Iox2jtsException, IoxException {
+	public void testShape2_OverlapFail() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
@@ -739,7 +739,7 @@ public class ItfAreaLV95Test {
 	}
 	
 	@Test
-	public void testTwoArcs_Shape3_all_Overlap() throws Iox2jtsException, IoxException {
+	public void testTwoArcs_Shape3_OverlapFail() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
@@ -1054,7 +1054,7 @@ public class ItfAreaLV95Test {
 	}
 	
 	@Test
-	public void testTwoArcs_Shape4_all_Overlap() throws Iox2jtsException, IoxException {
+	public void testTwoArcs_Shape4_OverlapFail() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
@@ -1366,7 +1366,7 @@ public class ItfAreaLV95Test {
 	}
 	
 	@Test
-	public void testTwoArcs_Shape5_all_Overlap() throws Iox2jtsException, IoxException {
+	public void testTwoArcs_Shape5_OverlapFail() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
@@ -1589,7 +1589,7 @@ public class ItfAreaLV95Test {
 	}
 	
 	@Test
-	public void testTwoArcs_Shape6_all_Overlap() throws Iox2jtsException, IoxException {
+	public void testTwoArcs_Shape6_OverlapFail() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
