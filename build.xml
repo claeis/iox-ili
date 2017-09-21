@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="bindist" name="iox-ili">
+<project basedir="." default="bindist" name="iox-ili" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
-  <property file="user.properties" />
+  <property file="user.properties"  prefix="user." />
   <!-- default if not set by user.properties -->
-  <property name="git" value="git"/>
+  <property name="user.git" value="git"/>
   <!-- set global properties for this build -->
 	<property name="src" value="${basedir}/src/main/java"/>
 	<property name="gensrc" value="${basedir}/gensrc"/>
 	<property name="srcVersionFile" value="ch/interlis/iox_j/Version.properties"/>
 	<property name="build" value="${basedir}/build"/>
 	<property name="dist" value="${basedir}/dist"/>
+	<property name="groupId" value="ch.interlis"/>
+	<property name="artifactId" value="${ant.project.name}"/>
+	<property name="release" value=""/>
 	<property name="report.dir" value="${build}/junitreport"/>
 	<property name="junit.dir" value="${build}/junit"/>
 	<property name="junit-out.dir" value="${build}/junit/test-out"/>
@@ -43,6 +46,33 @@
 		<pathelement location="lib/hamcrest-core-1.3.jar"/>
 	</path>
 
+  <target depends="init,buildnr" name="pom">
+  	<artifact:pom id="mypomE" groupId="${groupId}" artifactId="${artifactId}" version="${buildnr}" name="ehibasics">
+			<artifact:dependency groupId="ch.interlis" artifactId="ili2c-core" version="4.7.3"/>
+			<artifact:dependency groupId="ch.interlis" artifactId="iox-api" version="1.0.3"/>
+			<artifact:dependency groupId="com.moandjiezana.toml" artifactId="toml4j" version="0.5.1"/>
+			<artifact:dependency groupId="com.vividsolutions" artifactId="jts-core" version="1.14.0"/>
+	  </artifact:pom>
+	  <artifact:writepom pomRefId="mypomE" file="build/pom.xml"/>
+	<artifact:pom id="mypom" file="build/pom.xml" />
+  </target>
+  <target depends="init,pom" name="install">
+	  <!-- artifact:install-provider artifactId="wagon-ftp" version="3.0.0"/ -->
+	  <artifact:install file="build/jar/iox-ili.jar">
+		<artifact:pom refid="mypom"/>
+		<!-- artifact:attach file="build/jar/ehibasics-0.9-SNAPSHOT.jar" type="jar"/ -->    
+	  </artifact:install>
+  </target>
+  <target depends="init,pom" name="deploy">
+	  <artifact:install-provider artifactId="wagon-ftp" version="3.0.0"/>
+  <artifact:deploy file="build/jar/iox-ili.jar">
+    <remoteRepository url="ftp://ftp.interlis.ch">
+    	<authentication username="${user.repos_usr}" password="${user.repos_pwd}"/>
+    </remoteRepository>
+    <pom refid="mypom"/>
+  </artifact:deploy>    
+  </target>
+	
 	<target depends="init" name="compile">
     <!-- Compile the java code from ${src} into ${build}/classes -->
 		<javac destdir="${build}/classes" includes="**/*.java" excludes="**/bak~/*.java" debug="true" source="1.6" target="1.6">
@@ -89,7 +119,7 @@
 	<target depends="init" name="buildnr">
 
 		<copy file="${src}/${srcVersionFile}" tofile="${versionfile}"/>
-		<exec executable="${git}" outputproperty="gitBranch" failonerror="true">
+		<exec executable="${user.git}" outputproperty="gitBranch" failonerror="true">
 			<arg line="rev-parse --abbrev-ref HEAD"/>
 		</exec>
 		<loadresource property="gitBranchA">
@@ -112,7 +142,11 @@
 		<condition property="branch" value=".${buildnr.versionBranch}" else="">
 			<length string="${buildnr.versionBranch}" trim="true" when="greater" length="0"/>
 		</condition>
-		<property name="buildnr" value="${buildnr.versionMajor}.${buildnr.versionMinor}.${buildnr.versionMicro}${branch}"/>
+		<condition property="SNAPSHOT" value="" else="-SNAPSHOT">
+		   <length string="${release}" trim="true" when="greater" length="0"/>
+		</condition>
+		<!-- property name="buildnr" value="${buildnr.versionMajor}.${buildnr.versionMinor}.${buildnr.versionMicro}${branch}${SNAPSHOT}"/ -->
+		<property name="buildnr" value="${buildnr.versionMajor}.${buildnr.versionMinor}.${buildnr.versionMicro}${SNAPSHOT}"/>
     
     <!--  <property name="buildnr" value="${DSTAMP}"/>  -->
 	</target>
