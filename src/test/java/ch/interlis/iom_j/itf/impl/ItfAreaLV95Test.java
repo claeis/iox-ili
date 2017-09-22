@@ -27,6 +27,7 @@ public class ItfAreaLV95Test {
 	private TransferDescription td=null;
 	private Table tableB=null;
 	private AttributeDef formAttr=null;
+	
 	@Before
 	public void setup() throws Ili2cFailure
 	{
@@ -108,7 +109,7 @@ public class ItfAreaLV95Test {
 		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2500000.0, C2 1065000.0}, COORD {C1 2500000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1065000.0}, COORD {C1 2500000.0, C2 1065000.0}]}}}}}"
 				,polygon.toString());
 		IomObject polygon2=builder.getSurfaceObject("bP");
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1065000.0}, COORD {C1 2700000.0, C2 1065000.0}, COORD {C1 2661056.895, C2 1163622.54}, ARC {A2 1100000.0, A1 2666000.0, C1 2660000.0, C2 1175000.0}]}}}}}"
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1065000.0}, COORD {C1 2700000.0, C2 1065000.0}, COORD {C1 2661056.895, C2 1163622.54}, ARC {A2 1170487.736, A1 2660227.619, C1 2660000.0, C2 1175000.0}]}}}}}"
 				,polygon2.toString());
 		IomObject polygon3=builder.getSurfaceObject("cP");
 		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2500000.0, C2 1175000.0}, COORD {C1 2500000.0, C2 1285000.0}, COORD {C1 2830000.0, C2 1285000.0}, COORD {C1 2830000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2500000.0, C2 1175000.0}]}}}}}"
@@ -574,7 +575,7 @@ public class ItfAreaLV95Test {
 	}
 	
 	@Test
-	public void removeOverlap_testTwoArcs_Shape5_OverlapOk() throws Iox2jtsException, IoxException {
+	public void testTwoArcs_Shape5_OverlapOk_removeOverlap() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
