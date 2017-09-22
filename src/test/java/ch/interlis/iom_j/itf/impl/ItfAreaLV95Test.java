@@ -4,6 +4,9 @@ import static org.junit.Assert.*;
 import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.vividsolutions.jts.geom.Coordinate;
+
 import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.ili2c.Ili2cFailure;
 import ch.interlis.ili2c.config.Configuration;
@@ -19,6 +22,9 @@ import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.ItfReader;
 import ch.interlis.iom_j.itf.impl.ItfAreaLinetable2Polygon;
+import ch.interlis.iom_j.itf.impl.jtsext.algorithm.CurveSegmentIntersector;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
 import ch.interlis.iox.*;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 
