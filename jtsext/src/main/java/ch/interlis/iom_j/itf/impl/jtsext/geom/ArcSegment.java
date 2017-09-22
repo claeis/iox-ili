@@ -62,23 +62,6 @@ public class ArcSegment extends CurveSegment {
 
 			double pt2_re=endPoint.x;
 			double pt2_ho=endPoint.y;
-			
-			//EhiLogger.debug("pt1 "+pt1_re+", "+pt1_ho);
-			//EhiLogger.debug("arc "+arcPt_re+", "+arcPt_ho);
-			//EhiLogger.debug("pt2 "+pt2_re+", "+pt2_ho);
-			/*
-			if(c3==null){
-				ret.setDimension(IFMEFeature.FME_TWO_D);
-				ret.add2DCoordinate(p2_x, p2_y);
-			}else{
-				double zCoord = Double.parseDouble(c3);
-				ret.setDimension(IFMEFeature.FME_THREE_D);
-				ret.add3DCoordinate(p2_x, p2_y, zCoord);
-			}
-			*/
-			// letzter Punkt ein Bogenzwischenpunkt?
-		
-			// Zwischenpunkte erzeugen
 
 			// Distanz zwischen Bogenanfanspunkt und Zwischenpunkt
 			double a=CurveSegment.dist(pt1_re,pt1_ho,arcPt_re,arcPt_ho);
@@ -104,7 +87,7 @@ public class ArcSegment extends CurveSegment {
 				// anzahl Schritte
 				int alphan=(int)Math.ceil(alpha/theta);
 				// Winkelschrittweite
-				double alphai=alpha/(alphan*(r>0.0?1:-1));
+				double alphai=alpha/(alphan*(sign));
 				double ri=Math.atan2(pt1_re-reM,pt1_ho-hoM);
 				for(int i=1;i<alphan;i++){
 					ri += alphai;
@@ -122,7 +105,7 @@ public class ArcSegment extends CurveSegment {
 				// anzahl Schritte
 				int betan=(int)Math.ceil((beta/theta));
 				// Winkelschrittweite
-				double betai=beta/(betan*(r>0.0?1:-1));
+				double betai=beta/(betan*(sign));
 				double ri=Math.atan2(arcPt_re-reM,arcPt_ho-hoM);
 				for(int i=1;i<betan;i++){
 					ri += betai;
