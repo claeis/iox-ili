@@ -404,7 +404,7 @@ public class ItfAreaLV95Test {
 	}
 		
 	@Test
-	public void error_testTwoArcs_Shape4_OverlapOk() throws Iox2jtsException, IoxException {
+	public void testTwoArcs_Shape4_OverlapOk_Fail() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
@@ -427,24 +427,16 @@ public class ItfAreaLV95Test {
 		        }else if(event instanceof EndTransferEvent){
 		        }
 		 }while(!(event instanceof EndTransferEvent));
-			
-		builder.buildSurfaces();
-		IomObject polygon=builder.getSurfaceObject("aP");
-		System.out.println(polygon.toString());
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2500000.0, C2 1065000.0}, COORD {C1 2500000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1065000.0}, COORD {C1 2500000.0, C2 1065000.0}]}}}}}"
-				,polygon.toString());
-		IomObject polygon2=builder.getSurfaceObject("bP");
-		System.out.println(polygon2.toString());
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1065000.0}, COORD {C1 2740000.0, C2 1065000.0}, ARC {A2 1155000.0, A1 2690000.0, C1 2660000.0, C2 1175000.0}]}}}}}"
-				,polygon2.toString());
-		IomObject polygon3=builder.getSurfaceObject("cP");
-		System.out.println(polygon3.toString());
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2500000.0, C2 1175000.0}, COORD {C1 2500000.0, C2 1285000.0}, COORD {C1 2830000.0, C2 1285000.0}, COORD {C1 2830000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2500000.0, C2 1175000.0}]}}}}}"
-				,polygon3.toString());
+			try {	
+				builder.buildSurfaces();
+				fail();
+			}catch(Exception ex) {
+				assertTrue(ex.getMessage().contains("intersections"));		
+			}
 	}
 	
 	@Test
-	public void error_testTwoArcs_Shape4_OnLine() throws Iox2jtsException, IoxException {
+	public void testTwoArcs_Shape4_OnLine_Fail() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
@@ -467,20 +459,12 @@ public class ItfAreaLV95Test {
 		        }else if(event instanceof EndTransferEvent){
 		        }
 		 }while(!(event instanceof EndTransferEvent));
-			
-		builder.buildSurfaces();
-		IomObject polygon=builder.getSurfaceObject("aP");
-		System.out.println(polygon.toString());
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2500000.0, C2 1065000.0}, COORD {C1 2500000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1.0}, COORD {C1 2660000.0, C2 1065000.0}, COORD {C1 2500000.0, C2 1065000.0}]}}}}}"
-				,polygon.toString());
-		IomObject polygon2=builder.getSurfaceObject("bP");
-		System.out.println(polygon2.toString());
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1065000.0}, COORD {C1 2740000.0, C2 1065000.0}, ARC {A2 1155000.0, A1 2690000.0, C1 2660000.0, C2 1175000.0}]}}}}}"
-				,polygon2.toString());
-		IomObject polygon3=builder.getSurfaceObject("cP");
-		System.out.println(polygon3.toString());
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2500000.0, C2 1175000.0}, COORD {C1 2500000.0, C2 1285000.0}, COORD {C1 2830000.0, C2 1285000.0}, COORD {C1 2830000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2500000.0, C2 1175000.0}]}}}}}"
-				,polygon3.toString());
+			try {	
+				builder.buildSurfaces();
+				fail();
+			}catch(Exception ex) {
+				assertTrue(ex.getMessage().contains("intersections"));		
+			}
 	}
 	
 	@Test
@@ -589,8 +573,8 @@ public class ItfAreaLV95Test {
 				,polygon3.toString());
 	}
 	
-	//@Test
-	public void testTwoArcs_Shape5_OverlapOk() throws Iox2jtsException, IoxException {
+	@Test
+	public void removeOverlap_testTwoArcs_Shape5_OverlapOk() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
@@ -616,15 +600,12 @@ public class ItfAreaLV95Test {
 			
 		builder.buildSurfaces();
 		IomObject polygon=builder.getSurfaceObject("aP");
-		System.out.println(polygon.toString());
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2500000.0, C2 1065000.0}, COORD {C1 2500000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1065000.0}, COORD {C1 2500000.0, C2 1065000.0}]}}}}}"
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2500000.0, C2 1065000.0}, COORD {C1 2500000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1175000.0}, ARC {A2 1120000.0, A1 2632500.0, C1 2660000.0, C2 1065000.0}, COORD {C1 2500000.0, C2 1065000.0}]}}}}}"
 				,polygon.toString());
 		IomObject polygon2=builder.getSurfaceObject("bP");
-		System.out.println(polygon2.toString());
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1065000.0}, COORD {C1 2740000.0, C2 1065000.0}, ARC {A2 1155000.0, A1 2690000.0, C1 2660000.0, C2 1175000.0}]}}}}}"
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2637708.523626023, C2 1093750.3713318582}, ARC {A2 1138189.9272158023, A1 2634950.008492493, C1 2660000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1065000.0}, COORD {C1 2660000.01, C2 1065000.0}, ARC {A2 1077873.9615011232, A1 2646918.0678773983, C1 2637708.523626023, C2 1093750.3713318582}]}}}}}"
 				,polygon2.toString());
 		IomObject polygon3=builder.getSurfaceObject("cP");
-		System.out.println(polygon3.toString());
 		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2500000.0, C2 1175000.0}, COORD {C1 2500000.0, C2 1285000.0}, COORD {C1 2830000.0, C2 1285000.0}, COORD {C1 2830000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2500000.0, C2 1175000.0}]}}}}}"
 				,polygon3.toString());
 	}
@@ -734,7 +715,7 @@ public class ItfAreaLV95Test {
 					,polygon3.toString());
 	}
 	
-//	@Test
+	@Test
 	public void testTwoArcs_Shape6_OverlapOk() throws Iox2jtsException, IoxException {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
@@ -760,10 +741,10 @@ public class ItfAreaLV95Test {
 		 }while(!(event instanceof EndTransferEvent));
 			builder.buildSurfaces();
 			IomObject polygon=builder.getSurfaceObject("aP");
-			assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2500000.0, C2 1065000.0}, COORD {C1 2500000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1175000.0}, ARC {A2 1120000.0, A1 2.0, C1 2660000.0, C2 1065000.0}, COORD {C1 2500000.0, C2 1065000.0}]}}}}}"
+			assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2500000.0, C2 1065000.0}, COORD {C1 2500000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1175000.0}, ARC {A2 1120000.0, A1 2667500.0, C1 2660000.0, C2 1065000.0}, COORD {C1 2500000.0, C2 1065000.0}]}}}}}"
 					,polygon.toString());
 			IomObject polygon2=builder.getSurfaceObject("bP");
-			assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1065000.0}, COORD {C1 2700000.0, C2 1065000.0}, COORD {C1 2687500.0, C2 1137500.0}, ARC {A2 1149661.777, A1 2673560.0, C1 2660010.6100866087, C2 1174961.8129535718}, ARC {A2 1174980.9067326782, A1 2660005.305964293, C1 2660000.0, C2 1175000.0}]}}}}}"
+			assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1175000.0}, COORD {C1 2830000.0, C2 1065000.0}, COORD {C1 2700000.0, C2 1065000.0}, COORD {C1 2696143.848, C2 1153851.821}, ARC {A2 1157077.391893977, A1 2673800.6314487047, C1 2660013.1270763655, C2 1174952.7480200205}, ARC {A2 1174976.3744017577, A1 2660006.564948309, C1 2660000.0, C2 1175000.0}]}}}}}"
 					,polygon2.toString());
 			IomObject polygon3=builder.getSurfaceObject("cP");
 			assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2500000.0, C2 1175000.0}, COORD {C1 2500000.0, C2 1285000.0}, COORD {C1 2830000.0, C2 1285000.0}, COORD {C1 2830000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2500000.0, C2 1175000.0}]}}}}}"
