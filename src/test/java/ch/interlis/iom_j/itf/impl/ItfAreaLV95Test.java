@@ -409,38 +409,6 @@ public class ItfAreaLV95Test {
 		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2500000.0, C2 1175000.0}, COORD {C1 2500000.0, C2 1285000.0}, COORD {C1 2830000.0, C2 1285000.0}, COORD {C1 2830000.0, C2 1175000.0}, COORD {C1 2660000.0, C2 1175000.0}, COORD {C1 2500000.0, C2 1175000.0}]}}}}}"
 				,polygon3.toString());
 	}
-		
-	@Test
-	public void testTwoArcs_Shape4_OverlapOk_Fail() throws Iox2jtsException, IoxException {
-		String tableBName=tableB.getScopedName(null);
-		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
-		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
-		ItfReader reader=new ItfReader(new File("src/test/data/Itf/Test2Area_Shape4_OverlapOk.itf"));
-		reader.setModel(td);
-		EhiLogger.getInstance().setTraceFilter(false);
-		IoxEvent event=null;
-		 do{
-		        event=reader.read();
-		        if(event instanceof StartTransferEvent){
-		        }else if(event instanceof StartBasketEvent){
-		        }else if(event instanceof ObjectEvent){
-		        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-		        	if(iomObj.getobjecttag().equals(formAttrTableName)){
-		        		builder.addItfLinetableObject(iomObj);
-		        	}else if(iomObj.getobjecttag().equals(tableBName)){
-		        		builder.addGeoRef(iomObj.getobjectoid(), iomObj.getattrobj(formAttr.getName(), 0));
-		        	}
-		        }else if(event instanceof EndBasketEvent){
-		        }else if(event instanceof EndTransferEvent){
-		        }
-		 }while(!(event instanceof EndTransferEvent));
-			try {	
-				builder.buildSurfaces();
-				fail();
-			}catch(Exception ex) {
-				assertTrue(ex.getMessage().contains("intersections"));		
-			}
-	}
 	
 	@Test
 	public void testTwoArcs_Shape4_OnLine_Fail() throws Iox2jtsException, IoxException {
