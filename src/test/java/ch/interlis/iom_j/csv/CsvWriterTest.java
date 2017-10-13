@@ -27,6 +27,9 @@ public class CsvWriterTest {
 	private static final String ATTRIBUTE1="attr1";
 	private static final String ATTRIBUTE2="attr2";
 	private static final String ATTRIBUTE3="attr3";
+	private static final String ID="id";
+	private static final String STADT="stadt";
+	private static final String LAND="land";
 	
 	@Before
 	public void setup() throws Ili2cFailure
@@ -62,7 +65,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -107,7 +110,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -120,9 +123,9 @@ public class CsvWriterTest {
 		IoxEvent event=reader.read();
 		if(event instanceof ObjectEvent){
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schweiz", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("10", iomObj.getattrvalue(ID));
+        	assertEquals("Bern", iomObj.getattrvalue(STADT));
+        	assertEquals("Schweiz", iomObj.getattrvalue(LAND));
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
@@ -154,7 +157,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -200,7 +203,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -212,9 +215,9 @@ public class CsvWriterTest {
 		IoxEvent event=reader.read();
 		if(event instanceof ObjectEvent){
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schweiz", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("10", iomObj.getattrvalue("id"));
+        	assertEquals("Bern", iomObj.getattrvalue("stadt"));
+        	assertEquals("Schweiz", iomObj.getattrvalue("land"));
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
@@ -245,7 +248,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -289,7 +292,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -344,7 +347,7 @@ public class CsvWriterTest {
 				try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 				writer=null;
 			}
@@ -416,7 +419,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -430,37 +433,37 @@ public class CsvWriterTest {
 		if(event instanceof ObjectEvent){
 			{
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schweiz", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("10", iomObj.getattrvalue(ID));
+        	assertEquals("Bern", iomObj.getattrvalue(STADT));
+        	assertEquals("Schweiz", iomObj.getattrvalue(LAND));
 			}
 			event=reader.read();
 			{
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("11", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Zuerich", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Deutschland", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("11", iomObj.getattrvalue(ID));
+        	assertEquals("Zuerich", iomObj.getattrvalue(STADT));
+        	assertEquals("Deutschland", iomObj.getattrvalue(LAND));
 			}
 			event=reader.read();
 			{
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("12", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Luzern", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Italien", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("12", iomObj.getattrvalue(ID));
+        	assertEquals("Luzern", iomObj.getattrvalue(STADT));
+        	assertEquals("Italien", iomObj.getattrvalue(LAND));
 			}
 			event=reader.read();
 			{
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("13", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Genf", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Oesterreich", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("13", iomObj.getattrvalue(ID));
+        	assertEquals("Genf", iomObj.getattrvalue(STADT));
+        	assertEquals("Oesterreich", iomObj.getattrvalue(LAND));
 			}
 			event=reader.read();
 			{
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("14", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Chur", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Spanien", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("14", iomObj.getattrvalue(ID));
+        	assertEquals("Chur", iomObj.getattrvalue(STADT));
+        	assertEquals("Spanien", iomObj.getattrvalue(LAND));
 			}
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
@@ -513,7 +516,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -608,7 +611,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -685,7 +688,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -697,9 +700,9 @@ public class CsvWriterTest {
 		IoxEvent event=reader.read();
 		if(event instanceof ObjectEvent){
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("1,0", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Be,rn", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("S,chweiz", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("1,0", iomObj.getattrvalue(ID));
+        	assertEquals("Be,rn", iomObj.getattrvalue(STADT));
+        	assertEquals("S,chweiz", iomObj.getattrvalue(LAND));
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
@@ -733,7 +736,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -776,7 +779,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -821,7 +824,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -869,7 +872,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -918,7 +921,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -966,7 +969,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1015,7 +1018,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1064,7 +1067,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1077,9 +1080,9 @@ public class CsvWriterTest {
 		IoxEvent event=reader.read();
 		if(event instanceof ObjectEvent){
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schweiz", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("10", iomObj.getattrvalue(ID));
+        	assertEquals("Bern", iomObj.getattrvalue(STADT));
+        	assertEquals("Schweiz", iomObj.getattrvalue(LAND));
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
@@ -1112,7 +1115,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1158,7 +1161,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1203,7 +1206,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1248,7 +1251,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1285,7 +1288,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1317,7 +1320,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1358,7 +1361,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1393,7 +1396,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1432,7 +1435,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1457,7 +1460,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1482,7 +1485,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1508,7 +1511,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
@@ -1534,7 +1537,7 @@ public class CsvWriterTest {
 	    		try {
 					writer.close();
 				} catch (IoxException e) {
-					e.printStackTrace();
+					throw new IoxException(e);
 				}
 	    		writer=null;
 	    	}
