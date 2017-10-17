@@ -149,6 +149,9 @@ public class CsvReader implements IoxReader,IoxIliReader {
 						}else{
 							className=aClassName.getName();
 							topicName=iliTopics.get(aClassName).getName();
+							if(topicName==null) {
+								topicName="Topic";
+							}
 							valueCountOfFirstLine=headerAttributes.size();
 							skipLine=true;
 						}
@@ -165,6 +168,9 @@ public class CsvReader implements IoxReader,IoxIliReader {
 						}else{
 							className=aClassName.getName();
 							topicName=iliTopics.get(aClassName).getName();
+							if(topicName==null) {
+								topicName="Topic";
+							}
 						}
 					} catch (IOException e) {
 						throw new IoxException(e);
@@ -518,22 +524,51 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	
 	@Override
 	public void close() throws IoxException{
-		reader=null;
-		basketReader=null;
-		if(inputFile!=null){
-			userDefined_Delimiter=DEFAULT_DELIMITER;
-			userDefined_Record_Delimiter=DEFAULT_RECORD_DELIMITER;
-			CsvReader.currentDelimiter=DEFAULT_DELIMITER.charAt(0);
-			CsvReader.currentRecordDelimiter=DEFAULT_RECORD_DELIMITER.charAt(0);
-			inputReader=null;
-			inputReaderBasket=null;
-			td=null;
-			inputFile=null;
-			increasingNumber=1;
-			headerDefinition=null;
-			valueCountOfFirstLine=0;
+		if(headerAttributes!=null || headerAttributes.size()>0) {
+			headerAttributes.clear();
 			headerAttributes=null;
 		}
+		modelName=null;
+		topicName=null;
+		className=null;
+		iliTopics=null;
+		iliClasses=null;
+		listOfIliClasses=null;
+		try {
+			reader.close();
+		} catch (IOException e2) {
+			throw new IoxException(e2);
+		}
+		reader=null;
+		try {
+			basketReader.close();
+		} catch (IOException e1) {
+			throw new IoxException(e1);
+		}
+		basketReader=null;
+		if(inputFile!=null){
+			inputFile=null;
+		}
+		userDefined_Delimiter=DEFAULT_DELIMITER;
+		userDefined_Record_Delimiter=DEFAULT_RECORD_DELIMITER;
+		CsvReader.currentDelimiter=DEFAULT_DELIMITER.charAt(0);
+		CsvReader.currentRecordDelimiter=DEFAULT_RECORD_DELIMITER.charAt(0);
+		try {
+			inputReader.close();
+		} catch (IOException e) {
+			throw new IoxException(e);
+		}
+		inputReader=null;
+		try {
+			inputReaderBasket.close();
+		} catch (IOException e) {
+			throw new IoxException(e);
+		}
+		inputReaderBasket=null;
+		td=null;
+		increasingNumber=1;
+		headerDefinition=null;
+		valueCountOfFirstLine=0;
 	}
 	
 	@Override
