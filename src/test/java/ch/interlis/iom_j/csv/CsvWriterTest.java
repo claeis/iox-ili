@@ -84,6 +84,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"object_ModelSet_NoHeader_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -131,6 +136,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"object_ModelSet_SetHeaderPresent_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -178,6 +188,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"object_ModelSet_SetHeaderAbsent_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -223,6 +238,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"object_NoModelSet_SetHeaderPresent_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -268,6 +288,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"object_NoModelSet_SetHeaderAbsent_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -311,6 +336,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"object_NoModelSet_NoHeader_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -372,6 +402,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"object_SetMultipleModels_SetHeaderPresent_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -470,6 +505,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"multipleObjects_ModelSet_SetHeaderPresent_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -566,6 +606,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"multipleObjects_ModelSet_NoHeaderSet_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -661,6 +706,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"multipleObjects_NoModelSet_NoHeaderSet_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -708,6 +758,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"commaInText_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -753,6 +808,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"setDelimiter_setRecordDelimiter_NoModelSet_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -798,6 +858,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"setDelimiter_NoModelSet_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -841,6 +906,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"setRecordDelimiter_NoModelSet_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -893,6 +963,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"setDelimiter_setRecordDelimiter_ModelSet_DelimitersInText_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -941,6 +1016,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"setDelimiter_DelimiterInText_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -989,6 +1069,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"setRecordDelimiter_RecordDelimiterInText_ModelSet_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -1039,6 +1124,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"setDelimiter_setRecordDelimiter_HeaderSet_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -1088,6 +1178,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"setDelimiter_HeaderSet_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -1135,6 +1230,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"setRecordDelimiter_ModelSet_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -1180,6 +1280,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"quoteMarkInText.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -1225,6 +1330,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"carriageReturnLineFeedInText_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -1270,6 +1380,11 @@ public class CsvWriterTest {
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,"carriageReturnInText_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
@@ -1291,6 +1406,11 @@ public class CsvWriterTest {
 					throw new IoxException(e);
 				}
 	    		writer=null;
+	    		// delete created file
+	    		File file=new File(TEST_IN,"pathtoCsvFileNotFound_Fail.csv");
+	    		if(file.exists()) {
+	    			file.delete();
+	    		}
 	    	}
 		}
 	}
@@ -1323,6 +1443,11 @@ public class CsvWriterTest {
 					throw new IoxException(e);
 				}
 	    		writer=null;
+	    		// delete created file
+	    		File file=new File(TEST_IN,"headerAttributesInModelNotFound_Fail.csv");
+	    		if(file.exists()) {
+	    			file.delete();
+	    		}
 	    	}
 		}
 	}
@@ -1364,6 +1489,11 @@ public class CsvWriterTest {
 					throw new IoxException(e);
 				}
 	    		writer=null;
+	    		// delete created file
+	    		File file=new File(TEST_IN,"attributesInModelNotFound_Fail.csv");
+	    		if(file.exists()) {
+	    			file.delete();
+	    		}
 	    	}
 		}
 	}
@@ -1399,6 +1529,11 @@ public class CsvWriterTest {
 					throw new IoxException(e);
 				}
 	    		writer=null;
+	    		// delete created file
+	    		File file=new File(TEST_IN,"classInModelNotFound_Fail.csv");
+	    		if(file.exists()) {
+	    			file.delete();
+	    		}
 	    	}
 		}
 	}
@@ -1438,6 +1573,11 @@ public class CsvWriterTest {
 					throw new IoxException(e);
 				}
 	    		writer=null;
+	    		// delete created file
+	    		File file=new File(TEST_IN,"attributesNotFound_NoModel_Fail.csv");
+	    		if(file.exists()) {
+	    			file.delete();
+	    		}
 	    	}
 		}
 	}
@@ -1463,6 +1603,11 @@ public class CsvWriterTest {
 					throw new IoxException(e);
 				}
 	    		writer=null;
+	    		// delete created file
+	    		File file=new File(TEST_IN,"unknownEventType_Fail.csv");
+	    		if(file.exists()) {
+	    			file.delete();
+	    		}
 	    	}
 		}
 	}
@@ -1488,6 +1633,11 @@ public class CsvWriterTest {
 					throw new IoxException(e);
 				}
 	    		writer=null;
+	    		// delete created file
+	    		File file=new File(TEST_IN,"wrongHeaderSet_Fail.csv");
+	    		if(file.exists()) {
+	    			file.delete();
+	    		}
 	    	}
 		}
 	}
@@ -1514,6 +1664,11 @@ public class CsvWriterTest {
 					throw new IoxException(e);
 				}
 	    		writer=null;
+	    		// delete created file
+	    		File file=new File(TEST_IN,"setDelimiter_NotValidCharacter_Fail.csv");
+	    		if(file.exists()) {
+	    			file.delete();
+	    		}
 	    	}
 		}
 	}
@@ -1540,6 +1695,11 @@ public class CsvWriterTest {
 					throw new IoxException(e);
 				}
 	    		writer=null;
+	    		// delete created file
+	    		File file=new File(TEST_IN,"setRecordDelimiter_NotValidCharacter_Fail.csv");
+	    		if(file.exists()) {
+	    			file.delete();
+	    		}
 	    	}
 		}
 	}
