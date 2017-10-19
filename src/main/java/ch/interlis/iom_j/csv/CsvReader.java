@@ -49,13 +49,18 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	// iox reader parameter
 	private IoxFactoryCollection factory;
 	private FileReader inputReader=null;
+	private FileReader inputReaderBasket=null;
 	private static TransferDescription td=null;
 	private File inputFile=null;
 	private int increasingNumber=1;
 	private BufferedReader reader = null;
+	private BufferedReader basketReader = null;
 	private static String headerDefinition=null;
 	private static String userDefined_Delimiter=null;
 	private static String userDefined_Record_Delimiter=null;
+	private List<String> headerAttributes=new ArrayList<String>();
+	private int valueCountOfFirstLine=0;
+	private boolean skipLine=false;
 	// model, topic, class
 	private String modelName=null;
 	private String topicName="Topic";
@@ -73,14 +78,16 @@ public class CsvReader implements IoxReader,IoxIliReader {
 		try{
 			inputFile=new File(csvFile.getPath());
 			inputReader=new FileReader(inputFile);
-			init(inputReader);
+			inputReaderBasket=new FileReader(inputFile);
+			init(inputReader, inputReaderBasket);
 		}catch(java.io.IOException ex){
 			throw new IoxException(ex);
 		}
 	}
 	
-	private void init(FileReader in) throws IoxException, FileNotFoundException{
+	private void init(FileReader in, FileReader basketIn) throws IoxException, FileNotFoundException{
 		reader= new BufferedReader(in);
+		basketReader= new BufferedReader(basketIn);
 		factory=new ch.interlis.iox_j.DefaultIoxFactoryCollection();
 	}
 	
@@ -106,7 +113,7 @@ public class CsvReader implements IoxReader,IoxIliReader {
 			state=INSIDE_BASKET;
 		}
 		if(state==INSIDE_BASKET){
-			IomObject headerObj=null;
+			state=INSIDE_OBJECT;
 			// check if td is set
 			if(td==null){
 				// get model name
@@ -114,16 +121,16 @@ public class CsvReader implements IoxReader,IoxIliReader {
 				// check if header is defined
 				if(isHeaderDefined()){
 					// ignore first record
-					List<String> record;
+					skipLine=true;
 					try {
-						state=INSIDE_OBJECT;
-						record = readChars(reader, currentRecordDelimiter, currentDelimiter);
-						int count=1;
-						headerObj=createIomObject(modelName+"."+topicName+"."+className, null);
-						for(String attribute : record){
-							headerObj.setattrvalue("attr"+count, attribute);
-							count+=1;
-						}
+						headerAttributes = readChars(basketReader, currentRecordDelimiter, currentDelimiter);
+						valueCountOfFirstLine=headerAttributes.size();
+					} catch (IOException e) {
+						throw new IoxException(e);
+					}
+				}else {
+					try {
+						valueCountOfFirstLine = readChars(basketReader, currentRecordDelimiter, currentDelimiter).size();
 					} catch (IOException e) {
 						throw new IoxException(e);
 					}
@@ -134,21 +141,36 @@ public class CsvReader implements IoxReader,IoxIliReader {
 		    	
 				// check if header is defined
 				if(isHeaderDefined()){
-					List<String> records;
 					try {
-						state=INSIDE_OBJECT;
-						records = readChars(reader, currentRecordDelimiter, currentDelimiter);
-						Viewable aClassName=getViewableByAttributeNames(records);
+						headerAttributes = readChars(basketReader, currentRecordDelimiter, currentDelimiter);
+						Viewable aClassName=getViewableByAttributeNames(headerAttributes);
 						if(aClassName==null){
-							throw new IoxException("attributes of headerrecord: "+records.toString()+" not found in iliModel: "+modelName);
+							throw new IoxException("attributes of headerrecord: "+headerAttributes.toString()+" not found in iliModel: "+modelName);
 						}else{
 							className=aClassName.getName();
+							topicName=iliTopics.get(aClassName).getName();
+							if(topicName==null) {
+								topicName="Topic";
+							}
+							valueCountOfFirstLine=headerAttributes.size();
+							skipLine=true;
 						}
-						int count=1;
-						headerObj=createIomObject(modelName+"."+topicName+"."+className, null);
-						for(String attribute : records){
-							headerObj.setattrvalue("attr"+count, attribute);
-							count+=1;
+					} catch (IOException e) {
+						throw new IoxException(e);
+					}
+				}else {
+					try {
+						List<String> values = readChars(basketReader, currentRecordDelimiter, currentDelimiter);
+						valueCountOfFirstLine=values.size();
+						Viewable aClassName=getViewableByAttributeCount(valueCountOfFirstLine);
+						if(aClassName==null){
+							throw new IoxException("attributes size of first line: "+valueCountOfFirstLine+" not found in iliModel: "+modelName);
+						}else{
+							className=aClassName.getName();
+							topicName=iliTopics.get(aClassName).getName();
+							if(topicName==null) {
+								topicName="Topic";
+							}
 						}
 					} catch (IOException e) {
 						throw new IoxException(e);
@@ -162,26 +184,44 @@ public class CsvReader implements IoxReader,IoxIliReader {
 		if(state==INSIDE_OBJECT){
 			try {
 				while(reader.ready()){
+					iomObj=createIomObject(modelName+"."+topicName+"."+className, null);
 					// read every record.
-					List<String> record;
-					record = readChars(reader, currentRecordDelimiter, currentDelimiter);	
-					// if td!=null
-					if(td!=null){
-						// compare attrCount
-						Viewable iliClass=getViewableByAttributeCount(record.size());
-						if(iliClass==null){
-							throw new IoxException("attribute count of record: "+record.size()+" not found in classes of model: "+modelName);
-						}else{
-							topicName=iliTopics.get(iliClass).getName();
-							iomObj=createIomObject(modelName+"."+topicName+"."+iliClass.getName(), null);
-						}
-					}else{
-						iomObj=createIomObject(modelName+"."+topicName+"."+className, null);
+					List<String> record = readChars(reader, currentRecordDelimiter, currentDelimiter);
+					// if header defined, skip this line.
+					if(skipLine==true) {
+						skipLine=false;
+						continue; // next line
 					}
-					int count=1;
-					for(String attributes : record){
-						iomObj.setattrvalue("attr"+count, attributes);
-						count+=1;
+					if(isHeaderDefined()){
+						// compare attrCount
+						if(iomObj.getattrcount()!=headerAttributes.size()) {
+							// warning
+						}
+						if(headerAttributes!=null) {
+							for(int i=0;i<headerAttributes.size();i++) {
+								iomObj.setattrvalue(headerAttributes.get(i), record.get(i));
+							}
+						}
+					}else {
+						if(valueCountOfFirstLine==0) {
+							int count=1;
+							for(String attribute:record) {
+								iomObj.setattrvalue("attr"+count, attribute);
+								count+=1;
+							}
+							valueCountOfFirstLine=iomObj.getattrcount();	
+						}else {
+							// compare attrCount
+							if(record.size()!=valueCountOfFirstLine) {
+								// warning
+							}
+							int count=1;
+							for(int i=0;i<valueCountOfFirstLine;i++) {
+								String attribute=record.get(i);
+								iomObj.setattrvalue("attr"+count, attribute);
+								count+=1;
+							}
+						}
 					}
 					return new ch.interlis.iox_j.ObjectEvent(iomObj);
 				}
@@ -484,19 +524,51 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	
 	@Override
 	public void close() throws IoxException{
-		reader=null;
-		if(inputFile!=null){
-			userDefined_Delimiter=DEFAULT_DELIMITER;
-			userDefined_Record_Delimiter=DEFAULT_RECORD_DELIMITER;
-			CsvReader.currentDelimiter=DEFAULT_DELIMITER.charAt(0);
-			CsvReader.currentRecordDelimiter=DEFAULT_RECORD_DELIMITER.charAt(0);
-			inputReader=null;
-			td=null;
-			inputFile=null;
-			increasingNumber=1;
-			reader = null;
-			headerDefinition=null;
+		if(headerAttributes!=null || headerAttributes.size()>0) {
+			headerAttributes.clear();
+			headerAttributes=null;
 		}
+		modelName=null;
+		topicName=null;
+		className=null;
+		iliTopics=null;
+		iliClasses=null;
+		listOfIliClasses=null;
+		try {
+			reader.close();
+		} catch (IOException e2) {
+			throw new IoxException(e2);
+		}
+		reader=null;
+		try {
+			basketReader.close();
+		} catch (IOException e1) {
+			throw new IoxException(e1);
+		}
+		basketReader=null;
+		if(inputFile!=null){
+			inputFile=null;
+		}
+		userDefined_Delimiter=DEFAULT_DELIMITER;
+		userDefined_Record_Delimiter=DEFAULT_RECORD_DELIMITER;
+		CsvReader.currentDelimiter=DEFAULT_DELIMITER.charAt(0);
+		CsvReader.currentRecordDelimiter=DEFAULT_RECORD_DELIMITER.charAt(0);
+		try {
+			inputReader.close();
+		} catch (IOException e) {
+			throw new IoxException(e);
+		}
+		inputReader=null;
+		try {
+			inputReaderBasket.close();
+		} catch (IOException e) {
+			throw new IoxException(e);
+		}
+		inputReaderBasket=null;
+		td=null;
+		increasingNumber=1;
+		headerDefinition=null;
+		valueCountOfFirstLine=0;
 	}
 	
 	@Override

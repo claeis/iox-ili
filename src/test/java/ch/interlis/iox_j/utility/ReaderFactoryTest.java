@@ -3,13 +3,21 @@ package ch.interlis.iox_j.utility;
 import static org.junit.Assert.*;
 import java.io.File;
 import org.junit.Test;
+
+import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.csv.CsvReader;
 import ch.interlis.iom_j.iligml.Iligml20Reader;
 import ch.interlis.iom_j.itf.ItfReader2;
 import ch.interlis.iom_j.xtf.Xtf24Reader;
 import ch.interlis.iom_j.xtf.XtfReader;
+import ch.interlis.iox.EndBasketEvent;
+import ch.interlis.iox.EndTransferEvent;
+import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxReader;
+import ch.interlis.iox.ObjectEvent;
+import ch.interlis.iox.StartBasketEvent;
+import ch.interlis.iox.StartTransferEvent;
 
 public class ReaderFactoryTest {
 	
@@ -108,6 +116,29 @@ public class ReaderFactoryTest {
 		new ReaderFactory();
 		reader=new ReaderFactory().createReader(new File("src/test/data/CsvReader/TextType.csv"),null);
 		assertTrue(reader instanceof CsvReader);
+		try {
+			IoxEvent event=reader.read();
+			assertTrue(event instanceof StartTransferEvent);
+			event=reader.read();
+			assertTrue(event instanceof StartBasketEvent);
+			event=reader.read();
+			assertTrue(event instanceof ObjectEvent);
+			ObjectEvent objectEvent=(ObjectEvent)event;
+			IomObject iomObj=(IomObject) objectEvent.getIomObject();
+			assertTrue(iomObj.getattrcount()==3);
+			assertTrue(iomObj.getattrvalue("attr1").equals("10"));
+			assertTrue(iomObj.getattrvalue("attr2").equals("AU"));
+			assertTrue(iomObj.getattrvalue("attr3").equals("Australia"));
+			event=reader.read();
+			assertTrue(event instanceof EndBasketEvent);
+			event=reader.read();
+			assertTrue(event instanceof EndTransferEvent);
+		}catch(IoxException e) {
+			throw new IoxException(e);
+		}finally {
+			reader.close();
+			reader=null;
+		}
 	}
 	
 	// Es wird getestet ob der passende Reader: CsvReader zurueckgegeben wird.
