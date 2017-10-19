@@ -5,15 +5,12 @@ ideas/open issues
 LATEST
 -----------------------------
 
-iox-ili 1.20.7 (2017-??-??)
------------------------------
-- added CSVWriter
-- CSVReader: fixed warn message unclosed reader
-
 iox-ili 1.19.7 (2017-09-14)
 -----------------------------
 - Xtf24Reader: fixed xmlns setup
 - Xtf24Reader: added models to StartTransferEvent
+- added CSVWriter
+- CSVReader: fixed warn message unclosed reader
 - fixed ReaderFactory to return a Reader state before first event
 - fixed GetModels()
 - fixed coordinates calculation in ArcSegment+Iox2wkb if full circle
