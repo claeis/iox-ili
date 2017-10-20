@@ -21,10 +21,12 @@ script:
   - ant junitreport
 deploy:
   - provider: script
+    skip_cleanup: true
     script: ant -Duser.repos_pwd=${repos_pwd} -Duser.repos_usr=jql_jars-INTE deploy
     on:
       branch: master
   - provider: script
+    skip_cleanup: true
     script: ant -Duser.repos_pwd=${repos_pwd} -Duser.repos_usr=jql_jars-INTE deploy
     on:
-      branch: stable  
+      branch: stable
