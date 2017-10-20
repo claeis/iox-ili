@@ -95,6 +95,7 @@ public class ItfAreaLinetable2Polygon {
 	ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>(); 
 	private String linetableIliqname=null;
 	private String geomattrIliqname=null;
+	private boolean allowItfAreaHoles=true; // default is like Interlis2 (not exactly according to Interlis1 spec)
 
 	public ItfAreaLinetable2Polygon(AttributeDef surfaceAttr,boolean ignorePolygonBuildingErrors1)
 	{
@@ -368,18 +369,20 @@ public class ItfAreaLinetable2Polygon {
 			}
 			
 			// only ITF
-			for(Polygon poly:polys){
-				if(!hitPolys.containsKey(poly)){
-					IoxInvalidDataException ex=null;
-					try {
-						ex=new IoxInvalidDataException("no area-ref to polygon",geomattrIliqname,Jtsext2iox.JTS2surface(poly));
-					} catch (Iox2jtsException e) {
-						throw new IllegalStateException(e);
-					}
-					if(ignorePolygonBuildingErrors){
-						dataerrs.add(ex);
-					}else{
-						throw ex;
+			if(!allowItfAreaHoles) {
+				for(Polygon poly:polys){
+					if(!hitPolys.containsKey(poly)){
+						IoxInvalidDataException ex=null;
+						try {
+							ex=new IoxInvalidDataException("no area-ref to polygon",geomattrIliqname,Jtsext2iox.JTS2surface(poly));
+						} catch (Iox2jtsException e) {
+							throw new IllegalStateException(e);
+						}
+						if(ignorePolygonBuildingErrors){
+							dataerrs.add(ex);
+						}else{
+							throw ex;
+						}
 					}
 				}
 			}
@@ -415,5 +418,11 @@ public class ItfAreaLinetable2Polygon {
 	}
 	public ArrayList<IoxInvalidDataException> getDataerrs() {
 		return dataerrs;
+	}
+	public boolean isAllowItfAreaHoles() {
+		return allowItfAreaHoles;
+	}
+	public void setAllowItfAreaHoles(boolean allowItfAreaHoles) {
+		this.allowItfAreaHoles = allowItfAreaHoles;
 	}
 }

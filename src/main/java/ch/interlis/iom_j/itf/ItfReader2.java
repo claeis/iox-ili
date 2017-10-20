@@ -59,6 +59,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 	private ObjectPoolManager objPool=null;
 	private ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
 	private boolean ignorePolygonBuildingErrors=false;
+	private boolean allowItfAreaHoles=true; // default is like Interlis2 (not exactly according to Interlis1 spec)
 	private PipelinePool ioxDataPool=null;
 	private LogEventFactory errFact=null;
 	/** Creates a new reader.
@@ -502,7 +503,9 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 			if(type instanceof SurfaceType){
 				attrs_surfaceAttrs.put(attr, new ItfSurfaceLinetable2Polygon(attr,ignorePolygonBuildingErrors));
 			}else if(type instanceof AreaType){
-				attrs_areaAttrs.put(attr, new ItfAreaLinetable2Polygon(attr,ignorePolygonBuildingErrors));
+				ItfAreaLinetable2Polygon polygonBuilder = new ItfAreaLinetable2Polygon(attr,ignorePolygonBuildingErrors);
+				polygonBuilder.setAllowItfAreaHoles(allowItfAreaHoles);
+				attrs_areaAttrs.put(attr, polygonBuilder);
 			}
 		  }
 		}
@@ -544,5 +547,11 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 	}
 	public void setIoxDataPool(IoxDataPool ioxDataPool) {
 		this.ioxDataPool = (PipelinePool)ioxDataPool;
+	}
+	public boolean isAllowItfAreaHoles() {
+		return allowItfAreaHoles;
+	}
+	public void setAllowItfAreaHoles(boolean allowItfAreaHoles) {
+		this.allowItfAreaHoles = allowItfAreaHoles;
 	}
 }

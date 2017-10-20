@@ -22,6 +22,7 @@ import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.ItfReader;
 import ch.interlis.iox.*;
+import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 
 public class ItfAreaLV95_05Test {
@@ -105,6 +106,77 @@ public class ItfAreaLV95_05Test {
 		IomObject polygon=builder.getSurfaceObject("14");
 		//System.out.println(polygon.toString());
 		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2610432.457, C2 1182691.551}, ARC {A2 1182693.794, A1 2610433.547, C1 2610434.152, C2 1182696.214}, ARC {A2 1182695.5981813655, A1 2610434.047045499, C1 2610433.910314906, C2 1182694.9886300697}, ARC {A2 1182694.959, A1 2610433.901, C1 2610433.382, C2 1182693.788}, COORD {C1 2610432.457, C2 1182691.551}]}}}}}"
+				,polygon.toString());
+	}
+	
+	@Test
+	public void testAcceptHoles() throws Iox2jtsException, IoxException {
+		String tableBName=tableB.getScopedName(null);
+		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
+		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
+		ItfReader reader=new ItfReader(new File("src/test/data/Itf/Test2LV95_05AreaHole.itf"));
+		reader.setModel(td);
+		//EhiLogger.getInstance().setTraceFilter(false);
+		IoxEvent event=null;
+		 do{
+		        event=reader.read();
+		        if(event instanceof StartTransferEvent){
+		        }else if(event instanceof StartBasketEvent){
+		        }else if(event instanceof ObjectEvent){
+		        	IomObject iomObj=((ObjectEvent)event).getIomObject();
+		        	if(iomObj.getobjecttag().equals(formAttrTableName)){
+		        		builder.addItfLinetableObject(iomObj);
+		        	}else if(iomObj.getobjecttag().equals(tableBName)){
+		        		builder.addGeoRef(iomObj.getobjectoid(), iomObj.getattrobj(formAttr.getName(), 0));
+		        	}
+		        }else if(event instanceof EndBasketEvent){
+		        }else if(event instanceof EndTransferEvent){
+		        }
+		 }while(!(event instanceof EndTransferEvent));
+			
+		builder.buildSurfaces();
+		IomObject polygon=builder.getSurfaceObject("10");
+		//System.out.println(polygon.toString());
+		assertEquals("MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2610400.0, C2 1182600.0}, COORD {C1 2610400.0, C2 1182680.0}, COORD {C1 2610480.0, C2 1182680.0}, COORD {C1 2610480.0, C2 1182600.0}, COORD {C1 2610400.0, C2 1182600.0}]}}}, "+
+		"BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2610420.0, C2 1182620.0}, COORD {C1 2610460.0, C2 1182620.0}, COORD {C1 2610460.0, C2 1182660.0}, COORD {C1 2610420.0, C2 1182660.0}, COORD {C1 2610420.0, C2 1182620.0}]}}}]}}"
+				,polygon.toString());
+	}
+	@Test
+	public void testRejectHole() throws Iox2jtsException, IoxException {
+		String tableBName=tableB.getScopedName(null);
+		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
+		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
+		builder.setAllowItfAreaHoles(false); // override default
+		ItfReader reader=new ItfReader(new File("src/test/data/Itf/Test2LV95_05AreaHole.itf"));
+		reader.setModel(td);
+		//EhiLogger.getInstance().setTraceFilter(false);
+		IoxEvent event=null;
+		 do{
+		        event=reader.read();
+		        if(event instanceof StartTransferEvent){
+		        }else if(event instanceof StartBasketEvent){
+		        }else if(event instanceof ObjectEvent){
+		        	IomObject iomObj=((ObjectEvent)event).getIomObject();
+		        	if(iomObj.getobjecttag().equals(formAttrTableName)){
+		        		builder.addItfLinetableObject(iomObj);
+		        	}else if(iomObj.getobjecttag().equals(tableBName)){
+		        		builder.addGeoRef(iomObj.getobjectoid(), iomObj.getattrobj(formAttr.getName(), 0));
+		        	}
+		        }else if(event instanceof EndBasketEvent){
+		        }else if(event instanceof EndTransferEvent){
+		        }
+		 }while(!(event instanceof EndTransferEvent));
+			
+		try {
+			builder.buildSurfaces();
+			fail();
+		} catch (IoxInvalidDataException e) {
+			assertEquals("Test2LV95_05.TopicB.TableB.Form: no area-ref to polygon",e.getMessage());
+		}
+		IomObject polygon=builder.getSurfaceObject("10");
+		//System.out.println(polygon.toString());
+		assertEquals("MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2610400.0, C2 1182600.0}, COORD {C1 2610400.0, C2 1182680.0}, COORD {C1 2610480.0, C2 1182680.0}, COORD {C1 2610480.0, C2 1182600.0}, COORD {C1 2610400.0, C2 1182600.0}]}}}, "+
+		"BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2610420.0, C2 1182620.0}, COORD {C1 2610460.0, C2 1182620.0}, COORD {C1 2610460.0, C2 1182660.0}, COORD {C1 2610420.0, C2 1182660.0}, COORD {C1 2610420.0, C2 1182620.0}]}}}]}}"
 				,polygon.toString());
 	}
 	
