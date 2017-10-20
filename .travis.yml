@@ -7,7 +7,14 @@ branches:
   only:
     - master
     - stable
+
+addons:
+  apt:
+    packages:
+    - libmaven-ant-tasks-java
+
 install: true
+  
 script: 
   - ant jar 
   - ant junit 
