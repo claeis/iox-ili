@@ -1,0 +1,31 @@
+TRANSFER Test2LV95;
+
+  DOMAIN
+    LKoord = COORD2 2460000.000 1045000.000
+                    2870000.000 1310000.000;
+
+MODEL Test2LV95
+
+  TOPIC TopicA =
+    TABLE TableA =
+      Form: OPTIONAL SURFACE WITH (STRAIGHTS, ARCS) VERTEX LKoord
+                 WITHOUT OVERLAPS > 0.10;
+      NO IDENT
+    END TableA;
+  END TopicA.
+
+  TOPIC TopicB =
+    TABLE TableB =
+      Form: OPTIONAL AREA WITH (STRAIGHTS, ARCS) VERTEX LKoord
+                 WITHOUT OVERLAPS > 0.10;
+      NO IDENT
+    END TableB;
+  END TopicB.
+  
+END Test2LV95.
+
+FORMAT FREE;
+CODE BLANK = DEFAULT, UNDEFINED = DEFAULT, CONTINUE = DEFAULT;
+TID = ANY;
+
+END.

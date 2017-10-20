@@ -29,11 +29,6 @@ public class CsvReaderTest {
 	private static final String ATTRIBUTE4="attr4";
 	private static final String ATTRIBUTE5="attr5";
 	
-	private static final String CLASS1="class1";
-	private static final String CLASS2="class2";
-	private static final String CLASS3="class3";
-	private static final String CLASS4="class4";
-	
 	@Before
 	public void setup() throws Ili2cFailure
 	{
@@ -47,9 +42,15 @@ public class CsvReaderTest {
 	
 	// Es wird getestet ob die Attributenamen einzigartig sind und innerhalb vom Objekt richtig hinzugefuegt wurden.
 	@Test
-	public void attrNames_Ok() throws IoxException, FileNotFoundException{
-		CsvReader reader=new CsvReader(new File(TEST_IN,"TextType.csv"));
-		reader.setModel(td);
+	public void attrNames_Ok() throws IoxException, FileNotFoundException, Ili2cFailure{
+		// compile model
+		Configuration ili2cConfig=new Configuration();
+		FileEntry fileEntry=new FileEntry(TEST_IN+"/model6.ili", FileEntryKind.ILIMODELFILE);
+		ili2cConfig.addFileEntry(fileEntry);
+		TransferDescription td2=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
+		
+		CsvReader reader=new CsvReader(new File(TEST_IN,"TextType2.csv"));
+		reader.setModel(td2);
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event = reader.read();
@@ -58,6 +59,13 @@ public class CsvReaderTest {
 			assertTrue(iomObj.getattrvaluecount(ATTRIBUTE1)==1);
 			assertTrue(iomObj.getattrvaluecount(ATTRIBUTE2)==1);
 			assertTrue(iomObj.getattrvaluecount(ATTRIBUTE3)==1);
+			assertTrue(iomObj.getattrvaluecount("attr4")==1);
+			assertTrue(iomObj.getattrvaluecount("attr5")==1);
+			assertTrue(iomObj.getattrvaluecount("attr6")==1);
+			assertTrue(iomObj.getattrvaluecount("attr7")==1);
+			assertTrue(iomObj.getattrvaluecount("attr8")==1);
+			assertTrue(iomObj.getattrvaluecount("attr9")==1);
+			assertTrue(iomObj.getattrvaluecount("attr10")==1);
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
@@ -127,7 +135,7 @@ public class CsvReaderTest {
 		tdM=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(tdM);
 		
- 		CsvReader reader=new CsvReader(new File(TEST_IN,"TextType2.csv"));
+ 		CsvReader reader=new CsvReader(new File(TEST_IN,"TextType3.csv"));
 		reader.setModel(tdM);
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
@@ -350,6 +358,56 @@ public class CsvReaderTest {
         	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
         	assertEquals("AU", iomObj.getattrvalue(ATTRIBUTE2));
         	assertEquals("Australia", iomObj.getattrvalue(ATTRIBUTE3));
+		}
+		assertTrue(reader.read() instanceof EndBasketEvent);
+		assertTrue(reader.read() instanceof EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Der Benutzer setzt der Headerparameter: present. Die Attribute sollen laut definition importiert werden.
+	// Das model wird gesetzt.
+	@Test
+    public void headerPresentSpecialHeaderNames_SetModel_Ok() throws IoxException, FileNotFoundException, Ili2cFailure{
+		// compile model
+		
+		Configuration ili2cConfig=new Configuration();
+		FileEntry fileEntry=new FileEntry(TEST_IN+"/model3.ili", FileEntryKind.ILIMODELFILE);
+		ili2cConfig.addFileEntry(fileEntry);
+		TransferDescription td1=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
+		assertNotNull(td1);
+		
+		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderPresentNames.csv"));
+		reader.setModel(td1);
+		assertTrue(reader.read() instanceof StartTransferEvent);
+		reader.setHeader("present");
+		assertTrue(reader.read() instanceof StartBasketEvent);
+		IoxEvent event = reader.read();
+		if(event instanceof ObjectEvent){
+        	IomObject iomObj=((ObjectEvent)event).getIomObject();
+        	assertEquals("10", iomObj.getattrvalue("id"));
+        	assertEquals("AU", iomObj.getattrvalue("abbreviation"));
+        	assertEquals("Australia", iomObj.getattrvalue("state"));
+		}
+		assertTrue(reader.read() instanceof EndBasketEvent);
+		assertTrue(reader.read() instanceof EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Der Benutzer setzt der Headerparameter: present. Die Attribute sollen laut definition importiert werden.
+	@Test
+    public void headerPresentSpecialHeaderNames_Ok() throws IoxException, FileNotFoundException, Ili2cFailure{
+		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderPresentNames.csv"));
+		assertTrue(reader.read() instanceof StartTransferEvent);
+		reader.setHeader("present");
+		assertTrue(reader.read() instanceof StartBasketEvent);
+		IoxEvent event = reader.read();
+		if(event instanceof ObjectEvent){
+        	IomObject iomObj=((ObjectEvent)event).getIomObject();
+        	assertEquals("10", iomObj.getattrvalue("id"));
+        	assertEquals("AU", iomObj.getattrvalue("abbreviation"));
+        	assertEquals("Australia", iomObj.getattrvalue("state"));
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
@@ -607,7 +665,7 @@ public class CsvReaderTest {
 		tdM=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(tdM);
 		
- 		CsvReader reader=new CsvReader(new File(TEST_IN,"TextType2.csv"));
+ 		CsvReader reader=new CsvReader(new File(TEST_IN,"TextType3.csv"));
 		reader.setModel(tdM);
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
@@ -691,7 +749,7 @@ public class CsvReaderTest {
 		reader.close();
 		reader=null;
 	}
- 	
+	
 	// Der Benutzer setzt einen Parameter im Header, welcher ungueltig ist.
     @Test
     public void headerDefinitionNotValid_Fail() throws IoxException, FileNotFoundException{
@@ -702,7 +760,7 @@ public class CsvReaderTest {
     		reader.read();
     		fail();
     	}catch(IoxException ex){
-    		ex.getMessage().contains("expected present or absent, unexpected started");
+    		assertTrue(ex.getMessage().contains("expected present or absent, unexpected started"));
     	}
     	reader.close();
     	reader=null;
@@ -714,17 +772,11 @@ public class CsvReaderTest {
 		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderAbsent2.csv"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
 		try{
     		reader.read();
     		fail();
     	}catch(IoxException ex){
-    		ex.getMessage().contains("attribute count of record: HeaderAbsent2.Topic.Class1");
-    		ex.getMessage().contains(ATTRIBUTE1);
-    		ex.getMessage().contains(ATTRIBUTE2);
-    		ex.getMessage().contains(ATTRIBUTE3);
-    		ex.getMessage().contains(ATTRIBUTE4);
-    		ex.getMessage().contains("not found in classes of model");
+    		assertTrue(ex.getMessage().contains("attributes size of first line: 4 not found in iliModel: model"));
     	}
 		reader.close();
 		reader=null;
@@ -732,21 +784,25 @@ public class CsvReaderTest {
  	
  	// Der Benutzer setzt ein Model. Es werden mehrere Klassen mit der gleichen Anzahl an Attributen innerhalb des gesetzten Models gefunden.
  	@Test
-    public void multipleClassesFound_SetModel_Fail() throws IoxException, FileNotFoundException{
+    public void multipleClassesFound_SetModel_Fail() throws IoxException, FileNotFoundException, Ili2cFailure{
+ 	// compile model
+	Configuration ili2cConfig=new Configuration();
+	FileEntry fileEntry=new FileEntry(TEST_IN+"/model4.ili", FileEntryKind.ILIMODELFILE);
+	ili2cConfig.addFileEntry(fileEntry);
+	TransferDescription td2=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
+	assertNotNull(td2);
+ 		
 		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderAbsent2.csv"));
-		reader.setModel(td);
+		reader.setModel(td2);
 		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
 		try{
     		reader.read();
     		fail();
     	}catch(IoxException ex){
-    		ex.getMessage().contains("attribute count of record: HeaderAbsent2.Topic.Class1");
-    		ex.getMessage().contains(ATTRIBUTE1);
-    		ex.getMessage().contains(ATTRIBUTE2);
-    		ex.getMessage().contains(ATTRIBUTE3);
-    		ex.getMessage().contains(ATTRIBUTE4);
-    		ex.getMessage().contains("not found in classes of model");
+    		assertTrue(ex.getMessage().contains("multiple class candidates:"));
+    		assertTrue(ex.getMessage().contains("Class1"));
+    		assertTrue(ex.getMessage().contains("Class2"));
+    		assertTrue(ex.getMessage().contains("Class3"));
     	}
 		reader.close();
 		reader=null;
@@ -758,24 +814,19 @@ public class CsvReaderTest {
  		// compile model
  		TransferDescription tdM=null;
 		Configuration ili2cConfig=new Configuration();
-		FileEntry fileEntry=new FileEntry(TEST_IN+"/model2.ili", FileEntryKind.ILIMODELFILE);
+		FileEntry fileEntry=new FileEntry(TEST_IN+"/model.ili", FileEntryKind.ILIMODELFILE);
 		ili2cConfig.addFileEntry(fileEntry);
 		tdM=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(tdM);
  		
- 		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderAbsent.csv"));
+ 		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderAbsent3.csv"));
 		reader.setModel(tdM);
 		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
     	try{
     		reader.read();
     		fail();
     	}catch(IoxException ex){
-    		ex.getMessage().contains("multiple class candidates: ");
-    		ex.getMessage().contains(CLASS1);
-    		ex.getMessage().contains(CLASS2);
-    		ex.getMessage().contains(CLASS3);
-    		ex.getMessage().contains(CLASS4);
+    		assertTrue(ex.getMessage().contains("attributes size of first line: 6 not found in iliModel: model"));
     	}
 		reader.close();
 		reader=null;
@@ -800,11 +851,11 @@ public class CsvReaderTest {
     		reader.read();
     		fail();
     	}catch(IoxException ex){
-    		ex.getMessage().contains("multiple class candidates: ");
-    		ex.getMessage().contains(CLASS1);
-    		ex.getMessage().contains(CLASS2);
-    		ex.getMessage().contains(CLASS3);
-    		ex.getMessage().contains(CLASS4);
+    		assertTrue(ex.getMessage().contains("multiple class candidates: "));
+    		assertTrue(ex.getMessage().contains("Class1"));
+    		assertTrue(ex.getMessage().contains("Class2"));
+    		assertTrue(ex.getMessage().contains("Class3"));
+    		assertTrue(ex.getMessage().contains("Class4"));
     	}
 		reader.close();
 		reader=null;
@@ -829,13 +880,13 @@ public class CsvReaderTest {
     		reader.read();
     		fail();
     	}catch(IoxException ex){
-    		ex.getMessage().contains("attributes of header records: ");
-    		ex.getMessage().contains(ATTRIBUTE1);
-    		ex.getMessage().contains(ATTRIBUTE2);
-    		ex.getMessage().contains(ATTRIBUTE3);
-    		ex.getMessage().contains(ATTRIBUTE4);
-			ex.getMessage().contains(ATTRIBUTE5);
-			ex.getMessage().contains("not found in iliModel");
+    		assertTrue(ex.getMessage().contains("attributes of headerrecord:"));
+    		assertTrue(ex.getMessage().contains(ATTRIBUTE1));
+    		assertTrue(ex.getMessage().contains(ATTRIBUTE2));
+    		assertTrue(ex.getMessage().contains(ATTRIBUTE3));
+    		assertTrue(ex.getMessage().contains(ATTRIBUTE4));
+    		assertTrue(ex.getMessage().contains(ATTRIBUTE5));
+    		assertTrue(ex.getMessage().contains("not found in iliModel: model2"));
     	}
 		reader.close();
 		reader=null;
@@ -855,19 +906,158 @@ public class CsvReaderTest {
  		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderAbsent3.csv"));
 		reader.setModel(tdM);
 		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
     	try{
     		reader.read();
     		fail();
     	}catch(IoxException ex){
-    		ex.getMessage().contains("attribute count of record: ");
-    		ex.getMessage().contains(ATTRIBUTE1);
-    		ex.getMessage().contains(ATTRIBUTE2);
-    		ex.getMessage().contains(ATTRIBUTE3);
-    		ex.getMessage().contains(ATTRIBUTE4);
-			ex.getMessage().contains(ATTRIBUTE5);
-			ex.getMessage().contains("not found in classes of model");
+    		assertTrue(ex.getMessage().contains("attributes size of first line: 6 not found in iliModel: model2"));
     	}
+		reader.close();
+		reader=null;
+	}
+	
+	// Der Benutzer setzt der Headerparameter: present. Die Attribute koennen im gesetzten model nicht gefunden werden.
+	@Test
+    public void attrNamesNotFoundInModel_Fail() throws IoxException, FileNotFoundException, Ili2cFailure{
+		// compile model
+		Configuration ili2cConfig=new Configuration();
+		FileEntry fileEntry=new FileEntry(TEST_IN+"/model3.ili", FileEntryKind.ILIMODELFILE);
+		ili2cConfig.addFileEntry(fileEntry);
+		TransferDescription td1=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
+		assertNotNull(td1);
+		
+		CsvReader reader=new CsvReader(new File(TEST_IN,"AttrNamesNotFoundInModel.csv"));
+		reader.setModel(td1);
+		assertTrue(reader.read() instanceof StartTransferEvent);
+		reader.setHeader("present");
+		try{
+    		reader.read();
+    		fail();
+    	}catch(IoxException ex){
+    		assertTrue(ex.getMessage().contains("attributes of headerrecord: [id2, abbreviation3, country] not found in iliModel: model"));
+    	}
+		reader.close();
+		reader=null;
+	}
+	
+	// Der Benutzer setzt der Headerparameter: present. Die Werte auf der 5ten Zeile haben einen Wert zuviel.
+	// Dieser wird nicht herausgeschrieben. Dafuer soll eine Warnung dem Benutzer angezeigt werden.
+	@Test
+    public void numberOfAttrsNotEqual_SetHeader_Warn() throws IoxException, FileNotFoundException, Ili2cFailure{
+		CsvReader reader=new CsvReader(new File(TEST_IN,"NumberOfAttrsNotEqual.csv"));
+		assertTrue(reader.read() instanceof StartTransferEvent);
+		reader.setHeader("present");
+		assertTrue(reader.read() instanceof StartBasketEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		IoxEvent event=reader.read();
+		assertTrue(event instanceof ObjectEvent);
+			IomObject iomObj=((ObjectEvent)event).getIomObject();
+			assertTrue(iomObj.getattrcount()==3);
+	    	assertEquals("14", iomObj.getattrvalue("id"));
+	    	assertEquals("AU", iomObj.getattrvalue("abbreviation"));
+	    	assertEquals("Australia", iomObj.getattrvalue("state"));
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof EndBasketEvent);
+ 		assertTrue(reader.read() instanceof EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Der Benutzer setzt der Headerparameter: absent. Die Werte auf der 5ten Zeile haben einen Wert zuviel.
+	// Dieser wird nicht herausgeschrieben. Dafuer soll eine Warnung dem Benutzer angezeigt werden.
+	@Test
+    public void numberOfAttrsNotEqual_Warn() throws IoxException, FileNotFoundException, Ili2cFailure{
+		CsvReader reader=new CsvReader(new File(TEST_IN,"NumberOfAttrsNotEqual2.csv"));
+		assertTrue(reader.read() instanceof StartTransferEvent);
+		reader.setHeader("absent");
+		assertTrue(reader.read() instanceof StartBasketEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		IoxEvent event=reader.read();
+		assertTrue(event instanceof ObjectEvent);
+			IomObject iomObj=((ObjectEvent)event).getIomObject();
+			assertTrue(iomObj.getattrcount()==3);
+	    	assertEquals("14", iomObj.getattrvalue("attr1"));
+	    	assertEquals("AU", iomObj.getattrvalue("attr2"));
+	    	assertEquals("Australia", iomObj.getattrvalue("attr3"));
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof EndBasketEvent);
+ 		assertTrue(reader.read() instanceof EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Der Benutzer setzt der Headerparameter: present. Die Werte auf der 5ten Zeile haben einen Wert zuviel.
+	// Dieser wird nicht herausgeschrieben. Dafuer soll eine Warnung dem Benutzer angezeigt werden.
+	// Das Modell wird gesetzt.
+	@Test
+    public void numberOfAttrsNotEqual_SetModel_SetHeader_Warn() throws IoxException, FileNotFoundException, Ili2cFailure{
+		// compile model
+		Configuration ili2cConfig=new Configuration();
+		FileEntry fileEntry=new FileEntry(TEST_IN+"/model3.ili", FileEntryKind.ILIMODELFILE);
+		ili2cConfig.addFileEntry(fileEntry);
+		TransferDescription td1=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
+		assertNotNull(td1);
+		
+		CsvReader reader=new CsvReader(new File(TEST_IN,"NumberOfAttrsNotEqual.csv"));
+		reader.setModel(td1);
+		assertTrue(reader.read() instanceof StartTransferEvent);
+		reader.setHeader("present");
+		assertTrue(reader.read() instanceof StartBasketEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		IoxEvent event=reader.read();
+		assertTrue(event instanceof ObjectEvent);
+			IomObject iomObj=((ObjectEvent)event).getIomObject();
+			assertTrue(iomObj.getattrcount()==3);
+	    	assertEquals("14", iomObj.getattrvalue("id"));
+	    	assertEquals("AU", iomObj.getattrvalue("abbreviation"));
+	    	assertEquals("Australia", iomObj.getattrvalue("state"));
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof EndBasketEvent);
+ 		assertTrue(reader.read() instanceof EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Der Benutzer setzt der Headerparameter: absent. Die Werte auf der 5ten Zeile haben einen Wert zuviel.
+	// Dieser wird nicht herausgeschrieben. Dafuer soll eine Warnung dem Benutzer angezeigt werden.
+	// Das Model wird gesetzt.
+	@Test
+    public void numberOfAttrsNotEqual_SetModel_Warn() throws IoxException, FileNotFoundException, Ili2cFailure{
+		// compile model
+		Configuration ili2cConfig=new Configuration();
+		FileEntry fileEntry=new FileEntry(TEST_IN+"/model3.ili", FileEntryKind.ILIMODELFILE);
+		ili2cConfig.addFileEntry(fileEntry);
+		TransferDescription td1=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
+		assertNotNull(td1);
+		
+		CsvReader reader=new CsvReader(new File(TEST_IN,"NumberOfAttrsNotEqual2.csv"));
+		reader.setModel(td1);
+		assertTrue(reader.read() instanceof StartTransferEvent);
+		reader.setHeader("absent");
+		assertTrue(reader.read() instanceof StartBasketEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof ObjectEvent);
+		IoxEvent event=reader.read();
+		assertTrue(event instanceof ObjectEvent);
+			IomObject iomObj=((ObjectEvent)event).getIomObject();
+			assertTrue(iomObj.getattrcount()==3);
+	    	assertEquals("14", iomObj.getattrvalue("attr1"));
+	    	assertEquals("AU", iomObj.getattrvalue("attr2"));
+	    	assertEquals("Australia", iomObj.getattrvalue("attr3"));
+		assertTrue(reader.read() instanceof ObjectEvent);
+		assertTrue(reader.read() instanceof EndBasketEvent);
+ 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
 	}

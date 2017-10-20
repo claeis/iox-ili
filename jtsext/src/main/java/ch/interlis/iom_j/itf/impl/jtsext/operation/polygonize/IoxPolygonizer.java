@@ -193,11 +193,13 @@ public class IoxPolygonizer
     shellList = new ArrayList();
     for (Iterator i = edgeRingList.iterator(); i.hasNext(); ) {
       EdgeRing er = (EdgeRing) i.next();
-      if (er.isHole())
+      if (er.isHole()) {
+        //  graph.printEdges("hole: ",(List<PolygonizeDirectedEdge>)er.getEdges());
         holeList.add(er);
-      else
+      }else {
+        // graph.printEdges("shell: ",(List<PolygonizeDirectedEdge>)er.getEdges());
         shellList.add(er);
-
+      }
     }
   }
 

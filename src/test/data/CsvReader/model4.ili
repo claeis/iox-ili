@@ -1,31 +1,24 @@
 INTERLIS 2.4;
 
-MODEL model2 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
-	TOPIC Topic =
+MODEL model4 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
+	TOPIC Topic12 =
 		CLASS Class1 =
 			attr1 : TEXT*40;
 			attr2 : TEXT*40;
 			attr3 : TEXT*40;
+			attr4 : TEXT*40;
 		END Class1;
-		
 		CLASS Class2 =
 			attr1 : TEXT*40;
 			attr2 : TEXT*40;
 			attr3 : TEXT*40;
+			attr4 : TEXT*40;
 		END Class2;
-	END Topic;
-	
-	TOPIC Topic2 =
 		CLASS Class3 =
 			attr1 : TEXT*40;
 			attr2 : TEXT*40;
 			attr3 : TEXT*40;
+			attr4 : TEXT*40;
 		END Class3;
-		
-		CLASS Class4 =
-			attr1 : TEXT*40;
-			attr2 : TEXT*40;
-			attr3 : TEXT*40;
-		END Class4;
-	END Topic2;
-END model2.
+	END Topic12;
+END model4.

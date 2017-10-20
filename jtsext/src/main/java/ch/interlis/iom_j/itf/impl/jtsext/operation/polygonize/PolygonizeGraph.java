@@ -26,6 +26,7 @@ import com.vividsolutions.jts.planargraph.*;
 class PolygonizeGraph
     extends PlanarGraph
 {
+	  final boolean doDetailTrace=false;
 
   private static int getDegreeNonDeleted(Node node)
   {
@@ -119,6 +120,11 @@ class PolygonizeGraph
     for (Iterator iNode = nodeIterator(); iNode.hasNext(); ) {
       Node node = (Node) iNode.next();
       computeNextCWEdges(node);
+      if(doDetailTrace) {
+          DirectedEdgeStar deStar = node.getOutEdges();
+          List<PolygonizeDirectedEdge> edges = getActiveOutgoingEdges(deStar);
+          printEdges("computeNextCWEdges "+node.getCoordinate()+": ",edges);
+      }
     }
   }
 
@@ -173,7 +179,6 @@ class PolygonizeGraph
 
   public void removeOverlaps(double newVertexOffset)
   {
-	  final boolean doDetailTrace=false;
 		CurveSegmentIntersector li = new CurveSegmentIntersector();
 	    for (Iterator iNode = nodeIterator(); iNode.hasNext(); ) {
 	        Node node = (Node) iNode.next();
@@ -242,7 +247,7 @@ class PolygonizeGraph
 	  
   }
 
-private void printEdges(String tag,List<PolygonizeDirectedEdge> edges) {
+void printEdges(String tag,List<PolygonizeDirectedEdge> edges) {
 		System.out.print(tag);
 		int edgec=edges.size();
 		for(int i=0;i<edgec;i++){
@@ -432,6 +437,9 @@ private Coordinate getIntersection(CurveSegmentIntersector li,Coordinate node,
       if (de.isInRing()) continue;
 
       EdgeRing er = findEdgeRing(de);
+      if(doDetailTrace) {
+    	  printEdges("getEdgeRings:", (List<PolygonizeDirectedEdge>)er.getEdges());
+      }
       edgeRingList.add(er);
     }
     return edgeRingList;
@@ -445,7 +453,7 @@ private Coordinate getIntersection(CurveSegmentIntersector li,Coordinate node,
    * @param dirEdges a List of the DirectedEdges in the graph
    * @return a List of DirectedEdges, one for each edge ring found
    */
-  private static List findLabeledEdgeRings(Collection dirEdges)
+  private List findLabeledEdgeRings(Collection dirEdges)
   {
     List edgeRingStarts = new ArrayList();
     // label the edge rings formed
@@ -457,7 +465,9 @@ private Coordinate getIntersection(CurveSegmentIntersector li,Coordinate node,
 
       edgeRingStarts.add(de);
       List edges = findDirEdgesInRing(de);
-
+      if(doDetailTrace) {
+    	  printEdges("findLabeledEdgeRings:",edges);
+      }
       label(edges, currLabel);
       currLabel++;
     }

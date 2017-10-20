@@ -17,7 +17,10 @@ abstract public class CurveSegment implements java.io.Serializable {
 		env.expandToInclude(getEndPoint());
 		return env;
 	}
-
+	public Envelope computeEnvelopeInternal() {
+		Envelope env=new Envelope();
+		return expandEnvelope(env);
+	}
 	public static double dist(double re1,double ho1,double re2,double ho2)
 	{
 		double ret;

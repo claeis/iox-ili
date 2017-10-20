@@ -5,13 +5,17 @@ ideas/open issues
 LATEST
 -----------------------------
 
-iox-ili 1.19.7 (2017-09-14)
+iox-ili 1.19.8 (2017-10-20)
 -----------------------------
 - Xtf24Reader: fixed xmlns setup
 - Xtf24Reader: added models to StartTransferEvent
+- ItfReader2: enable AREAs with holes
+- added CSVWriter
+- CSVReader: fixed warn message unclosed reader
 - fixed ReaderFactory to return a Reader state before first event
 - fixed GetModels()
 - fixed coordinates calculation in ArcSegment+Iox2wkb if full circle
+- fixed polygon building if arcs overhang
 - added IoxIliReader to make generic clients aware of setModel()
 
 iox-ili 1.19.6 (2017-08-24)
