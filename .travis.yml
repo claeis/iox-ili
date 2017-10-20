@@ -7,7 +7,7 @@ branches:
   only:
     - master
     - stable
-install: ant deps
+install: true
 script: 
   - ant jar 
   - ant junit 
