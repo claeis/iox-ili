@@ -27,6 +27,6 @@ deploy:
       branch: master
   - provider: script
     skip_cleanup: true
-    script: ant -Duser.repos_pwd=${repos_pwd} -Duser.repos_usr=jql_jars-INTE deploy
+    script: ant -Duser.repos_pwd=${repos_pwd} -Duser.repos_usr=jql_jars-INTE -Drelease=final deploy
     on:
       branch: stable
