@@ -12,5 +12,12 @@ script:
   - ant jar 
   - ant junit 
   - ant junitreport
-deploy: 
-  - ant -Duser.repos_pwd=${repos_pwd} -Duser.repos_usr=jql_jars-INTE deploy
+deploy:
+  - provider: script
+    script: ant -Duser.repos_pwd=${repos_pwd} -Duser.repos_usr=jql_jars-INTE deploy
+    on:
+      branch: master
+  - provider: script
+    script: ant -Duser.repos_pwd=${repos_pwd} -Duser.repos_usr=jql_jars-INTE deploy
+    on:
+      branch: stable  
