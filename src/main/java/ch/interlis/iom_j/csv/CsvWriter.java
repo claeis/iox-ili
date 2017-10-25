@@ -86,21 +86,29 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 	/** find appropriate viewable in model/models
 	 * @param iomObj
 	 * @return
+	 * @throws IoxException 
 	 */
-	private Viewable findViewable(IomObject iomObj) {
+	private Viewable findViewable(IomObject iomObj) throws IoxException {
+		List<Viewable>foundIliClasses=null;
 		Viewable ret=null;
 		String tag=iomObj.getobjecttag();
 		String[] elements=tag.split("\\.");
 		String viewable=elements[elements.length-1];
 		// td is set
 		if(td!=null) {
+			foundIliClasses=new ArrayList<Viewable>();
 			List<HashMap<String,Viewable>> allModels=setupNameMapping();
 			for(HashMap<String,Viewable> map : allModels) {
 				ret= map.get(viewable);
 				if(ret!=null) {
-					return ret;
+					foundIliClasses.add(ret);
 				}
 			}
+			if(foundIliClasses.size()>1) {
+	    		throw new IoxException("several possible classes were found: "+foundIliClasses.toString());
+	    	}else if(foundIliClasses.size()==1){
+	    		return foundIliClasses.get(0);
+	    	}
 		}
 		return null;
 	}
@@ -133,6 +141,7 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 					}
 				}
 			}
+			
 		}
 		return attrs;
 	}

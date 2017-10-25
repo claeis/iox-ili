@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.Model;
@@ -102,6 +104,7 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	 */
 	@Override
     public IoxEvent read() throws IoxException{
+		Map<String, String> csvAttributes=null;
 		IomObject iomObj = null;
 		if(state==START){
 			state=INSIDE_TRANSFER;
@@ -185,6 +188,7 @@ public class CsvReader implements IoxReader,IoxIliReader {
 			try {
 				while(reader.ready()){
 					iomObj=createIomObject(modelName+"."+topicName+"."+className, null);
+					csvAttributes=new HashMap<String, String>();
 					// read every record.
 					List<String> record = readChars(reader, currentRecordDelimiter, currentDelimiter);
 					// if header defined, skip this line.
@@ -193,13 +197,25 @@ public class CsvReader implements IoxReader,IoxIliReader {
 						continue; // next line
 					}
 					if(isHeaderDefined()){
-						// compare attrCount
-						if(iomObj.getattrcount()!=headerAttributes.size()) {
-							// warning
-						}
+						// add all attribute-names and attribute-values
 						if(headerAttributes!=null) {
 							for(int i=0;i<headerAttributes.size();i++) {
-								iomObj.setattrvalue(headerAttributes.get(i), record.get(i));
+								csvAttributes.put(headerAttributes.get(i), record.get(i));
+							}
+							if(td!=null) {
+								// filter attribute-values of model defined attribute-names
+								if(iliAttrs!=null) {
+									for(int i=0;i<iliAttrs.size();i++) {
+										iomObj.setattrvalue(iliAttrs.get(i), csvAttributes.get(iliAttrs.get(i)));
+									}
+								}
+							}else {
+								// get attribute-names
+								if(csvAttributes!=null) {
+									for (Map.Entry<String,String> entry : csvAttributes.entrySet()) {
+										iomObj.setattrvalue(entry.getKey(), entry.getValue());
+									}
+								}
 							}
 						}
 					}else {
@@ -281,48 +297,41 @@ public class CsvReader implements IoxReader,IoxIliReader {
 		}
     }
     
+    List<String> iliAttrs=null;
     /** Get Viewable of model, where attributes of records are equal to attribute in model class
      * @return Viewable
      * @throws IoxException 
      */
     private Viewable getViewableByAttributeNames(List<String> headerAttrs) throws IoxException{
-    	int countOfMatchedViewables=0;
-    	StringBuilder multipleMatchedClasses = new StringBuilder();
+    	List<String> foundClasses=null;
     	Viewable viewable=null;
-    	boolean attrsEqual=false;
     	if(iliClasses==null){
     		setupNameMapping();
     	}
-    	String comma="";
+    	foundClasses=new ArrayList<String>();
     	// first last model file.
     	for(HashMap<Viewable, Model> mapIliClasses : listOfIliClasses){
     		for(Viewable iliViewable : mapIliClasses.keySet()){
-    			List<String> iliAttrs=new ArrayList<String>();
+    			iliAttrs=new ArrayList<String>();
     			Iterator attrIter=iliViewable.getAttributes();
     			while(attrIter.hasNext()){
     				Element attribute=(Element) attrIter.next();
     				iliAttrs.add(attribute.getName());
     			}
-    			if(iliAttrs.size()==headerAttrs.size()){
-    				if(iliAttrs.containsAll(headerAttrs)){
-    					viewable=iliViewable;
-    					modelName=mapIliClasses.get(iliViewable).getName();
-    					countOfMatchedViewables+=1;
-    					attrsEqual=true;
-    					multipleMatchedClasses.append(comma);
-        				multipleMatchedClasses.append(viewable.getName());
-        				comma=",";
-    				}
-    			}
+    			// check if all model attributes are contained in defined header
+				if(iliAttrs.containsAll(headerAttrs)){
+					viewable=iliViewable;
+					modelName=mapIliClasses.get(iliViewable).getName();
+					foundClasses.add(viewable.getScopedName());
+				}
     		}
     	}
-    	if(attrsEqual==true && countOfMatchedViewables==1){
+    	if(foundClasses.size()>1) {
+    		throw new IoxException("several possible classes were found: "+foundClasses.toString());
+    	}else if(foundClasses.size()==1){
     		return viewable;
-    	}else if(attrsEqual==true && countOfMatchedViewables>1){
-    		throw new IoxException("multiple class candidates: "+multipleMatchedClasses.toString());
-    	}else{
-    		return null;
     	}
+    	return null;
     }
 	
     /** Get Viewable of model, where record attribute-count is equal to attribute-count of model class
