@@ -215,7 +215,7 @@
             <formatter type="plain"/>
             <test name="ch.interlis.iox_j.validator.ErrorMsg23Test"/>
         </junit-->
-		<junit printsummary="yes" dir="${junit.dir}">
+		<junit printsummary="yes" dir="${junit.dir}" haltonfailure="yes">
 			<classpath>
 				<path refid="classpath"/>
 				<path refid="junit"/>
