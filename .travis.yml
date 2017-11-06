@@ -18,7 +18,9 @@ install: true
 script: 
   - ant jar 
   - ant junit 
-  - ant junitreport
+  - # ant junitreport
+after_failure:
+  - cat  build/junitreport/TEST-*.txt
 deploy:
   - provider: script
     skip_cleanup: true

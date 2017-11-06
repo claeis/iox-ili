@@ -222,7 +222,7 @@
 				<pathelement location="${build}/classes"/>
 			</classpath>
 
-			<formatter type="xml"/>
+			<formatter type="plain"/>
 
 			<batchtest fork="yes" todir="${report.dir}">
 				<fileset dir="${basedir}/src/test/java" includes="**/*Test.java"/>
