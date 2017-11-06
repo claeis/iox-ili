@@ -82,6 +82,7 @@
         <pathelement location="lib/wstx-asl-3.2.8.jar"/ -->
 			</classpath>
 			<src path="${src}" />
+			<src path="src/test/java" />
 			<src path="${gensrc}" />
 			<src path="${basedir}/jtsext/src/main/java" />
     	<!-- <src path="${build}/src"/> -->
