@@ -222,7 +222,7 @@ public class Polyline23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob die Linienpunkte aneinander gehängt werden können.
+	// Es wird getestet ob die Linienpunkte aneinander gehaengt werden koennen.
 	@Test
 	public void createASeriesOf2dStraightLines_Ok(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
@@ -255,7 +255,7 @@ public class Polyline23Test {
 		assertEquals(0,logger.getErrs().size());
 	}
 	
-	// Es wird getestet ob die Linienpunkte aneinander gehängt werden können.
+	// Es wird getestet ob die Linienpunkte aneinander gehaengt werden koennen.
 //	@Test
 //	public void createASeriesOf3dStraightLines_Ok(){
 //		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
@@ -378,7 +378,7 @@ public class Polyline23Test {
 		assertEquals("unexpected Type POLYLINE", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob bei einem Kompletten Polsline Type, zwei Sequenzen erstellt werden können.
+	// Es wird getestet, ob bei einem Kompletten Polsline Type, zwei Sequenzen erstellt werden koennen.
 	@Test
 	public void completeBy2Sequences_Fail(){
 		Iom_jObject objStraightsFail=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
@@ -471,7 +471,7 @@ public class Polyline23Test {
 		assertEquals("unexpected COORD", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob Linienüberschneidungen zu einem Fehler führen. Ja.
+	// Es wird getestet ob Linienueberschneidungen zu einem Fehler fuehren. Ja.
 	@Test
 	public void intersectionBy2dPolylines_Fail(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
@@ -505,7 +505,7 @@ public class Polyline23Test {
 		assertEquals("Attribute straights2dWithoutOverlaps has an invalid self-intersection at (480005.0, 70000.0)", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob bei 3d Polylines, Fehler bei überschneidungen ausgegeben werden.
+	// Es wird getestet ob bei 3d Polylines, Fehler bei ueberschneidungen ausgegeben werden.
 //	@Test
 //	public void intersectionBy3dPolylines_Fail(){
 //		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);

@@ -236,7 +236,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn diese 2 Strings in einem Vergleich übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn diese 2 Strings in einem Vergleich uebereinstimmen.
 	@Test
 	public void textEqual_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONG, OID);
@@ -256,7 +256,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2 Numerischen Werte übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2 Numerischen Werte uebereinstimmen.
 	@Test
 	public void numericEqual_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID);
@@ -276,7 +276,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2 Numerischen Werte übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2 Numerischen Werte uebereinstimmen.
 	@Test
 	public void decEqual_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID);
@@ -331,7 +331,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}	
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählungen mit der Unter-Hierarchie übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlungen mit der Unter-Hierarchie uebereinstimmen.
 	@Test
 	public void subEnumerationEqual_Ok(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSEQUALATIONH, OID);
@@ -351,7 +351,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Koordinaten übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Koordinaten uebereinstimmen.
 	@Test
 	public void coordsEqual_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONE, OID);
@@ -381,7 +381,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polylines nur aus Geraden übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polylines nur aus Geraden uebereinstimmen.
 	@Test
 	public void polylines2dStrainghtsEqual_Ok(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIOND, OID);
@@ -415,7 +415,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2 3d Polylines aus Geraden und Kurven übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2 3d Polylines aus Geraden und Kurven uebereinstimmen.
 	@Test
 	public void polylines3dStraightsArcs_Ok(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIONA, OID);
@@ -467,7 +467,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Oberflächen übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Oberflaechen uebereinstimmen.
 	@Test
 	public void surface2dEqual_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONB, OID);
@@ -695,7 +695,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzählungen ungleich sind.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzaehlungen ungleich sind.
 	@Test
 	public void enumerationUnEqual_Ok(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID);
@@ -715,7 +715,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählungen mit der Unter-Hierarchy ungleich sind.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlungen mit der Unter-Hierarchy ungleich sind.
 	@Test
 	public void enumerationSubUnEqual_Ok(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID);
@@ -851,7 +851,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Oberflächen in 2d ungleich zu einander stehen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Oberflaechen in 2d ungleich zu einander stehen.
 	@Test
 	public void surface2dUnEqual_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONG, OID);
@@ -1031,7 +1031,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummer aus attr1 grösser als die Nummer aus attr2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummer aus attr1 groesser als die Nummer aus attr2 ist.
 	@Test
 	public void numericGreaterThan_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
@@ -1051,7 +1051,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummer aus attr1 grösser als die Nummer aus attr2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummer aus attr1 groesser als die Nummer aus attr2 ist.
 	@Test
 	public void decimalGreaterThan_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
@@ -1071,7 +1071,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung grösser als die zweite Aufzählung ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung groesser als die zweite Aufzaehlung ist.
 	@Test
 	public void enumerationGreaterThan_Ok(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OID);
@@ -1091,7 +1091,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 grösser als attr2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 groesser als attr2 ist.
 	@Test
 	public void textGreaterThan_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OID);
@@ -1131,7 +1131,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 kleiner als die Aufzählung2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 kleiner als die Aufzaehlung2 ist.
 	@Test
 	public void enumerationLessThan_Ok(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OID);
@@ -1171,7 +1171,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 grösser oder gleich attr2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 groesser oder gleich attr2 ist.
 	@Test
 	public void numericGreaterThanOrEqual_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
@@ -1191,7 +1191,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 grösser oder gleich wie attr2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 groesser oder gleich wie attr2 ist.
 	@Test
 	public void numericGreaterOrEqual_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
@@ -1211,7 +1211,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 grösser oder gleich attr2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 groesser oder gleich attr2 ist.
 	@Test
 	public void decimalGreaterThanOrEqual_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
@@ -1231,7 +1231,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 grösser oder gleich wie attr2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 groesser oder gleich wie attr2 ist.
 	@Test
 	public void decimalGreaterOrEqual_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
@@ -1251,7 +1251,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 grösser oder gleich der Aufzählung2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 groesser oder gleich der Aufzaehlung2 ist.
 	@Test
 	public void enumerationGreaterOrEqual_Ok(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OID);
@@ -1271,7 +1271,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 grösser oder gleich der Aufzählung2 ist. 
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 groesser oder gleich der Aufzaehlung2 ist. 
 	@Test
 	public void enumerationGreaterOrEqual2_Ok(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OID);
@@ -1291,7 +1291,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 grösser oder gleich dem Text aus attr2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 groesser oder gleich dem Text aus attr2 ist.
 	@Test
 	public void textGreaterOrEqual_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OID);
@@ -1311,7 +1311,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 grösser oder gleich dem Text aus attr2 ist
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 groesser oder gleich dem Text aus attr2 ist
 	@Test
 	public void textGreaterOrEqual2_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OID);
@@ -1371,7 +1371,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 kleiner oder gleich gross der Aufzählung2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 kleiner oder gleich gross der Aufzaehlung2 ist.
 	@Test
 	public void enumerationLessThanOrEqual_Ok(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OID);
@@ -1391,7 +1391,7 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 kleiner oder gleich der Aufzählung2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 kleiner oder gleich der Aufzaehlung2 ist.
 	@Test
 	public void enumerationLessThanOrEqual2_Ok(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OID);
@@ -1513,7 +1513,7 @@ public class MandatoryConstraints23 {
 	//########### FAIL MANDATORY CONSTRAINTS ##################//
 	//#########################################################//
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die boolean nicht übereinstimmen.	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die boolean nicht uebereinstimmen.	
 	@Test
 	public void booleanEqual_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
@@ -1534,7 +1534,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualI.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Texte nicht übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Texte nicht uebereinstimmen.
 	@Test
 	public void textNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONG, OID);
@@ -1555,7 +1555,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualG.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummern nicht übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummern nicht uebereinstimmen.
 	@Test
 	public void numericNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID);
@@ -1576,7 +1576,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualF.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummern nicht übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummern nicht uebereinstimmen.
 	@Test
 	public void decimalNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID);
@@ -1597,7 +1597,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualF.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Coords nicht übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Coords nicht uebereinstimmen.
 	@Test
 	public void coordsNotEqual_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONE, OID);
@@ -1628,7 +1628,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualE.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2d Polylines nicht übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2d Polylines nicht uebereinstimmen.
 	@Test
 	public void polylines2dNotEqual_False(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIOND, OID);
@@ -1687,7 +1687,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualD.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 3d Polylines nich übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 3d Polylines nich uebereinstimmen.
 	@Test
 	public void polyline3dNotEqual_False(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIONA, OID);
@@ -1740,7 +1740,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2d Oberflächen nicht übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2d Oberflaechen nicht uebereinstimmen.
 	@Test
 	public void polyline2dNotEqual_False(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONB, OID);
@@ -1821,7 +1821,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2d Areas nicht übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2d Areas nicht uebereinstimmen.
 	@Test
 	public void area2dNotEqual_False(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONC, OID);
@@ -1906,7 +1906,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Texte übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Texte uebereinstimmen.
 	@Test
 	public void textIsEqual_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONA, OID);
@@ -1927,7 +1927,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassUnEqualA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Texte übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Texte uebereinstimmen.
 	@Test
 	public void numberUnEqual_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OID);
@@ -1948,7 +1948,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassUnEqualB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Texte übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Texte uebereinstimmen.
 	@Test
 	public void decimalUnEqual_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OID);
@@ -1969,7 +1969,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassUnEqualB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzählungen nicht ungleich sind.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzaehlungen nicht ungleich sind.
 	@Test
 	public void enumerationUnEqual_False(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID);
@@ -1990,7 +1990,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassUnEqualC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzählungen mit ihrer Sub-Hierarchie nicht übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzaehlungen mit ihrer Sub-Hierarchie nicht uebereinstimmen.
 	@Test
 	public void subEnumerationUnEqual_False(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID);
@@ -2011,7 +2011,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassUnEqualC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Coords nicht übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Coords nicht uebereinstimmen.
 	@Test
 	public void coordsUnEqual_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIOND, OID);
@@ -2042,7 +2042,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassUnEqualD.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polylines nur aus Geraden, nicht übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polylines nur aus Geraden, nicht uebereinstimmen.
 	@Test
 	public void polyline2dStraightsUnEqual_False(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONE, OID);
@@ -2079,7 +2079,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassUnEqualE.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 3d Polylines aus Geraden und Kurven nicht übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 3d Polylines aus Geraden und Kurven nicht uebereinstimmen.
 	@Test
 	public void polyline3dStraightsArcsUnEqual_False(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONF, OID);
@@ -2132,7 +2132,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassUnEqualF.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Oberflächen nicht ungleich zueinander sind.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Oberflaechen nicht ungleich zueinander sind.
 	@Test
 	public void surface2dUnEqual_False(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONG, OID);
@@ -2323,7 +2323,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassUnEqualI.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn das erste Attribute nicht grösser als das Zweite Attribute ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn das erste Attribute nicht groesser als das Zweite Attribute ist.
 	@Test
 	public void numericGreaterThan_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
@@ -2344,7 +2344,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die attr1 nicht grösser als attr2 ist. 
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die attr1 nicht groesser als attr2 ist. 
 	@Test
 	public void numericNotGreaterThan_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
@@ -2365,7 +2365,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn das erste Attribute nicht grösser als das Zweite Attribute ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn das erste Attribute nicht groesser als das Zweite Attribute ist.
 	@Test
 	public void decimalGreaterThan_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
@@ -2386,7 +2386,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die attr1 nicht grösser als attr2 ist. 
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die attr1 nicht groesser als attr2 ist. 
 	@Test
 	public void decimalNotGreaterThan_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
@@ -2407,7 +2407,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 nicht grösser als die Aufzählung2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 nicht groesser als die Aufzaehlung2 ist.
 	@Test
 	public void enumerationNotGreaterThan_False(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OID);
@@ -2428,7 +2428,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzählungen nicht ungleich sind.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzaehlungen nicht ungleich sind.
 	@Test
 	public void enumerationUnEqual2_False(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OID);
@@ -2449,7 +2449,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht grösser als attr2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht groesser als attr2 ist.
 	@Test
 	public void textNotGreaterThan_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OID);
@@ -2470,7 +2470,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht grösser als attr2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht groesser als attr2 ist.
 	@Test
 	public void textNotGreaterThan2_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OID);
@@ -2575,7 +2575,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 nicht kleiner als Aufzählung2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 nicht kleiner als Aufzaehlung2 ist.
 	@Test
 	public void enumerationNotLessThan_False(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OID);
@@ -2596,7 +2596,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 nicht kleiner als die Aufzählung ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 nicht kleiner als die Aufzaehlung ist.
 	@Test
 	public void enumeriationsNotLessThan_False(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OID);
@@ -2659,7 +2659,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht grösser oder gleich attr2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht groesser oder gleich attr2 ist.
 	@Test
 	public void numericNotGreaterThanOrEqual_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
@@ -2680,7 +2680,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanOrEqualA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht grösser oder gleich attr2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht groesser oder gleich attr2 ist.
 	@Test
 	public void decimalNotGreaterThanOrEqual_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
@@ -2701,7 +2701,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanOrEqualA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 nicht grösser oder gleich die Aufzählung2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 nicht groesser oder gleich die Aufzaehlung2 ist.
 	@Test
 	public void enumeriationNotGreaterThanOrEqual_False(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OID);
@@ -2722,7 +2722,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassGreaterThanOrEqualB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 nicht grösser oder gleich dem Text aus attr2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 nicht groesser oder gleich dem Text aus attr2 ist.
 	@Test
 	public void textNotGreaterThanOrEqual_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OID);
@@ -2785,7 +2785,7 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassLessThanOrEqualA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzählung1 nicht kleiner oder gleich der Aufzählung2 ist.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 nicht kleiner oder gleich der Aufzaehlung2 ist.
 	@Test
 	public void enumerationNotLessThanOrEqual_False(){
 		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OID);

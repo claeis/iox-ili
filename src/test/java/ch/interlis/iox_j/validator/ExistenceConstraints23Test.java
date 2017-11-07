@@ -46,7 +46,7 @@ public class ExistenceConstraints23Test {
 	//########## SUCCESSFUL TESTS ################################/
 	//############################################################/
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr5 der KlasseA über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr5 der KlasseA ueber die
 	// Existence Constraint auf das Attr1 der Klasse ConditionClass verweist und dieselbe Value hat.
 	@Test
 	public void existenceConstraintToClass_Ok() throws Exception{
@@ -70,7 +70,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr5 der KlasseA über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr5 der KlasseA ueber die
 	// Existence Constraint auf das Attr1 der Klasse ConditionClass verweist, welche von der Klasse ConditionClassX extended wird und dieselbe Value hat.
 	@Test
 	public void existenceConstraintViaExtendedClass_Ok() throws Exception{
@@ -94,7 +94,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der KlasseB über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der KlasseB ueber die
 	// Existence Constraint auf das Attr1 der Klasse ConditionClass verweist, welche sich in einer anderen Basket befindet und dieselbe Value hat.
 	@Test
 	public void existenceConstraintViaDiffModelDiffBasket_Ok() throws Exception {
@@ -120,7 +120,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der KlasseB über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der KlasseB ueber die
 	// Existence Constraint auf das Attr1 der Klasse ConditionClass eines anderen Models verweist und dieselbe Value hat.
 	@Test
 	public void existenceConstraintViaDiffModel_Ok() throws Exception {
@@ -175,7 +175,7 @@ public class ExistenceConstraints23Test {
 //		assertTrue(logger.getErrs().size()==0);
 //	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der ClassCoord1d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der ClassCoord1d ueber die
 	// Existence Constraint auf das Attr0 der Klasse ConditionClassCoord verweist und dieselbe Value hat.
 	@Test
 	public void existenceConstraintViaDiffModel1dCoord_Ok(){
@@ -202,7 +202,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der ClassCoord2d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der ClassCoord2d ueber die
 	// Existence Constraint auf das Attr1 der Klasse ConditionClassCoord verweist und dieselben Values hat.
 	@Test
 	public void existenceConstraintViaDiffModel2dCoords_Ok(){
@@ -231,7 +231,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der ClassCoord3d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der ClassCoord3d ueber die
 	// Existence Constraint auf das Attr2 der Klasse ConditionClassCoord verweist und dieselben Values hat.
 	@Test
 	public void existenceConstraintDiffModel3dCoords_Ok(){
@@ -262,7 +262,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn straights2d der Klasse ClassLine2d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn straights2d der Klasse ClassLine2d ueber die
 	// Existence Constraint auf das straights2d der Klasse ConditionClassLine verweist und dieselbe Value hat.
 	@Test
 	public void diffModel2dpolylineStraights_Ok(){
@@ -303,7 +303,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das straights3d der ClassLine3d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das straights3d der ClassLine3d ueber die
 	// Existence Constraint auf das straights3d der Klasse ConditionClassLine verweist und dieselbe Value hat.
 	@Test
 	public void diffModel3dPolylineStraights_Ok(){
@@ -348,7 +348,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcs2d der ClassLine2dArcs über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcs2d der ClassLine2dArcs ueber die
 	// Existence Constraint auf das arcs2d der Klasse ConditionClassLine verweist und dieselbe Value hat.
 	@Test
 	public void diffModel2dPolylineArcs_Ok(){
@@ -391,7 +391,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcs3d der ClassLine3dArcs über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcs3d der ClassLine3dArcs ueber die
 	// Existence Constraint auf das arcs3d der Klasse ConditionClassLine verweist und dieselbe Value hat.
 	@Test
 	public void diffModel3dPolylineArcs_Ok(){
@@ -438,7 +438,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcsstraights3d der ClassLine3dArcsStraights über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcsstraights3d der ClassLine3dArcsStraights ueber die
 	// Existence Constraint auf das arcsstraights3d der Klasse ConditionClassLine verweist und dieselbe Value hat.
 	@Test
 	public void diffModel3dPolylineStraightsArcs_Ok(){
@@ -493,7 +493,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcsstraights2d der ClassLine2dArcsStraights über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcsstraights2d der ClassLine2dArcsStraights ueber die
 	// Existence Constraint auf das arcsstraights2d der Klasse ConditionClassLine verweist und dieselbe Value hat.
 	@Test
 	public void diffModel2dPolylineStraightsArcs_Ok(){
@@ -542,7 +542,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das surface2d der ClassSurface2d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das surface2d der ClassSurface2d ueber die
 	// Existence Constraint auf das surface2d der Klasse ConditionClassSurface verweist und dieselbe Value hat.
 	@Test
 	public void diffModel2dSurface_Ok(){
@@ -629,7 +629,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das surface3d der ClassSurface3d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das surface3d der ClassSurface3d ueber die
 	// Existence Constraint auf das surface3d der Klasse ConditionClassSurface verweist und dieselbe Value hat.
 	@Test
 	public void diffModel3dSurface_Ok(){
@@ -728,7 +728,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das area2d der ClassArea2d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das area2d der ClassArea2d ueber die
 	// Existence Constraint auf das area2d der Klasse ConditionClassArea verweist und dieselbe Value hat.
 	@Test
 	public void diffModel2dArea_Ok(){
@@ -815,7 +815,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das area3d der ClassArea3d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das area3d der ClassArea3d ueber die
 	// Existence Constraint auf das area3d der Klasse ConditionClassArea verweist und dieselbe Value hat.
 	@Test
 	public void diffModel3dSurfaceArea_Ok(){
@@ -914,7 +914,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn 2 Objekte erstellt werden, wenn eines der Objekte das Attr1 der ClassCooord2d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn 2 Objekte erstellt werden, wenn eines der Objekte das Attr1 der ClassCooord2d ueber die
 	// Existence Constraint auf das Attr1 der ConditionClassCoord verweist und dieselbe Value hat.
 	@Test
 	public void diffModel2ObjsOneContainsConditionAttrs_Ok(){
@@ -973,7 +973,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn beide Objekte keine Attribute für den Constraint definiert haben.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn beide Objekte keine Attribute fuer den Constraint definiert haben.
 	@Test
 	public void diffModelBothObjectsWithoutConditionValues_Ok(){
 		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", OID1);
@@ -1001,7 +1001,7 @@ public class ExistenceConstraints23Test {
 	//################ FAIL TESTS ################################
 	//############################################################
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void sameModelDifferentAttrs_Fail() throws Exception{
 		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", OID1);
@@ -1025,7 +1025,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute, welche in 2 unterschiedlichen Model sich befinden nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute, welche in 2 unterschiedlichen Model sich befinden nicht uebereinstimmen.
 	@Test
 	public void diffModelConstraintValuesDifferent_Fail() throws Exception {
 		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClass", OID1);
@@ -1051,7 +1051,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void sameModelConstraintAttrsDifferent_Fail() throws Exception{
 		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass2", OID1);
@@ -1075,7 +1075,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Condition Attributes welche über eine weitere Klasse extended wird, mit dem Attribute in ClassA übereinstimmt.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Condition Attributes welche ueber eine weitere Klasse extended wird, mit dem Attribute in ClassA uebereinstimmt.
 	@Test
 	public void sameModelOverExtendedClass_Fail() throws Exception{
 		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClassX", OID1);
@@ -1131,7 +1131,7 @@ public class ExistenceConstraints23Test {
 //		assertEquals("The value of the attribute attr5 of CLASS ExistenceConstraints23.Topic.ClassA was not found in the conditional CLASS ExistenceConstraints23.Topic.ConditionClass2.", logger.getErrs().get(0).getEventMsg());
 //	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 1d Coord constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 1d Coord constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void diffModelDiff1dCoords_Fail(){
 		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", OID1);
@@ -1158,7 +1158,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord1d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Coords constraint Attribute nicht übereinstimmen. 
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Coords constraint Attribute nicht uebereinstimmen. 
 	@Test
 	public void diffModel2dCoordDifferent_Fail(){
 		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", OID1);
@@ -1187,7 +1187,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Coord constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Coord constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void diffModel3dCoordsDiff_Fail(){
 		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", OID1);
@@ -1218,7 +1218,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void diffModel2dPolylineStraights_Fail(){
 		// Polyline in Condition Class
@@ -1259,7 +1259,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute straights2d of ExistenceConstraints23Coords.Topic.ClassLine2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void diffModels3dPolylineStraights_Fail(){
 		// Polyline in Condition Class
@@ -1304,7 +1304,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute straights3d of ExistenceConstraints23Coords.Topic.ClassLine3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline mit Arcs constraint Attributes nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline mit Arcs constraint Attributes nicht uebereinstimmen.
 	@Test
 	public void diffModels2dPolylineArcs_Fail(){
 		Iom_jObject objStraightsCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassLine", OID1);
@@ -1347,7 +1347,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute arcs2d of ExistenceConstraints23Coords.Topic.ClassLine2dArcs was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline mit Arcs constraint Attributes nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline mit Arcs constraint Attributes nicht uebereinstimmen.
 	@Test
 	public void diffModels3dPolylineArcs_Fail(){
 		Iom_jObject objStraightsCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassLine", OID1);
@@ -1394,7 +1394,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute arcs3d of ExistenceConstraints23Coords.Topic.ClassLine3dArcs was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline mit Straights und Arcs constraint Attributes nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline mit Straights und Arcs constraint Attributes nicht uebereinstimmen.
 	@Test
 	public void diffModels3dPolylineStraightsArcs_Fail(){
 		Iom_jObject objStraightsCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassLine", OID1);
@@ -1449,7 +1449,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute arcsstraights3d of ExistenceConstraints23Coords.Topic.ClassLine3dArcsStraights was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline mit Straights und Arcs constraint Attributes nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline mit Straights und Arcs constraint Attributes nicht uebereinstimmen.
 	@Test
 	public void diffModels2dPolylineStraightsArcs_Fail(){
 		Iom_jObject objStraightsCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassLine", OID1);
@@ -1498,7 +1498,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute arcsstraights2d of ExistenceConstraints23Coords.Topic.ClassLine2dArcsStraights was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Oberflächen constraint Attributes nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Oberflaechen constraint Attributes nicht uebereinstimmen.
 	@Test
 	public void diffModels2dSurface_Fail(){
 		Iom_jObject objSurfaceSuccessCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassSurface", OID1);
@@ -1585,7 +1585,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute surface2d of ExistenceConstraints23Coords.Topic.ClassSurface2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Oberflächen constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Oberflaechen constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void diffModels3dSurface_Fail(){
 		Iom_jObject objSurfaceSuccessCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassSurface", OID1);
@@ -1684,7 +1684,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute surface3d of ExistenceConstraints23Coords.Topic.ClassSurface3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polygone constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polygone constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void diffModels2dArea_Fail(){
 		Iom_jObject objSurfaceSuccessCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassArea", OID1);
@@ -1771,7 +1771,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute area2d of ExistenceConstraints23Coords.Topic.ClassArea2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Area constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Area constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void diffModels3dArea_Fail(){
 		Iom_jObject objSurfaceSuccessCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassArea", OID1);

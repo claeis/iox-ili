@@ -74,7 +74,7 @@ public class Bid10Test {
 	}
 
 	// Es werden die selben BID's innerhalb verschiedener TransferEvents erstellt.
-	// Beim Start eines TransferEvents wird die Map gelöscht.
+	// Beim Start eines TransferEvents wird die Map geloescht.
 	// Somit soll keine Fehlermeldung ausgegeben werden.
 	@Test
 	public void differentTransferEvents_Ok() throws Exception {

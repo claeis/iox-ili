@@ -129,7 +129,7 @@ public class Configuration23Test {
 		assertEquals("The value of the attribute attrText of Configuration23.Topic.ClassA was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht übereinstimmen und validationConfig msg nicht leer ist.
+	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht uebereinstimmen und validationConfig msg nicht leer ist.
 	@Test
 	public void existenceConstraint_AttrsNotEqual_MSGNotEmpty_Fail() throws Exception{
 		Iom_jObject objBedingung=new Iom_jObject(CONDITIONTEXTCLASS, OID1);
@@ -153,7 +153,7 @@ public class Configuration23Test {
 		assertEquals("My own error message.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht übereinstimmen, check=OFF und msg=NotEmpty.
+	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht uebereinstimmen, check=OFF und msg=NotEmpty.
 	@Test
 	public void existenceConstraint_AttrsNotEqual_MSGNotEmpty__CheckOFF_Fail() throws Exception{
 		Iom_jObject objBedingung=new Iom_jObject(CONDITIONTEXTCLASS, OID1);
@@ -177,7 +177,7 @@ public class Configuration23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht übereinstimmen und validationConfig msg leer ist.
+	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht uebereinstimmen und validationConfig msg leer ist.
 	@Test
 	public void existenceConstraint_DifferentAttrs_MSGIsEmpty_Fail() throws Exception{
 		Iom_jObject objBedingung=new Iom_jObject(CONDITIONTEXTCLASS, OID1);
@@ -202,7 +202,7 @@ public class Configuration23Test {
 	}
 	
 	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird,
-	// wenn die beiden constraint Attribute nicht übereinstimmen, check=WARNING und msg=NotEmpty.
+	// wenn die beiden constraint Attribute nicht uebereinstimmen, check=WARNING und msg=NotEmpty.
 	@Test
 	public void existenceConstraint_MSGNotEmptyAndWarning_Fail() throws Exception{
 		Iom_jObject objBedingung=new Iom_jObject(CONDITIONTEXTCLASS, OID1);
@@ -228,7 +228,7 @@ public class Configuration23Test {
 	}
 
 	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird
-	// wenn die beiden constraint Attribute nicht übereinstimmen, validationConfig msg leer und check auf warning konfiguriert ist.
+	// wenn die beiden constraint Attribute nicht uebereinstimmen, validationConfig msg leer und check auf warning konfiguriert ist.
 	@Test
 	public void existenceConstraint_MSGEmptyAndWarning_Fail() throws Exception{
 		Iom_jObject objBedingung=new Iom_jObject(CONDITIONTEXTCLASS, OID1);
@@ -386,7 +386,7 @@ public class Configuration23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn config auf off gestellt wurde und die Booleans nicht übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn config auf off gestellt wurde und die Booleans nicht uebereinstimmen.
 	@Test
 	public void mandatoryConstraint_BooleanInEqual_CheckOFF(){
 		Iom_jObject iomObjA=new Iom_jObject(CLASSE, OID1);
@@ -432,7 +432,7 @@ public class Configuration23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn config auf Warning eingestellt ist und die boolean nicht übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn config auf Warning eingestellt ist und die boolean nicht uebereinstimmen.
 	@Test
 	public void mandatoryConstraint_BooleanNotEqual_CheckWarning(){
 		Iom_jObject iomObjA=new Iom_jObject(CLASSE, OID1);
@@ -1112,7 +1112,7 @@ public class Configuration23Test {
 	}
 	
 	// Es wird getestet ob die eigens erstellte Fehlermeldung ausgegeben wird, wenn in einer VIEW ausserhalb des Models
-	// ein SetConstraint false ergibt und validationConfig msg definiert ist, jedoch keinen Text enthält.
+	// ein SetConstraint false ergibt und validationConfig msg definiert ist, jedoch keinen Text enthaelt.
 	@Test
 	public void additionalConstraint_SetConstraint_BagOfStructWrongNumber_MSGEmpty(){
 		Iom_jObject iomObjStruct=new Iom_jObject(STRUCTA, null);
@@ -1362,7 +1362,7 @@ public class Configuration23Test {
 		assertEquals("Unique is violated! Values Ralf already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der höheren Hierarchie nicht übereinstimmt und validationConfig.MSG nicht leer ist.
+	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der hoeheren Hierarchie nicht uebereinstimmt und validationConfig.MSG nicht leer ist.
 	@Test
 	public void function_isEnumSubVal_MehrVierIsNotSubValOfEins_MSGNotEmpty_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(CLASSN, OID1);
@@ -1415,8 +1415,8 @@ public class Configuration23Test {
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird
-	// wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der höheren,
-	// Hierarchie nicht übereinstimmt und validationConfig.MSG nicht leer ist und Check auf Warning konfiguriert ist.
+	// wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der hoeheren,
+	// Hierarchie nicht uebereinstimmt und validationConfig.MSG nicht leer ist und Check auf Warning konfiguriert ist.
 	@Test
 	public void function_isEnumSubVal_MSGNotEmptyAndWarning_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(CLASSN, OID1);
@@ -1440,8 +1440,8 @@ public class Configuration23Test {
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird
-	// wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der höheren,
-	// Hierarchie nicht übereinstimmt und validationConfig.MSG leer ist und Check auf Warning konfiguriert ist.
+	// wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der hoeheren,
+	// Hierarchie nicht uebereinstimmt und validationConfig.MSG leer ist und Check auf Warning konfiguriert ist.
 	@Test
 	public void function_MSGEmptyAndWarning_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(CLASSN, OID1);
@@ -1464,7 +1464,7 @@ public class Configuration23Test {
 		assertEquals("Mandatory Constraint Configuration23.Topic.ClassN.Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der höheren Hierarchie nicht übereinstimmt und validationConfig.MSG leer ist.
+	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der hoeheren Hierarchie nicht uebereinstimmt und validationConfig.MSG leer ist.
 	@Test
 	public void function_isEnumSubVal_MehrVierIsNotSubValOfEins_MSGEmpty(){
 		Iom_jObject iomObjA=new Iom_jObject(CLASSN, OID1);
@@ -1744,8 +1744,8 @@ public class Configuration23Test {
 		assertTrue(logger.getWarn().size()==0);
 	}		
 	
-	// wenn die configuration: multiplicity=off und target=off gemacht wird, dürfen keine Fehler und Warnungen ausgegeben werden.
-	// Es müssen 2 Info-Meldungen ausgegeben werden.
+	// wenn die configuration: multiplicity=off und target=off gemacht wird, duerfen keine Fehler und Warnungen ausgegeben werden.
+	// Es muessen 2 Info-Meldungen ausgegeben werden.
 	@Test
 	public void association_TargetAndCardinalityWrong_MultiplicityOFF_TargetOFF(){
 		Iom_jObject iomObjG=new Iom_jObject(CLASSS, OID1);
@@ -1775,8 +1775,8 @@ public class Configuration23Test {
 		assertTrue(logger.getWarn().size()==0);
 	}
 	
-	// wenn die configuration: multiplicity=warning und target=warning configuriert wird, dürfen keine Fehler ausgegeben werden.
-	// Es müssen 2 Warningen ausgegeben werden:
+	// wenn die configuration: multiplicity=warning und target=warning configuriert wird, duerfen keine Fehler ausgegeben werden.
+	// Es muessen 2 Warningen ausgegeben werden:
 	// Info: No object found with OID o5.
 	// Info: t1 should associate 1 to 1 target objects (instead of 2)
 	@Test

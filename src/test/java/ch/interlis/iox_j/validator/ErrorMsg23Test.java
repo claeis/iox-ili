@@ -87,7 +87,7 @@ public class ErrorMsg23Test {
 	}
 	
 	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
-	// wenn die beiden Koordinaten die vordefinierte maximale Zahl des Punktes überschreiten.
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl des Punktes ueberschreiten.
 	@Test
 	public void coordFromPoint_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -113,7 +113,7 @@ public class ErrorMsg23Test {
 	}
 	
 	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
-	// wenn die beiden Koordinaten die vordefinierte maximale Zahl der Linie überschreiten.
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl der Linie ueberschreiten.
 	@Test
 	public void coordFromLine_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -148,7 +148,7 @@ public class ErrorMsg23Test {
 	}
 	
 	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
-	// wenn die beiden Koordinaten die vordefinierte maximale Zahl der Oberfläche überschreiten.
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl der Oberflaeche ueberschreiten.
 	@Test
 	public void coordFromSurface_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -193,7 +193,7 @@ public class ErrorMsg23Test {
 	}
 	
 	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
-	// wenn die beiden Koordinaten die vordefinierte maximale Zahl des Punktes innerhalb der Struktur überschreiten.
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl des Punktes innerhalb der Struktur ueberschreiten.
 	@Test
 	public void coordFromStructAttrPoint_Fail(){
 		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTB, null);

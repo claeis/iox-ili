@@ -120,7 +120,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn 1 Punkt des Innerboundary den Outerboundary berührt.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn 1 Punkt des Innerboundary den Outerboundary beruehrt.
 	@Test
 	public void area2dInnerTouchesOuterboundaryOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -198,7 +198,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er 2 Innerboundaries hat, welche sich nicht berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn er 2 Innerboundaries hat, welche sich nicht beruehren.
 	@Test
 	public void area2dWith2Innerboundaries_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -305,7 +305,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn der Innerboundary den Outerboundary an einem Punkt berührt.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn der Innerboundary den Outerboundary an einem Punkt beruehrt.
 	@Test
 	public void area3dInnerTouchesOuterboundaryOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -395,7 +395,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone sich auf einer Linie an drei Punkten berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone sich auf einer Linie an drei Punkten beruehren.
 	// Senkrecht: x--------x--------x  Beide Punkte liegen aufeinander und habe beide dieselben Segmentpunkte.
 	@Test
 	public void area2dIntersectIn1LineOnSame3Points_Ok(){
@@ -496,7 +496,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone aus einem Kreisbogen sich auf einer Linie an den gleichen Punkten berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone aus einem Kreisbogen sich auf einer Linie an den gleichen Punkten beruehren.
 	// x--------x--------x  Beide Kreisboegen liegen aufeinander und haben beide dieselben Segmentpunkte.
 	@Test
 	public void area3dArcsBothAllSegmentPointsSame_Ok(){
@@ -664,7 +664,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die 2 Innerboundaries nicht berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die 2 Innerboundaries nicht beruehren.
 	@Test
 	public void area3dWith2Innerboundaries_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -789,7 +789,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn der Innerboundary die Outerboundary an einem Punkt berührt. 
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn der Innerboundary die Outerboundary an einem Punkt beruehrt. 
 	@Test
 	public void area3dInnerboundaryTouchesOuterboundaryOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -914,7 +914,7 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die Linien des Polygons sich überschneiden.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die Linien des Polygons sich ueberschneiden.
 	@Test
 	public void area2dOverlapOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -993,7 +993,7 @@ public class Area10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die 2 Innerboundaries überschneiden.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die 2 Innerboundaries ueberschneiden.
 	@Test
 	public void area2dInnerboundariesOverlapEachOther_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1101,7 +1101,7 @@ public class Area10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}	
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich 2 Linien an 4 Ecken überschneiden.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich 2 Linien an 4 Ecken ueberschneiden.
 	@Test
 	public void area3dOverlapOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1192,7 +1192,7 @@ public class Area10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich 2 Innerboundaries des Polygons überschneiden.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich 2 Innerboundaries des Polygons ueberschneiden.
 	@Test
 	public void area3dIntersectionOfInnerboundaries_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1318,7 +1318,7 @@ public class Area10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die Innerboundary mit der Outerboundary überschneidet.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die Innerboundary mit der Outerboundary ueberschneidet.
 	@Test
 	public void area3dInnerboundaryIntersectOuterboundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1409,7 +1409,7 @@ public class Area10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein 2d Polygon erstellt werden kann, wenn der Innerboundary die Outerboundary überschneidet.
+	// Es wird getestet, ob ein 2d Polygon erstellt werden kann, wenn der Innerboundary die Outerboundary ueberschneidet.
 	@Test
 	public void area2dInnerboundaryIntersectOuterboundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1488,7 +1488,7 @@ public class Area10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone sich auf einer Linie an drei Punkten berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone sich auf einer Linie an drei Punkten beruehren.
 	// area1: x--------x--------x
 	// area2: x-----------------x
 	// Beide Areas liegen aufeinander, area2 hat keinen Mittelpunkt.
@@ -1583,7 +1583,7 @@ public class Area10Test {
 		assertEquals("failed to validate AREA Datatypes10.Topic.FlaechenTable.areaWithoutOverlaps2d", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone aus einem Kreisbogen sich auf einer Linie an 1 Punkt nicht berühren.
+	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone aus einem Kreisbogen sich auf einer Linie an 1 Punkt nicht beruehren.
 	// x--------x--------x  Beide Kreisboegen liegen aufeinander und unterscheiden sich nur von 1 Segment der 2.ten Area.
 	@Test
 	public void area3d1AreaArcPointOther_Fail(){
@@ -1653,7 +1653,7 @@ public class Area10Test {
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei einer AREA oder SURFACE die outerboundary
 	// (welche minimal 1 Mal existieren muss) nicht gefunden wird.
-	// Dafür sollte eine klare Fehlermeldung erscheinen:
+	// Dafuer sollte eine klare Fehlermeldung erscheinen:
 	// dass bei einem Surface oder einer Area mindestens ein Outerboundary deklariert sein muss.
 	@Test
 	public void missingOuterBoundaryInArea_False(){

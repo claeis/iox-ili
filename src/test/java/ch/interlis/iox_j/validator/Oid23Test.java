@@ -52,7 +52,7 @@ public class Oid23Test {
 	//######################## SUCCESS ############################//
 	//#############################################################//
 	
-	// Es wird getestet ob die Definition von 2 unterschiedlichen Oid's möglich ist.
+	// Es wird getestet ob die Definition von 2 unterschiedlichen Oid's moeglich ist.
 	@Test
 	public void differentOid_Ok() throws Exception {
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
@@ -72,7 +72,7 @@ public class Oid23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob die Definition eines Objectes welches die Oid über eine Referenz einer Association enthält, möglich ist.
+	// Es wird getestet ob die Definition eines Objectes welches die Oid ueber eine Referenz einer Association enthaelt, moeglich ist.
 	@Test
 	public void definitionOfEmbeddedAssociatianWithoutId_Ok(){
 		final String OBJ_B1="b1";
@@ -95,7 +95,7 @@ public class Oid23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob die Definition einer Association ohne Oid möglich ist.
+	// Es wird getestet ob die Definition einer Association ohne Oid moeglich ist.
 	@Test
 	public void associatianWithoutId_Ok(){
 		final String OBJ_B1="b1";
@@ -121,7 +121,7 @@ public class Oid23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob die Definition einer Association mit einer Oid möglich ist.
+	// Es wird getestet ob die Definition einer Association mit einer Oid moeglich ist.
 	@Test
 	public void associatianWithId_Ok(){
 		final String OBJ_B1="b1";
@@ -147,7 +147,7 @@ public class Oid23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob die Definition einer Association mit einer uuoid als Oid möglich ist.
+	// Es wird getestet ob die Definition einer Association mit einer uuoid als Oid moeglich ist.
 	@Test
 	public void associatianWithOidUUOID_Ok(){
 		final String OBJ_B1="b1";
@@ -197,7 +197,7 @@ public class Oid23Test {
 	//######################### FAIL ##############################//
 	//#############################################################//
 	
-	// Es wird getestet ob die Definition von zwei gleichen Klassen und oids möglich ist.
+	// Es wird getestet ob die Definition von zwei gleichen Klassen und oids moeglich ist.
 	@Test
 	public void duplicateOidsOfSameTable_Fail() throws Exception {
 		final String OBJ_B1="b1";
@@ -219,7 +219,7 @@ public class Oid23Test {
 		assertEquals("OID b1 of object Oid23.Topic.ClassB already exists in CLASS Oid23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob die Definition von einer gleichen Oid in verschiedenen Tables möglich ist.
+	// Es wird getestet ob die Definition von einer gleichen Oid in verschiedenen Tables moeglich ist.
 	@Test
 	public void duplicateOidDifferentTable_Fail() throws Exception {
 		final String OBJ_B1="b1";
@@ -241,7 +241,7 @@ public class Oid23Test {
 		assertEquals("OID b1 of object Oid23.Topic.ClassC already exists in CLASS Oid23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob die Definition einer undefinierten oid welche zu einer Klasse refereziert wird, möglich sein kann.
+	// Es wird getestet ob die Definition einer undefinierten oid welche zu einer Klasse refereziert wird, moeglich sein kann.
 	@Test
 	public void undefinedOid_Fail(){
 		final String OBJ_B1="b1";
