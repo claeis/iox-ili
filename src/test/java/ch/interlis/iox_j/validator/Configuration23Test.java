@@ -1806,7 +1806,7 @@ public class Configuration23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 		assertTrue(logger.getWarn().size()==2);
-		assertEquals("t1 should associate 1 to 1 target objects (instead of 2)",logger.getWarn().get(0).getEventMsg());
-		assertEquals("No object found with OID o5 in basket b1.",logger.getWarn().get(1).getEventMsg());
+		assertEquals("No object found with OID o5 in basket b1.",logger.getWarn().get(0).getEventMsg());
+		assertEquals("t1 should associate 1 to 1 target objects (instead of 2)",logger.getWarn().get(1).getEventMsg());
 	}
 }
