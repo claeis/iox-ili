@@ -25,7 +25,7 @@ import ch.interlis.iox_j.ObjectEvent;
 
 public class CsvWriter implements ch.interlis.iox.IoxWriter {
 	// td
-	private static TransferDescription td=null;
+	private TransferDescription td=null;
 	// state
     private static final int START=0;
     private static final int INSIDE_LINEFEED=1;
@@ -33,25 +33,19 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
     private static final int END_LINEFEED=3;
     private static final int END_CARRIAGERETURN=4;
 	// csv
-	private static final String HEADER_PRESENT="present";
-	private static final String HEADER_ABSENT="absent";
-	private static final char DEFAULT_DELIMITER='\"';
-	private static final char DEFAULT_RECORD_DELIMITER=',';
+	private static final char DEFAULT_VALUE_DELIMITER='\"';
+	private static final char DEFAULT_VALUE_SEPARATOR=',';
 	private static final char NEWLINE_CARRIAGERETURN='\r';
 	private static final char NEWLINE_LINEFEED='\n';
 	// writer
 	private BufferedWriter writer=null;
 	// defined by user
-	private static String userDefined_Header=null;
-	private static String userDefined_Delimiter=null;
-	private static String userDefined_Record_Delimiter=null;
+	private boolean doHeader=true;
 	// current delimiter
-	private static char currentDelimiter;
-	private static char currentRecordDelimiter;
+	private Character currentValueDelimiter=DEFAULT_VALUE_DELIMITER;
+	private char currentValueSeparator=DEFAULT_VALUE_SEPARATOR;
 	// first line of file
 	private boolean firstLineInFile=true; // could be header/first attrValues
-	// header
-	private boolean headerIsAlreadyDefined=false; // set header once
 	private String[] headerAttrNames=null;
 
 	/** create new CsvWriter
@@ -118,7 +112,7 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 	 * @param iomObj
 	 * @return
 	 */
-	private String[] getValidAttributes(Viewable viewable, IomObject iomObj){
+	private String[] getAttributeNames(Viewable viewable, IomObject iomObj){
 		// iliAttributes
 		String[] attrs=new String[iomObj.getattrcount()];
 		int count=0;
@@ -128,6 +122,7 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 				attrs[count]=attribute;
 				count+=1;
 			}
+			java.util.Arrays.sort(attrs);
 		}else {
 			Iterator viewableIter=viewable.getAttributes();
 			while(viewableIter.hasNext()) {
@@ -135,10 +130,8 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 				if(attrObj instanceof LocalAttribute) {
 					LocalAttribute localAttr= (LocalAttribute)attrObj;
 					String iliAttrName=localAttr.getName();
-					if(iomObj.getattrvaluecount(iliAttrName)>0) {
-						attrs[count]=localAttr.getName();
-						count+=1;
-					}
+					attrs[count]=iliAttrName;
+					count+=1;
 				}
 			}
 			
@@ -190,97 +183,39 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 	public void write(IoxEvent event) throws IoxException {
 		if(event instanceof StartTransferEvent){
 		}else if(event instanceof StartBasketEvent){
-			if(userDefined_Delimiter==null) {
-				currentDelimiter=CsvWriter.DEFAULT_DELIMITER;
-			}else {
-				if(userDefined_Delimiter.length()>1) {
-				   throw new IoxException("userDefined delimiter "+userDefined_Delimiter+" not valid char");
-				}
-				currentDelimiter=userDefined_Delimiter.charAt(0);
-			}
-			if(userDefined_Record_Delimiter==null) {
-				currentRecordDelimiter=CsvWriter.DEFAULT_RECORD_DELIMITER;
-			}else {
-				if(userDefined_Record_Delimiter.length()>1) {
-					throw new IoxException("userDefined record delimiter "+userDefined_Record_Delimiter+" not valid char");
-				}
-				currentRecordDelimiter=userDefined_Record_Delimiter.charAt(0);
-			}
 		}else if(event instanceof ObjectEvent){
 			ObjectEvent obj=(ObjectEvent) event;
 			IomObject iomObj=(IomObject)obj.getIomObject();
-			if(td!=null) {
-				// check if class exists in model/s
+			// first obj?
+			if(headerAttrNames==null) {
+				// get list of attr names
 				Viewable resultViewableHeader=findViewable(iomObj);
-				if(resultViewableHeader!=null) {
-	            	if(userDefinedHeaderIsSet() && !headerIsAlreadyDefined) {
-	            		headerAttrNames=getValidAttributes(resultViewableHeader, iomObj);
-	    				try {
-							writeHeader(headerAttrNames);
-							headerIsAlreadyDefined=true;
-							firstLineInFile=false;
-						} catch (IOException e) {
-							throw new IoxException("attributes in model not found",e);
-						}
-	            	}
-	            	// content
-	            	headerAttrNames=getValidAttributes(resultViewableHeader, iomObj);
-	            	 if(headerAttrNames[0]==null) {
-	            		 throw new IoxException("attrnames of "+iomObj.getobjecttag()+" not valid");
-	            	  }
-	            	// attrvalues of attrnames (header set/ header not set)
-	            	String[] validAttrValues=getValidAttrValues(headerAttrNames, iomObj);
-	            	if(validAttrValues[0]==null) {
-	            		throw new IoxException("attrvalues of "+iomObj.toString()+" not equal to "+headerAttrNames);
-	            	}
-	            	try {
-	            		if(!firstLineInFile) {
-	            			writer.newLine();
-	            		}else {
-	            			firstLineInFile=false;
-	            		}
-	            		writeLine(validAttrValues);
-	            	} catch (IOException e) {
-						throw new IoxException(e);
-	            	}
-	            }else {
+				if(td!=null && resultViewableHeader==null) {
 	            	throw new IoxException("class "+iomObj.getobjecttag()+" in model not found");
-	            }
-			}else {
-				// no model set
-				// check if class exists in model/s
-            	if(userDefinedHeaderIsSet() && !headerIsAlreadyDefined) {
-            		headerAttrNames=getValidAttributes(null, iomObj);
-    				try {
+				}
+	    		headerAttrNames=getAttributeNames(resultViewableHeader, iomObj);
+	    		if(doHeader) {
+					try {
 						writeHeader(headerAttrNames);
-						headerIsAlreadyDefined=true;
-						firstLineInFile=false;
 					} catch (IOException e) {
 						throw new IoxException(e);
 					}
-            	}
-            	if(!userDefinedHeaderIsSet() && !headerIsAlreadyDefined) {
-            		headerAttrNames=getValidAttributes(null, iomObj);
-            		if(headerAttrNames==null) {
-            			headerIsAlreadyDefined=true;
-            		}
-            	}
-            	// content
-            	String[] validAttrValues=getValidAttrValues(headerAttrNames, iomObj);
-            	if(validAttrValues[0]==null) {
-            		throw new IoxException("attrnames of "+iomObj.toString()+" not equal to "+headerAttrNames);
-            	}
-            	try {
-            		if(!firstLineInFile) {
-            			writer.newLine();
-            		}else {
-            			firstLineInFile=false;
-            		}
-	            	writeLine(validAttrValues);
-            	} catch (IOException e) {
-					throw new IoxException(e);
-            	}
-            }
+        			firstLineInFile=false;
+	    		}
+			}
+        	String[] validAttrValues=getAttributeValues(headerAttrNames, iomObj);
+        	try {
+        		if(!firstLineInFile) {
+        			writer.newLine();
+        		}else {
+        			firstLineInFile=false;
+        		}
+        		writeLine(validAttrValues);
+        	} catch (IOException e) {
+				throw new IoxException(e);
+        	}
+        	
+        	
 		}else if(event instanceof EndBasketEvent){
 		}else if(event instanceof EndTransferEvent){
 			close();
@@ -290,38 +225,17 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 	}
     
     /** get attribute values which are valid to write to file
-     * @param validHeaderAttrs
+     * @param attrNames
      * @param currentIomObject
      * @return
      */
-    private String[] getValidAttrValues(String[] validHeaderAttrs, IomObject currentIomObject) {
-    	String[] attrValues=null;
-    	String attrValue=null;
-    	// td!=null && header is defined
-    	if(headerIsAlreadyDefined) {
-    		int count=0;
-    		attrValues=new String[validHeaderAttrs.length];
-	    	for (int i=0;i<validHeaderAttrs.length;i++) {
-	    		attrValue=currentIomObject.getattrvalue(validHeaderAttrs[i]);
-	    		if(attrValue!=null) {
-	    			attrValues[count]=attrValue;
-	    			count+=1;
-	    		}
-	    	}
-	    	return attrValues;
-    	}else {
-    		// td!=null && no header defined
-    		int count=0;
-    		attrValues=new String[currentIomObject.getattrcount()];
-	    	for (int i=0;i<currentIomObject.getattrcount();i++) {
-	    		attrValue=currentIomObject.getattrvalue(currentIomObject.getattrname(i));
-	    		if(attrValue!=null) {
-	    			attrValues[count]=attrValue;
-	    			count+=1;
-	    		}
-	    	}
-	    	return attrValues;
+    private String[] getAttributeValues(String[] attrNames, IomObject currentIomObject) {
+    	String[] attrValues=new String[attrNames.length];
+    	for (int i=0;i<attrNames.length;i++) {
+    		String attrValue=currentIomObject.getattrvalue(attrNames[i]);
+			attrValues[i]=attrValue;
     	}
+    	return attrValues;
 	}
 
     /** write header attribute names to file
@@ -332,10 +246,12 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
     	boolean firstName=true;
     	for (String name : attrNames) {
     		if(!firstName){
-        		writer.write(currentRecordDelimiter);
+        		writer.write(currentValueSeparator);
         	}
     		firstName=false;
-            writer.write(quoteformatter(name));
+        	if(currentValueDelimiter!=null)writer.write(currentValueDelimiter);
+            writer.write(escapequotes(name));
+        	if(currentValueDelimiter!=null)writer.write(currentValueDelimiter);
         }
 	}
 
@@ -343,10 +259,17 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 	 * @param value
 	 * @return
 	 */
-	private String quoteformatter(String value) {
+	private String escapequotes(String value) {
+		if(value==null) {
+			return "";
+		}
+		if(currentValueDelimiter==null) {
+			return value;
+		}
+		String quote=currentValueDelimiter.toString();
         String result = value;
-        if (result.contains("\"")) {
-            result = result.replace("\"", "\"\"");
+        if (result.contains(quote)) {
+            result = result.replace(quote, quote+quote);
         }
         return result;
     }
@@ -360,13 +283,13 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
         boolean first = true;
         for (String value : attrValues){
             if (!first) {
-                writer.write(currentRecordDelimiter);
+                writer.write(currentValueSeparator);
             }
         	// iterate through each char
-        	writer.write(currentDelimiter);
-        	String newValue=quoteformatter(value);
+        	if(currentValueDelimiter!=null)writer.write(currentValueDelimiter);
+        	String newValue=escapequotes(value);
             writeChars(newValue);
-            writer.write(currentDelimiter);
+        	if(currentValueDelimiter!=null)writer.write(currentValueDelimiter);
             first = false;
         }
     }
@@ -424,7 +347,7 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 	 * @param td
 	 */
 	public void setModel(TransferDescription td) {
-		CsvWriter.td=td;
+		this.td=td;
 	}
 	
 	/** close writer and delete saved data
@@ -439,14 +362,6 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 			}
 			writer=null;
 		}
-		userDefined_Record_Delimiter=null;
-		userDefined_Delimiter=null;
-		headerAttrNames=null;
-		userDefined_Header=null;
-		currentDelimiter='\0';
-		currentRecordDelimiter='\0';
-		td=null;
-		
 	}
 	
 	@Override
@@ -470,52 +385,32 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 	/** get delimiter of user set
 	 * @return
 	 */
-	public String getDelimiter() {
-		if(userDefined_Delimiter!=null){
-			return userDefined_Delimiter;
-		}
-		return null;
+	public Character getValueDelimiter() {
+		return currentValueDelimiter;
 	}
 	
-	/** user set delimiter
-	 * @param delimiter
+	/** set value delimiter
+	 * @param delimiter maybe null to write without delimiter
 	 */
-	public void setDelimiter(String delimiter) {
-		CsvWriter.userDefined_Delimiter = delimiter;
+	public void setValueDelimiter(Character delimiter) {
+		currentValueDelimiter = delimiter;
 	}
 	
-	/** get record delimiter
+	/** get separator
 	 * @return
 	 */
-	public String getRecordDelimiter() {
-		if(userDefined_Record_Delimiter!=null){
-			return userDefined_Delimiter;
-		}
-		return null;
+	public char getValueSeparator() {
+		return currentValueSeparator;
 	}
-	
-	public void setRecordDelimiter(String recordDelimiter) {
-		CsvWriter.userDefined_Record_Delimiter = recordDelimiter;
+	public void setValueSeparator(char separator) {
+		currentValueSeparator=separator;
 	}
-	
-	private static Boolean userDefinedHeaderIsSet() throws IoxException{
-		if(userDefined_Header!=null){
-			if(userDefined_Header.contains(HEADER_PRESENT)){
-				return true;
-			}else if(userDefined_Header.contains(HEADER_ABSENT)){
-				return false;
-			}else{
-				throw new IoxException("expected present or absent, unexpected "+userDefined_Header);
-			}
-		}
-		return false;
-	}
-	
+		
 	/**
 	 * set header is present or header is absent.
 	 * @param headerState
 	 */
-	public void setHeader(String headerState){
-		CsvWriter.userDefined_Header = headerState;
+	public void setWriteHeader(boolean headerState){
+		doHeader = headerState;
 	}
 }

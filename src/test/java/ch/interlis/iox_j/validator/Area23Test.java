@@ -2685,7 +2685,7 @@ public class Area23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
+		assertEquals(1,logger.getErrs().size());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei einer AREA oder SURFACE die outerboundary

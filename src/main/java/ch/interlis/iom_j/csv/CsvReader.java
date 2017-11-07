@@ -26,7 +26,7 @@ import ch.interlis.iox_j.IoxIliReader;
 
 public class CsvReader implements IoxReader,IoxIliReader {
 	// state
-	private static int state;
+	private int state;
 	private static final int START=0;
 	private static final int INSIDE_TRANSFER=1;
 	private static final int INSIDE_BASKET=2;
@@ -52,14 +52,14 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	private IoxFactoryCollection factory;
 	private FileReader inputReader=null;
 	private FileReader inputReaderBasket=null;
-	private static TransferDescription td=null;
+	private TransferDescription td=null;
 	private File inputFile=null;
 	private int increasingNumber=1;
 	private BufferedReader reader = null;
 	private BufferedReader basketReader = null;
-	private static String headerDefinition=null;
-	private static String userDefined_Delimiter=null;
-	private static String userDefined_Record_Delimiter=null;
+	private String headerDefinition=null;
+	private String userDefined_Delimiter=null;
+	private String userDefined_Record_Delimiter=null;
 	private List<String> headerAttributes=new ArrayList<String>();
 	private int valueCountOfFirstLine=0;
 	private boolean skipLine=false;
@@ -68,8 +68,8 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	private String topicName="Topic";
 	private String className="Class"+increasingNumber;
 	// delimiter
-	private static char currentDelimiter;
-	private static char currentRecordDelimiter;
+	private char currentDelimiter;
+	private char currentRecordDelimiter;
 	// ili elements
 	private HashMap<Viewable, Topic> iliTopics=null;
 	private HashMap<Viewable, Model> iliClasses=null;
@@ -94,7 +94,7 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	}
 	
 	public void setModel(TransferDescription td){
-		CsvReader.td=td;
+		this.td=td;
 	}
 
 	/**
@@ -403,7 +403,7 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	 * @throws IOException
 	 * @throws IoxException
 	 */
-	private static List<String> readChars(BufferedReader bufferedReader, char separator, char limiter) throws IOException, IoxException{
+	private List<String> readChars(BufferedReader bufferedReader, char separator, char limiter) throws IOException, IoxException{
         List<String> result = new ArrayList<String>();
         StringBuffer currentValue = new StringBuffer();
         // buffered reader is empty/null/!has next
@@ -560,8 +560,8 @@ public class CsvReader implements IoxReader,IoxIliReader {
 		}
 		userDefined_Delimiter=DEFAULT_DELIMITER;
 		userDefined_Record_Delimiter=DEFAULT_RECORD_DELIMITER;
-		CsvReader.currentDelimiter=DEFAULT_DELIMITER.charAt(0);
-		CsvReader.currentRecordDelimiter=DEFAULT_RECORD_DELIMITER.charAt(0);
+		currentDelimiter=DEFAULT_DELIMITER.charAt(0);
+		currentRecordDelimiter=DEFAULT_RECORD_DELIMITER.charAt(0);
 		try {
 			inputReader.close();
 		} catch (IOException e) {
@@ -590,7 +590,7 @@ public class CsvReader implements IoxReader,IoxIliReader {
 		this.factory=factory;
 	}
 	
-	private static Boolean isHeaderDefined() throws IoxException{
+	private Boolean isHeaderDefined() throws IoxException{
 		if(headerDefinition!=null){
 			if(headerDefinition.contains(HEADER_PRESENT)){
 				return true;
@@ -608,7 +608,7 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	 * @param headerState
 	 */
 	public void setHeader(String headerState){
-		CsvReader.headerDefinition = headerState;
+		headerDefinition = headerState;
 	}
 	
 	private String getDelimiter() throws IoxException{
@@ -623,7 +623,7 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	 * set user defined delimiter.
 	 * @param definition
 	 */
-	public static void setDelimiter(String definition){
+	public void setDelimiter(String definition){
 		userDefined_Delimiter = definition;
 	}
 	
@@ -640,6 +640,6 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	 * @param definition
 	 */
 	public void setRecordDelimiter(String definition){
-		CsvReader.userDefined_Record_Delimiter = definition;
+		userDefined_Record_Delimiter = definition;
 	}
 }

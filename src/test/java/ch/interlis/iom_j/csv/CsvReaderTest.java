@@ -459,7 +459,7 @@ public class CsvReaderTest {
 	@Test
     public void setUserDefinedDelimiter_Ok() throws IoxException, FileNotFoundException{
 		CsvReader reader=new CsvReader(new File(TEST_IN,"Delimiter.csv"));
-		CsvReader.setDelimiter("%");
+		reader.setDelimiter("%");
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event = reader.read();
@@ -480,7 +480,7 @@ public class CsvReaderTest {
     public void setUserDefinedRecordDelimiterAndDelimiter_Ok() throws IoxException, FileNotFoundException{
 		CsvReader reader=new CsvReader(new File(TEST_IN,"RecordDelimiterAndDelimiter.csv"));
 		reader.setRecordDelimiter("&");
-		CsvReader.setDelimiter("%");
+		reader.setDelimiter("%");
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event = reader.read();
@@ -628,6 +628,7 @@ public class CsvReaderTest {
 		ili2cConfig.addFileEntry(fileEntry);
 		FileEntry fileEntry2=new FileEntry(TEST_IN+"/StadtModel.ili", FileEntryKind.ILIMODELFILE); // third input model
 		ili2cConfig.addFileEntry(fileEntry2);
+		ili2cConfig.setAutoCompleteModelList(false);
 		tdM=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(tdM);
 		
