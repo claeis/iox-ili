@@ -174,7 +174,7 @@ public class Datatypes10Test {
 	@Test
 	public void text2ZeichensatzContentOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("text2", "ִגהאבזַחֹךכטימןלםׁסײפצעףÜûüשת");
+		objTest.setattrvalue("text2", "\u00c4\u00e2\u00e4\u00e0\u00e1\u00e6\u00c7\u00e7\u00c9\u00ea\u00eb\u00e8\u00e9\u00ee\u00ef\u00ec\u00ed\u00d1\u00f1\u00d6\u00f4\u00f6\u00f2\u00f3\u00dc\u00fb\u00fc\u00f9\u00fa");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
