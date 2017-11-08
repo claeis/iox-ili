@@ -3,6 +3,7 @@ package ch.interlis.iom_j.itf.impl;
 import static org.junit.Assert.*;
 import java.io.File;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -28,6 +29,7 @@ import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
 import ch.interlis.iox.*;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 
+@Ignore("review of tests required")
 public class ItfAreaLV95Test {
 
 	private TransferDescription td=null;

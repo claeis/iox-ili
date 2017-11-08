@@ -452,8 +452,14 @@ import java.util.ArrayList;
 			}
 			ret.append(" {");
 			String sep="";
-			for(i=0;i<obj.getattrcount();i++){
-			   String propName=obj.getattrname(i);
+			int attrc = obj.getattrcount();
+			String propNames[]=new String[attrc];
+			for(i=0;i<attrc;i++){
+				   propNames[i]=obj.getattrname(i);
+			}
+			java.util.Arrays.sort(propNames);
+			for(i=0;i<attrc;i++){
+			   String propName=propNames[i];
 				int propc=obj.getattrvaluecount(propName);
 				if(propc>0){
 					ret.append(sep+propName);

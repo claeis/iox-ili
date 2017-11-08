@@ -2,6 +2,7 @@ package ch.interlis.iom_j.itf.impl;
 
 import static org.junit.Assert.*;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.vividsolutions.jts.geom.Polygon;
@@ -126,7 +127,28 @@ public class ItfAreaLinetable2PolygonTest {
 	@Test
 	public void testZweiAneinanderliegendePolygone() throws IoxException {
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(geomAttr);
-		
+/*
+ MULTISURFACE {surface SURFACE {
+	boundary BOUNDARY {
+		polyline POLYLINE {sequence SEGMENTS {segment [
+			COORD {C1 110.0, C2 110.0}, 
+			COORD {C1 110.0, C2 140.0}, 
+			COORD {C1 120.0, C2 140.0}, 
+			COORD {C1 150.0, C2 140.0}, falscher Stuetzpunkt (zuviel)
+			COORD {C1 150.0, C2 110.0}, falscher Stuetzpunkt (zuviel)
+			COORD {C1 120.0, C2 110.0}, 
+			COORD {C1 110.0, C2 110.0}]}}}}}
+
+MULTISURFACE {surface SURFACE {
+	boundary BOUNDARY {
+		polyline POLYLINE {sequence SEGMENTS {segment [
+			COORD {C1 120.0, C2 110.0}, 
+			COORD {C1 120.0, C2 140.0}, 
+			COORD {C1 150.0, C2 140.0}, 
+			COORD {C1 150.0, C2 110.0}, 
+			COORD {C1 120.0, C2 110.0}]}}}}}
+	
+ */
 		
 		IomObject polyline=newPolyline();
 		addCoord(polyline,120.0,  110.0); 

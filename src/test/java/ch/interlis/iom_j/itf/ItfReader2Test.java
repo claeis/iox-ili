@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import org.junit.Before;
 import org.junit.ComparisonFailure;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ch.ehi.basics.logging.EhiLogger;
@@ -132,6 +133,7 @@ public class ItfReader2Test {
 		}
 	}
 	@Test
+	@Ignore("not yet implemented")
 	public void testSURFACEnoMainObj() throws Iox2jtsException, IoxException {
 		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceNoMainObj.itf"),false);
 		reader.setModel(td);
@@ -157,6 +159,7 @@ public class ItfReader2Test {
 		}
 	}
 	@Test
+	@Ignore("not yet implemented")
 	public void testSURFACEnoMainTable() throws Iox2jtsException, IoxException {
 		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceNoMainTable.itf"),false);
 		reader.setModel(td);
@@ -252,6 +255,7 @@ public class ItfReader2Test {
 		}
 	}
 	@Test
+	@Ignore("not yet implemented")
 	public void testAREAnoMainObj() throws Iox2jtsException, IoxException {
 		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/AreaNoMainObj.itf"),false);
 		reader.setModel(td);
@@ -277,6 +281,7 @@ public class ItfReader2Test {
 		}
 	}
 	@Test
+	@Ignore("not yet implemented")
 	public void testAREAnoMainTable() throws Iox2jtsException, IoxException {
 		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/AreaNoMainTable.itf"),false);
 		reader.setModel(td);
