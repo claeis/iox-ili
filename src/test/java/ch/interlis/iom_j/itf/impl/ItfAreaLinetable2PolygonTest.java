@@ -284,6 +284,7 @@ public class ItfAreaLinetable2PolygonTest {
 	@Test
 	public void testFlaecheOhneRef() throws IoxException {
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(geomAttr);
+		builder.setAllowItfAreaHoles(false);
 		String mainObjectTid="10";
 		
 		IomObject polyline=newPolyline();
@@ -575,6 +576,7 @@ public class ItfAreaLinetable2PolygonTest {
 		String geomAttr="_itf_geom_TableA";
 		String tableName="Test1.TopicA.TableA_Form";
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(geomAttr);
+		builder.setAllowItfAreaHoles(false);
 		String mainObjectTid="10";
 		
 		IomObject polyline=newPolyline();
