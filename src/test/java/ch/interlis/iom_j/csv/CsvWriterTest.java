@@ -964,7 +964,7 @@ public class CsvWriterTest {
 		}
 		BufferedReader reader=new BufferedReader(new FileReader(new File(TEST_IN,"setDelimiter_setRecordDelimiter_ModelSet_DelimitersInText_Ok.csv")));
 		String line=reader.readLine();
-		assertEquals("\\10\\\\\\B\\\\ern\\\\\\Schweiz\\",line);
+		assertEquals("\\10\\\\\\B\\\\ern\\\\\\Schweiz\\",line); // FIXME CsvReader fails
 		assertEquals(null,reader.readLine());
 		reader.close();
 		reader=null;
@@ -1008,7 +1008,7 @@ public class CsvWriterTest {
 	    	}
 		}
 		BufferedReader reader=new BufferedReader(new FileReader(new File(TEST_IN,"setDelimiter_DelimiterInText_Ok.csv")));
-       	assertEquals("|10|,|Bern|,|Schw||eiz|", reader.readLine());
+       	assertEquals("|10|,|Bern|,|Schw||eiz|", reader.readLine()); // FIXME CsvReader fails
        	assertEquals(null, reader.readLine());
 		reader.close();
 		reader=null;
