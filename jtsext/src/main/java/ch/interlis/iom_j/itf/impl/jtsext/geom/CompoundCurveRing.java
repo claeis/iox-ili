@@ -236,10 +236,17 @@ public class CompoundCurveRing extends LinearRing {
 	    			seg0=top;
 	    		}
 	    		Coordinate[] coords=new Coordinate[4];
-	    		coords[0]=(seg0 instanceof StraightSegment)?seg0.getStartPoint():((ArcSegment) seg0).getDirectionPt(false,0.1);
-	    		coords[1]=seg0.getEndPoint();
-	    		coords[2]=(seg1 instanceof StraightSegment)?seg1.getEndPoint():((ArcSegment) seg1).getDirectionPt(true,0.1);
-	    		coords[3]=coords[0];
+	    		if(seg0.getStartPoint().equals2D(seg1.getEndPoint())) {
+		    		coords[0]=(seg0 instanceof StraightSegment)?seg0.getStartPoint():((ArcSegment) seg0).getDirectionPt(false,0.1);
+		    		coords[1]=seg0.getEndPoint();
+		    		coords[2]=(seg1 instanceof StraightSegment)?seg1.getStartPoint():((ArcSegment) seg1).getDirectionPt(true,0.1);
+		    		coords[3]=coords[0];
+	    		}else {
+		    		coords[0]=(seg0 instanceof StraightSegment)?seg0.getStartPoint():((ArcSegment) seg0).getDirectionPt(false,0.1);
+		    		coords[1]=seg0.getEndPoint();
+		    		coords[2]=(seg1 instanceof StraightSegment)?seg1.getEndPoint():((ArcSegment) seg1).getDirectionPt(true,0.1);
+		    		coords[3]=coords[0];
+	    		}
 	    		return CGAlgorithms.isCCW(coords);
 	        }
 	    }

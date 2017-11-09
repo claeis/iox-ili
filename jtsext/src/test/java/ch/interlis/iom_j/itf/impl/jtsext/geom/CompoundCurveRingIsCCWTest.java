@@ -51,6 +51,20 @@ public class CompoundCurveRingIsCCWTest {
 		assertEquals(false,CompoundCurveRing.isCCW(ring));
 	}
 	@Test
+	public void isCWdreieck() {
+		JtsextGeometryFactory fact=new JtsextGeometryFactory();
+		ArrayList<CurveSegment> segs=new ArrayList<CurveSegment>();
+		
+		addCoord(segs,110.0,  110.0); // hoechstes Segment
+		addCoord(segs,110.0,  140.0); 
+		addCoord(segs,120.0,  140.0); 
+		addCoord(segs,110.0,  110.0);
+
+		CompoundCurve line=new CompoundCurve(segs,fact);
+		CompoundCurveRing ring=fact.createCompoundCurveRing(line);
+		assertEquals(false,CompoundCurveRing.isCCW(ring));
+	}
+	@Test
 	public void isCWerstesSegmentIstHoechsteGerade() {
 		JtsextGeometryFactory fact=new JtsextGeometryFactory();
 		ArrayList<CurveSegment> segs=new ArrayList<CurveSegment>();
@@ -77,6 +91,20 @@ public class CompoundCurveRingIsCCWTest {
 		addCoord(segs,110.0,  140.0); 
 		addCoord(segs,110.0,  110.0);
 		addCoord(segs,120.0,  110.0); 
+
+		CompoundCurve line=new CompoundCurve(segs,fact);
+		CompoundCurveRing ring=fact.createCompoundCurveRing(line);
+		assertEquals(true,CompoundCurveRing.isCCW(ring));
+	}
+	@Test
+	public void isCCWDreieck() {
+		JtsextGeometryFactory fact=new JtsextGeometryFactory();
+		ArrayList<CurveSegment> segs=new ArrayList<CurveSegment>();
+		
+		addCoord(segs,110.0,  110.0); // hoechstes Segment
+		addCoord(segs,120.0,  140.0); 
+		addCoord(segs,110.0,  140.0); 
+		addCoord(segs,110.0,  110.0);
 
 		CompoundCurve line=new CompoundCurve(segs,fact);
 		CompoundCurveRing ring=fact.createCompoundCurveRing(line);
