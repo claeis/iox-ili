@@ -448,7 +448,7 @@ public class AdditionalConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei die Funktion: areArea,

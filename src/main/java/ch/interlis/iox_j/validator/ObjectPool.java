@@ -31,7 +31,7 @@ public class ObjectPool {
 	private boolean doItfOidPerTable;
 	private HashMap<String,Object> tag2class;
 	private ObjectPoolManager objPoolManager=null;
-	Map<String, Map<ObjectPoolKey, IomObject>> collectionOfBaskets = new HashMap<String, Map<ObjectPoolKey, IomObject>>();
+	Map<String, Map<ObjectPoolKey, IomObject>> collectionOfBaskets = new java.util.TreeMap<String, Map<ObjectPoolKey, IomObject>>();
 	
 	public ObjectPool(boolean doItfOidPerTable, IoxLogging errs, LogEventFactory errFact, HashMap<String,Object> tag2class,ObjectPoolManager objPoolManager){
 		this.doItfOidPerTable = doItfOidPerTable;

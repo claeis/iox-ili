@@ -1359,7 +1359,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der hoeheren Hierarchie nicht uebereinstimmt und validationConfig.MSG nicht leer ist.
@@ -1411,7 +1411,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o2", logger.getWarn().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird
@@ -1806,7 +1806,7 @@ public class Configuration23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 		assertTrue(logger.getWarn().size()==2);
-		assertEquals("No object found with OID o5 in basket b1.",logger.getWarn().get(0).getEventMsg());
-		assertEquals("t1 should associate 1 to 1 target objects (instead of 2)",logger.getWarn().get(1).getEventMsg());
+		assertEquals("t1 should associate 1 to 1 target objects (instead of 2)",logger.getWarn().get(0).getEventMsg());
+		assertEquals("No object found with OID o5 in basket b1.",logger.getWarn().get(1).getEventMsg());
 	}
 }

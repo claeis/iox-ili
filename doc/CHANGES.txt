@@ -9,6 +9,7 @@ iox-ili 1.20.0 (2017-11-xx)
 -----------------------------
 - implement MultiPoint wkb conversion
 - fix itf AREA building when a top horizontal straight line
+- keep objects ordered, so that reruns of tests give the same ordering of messages
 
 iox-ili 1.19.8 (2017-10-20)
 -----------------------------

@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.btree.BTree;
@@ -20,7 +21,7 @@ import ch.ehi.iox.objpool.impl.btree.BTreeCursor;
 
 public class ObjPoolImpl2<K,V> implements Map<K, V> {
 	
-	private HashMap<K, Long> tree= null;
+	private TreeMap<K, Long> tree= null;
 	private RandomAccessFile outFile=null;
 	private java.io.File outFilename=null;
 	private Serializer valueSerializer=null;
@@ -30,7 +31,7 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 		try{
 			objectPoolManager=objectPoolManager1;
 			valueSerializer=valueSerializer1;
-			tree= new HashMap<K, Long>();
+			tree= new TreeMap<K, Long>();
 			outFilename=ObjectPoolManager.getCacheTmpFilename();
 			outFile=new RandomAccessFile(outFilename, "rw");
 		}catch(IOException e){
