@@ -165,84 +165,10 @@ class EdgeRing {
   public boolean isHole()
   {
     LinearRing ring = getRing();
-    if(ring instanceof CompoundCurveRing) {
-    	if(false) {
-    		// find ring orientation
-        	ArrayList<CompoundCurve> lines = ((CompoundCurveRing)ring).getLines();
-    		ArrayList<Coordinate> coordv=new ArrayList<Coordinate>();
-        	for(CompoundCurve line:lines) {
-        		for(CurveSegment seg:line.getSegments()) {
-        			Coordinate coord=null;
-        			coord = seg.getStartPoint();
-        			coordv.add(coord);
-        			if(seg instanceof ArcSegment){
-        				coord = ((ArcSegment) seg).getMidPoint();
-        				coordv.add(coord);
-        			}
-        		}
-        	}
-    		// close ring
-    		coordv.add(coordv.get(0));
-    		Coordinate[] coords=coordv.toArray(new Coordinate[coordv.size()]);
-    	    return CGAlgorithms.isCCW(coords);
-    		
-    	}
-        if(true) {
-    		ArrayList<CurveSegment> segs=new ArrayList<CurveSegment>();
-        	for(CompoundCurve line:((CompoundCurveRing)ring).getLines()) {
-    			segs.addAll(line.getSegments());
-        	}
-        	int topIdx = 0;
-    		Envelope topEnv= segs.get(topIdx).computeEnvelopeInternal();
-    		for(int i=1;i<segs.size();i++) {
-    			CurveSegment seg=segs.get(i);
-    			Envelope segEnv= seg.computeEnvelopeInternal();
-    			if(segEnv.getMaxY()>topEnv.getMaxY()) {
-    				topIdx=i;
-    				topEnv=segEnv;
-    			}
-    		}
-    		CurveSegment top=segs.get(topIdx);
-    		if(top instanceof ArcSegment && ((ArcSegment) top).getSign()!=0.0 && top.getStartPoint().y<topEnv.getMaxY() && top.getEndPoint().y<topEnv.getMaxY()) {
-    			// maxY ist Zwischenpunkt auf dem Bogen
-        		Coordinate[] coords=new Coordinate[4];
-    			coords[0]=top.getStartPoint();
-    			coords[1]=((ArcSegment) top).getMidPoint();
-    			coords[2]=top.getEndPoint();
-    			coords[3]=top.getStartPoint();
-        	    return CGAlgorithms.isCCW(coords);
-    		}
-			CurveSegment seg0=null;
-			CurveSegment seg1=null;
-    		if(top.getStartPoint().y==topEnv.getMaxY()) {
-    			// segment davor relevant
-    			int seg0Idx=topIdx-1;
-    			if(seg0Idx<0) {
-    				seg0Idx=segs.size()-1;
-    			}
-    			seg0=segs.get(seg0Idx);
-    			seg1=top;
-    		}else {
-    			// segmment danach relevant
-    			int seg1Idx=topIdx+1;
-    			if(seg1Idx>=segs.size()) {
-    				seg1Idx=0;
-    			}
-    			seg0=top;
-    			seg1=segs.get(seg1Idx);
-    		}
-    		Coordinate[] coords=new Coordinate[4];
-			coords[0]=(seg0 instanceof StraightSegment)?seg0.getStartPoint():((ArcSegment) seg0).getDirectionPt(false,0.1);
-			coords[1]=seg0.getEndPoint();
-			coords[2]=(seg1 instanceof StraightSegment)?seg1.getEndPoint():((ArcSegment) seg1).getDirectionPt(true,0.1);
-			coords[3]=coords[0];
-    	    return CGAlgorithms.isCCW(coords);
-        }
-    }
-    return CGAlgorithms.isCCW(ring.getCoordinates());
+	return CompoundCurveRing.isCCW(ring);
   }
 
-  /**
+/**
    * Adds a hole to the polygon formed by this ring.
    * @param hole the {@link LinearRing} forming the hole.
    */
