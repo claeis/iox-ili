@@ -78,6 +78,7 @@
 		<javac destdir="${build}/classes" includes="**/*.java" excludes="**/bak~/*.java" debug="true" source="1.6" target="1.6">
 			<classpath>
 				<path refid="classpath"/>
+				<path refid="junit"/>
         <!-- pathelement location="lib/stax-api-1.0.jar"/>
         <pathelement location="lib/wstx-asl-3.2.8.jar"/ -->
 			</classpath>
