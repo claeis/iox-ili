@@ -121,7 +121,6 @@ import java.util.Map;
 		throws IoxException
         { 
 			String encoding="UTF-8";
-			System.err.println(buffer.getAbsolutePath());
 			try{
 	        	init(td,new java.io.OutputStreamWriter(new java.io.FileOutputStream(buffer),encoding));
 			} catch (UnsupportedEncodingException ex) {
