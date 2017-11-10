@@ -161,7 +161,7 @@ public class CsvReaderTest {
 		IoxEvent event = reader.read();
 		if(event instanceof ObjectEvent){
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
-			assertTrue(iomObj.getobjecttag().equals("TextType.Topic.Class1"));
+			assertEquals("TextType.Topic.Class1",iomObj.getobjecttag());
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
