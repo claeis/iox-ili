@@ -196,7 +196,7 @@
 		<delete dir="${build}"/>
 	</target>
 
-	<target name="junit">
+	<target depends="init" name="junit">
 		<delete dir="${junit-out.dir}" quiet="true"/>
 		<delete dir="${junit.dir}" quiet="true"/>
 		<delete dir="${report.dir}" quiet="true"/>
