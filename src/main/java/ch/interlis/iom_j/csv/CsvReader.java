@@ -298,6 +298,7 @@ public class CsvReader implements IoxReader,IoxIliReader {
     }
     
     List<String> iliAttrs=null;
+	private String lineSeparator=System.getProperty("line.separator");
     /** Get Viewable of model, where attributes of records are equal to attribute in model class
      * @return Viewable
      * @throws IoxException 
@@ -641,5 +642,9 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	 */
 	public void setRecordDelimiter(String definition){
 		userDefined_Record_Delimiter = definition;
+	}
+
+	public String getLineSeparator() {
+		return lineSeparator;
 	}
 }

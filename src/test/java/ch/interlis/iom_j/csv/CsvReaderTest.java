@@ -330,7 +330,7 @@ public class CsvReaderTest {
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
         	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
         	assertEquals("AU", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("A,u\"s"+"\r\n"+"tralia", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("A,u\"s"+reader.getLineSeparator()+"tralia", iomObj.getattrvalue(ATTRIBUTE3));
 		}
 		event = reader.read();
 		if(event instanceof ObjectEvent){
