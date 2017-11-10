@@ -1286,64 +1286,13 @@ public class CsvWriterTest {
 			file.delete();
 		}
 	}
-
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
-	// - Das Modell gesetzt wird
-	// - Der Header nicht gesetzt wird
-	// - Carriage-Return und Line-Feed innerhalb des Textes geschrieben sind
-	@Test
-	public void carriageReturnLineFeedInText_Ok() throws IoxException, FileNotFoundException{
-		CsvWriter writer=null;
-		try {
-			writer=new CsvWriter(new File(TEST_IN,"carriageReturnLineFeedInText_Ok.csv"));
-			writer.setModel(td);
-			writer.setWriteHeader(false);
-			writer.write(new StartTransferEvent());
-			writer.write(new StartBasketEvent("model.Topic1","bid1"));
-			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern\n\rZuerich");
-			iomObj.setattrvalue("land", "Schweiz\n\rDeutschland");
-			writer.write(new ObjectEvent(iomObj));
-			writer.write(new EndBasketEvent());
-			writer.write(new EndTransferEvent());
-		}finally {
-	    	if(writer!=null) {
-	    		try {
-					writer.close();
-				} catch (IoxException e) {
-					throw new IoxException(e);
-				}
-	    		writer=null;
-	    	}
-		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"carriageReturnLineFeedInText_Ok.csv"));
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern\r\nZuerich", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schweiz\r\nDeutschland", iomObj.getattrvalue(ATTRIBUTE3));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
-		reader.close();
-		reader=null;
-		// delete created file
-		File file=new File(TEST_IN,"carriageReturnLineFeedInText_Ok.csv");
-		if(file.exists()) {
-			file.delete();
-		}
-	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
 	// - Das Modell gesetzt wird
 	// - Der Header nicht gesetzt wird
 	// - Carriage-Return innerhalb des Textes geschrieben ist
 	@Test
-	public void carriageReturnInText_Ok() throws IoxException, FileNotFoundException{
+	public void newlineInText_Ok() throws IoxException, FileNotFoundException{
 		CsvWriter writer=null;
 		try {
 			writer=new CsvWriter(new File(TEST_IN,"carriageReturnInText_Ok.csv"));
@@ -1353,8 +1302,8 @@ public class CsvWriterTest {
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
 			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern\r\nZuerich");
-			iomObj.setattrvalue("land", "Schweiz\r\nDeutschland");
+			iomObj.setattrvalue("stadt", "Bern"+System.getProperty("line.separator")+"Zuerich");
+			iomObj.setattrvalue("land", "Schweiz"+System.getProperty("line.separator")+"Deutschland");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -1375,8 +1324,8 @@ public class CsvWriterTest {
 		if(event instanceof ObjectEvent){
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
         	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern\r\nZuerich", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schweiz\r\nDeutschland", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("Bern"+reader.getLineSeparator()+"Zuerich", iomObj.getattrvalue(ATTRIBUTE2));
+        	assertEquals("Schweiz"+reader.getLineSeparator()+"Deutschland", iomObj.getattrvalue(ATTRIBUTE3));
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
