@@ -350,7 +350,7 @@ public class CsvReaderTest {
     public void headerPresent_Ok() throws IoxException, FileNotFoundException{
 		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderPresent.csv"));
 		assertTrue(reader.read() instanceof StartTransferEvent);
-		reader.setHeader("present");
+		reader.setFirstLineIsHeader(true);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event = reader.read();
 		if(event instanceof ObjectEvent){
@@ -380,7 +380,7 @@ public class CsvReaderTest {
 		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderPresentNames.csv"));
 		reader.setModel(td1);
 		assertTrue(reader.read() instanceof StartTransferEvent);
-		reader.setHeader("present");
+		reader.setFirstLineIsHeader(true);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event = reader.read();
 		if(event instanceof ObjectEvent){
@@ -400,7 +400,7 @@ public class CsvReaderTest {
     public void headerPresentSpecialHeaderNames_Ok() throws IoxException, FileNotFoundException, Ili2cFailure{
 		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderPresentNames.csv"));
 		assertTrue(reader.read() instanceof StartTransferEvent);
-		reader.setHeader("present");
+		reader.setFirstLineIsHeader(true);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event = reader.read();
 		if(event instanceof ObjectEvent){
@@ -421,7 +421,7 @@ public class CsvReaderTest {
 		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderAbsent.csv"));
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
-		reader.setHeader("absent");
+		reader.setFirstLineIsHeader(false);
 		IoxEvent event = reader.read();
 		if(event instanceof ObjectEvent){
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
@@ -439,7 +439,7 @@ public class CsvReaderTest {
 	@Test
     public void setUserDefinedRecordDelimiter_Ok() throws IoxException, FileNotFoundException{
 		CsvReader reader=new CsvReader(new File(TEST_IN,"RecordDelimiter.csv"));
-		reader.setRecordDelimiter("?");
+		reader.setValueSeparator('?');
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event = reader.read();
@@ -459,7 +459,7 @@ public class CsvReaderTest {
 	@Test
     public void setUserDefinedDelimiter_Ok() throws IoxException, FileNotFoundException{
 		CsvReader reader=new CsvReader(new File(TEST_IN,"Delimiter.csv"));
-		reader.setDelimiter("%");
+		reader.setValueDelimiter('%');
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event = reader.read();
@@ -479,8 +479,8 @@ public class CsvReaderTest {
 	@Test
     public void setUserDefinedRecordDelimiterAndDelimiter_Ok() throws IoxException, FileNotFoundException{
 		CsvReader reader=new CsvReader(new File(TEST_IN,"RecordDelimiterAndDelimiter.csv"));
-		reader.setRecordDelimiter("&");
-		reader.setDelimiter("%");
+		reader.setValueSeparator('&');
+		reader.setValueDelimiter('%');
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event = reader.read();
@@ -578,7 +578,7 @@ public class CsvReaderTest {
  		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderPresent.csv"));
  		reader.setModel(td);
  		assertTrue(reader.read() instanceof StartTransferEvent);
- 		reader.setHeader("present");
+ 		reader.setFirstLineIsHeader(true);
  		assertTrue(reader.read() instanceof StartBasketEvent);
  		IoxEvent event = reader.read();
  		if(event instanceof ObjectEvent){
@@ -669,7 +669,7 @@ public class CsvReaderTest {
  		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderPresent.csv"));
 		reader.setModel(tdM);
 		assertTrue(reader.read() instanceof StartTransferEvent);
-		reader.setHeader("present");
+		reader.setFirstLineIsHeader(true);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event=reader.read();
 		if(event instanceof ObjectEvent){
@@ -702,7 +702,7 @@ public class CsvReaderTest {
  		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderPresent3.csv"));
 		reader.setModel(tdM);
 		assertTrue(reader.read() instanceof StartTransferEvent);
-		reader.setHeader("present");
+		reader.setFirstLineIsHeader(true);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event=reader.read();
 		if(event instanceof ObjectEvent){
@@ -742,7 +742,7 @@ public class CsvReaderTest {
 		assertNotNull(tdM);
 		try {
 			reader=new CsvReader(new File(TEST_IN,"AttributesLimited.csv"));
-			reader.setHeader("present");
+			reader.setFirstLineIsHeader(true);
 			reader.setModel(tdM);
 			assertTrue(reader.read() instanceof StartTransferEvent);
 			assertTrue(reader.read() instanceof StartBasketEvent);
@@ -764,22 +764,6 @@ public class CsvReaderTest {
 	    	}
 		}
 	}
-	
-	// Der Benutzer setzt einen Parameter im Header, welcher ungueltig ist.
-    @Test
-    public void headerDefinitionNotValid_Fail() throws IoxException, FileNotFoundException{
-    	CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderPresent.csv"));
-    	reader.setHeader("started");
-    	assertTrue(reader.read() instanceof StartTransferEvent);
-    	try{
-    		reader.read();
-    		fail();
-    	}catch(IoxException ex){
-    		assertTrue(ex.getMessage().contains("expected present or absent, unexpected started"));
-    	}
-    	reader.close();
-    	reader=null;
-    }
 	
  	// Der Benutzer setzt ein Model. Der Attribute Count wird in keiner Klasse des Models gefunden.
  	@Test
@@ -861,7 +845,7 @@ public class CsvReaderTest {
  		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderPresent2.csv"));
 		reader.setModel(tdM);
 		assertTrue(reader.read() instanceof StartTransferEvent);
-		reader.setHeader("present");
+		reader.setFirstLineIsHeader(true);
     	try{
     		reader.read();
     		fail();
@@ -915,7 +899,7 @@ public class CsvReaderTest {
 		CsvReader reader=new CsvReader(new File(TEST_IN,"AttrNamesNotFoundInModel.csv"));
 		reader.setModel(td1);
 		assertTrue(reader.read() instanceof StartTransferEvent);
-		reader.setHeader("present");
+		reader.setFirstLineIsHeader(true);
 		try{
     		reader.read();
     		fail();
@@ -941,7 +925,7 @@ public class CsvReaderTest {
 		CsvReader reader=new CsvReader(new File(TEST_IN,"NumberOfAttrsNotEqual.csv"));
 		reader.setModel(td1);
 		assertTrue(reader.read() instanceof StartTransferEvent);
-		reader.setHeader("present");
+		reader.setFirstLineIsHeader(true);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		assertTrue(reader.read() instanceof ObjectEvent);
 		assertTrue(reader.read() instanceof ObjectEvent);
@@ -976,7 +960,7 @@ public class CsvReaderTest {
 		CsvReader reader=new CsvReader(new File(TEST_IN,"NumberOfAttrsNotEqual2.csv"));
 		reader.setModel(td1);
 		assertTrue(reader.read() instanceof StartTransferEvent);
-		reader.setHeader("absent");
+		reader.setFirstLineIsHeader(false);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		assertTrue(reader.read() instanceof ObjectEvent);
 		assertTrue(reader.read() instanceof ObjectEvent);
@@ -1011,7 +995,7 @@ public class CsvReaderTest {
 		assertNotNull(tdM);
 		try {
 			reader=new CsvReader(new File(TEST_IN,"AttributesLimited2.csv"));
-			reader.setHeader("present");
+			reader.setFirstLineIsHeader(true);
 			reader.setModel(tdM);
 			assertTrue(reader.read() instanceof StartTransferEvent);
 			assertTrue(reader.read() instanceof StartBasketEvent);

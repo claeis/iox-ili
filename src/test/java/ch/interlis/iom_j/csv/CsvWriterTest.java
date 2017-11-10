@@ -130,7 +130,7 @@ public class CsvWriterTest {
 		}
 		CsvReader reader=new CsvReader(new File(TEST_IN,"object_ModelSet_SetHeaderPresent_Ok.csv"));
 		reader.setModel(td);
-		reader.setHeader("present");
+		reader.setFirstLineIsHeader(true);
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event=reader.read();
@@ -182,7 +182,7 @@ public class CsvWriterTest {
 		}
 		CsvReader reader=new CsvReader(new File(TEST_IN,"object_ModelSet_SetHeaderAbsent_Ok.csv"));
 		reader.setModel(td);
-		reader.setHeader("absent");
+		reader.setFirstLineIsHeader(false);
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event=reader.read();
@@ -232,7 +232,7 @@ public class CsvWriterTest {
 	    	}
 		}
 		CsvReader reader=new CsvReader(new File(TEST_IN,"object_NoModelSet_SetHeaderPresent_Ok.csv"));
-		reader.setHeader("present");
+		reader.setFirstLineIsHeader(true);
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event=reader.read();
@@ -282,7 +282,7 @@ public class CsvWriterTest {
 	    	}
 		}
 		CsvReader reader=new CsvReader(new File(TEST_IN,"object_NoModelSet_SetHeaderAbsent_Ok.csv"));
-		reader.setHeader("absent");
+		reader.setFirstLineIsHeader(false);
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event=reader.read();
@@ -392,7 +392,7 @@ public class CsvWriterTest {
 			}
 		}
 		CsvReader reader=new CsvReader(new File(TEST_IN,"object_SetMultipleModels_SetHeaderPresent_Ok.csv"));
-		reader.setHeader("absent");
+		reader.setFirstLineIsHeader(false);
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event=reader.read();
@@ -470,7 +470,7 @@ public class CsvWriterTest {
 		}
 		IoxEvent event=null;
 		CsvReader reader=new CsvReader(new File(TEST_IN,"multipleObjects_ModelSet_SetHeaderPresent_Ok.csv"));
-		reader.setHeader("present");
+		reader.setFirstLineIsHeader(true);
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		event=reader.read();
@@ -755,7 +755,7 @@ public class CsvWriterTest {
 	    	}
 		}
 		CsvReader reader=new CsvReader(new File(TEST_IN,"commaInText_Ok.csv"));
-		reader.setHeader("present");
+		reader.setFirstLineIsHeader(true);
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event=reader.read();
@@ -1052,7 +1052,7 @@ public class CsvWriterTest {
 	    	}
 		}
 		CsvReader reader=new CsvReader(new File(TEST_IN,"setRecordDelimiter_RecordDelimiterInText_ModelSet_Ok.csv"));
-		reader.setRecordDelimiter("\\");
+		reader.setValueSeparator('\\');
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event=reader.read();
@@ -1107,8 +1107,8 @@ public class CsvWriterTest {
 	    	}
 		}
 		CsvReader reader=new CsvReader(new File(TEST_IN,"setDelimiter_setRecordDelimiter_HeaderSet_Ok.csv"));
-		reader.setRecordDelimiter("\\");
-		reader.setDelimiter("|");
+		reader.setValueSeparator('\\');
+		reader.setValueDelimiter('|');
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event=reader.read();
@@ -1161,8 +1161,8 @@ public class CsvWriterTest {
 	    	}
 		}
 		CsvReader reader=new CsvReader(new File(TEST_IN,"setDelimiter_HeaderSet_Ok.csv"));
-		reader.setDelimiter("|");
-		reader.setHeader("present");
+		reader.setValueDelimiter('|');
+		reader.setFirstLineIsHeader(true);
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event=reader.read();
@@ -1215,7 +1215,7 @@ public class CsvWriterTest {
 	    	}
 		}
 		CsvReader reader=new CsvReader(new File(TEST_IN,"setRecordDelimiter_ModelSet_Ok.csv"));
-		reader.setRecordDelimiter("\\");
+		reader.setValueSeparator('\\');
 		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event=reader.read();
