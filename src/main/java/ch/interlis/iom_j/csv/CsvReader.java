@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import ch.ehi.basics.view.GenericFileFilter;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.Model;
@@ -120,7 +121,7 @@ public class CsvReader implements IoxReader,IoxIliReader {
 			// check if td is set
 			if(td==null){
 				// get model name
-				modelName=getNameOfDataFile();
+				modelName=getNameOfFile(inputFile);
 				// check if header is defined
 				if(isHeaderDefined()){
 					// ignore first record
@@ -380,16 +381,12 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	 * @return modelname
 	 * @throws IoxException
 	 */
-	private String getNameOfDataFile() throws IoxException{
+	private String getNameOfFile(File file) throws IoxException{
 		// get path of csv file
-		String path=inputFile.getPath();
+		String path=file.getName();
 		if(path!=null){
-			String[] pathParts=path.split("\\\\");
-			int partLength=pathParts.length;
-			String file=pathParts[partLength-1];
-			String[] fileParts=file.split(".csv");
-			file=fileParts[0];
-			return file;
+			String fileName=GenericFileFilter.stripFileExtension(path);
+			return fileName;
 		}else{
 			throw new IoxException("expected csv file");
 		}
