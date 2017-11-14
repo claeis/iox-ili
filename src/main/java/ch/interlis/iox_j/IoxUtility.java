@@ -170,6 +170,7 @@ public class IoxUtility {
 			java.util.ResourceBundle resVersion = java.util.ResourceBundle.getBundle("ch/interlis/iox_j/Version");
 			StringBuffer ret = new StringBuffer(20);
 			ret.append(resVersion.getString("version"));
+			ret.append('-');
 			ret.append(resVersion.getString("versionCommit"));
 			version = ret.toString();
 		}
