@@ -22,6 +22,10 @@
  */
 package ch.interlis.iox_j.jts;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Polygon;
+
 import ch.interlis.iom.IomObject;
 
 /** Utility to convert from JTS to INTERLIS IOM geometry types.
@@ -92,6 +96,18 @@ public class Jts2iox {
 		}
 		return ret;
 	}
+	/** Converts from a CoordinateSequences to a INTERLIS MULTICOORD.
+	 * @param value JTS CoordinateSequences.
+	 * @return INTERLIS MULTICOORD structure
+	 */
+	static public  IomObject JTS2multicoord(com.vividsolutions.jts.geom.Coordinate[] value)
+	{
+		IomObject ret=new ch.interlis.iom_j.Iom_jObject("MULTICOORD",null);
+		for(Coordinate jtsCoordinate:value) {
+			ret.addattrobj("segment", JTS2coord(jtsCoordinate));
+		}
+		return ret;
+	}
 	/** Converts from a LineString to a INTERLIS POLYLINE.
 	 * @param value JTS LineString
 	 * @return INTERLIS POLYLINE structure
@@ -104,6 +120,21 @@ public class Jts2iox {
 		int coordc=value.getNumPoints();
 		for(int coordi=0;coordi<coordc;coordi++){
 			sequence.addattrobj("segment", JTS2coord(value.getCoordinateN(coordi)));
+		}
+		return ret;
+	}
+	/** Converts from a MultiLineString to a INTERLIS MULTIPOLYLINE.
+	 * @param value JTS MultiLineString
+	 * @return INTERLIS MULTIPOLYLINE structure
+	 */
+	static public  IomObject JTS2multipolyline(com.vividsolutions.jts.geom.MultiLineString value)
+	{
+		IomObject ret=new ch.interlis.iom_j.Iom_jObject("MULTIPOLYLINE",null);
+		int lineStringCount = value.getNumGeometries();
+		LineString ljtsLineStringArray[] = new LineString[lineStringCount];
+		for (int lineStringi=0;lineStringi<lineStringCount;lineStringi++) {
+		    ljtsLineStringArray[lineStringi]=(LineString) value.getGeometryN(lineStringi);
+		    ret.addattrobj("polyline", JTS2polyline(ljtsLineStringArray[lineStringi]));
 		}
 		return ret;
 	}
@@ -136,5 +167,19 @@ public class Jts2iox {
 		
 		return ret;
 	}
-
+	/** Converts from a MultiPolygon to a INTERLIS MULTISURFACE.
+	 * @param value JTS MultiPolygon
+	 * @return INTERLIS MULTISURFACE structure
+	 */
+	static public  IomObject JTS2multisurface(com.vividsolutions.jts.geom.MultiPolygon value) 
+	{
+		IomObject ret=new ch.interlis.iom_j.Iom_jObject("MULTISURFACE",null);
+		int numberOfSurfaces = value.getNumGeometries();
+		Polygon polygon[] = new Polygon[numberOfSurfaces];
+		for (int i=0;i<numberOfSurfaces;i++) {
+			polygon[i]=(Polygon) value.getGeometryN(i);
+		    ret.addattrobj("surface", JTS2surface(polygon[i]));
+		}
+		return ret;
+	}
 }
