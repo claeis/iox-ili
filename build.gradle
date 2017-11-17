@@ -76,7 +76,7 @@ task generateMyResources {
 		def versionProps = new Properties()
 		versionProps.setProperty('version', "$project.version")
 		versionProps.setProperty('versionCommit', getGitHash())
-		def versionPropsFile = new File(generatedResources,"ch/interlis/ioxwkf/Version.properties")
+		def versionPropsFile = new File(generatedResources,"ch/interlis/iox_j/Version.properties")
 		versionPropsFile.getParentFile().mkdirs();
 		versionProps.store(versionPropsFile.newWriter(), null);
 	}
