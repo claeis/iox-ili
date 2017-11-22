@@ -27,13 +27,14 @@ import com.vividsolutions.jts.geom.CoordinateList;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iox_j.wkb.Wkb2iox;
 
 /** Utility to convert from INTERLIS to JTS geometry types.
  * @author ceis
  */
 public class Iox2jts {
 	// utility, no instances
-	private Iox2jts(){}
+	Iox2jts(){}
 	private static double dist(double re1,double ho1,double re2,double ho2)
 	{
 		double ret;
@@ -133,10 +134,10 @@ public class Iox2jts {
 	public static com.vividsolutions.jts.geom.MultiPoint multicoord2JTS(IomObject obj)
 	throws Iox2jtsException 
 	{
-		int segmentCount=obj.getattrvaluecount("segment");
+		int segmentCount=obj.getattrvaluecount(Wkb2iox.ATTR_COORD);
 		com.vividsolutions.jts.geom.Point[] jtsPointArray=new com.vividsolutions.jts.geom.Point[segmentCount];
 		for(int i=0;i<segmentCount;i++) {
-			IomObject segment=obj.getattrobj("segment", i);
+			IomObject segment=obj.getattrobj(Wkb2iox.ATTR_COORD, i);
 			Coordinate jtsCoordinate=coord2JTS(segment);
 			com.vividsolutions.jts.geom.Point jtsPoint=new com.vividsolutions.jts.geom.Point(jtsCoordinate, new PrecisionModel(), 0);
 			jtsPointArray[i]=jtsPoint;
@@ -408,19 +409,19 @@ public class Iox2jts {
 	public static com.vividsolutions.jts.geom.MultiPolygon multisurface2JTS(IomObject obj,double strokeP,int srid) //SurfaceOrAreaType type)
 	throws Iox2jtsException
 	{
+		com.vividsolutions.jts.geom.Polygon[] jtsPolygons=null;
 		com.vividsolutions.jts.geom.Polygon jtsPolygon=null;
 		int surfaceCount=obj.getattrvaluecount("surface");
-		com.vividsolutions.jts.geom.Polygon[] polygons=new com.vividsolutions.jts.geom.Polygon[surfaceCount];
-		
+		jtsPolygons=new com.vividsolutions.jts.geom.Polygon[surfaceCount];
 		for(int surfacei=0;surfacei<surfaceCount;surfacei++){
 			IomObject surface=obj.getattrobj("surface",surfacei);
-			com.vividsolutions.jts.geom.LinearRing shell=null;
-			com.vividsolutions.jts.geom.LinearRing holes[]=null;
-			int boundaryc=surface.getattrvaluecount("boundary");
-			if(boundaryc>1){
-				holes=new com.vividsolutions.jts.geom.LinearRing[boundaryc-1];				
+			com.vividsolutions.jts.geom.LinearRing jtsShell=null;
+			com.vividsolutions.jts.geom.LinearRing jtsHoles[]=null;
+			int boundarycount=surface.getattrvaluecount("boundary");
+			if(boundarycount>1){
+				jtsHoles=new com.vividsolutions.jts.geom.LinearRing[boundarycount-1];				
 			}
-			for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
+			for(int boundaryi=0;boundaryi<boundarycount;boundaryi++){
 				IomObject boundary=surface.getattrobj("boundary",boundaryi);
 				com.vividsolutions.jts.geom.CoordinateList jtsLine=new com.vividsolutions.jts.geom.CoordinateList();
 				for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
@@ -429,15 +430,15 @@ public class Iox2jts {
 				}
 				jtsLine.closeRing();
 				if(boundaryi==0){
-					shell=new com.vividsolutions.jts.geom.GeometryFactory().createLinearRing(jtsLine.toCoordinateArray());
+					jtsShell=new com.vividsolutions.jts.geom.GeometryFactory().createLinearRing(jtsLine.toCoordinateArray());
 				}else{
-					holes[boundaryi-1]=new com.vividsolutions.jts.geom.GeometryFactory().createLinearRing(jtsLine.toCoordinateArray());
+					jtsHoles[boundaryi-1]=new com.vividsolutions.jts.geom.GeometryFactory().createLinearRing(jtsLine.toCoordinateArray());
 				}
 			}
-			jtsPolygon=new com.vividsolutions.jts.geom.GeometryFactory().createPolygon(shell,holes);
-			polygons[surfacei]=jtsPolygon;
+			jtsPolygon=new com.vividsolutions.jts.geom.GeometryFactory().createPolygon(jtsShell,jtsHoles);
+			jtsPolygons[surfacei]=jtsPolygon;
 		}
-		com.vividsolutions.jts.geom.MultiPolygon ret=new com.vividsolutions.jts.geom.MultiPolygon(polygons, new PrecisionModel(), srid);
+		com.vividsolutions.jts.geom.MultiPolygon ret=new com.vividsolutions.jts.geom.MultiPolygon(jtsPolygons, new PrecisionModel(), srid);
 		return ret;
 	}
 }
