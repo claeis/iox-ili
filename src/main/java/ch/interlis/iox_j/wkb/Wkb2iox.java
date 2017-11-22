@@ -50,6 +50,8 @@ public class Wkb2iox
 	static final public String ATTR_COORD="coord";
 	static final public String OBJ_MULTIPOLYLINE="MULTIPOLYLINE";
 	static final public String OBJ_MULTIPOINT="MULTIPOINT";
+	static final public String OBJ_MULTICOORD="MULTICOORD";
+	
   /**
    * Converts a hexadecimal string to a byte array.
    *
@@ -209,7 +211,7 @@ public class Wkb2iox
   }
   private IomObject readMultiPoint() throws IOException
   {
-		IomObject ret=new ch.interlis.iom_j.Iom_jObject(OBJ_MULTIPOINT,null);
+		IomObject ret=new ch.interlis.iom_j.Iom_jObject(OBJ_MULTICOORD,null);
 	    int coordc = dis.readInt();
 	    for(int coordi=0;coordi<coordc;coordi++){
 	        byte byteOrder = dis.readByte();

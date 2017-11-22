@@ -25,15 +25,15 @@ package ch.interlis.iox_j.jts;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
-
 import ch.interlis.iom.IomObject;
+import ch.interlis.iox_j.wkb.Wkb2iox;
 
 /** Utility to convert from JTS to INTERLIS IOM geometry types.
  * @author ceis
  */
 public class Jts2iox {
 	// utility, no instances
-	private Jts2iox(){}
+	Jts2iox(){}
 	/** Converts from a hex WKB to an INTERLIS COORD.
 	 * @param value hex encoded OGC WKB
 	 * @return COORD structure
@@ -96,15 +96,16 @@ public class Jts2iox {
 		}
 		return ret;
 	}
-	/** Converts from a CoordinateSequences to a INTERLIS MULTICOORD.
-	 * @param value JTS CoordinateSequences.
+	/** Converts from a CoordinateArray to a INTERLIS MULTICOORD.
+	 * @param value JTS CoordinateArray.
 	 * @return INTERLIS MULTICOORD structure
+	 * Warning: only in multicoord, the segment name is always 'coord'.
 	 */
 	static public  IomObject JTS2multicoord(com.vividsolutions.jts.geom.Coordinate[] value)
 	{
 		IomObject ret=new ch.interlis.iom_j.Iom_jObject("MULTICOORD",null);
 		for(Coordinate jtsCoordinate:value) {
-			ret.addattrobj("segment", JTS2coord(jtsCoordinate));
+			ret.addattrobj(Wkb2iox.ATTR_COORD, JTS2coord(jtsCoordinate));
 		}
 		return ret;
 	}
@@ -131,10 +132,10 @@ public class Jts2iox {
 	{
 		IomObject ret=new ch.interlis.iom_j.Iom_jObject("MULTIPOLYLINE",null);
 		int lineStringCount = value.getNumGeometries();
-		LineString ljtsLineStringArray[] = new LineString[lineStringCount];
+		LineString jtsLineStringArray[] = new LineString[lineStringCount];
 		for (int lineStringi=0;lineStringi<lineStringCount;lineStringi++) {
-		    ljtsLineStringArray[lineStringi]=(LineString) value.getGeometryN(lineStringi);
-		    ret.addattrobj("polyline", JTS2polyline(ljtsLineStringArray[lineStringi]));
+		    jtsLineStringArray[lineStringi]=(LineString) value.getGeometryN(lineStringi);
+		    ret.addattrobj("polyline", JTS2polyline(jtsLineStringArray[lineStringi]));
 		}
 		return ret;
 	}
@@ -171,14 +172,29 @@ public class Jts2iox {
 	 * @param value JTS MultiPolygon
 	 * @return INTERLIS MULTISURFACE structure
 	 */
-	static public  IomObject JTS2multisurface(com.vividsolutions.jts.geom.MultiPolygon value) 
+	static public IomObject JTS2multisurface(com.vividsolutions.jts.geom.MultiPolygon value)
 	{
 		IomObject ret=new ch.interlis.iom_j.Iom_jObject("MULTISURFACE",null);
-		int numberOfSurfaces = value.getNumGeometries();
-		Polygon polygon[] = new Polygon[numberOfSurfaces];
-		for (int i=0;i<numberOfSurfaces;i++) {
-			polygon[i]=(Polygon) value.getGeometryN(i);
-		    ret.addattrobj("surface", JTS2surface(polygon[i]));
+		int surfaceCount=value.getNumGeometries();
+		for(int surfacei=0;surfacei<surfaceCount;surfacei++) {
+			IomObject surface=new ch.interlis.iom_j.Iom_jObject("SURFACE",null);
+			com.vividsolutions.jts.geom.Polygon polygon=(Polygon) value.getGeometryN(surfacei);
+			// shell
+			{
+				com.vividsolutions.jts.geom.LineString jtsShell=polygon.getExteriorRing();
+				IomObject boundary=new ch.interlis.iom_j.Iom_jObject("BOUNDARY",null);
+				surface.addattrobj("boundary",boundary);
+				boundary.addattrobj("polyline", JTS2polyline(jtsShell));
+			}
+			// holes
+			int jtsHolesCount=polygon.getNumInteriorRing();
+			for(int holei=0;holei<jtsHolesCount;holei++){
+				com.vividsolutions.jts.geom.LineString jtsHole=polygon.getInteriorRingN(holei);
+				IomObject boundary=new ch.interlis.iom_j.Iom_jObject("BOUNDARY",null);
+				surface.addattrobj("boundary",boundary);
+				boundary.addattrobj("polyline", JTS2polyline(jtsHole));
+			}
+			ret.addattrobj("surface",surface);
 		}
 		return ret;
 	}
