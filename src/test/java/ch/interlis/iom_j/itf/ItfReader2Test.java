@@ -50,6 +50,25 @@ public class ItfReader2Test {
 		throw new ComparisonFailure("no such error",expected,"");
 		
 	}
+	private void assertError(String expected)
+	{
+		LogEvent foundErr=null;
+		for(LogEvent err:errs.getErrs()){
+			if(expected.equals(err.getEventMsg())){
+				foundErr=err;
+				break;
+			}
+			if(err.getException()!=null && expected.equals(err.getException().getMessage())){
+				foundErr=err;
+				break;
+			}
+		}
+		if(foundErr!=null){
+			return;
+		}
+		throw new ComparisonFailure("no such error",expected,"");
+		
+	}
 	@Before
 	public void setup() throws Ili2cFailure
 	{
@@ -133,7 +152,6 @@ public class ItfReader2Test {
 		}
 	}
 	@Test
-	@Ignore("not yet implemented")
 	public void testSURFACEnoMainObj() throws Iox2jtsException, IoxException {
 		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceNoMainObj.itf"),false);
 		reader.setModel(td);
@@ -155,11 +173,10 @@ public class ItfReader2Test {
 			 }while(!(event instanceof EndTransferEvent));
 			 fail();
 		}catch(IoxInvalidDataException ex){
-			 assertError("no main obj","1");
+			 assertError("unexpected linetable Test1.TopicA.TableA_Form");
 		}
 	}
 	@Test
-	@Ignore("not yet implemented")
 	public void testSURFACEnoMainTable() throws Iox2jtsException, IoxException {
 		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceNoMainTable.itf"),false);
 		reader.setModel(td);
@@ -181,7 +198,7 @@ public class ItfReader2Test {
 			 }while(!(event instanceof EndTransferEvent));
 			 fail();
 		}catch(IoxInvalidDataException ex){
-			 assertError("no main table","1");
+			 assertError("unexpected linetable Test1.TopicA.TableA_Form");
 		}
 	}
 
@@ -255,7 +272,6 @@ public class ItfReader2Test {
 		}
 	}
 	@Test
-	@Ignore("not yet implemented")
 	public void testAREAnoMainObj() throws Iox2jtsException, IoxException {
 		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/AreaNoMainObj.itf"),false);
 		reader.setModel(td);
@@ -277,11 +293,10 @@ public class ItfReader2Test {
 			 }while(!(event instanceof EndTransferEvent));
 			 fail();
 		}catch(IoxInvalidDataException ex){
-			 assertError("no main obj","1");
+			 assertError("no main objects of Test1.TopicB.TableB but linetable objects");
 		}
 	}
 	@Test
-	@Ignore("not yet implemented")
 	public void testAREAnoMainTable() throws Iox2jtsException, IoxException {
 		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/AreaNoMainTable.itf"),false);
 		reader.setModel(td);
@@ -303,7 +318,7 @@ public class ItfReader2Test {
 			 }while(!(event instanceof EndTransferEvent));
 			 fail();
 		}catch(IoxInvalidDataException ex){
-			 assertError("no main table","1");
+			 assertError("no main objects of Test1.TopicB.TableB but linetable objects");
 		}
 	}
 	@Test
