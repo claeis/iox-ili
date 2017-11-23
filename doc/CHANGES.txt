@@ -5,6 +5,13 @@ ideas/open issues
 LATEST
 -----------------------------
 
+iox-ili 1.20.0 (2017-11-23)
+-----------------------------
+- implement MultiPoint wkb conversion
+- fix itf AREA building when a top horizontal straight line
+- keep objects ordered, so that reruns of tests give the same ordering of messages
+- fixed ItfReader2 if no main table obj for AREA/SURFACE attrs 
+
 iox-ili 1.19.8 (2017-10-20)
 -----------------------------
 - Xtf24Reader: fixed xmlns setup

@@ -78,10 +78,12 @@
 		<javac destdir="${build}/classes" includes="**/*.java" excludes="**/bak~/*.java" debug="true" source="1.6" target="1.6">
 			<classpath>
 				<path refid="classpath"/>
+				<path refid="junit"/>
         <!-- pathelement location="lib/stax-api-1.0.jar"/>
         <pathelement location="lib/wstx-asl-3.2.8.jar"/ -->
 			</classpath>
 			<src path="${src}" />
+			<src path="src/test/java" />
 			<src path="${gensrc}" />
 			<src path="${basedir}/jtsext/src/main/java" />
     	<!-- <src path="${build}/src"/> -->
@@ -194,7 +196,7 @@
 		<delete dir="${build}"/>
 	</target>
 
-	<target name="junit">
+	<target depends="init" name="junit">
 		<delete dir="${junit-out.dir}" quiet="true"/>
 		<delete dir="${junit.dir}" quiet="true"/>
 		<delete dir="${report.dir}" quiet="true"/>
@@ -215,14 +217,14 @@
             <formatter type="plain"/>
             <test name="ch.interlis.iox_j.validator.ErrorMsg23Test"/>
         </junit-->
-		<junit printsummary="yes" dir="${junit.dir}">
+		<junit printsummary="yes" dir="${junit.dir}" haltonfailure="yes">
 			<classpath>
 				<path refid="classpath"/>
 				<path refid="junit"/>
 				<pathelement location="${build}/classes"/>
 			</classpath>
 
-			<formatter type="xml"/>
+			<formatter type="plain"/>
 
 			<batchtest fork="yes" todir="${report.dir}">
 				<fileset dir="${basedir}/src/test/java" includes="**/*Test.java"/>

@@ -6,3 +6,5 @@ support/
 .project
 .classpath
 *~
+/bin/
+.gradle/

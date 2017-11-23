@@ -93,12 +93,12 @@ public class Configuration10Test {
 		assertEquals("No object found with OID o1 in basket b1.", logger.getWarn().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob ein Fehler geworfen wird, wenn die Klasse nicht gefunden werden kann und die multiplicität auf off gestellt ist.
+	// Es wird getestet ob ein Fehler geworfen wird, wenn die Klasse nicht gefunden werden kann und die multiplicitaet auf off gestellt ist.
 	@Test
 	public void referencetype_ClassNotFound_MultiplicityOFF() throws Exception {
 		Iom_jObject iomObjI=new Iom_jObject(CLASSA,OID1);
-		Iom_jObject iomObjJ=new Iom_jObject(CLASSD,OID2); // wird nicht in Basket ausgeführt.
-		iomObjJ.addattrobj("attrC1", "REF").setobjectrefoid(OID1); // wird nicht in Basket ausgeführt.
+		Iom_jObject iomObjJ=new Iom_jObject(CLASSD,OID2); // wird nicht in Basket ausgefuehrt.
+		iomObjJ.addattrobj("attrC1", "REF").setobjectrefoid(OID1); // wird nicht in Basket ausgefuehrt.
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue(CLASSD+"attrC1.attrC1", ValidationConfig.MULTIPLICITY,ValidationConfig.OFF);
 		LogCollector logger=new LogCollector();
@@ -117,10 +117,10 @@ public class Configuration10Test {
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung oder eine Warnung geworfen wird, wenn bei der Konfiguration multiplicity, warning eingeschalten wurde und es einen Fehler gibt.
-	// Bei eingeschaltenem Warning bei Konfiguration multiplicity, soll, falls es zu einem Multiplizitäten-Fehler kommt, nur eine Warning und keinen Fehler ausgegeben werden.
+	// Bei eingeschaltenem Warning bei Konfiguration multiplicity, soll, falls es zu einem Multiplizitaeten-Fehler kommt, nur eine Warning und keinen Fehler ausgegeben werden.
 	@Test
 	public void referenceType_ToFewReferenceClasses_MultiplicityWARNING() throws Exception {
-		Iom_jObject iomObjA=new Iom_jObject(CLASSA,OID1); // wird nicht in Basket ausgeführt.
+		Iom_jObject iomObjA=new Iom_jObject(CLASSA,OID1); // wird nicht in Basket ausgefuehrt.
 		Iom_jObject iomObjI=new Iom_jObject(CLASSD,OID2);
 		// wird nicht gefunden (iomObjI.addattrobj(ATTR_C1, "REF").setobjectrefoid(OID1))
 		ValidationConfig modelConfig=new ValidationConfig();

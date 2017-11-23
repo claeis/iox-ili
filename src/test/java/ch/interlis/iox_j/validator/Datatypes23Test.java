@@ -92,7 +92,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// eine richtige Eingabe der minimalen Länge einer uuid.
+	// eine richtige Eingabe der minimalen Laenge einer uuid.
 	@Test
 	public void uuidMinLengthOk(){
 		Iom_jObject objMin=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -130,7 +130,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Maximale Eingabe der Länge einer Standardid.
+	// Maximale Eingabe der Laenge einer Standardid.
 	@Test
 	public void standardidMaxLengthOk(){
 		Iom_jObject objMax=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -168,7 +168,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Das kleinste Jahr welches noch gültig ist, wird getestet.
+	// Das kleinste Jahr welches noch gueltig ist, wird getestet.
 	@Test
 	public void dateMinYearOk(){
 		Iom_jObject objMinYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -206,7 +206,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Dieses Datum wird über Interlis.xmlDate ausgeführt.
+	// Dieses Datum wird ueber Interlis.xmlDate ausgefuehrt.
 	@Test
 	public void formatXMLDateOk(){
 		Iom_jObject objMinYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -225,7 +225,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Das höchste Jahr wird getetstet.
+	// Das hoechste Jahr wird getetstet.
 	@Test
 	public void dateMaxYearOk(){
 		Iom_jObject objMaxYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -263,7 +263,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die Eingabe des grössten Monats wird getestet.
+	// Die Eingabe des groessten Monats wird getestet.
 	@Test
 	public void dateMaxMonthOk(){
 		Iom_jObject objMaxMonth=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -301,7 +301,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Der grösste Tag eines Datums wird getestet.
+	// Der groesste Tag eines Datums wird getestet.
 	@Test
 	public void dateMaxDayOk(){
 		Iom_jObject objMaxDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -377,7 +377,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die höchste Minuten Zeit Angabe wird getestet.
+	// Die hoechste Minuten Zeit Angabe wird getestet.
 	@Test
 	public void timeMaxMinutesOk(){
 		Iom_jObject objMaxMinute=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -415,7 +415,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die grösste Sekunden Eingabe einer Zeit wird getestet.
+	// Die groesste Sekunden Eingabe einer Zeit wird getestet.
 	@Test
 	public void timeMaxSecondsOk(){
 		Iom_jObject objMaxSecond=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -434,7 +434,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Die kleinst möglichste Angabe des Datums und der Zeit des Jahres wird getestet.
+	// Die kleinst moeglichste Angabe des Datums und der Zeit des Jahres wird getestet.
 	@Test
 	public void dateTimeMinYearOk(){
 		Iom_jObject objMinYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -472,7 +472,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die höchste Angabe des Monats bei Datum und Zeit wird getestet.
+	// Die hoechste Angabe des Monats bei Datum und Zeit wird getestet.
 	@Test
 	public void dateTimeMaxMonthOk(){
 		Iom_jObject objMaxMonth=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -510,7 +510,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die grösste Tages Angabe von Datum und Zeit wird getestet.
+	// Die groesste Tages Angabe von Datum und Zeit wird getestet.
 	@Test
 	public void dateTimeMaxDayOk(){
 		Iom_jObject objMaxDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -548,7 +548,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die höchste Angabe der Stunde von Datum und Zeit wird getestet.
+	// Die hoechste Angabe der Stunde von Datum und Zeit wird getestet.
 	@Test
 	public void dateTimeMaxHourOk(){
 		Iom_jObject objMaxHour=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -586,7 +586,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die höchste Minuten Angabe von Datum und Zeit wird getestet.
+	// Die hoechste Minuten Angabe von Datum und Zeit wird getestet.
 	@Test
 	public void dateTimeMaxMinuteOk(){
 		Iom_jObject objMaxMinute=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -624,7 +624,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die höchste Sekunden Angabe von Datum und Zeit wird getestet.
+	// Die hoechste Sekunden Angabe von Datum und Zeit wird getestet.
 	@Test
 	public void dateTimeMaxSecondOk(){
 		Iom_jObject objMaxSecond=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -681,7 +681,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die grösste Numnern Angabe wird getestet.
+	// Die groesste Numnern Angabe wird getestet.
 	@Test
 	public void numericIntTypeMaxOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -719,7 +719,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die grösste Dezimale Zahl wird getestet.
+	// Die groesste Dezimale Zahl wird getestet.
 	@Test
 	public void numericDecTypeMaxOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -738,7 +738,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Das kleinste Element einer Aufzählung wird getestet.
+	// Das kleinste Element einer Aufzaehlung wird getestet.
 	@Test
 	public void enumerationTypeMinOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -757,7 +757,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Das erste Element einer Aufzählung wird getestet.
+	// Das erste Element einer Aufzaehlung wird getestet.
 	@Test
 	public void enumerationTypeEinsOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -776,7 +776,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Eine Verschachtelung einer Aufzählung wird getestet.
+	// Eine Verschachtelung einer Aufzaehlung wird getestet.
 	@Test
 	public void enumerationTypeVierOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -795,7 +795,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Eine Verschachtelung einer Aufzählung wird getestet.
+	// Eine Verschachtelung einer Aufzaehlung wird getestet.
 	@Test
 	public void enumerationTypeDreiOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -814,7 +814,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Eine geordnete Aufzählung wird getestet.
+	// Eine geordnete Aufzaehlung wird getestet.
 	@Test
 	public void enumerationTypeCircularOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -835,7 +835,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Eine geordnete Aufzählung wird getestet.
+	// Eine geordnete Aufzaehlung wird getestet.
 	@Test
 	public void enumerationTypeOrderedOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1027,7 +1027,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die Länge eines unlimitierten Textes wird mit einer sehr hohen Länge getestet.
+	// Die Laenge eines unlimitierten Textes wird mit einer sehr hohen Laenge getestet.
 	@Test
 	public void textTypeTextUnLimitedMaxOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1065,7 +1065,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Der MText wird mit Zeichenumbrüchen getestet.
+	// Der MText wird mit Zeichenumbruechen getestet.
 	@Test
 	public void textTypeMTextLimitedSpecialCharacterOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1084,7 +1084,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Der MText wird auf die Länge bei unlimited getestet.
+	// Der MText wird auf die Laenge bei unlimited getestet.
 	@Test
 	public void textTypeMTextUnLimitedSpecialCharacterOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1103,7 +1103,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die maximale Länge eines Textes wird mit einer grossen Länge getestet.
+	// Die maximale Laenge eines Textes wird mit einer grossen Laenge getestet.
 	@Test
 	public void textTypeNameMaxLengthOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1122,7 +1122,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Ein Uri Text wird auf die Maximale Länge getestet.
+	// Ein Uri Text wird auf die Maximale Laenge getestet.
 	@Test
 	public void textTypeUriMaxLengthOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1288,7 +1288,7 @@ public class Datatypes23Test {
 		assertEquals("value Left is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Es wird getestet ob die ungültige Eingabe einer uuid mit der richtigen Länge eingegeben werden kann.
+	// Es wird getestet ob die ungueltige Eingabe einer uuid mit der richtigen Laenge eingegeben werden kann.
 	@Test
 	public void uuidNotAllowedCharFail(){
 		Iom_jObject objNotAllowedChar=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1328,7 +1328,7 @@ public class Datatypes23Test {
 		assertEquals("value <123e4567-e89b-12d3-b456-42665544000> is not a valid UUID", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine zu lange Eingabe einer uuid zu einem Fehler führt.
+	// Es wird getestet ob eine zu lange Eingabe einer uuid zu einem Fehler fuehrt.
 	@Test
 	public void uuidLengthToLongFail(){
 		Iom_jObject objLengthToLong=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1349,7 +1349,7 @@ public class Datatypes23Test {
 		assertEquals("value <123e4567-e89b-12d3-b456-4266554400000> is not a valid UUID", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Es wird getestet ob das Datum im gültigen Bereich ist. Minimum Test.
+	// Es wird getestet ob das Datum im gueltigen Bereich ist. Minimum Test.
 	@Test
 	public void dateYearToLowFail(){
 		Iom_jObject objYearToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1369,7 +1369,7 @@ public class Datatypes23Test {
 		assertEquals("date value <1580-2-15> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob die Eingabe des Jahres in einem gültigen Bereich ist. Maximaler Test.
+	// Es wird getestet ob die Eingabe des Jahres in einem gueltigen Bereich ist. Maximaler Test.
 	@Test
 	public void dateYearToHighFail(){
 		Iom_jObject objYearToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1469,7 +1469,7 @@ public class Datatypes23Test {
 		assertEquals("date value <2016-2-32> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Datenformat mit Punkten unzulässig.
+	// Datenformat mit Punkten unzulaessig.
 	@Test
 	public void dateFormatWithDotsFail(){
 		Iom_jObject objFormatWithDots=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1489,7 +1489,7 @@ public class Datatypes23Test {
 		assertEquals("invalid format of date value <2016.2.15>", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Datenformat mit Slash unzulässig.
+	// Datenformat mit Slash unzulaessig.
 	@Test
 	public void dateFormatWithSlashFail(){
 		Iom_jObject objFormatSlash=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1509,7 +1509,7 @@ public class Datatypes23Test {
 		assertEquals("invalid format of date value <2016/2/15>", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Eingabe des Datum mit zu kleinem Jahresdatum (jjjj) unzulässig.
+	// Eingabe des Datum mit zu kleinem Jahresdatum (jjjj) unzulaessig.
 	@Test
 	public void dateLengthToShortFail(){
 		Iom_jObject objLengthToShort=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1529,7 +1529,7 @@ public class Datatypes23Test {
 		assertEquals("date value <216-2-2> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Eingabe des Datum Jahres zu lang (jjjj). Eingabe unzulässig.
+	// Eingabe des Datum Jahres zu lang (jjjj). Eingabe unzulaessig.
 	@Test
 	public void dateLengthToLongFail(){
 		Iom_jObject objLengthToLong=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1550,7 +1550,7 @@ public class Datatypes23Test {
 		assertEquals("date value <20016-12-15> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Zeitangabe Stunde zu lang. unzulässig.
+	// Zeitangabe Stunde zu lang. unzulaessig.
 	@Test
 	public void timeHourToHighFail(){
 		Iom_jObject objHourToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1650,7 +1650,7 @@ public class Datatypes23Test {
 		assertEquals("invalid format of time value <23:59:59.9990>", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Dieses Datum wird über Interlis.xmlDate ausgeführt und ist kleiner als der definierte Bereich.
+	// Dieses Datum wird ueber Interlis.xmlDate ausgefuehrt und ist kleiner als der definierte Bereich.
 	@Test
 	public void formatDateToSmallFail(){
 		Iom_jObject objMinYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1850,7 +1850,7 @@ public class Datatypes23Test {
 		assertEquals("datetime value <2016-2-29T12:59:60.000> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// DatumZeit Länge zu kurz.
+	// DatumZeit Laenge zu kurz.
 	@Test
 	public void dateTimeLengthToShortFail(){
 		Iom_jObject objLengthToShort=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1870,7 +1870,7 @@ public class Datatypes23Test {
 		assertEquals("invalid format of datetime value <2016-2-2T2:2:2.99>", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// DatumZeit Länge zu gross.
+	// DatumZeit Laenge zu gross.
 	@Test
 	public void dateTimeLengthToHighFail(){
 		Iom_jObject objLengthToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1890,7 +1890,7 @@ public class Datatypes23Test {
 		assertEquals("invalid format of datetime value <2016-12-29T12:59:59.9999>", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// DatumZeit Format mit Punkten unzulässig.
+	// DatumZeit Format mit Punkten unzulaessig.
 	@Test
 	public void dateTimeFormatWithDotsFail(){
 		Iom_jObject objFormatWithDots=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1910,7 +1910,7 @@ public class Datatypes23Test {
 		assertEquals("invalid format of datetime value <2016.2.29T12:59:59.999>", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// DatumZeit ohne T unzulässig.
+	// DatumZeit ohne T unzulaessig.
 	@Test
 	public void dateTimeFormatWithoutTFail() {
 		Iom_jObject objFormatWithoutT=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1931,7 +1931,7 @@ public class Datatypes23Test {
 		assertEquals("invalid format of datetime value <2016-2-29V12:59:59.999>", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Falsches Format bei NumericType unzulässig.
+	// Falsches Format bei NumericType unzulaessig.
 	@Test
 	public void numericTypeWrongFormatFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1951,7 +1951,7 @@ public class Datatypes23Test {
 		assertEquals("value <a> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Numeric Länge zu klein. 0-10. Kann nicht minus sein.
+	// Numeric Laenge zu klein. 0-10. Kann nicht minus sein.
 	@Test
 	public void numericTypeMinWrongFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -1971,7 +1971,7 @@ public class Datatypes23Test {
 		assertEquals("value -1 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Numeric Länge zu gross. 0-10. Kann nicht 11 sein.
+	// Numeric Laenge zu gross. 0-10. Kann nicht 11 sein.
 	@Test
 	public void numericTypeMaxWrongFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -2031,7 +2031,7 @@ public class Datatypes23Test {
 		assertEquals("value -1 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Dezimales Maximum überschritten.
+	// Dezimales Maximum ueberschritten.
 	@Test
 	public void numericTypeDecMaxWrongFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -2051,7 +2051,7 @@ public class Datatypes23Test {
 		assertEquals("value 11 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Es wird die Eingabe einer ungültigen Sub Value getestet.
+	// Es wird die Eingabe einer ungueltigen Sub Value getestet.
 	@Test
 	public void enumerationTypeWrongSubValueFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -2071,7 +2071,7 @@ public class Datatypes23Test {
 		assertEquals("value mehr.elf is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Ungültige Eingabe einer Aufzählung.
+	// Ungueltige Eingabe einer Aufzaehlung.
 	@Test
 	public void enumerationTypeWrongValueFail(){
 		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -2091,7 +2091,7 @@ public class Datatypes23Test {
 		assertEquals("value 5 is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Test ob die Länge des Texted bei textLimited begränzt ist und einen Fehler ausgibt.
+	// Test ob die Laenge des Texted bei textLimited begraenzt ist und einen Fehler ausgibt.
 	@Test
 	public void textTypeTextLimitedToLongFail(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -2151,7 +2151,7 @@ public class Datatypes23Test {
 		assertEquals("Attribute textUnlimited must not contain control characters", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob die Länge des mTextedLimited bei einer zu langen Eingabe einen Fehler ausgibt.
+	// Es wird getestet ob die Laenge des mTextedLimited bei einer zu langen Eingabe einen Fehler ausgibt.
 	@Test
 	public void textTypeMTextLimitedToHighFail(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -2191,7 +2191,7 @@ public class Datatypes23Test {
 		assertEquals("Attribute nametext is length restricted to 255", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob bei uriText die maximale Länge 1024 nicht überschreitet. Dabei ist 0, die erste Nummer.
+	// Es wird getestet ob bei uriText die maximale Laenge 1024 nicht ueberschreitet. Dabei ist 0, die erste Nummer.
 	@Test
 	public void textTypeUriLengthToHighFail(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");

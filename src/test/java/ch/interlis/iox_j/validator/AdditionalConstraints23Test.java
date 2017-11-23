@@ -448,11 +448,11 @@ public class AdditionalConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei die Funktion: areArea,
-	// über eine additional constraint via set constraint ausgeführt werden kann.
+	// ueber eine additional constraint via set constraint ausgefuehrt werden kann.
 	// 1 object. Objects=ALL, SurfaceBAG=UNDEFINED, SurfaceAttr=Geometrie.
 	@Test
 	public void mandatoryConstraint_FunctionAreArea_Ok(){
@@ -504,7 +504,7 @@ public class AdditionalConstraints23Test {
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei die Funktion: areArea,
-	// über eine additional constraint via set constraint ausgeführt werden kann und die Objekte verschiedene Values enthalten.
+	// ueber eine additional constraint via set constraint ausgefuehrt werden kann und die Objekte verschiedene Values enthalten.
 	// 1 object. Objects=ALL, SurfaceBAG=>> Numbers, SurfaceAttr=>> AdditionalConstraints23.Topic.StructD->Surface.
 	@Test
 	public void mandatoryConstraint_FunctionAreArea_Fail(){

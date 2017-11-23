@@ -62,6 +62,8 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 	private boolean allowItfAreaHoles=true; // default is like Interlis2 (not exactly according to Interlis1 spec)
 	private PipelinePool ioxDataPool=null;
 	private LogEventFactory errFact=null;
+
+	private java.util.Set<String> unexpectedLinetables=new java.util.HashSet<String>();
 	/** Creates a new reader.
 	 * @param in Input stream to read from.
 	 * @throws IoxException
@@ -168,152 +170,120 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 			currentAreaAttrs=null;
 		}
 
-		IoxEvent rawEvent=nextEvent();
-		if(rawEvent instanceof ObjectEvent){
-			IomObject rawObj=((ObjectEvent)rawEvent).getIomObject();
-			String iliQName=rawObj.getobjecttag();
-			Object aclassObj=rawReader.mapIliQName2Class(iliQName);
-			AbstractClassDef aclass=null;
-			AttributeDef surfaceOrAreaAttr=null;
-			if(aclassObj instanceof AbstractClassDef){
-				// main table
-				aclass=(AbstractClassDef)aclassObj;
-			}else{
-				// SURFACE or AREA helper table
-				surfaceOrAreaAttr=(AttributeDef)aclassObj;
-				aclass=(AbstractClassDef)surfaceOrAreaAttr.getContainer();
+		IoxEvent rawEvent=null;
+		while(true) {
+			rawEvent=nextEvent();
+			if(rawEvent instanceof ObjectEvent){
+				rawEvent = handleObject(rawEvent);
+				if(rawEvent==null) {
+					continue;
+				}
+				return rawEvent;
+			}else if(rawEvent instanceof EndTransferEvent){
+				if(dataerrs.size()>0){
+	        		for(IoxInvalidDataException dataerr:dataerrs){
+	        			errFact.addEvent(errFact.logError(dataerr));
+	        		}
+					throw new IoxInvalidDataException("failed to build polygons");
+				}
 			}
-			currentSurfaceAttrs=getSurfaceAttrs(aclass);
-			currentAreaAttrs=getAreaAttrs(aclass);
-			// IF no SURFACE or AREA attributes?
-			if(currentSurfaceAttrs.size()==0 && currentAreaAttrs.size()==0){
-				// no buffering required
-			}else{
-				// main object read?
-				if(surfaceOrAreaAttr==null){
-					// push back object
-					pushBackEvent(rawEvent);
-				}
-				// WHILE another area linetable
-				while(surfaceOrAreaAttr!=null){
-					// collect linetable objects
-					ItfAreaLinetable2Polygon polygonizer=currentAreaAttrs.get(surfaceOrAreaAttr);
-					while(true){
-						polygonizer.addItfLinetableObject(rawObj);
-						rawEvent=nextEvent();
-						if(rawEvent instanceof ObjectEvent){
-							rawObj=((ObjectEvent)rawEvent).getIomObject();
-							// different linetable or maintable object?
-							if(!iliQName.equals(rawObj.getobjecttag())){
-								iliQName=rawObj.getobjecttag();
-								break;
-							}
-						}else{
-							rawObj=null;
-							iliQName=null;
-							// push back object
-							pushBackEvent(rawEvent);
-							break;
-						}
+			break;
+		}
+		return rawEvent;
+	}
+	protected IoxEvent handleObject(IoxEvent rawEvent) throws IoxException {
+		IomObject rawObj=((ObjectEvent)rawEvent).getIomObject();
+		String iliQName=rawObj.getobjecttag();
+		Object aclassObj=rawReader.mapIliQName2Class(iliQName);
+		AbstractClassDef aclass=null;
+		AttributeDef surfaceOrAreaAttr=null;
+		if(aclassObj instanceof AbstractClassDef){
+			// main table
+			aclass=(AbstractClassDef)aclassObj;
+		}else{
+			// SURFACE or AREA helper table
+			surfaceOrAreaAttr=(AttributeDef)aclassObj;
+			aclass=(AbstractClassDef)surfaceOrAreaAttr.getContainer();
+		}
+		currentSurfaceAttrs=getSurfaceAttrs(aclass);
+		currentAreaAttrs=getAreaAttrs(aclass);
+		// IF no SURFACE or AREA attributes?
+		if(currentSurfaceAttrs.size()==0 && currentAreaAttrs.size()==0){
+			// no buffering required
+		}else{
+			// main object read?
+			if(surfaceOrAreaAttr==null){
+				// push back object
+				pushBackEvent(rawEvent);
+			}
+			// WHILE another area linetable
+			while(surfaceOrAreaAttr!=null){
+				// collect linetable objects
+				ItfAreaLinetable2Polygon polygonizer=currentAreaAttrs.get(surfaceOrAreaAttr);
+				if(polygonizer==null) {
+					if(!unexpectedLinetables.contains(iliQName)) {
+						dataerrs.add( new IoxInvalidDataException("unexpected linetable "+iliQName));
+						unexpectedLinetables.add(iliQName);
 					}
-					surfaceOrAreaAttr=null;
-					if(iliQName!=null){
-						aclassObj=rawReader.mapIliQName2Class(iliQName);
-						if(aclassObj instanceof AbstractClassDef){
-							// main table
-							if(aclassObj!=aclass){
-								throw new IoxException("unexpected table "+iliQName);
-							}
-							// push back main table object
-							pushBackEvent(rawEvent);
-						}else{
-							// next AREA helper table
-							surfaceOrAreaAttr=(AttributeDef)aclassObj;
-							if(surfaceOrAreaAttr.getContainer()!=aclass){
-								throw new IoxException("unexpected linetable "+iliQName);
-							}
-						}
+					ItfSurfaceLinetable2Polygon surfacePolygonizer=currentSurfaceAttrs.get(surfaceOrAreaAttr);
+					if(surfacePolygonizer!=null) {
+						surfacePolygonizer.addItfLinetableObject(rawObj);
 					}
+					return null;
 				}
-				// maintable
-				surfaceOrAreaAttr=null;
-				//mainObjs=new HashMap<String,IomObject>();
-				currentMainObjs=objPool.newObjectPoolImpl2(new JavaSerializer());
-				iliQName=aclass.getScopedName(null);
 				while(true){
-					  // collect objects
+					polygonizer.addItfLinetableObject(rawObj);
 					rawEvent=nextEvent();
 					if(rawEvent instanceof ObjectEvent){
 						rawObj=((ObjectEvent)rawEvent).getIomObject();
+						// different linetable or maintable object?
 						if(!iliQName.equals(rawObj.getobjecttag())){
-							// object from different table; no longer main table
-							aclassObj=rawReader.mapIliQName2Class(rawObj.getobjecttag());
-							if(aclassObj instanceof AbstractClassDef){
-								// another main table
-								pushBackEvent(rawEvent);
-							}else{
-								// next SURFACE helper table or AREA helper table of new main table
-								surfaceOrAreaAttr=(AttributeDef)aclassObj;
-								if(surfaceOrAreaAttr.getContainer()!=aclass){
-									// area helper table of another main table
-									surfaceOrAreaAttr=null;
-									pushBackEvent(rawEvent);
-								}else{
-									iliQName=rawObj.getobjecttag();
-								}
-							}
+							iliQName=rawObj.getobjecttag();
 							break;
-						}else{
-							String oid=rawObj.getobjectoid();
-							currentMainObjs.put(oid,rawObj);
-							// FOR all area attrs: add georef to polygonizer
-							for(AttributeDef areaAttr : currentAreaAttrs.keySet()){
-								ItfAreaLinetable2Polygon polygonizer=currentAreaAttrs.get(areaAttr);
-								IomObject georef=rawObj.getattrobj(areaAttr.getName(), 0);
-								if(georef!=null){
-									polygonizer.addGeoRef(oid, georef);
-								}
-							}
-							// FOR all surface attrs: add mainobj-tid to polygonizer
-							for(AttributeDef surfaceAttr : currentSurfaceAttrs.keySet()){
-								ItfSurfaceLinetable2Polygon polygonizer=currentSurfaceAttrs.get(surfaceAttr);
-								polygonizer.addMainObjectTid(oid);
-							}
 						}
 					}else{
+						rawObj=null;
+						iliQName=null;
+						// push back object
 						pushBackEvent(rawEvent);
 						break;
 					}
 				}
-				// WHILE another surface linetable
-				while(surfaceOrAreaAttr!=null){
-					// collect linetable objects
-					ItfSurfaceLinetable2Polygon polygonizer=currentSurfaceAttrs.get(surfaceOrAreaAttr);
-					while(true){
-						polygonizer.addItfLinetableObject(rawObj);
-						rawEvent=nextEvent();
-						if(rawEvent instanceof ObjectEvent){
-							rawObj=((ObjectEvent)rawEvent).getIomObject();
-							if(!iliQName.equals(rawObj.getobjecttag())){
-								// object from another table
-								iliQName=rawObj.getobjecttag();
-								break;
-							}
-						}else{
-							rawObj=null;
-							iliQName=null;
-							pushBackEvent(rawEvent);
-							break;
+				surfaceOrAreaAttr=null;
+				if(iliQName!=null){
+					aclassObj=rawReader.mapIliQName2Class(iliQName);
+					if(aclassObj instanceof AbstractClassDef){
+						// main table
+						if(aclassObj!=aclass){
+							throw new IoxException("unexpected table "+iliQName);
+						}
+						// push back main table object
+						pushBackEvent(rawEvent);
+					}else{
+						// next AREA helper table
+						surfaceOrAreaAttr=(AttributeDef)aclassObj;
+						if(surfaceOrAreaAttr.getContainer()!=aclass){
+							throw new IoxException("unexpected linetable "+iliQName);
 						}
 					}
-					surfaceOrAreaAttr=null;
-					if(iliQName!=null){
-						aclassObj=rawReader.mapIliQName2Class(iliQName);
+				}
+			}
+			// maintable
+			surfaceOrAreaAttr=null;
+			//mainObjs=new HashMap<String,IomObject>();
+			currentMainObjs=objPool.newObjectPoolImpl2(new JavaSerializer());
+			iliQName=aclass.getScopedName(null);
+			while(true){
+				  // collect objects
+				rawEvent=nextEvent();
+				if(rawEvent instanceof ObjectEvent){
+					rawObj=((ObjectEvent)rawEvent).getIomObject();
+					if(!iliQName.equals(rawObj.getobjecttag())){
+						// object from different table; no longer main table
+						aclassObj=rawReader.mapIliQName2Class(rawObj.getobjecttag());
 						if(aclassObj instanceof AbstractClassDef){
 							// another main table
-							surfaceOrAreaAttr=null;
 							pushBackEvent(rawEvent);
-							break;
 						}else{
 							// next SURFACE helper table or AREA helper table of new main table
 							surfaceOrAreaAttr=(AttributeDef)aclassObj;
@@ -321,78 +291,135 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 								// area helper table of another main table
 								surfaceOrAreaAttr=null;
 								pushBackEvent(rawEvent);
-								break;
+							}else{
+								iliQName=rawObj.getobjecttag();
 							}
 						}
+						break;
+					}else{
+						String oid=rawObj.getobjectoid();
+						currentMainObjs.put(oid,rawObj);
+						// FOR all area attrs: add georef to polygonizer
+						for(AttributeDef areaAttr : currentAreaAttrs.keySet()){
+							ItfAreaLinetable2Polygon polygonizer=currentAreaAttrs.get(areaAttr);
+							IomObject georef=rawObj.getattrobj(areaAttr.getName(), 0);
+							if(georef!=null){
+								polygonizer.addGeoRef(oid, georef);
+							}
+						}
+						// FOR all surface attrs: add mainobj-tid to polygonizer
+						for(AttributeDef surfaceAttr : currentSurfaceAttrs.keySet()){
+							ItfSurfaceLinetable2Polygon polygonizer=currentSurfaceAttrs.get(surfaceAttr);
+							polygonizer.addMainObjectTid(oid);
+						}
+					}
+				}else{
+					pushBackEvent(rawEvent);
+					break;
+				}
+			}
+			// WHILE another surface linetable
+			while(surfaceOrAreaAttr!=null){
+				// collect linetable objects
+				ItfSurfaceLinetable2Polygon polygonizer=currentSurfaceAttrs.get(surfaceOrAreaAttr);
+				while(true){
+					polygonizer.addItfLinetableObject(rawObj);
+					rawEvent=nextEvent();
+					if(rawEvent instanceof ObjectEvent){
+						rawObj=((ObjectEvent)rawEvent).getIomObject();
+						if(!iliQName.equals(rawObj.getobjecttag())){
+							// object from another table
+							iliQName=rawObj.getobjecttag();
+							break;
+						}
+					}else{
+						rawObj=null;
+						iliQName=null;
+						pushBackEvent(rawEvent);
+						break;
 					}
 				}
-				// polygonize all collected linetables
-				// FOR all area attrs: polygonize and add polygon to main object
-				for(AttributeDef areaAttr : currentAreaAttrs.keySet()){
-					String areaAttrName=areaAttr.getName();
-					setTopologyValidationDone(areaAttr);
-					ItfAreaLinetable2Polygon polygonizer=currentAreaAttrs.get(areaAttr);
-					try {
-						polygonizer.buildSurfaces();
-						ArrayList<IoxInvalidDataException> dataerrs2 = polygonizer.getDataerrs();
-						dataerrs.addAll(dataerrs2);
-						if(dataerrs2.size()>0){
-							setTopologyValidationFailed(areaAttr);
+				surfaceOrAreaAttr=null;
+				if(iliQName!=null){
+					aclassObj=rawReader.mapIliQName2Class(iliQName);
+					if(aclassObj instanceof AbstractClassDef){
+						// another main table
+						surfaceOrAreaAttr=null;
+						pushBackEvent(rawEvent);
+						break;
+					}else{
+						// next SURFACE helper table or AREA helper table of new main table
+						surfaceOrAreaAttr=(AttributeDef)aclassObj;
+						if(surfaceOrAreaAttr.getContainer()!=aclass){
+							// area helper table of another main table
+							surfaceOrAreaAttr=null;
+							pushBackEvent(rawEvent);
+							break;
 						}
-					} catch (IoxInvalidDataException e) {
-						ArrayList<IoxInvalidDataException> dataerrs2 = polygonizer.getDataerrs();
-						dataerrs.addAll(dataerrs2);
-						dataerrs.add(new IoxInvalidDataException("failed to build polygons of "+aclass.getScopedName(null)+"."+areaAttrName,e));
+					}
+				}
+			}
+			// polygonize all collected linetables
+			// FOR all area attrs: polygonize and add polygon to main object
+			for(AttributeDef areaAttr : currentAreaAttrs.keySet()){
+				String areaAttrName=areaAttr.getName();
+				setTopologyValidationDone(areaAttr);
+				ItfAreaLinetable2Polygon polygonizer=currentAreaAttrs.get(areaAttr);
+				try {
+					polygonizer.buildSurfaces();
+					ArrayList<IoxInvalidDataException> dataerrs2 = polygonizer.getDataerrs();
+					dataerrs.addAll(dataerrs2);
+					if(dataerrs2.size()>0){
 						setTopologyValidationFailed(areaAttr);
-						continue;
 					}
+				} catch (IoxInvalidDataException e) {
+					ArrayList<IoxInvalidDataException> dataerrs2 = polygonizer.getDataerrs();
+					dataerrs.addAll(dataerrs2);
+					dataerrs.add(new IoxInvalidDataException("failed to build polygons of "+aclass.getScopedName(null)+"."+areaAttrName,e));
+					setTopologyValidationFailed(areaAttr);
+					continue;
 				}
-				// FOR all surface attrs: polygonize and add polygon to main object
-				for(AttributeDef surfaceAttr : currentSurfaceAttrs.keySet()){
-					String surfaceAttrName=surfaceAttr.getName();
-					setTopologyValidationDone(surfaceAttr);
-					ItfSurfaceLinetable2Polygon polygonizer=currentSurfaceAttrs.get(surfaceAttr);
-					try {
-						polygonizer.buildSurfaces();
-						ArrayList<IoxInvalidDataException> dataerrs2 = polygonizer.getDataerrs();
-						dataerrs.addAll(dataerrs2);
-						if(dataerrs2.size()>0){
-							setTopologyValidationFailed(surfaceAttr);
-						}
-					} catch (IoxInvalidDataException e) {
-						ArrayList<IoxInvalidDataException> dataerrs2 = polygonizer.getDataerrs();
-						dataerrs.addAll(dataerrs2);
-						dataerrs.add( new IoxInvalidDataException("failed to build polygons of "+aclass.getScopedName(null)+"."+surfaceAttrName,e));
+			}
+			// FOR all surface attrs: polygonize and add polygon to main object
+			for(AttributeDef surfaceAttr : currentSurfaceAttrs.keySet()){
+				String surfaceAttrName=surfaceAttr.getName();
+				setTopologyValidationDone(surfaceAttr);
+				ItfSurfaceLinetable2Polygon polygonizer=currentSurfaceAttrs.get(surfaceAttr);
+				try {
+					polygonizer.buildSurfaces();
+					ArrayList<IoxInvalidDataException> dataerrs2 = polygonizer.getDataerrs();
+					dataerrs.addAll(dataerrs2);
+					if(dataerrs2.size()>0){
 						setTopologyValidationFailed(surfaceAttr);
-						continue;
 					}
+				} catch (IoxInvalidDataException e) {
+					ArrayList<IoxInvalidDataException> dataerrs2 = polygonizer.getDataerrs();
+					dataerrs.addAll(dataerrs2);
+					dataerrs.add( new IoxInvalidDataException("failed to build polygons of "+aclass.getScopedName(null)+"."+surfaceAttrName,e));
+					setTopologyValidationFailed(surfaceAttr);
+					continue;
 				}
-				String nextTid=currentMainObjs.keySet().iterator().next();
-				IomObject nextObj=currentMainObjs.get(nextTid);
-				currentMainObjs.remove(nextTid);
-				// FOR all area attrs: add polygon to main object
-				for(AttributeDef areaAttr : currentAreaAttrs.keySet()){
-					String areaAttrName=areaAttr.getName();
-					ItfAreaLinetable2Polygon polygonizer=currentAreaAttrs.get(areaAttr);
-					mergeAreaGeomToMainObj(areaAttrName, polygonizer, nextTid,nextObj);
-				}
-				// FOR all surface attrs: add polygon to main object
-				for(AttributeDef surfaceAttr : currentSurfaceAttrs.keySet()){
-					String surfaceAttrName=surfaceAttr.getName();
-					ItfSurfaceLinetable2Polygon polygonizer=currentSurfaceAttrs.get(surfaceAttr);
-					mergeSurfaceGeomToMainObj(surfaceAttrName, polygonizer,nextTid, nextObj);
-				}
-				return new ObjectEvent(nextObj);
 			}
-			
-			
-		}else if(rawEvent instanceof EndTransferEvent){
-			if(dataerrs.size()>0){
-        		for(IoxInvalidDataException dataerr:dataerrs){
-        			errFact.addEvent(errFact.logError(dataerr));
-        		}
-				throw new IoxInvalidDataException("failed to build polygons");
+			if(currentMainObjs.keySet().size()==0) {
+				dataerrs.add( new IoxInvalidDataException("no main objects of "+aclass.getScopedName()+" but linetable objects"));
+				return null;
 			}
+			String nextTid=currentMainObjs.keySet().iterator().next();
+			IomObject nextObj=currentMainObjs.get(nextTid);
+			currentMainObjs.remove(nextTid);
+			// FOR all area attrs: add polygon to main object
+			for(AttributeDef areaAttr : currentAreaAttrs.keySet()){
+				String areaAttrName=areaAttr.getName();
+				ItfAreaLinetable2Polygon polygonizer=currentAreaAttrs.get(areaAttr);
+				mergeAreaGeomToMainObj(areaAttrName, polygonizer, nextTid,nextObj);
+			}
+			// FOR all surface attrs: add polygon to main object
+			for(AttributeDef surfaceAttr : currentSurfaceAttrs.keySet()){
+				String surfaceAttrName=surfaceAttr.getName();
+				ItfSurfaceLinetable2Polygon polygonizer=currentSurfaceAttrs.get(surfaceAttr);
+				mergeSurfaceGeomToMainObj(surfaceAttrName, polygonizer,nextTid, nextObj);
+			}
+			return new ObjectEvent(nextObj);
 		}
 		return rawEvent;
 	}

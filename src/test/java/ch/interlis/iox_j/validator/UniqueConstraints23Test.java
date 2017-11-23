@@ -124,7 +124,7 @@ public class UniqueConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob ein Fehler ausgegeben wird, wenn kein Unique definiert wurde, jedoch das attr2 der beiden Objekte die gleichen Werte enthält.
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn kein Unique definiert wurde, jedoch das attr2 der beiden Objekte die gleichen Werte enthaelt.
 	@Test
 	public void noAttrsAreUnique_Attr2ValueExistTwice_Ok(){
 		// Set object.
@@ -202,7 +202,7 @@ public class UniqueConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet ob ein Fehler ausgegeben wird, wenn (Attr1 und Attr2) Unique sind, jedoch Attr2 identische Werte enthält.
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn (Attr1 und Attr2) Unique sind, jedoch Attr2 identische Werte enthaelt.
 	@Test
 	public void only1AttributeValue_Attr2ExistTwice_Ok(){
 		// Set object.
@@ -605,7 +605,7 @@ public class UniqueConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// In beiden Objekten wird je über eine Structure auf ein attribute einer SURFACE verwiesen, Beide Attribute wurden mit unterschiedlichen Values erstellt.
+	// In beiden Objekten wird je ueber eine Structure auf ein attribute einer SURFACE verwiesen, Beide Attribute wurden mit unterschiedlichen Values erstellt.
 	// Somit darf keine Fehlermeldung ausgegeben werden.
 	@Test
 	public void uniqueSurfaceValuesOfStructureAreDifferent_Ok(){
@@ -696,7 +696,7 @@ public class UniqueConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// In beiden Objekten wird je über eine Structure auf ein attribute einer AREA verwiesen, Beide Attribute wurden mit unterschiedlichen Values erstellt.
+	// In beiden Objekten wird je ueber eine Structure auf ein attribute einer AREA verwiesen, Beide Attribute wurden mit unterschiedlichen Values erstellt.
 	// Somit darf keine Fehlermeldung ausgegeben werden.
 	@Test
 	public void uniqueAreaValuesOfStructureAreDifferent_Ok(){
@@ -819,7 +819,7 @@ public class UniqueConstraints23Test {
 	}	
 	
 	// In beiden Objekten einer Association werden auf die Rolle: c1 verwiesen. Es wird nur von 1 Objekt auf die Rolle c1 verweisen.
-	// Somit darf keine Fehlermeldung ausgegeben werden, da c1 nicht über 2 Mal angesprochen wird.
+	// Somit darf keine Fehlermeldung ausgegeben werden, da c1 nicht ueber 2 Mal angesprochen wird.
 	@Test
 	public void uniqueAttrValuesOfRoleC1_InStandAloneAssociationAreDifferent_Ok(){
 		Iom_jObject iomObjE=new Iom_jObject(CLASSC1,OID1);
@@ -848,7 +848,7 @@ public class UniqueConstraints23Test {
 	}	
 	
 	// Die Objekte referenzieren auf die Rolle: c1. Es wird nur von 1 Objekt auf die Rolle c1 verweisen.
-	// Somit darf keine Fehlermeldung ausgegeben werden, da c1 nicht über 2 Mal angesprochen wird.
+	// Somit darf keine Fehlermeldung ausgegeben werden, da c1 nicht ueber 2 Mal angesprochen wird.
 	@Test
 	public void uniqueAttrValuesOfRoleC1_InEmbeddedAssociationIsDifferent_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(CLASSC1,OID1);
@@ -895,7 +895,7 @@ public class UniqueConstraints23Test {
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn eine Konstante in  einem UniquenessConstraint undefiniert (gar nicht erstellt) ist.
 	// attr1 ist UNIQUE und noch einmal UNIQUE mit attr2 zusammen. Jedoch wird attr1 nicht erstellt.
-	// Es soll keine Fehlermeldung für die Unique Verletzung von attr2 ausgegeben werden.
+	// Es soll keine Fehlermeldung fuer die Unique Verletzung von attr2 ausgegeben werden.
 	@Test
 	public void nonUniqueAttr1IsUndefined_UniqueAttrValueOfAttr2ExistTwice_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(UNDEFINED, OID1);
@@ -1673,7 +1673,7 @@ public class UniqueConstraints23Test {
 	
 	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
 	// In beiden Objekten wird je auf ein attribute einer Struktur verwiesen, beide Attribute wurden mit den Selben Attribute-Values erstellt.
-	// Somit müssen 2 Fehlermeldungen ausgegeben werden: Eine für Unique attr1,attr2 und eine für Unique attr1.
+	// Somit muessen 2 Fehlermeldungen ausgegeben werden: Eine fuer Unique attr1,attr2 und eine fuer Unique attr1.
 	@Test
 	public void local_UniqueAttrValuesAttr1AndAttr2_OfStructExistTwice_False(){
 		Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
@@ -1741,7 +1741,7 @@ public class UniqueConstraints23Test {
 	
 	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint und einen GLOBAL Uniqueness Constraint.
 	// In beiden Objekten wird je auf ein attribute einer unterschiedlichen Struktur verwiesen, die Attribute wurden mit gleichen Values erstellt.
-	// Somit müssen 2 Fehlermeldungen ausgegeben werden, da attr2 Unique ist und in StructE attr1 und attr2 Unique ist.
+	// Somit muessen 2 Fehlermeldungen ausgegeben werden, da attr2 Unique ist und in StructE attr1 und attr2 Unique ist.
 	@Test
 	public void local_UniqueAttrValueAttr1ExistTwice_UniqueGlobalAttrValueAttr2ExistTwice_False(){
 		Iom_jObject struct2=new Iom_jObject(STRUCTE, null);
@@ -1986,7 +1986,7 @@ public class UniqueConstraints23Test {
 		assertEquals("Unique is violated! Values 5 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// In beiden Objekten einer Association werden auf die Rolle: c1 verwiesen. Beide Objekte verweisen 2 Mal über die Rolle c1 auf die Klasse C.
+	// In beiden Objekten einer Association werden auf die Rolle: c1 verwiesen. Beide Objekte verweisen 2 Mal ueber die Rolle c1 auf die Klasse C.
 	// Somit muss eine Fehlermeldung ausgegeben werden, da c1 nur maximal 1 Mal angesprochen werden darf. Da diese Unique ist.
 	//@Test
 	public void uniqueAttrValuesOfRoleC1_InStandAloneAssociation_ExistTwice_False(){
@@ -2012,7 +2012,7 @@ public class UniqueConstraints23Test {
 		assertEquals("Unique is violated! Values REF {} already exist in Object: UniqueConstraints23.Topic.assoB", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// In beiden Objekten wird je über eine AREA auf ein attribute einer AREA verwiesen, Beide Attribute wurden mit den Selben Values erstellt.
+	// In beiden Objekten wird je ueber eine AREA auf ein attribute einer AREA verwiesen, Beide Attribute wurden mit den Selben Values erstellt.
 	// Somit muss eine Fehlermeldung ausgegeben werden.
 	@Test
 	public void uniqueAttrValuesOfArea_OfStructureExistTwice_False(){
@@ -2136,7 +2136,7 @@ public class UniqueConstraints23Test {
 		assertEquals("Unique is violated! Values text already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// In beiden Objekten wird je über eine Structure auf ein attribute einer SURFACE verwiesen, Beide Attribute wurden mit den Selben Values erstellt.
+	// In beiden Objekten wird je ueber eine Structure auf ein attribute einer SURFACE verwiesen, Beide Attribute wurden mit den Selben Values erstellt.
 	// Somit muss eine Fehlermeldung ausgegeben werden.
 	@Test
 	public void uniqueAttrValuesOfSurface_InStructureExistTwice_False(){

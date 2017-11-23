@@ -180,6 +180,10 @@ public class ItfSurfaceLinetable2Polygon {
 		}
 		IomObject structvalue=iomObj.getattrobj(helperTableMainTableRef,0);
 		String refoid=structvalue.getobjectrefoid();
+		if(refoid==null) {
+			dataerrs.add(new IoxInvalidDataException("boundary line without reference to main table",linetableIliqname,iomObj.getobjectoid(),iomObj));
+			return;
+		}
 		java.util.ArrayList<IomObject> lines=null;
 		if(linepool.containsKey(refoid)){
 			lines=(ArrayList<IomObject>) linepool.get(refoid).clone();

@@ -1,0 +1,138 @@
+group 'ch.interlis'
+version '1.20.0'+System.getProperty('release','-SNAPSHOT')
+
+apply plugin: "java"
+apply plugin: "maven"
+
+configurations {
+    deployerJars
+}
+
+sourceCompatibility = "1.6" 
+targetCompatibility = "1.6"
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+    compile group: 'ch.interlis', name: 'iox-api', version: '1.+' // use SNAPSHOT
+    compile group: 'ch.interlis', name: 'ili2c-core', version: '4.+' // use SNAPSHOT
+    testCompile group: 'ch.interlis', name: 'ili2c-tool', version: '4.+' // use SNAPSHOT
+	compile group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.5.1'
+	compile group: 'com.vividsolutions', name: 'jts-core', version: '1.14.0'
+    deployerJars "org.apache.maven.wagon:wagon-ftp:3.0.0"
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url "http://jars.interlis.ch"
+    }
+    mavenCentral()
+}
+
+Properties properties = new Properties()
+File propFile=project.rootProject.file('user.properties')
+if(propFile.exists()){
+	properties.load(propFile.newDataInputStream())
+}
+def git = System.getProperty('git',properties.get('git','git'))
+def repos_pwd = System.getProperty('repos_pwd',properties.get('repos_pwd','repos_pwd'))
+def repos_usr = System.getProperty('repos_usr',properties.get('repos_usr','repos_usr'))
+def dburl = System.getProperty('dburl',properties.get('dburl'))
+def dbusr = System.getProperty('dbusr',properties.get('dbusr'))
+def dbpwd = System.getProperty('dbpwd',properties.get('dbpwd'))
+    
+def generatedResources = "$buildDir/generated-resources/main"
+
+def getGitHash = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine git, 'rev-parse', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+sourceSets {
+  main {
+    //let's register an output folder on the main SourceSet:
+    //it is now a part of the 'main' classpath and will be a part of the jar
+    output.dir(generatedResources, builtBy: 'generateMyResources')
+    java {
+    	srcDirs=['src/main/java'
+    	,'gensrc'
+    	,'jtsext/src/main/java']
+    }
+  }
+  test {
+  	  java {
+  	  	  srcDirs=['src/test/java'
+  	  	  ,'jtsext/src/test/java']
+  	  }
+  }
+}
+
+task generateMyResources {
+	doLast {
+		def versionProps = new Properties()
+		versionProps.setProperty('version', "$project.version")
+		versionProps.setProperty('versionCommit', getGitHash())
+		def versionPropsFile = new File(generatedResources,"ch/interlis/iox_j/Version.properties")
+		versionPropsFile.getParentFile().mkdirs();
+		versionProps.store(versionPropsFile.newWriter(), null);
+	}
+}
+
+def validateOnlyAsciiChars(File file) {
+	byte[] contents = file.bytes
+	for(byte b:contents){
+		if(b==9 || b==10 || b==13){
+			// tab, lf, cr
+		}else if(b>=32 && b<=126){
+			// printable character
+		}else{
+			//println 'special char '+b
+			return false
+		}
+	}
+	return true
+}
+
+task validateJavaSources{
+	boolean filesOk=true;
+	sourceSets.main.java.each { File file ->
+		if(!validateOnlyAsciiChars(file)){
+			logger.error(file.name+" contains non ascii characters")
+			filesOk=false
+		}
+	}
+	sourceSets.test.java.each { File file ->
+		if(!validateOnlyAsciiChars(file)){
+			logger.error(file.name+" contains non ascii characters")
+			filesOk=false
+		}
+	}
+	if(!filesOk){
+			throw new GradleException('some files in sourceSets are not valid')
+	}
+}
+
+test {
+	// when Gradle forks a new Java process, it does not automatically pass the 
+	// environment variable values along to the new environment. One has to 
+	// explicitly pass these variables
+	systemProperty 'dburl', dburl
+	systemProperty 'dbusr', dbusr
+	systemProperty 'dbpwd', dbpwd
+    testLogging.exceptionFormat = 'full'
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+        	configuration = configurations.deployerJars
+			repository(url: 'ftp://ftp.interlis.ch'){
+            	authentication(userName: repos_usr, password: repos_pwd)
+            }
+        }
+    }
+}

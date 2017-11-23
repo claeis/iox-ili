@@ -35,7 +35,7 @@ public class ItfAreaLV95_05Test {
 	{
 		// compile model
 		Configuration ili2cConfig=new Configuration();
-		FileEntry fileEntry=new FileEntry("src/test/data/itf/Test2LV95_05.ili", FileEntryKind.ILIMODELFILE);
+		FileEntry fileEntry=new FileEntry("src/test/data/Itf/Test2LV95_05.ili", FileEntryKind.ILIMODELFILE);
 		ili2cConfig.addFileEntry(fileEntry);
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
@@ -73,7 +73,7 @@ public class ItfAreaLV95_05Test {
 		builder.buildSurfaces();
 		IomObject polygon=builder.getSurfaceObject("14");
 		//System.out.println(polygon.toString());
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2610432.457, C2 1182691.551}, ARC {A2 1182693.794, A1 2610433.547, C1 2610434.152, C2 1182696.214}, ARC {A2 1182695.5981813655, A1 2610434.047045499, C1 2610433.910314906, C2 1182694.9886300697}, ARC {A2 1182694.959, A1 2610433.901, C1 2610433.382, C2 1182693.788}, COORD {C1 2610432.457, C2 1182691.551}]}}}}}"
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2610432.457, C2 1182691.551}, ARC {A1 2610433.547, A2 1182693.794, C1 2610434.152, C2 1182696.214}, ARC {A1 2610434.047045499, A2 1182695.5981813655, C1 2610433.910314906, C2 1182694.9886300697}, ARC {A1 2610433.901, A2 1182694.959, C1 2610433.382, C2 1182693.788}, COORD {C1 2610432.457, C2 1182691.551}]}}}}}"
 				,polygon.toString());
 	}
 
@@ -105,7 +105,7 @@ public class ItfAreaLV95_05Test {
 		builder.buildSurfaces();
 		IomObject polygon=builder.getSurfaceObject("14");
 		//System.out.println(polygon.toString());
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2610432.457, C2 1182691.551}, ARC {A2 1182693.794, A1 2610433.547, C1 2610434.152, C2 1182696.214}, ARC {A2 1182695.5981813655, A1 2610434.047045499, C1 2610433.910314906, C2 1182694.9886300697}, ARC {A2 1182694.959, A1 2610433.901, C1 2610433.382, C2 1182693.788}, COORD {C1 2610432.457, C2 1182691.551}]}}}}}"
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2610432.457, C2 1182691.551}, ARC {A1 2610433.547, A2 1182693.794, C1 2610434.152, C2 1182696.214}, ARC {A1 2610434.047045499, A2 1182695.5981813655, C1 2610433.910314906, C2 1182694.9886300697}, ARC {A1 2610433.901, A2 1182694.959, C1 2610433.382, C2 1182693.788}, COORD {C1 2610432.457, C2 1182691.551}]}}}}}"
 				,polygon.toString());
 	}
 	

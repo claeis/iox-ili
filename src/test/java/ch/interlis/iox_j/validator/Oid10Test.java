@@ -44,7 +44,7 @@ public class Oid10Test {
 	//####################### SUCCESS #########################//
 	//#########################################################//
 	
-	// // Es wird getestet ob eine 2 unterschiedliche OID's erstellt werden können.
+	// // Es wird getestet ob eine 2 unterschiedliche OID's erstellt werden koennen.
 	@Test
 	public void classesWithDifferentOids_Ok() throws Exception {
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
@@ -68,7 +68,7 @@ public class Oid10Test {
 	//######################### FAIL ##########################//
 	//#########################################################//
 	
-	// Es wird getestet ob 2 Klassen mit der selben OID erstellt werden können.
+	// Es wird getestet ob 2 Klassen mit der selben OID erstellt werden koennen.
 	@Test
 	public void duplicateOid_Fail() throws Exception {
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
@@ -89,7 +89,7 @@ public class Oid10Test {
 		assertEquals("OID o1 of object Oid1.Topic.ClassB already exists in CLASS Oid1.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob in unterschiedlichen Klassen die OIDs doppelt erstellt werden können.
+	// Es wird getestet ob in unterschiedlichen Klassen die OIDs doppelt erstellt werden koennen.
 	@Test
 	public void differentTableDuplicateOid_Fail() throws Exception {
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);

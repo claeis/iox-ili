@@ -2,7 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import ch.interlis.ili2c.metamodel.Viewable;
 
-public class ObjectPoolKey {
+public class ObjectPoolKey implements java.lang.Comparable {
 
 	private String oid;
 	private Viewable classValue;
@@ -16,6 +16,48 @@ public class ObjectPoolKey {
 		this.setBasketId(basketId);
 	}
 
+	@Override
+	public int compareTo(Object obj) {
+		if (this == obj)
+			return 0;
+		if (obj == null)
+			return -1;
+		if (getClass() != obj.getClass())
+			return -1;
+		ObjectPoolKey other = (ObjectPoolKey) obj;
+		if (getBasketId() == null) {
+			if (other.getBasketId() != null) {
+				return -1;
+			}
+			// both basketId==null 
+		} else {
+			int c=getBasketId().compareTo(other.getBasketId());
+			if(c!=0) {
+				return c;
+			}
+		}
+		if (getClassValue() == null) {
+			if (other.getClassValue() != null)
+				return -1;
+		} else {
+			int c=getClassValue().getScopedName().compareTo(other.getClassValue().getScopedName());
+			if(c!=0) {
+				return c;
+			}
+		}
+		if (getOid() == null) {
+			if (other.getOid() != null)
+				return -1;
+		} else {
+			int c=getOid().compareTo(other.getOid());
+			if(c!=0) {
+				return c;
+			}
+		}
+		return 0;
+	}
+
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -76,4 +118,5 @@ public class ObjectPoolKey {
 	private void setBasketId(String basketId) {
 		this.basketId = basketId;
 	}
+
 }

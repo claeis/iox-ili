@@ -172,7 +172,7 @@ public class Surface10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Surface mit 3 (2d) Polylines (überhaupt eine gültige Fläche) erstellt werden kann.
+	// Es wird getestet ob eine Surface mit 3 (2d) Polylines (ueberhaupt eine gueltige Flaeche) erstellt werden kann.
 	@Test
 	public void surface2dWith3Polylines_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -524,7 +524,7 @@ public class Surface10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Surface mit mehreren innerboundaries ohne überlappungen erstellt werden kann.
+	// Es wird getestet ob eine Surface mit mehreren innerboundaries ohne ueberlappungen erstellt werden kann.
 	@Test
 	public void surface2dWithInnerboundaries_OK(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -631,7 +631,7 @@ public class Surface10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Surface mit 2, (sich an 1 Punkt berührenden Innerboundaries), erstellt werden kann.
+	// Es wird getestet ob eine Surface mit 2, (sich an 1 Punkt beruehrenden Innerboundaries), erstellt werden kann.
 	@Test
 	public void surfacetouchOfInnerboundariesOn1Point_OK(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -738,7 +738,7 @@ public class Surface10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}	
 	
-	// Es wird getestet ob eine Surface mit einem Innerboundary, welche die Outerboundary an einem Punkt berührt, erstellt werden kann.
+	// Es wird getestet ob eine Surface mit einem Innerboundary, welche die Outerboundary an einem Punkt beruehrt, erstellt werden kann.
 	@Test
 	public void innerAndOuterBoundaryTouchOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -816,7 +816,7 @@ public class Surface10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Surface mit 2 innerboundaries, welche sich nicht berühren, erstellt werden kann.
+	// Es wird getestet ob eine Surface mit 2 innerboundaries, welche sich nicht beruehren, erstellt werden kann.
 	@Test
 	public void surfaceWithTwoInnerboundaries_OK(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -941,7 +941,7 @@ public class Surface10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Surface mit 2 Innerboundaries, welche sich an 1 Punkt berühren, in 3d Punkten erstellt werden kann.
+	// Es wird getestet ob eine Surface mit 2 Innerboundaries, welche sich an 1 Punkt beruehren, in 3d Punkten erstellt werden kann.
 	@Test
 	public void surfaceWith2InnerboundariesTouchOn1Point_OK(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1066,7 +1066,7 @@ public class Surface10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}	
 	
-	// Es wird getestet ob eine Surface, mit einem InnerBoundary, welches die OuterBoundary an einem Punkt berührt, erstellt werden kann.
+	// Es wird getestet ob eine Surface, mit einem InnerBoundary, welches die OuterBoundary an einem Punkt beruehrt, erstellt werden kann.
 	@Test
 	public void surfaceInnerboundaryTouchesOuterboundaryOn1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1160,7 +1160,7 @@ public class Surface10Test {
 	//########## FAILING TESTS ###################################/
 	//############################################################/
 
-	// Es wird getestet ob eine Surface erstellt werden kann, welche sich selber an 4 Punkten überschneidet.
+	// Es wird getestet ob eine Surface erstellt werden kann, welche sich selber an 4 Punkten ueberschneidet.
 	@Test
 	public void surfaceOverlapOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1239,7 +1239,7 @@ public class Surface10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eineSurface mit einer Innerboundary, welche sich an 2 Stellen mit der Outerboundary überschneidet, erstellt werden kann.
+	// Es wird getestet ob eineSurface mit einer Innerboundary, welche sich an 2 Stellen mit der Outerboundary ueberschneidet, erstellt werden kann.
 	@Test
 	public void surfaceIntersectionErrs_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1318,7 +1318,7 @@ public class Surface10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Surface welche 2 sich überschneidende innerboundaries beinhaltet, erstellt werden kann.
+	// Es wird getestet ob eine Surface welche 2 sich ueberschneidende innerboundaries beinhaltet, erstellt werden kann.
 	@Test
 	public void surfaceInvalidRingLines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1426,7 +1426,7 @@ public class Surface10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Surface mit sich überschneidenden Linien in 3d Koordinatenpunkte, erstellt werden kann.
+	// Es wird getestet ob eine Surface mit sich ueberschneidenden Linien in 3d Koordinatenpunkte, erstellt werden kann.
 	@Test
 	public void surface3dOverlapOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1517,7 +1517,7 @@ public class Surface10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Surface in 3d mit 2 Innerboundaries, welche die Outerboundary überschneidet, erstellt werden kann.
+	// Es wird getestet ob eine Surface in 3d mit 2 Innerboundaries, welche die Outerboundary ueberschneidet, erstellt werden kann.
 	@Test
 	public void surface3dIntersectionErrs_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1608,7 +1608,7 @@ public class Surface10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fläche erstellt werden kann, wenn die Boundary Linien keine gültige Fläche darstellen.
+	// Es wird getestet ob eine Flaeche erstellt werden kann, wenn die Boundary Linien keine gueltige Flaeche darstellen.
 	@Test
 	public void surface3dInvalidRingLines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1906,7 +1906,7 @@ public class Surface10Test {
 		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Surface mit einer ungültigen Value C1, C2 und C3 erstellt werden kann.
+	// Es wird getestet ob eine Surface mit einer ungueltigen Value C1, C2 und C3 erstellt werden kann.
 	@Test
 	public void surface3dInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1938,7 +1938,7 @@ public class Surface10Test {
 		assertEquals("value 50000.000 is out of range", logger.getErrs().get(2).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Surface mit einer ungültigen Value C1 und C2 erstellt werden kann.
+	// Es wird getestet ob eine Surface mit einer ungueltigen Value C1 und C2 erstellt werden kann.
 	@Test
 	public void surface2dInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1968,7 +1968,7 @@ public class Surface10Test {
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Surface mit einer ungültigen Value von A1 und A2 erstellt werden kann.
+	// Es wird getestet ob eine Surface mit einer ungueltigen Value von A1 und A2 erstellt werden kann.
 	@Test
 	public void surfaceValueOfArcOutOfRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -2005,7 +2005,7 @@ public class Surface10Test {
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Surface mit einer ungültigen Value von A1 und A2 erstellt werden kann.
+	// Es wird getestet ob eine Surface mit einer ungueltigen Value von A1 und A2 erstellt werden kann.
 	@Test
 	public void surface3dValueOutOfRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -2042,7 +2042,7 @@ public class Surface10Test {
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei einer AREA oder SURFACE die outerboundary
 	// (welche minimal 1 Mal existieren muss) nicht gefunden wird.
-	// Dafür sollte eine klare Fehlermeldung erscheinen:
+	// Dafuer sollte eine klare Fehlermeldung erscheinen:
 	// dass bei einem Surface oder einer Area mindestens ein Outerboundary deklariert sein muss.
 	@Test
 	public void missingOuterBoundaryInSurface_False(){

@@ -112,7 +112,7 @@ public class Function23Test {
 	//######## SUCCESS FUNCTIONS ##############################//
 	//#########################################################//
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: len, die Länge stimmt. 
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: len, die Laenge stimmt. 
 	@Test
 	public void len_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA1, OBJ_OID1);
@@ -132,7 +132,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: len die länge der Konstanten mit der Länge des Textes übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: len die laenge der Konstanten mit der Laenge des Textes uebereinstimmt.
 	@Test
 	public void lenWithText_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA2, OBJ_OID1);
@@ -151,7 +151,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenTrim die Länge des Textes stimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenTrim die Laenge des Textes stimmt.
 	@Test
 	public void lenTrimAttr1_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA3, OBJ_OID1);
@@ -171,7 +171,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM die Länge des Textes mit einem Zeilenumbruch stimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM die Laenge des Textes mit einem Zeilenumbruch stimmt.
 	@Test
 	public void lenM_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB1, OBJ_OID1);
@@ -191,7 +191,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM die Länge einer Konstanten mit der Länge des Textes übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM die Laenge einer Konstanten mit der Laenge des Textes uebereinstimmt.
 	@Test
 	public void lenMLenConstant_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB2, OBJ_OID1);
@@ -210,7 +210,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenMTrim die Länge mit einem Zeilenumbruch strimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenMTrim die Laenge mit einem Zeilenumbruch strimmt.
 	@Test
 	public void lenMTrim_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB3, OBJ_OID1);
@@ -230,7 +230,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim die Längen der Texte übereinstimmen.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim die Laengen der Texte uebereinstimmen.
 	@Test
 	public void trim_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC1, OBJ_OID1);
@@ -250,7 +250,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim die Konstante mit der Länge des Textes übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim die Konstante mit der Laenge des Textes uebereinstimmt.
 	@Test
 	public void trimConstant_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC2, OBJ_OID1);
@@ -269,7 +269,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim Stimmen die Längen der Texte überein.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim Stimmen die Laengen der Texte ueberein.
 	@Test
 	public void trimTrimAttr1_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC3, OBJ_OID1);
@@ -289,7 +289,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM die Text übereinstimmen.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM die Text uebereinstimmen.
 	@Test
 	public void trimM_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD1, OBJ_OID1);
@@ -309,7 +309,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM, die Konstante mit dem Text übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM, die Konstante mit dem Text uebereinstimmt.
 	@Test
 	public void trimMConstant_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD2, OBJ_OID1);
@@ -328,7 +328,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim, die beiden Texte übereinstimmen.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim, die beiden Texte uebereinstimmen.
 	@Test
 	public void trimTrimAttr_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD3, OBJ_OID1);
@@ -389,7 +389,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: inEnumRange das attr2 sich innerhalb von attr1 und attr3 befindet, welche über eine Unter-Hierarchie gehen.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: inEnumRange das attr2 sich innerhalb von attr1 und attr3 befindet, welche ueber eine Unter-Hierarchie gehen.
 	@Test
 	public void inEnumRangeSubEnum_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSI, OBJ_OID1);
@@ -410,7 +410,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Anzahl der elemente mit dem attr2 übereinstimmen.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Anzahl der elemente mit dem attr2 uebereinstimmen.
 	@Test
 	public void elementCountTrue_Ok(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
@@ -438,7 +438,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount der Bag mit dem attr2 übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount der Bag mit dem attr2 uebereinstimmt.
 	@Test
 	public void elementCount_Ok(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
@@ -460,7 +460,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Anzahl der Listen mit der Anzahl von attr2 übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Anzahl der Listen mit der Anzahl von attr2 uebereinstimmt.
 	@Test
 	public void elementCount5Lists_Ok(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
@@ -494,7 +494,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Liste mit dem Attribute2 übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Liste mit dem Attribute2 uebereinstimmt.
 	@Test
 	public void elementCountList_Ok(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
@@ -565,7 +565,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass die gesuchte Klasse, mit dem Resultat der Funktion: myClass übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass die gesuchte Klasse, mit dem Resultat der Funktion: myClass uebereinstimmt.
 	@Test
 	public void isOfClassWithRefEqualToMyClass_Ok(){
 		String objTargetId=OBJ_OID1;
@@ -606,7 +606,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: myClass, die KlasseY mit der Gesuchten Klasse übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: myClass, die KlasseY mit der Gesuchten Klasse uebereinstimmt.
 	@Test
 	public void myClass_Ok(){
 		Iom_jObject iomObjS1=new Iom_jObject(ILI_STRUCTB, null);
@@ -627,7 +627,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isSubClass die referenzierte Klasse mit der Klasse der Funktion: myClass übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isSubClass die referenzierte Klasse mit der Klasse der Funktion: myClass uebereinstimmt.
 	@Test
 	public void isSubClassWithRefAndMyClass_Ok(){
 		String objTargetId=OBJ_OID1;
@@ -852,7 +852,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: areArea die Geometrien einer AREA im Argument Objects die angegebene Klasse diese Anforderung erfüllt. 
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: areArea die Geometrien einer AREA im Argument Objects die angegebene Klasse diese Anforderung erfuellt. 
 	// 2 objects. Objects with Class implementation
 	@Test
 	public void areAreaObjectsOfSpecificClass_Ok(){
@@ -973,7 +973,7 @@ public class Function23Test {
 	//######## FAIL FUNCTIONS #################################//
 	//#########################################################//
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der höheren Hierarchie nicht übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der hoeheren Hierarchie nicht uebereinstimmt.
 	@Test
 	public void isEnumSubVal_MehrVierIsNotSubValOfEins_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSG, OBJ_OID1);
@@ -1083,7 +1083,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassA1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: len, die länge der Strings nicht der Länge des attr2 entspricht.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: len, die laenge der Strings nicht der Laenge des attr2 entspricht.
 	@Test
 	public void len_StringLenthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA2, OBJ_OID1);
@@ -1103,7 +1103,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassA2.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: len die Länge zu lang ist.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: len die Laenge zu lang ist.
 	@Test
 	public void len_TrimLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA3, OBJ_OID1);
@@ -1124,7 +1124,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassA3.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM, die Längen nicht übereinstimmen.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM, die Laengen nicht uebereinstimmen.
 	@Test
 	public void lenM_lengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB1, OBJ_OID1);
@@ -1145,7 +1145,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassB1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM, die Länge der Konstanten nicht übereinstimmen.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM, die Laenge der Konstanten nicht uebereinstimmen.
 	@Test
 	public void lenM_ConstantLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB2, OBJ_OID1);
@@ -1165,7 +1165,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassB2.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM, die Länge der attr in der Funktion: trim stehenden länge mit der Länge in attr2 nicht übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: lenM, die Laenge der attr in der Funktion: trim stehenden laenge mit der Laenge in attr2 nicht uebereinstimmt.
 	@Test
 	public void lenM_TrimLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSB3, OBJ_OID1);
@@ -1186,7 +1186,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassB3.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim, die Längen der beiden Strings nicht übereinstimmen.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim, die Laengen der beiden Strings nicht uebereinstimmen.
 	@Test
 	public void trim_LengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC1, OBJ_OID1);
@@ -1207,7 +1207,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassC1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim, die Länge der Konstanten und die Länge von attr2 nicht übereinstimmen.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim, die Laenge der Konstanten und die Laenge von attr2 nicht uebereinstimmen.
 	@Test
 	public void trim_ConstantLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC2, OBJ_OID1);
@@ -1227,7 +1227,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassC2.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim, der getrimmte Text: attr1 und der attr2 Text nicht übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trim, der getrimmte Text: attr1 und der attr2 Text nicht uebereinstimmt.
 	@Test
 	public void trim_TrimedTextLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSC3, OBJ_OID1);
@@ -1248,7 +1248,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassC3.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM, der getrimmte Text in attr1 nicht mit dem Text in attr2 nicht übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM, der getrimmte Text in attr1 nicht mit dem Text in attr2 nicht uebereinstimmt.
 	@Test
 	public void trimM_MTrimmedLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD1, OBJ_OID1);
@@ -1269,7 +1269,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassD1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM, die Länge in der Konstante mit der Länge in attr2 nicht übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM, die Laenge in der Konstante mit der Laenge in attr2 nicht uebereinstimmt.
 	@Test
 	public void trimM_ConstantLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD2, OBJ_OID1);
@@ -1289,7 +1289,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassD2.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM, die Länge der Texte nicht übereinstimmen.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: trimM, die Laenge der Texte nicht uebereinstimmen.
 	@Test
 	public void trimM_TrimmedLengthNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD3, OBJ_OID1);
@@ -1332,7 +1332,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassH.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount, der Count des BAG nicht mit dem attr2 übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount, der Count des BAG nicht mit dem attr2 uebereinstimmt.
 	@Test
 	public void elementCount_CountOfBagNotEqual_Fail(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
@@ -1361,7 +1361,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassN.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Anzahl der Listen nicht mit der Value von attr2 übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Anzahl der Listen nicht mit der Value von attr2 uebereinstimmt.
 	@Test
 	public void elementCount_ListCountNotEqual_Fail(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
@@ -1473,7 +1473,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassV.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass die referenzierte Klasse, keine gültige Klasse der Eltern-Klasse ist.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass die referenzierte Klasse, keine gueltige Klasse der Eltern-Klasse ist.
 	@Test
 	public void isOfClass_ChildClassNotValid_Fail(){
 		String objTargetId=OBJ_OID1;
@@ -1500,7 +1500,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassV.Constraint1 is not true.", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isSubClass, die beiden Konstanten Klassen nicht übereinstimmen.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isSubClass, die beiden Konstanten Klassen nicht uebereinstimmen.
 	@Test
 	public void isSubClassConstants_SubClassNotValid_Fail(){
 		Iom_jObject iomObjW=new Iom_jObject(ILI_CLASSX, OBJ_OID1);
@@ -1541,7 +1541,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassZ.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass die MyClass über eine falsche Referenz führt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass die MyClass ueber eine falsche Referenz fuehrt.
 	@Test
 	public void isOfClass_MyClassNotValid_Fail(){
 		String objTargetId=OBJ_OID1;
@@ -1566,7 +1566,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassWB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: areArea, die Linien sich überschneiden.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: areArea, die Linien sich ueberschneiden.
 	// 2 objects == 2 mandatoryConstraint fails.
 	@Test
 	public void areArea_ObjectsWithClass_IntersectionAreas_Fail(){
@@ -1651,7 +1651,7 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassZB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei mehreren Constraints, der Erste Constraint Fehl Schlägt, jedoch der zweite richtig wäre.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei mehreren Constraints, der Erste Constraint Fehl Schlaegt, jedoch der zweite richtig waere.
 	@Test
 	public void multipleConstraints_firstConstraint_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSZZ, OBJ_OID1);
@@ -1845,7 +1845,7 @@ public class Function23Test {
 		assertEquals("Function INTERLIS.convertUnit is not yet implemented.", logger.getWarn().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: areArea, die Anzahl der Objects im ersten Argument nicht mit den Geometrien übereinstimmt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: areArea, die Anzahl der Objects im ersten Argument nicht mit den Geometrien uebereinstimmt.
 	// 2 objects. Objects with Class implementation
 	@Test
 	public void areArea_WrongCount_Fail(){

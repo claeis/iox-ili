@@ -37,7 +37,7 @@ public class Datatypes10Test {
 	//########## SUCCESSFUL TESTS ################################/
 	//############################################################/
 	
-	// Die maximale Länge des Textes wird getestet.
+	// Die maximale Laenge des Textes wird getestet.
 	@Test
 	public void textMaximum_Ok(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -56,7 +56,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird die minimale Länge des Textes getestet.
+	// Es wird die minimale Laenge des Textes getestet.
 	@Test
 	public void textMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -94,7 +94,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob die Zahlen 0-9 in dieser Numeric vorkommen können.
+	// Es wird getestet ob die Zahlen 0-9 in dieser Numeric vorkommen koennen.
 	@Test
 	public void text2Numeric0_9Ok(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -113,7 +113,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob diese Befehl Wörter Auswirkungen auf die Eingabe haben.
+	// Es wird getestet ob diese Befehl Woerter Auswirkungen auf die Eingabe haben.
 	@Test
 	public void text2ValOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -132,7 +132,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob diese Zeichen im Text vorkommen können.
+	// Es wird getestet ob diese Zeichen im Text vorkommen koennen.
 	@Test
 	public void text2SignsOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -151,7 +151,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob es möglich ist, 2 Wörter zu schreiben.
+	// Es wird getestet ob es moeglich ist, 2 Woerter zu schreiben.
 	@Test
 	public void text2WordSeparationOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -174,7 +174,7 @@ public class Datatypes10Test {
 	@Test
 	public void text2ZeichensatzContentOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("text2", "ÄâäàáæÇçÉêëèéîïìíÑñÖôöòóÜûüùú");
+		objTest.setattrvalue("text2", "\u00c4\u00e2\u00e4\u00e0\u00e1\u00e6\u00c7\u00e7\u00c9\u00ea\u00eb\u00e8\u00e9\u00ee\u00ef\u00ec\u00ed\u00d1\u00f1\u00d6\u00f4\u00f6\u00f2\u00f3\u00dc\u00fb\u00fc\u00f9\u00fa");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -269,7 +269,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die maximale Aufzählung wird hier getestet.
+	// Die maximale Aufzaehlung wird hier getestet.
 	@Test
 	public void aufzaehlungMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -288,7 +288,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die minimale Aufzählung wird getestet.
+	// Die minimale Aufzaehlung wird getestet.
 	@Test
 	public void aufzaehlungMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -307,7 +307,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob diese Aufzählung in einer Verschachtelung funktioniert.
+	// Es wird getestet ob diese Aufzaehlung in einer Verschachtelung funktioniert.
 	@Test
 	public void aufzaehlungVerschachtelungOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -326,7 +326,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die maximale Länge dieser Numeric wird getetstet.
+	// Die maximale Laenge dieser Numeric wird getetstet.
 	@Test
 	public void laengeMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -345,7 +345,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die minimale Länge der Numeric wird getestet
+	// Die minimale Laenge der Numeric wird getestet
 	@Test
 	public void laengeMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -364,7 +364,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// 3 Stellen nach dem Komma werden getestet auf die Zulässigkeit.
+	// 3 Stellen nach dem Komma werden getestet auf die Zulaessigkeit.
 	@Test
 	public void laenge2ThirdPositionAfterDotOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -383,7 +383,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Das Maximum der Fläche wird getestet
+	// Das Maximum der Flaeche wird getestet
 	@Test
 	public void flaecheMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -402,7 +402,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Das Minimum der Fläche wird getestet.
+	// Das Minimum der Flaeche wird getestet.
 	@Test
 	public void flaecheMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -421,7 +421,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// 3 Stellen nach dem Komma werden getestet auf die Fläche.
+	// 3 Stellen nach dem Komma werden getestet auf die Flaeche.
 	@Test
 	public void flaeche2ThirdPositionAfterDotOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -554,7 +554,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Das minimale Datum, welches möglich ist, wird getestet.
+	// Das minimale Datum, welches moeglich ist, wird getestet.
 	@Test
 	public void datumLowestYearOk(){
 		Iom_jObject objLowestYear=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -900,7 +900,7 @@ public class Datatypes10Test {
 	//########## FAILING TESTS ###################################/
 	//############################################################/
 	
-	// Testet die Fehlerausgabe, wenn der Text grösser ist, als zulässig.
+	// Testet die Fehlerausgabe, wenn der Text groesser ist, als zulaessig.
 	@Test
 	public void textGreaterThanMaximumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -940,7 +940,7 @@ public class Datatypes10Test {
 		assertEquals("unknown property <Ztext>", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// testet, die Eingabe von nicht gültigen Zeichen.
+	// testet, die Eingabe von nicht gueltigen Zeichen.
 	@Test
 	public void textContainUnvalidCharactersFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -960,7 +960,7 @@ public class Datatypes10Test {
 		assertEquals("Attribute text must not contain control characters", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Testet die Eingabe von Buchstaben in einem Bereich für Zahlen.
+	// Testet die Eingabe von Buchstaben in einem Bereich fuer Zahlen.
 	@Test
 	public void bereichContainLettersFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -980,7 +980,7 @@ public class Datatypes10Test {
 		assertEquals("value <test> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn die Zahleneingabe grösser ist, als erlaubt.
+	// Gibt einen Fehler aus, wenn die Zahleneingabe groesser ist, als erlaubt.
 	@Test
 	public void bereichGreaterThanMaximumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1020,7 +1020,7 @@ public class Datatypes10Test {
 		assertEquals("value -0.5 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn der Bereich (auf 3 Kommastellen gerundet) grösser ist als definiert.
+	// Gibt einen Fehler aus, wenn der Bereich (auf 3 Kommastellen gerundet) groesser ist als definiert.
 	@Test
 	public void bereich2GreaterThanMaximumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1100,7 +1100,7 @@ public class Datatypes10Test {
 		assertEquals("unknown property <aufzaelung>", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn die Aufzählung nicht in der gleichen Enumeration sich befindet.
+	// Gibt einen Fehler aus, wenn die Aufzaehlung nicht in der gleichen Enumeration sich befindet.
 	@Test
 	public void aufzaehlungNotInSameEnumerationFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1120,7 +1120,7 @@ public class Datatypes10Test {
 		assertEquals("value meter.ml is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn  die Aufzählung nicht in der selber Enumeratiobn sich befindet. Test 2.
+	// Gibt einen Fehler aus, wenn  die Aufzaehlung nicht in der selber Enumeratiobn sich befindet. Test 2.
 	@Test
 	public void aufzaehlungNotInSameEnumeration2Fail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1140,7 +1140,7 @@ public class Datatypes10Test {
 		assertEquals("value liter.mm is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Gibt einen Fehler aus, wenn die Länge zu hoch ist.
+	// Gibt einen Fehler aus, wenn die Laenge zu hoch ist.
 	@Test
 	public void laengeToHighFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1160,7 +1160,7 @@ public class Datatypes10Test {
 		assertEquals("value 10.5 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn die Länge zu kurz ist.
+	// Gibt einen Fehler aus, wenn die Laenge zu kurz ist.
 	@Test
 	public void laengeToLowFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1180,7 +1180,7 @@ public class Datatypes10Test {
 		assertEquals("value 0.4 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn die Länge nicht numerisch ist.
+	// Gibt einen Fehler aus, wenn die Laenge nicht numerisch ist.
 	@Test
 	public void laengeNotValidFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1220,7 +1220,7 @@ public class Datatypes10Test {
 		assertEquals("value <2.0 5.2> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Gibt einen Fehler aus, wenn die Flächendefinition zu gross ist.
+	// Gibt einen Fehler aus, wenn die Flaechendefinition zu gross ist.
 	@Test
 	public void flaecheToHighFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1240,7 +1240,7 @@ public class Datatypes10Test {
 		assertEquals("value 10.5 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn die Flächendefinition zu klein ist.
+	// Gibt einen Fehler aus, wenn die Flaechendefinition zu klein ist.
 	@Test
 	public void flaecheToLowFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1260,7 +1260,7 @@ public class Datatypes10Test {
 		assertEquals("value 0.4 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn die Fläche nicht numerisch, sondern aus Buchstaben besteht.
+	// Gibt einen Fehler aus, wenn die Flaeche nicht numerisch, sondern aus Buchstaben besteht.
 	@Test
 	public void flaecheNotValidFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1280,7 +1280,7 @@ public class Datatypes10Test {
 		assertEquals("value <abc> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn die Fläche nicht numerisch, sondern aus koordinaten besteht aus.
+	// Gibt einen Fehler aus, wenn die Flaeche nicht numerisch, sondern aus koordinaten besteht aus.
 	@Test
 	public void FlaecheWith2DezFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1300,7 +1300,7 @@ public class Datatypes10Test {
 		assertEquals("value <2.0 5.2> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn der Radian grösser ist, als die Definition des Maximums.
+	// Gibt einen Fehler aus, wenn der Radian groesser ist, als die Definition des Maximums.
 	@Test
 	public void radiansGreaterThanMaxFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1340,7 +1340,7 @@ public class Datatypes10Test {
 		assertEquals("value 0.4 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn grads grösser definiert wurde, als erlaubt.
+	// Gibt einen Fehler aus, wenn grads groesser definiert wurde, als erlaubt.
 	@Test
 	public void gradsGreaterThanMaxFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1380,7 +1380,7 @@ public class Datatypes10Test {
 		assertEquals("value 0.4 is out of range", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn degrees grösser ist, als erlaubt.
+	// Gibt einen Fehler aus, wenn degrees groesser ist, als erlaubt.
 	@Test
 	public void degreesGreaterThanMaxFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1520,7 +1520,7 @@ public class Datatypes10Test {
 		assertEquals("value <15801225> is not in range", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn das Datum die maximale Definition übersteigt.
+	// Gibt einen Fehler aus, wenn das Datum die maximale Definition uebersteigt.
 	@Test
 	public void datumYearToHighFail(){
 		Iom_jObject objYearToHigh=new Iom_jObject("Datatypes10.Topic.Table", "o1");

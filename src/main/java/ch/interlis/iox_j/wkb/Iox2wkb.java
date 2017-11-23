@@ -142,6 +142,28 @@ public class Iox2wkb {
 	      }
 	      return os.toByteArray();
 	}
+	public byte[] multicoord2wkb(IomObject obj)
+	throws Iox2wkbException
+	{
+		if(obj==null){
+			return null;
+		}
+	    try {
+			writeByteOrder();
+			writeGeometryType(WKBConstants.wkbMultiPoint);
+			int coordc=obj.getattrvaluecount(Wkb2iox.ATTR_COORD);
+			os.writeInt(coordc);
+
+			for(int coordi=0;coordi<coordc;coordi++){
+				IomObject coord=obj.getattrobj(Wkb2iox.ATTR_COORD,coordi);
+				Iox2wkb helper=new Iox2wkb(outputDimension,os.order());
+				os.write(helper.coord2wkb(coord));
+			}
+		} catch (IOException e) {
+	        throw new RuntimeException("Unexpected IO exception: " + e.getMessage());
+		}
+		return os.toByteArray();
+	}
 	private void writeCoord(IomObject value) throws Iox2wkbException {
 		String c1=value.getattrvalue("C1");
 		String c2=value.getattrvalue("C2");

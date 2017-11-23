@@ -63,7 +63,7 @@ public class ItfSurfaceArcTest {
 		builder.buildSurfaces();
 		IomObject polygon=builder.getSurfaceObject(mainObjectTid);
 		//System.out.println(polygon);
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, ARC {A2 108.0, A1 115.0, C1 110.0, C2 110.0}]}}}}}"
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, ARC {A1 115.0, A2 108.0, C1 110.0, C2 110.0}]}}}}}"
 				,polygon.toString());
 		
 	}

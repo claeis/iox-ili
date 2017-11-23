@@ -1,0 +1,12 @@
+INTERLIS 2.3;
+
+MODEL CsvModelAttributesLimited (de) AT "mailto:ceis@localhost" VERSION "20170703" =
+	TOPIC Topic12 =
+		CLASS Class1 =
+			idname : TEXT*40;
+			textname : TEXT*40;
+			doublename : TEXT*40;
+			the_geom : TEXT*40;
+		END Class1;
+	END Topic12;
+END CsvModelAttributesLimited.

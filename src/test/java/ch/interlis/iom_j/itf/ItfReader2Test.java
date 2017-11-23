@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import org.junit.Before;
 import org.junit.ComparisonFailure;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ch.ehi.basics.logging.EhiLogger;
@@ -45,6 +46,25 @@ public class ItfReader2Test {
 			if(tid!=null && tid.equals(((LogEventImpl) foundErr).getSourceObjectXtfId())){
 				return;
 			}
+		}
+		throw new ComparisonFailure("no such error",expected,"");
+		
+	}
+	private void assertError(String expected)
+	{
+		LogEvent foundErr=null;
+		for(LogEvent err:errs.getErrs()){
+			if(expected.equals(err.getEventMsg())){
+				foundErr=err;
+				break;
+			}
+			if(err.getException()!=null && expected.equals(err.getException().getMessage())){
+				foundErr=err;
+				break;
+			}
+		}
+		if(foundErr!=null){
+			return;
 		}
 		throw new ComparisonFailure("no such error",expected,"");
 		
@@ -153,7 +173,7 @@ public class ItfReader2Test {
 			 }while(!(event instanceof EndTransferEvent));
 			 fail();
 		}catch(IoxInvalidDataException ex){
-			 assertError("no main obj","1");
+			 assertError("unexpected linetable Test1.TopicA.TableA_Form");
 		}
 	}
 	@Test
@@ -178,7 +198,7 @@ public class ItfReader2Test {
 			 }while(!(event instanceof EndTransferEvent));
 			 fail();
 		}catch(IoxInvalidDataException ex){
-			 assertError("no main table","1");
+			 assertError("unexpected linetable Test1.TopicA.TableA_Form");
 		}
 	}
 
@@ -273,7 +293,7 @@ public class ItfReader2Test {
 			 }while(!(event instanceof EndTransferEvent));
 			 fail();
 		}catch(IoxInvalidDataException ex){
-			 assertError("no main obj","1");
+			 assertError("no main objects of Test1.TopicB.TableB but linetable objects");
 		}
 	}
 	@Test
@@ -298,7 +318,7 @@ public class ItfReader2Test {
 			 }while(!(event instanceof EndTransferEvent));
 			 fail();
 		}catch(IoxInvalidDataException ex){
-			 assertError("no main table","1");
+			 assertError("no main objects of Test1.TopicB.TableB but linetable objects");
 		}
 	}
 	@Test
