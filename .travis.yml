@@ -19,6 +19,6 @@ deploy:
       branch: master
   - provider: script
     skip_cleanup: true
-    script: gradle -Drepos_pwd=${repos_pwd} -Drepos_usr=jql_jars-INTE -Drelease=final upload
+    script: gradle -Drepos_pwd=${repos_pwd} -Drepos_usr=jql_jars-INTE '-Drelease=' upload
     on:
       branch: stable
