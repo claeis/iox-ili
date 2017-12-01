@@ -441,7 +441,7 @@ public class ItfSurfaceLinetable2Polygon {
 				}else{
 					isDisconnected=true;
 					try {
-						dataerrs.add(new IoxInvalidDataException("multipolygon",geomattrIliqname,mainTid,Jtsext2iox.JTS2surface(holePoly)));
+						dataerrs.add(new IoxInvalidDataException("multipolygon "+IoxInvalidDataException.formatTids(new String[] {mainTid}),geomattrIliqname,mainTid,Jtsext2iox.JTS2surface(holePoly)));
 					} catch (Iox2jtsException e) {
 						throw new IllegalStateException(e);
 					}

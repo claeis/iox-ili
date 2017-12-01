@@ -183,66 +183,70 @@ class PolygonizeGraph
 	    for (Iterator iNode = nodeIterator(); iNode.hasNext(); ) {
 	        Node node = (Node) iNode.next();
 	        //computeNextCWEdges(node);
-	        boolean overlapRemoved=false;
             DirectedEdgeStar deStar = node.getOutEdges();
-            PolygonizeDirectedEdge startDE = null;
-            PolygonizeDirectedEdge prevDE = null;
-            // the edges are stored in CCW order around the star
-            List<PolygonizeDirectedEdge> edges = getActiveOutgoingEdges(deStar);
-            if(doDetailTrace)printEdges(node.getCoordinate()+": ",edges);
-            int edgec=edges.size();
-            double maxDist=0.0;
-            for(int i=0;i<edgec;i++){
-                PolygonizeDirectedEdge currentDE = edges.get(i);
-                for(int j=i+1;j<edgec;j++){
-                    PolygonizeDirectedEdge nextDE = edges.get(j);
-                    if((currentDE.isArc() || nextDE.isArc()) && Math.abs(currentDE.getAngle()-nextDE.getAngle())<0.0001){
-                    	maxDist=2*newVertexOffset;
-                    	if(doDetailTrace)System.out.println("  angleDiff "+(currentDE.getAngle()-nextDE.getAngle()));
-                    }
-                    Coordinate is=getIntersection(li,node.getCoordinate(),currentDE, nextDE);
-                    if(is!=null){
-                    	double dist=CurveSegment.dist(node.getCoordinate(),is);
-                    	if(dist>maxDist){
-                    		maxDist=dist;
-                    	}
-                    }
-                }
-            }
-            if(maxDist>0){
-            	maxDist=maxDist*1.1;
-            	if(doDetailTrace)System.out.println("  maxDist "+maxDist);
+	        boolean overlapRemoved=false;
+            do{
+    	        overlapRemoved=false;
+                PolygonizeDirectedEdge startDE = null;
+                PolygonizeDirectedEdge prevDE = null;
+                List<PolygonizeDirectedEdge> edges = getActiveOutgoingEdges(deStar);
+                if(doDetailTrace)printEdges("removeOverlaps "+node.getCoordinate()+": ",edges);
+                int edgec=edges.size();
+                double maxDist=0.0;
+                // calculate distance for evaluation of curve direction
                 for(int i=0;i<edgec;i++){
                     PolygonizeDirectedEdge currentDE = edges.get(i);
-                    currentDE.adjustDirectionPt(maxDist);
+                    for(int j=i+1;j<edgec;j++){
+                        PolygonizeDirectedEdge nextDE = edges.get(j);
+                        if((currentDE.isArc() || nextDE.isArc()) && Math.abs(currentDE.getAngle()-nextDE.getAngle())<0.0001){
+                        	maxDist=2*newVertexOffset;
+                        	if(doDetailTrace)System.out.println("  angleDiff "+(currentDE.getAngle()-nextDE.getAngle()));
+                        }
+                        Coordinate is=getIntersection(li,node.getCoordinate(),currentDE, nextDE);
+                        if(is!=null){
+                        	double dist=CurveSegment.dist(node.getCoordinate(),is);
+                        	if(dist>maxDist){
+                        		maxDist=dist;
+                        	}
+                        }
+                    }
                 }
-    		    Collections.sort(deStar.getEdges());
-                edges = getActiveOutgoingEdges(deStar);
-                if(doDetailTrace)printEdges("   reordered ",edges);
-            }
-            
-            // the edges are stored in CCW order around the star
-            for (Iterator i = deStar.getEdges().iterator(); i.hasNext(); ) {
-              PolygonizeDirectedEdge currentDE = (PolygonizeDirectedEdge) i.next();
-              if (currentDE.isMarked()) continue;
-              if (startDE == null){
-                startDE = currentDE;
-              }
-              if (prevDE != null) {
-            	  // check outDE,prevDE
-            	  boolean removed=removeOverlap(li,node.getCoordinate(),prevDE, currentDE,newVertexOffset);
-            	  overlapRemoved=overlapRemoved || removed;
-              }
-              prevDE = currentDE;
-            }
-            if (prevDE != null) {
-            	  // check prevDE,startDE
-            	boolean removed=removeOverlap(li,node.getCoordinate(),prevDE, startDE,newVertexOffset);
-            	overlapRemoved=overlapRemoved || removed;
-            }
-            if(overlapRemoved){
-            	if(doDetailTrace)printEdges("   overlapRemoved ",edges);
-            }
+                // reorder edges based on curve direction at given distance to node 
+                if(maxDist>0){
+                	maxDist=maxDist*1.1;
+                	if(doDetailTrace)System.out.println("  maxDist "+maxDist);
+                    for(int i=0;i<edgec;i++){
+                        PolygonizeDirectedEdge currentDE = edges.get(i);
+                        currentDE.adjustDirectionPt(maxDist);
+                    }
+        		    Collections.sort(deStar.getEdges());
+                    edges = getActiveOutgoingEdges(deStar);
+                    if(doDetailTrace)printEdges("   reordered ",edges);
+                }
+                
+                // the edges are stored in CCW order around the star
+                for (Iterator i = deStar.getEdges().iterator(); i.hasNext(); ) {
+                  PolygonizeDirectedEdge currentDE = (PolygonizeDirectedEdge) i.next();
+                  if (currentDE.isMarked()) continue;
+                  if (startDE == null){
+                    startDE = currentDE;
+                  }
+                  if (prevDE != null) {
+                	  // check outDE,prevDE
+                	  boolean removed=removeOverlap(li,node.getCoordinate(),prevDE, currentDE,newVertexOffset);
+                	  overlapRemoved=overlapRemoved || removed;
+                  }
+                  prevDE = currentDE;
+                }
+                if (prevDE != null) {
+                	  // check prevDE,startDE
+                	boolean removed=removeOverlap(li,node.getCoordinate(),prevDE, startDE,newVertexOffset);
+                	overlapRemoved=overlapRemoved || removed;
+                }
+                if(overlapRemoved){
+                	if(doDetailTrace)printEdges("   overlapRemoved ",edges);
+                }
+            }while(overlapRemoved);
 	      }
 	  
   }
