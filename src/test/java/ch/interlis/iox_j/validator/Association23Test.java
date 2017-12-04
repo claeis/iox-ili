@@ -43,6 +43,8 @@ public class Association23Test {
 	private final static String ILI_CLASSI=ILI_TOPIC+".ClassI";
 	private final static String ILI_CLASSJ=ILI_TOPIC+".ClassJ";
 	private final static String ILI_CLASSO=ILI_TOPIC+".ClassO";
+	private final static String ILI_CLASSP=ILI_TOPIC+".ClassP";
+	private final static String ILI_CLASSQ=ILI_TOPIC+".ClassQ";
 	private final static String ILI_TOPICB_CLASSE=ILI_TOPICB+".ClassE";
 	private final static String ILI_TOPICB_CLASSF=ILI_TOPICB+".ClassF";
 	private final static String ILI_TOPICB_CLASSG=ILI_TOPICB+".ClassG";
@@ -924,7 +926,7 @@ public class Association23Test {
 		iomObjTopicAClassO.setattrvalue("attrO", "text1");
 		Iom_jObject iomObjTopicBClassO=new Iom_jObject(ILI_TOPICB_CLASSO, OID2);
 		iomObjTopicBClassO.setattrvalue("attrO", "text2");
-		iomObjTopicBClassO.addattrobj("c1", "REF").setobjectrefoid(OID1);
+		iomObjTopicBClassO.addattrobj("o1", "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
@@ -953,7 +955,7 @@ public class Association23Test {
 		iomObjTopicAClassO.setattrvalue("attrO", "text1");
 		Iom_jObject iomObjTopicBClassO=new Iom_jObject(ILI_TOPICB_CLASSO, OID2);
 		iomObjTopicBClassO.setattrvalue("attrO", "text2");
-		iomObjTopicAClassO.addattrobj("c2", "REF").setobjectrefoid(OID1);
+		iomObjTopicAClassO.addattrobj("o2", "REF").setobjectrefoid(OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
@@ -970,7 +972,7 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("unknown property <c2>", logger.getErrs().get(0).getEventMsg());
+		assertEquals("unknown property <o2>", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Die beiden referenzierten Klassen der Objekte befinden sich in verschiedenen Topic's.
@@ -998,6 +1000,86 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("c1 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
+		assertEquals("o1 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es soll keine Fehlermeldung ausgegeben werden, da die erste Referenz erstellt wurde.
+	// Die Klassen befinden sich in der selben Topic.
+	// Die zweite wird automatisch benutzt.
+	@Test
+	public void embeddedAsso_SameBaskets_Only1Reference_Ok(){
+		Iom_jObject iomObjClassP=new Iom_jObject(ILI_CLASSP, OID1);
+		iomObjClassP.setattrvalue("attrP", "textP");
+		Iom_jObject iomObjClassQ=new Iom_jObject(ILI_CLASSQ, OID2);
+		iomObjClassQ.setattrvalue("attrQ", "textQ");
+		iomObjClassQ.addattrobj("p1", "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjClassP));
+		validator.validate(new ObjectEvent(iomObjClassQ));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Die zweite Rolle darf nicht gesetzt werden.
+	// Nur die erste Rolle soll gesetzt werden koennen.
+	// Die beiden referenzierten Klassen der Objekte befinden sich in dem selben Topic.
+	// Deshalb soll hier die Fehlermeldung: unknown property ausgegeben werden.
+	@Test
+	public void embeddedAsso_SameBaskets_WrongProp_Fail(){
+		Iom_jObject iomObjClassP=new Iom_jObject(ILI_CLASSP, OID1);
+		iomObjClassP.setattrvalue("attrP", "textP");
+		Iom_jObject iomObjClassQ=new Iom_jObject(ILI_CLASSQ, OID2);
+		iomObjClassQ.setattrvalue("attrQ", "textQ");
+		iomObjClassQ.addattrobj("q2", "REF").setobjectrefoid(OID1);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjClassP));
+		validator.validate(new ObjectEvent(iomObjClassQ));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("unknown property <q2>", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Die beiden referenzierten Klassen der Objekte befinden sich in dem Selben Topic.
+	// Da keine Referenz erstellt wurde, die Kardinalitaet von c1 mindestens 1 sein muss,
+	// muss die Fehlermeldung: c1 should associate 1 to * target objects (instead of 0), ausgegeben werden.
+	@Test
+	public void embeddedAsso_SameBaskets_NoReferencesSet_Fail(){
+		Iom_jObject iomObjClassP=new Iom_jObject(ILI_CLASSP, OID1);
+		iomObjClassP.setattrvalue("attrP", "textP");
+		Iom_jObject iomObjClassQ=new Iom_jObject(ILI_CLASSQ, OID2);
+		iomObjClassQ.setattrvalue("attrQ", "textQ");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+		validator.validate(new ObjectEvent(iomObjClassP));
+		validator.validate(new ObjectEvent(iomObjClassQ));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("q1 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
 	}
 }
