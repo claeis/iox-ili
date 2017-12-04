@@ -38,6 +38,7 @@ public class UniqueConstraints23Test {
 	// CLASS
 	private final static String CLASSA=TOPIC+".ClassA";
 	private final static String CLASSB=TOPIC+".ClassB";
+	private final static String CLASSBP=TOPIC+".ClassBp";
 	private final static String CLASSB0=TOPIC+".ClassB0";
 	private final static String CLASSC=TOPIC+".ClassC";
 	private final static String CLASSD=TOPIC+".ClassD";
@@ -248,6 +249,33 @@ public class UniqueConstraints23Test {
 		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(obj1));
 		validator.validate(new ObjectEvent(obj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn (attr1, attr2) Unique definiert sind und beide Werte unterschiedlich definiert sind.
+	// Die Klasse: ClassB wird von der Klasse: ClassBP erweitert.
+	@Test
+	public void subClassAttrValuesDifferent_Ok(){
+		// Set object.
+		Iom_jObject iomObjClassBP=new Iom_jObject(CLASSBP,OID1);
+		iomObjClassBP.setattrvalue("attr1", "Anna");
+		iomObjClassBP.setattrvalue("attr2", "15");
+		Iom_jObject iomObjClassBP2=new Iom_jObject(CLASSBP,OID2);
+		iomObjClassBP2.setattrvalue("attr1", "Ralf");
+		iomObjClassBP2.setattrvalue("attr2", "20");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjClassBP));
+		validator.validate(new ObjectEvent(iomObjClassBP2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
@@ -1320,6 +1348,34 @@ public class UniqueConstraints23Test {
 	//########## FAILING TESTS ###################################/
 	//############################################################/
 
+	// Es wird getestet ob ein Fehler ausgegeben wird, wenn (attr1, attr2) Unique definiert sind und beide Werte gleich sind.
+	// Die Klasse: ClassB wird von der Klasse: ClassBP erweitert.
+	@Test
+	public void subClassAttrValuesDifferent_Fail(){
+		// Set object.
+		Iom_jObject iomObjClassBP=new Iom_jObject(CLASSBP,OID1);
+		iomObjClassBP.setattrvalue("attr1", "Anna");
+		iomObjClassBP.setattrvalue("attr2", "20");
+		Iom_jObject iomObjClassBP2=new Iom_jObject(CLASSBP,OID2);
+		iomObjClassBP2.setattrvalue("attr1", "Anna");
+		iomObjClassBP2.setattrvalue("attr2", "20");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjClassBP));
+		validator.validate(new ObjectEvent(iomObjClassBP2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Unique is violated! Values Anna, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+	}
+	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die Nummer Unique und identisch ist.
 	@Test
 	public void uniqueAttrValuesOfAttr2ExistTwice_Fail(){

@@ -31,6 +31,8 @@ public class MandatoryConstraints23 {
 	private final static String ILI_CLASSCONSTANTF=TOPIC+".ClassConstantF";
 	private final static String ILI_CLASSCONSTANTG=TOPIC+".ClassConstantG";
 	private final static String ILI_CLASSCONSTANTJ=TOPIC+".ClassConstantJ";
+	private final static String ILI_CLASSCONSTANTJP=TOPIC+".ClassConstantJp";
+	private final static String ILI_CLASSCONSTANTJP3=TOPIC+".ClassConstantJp3";
 	// ATTRIBUTES EQUALATION (==) SUCCESS AND FAIL
 	private final static String ILI_CLASSEQUALATIONA=TOPIC+".ClassEqualA";
 	private final static String ILI_CLASSEQUALATIONB=TOPIC+".ClassEqualB";
@@ -43,6 +45,7 @@ public class MandatoryConstraints23 {
 	private final static String ILI_CLASSEQUALATIONG=TOPIC+".ClassEqualG";
 	private final static String ILI_CLASSEQUALATIONH=TOPIC+".ClassEqualH";
 	private final static String ILI_CLASSEQUALATIONI=TOPIC+".ClassEqualI";
+	private final static String ILI_CLASSEQUALATIONIP=TOPIC+".ClassEqualIp";
 	// ATTRIBUTES INEQUALATION (!=), (<>) SUCCESS AND FAIL
 	private final static String ILI_CLASSINEQUALATIONA=TOPIC+".ClassUnEqualA";
 	private final static String ILI_CLASSINEQUALATIONB=TOPIC+".ClassUnEqualB";
@@ -108,10 +111,12 @@ public class MandatoryConstraints23 {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die aufzaehlung1 auf mehr.vier gesetzt wird.
 	@Test
-	public void constantEnumerationSub_Ok(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSCONSTANTJ, OID);
-		objValue.setattrvalue("aufzaehlung1", "mehr.vier");
+	public void constantEnumeration_Ok(){
+		Iom_jObject objClassConstantJ=new Iom_jObject(ILI_CLASSCONSTANTJ, OID);
+		objClassConstantJ.setattrvalue("aufzaehlung1", "mehr.vier");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -119,11 +124,51 @@ public class MandatoryConstraints23 {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(objValue));
+		validator.validate(new ObjectEvent(objClassConstantJ));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die aufzaehlung1 auf mehr.vier gesetzt wird
+	// und die Klasse: ClassConstantJP die Klasse: ClassConstant erweitert.
+	@Test
+	public void constantEnumerationSub_Ok(){
+		Iom_jObject objClassConstantJP=new Iom_jObject(ILI_CLASSCONSTANTJP, OID);
+		objClassConstantJP.setattrvalue("aufzaehlung1", "mehr.vier");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(objClassConstantJP));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die aufzaehlung1 auf mehr.vier gesetzt wird
+	// und die Klasse: ClassConstant ueber die Klassen: ClassConstantJP3 --> ClassConstantJP2 --> ClassConstantJP erweitert wird.
+	@Test
+	public void multipleSubClassesEnumeration_Ok(){
+		Iom_jObject objClassConstantJP3=new Iom_jObject(ILI_CLASSCONSTANTJP3, OID);
+		objClassConstantJP3.setattrvalue("aufzaehlung1", "mehr.vier");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(objClassConstantJP3));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(0,logger.getErrs().size());
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn eine Konstante true ergibt oder not false ist.
@@ -1517,6 +1562,69 @@ public class MandatoryConstraints23 {
 	@Test
 	public void booleanEqual_False(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
+		iomObjA.setattrvalue("attr1", "true");
+		iomObjA.setattrvalue("attr2", "false");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualI.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die aufzaehlung1 auf eins gesetzt wird
+	// und die Klasse: ClassConstant ueber die Klassen: ClassConstantJP3 --> ClassConstantJP2 --> ClassConstantJP erweitert wird.
+	@Test
+	public void multipleSubClassesEnumeration_Fail(){
+		Iom_jObject objClassConstantJP3=new Iom_jObject(ILI_CLASSCONSTANTJP3, OID);
+		objClassConstantJP3.setattrvalue("aufzaehlung1", "eins");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(objClassConstantJP3));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1,logger.getErrs().size());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassConstantJ.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die aufzaehlung1 auf eins gesetzt wird,
+	// die Klasse: ClassConstantJP die Klasse: ClassConstant erweitert und der constraint false ist.
+	@Test
+	public void constantEnumerationSub_Fail(){
+		Iom_jObject objClassConstantJP=new Iom_jObject(ILI_CLASSCONSTANTJP, OID);
+		objClassConstantJP.setattrvalue("aufzaehlung1", "eins");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(objClassConstantJP));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1,logger.getErrs().size());
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassConstantJ.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die boolean nicht uebereinstimmen.	
+	@Test
+	public void subClassBooleanEqual_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONIP, OID);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();

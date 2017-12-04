@@ -70,6 +70,32 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn das Attr5 der KlasseA ueber die
+	// Existence Constraint auf das Attr1 der Klasse ConditionClass verweist und dieselbe Value hat.
+	// Die Klasse: ClassA wird von der Klasse: Class AP erweitert.
+	// Die Klasse: ConditionClass wird von der Klasse: ConditionClassX erweitert.
+	@Test
+	public void subClassExistenceConstraintToClass_Ok() throws Exception{
+		Iom_jObject objConditionX=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClassX", OID1);
+		objConditionX.setattrvalue("attr1", "lars");
+		Iom_jObject objAP=new Iom_jObject("ExistenceConstraints23.Topic.ClassAp", OID2);
+		objAP.setattrvalue("attr5", "lars");
+		objAP.setattrvalue("attr2", "20");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new ObjectEvent(objConditionX));
+		validator.validate(new ObjectEvent(objAP));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr5 der KlasseA ueber die
 	// Existence Constraint auf das Attr1 der Klasse ConditionClass verweist, welche von der Klasse ConditionClassX extended wird und dieselbe Value hat.
 	@Test
@@ -1023,6 +1049,33 @@ public class ExistenceConstraints23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn das Attr5 der KlasseA ueber die
+	// Existence Constraint auf das Attr1 der Klasse ConditionClass verweist und beide unterschiedliche Values enthalten.
+	// Die Klasse: ClassA wird von der Klasse: Class AP erweitert.
+	// Die Klasse: ConditionClass wird von der Klasse: ConditionClassX erweitert.
+	@Test
+	public void subClassSameModelDifferentAttrs_Fail() throws Exception{
+		Iom_jObject objConditionX=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClassX", OID1);
+		objConditionX.setattrvalue("attr1", "other");
+		Iom_jObject objAP=new Iom_jObject("ExistenceConstraints23.Topic.ClassAp", OID2);
+		objAP.setattrvalue("attr5", "lars");
+		objAP.setattrvalue("attr2", "20");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new ObjectEvent(objConditionX));
+		validator.validate(new ObjectEvent(objAP));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassAp was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute, welche in 2 unterschiedlichen Model sich befinden nicht uebereinstimmen.

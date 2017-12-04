@@ -20,6 +20,9 @@ MODEL PlausibilityConstraint23
 			attr1 >= attr2;
 		END ClassA;
 		
+		CLASS ClassAp EXTENDS ClassA =
+		END ClassAp;
+		
 		CLASS ClassB =
 			attr1 : 0..10;
 			attr2 : 0..10;

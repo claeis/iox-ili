@@ -20,6 +20,9 @@ MODEL UniqueConstraints23
 		  UNIQUE attr1, attr2;
 		END ClassB;
 		
+		CLASS ClassBp EXTENDS ClassB =
+		END ClassBp;
+		
 		CLASS ClassB0 =
 		  attr1 : TEXT*10;
 		  attr2 : 0 .. 100;

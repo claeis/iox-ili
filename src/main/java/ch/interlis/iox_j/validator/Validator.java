@@ -494,54 +494,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							}
 						}
 					}
-					Iterator constraintIterator=classOfCurrentObj.iterator();
-					while (constraintIterator.hasNext()) {
-						Object constraintObj = constraintIterator.next();
-						// existence constraint
-						if(constraintObj instanceof ExistenceConstraint){
-							ExistenceConstraint existenceConstraint=(ExistenceConstraint) constraintObj;
-							validateExistenceConstraint(iomObj, existenceConstraint);
-						}
-						// mandatory constraint
-						if(constraintObj instanceof MandatoryConstraint){
-							MandatoryConstraint mandatoryConstraint=(MandatoryConstraint) constraintObj;
-							validateMandatoryConstraint(iomObj, mandatoryConstraint);
-						}
-						// set constraint
-						if(constraintObj instanceof SetConstraint){
-							SetConstraint setConstraint=(SetConstraint) constraintObj;
-							String constraintName = getScopedName(setConstraint);
-							String checkSetConstraint=null;
-							if(!enforceConstraintValidation){
-								checkSetConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
-							}
-							if(ValidationConfig.OFF.equals(checkSetConstraint)){
-								if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
-									configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-									errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
-								}
-							} else {
-								collectSetConstraintObjs(checkSetConstraint, constraintName, iomObj, setConstraint);
-							}
-						}
-						// plausibility constraint
-						if(constraintObj instanceof PlausibilityConstraint){
-							PlausibilityConstraint plausibilityConstraint=(PlausibilityConstraint) constraintObj;
-							String constraintName = getScopedName(plausibilityConstraint);
-							String checkPlausibilityConstraint=null;
-							if(!enforceConstraintValidation){
-								checkPlausibilityConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
-							}
-							if(ValidationConfig.OFF.equals(checkPlausibilityConstraint)){
-								if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
-									configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-									errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
-								}
-							} else {
-								fillOfPlausibilityConstraintMap(checkPlausibilityConstraint, constraintName, plausibilityConstraint, iomObj);
-							}
-						}
-					}
+					validateConstraints(iomObj, classOfCurrentObj);
 					Iterator<ViewableTransferElement> attrIterator=classOfCurrentObj.getAttributesAndRoles2();
 					while (attrIterator.hasNext()) {
 						ViewableTransferElement objA = attrIterator.next();
@@ -590,6 +543,59 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}else{
 				validateSetConstraint(setConstraint);
 			}
+		}
+	}
+	private void validateConstraints(IomObject iomObj, Viewable classOfCurrentObj) {
+		while(classOfCurrentObj!=null) {
+			Iterator constraintIterator=classOfCurrentObj.iterator();
+			while (constraintIterator.hasNext()) {
+				Object constraintObj = constraintIterator.next();
+				// existence constraint
+				if(constraintObj instanceof ExistenceConstraint){
+					ExistenceConstraint existenceConstraint=(ExistenceConstraint) constraintObj;
+					validateExistenceConstraint(iomObj, existenceConstraint);
+				}
+				// mandatory constraint
+				if(constraintObj instanceof MandatoryConstraint){
+					MandatoryConstraint mandatoryConstraint=(MandatoryConstraint) constraintObj;
+					validateMandatoryConstraint(iomObj, mandatoryConstraint);
+				}
+				// set constraint
+				if(constraintObj instanceof SetConstraint){
+					SetConstraint setConstraint=(SetConstraint) constraintObj;
+					String constraintName = getScopedName(setConstraint);
+					String checkSetConstraint=null;
+					if(!enforceConstraintValidation){
+						checkSetConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
+					}
+					if(ValidationConfig.OFF.equals(checkSetConstraint)){
+						if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
+							configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
+							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
+						}
+					} else {
+						collectSetConstraintObjs(checkSetConstraint, constraintName, iomObj, setConstraint);
+					}
+				}
+				// plausibility constraint
+				if(constraintObj instanceof PlausibilityConstraint){
+					PlausibilityConstraint plausibilityConstraint=(PlausibilityConstraint) constraintObj;
+					String constraintName = getScopedName(plausibilityConstraint);
+					String checkPlausibilityConstraint=null;
+					if(!enforceConstraintValidation){
+						checkPlausibilityConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
+					}
+					if(ValidationConfig.OFF.equals(checkPlausibilityConstraint)){
+						if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
+							configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
+							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
+						}
+					} else {
+						fillOfPlausibilityConstraintMap(checkPlausibilityConstraint, constraintName, plausibilityConstraint, iomObj);
+					}
+				}
+			}
+			classOfCurrentObj=(Viewable) classOfCurrentObj.getExtending();
 		}
 	}
 
@@ -2231,13 +2237,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 		// Uniqueness
 		if(isObject){
-			Iterator attrI=aclass1.iterator();
-			while (attrI.hasNext()) {
-				Object obj1 = attrI.next();
-				if(obj1 instanceof UniquenessConstraint){
-					UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) obj1; // uniquenessConstraint not null.
-					validateUniquenessConstraint(iomObj, uniquenessConstraint);
+			Viewable aclass2=aclass1;
+			while(aclass2!=null) {
+				Iterator attrI=aclass2.iterator();
+				while (attrI.hasNext()) {
+					Object obj1 = attrI.next();
+					if(obj1 instanceof UniquenessConstraint){
+						UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) obj1; // uniquenessConstraint not null.
+						validateUniquenessConstraint(iomObj, uniquenessConstraint);
+					}
 				}
+				aclass2=(Viewable) aclass2.getExtending();
 			}
 		}
 		
