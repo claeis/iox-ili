@@ -526,6 +526,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							RoleDef role=targetRoleIterator.next();
 							validateRoleCardinality(role, iomObj);
 						}
+						targetRoleIterator=abstractClassDef.getOpposideForNonNavigableRoles();
+						while(targetRoleIterator.hasNext()){
+							RoleDef role=targetRoleIterator.next();
+							validateRoleCardinality(role, iomObj);
+						}
 					}
 				}
 			}
@@ -1561,6 +1566,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		return buf.toString();
 	}
+	
 	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {
 		String roleQName = null;
 		roleQName = getScopedName(role);

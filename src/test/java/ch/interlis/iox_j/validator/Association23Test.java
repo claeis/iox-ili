@@ -971,13 +971,13 @@ public class Association23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
+		assertTrue(logger.getErrs().size()==2);
 		assertEquals("unknown property <o2>", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Die beiden referenzierten Klassen der Objekte befinden sich in verschiedenen Topic's.
-	// Da keine Referenz erstellt wurde, die Kardinalitaet von c1 mindestens 1 sein muss,
-	// muss die Fehlermeldung: c1 should associate 1 to * target objects (instead of 0), ausgegeben werden.
+	// Da keine Referenz erstellt wurde, die Kardinalitaet von o2 mindestens 1 sein muss,
+	// muss die Fehlermeldung: o2 should associate 1 to * target objects (instead of 0), ausgegeben werden.
 	@Test
 	public void embeddedAsso_DifferentBaskets_NoReferencesSet_Fail(){
 		Iom_jObject iomObjTopicAClassO=new Iom_jObject(ILI_CLASSO, OID1);
@@ -1000,7 +1000,7 @@ public class Association23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("o1 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
+		assertEquals("o2 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll keine Fehlermeldung ausgegeben werden, da die erste Referenz erstellt wurde.
