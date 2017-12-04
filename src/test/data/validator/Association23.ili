@@ -43,6 +43,10 @@ MODEL Association23
 		   attrJ1 : TEXT*10;
 		END ClassJ;
 		
+		CLASS ClassO =
+		   attrO : TEXT*10;
+		END ClassO;
+		
 		CLASS ClassAp EXTENDS ClassA =
 		END ClassAp;
 		
@@ -123,6 +127,7 @@ MODEL Association23
 	END Topic;
 
 	TOPIC TopicB=
+		DEPENDS ON Association23.Topic;
 		CLASS ClassE =
 		   attrE1 : TEXT*10;
 		END ClassE;
@@ -139,6 +144,10 @@ MODEL Association23
 		   attrH1 : TEXT*10;
 		END ClassH;
 				
+		CLASS ClassO =
+		   attrO : TEXT*10;
+		END ClassO;
+		
 		ASSOCIATION gh1 =
 		  g1 (EXTERNAL) -- {1..1} ClassG;
 		  h1 (EXTERNAL) -- {1..1} ClassH;
@@ -148,5 +157,10 @@ MODEL Association23
 		  e1 (EXTERNAL) -- {1..*} ClassE;
 		  f1 (EXTERNAL) -- {1..*} ClassF;
 		END ef1;
+
+		ASSOCIATION Assoc1 =
+			c1 (EXTERNAL) -- {0..1} Association23.Topic.ClassO;
+			c2 -- {1..*} ClassO;
+		END Assoc1;
 	END TopicB;
 END Association23.
