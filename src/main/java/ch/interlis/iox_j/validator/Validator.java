@@ -695,16 +695,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				loggedObjects.add(uniquenessConstraint);
 				errs.addEvent(errFact.logInfoMsg("validate unique constraint {0}...",getScopedName(uniquenessConstraint)));
 			}
-			StringBuilder contentUniqueAttrs = new StringBuilder();
-			ArrayList<String> uniqueConstraintAttrs=new ArrayList<String>();
-			// gets all constraint attribute-names.
-			Iterator iter = uniquenessConstraint.getElements().iteratorAttribute();
-			uniqueConstraintAttrs.add(aClass1.toString());
-			while (iter.hasNext()){
-				ObjectPath object = (ObjectPath)iter.next();
-				uniqueConstraintAttrs.add(object.getLastPathEl().getName());
-				contentUniqueAttrs.append(object.getLastPathEl().getName());
-			}
 			Holder<AttributeArray> values = new Holder<AttributeArray>();
 			String returnValue = validateUnique(iomObj,uniquenessConstraint, values);
 			if (returnValue == null){
@@ -2463,7 +2453,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String validateUnique(IomObject currentObject,UniquenessConstraint constraint, Holder<AttributeArray> values) {
 		IomObject originObj=currentObject;
 		ArrayList<Object> accu = new ArrayList<Object>();
-		Iterator constraintIter = constraint.getElements().iteratorAttribute();
 		if(constraint.getPrefix()!=null){
 			PathEl[] attrPath = constraint.getPrefix().getPathElements();
 			for(int i=0;i<attrPath.length;i++){
@@ -2474,6 +2463,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 		}
+		Iterator constraintIter = constraint.getElements().iteratorAttribute();
 		while(constraintIter.hasNext()){
 			String uniqueAttrName = constraintIter.next().toString();
 			Object attrValue=null;

@@ -29,9 +29,24 @@ public class CompoundCurveRingIsCCWTest {
 			Coordinate pt=new Coordinate(x,y);
 			polyline.set(0, new StraightSegment(seg0.getStartPoint(), pt));
 		}else {
-			StraightSegment segn=(StraightSegment) polyline.get(polyline.size()-1);
+			CurveSegment segn=(CurveSegment) polyline.get(polyline.size()-1);
 			Coordinate pt=new Coordinate(x,y);
 			polyline.add(new StraightSegment(segn.getEndPoint(), pt));
+		}
+	}
+	private void addArc(ArrayList<CurveSegment> polyline, double ax, double ay,double x, double y) {
+		if(polyline.size()==0) {
+			throw new IllegalArgumentException();
+		}else if(polyline.size()==1 && polyline.get(0) instanceof StartSegment) {
+			StraightSegment seg0=(StraightSegment) polyline.get(0);
+			Coordinate apt=new Coordinate(ax,ay);
+			Coordinate pt=new Coordinate(x,y);
+			polyline.set(0, new ArcSegment(seg0.getStartPoint(), apt,pt));
+		}else {
+			CurveSegment segn=(CurveSegment) polyline.get(polyline.size()-1);
+			Coordinate apt=new Coordinate(ax,ay);
+			Coordinate pt=new Coordinate(x,y);
+			polyline.add(new ArcSegment(segn.getEndPoint(), apt,pt));
 		}
 	}
 
@@ -59,6 +74,19 @@ public class CompoundCurveRingIsCCWTest {
 		addCoord(segs,110.0,  140.0); 
 		addCoord(segs,120.0,  140.0); 
 		addCoord(segs,110.0,  110.0);
+
+		CompoundCurve line=new CompoundCurve(segs,fact);
+		CompoundCurveRing ring=fact.createCompoundCurveRing(line);
+		assertEquals(false,CompoundCurveRing.isCCW(ring));
+	}
+	@Test
+	public void isCWAuge() {
+		JtsextGeometryFactory fact=new JtsextGeometryFactory();
+		ArrayList<CurveSegment> segs=new ArrayList<CurveSegment>();
+		
+		addCoord(segs,110.0,  110.0); // hoechstes Segment
+		addCoord(segs,114.0,  113.0); 
+		addArc(segs,  114.0,  110.0, 110.0,  110.0);
 
 		CompoundCurve line=new CompoundCurve(segs,fact);
 		CompoundCurveRing ring=fact.createCompoundCurveRing(line);
@@ -104,6 +132,19 @@ public class CompoundCurveRingIsCCWTest {
 		addCoord(segs,110.0,  110.0); // hoechstes Segment
 		addCoord(segs,120.0,  140.0); 
 		addCoord(segs,110.0,  140.0); 
+		addCoord(segs,110.0,  110.0);
+
+		CompoundCurve line=new CompoundCurve(segs,fact);
+		CompoundCurveRing ring=fact.createCompoundCurveRing(line);
+		assertEquals(true,CompoundCurveRing.isCCW(ring));
+	}
+	@Test
+	public void isCCWAuge() {
+		JtsextGeometryFactory fact=new JtsextGeometryFactory();
+		ArrayList<CurveSegment> segs=new ArrayList<CurveSegment>();
+		
+		addCoord(segs,110.0,  110.0); 
+		addArc(segs,  114.0,  110.0, 114.0,  113.0); // hoechstes Segment
 		addCoord(segs,110.0,  110.0);
 
 		CompoundCurve line=new CompoundCurve(segs,fact);

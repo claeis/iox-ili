@@ -32,10 +32,22 @@ public class AttributeArray {
 		if(refoid!=null){
 			result = prime*result + refoid.hashCode();
 		}
+		// compare attrs
 		int attrc=thisObj.getattrcount();
 		for(int attri=0;attri<attrc;attri++){
 			String attrName=thisObj.getattrname(attri);
-			result = prime*result + attrName.hashCode();
+			int valuec=thisObj.getattrvaluecount(attrName);
+			for(int valuei=0;valuei<valuec;valuei++){
+				IomObject valueObj=thisObj.getattrobj(attrName, valuei);
+				if(valueObj!=null){
+					result = prime*result + hashCodeIomObj(valueObj);
+				}else {
+					String valueStr=thisObj.getattrprim(attrName, valuei);
+					if(valueStr!=null){
+						result = prime*result + valueStr.hashCode();
+					}
+				}
+			}
 		}
 		return result;
 	}

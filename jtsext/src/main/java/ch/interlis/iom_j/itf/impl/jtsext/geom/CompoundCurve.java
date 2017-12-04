@@ -24,6 +24,7 @@ public class CompoundCurve extends LineString {
 	public static final String OVERLAP_TID_TAG = "overlap-";
 	public static final String MODIFIED_TID_TAG = "modified-";
 	private ArrayList<CurveSegment> segments=null;
+	public static final double ARC_MIN_DIRECTION_PT = 0.1;
 	public CompoundCurve(List<CurveSegment> segments, GeometryFactory factory) {
 		super(derivePoints(segments, factory), factory);
 		this.segments=new ArrayList<CurveSegment>(segments);
@@ -355,6 +356,9 @@ public class CompoundCurve extends LineString {
 				if(seg instanceof StraightSegment){
 					return seg.getStartPoint();
 				}
+			}
+			if(dist==0.0) {
+				dist=ARC_MIN_DIRECTION_PT;
 			}
 			Coordinate directionPt=((ArcSegment)seg).getDirectionPt(atStart,dist);
 			return directionPt;
