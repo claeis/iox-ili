@@ -23,6 +23,9 @@ MODEL ExistenceConstraints23
 			EXISTENCE CONSTRAINT attr5 REQUIRED IN ExistenceConstraints23.Topic.ConditionClass : attr1 OR ExistenceConstraints23.Topic.ConditionClass2 : attr1;
 		END ClassA;
 		
+		CLASS ClassAp EXTENDS ClassA =
+		END ClassAp;
+		
 		CLASS ClassB =
 			attr1 : TEXT*10;
 			attr2 : 0 .. 100;
@@ -47,6 +50,14 @@ MODEL ExistenceConstraints23
 			EXISTENCE CONSTRAINT attr1 REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClassStructure : attr1;
 		END ClassStructureOtherModel;
 		
+		STRUCTURE structureBase=
+			attr1 : TEXT*10;
+			EXISTENCE CONSTRAINT attr1 REQUIRED IN ExistenceConstraints23.Topic.ConditionClass : attr1;
+		END structureBase;
+		
+		CLASS ClassD =
+			attr1 : structureBase;
+		END ClassD;
 	END Topic;
 	
 END ExistenceConstraints23.

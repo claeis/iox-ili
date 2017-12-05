@@ -38,6 +38,7 @@ public class PlausibilityConstraints23Test {
 	private final static String ILI_CLASSE=TOPIC+".ClassE";
 	private final static String ILI_CLASSF=TOPIC+".ClassF";
 	private final static String ILI_CLASSG=TOPIC+".ClassG";
+	private final static String ILI_CLASSAP=TOPIC+".ClassAp";
 	// START BASKET EVENT
 	private final static String BID="b1";
 	
@@ -59,6 +60,27 @@ public class PlausibilityConstraints23Test {
 	@Test
 	public void targetResultEqualsPercentage_1object_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
+		iomObjA.setattrvalue("attr1", "7");
+		iomObjA.setattrvalue("attr2", "5");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 100% liegt und >= 50% erreicht werden muss.
+	// Die Klasse A wird von der Klasse AP erweitert.
+	@Test
+	public void subClassTargetResultEqualsPercentage_1object_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAP, OID1);
 		iomObjA.setattrvalue("attr1", "7");
 		iomObjA.setattrvalue("attr2", "5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -428,6 +450,28 @@ public class PlausibilityConstraints23Test {
 	@Test
 	public void targetResultLessThanPercentage_1object_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
+		iomObjA.setattrvalue("attr1", "5");
+		iomObjA.setattrvalue("attr2", "7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und >= 50% erreicht werden muss.
+	// Die Klasse A wird ueber die Klasse AP Erweitert.
+	@Test
+	public void subClassTargetResultLessThanPercentage_1object_Fail(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAP, OID1);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "7");
 		ValidationConfig modelConfig=new ValidationConfig();

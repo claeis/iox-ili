@@ -21,6 +21,9 @@ MODEL SetConstraint23
 				INTERLIS.objectCount(ALL) == 5;
 		END ClassB;
 		
+		CLASS ClassBp EXTENDS ClassB =
+		END ClassBp;
+		
 		STRUCTURE StructC =
 		END StructC;
 		

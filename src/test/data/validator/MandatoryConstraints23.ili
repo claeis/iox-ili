@@ -63,6 +63,15 @@ MODEL MandatoryConstraints23
 			aufzaehlung1 == #mehr.vier;
 		END ClassConstantJ;
 		
+		CLASS ClassConstantJp EXTENDS ClassConstantJ=
+		END ClassConstantJp;
+		
+		CLASS ClassConstantJp2 EXTENDS ClassConstantJp=
+		END ClassConstantJp2;
+		
+		CLASS ClassConstantJp3 EXTENDS ClassConstantJp2=
+		END ClassConstantJp3;
+		
 		CLASS ClassEqualA =
 			straightsarcs1 : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
 			arcsstraights2 : POLYLINE WITH (ARCS, STRAIGHTS) VERTEX Hkoord;
@@ -148,6 +157,9 @@ MODEL MandatoryConstraints23
 			MANDATORY CONSTRAINT
 			attr1 == attr2;
 		END ClassEqualI;
+		
+		CLASS ClassEqualIp EXTENDS ClassEqualI =
+		END ClassEqualIp;
 		
 		CLASS ClassUnEqualA =
 			attr1 : TEXT*10;
