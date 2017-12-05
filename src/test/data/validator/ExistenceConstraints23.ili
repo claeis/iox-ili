@@ -50,6 +50,14 @@ MODEL ExistenceConstraints23
 			EXISTENCE CONSTRAINT attr1 REQUIRED IN ExistenceConstraints23Condition.Topic.ConditionClassStructure : attr1;
 		END ClassStructureOtherModel;
 		
+		STRUCTURE structureBase=
+			attr1 : TEXT*10;
+			EXISTENCE CONSTRAINT attr1 REQUIRED IN ExistenceConstraints23.Topic.ConditionClass : attr1;
+		END structureBase;
+		
+		CLASS ClassD =
+			attr1 : structureBase;
+		END ClassD;
 	END Topic;
 	
 END ExistenceConstraints23.

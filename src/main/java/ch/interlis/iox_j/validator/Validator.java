@@ -550,7 +550,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 	}
-	private void validateConstraints(IomObject iomObj, Viewable classOfCurrentObj) {
+	private void validateConstraints(IomObject iomObj, Viewable classOfIomObj) {
+		Viewable classOfCurrentObj=classOfIomObj;
 		while(classOfCurrentObj!=null) {
 			Iterator constraintIterator=classOfCurrentObj.iterator();
 			while (constraintIterator.hasNext()) {
@@ -601,6 +602,30 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 			classOfCurrentObj=(Viewable) classOfCurrentObj.getExtending();
+		}
+		Iterator iter = classOfIomObj.getAttributesAndRoles2();
+		while (iter.hasNext()) {
+			ViewableTransferElement obj = (ViewableTransferElement)iter.next();
+			if (obj.obj instanceof AttributeDef) {
+				AttributeDef attr = (AttributeDef) obj.obj;
+				if(!attr.isTransient()){
+					Type proxyType=attr.getDomain();
+					if(proxyType!=null && (proxyType instanceof ObjectType)){
+						// skip implicit particles (base-viewables) of views
+					}else{
+						Type type=attr.getDomainResolvingAliases();
+						String attrName=attr.getName();
+						if (type instanceof CompositionType){
+							Viewable structType=((CompositionType) type).getComponentType();
+							 int structc=iomObj.getattrvaluecount(attrName);
+							 for(int structi=0;structi<structc;structi++){
+								 IomObject structEle=iomObj.getattrobj(attrName, structi);
+								 validateConstraints(structEle, structType);
+							 }
+						}
+					}
+				}
+			}
 		}
 	}
 
