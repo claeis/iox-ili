@@ -1875,16 +1875,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			boolean valueExists = false;
 			Table classA = null;
 			Table otherClass = null;
-			while (requiredInIterator.hasNext()) {
+			while (!valueExists && requiredInIterator.hasNext()) {
 				classA = null;
-				ObjectPath attrName = (ObjectPath)requiredInIterator.next();
-				otherClass = (Table) attrName.getRoot();
-				String otherAttrName = attrName.toString();
-				String attrValueThisObj = iomObj.getattrvalue(otherAttrName);
-				for (String basketId : objectPool.getBasketIds()){
+				ObjectPath otherAttrPath = (ObjectPath)requiredInIterator.next();
+				String otherAttrName = otherAttrPath.toString();
+				otherClass = (Table) otherAttrPath.getRoot();
+				String attrValueThisObj = iomObj.getattrvalue(restrictedAttrName);
+				Iterator<String> basketIdIterator=objectPool.getBasketIds().iterator();
+				while( !valueExists &&  basketIdIterator.hasNext()){
+					String basketId=basketIdIterator.next();
 					// iterate through iomObjects
 					Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
-					while (objectIterator.hasNext()){
+					while (!valueExists &&  objectIterator.hasNext()){
 						IomObject otherIomObj = objectIterator.next();
 						if (otherIomObj.getattrcount() == 0){
 						// do not validate.
@@ -1909,10 +1911,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 										SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
 										valueExists = equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, otherAttrName, restrictedAttrName);
 									} else if (type instanceof CompositionType){
-										CompositionType compositionType = (CompositionType) type;
-										valueExists = equalsCompositionValue(iomObj, compositionType, otherIomObj, otherAttrName, restrictedAttrName);
+										if(iomObj.getattrvaluecount(restrictedAttrName)==otherIomObj.getattrvaluecount(restrictedAttrName)) {
+											 for(int structi=0;structi<iomObj.getattrvaluecount(restrictedAttrName);structi++){
+												 IomObject structEle=iomObj.getattrobj(restrictedAttrName, structi);
+												 IomObject otherStructEle=otherIomObj.getattrobj(restrictedAttrName, structi);
+												 if(structEle!=null && otherStructEle!=null) {
+													 valueExists = equalsStructEle(((CompositionType) type).getComponentType(),structEle, otherStructEle);
+													 if(!valueExists) {
+														 // werte nicht gleich; weiterfahren mit naechstem Hauptobject
+														 break;
+													 }
+												 }else {
+													 break;
+												 }
+											 }
+										}
 									} else {
-										// if type is not type of alias, validate attribute names
 										if(otherIomObj.getattrvalue(otherAttrName).equals(iomObj.getattrvalue(restrictedAttrName))){
 											valueExists = true;
 										}
@@ -1934,9 +1948,67 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 	
-	private boolean equalsCompositionValue(IomObject iomObjectA, CompositionType compositionType, IomObject otherIomObj, String otherAttrName, String restrictedAttrName) {
-		IomObject compositionValueRestricted=iomObjectA.getattrobj(restrictedAttrName, 0);
-		IomObject compositionValueOther = otherIomObj.getattrobj(otherAttrName, 0);
+	private boolean equalsStructEle(Viewable aclass,IomObject iomObj, IomObject otherIomObj) {
+		Iterator iter = aclass.getAttributesAndRoles2();
+		while (iter.hasNext()) {
+			ViewableTransferElement obj = (ViewableTransferElement)iter.next();
+			if (obj.obj instanceof AttributeDef) {
+				AttributeDef attr = (AttributeDef) obj.obj;
+				if(!attr.isTransient()){
+					Type proxyType=attr.getDomain();
+					if(proxyType!=null && (proxyType instanceof ObjectType)){
+						// skip implicit particles (base-viewables) of views
+					}else{
+						String targetAttrName=attr.getName();
+						Type type=attr.getDomainResolvingAliases();
+						if(iomObj.getattrvaluecount(targetAttrName)!=otherIomObj.getattrvaluecount(targetAttrName)) {
+							return false;
+						}
+						if(iomObj.getattrvaluecount(targetAttrName)>0) {
+							if(type instanceof ReferenceType){
+								ReferenceType referenceType = (ReferenceType) type;
+								if(!equalsReferenceValue(iomObj, referenceType, otherIomObj, targetAttrName,targetAttrName)) {
+									return false;
+								}
+							} else if (type instanceof CoordType){
+								CoordType coordType = (CoordType) type;
+								if(!equalsCoordValue(iomObj, coordType, otherIomObj, targetAttrName,targetAttrName)) {
+									return false;
+								}
+							} else if (type instanceof PolylineType){
+								PolylineType polylineType = (PolylineType) type;
+								if(!equalsPolylineValue(iomObj, polylineType, otherIomObj, targetAttrName,targetAttrName)){
+									return false;
+								}
+							} else if (type instanceof SurfaceOrAreaType){
+								SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
+								if(!equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, targetAttrName,targetAttrName)) {
+									return false;
+								}
+							} else if (type instanceof CompositionType){
+								 for(int structi=0;structi<iomObj.getattrvaluecount(targetAttrName);structi++){
+									 IomObject structEle=iomObj.getattrobj(targetAttrName, structi);
+									 IomObject otherStructEle=otherIomObj.getattrobj(targetAttrName, structi);
+									 if(structEle!=null && otherStructEle!=null) {
+										 if(!equalsStructEle(((CompositionType) type).getComponentType(),structEle, otherStructEle)) {
+											 // werte nicht gleich; weiterfahren mit naechstem Hauptobject
+											 return false;
+										 }
+									 }else {
+										 return false;
+									 }
+								 }
+							} else {
+								if(!otherIomObj.getattrvalue(targetAttrName).equals(iomObj.getattrvalue(targetAttrName))){
+									return false;
+								}
+							}
+						}
+						
+					}
+				}
+			}
+		}
 		return true;
 	}
 
