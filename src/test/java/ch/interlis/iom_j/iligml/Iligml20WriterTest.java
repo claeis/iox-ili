@@ -3,11 +3,18 @@ package ch.interlis.iom_j.iligml;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.ili2c.Ili2cFailure;
@@ -24,6 +31,7 @@ import ch.interlis.iox_j.jts.Iox2jtsException;
 public class Iligml20WriterTest {
 
 	private final static String TEST_OUT="build";
+	private final static String TEST_IN="src/test/data/Iligml20Writer";
 	private TransferDescription td=null;
 	@BeforeClass
 	public static void setupEnv()
@@ -203,15 +211,19 @@ public class Iligml20WriterTest {
 		writer=null;
 	}
 	@Test
-	public void testReference() throws Iox2jtsException, IoxException {
-		Iligml20Writer writer=new Iligml20Writer(new File(TEST_OUT,"Reference-out.gml"),td);
+	public void testReference() throws Iox2jtsException, IoxException, ParserConfigurationException, SAXException, IOException {
+		File destFile = new File(TEST_OUT,"Reference-out.gml");
+		Iligml20Writer writer=new Iligml20Writer(destFile,td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicG","bid1"));
 		writer.write(new ObjectEvent(new Iom_jObject("Test1.TopicG.ClassG1","10")));
 		writer.write(new ObjectEvent(new Iom_jObject("Test1.TopicG.ClassG1","11")));
-		Iom_jObject objG2=new Iom_jObject("Test1.TopicG.ClassG2","20");
-		objG2.addattrobj("attrRefG1", "REF").setobjectrefoid("10");
-		writer.write(new ObjectEvent(objG2));
+		Iom_jObject objG2_20=new Iom_jObject("Test1.TopicG.ClassG2","20");
+		objG2_20.addattrobj("attrRefG1", "REF").setobjectrefoid("10");
+		writer.write(new ObjectEvent(objG2_20));
+		Iom_jObject objG2_21=new Iom_jObject("Test1.TopicG.ClassG2","21");
+		objG2_21.addattrobj("attrRefG1", "REF").setobjectrefoid("10");
+		writer.write(new ObjectEvent(objG2_21));
 		Iom_jObject objG3=new Iom_jObject("Test1.TopicG.ClassG3","30");
 		objG3.addattrobj("attrRefG1", "REF").setobjectrefoid("10");
 		writer.write(new ObjectEvent(objG3));
@@ -219,6 +231,15 @@ public class Iligml20WriterTest {
 		writer.write(new EndTransferEvent());
 		writer.close();
 		writer=null;
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+	    DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+	    Document doc = docBuilder.parse(destFile);
+	    doc.normalizeDocument();
+	    File controlFile=new File(TEST_IN,"Reference.gml");
+	    Document controlDoc = docBuilder.parse(controlFile);
+	    controlDoc.normalizeDocument();
+	    assertThat(doc,org.xmlunit.matchers.CompareMatcher.isSimilarTo(controlDoc).ignoreWhitespace().ignoreComments().throwComparisonFailure());
 	}
 
 	
