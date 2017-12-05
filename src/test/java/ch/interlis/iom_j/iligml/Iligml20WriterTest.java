@@ -15,6 +15,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+import org.xmlunit.xpath.JAXPXPathEngine;
+import org.xmlunit.xpath.XPathEngine;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.ili2c.Ili2cFailure;
@@ -239,7 +241,16 @@ public class Iligml20WriterTest {
 	    File controlFile=new File(TEST_IN,"Reference.gml");
 	    Document controlDoc = docBuilder.parse(controlFile);
 	    controlDoc.normalizeDocument();
-	    assertThat(doc,org.xmlunit.matchers.CompareMatcher.isSimilarTo(controlDoc).ignoreWhitespace().ignoreComments().throwComparisonFailure());
+	    XPathEngine xpath = new JAXPXPathEngine();
+	    java.util.HashMap<String,String> nsMap=new java.util.HashMap<String,String>();
+	    nsMap.put("gml", "http://www.opengis.net/gml/3.2");
+	    nsMap.put("xtf", "http://www.interlis.ch/ILIGML-2.0/Test1");
+	    xpath.setNamespaceContext(nsMap);
+	    assertThat(xpath.selectNodes("//*[@gml:id='x10']", doc).iterator().next(),org.xmlunit.matchers.CompareMatcher.isSimilarTo(xpath.selectNodes("//*[@gml:id='x10']", controlDoc).iterator().next()).ignoreWhitespace().ignoreComments().throwComparisonFailure());
+	    assertThat(xpath.selectNodes("//*[@gml:id='x11']", doc).iterator().next(),org.xmlunit.matchers.CompareMatcher.isSimilarTo(xpath.selectNodes("//*[@gml:id='x11']", controlDoc).iterator().next()).ignoreWhitespace().ignoreComments().throwComparisonFailure());
+	    assertThat(xpath.selectNodes("//*[@gml:id='x20']", doc).iterator().next(),org.xmlunit.matchers.CompareMatcher.isSimilarTo(xpath.selectNodes("//*[@gml:id='x20']", controlDoc).iterator().next()).ignoreWhitespace().ignoreComments().throwComparisonFailure());
+	    assertThat(xpath.selectNodes("//*[@gml:id='x21']", doc).iterator().next(),org.xmlunit.matchers.CompareMatcher.isSimilarTo(xpath.selectNodes("//*[@gml:id='x21']", controlDoc).iterator().next()).ignoreWhitespace().ignoreComments().throwComparisonFailure());
+	    assertThat(xpath.selectNodes("//*[@gml:id='x30']", doc).iterator().next(),org.xmlunit.matchers.CompareMatcher.isSimilarTo(xpath.selectNodes("//*[@gml:id='x30']", controlDoc).iterator().next()).ignoreWhitespace().ignoreComments().throwComparisonFailure());
 	}
 
 	
