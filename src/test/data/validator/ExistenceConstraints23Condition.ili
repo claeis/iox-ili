@@ -3,20 +3,25 @@ INTERLIS 2.3;
 MODEL ExistenceConstraints23Condition
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" =
   
+	DOMAIN
+		Skoord = COORD 480000.000 .. 850000.000 [INTERLIS.m];
+		Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+				        70000.000 .. 310000.000 [INTERLIS.m],
+					   ROTATION 2 -> 1;
+		Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+				        70000.000 .. 310000.000 [INTERLIS.m],
+				              0.000 .. 5000.000 [INTERLIS.m];
 	STRUCTURE structure=
 		attr1 : TEXT*10;
 	END structure;
 	
+	STRUCTURE structure2=
+	    coord : Lkoord;
+		attr1 : LIST OF structure;
+	END structure2;
+	
 	TOPIC Topic=
 	
-		DOMAIN
-			Skoord = COORD 480000.000 .. 850000.000 [INTERLIS.m];
-			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
-					        70000.000 .. 310000.000 [INTERLIS.m],
-						   ROTATION 2 -> 1;
-			Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
-					        70000.000 .. 310000.000 [INTERLIS.m],
-					              0.000 .. 5000.000 [INTERLIS.m];
 		CLASS ConditionClass =
 			attr1 : TEXT*10;
 		END ConditionClass;
@@ -24,6 +29,10 @@ MODEL ExistenceConstraints23Condition
 		CLASS ConditionClassStructure =
 			attr1 : structure;
 		END ConditionClassStructure;
+		
+		CLASS ConditionClassStructure2 =
+			attr1 : structure2;
+		END ConditionClassStructure2;
 		
 		CLASS ConditionClassCoord =
 			attr0 : Skoord;
