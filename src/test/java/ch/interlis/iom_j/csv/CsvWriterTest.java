@@ -291,6 +291,85 @@ public class CsvWriterTest {
 			file.delete();
 		}
 	}
+	@Test
+	public void attributeDefaultOrdering_Ok() throws IoxException, IOException{
+		CsvWriter writer=null;
+		final String FILE_NAME = "attributeDefaultOrdering_Ok.csv";
+		try {
+			Settings settings=new Settings();
+			settings.setValue(CsvReader.ENCODING, "UTF8");
+			writer=new CsvWriter(new File(TEST_IN,FILE_NAME),settings);
+			writer.write(new StartTransferEvent());
+			writer.setWriteHeader(false);
+			writer.write(new StartBasketEvent("model.Topic1","bid1"));
+			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
+			iomObj.setattrvalue("id", "10");
+			iomObj.setattrvalue("stadt", "Bern");
+			iomObj.setattrvalue("land", "Schweiz");
+			writer.write(new ObjectEvent(iomObj));
+			writer.write(new EndBasketEvent());
+			writer.write(new EndTransferEvent());
+		}finally {
+	    	if(writer!=null) {
+	    		try {
+					writer.close();
+				} catch (IoxException e) {
+					throw new IoxException(e);
+				}
+	    		writer=null;
+	    	}
+		}
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILE_NAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"10\",\"Schweiz\",\"Bern\"", line);
+		reader.close();
+		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,FILE_NAME);
+		if(file.exists()) {
+			file.delete();
+		}
+	}
+	@Test
+	public void attributeDefinedOrdering_Ok() throws IoxException, IOException{
+		CsvWriter writer=null;
+		final String FILE_NAME = "attributeDefinedOrdering_Ok.csv";
+		try {
+			Settings settings=new Settings();
+			settings.setValue(CsvReader.ENCODING, "UTF8");
+			writer=new CsvWriter(new File(TEST_IN,FILE_NAME),settings);
+			writer.write(new StartTransferEvent());
+			writer.setWriteHeader(false);
+			writer.setAttributes(new String[] {"id","stadt","land"});
+			writer.write(new StartBasketEvent("model.Topic1","bid1"));
+			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
+			iomObj.setattrvalue("id", "10");
+			iomObj.setattrvalue("stadt", "Bern");
+			iomObj.setattrvalue("land", "Schweiz");
+			writer.write(new ObjectEvent(iomObj));
+			writer.write(new EndBasketEvent());
+			writer.write(new EndTransferEvent());
+		}finally {
+	    	if(writer!=null) {
+	    		try {
+					writer.close();
+				} catch (IoxException e) {
+					throw new IoxException(e);
+				}
+	    		writer=null;
+	    	}
+		}
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILE_NAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"10\",\"Bern\",\"Schweiz\"", line);
+		reader.close();
+		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,FILE_NAME);
+		if(file.exists()) {
+			file.delete();
+		}
+	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn:
 	// - Das Modell nicht gesetzt wird

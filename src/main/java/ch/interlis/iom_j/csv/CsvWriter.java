@@ -48,7 +48,7 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 	private Character currentValueDelimiter=DEFAULT_VALUE_DELIMITER;
 	private char currentValueSeparator=DEFAULT_VALUE_SEPARATOR;
 	// first line of file
-	private boolean firstLineInFile=true; // could be header/first attrValues
+	private boolean firstObj=true;
 	private String[] headerAttrNames=null;
 
 	/** create new CsvWriter
@@ -110,31 +110,31 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 	 * @param iomObj
 	 * @return
 	 */
-	private String[] getAttributeNames(Viewable viewable, IomObject iomObj){
+	private String[] getAttributeNames(IomObject iomObj){
 		// iliAttributes
 		String[] attrs=new String[iomObj.getattrcount()];
 		int count=0;
-		if(viewable==null) {
-			for(int i=0;i<iomObj.getattrcount();i++) {
-				String attribute=iomObj.getattrname(i);
-				attrs[count]=attribute;
-				count+=1;
-			}
-			java.util.Arrays.sort(attrs);
-		}else {
-			Iterator viewableIter=viewable.getAttributes();
-			while(viewableIter.hasNext()) {
-				Object attrObj=viewableIter.next();
-				if(attrObj instanceof LocalAttribute) {
-					LocalAttribute localAttr= (LocalAttribute)attrObj;
-					String iliAttrName=localAttr.getName();
-					attrs[count]=iliAttrName;
-					count+=1;
-				}
-			}
-			
+		for(int i=0;i<iomObj.getattrcount();i++) {
+			String attribute=iomObj.getattrname(i);
+			attrs[count]=attribute;
+			count+=1;
 		}
+		java.util.Arrays.sort(attrs);
 		return attrs;
+	}
+	private String[] getAttributeNames(Viewable viewable){
+		// iliAttributes
+		ArrayList<String> attrs=new ArrayList<String>();
+		Iterator viewableIter=viewable.getAttributes();
+		while(viewableIter.hasNext()) {
+			Object attrObj=viewableIter.next();
+			if(attrObj instanceof LocalAttribute) {
+				LocalAttribute localAttr= (LocalAttribute)attrObj;
+				String iliAttrName=localAttr.getName();
+				attrs.add(iliAttrName);
+			}
+		}
+		return attrs.toArray(new String[attrs.size()]);
 	}
 
 	/** Iterate through ili file and set all models with class names and appropriate class object.
@@ -185,30 +185,31 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 			ObjectEvent obj=(ObjectEvent) event;
 			IomObject iomObj=(IomObject)obj.getIomObject();
 			// first obj?
-			if(headerAttrNames==null) {
+			if(firstObj) {
 				// get list of attr names
-				Viewable resultViewableHeader=findViewable(iomObj);
-				if(td!=null && resultViewableHeader==null) {
-	            	throw new IoxException("class "+iomObj.getobjecttag()+" in model not found");
+				if(td!=null) {
+					Viewable resultViewableHeader=findViewable(iomObj);
+					if(resultViewableHeader==null) {
+						throw new IoxException("class "+iomObj.getobjecttag()+" in model not found");
+					}
+		    		headerAttrNames=getAttributeNames(resultViewableHeader);
+				}else {
+					if(headerAttrNames==null) {
+			    		headerAttrNames=getAttributeNames(iomObj);
+					}
 				}
-	    		headerAttrNames=getAttributeNames(resultViewableHeader, iomObj);
 	    		if(doHeader) {
 					try {
 						writeHeader(headerAttrNames);
 					} catch (IOException e) {
 						throw new IoxException(e);
 					}
-        			firstLineInFile=false;
 	    		}
+	    		firstObj=false;
 			}
         	String[] validAttrValues=getAttributeValues(headerAttrNames, iomObj);
         	try {
-        		if(!firstLineInFile) {
-        			writer.newLine();
-        		}else {
-        			firstLineInFile=false;
-        		}
-        		writeLine(validAttrValues);
+        		writeRecord(validAttrValues);
         	} catch (IOException e) {
 				throw new IoxException(e);
         	}
@@ -251,6 +252,7 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
             writer.write(escapequotes(name));
         	if(currentValueDelimiter!=null)writer.write(currentValueDelimiter);
         }
+		writer.newLine();
 	}
 
 	/** replace value content of quote with csv format
@@ -277,7 +279,7 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 	 * @throws IOException
 	 * @throws IoxException
 	 */
-    private void writeLine(String[] attrValues) throws IOException, IoxException {
+    private void writeRecord(String[] attrValues) throws IOException, IoxException {
         boolean first = true;
         for (String value : attrValues){
             if (!first) {
@@ -290,6 +292,7 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
         	if(currentValueDelimiter!=null)writer.write(currentValueDelimiter);
             first = false;
         }
+		writer.newLine();
     }
     
     /** check each char on special characters and/or write down char to file
@@ -345,7 +348,17 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 	 * @param td
 	 */
 	public void setModel(TransferDescription td) {
+		if(headerAttrNames!=null) {
+			throw new IllegalStateException("attributes must not be set");
+		}
 		this.td=td;
+	}
+	public void setAttributes(String [] attr)
+	{
+		if(td!=null) {
+			throw new IllegalStateException("ili-model must not be set");
+		}
+		headerAttrNames=attr.clone();
 	}
 	
 	/** close writer and delete saved data
