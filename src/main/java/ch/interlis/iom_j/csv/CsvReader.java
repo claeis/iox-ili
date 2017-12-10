@@ -3,7 +3,8 @@ package ch.interlis.iom_j.csv;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import ch.ehi.basics.settings.Settings;
 import ch.ehi.basics.view.GenericFileFilter;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Element;
@@ -47,10 +49,9 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	private static final char DEFAULT_VALUE_SEPARATOR=',';
 	private static final char NEWLINE_CARRIAGERETURN='\r';
 	private static final char NEWLINE_LINEFEED='\n';
+	public static final String ENCODING = "ch.interlis.iom_j.csv.encoding";
 	// iox reader parameter
 	private IoxFactoryCollection factory;
-	private FileReader inputReader=null;
-	private FileReader inputReaderBasket=null;
 	private TransferDescription td=null;
 	private File inputFile=null;
 	private int increasingNumber=1;
@@ -72,21 +73,30 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	private HashMap<Viewable, Model> iliClasses=null;
 	private ArrayList<HashMap<Viewable, Model>> listOfIliClasses=null;
 	
-	public CsvReader(File csvFile)throws IoxException{
+	public CsvReader(File csvFile)throws IoxException
+	{
+		this(csvFile,null);
+	}
+	public CsvReader(File csvFile,Settings settings)throws IoxException{
 		state=START;
 		try{
-			inputFile=new File(csvFile.getPath());
-			inputReader=new FileReader(inputFile);
-			inputReaderBasket=new FileReader(inputFile);
-			init(inputReader, inputReaderBasket);
+			inputFile=csvFile;
+			String encoding=null;
+			if(settings!=null) {
+				encoding=settings.getValue(ENCODING);
+			}
+			if(encoding==null) {
+				encoding=Charset.defaultCharset().name();
+			}
+			reader=new BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(inputFile),encoding));
+			basketReader=new BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(inputFile),encoding));
+			init();
 		}catch(java.io.IOException ex){
 			throw new IoxException(ex);
 		}
 	}
 	
-	private void init(FileReader in, FileReader basketIn) throws IoxException, FileNotFoundException{
-		reader= new BufferedReader(in);
-		basketReader= new BufferedReader(basketIn);
+	private void init() throws IoxException, FileNotFoundException{
 		factory=new ch.interlis.iox_j.DefaultIoxFactoryCollection();
 	}
 	
@@ -525,48 +535,22 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	
 	@Override
 	public void close() throws IoxException{
-		if(headerAttributes!=null || headerAttributes.size()>0) {
-			headerAttributes.clear();
-			headerAttributes=null;
+		if(reader!=null) {
+			try {
+				reader.close();
+			} catch (IOException e2) {
+				throw new IoxException(e2);
+			}
+			reader=null;
 		}
-		modelName=null;
-		topicName=null;
-		className=null;
-		iliTopics=null;
-		iliClasses=null;
-		listOfIliClasses=null;
-		try {
-			reader.close();
-		} catch (IOException e2) {
-			throw new IoxException(e2);
+		if(basketReader!=null) {
+			try {
+				basketReader.close();
+			} catch (IOException e1) {
+				throw new IoxException(e1);
+			}
+			basketReader=null;
 		}
-		reader=null;
-		try {
-			basketReader.close();
-		} catch (IOException e1) {
-			throw new IoxException(e1);
-		}
-		basketReader=null;
-		if(inputFile!=null){
-			inputFile=null;
-		}
-		currentValueDelimiter=DEFAULT_VALUE_DELIMITER;
-		currentValueSeparator=DEFAULT_VALUE_SEPARATOR;
-		try {
-			inputReader.close();
-		} catch (IOException e) {
-			throw new IoxException(e);
-		}
-		inputReader=null;
-		try {
-			inputReaderBasket.close();
-		} catch (IOException e) {
-			throw new IoxException(e);
-		}
-		inputReaderBasket=null;
-		td=null;
-		increasingNumber=1;
-		valueCountOfFirstLine=0;
 	}
 	
 	@Override

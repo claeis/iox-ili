@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
+
+import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.Ili2cFailure;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -232,6 +234,26 @@ public class CsvReaderTest {
         	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
         	assertEquals("AU", iomObj.getattrvalue(ATTRIBUTE2));
         	assertEquals("Australia", iomObj.getattrvalue(ATTRIBUTE3));
+		}
+		assertTrue(reader.read() instanceof EndBasketEvent);
+		assertTrue(reader.read() instanceof EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	// Es wird getestet ob die Datei mit dem gegebenen Character Encoding gelesen wird
+	@Test
+    public void encoding_Ok() throws IoxException, FileNotFoundException{
+		Settings settings=new Settings();
+		settings.setValue(CsvReader.ENCODING, "UTF-8");
+		CsvReader reader=new CsvReader(new File(TEST_IN,"TextTypeUTF8.csv"),settings);
+		assertTrue(reader.read() instanceof StartTransferEvent);
+		assertTrue(reader.read() instanceof StartBasketEvent);
+		IoxEvent event=reader.read();
+		if(event instanceof ObjectEvent){
+        	IomObject iomObj=((ObjectEvent)event).getIomObject();
+        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
+        	assertEquals("AU", iomObj.getattrvalue(ATTRIBUTE2));
+        	assertEquals("\u0402\u00A2", iomObj.getattrvalue(ATTRIBUTE3));
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
