@@ -4,10 +4,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
+import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.LocalAttribute;
 import ch.interlis.ili2c.metamodel.Topic;
@@ -53,30 +56,25 @@ public class CsvWriter implements ch.interlis.iox.IoxWriter {
 	 * @throws IoxException
 	 */
 	public CsvWriter(File file)throws IoxException{
-		FileWriter fileWriter=null;
+		this(file,null);
+	}
+	public CsvWriter(File file,Settings settings)throws IoxException{
 		if(file!=null) {
-			try {
-				file.createNewFile();
-			} catch (IOException e1) {
-				throw new IoxException("path to create file not found",e1);
+			String encoding=null;
+			if(settings!=null) {
+				encoding=settings.getValue(CsvReader.ENCODING);
+			}
+			if(encoding==null) {
+				encoding=Charset.defaultCharset().name();
 			}
 			try {
-				fileWriter=new FileWriter(file);
-				init(file, fileWriter);
+				writer=new BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream(file),encoding));
 			} catch (IOException e) {
 				throw new IoxException("could not create file",e);
 			}
 		}
 	}
-	
-	/** initialize writer
-	 * @param in
-	 * @param fileWriter
-	 */
-	private void init(File in, FileWriter fileWriter) {
-		writer=new BufferedWriter(fileWriter);
-	}
-    
+	    
 	/** find appropriate viewable in model/models
 	 * @param iomObj
 	 * @return

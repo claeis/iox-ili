@@ -12,6 +12,8 @@ iox-ili 1.20.1 (2017-12-04)
 - Iligml20Writer: fixed "max one reference value allowed"
 - added IoxStatistics
 - CsvReader: support character encoding
+- CsvWriter: support character encoding
+
 
 iox-ili 1.20.0 (2017-11-23)
 -----------------------------
