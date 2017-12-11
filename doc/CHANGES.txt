@@ -14,6 +14,7 @@ iox-ili 1.20.1 (2017-12-04)
 - CsvReader: support character encoding
 - CsvWriter: support character encoding
 - CsvWriter: support defined attribute ordering
+- CsvReader: support query of attribute names
 
 
 iox-ili 1.20.0 (2017-11-23)

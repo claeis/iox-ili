@@ -1011,9 +1011,9 @@ public class CsvReaderTest {
 		assertTrue(event instanceof ObjectEvent);
 			IomObject iomObj=((ObjectEvent)event).getIomObject();
 			assertTrue(iomObj.getattrcount()==3);
-	    	assertEquals("14", iomObj.getattrvalue("attr1"));
-	    	assertEquals("AU", iomObj.getattrvalue("attr2"));
-	    	assertEquals("Australia", iomObj.getattrvalue("attr3"));
+	    	assertEquals("14", iomObj.getattrvalue("id"));
+	    	assertEquals("AU", iomObj.getattrvalue("abbreviation"));
+	    	assertEquals("Australia", iomObj.getattrvalue("state"));
 		assertTrue(reader.read() instanceof ObjectEvent);
 		assertTrue(reader.read() instanceof EndBasketEvent);
  		assertTrue(reader.read() instanceof EndTransferEvent);
