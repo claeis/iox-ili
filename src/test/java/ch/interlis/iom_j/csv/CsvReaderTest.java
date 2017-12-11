@@ -260,6 +260,25 @@ public class CsvReaderTest {
 		reader.close();
 		reader=null;
 	}
+	// Es wird getestet ob ein fehlender Wert als UNDEFINED gelesen wird
+	@Test
+    public void attrValueUndefined_Ok() throws IoxException, FileNotFoundException{
+		Settings settings=new Settings();
+		CsvReader reader=new CsvReader(new File(TEST_IN,"TextTypeUndefined.csv"),settings);
+		assertTrue(reader.read() instanceof StartTransferEvent);
+		assertTrue(reader.read() instanceof StartBasketEvent);
+		IoxEvent event=reader.read();
+		if(event instanceof ObjectEvent){
+        	IomObject iomObj=((ObjectEvent)event).getIomObject();
+        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
+        	assertEquals("AU", iomObj.getattrvalue(ATTRIBUTE2));
+        	assertEquals(null, iomObj.getattrvalue(ATTRIBUTE3));
+		}
+		assertTrue(reader.read() instanceof EndBasketEvent);
+		assertTrue(reader.read() instanceof EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
 	
 	// Es wird getestet ob mehrere Records mit Anfuehrungszeichen erstellt werden koennen.
 	@Test
