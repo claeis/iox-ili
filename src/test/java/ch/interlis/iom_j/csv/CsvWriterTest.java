@@ -190,9 +190,9 @@ public class CsvWriterTest {
 		IoxEvent event=reader.read();
 		if(event instanceof ObjectEvent){
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schweiz", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("10", iomObj.getattrvalue("id"));
+        	assertEquals("Bern", iomObj.getattrvalue("stadt"));
+        	assertEquals("Schweiz", iomObj.getattrvalue("land"));
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
