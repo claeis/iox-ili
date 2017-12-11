@@ -55,6 +55,7 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	private TransferDescription td=null;
 	private File inputFile=null;
 	private int nextId=1;
+	private int lineCount=1;
 	private BufferedReader reader = null;
 	private boolean firstLineIsHeader=false;
 	private List<String> headerAttributes=null;;
@@ -200,6 +201,7 @@ public class CsvReader implements IoxReader,IoxIliReader {
 				}
 				if(record!=null && record.size()>0) {
 					iomObj=createIomObject(modelName+"."+topicName+"."+className, null);
+					iomObj.setobjectline(lineCount);
 					for(int i=0;i<headerAttributes.size();i++) {
 						String value=null;
 						if(record.size()>i) {
@@ -423,6 +425,7 @@ public class CsvReader implements IoxReader,IoxIliReader {
         	   }
            }
            if(state==INSIDE_NEWLINE){
+    		   lineCount++;
         	   // CRLF no delimiter defined
 	           result.add(currentValue.toString());
 			   int charCount=currentValue.length();
@@ -441,12 +444,14 @@ public class CsvReader implements IoxReader,IoxIliReader {
         		   state=END_RECORD_DELIMITER;
         		   continue;
         	   }else if(currentChar==NEWLINE_CARRIAGERETURN){
+        		   lineCount++;
         		   result.add(currentValue.toString());
         		   int charCount=currentValue.length();
     			   currentValue.delete(0, charCount);
         		   state=END_OBJECT;
         		   continue;
         	   }else if(currentChar==NEWLINE_LINEFEED){
+        		   lineCount++;
         		   result.add(currentValue.toString());
         		   int charCount=currentValue.length();
     			   currentValue.delete(0, charCount);
@@ -461,6 +466,7 @@ public class CsvReader implements IoxReader,IoxIliReader {
         		   state=INSIDE_DELIMITER;
         		   continue;
         	   }else if(currentChar==NEWLINE_CARRIAGERETURN || currentChar==NEWLINE_LINEFEED){
+        		   lineCount++;
         		   state=END_OBJECT;
         	   }else{
         		   state=INSIDE_NO_DELIMITER;
