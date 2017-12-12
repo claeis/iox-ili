@@ -23,6 +23,9 @@ import ch.interlis.iox_j.StartTransferEvent;
 
 public class CsvReaderTest {
 
+	private static final String MODEL3_ATTR_STATE = "state";
+	private static final String MODEL3_ATTR_ABBREVIATION = "abbreviation";
+	private static final String MODEL3_ATTR_ID = "id";
 	private TransferDescription td=null;
 	private static final String TEST_IN="src/test/data/CsvReader";
 	private static final String ATTRIBUTE1="attr1";
@@ -36,7 +39,7 @@ public class CsvReaderTest {
 	{
 		// compile model
 		Configuration ili2cConfig=new Configuration();
-		FileEntry fileEntry=new FileEntry(TEST_IN+"/model.ili", FileEntryKind.ILIMODELFILE);
+		FileEntry fileEntry=new FileEntry(TEST_IN+"/model3.ili", FileEntryKind.ILIMODELFILE);
 		ili2cConfig.addFileEntry(fileEntry);
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
@@ -109,9 +112,7 @@ public class CsvReaderTest {
 		IoxEvent event = reader.read();
 		if(event instanceof ObjectEvent){
 			IomObject iomObj=((ObjectEvent)event).getIomObject();
-			assertTrue(iomObj.getobjecttag().contains("model"));
-			assertTrue(iomObj.getobjecttag().contains("Topic12"));
-			assertTrue(iomObj.getobjecttag().contains("Class1"));
+			assertEquals("model3.Topic12.Class1",iomObj.getobjecttag());
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
@@ -390,15 +391,15 @@ public class CsvReaderTest {
 	@Test
     public void headerPresent_Ok() throws IoxException, FileNotFoundException{
 		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderPresent.csv"));
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		reader.setFirstLineIsHeader(true);
+		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event = reader.read();
 		if(event instanceof ObjectEvent){
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("AU", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Australia", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("10", iomObj.getattrvalue("id"));
+        	assertEquals("AU", iomObj.getattrvalue("abbreviation"));
+        	assertEquals("Australia", iomObj.getattrvalue("state"));
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
@@ -624,9 +625,30 @@ public class CsvReaderTest {
  		IoxEvent event = reader.read();
  		if(event instanceof ObjectEvent){
          	IomObject iomObj=((ObjectEvent)event).getIomObject();
-         	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("AU", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Australia", iomObj.getattrvalue(ATTRIBUTE3));
+         	assertEquals("10", iomObj.getattrvalue(MODEL3_ATTR_ID));
+        	assertEquals("AU", iomObj.getattrvalue(MODEL3_ATTR_ABBREVIATION));
+        	assertEquals("Australia", iomObj.getattrvalue(MODEL3_ATTR_STATE));
+ 		}
+ 		assertTrue(reader.read() instanceof EndBasketEvent);
+ 		assertTrue(reader.read() instanceof EndTransferEvent);
+ 		reader.close();
+ 		reader=null;
+ 	}
+    // Der Benutzer setzt einen Header und ein Model. Im Header haben die Attribute eine andere Gross-/kleinschreibung als im Modell.
+ 	// Der CsvReader muss die Namen gem. Modell verwenden/liefern.
+ 	@Test
+     public void attrsSimpilarIliClass_SetModelAndHeader_Ok() throws IoxException, FileNotFoundException{
+ 		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderSimilar.csv"));
+ 		reader.setModel(td);
+ 		reader.setFirstLineIsHeader(true);
+ 		assertTrue(reader.read() instanceof StartTransferEvent);
+ 		assertTrue(reader.read() instanceof StartBasketEvent);
+ 		IoxEvent event = reader.read();
+ 		if(event instanceof ObjectEvent){
+         	IomObject iomObj=((ObjectEvent)event).getIomObject();
+         	assertEquals("10", iomObj.getattrvalue(MODEL3_ATTR_ID));
+        	assertEquals("AU", iomObj.getattrvalue(MODEL3_ATTR_ABBREVIATION));
+        	assertEquals("Australia", iomObj.getattrvalue(MODEL3_ATTR_STATE));
  		}
  		assertTrue(reader.read() instanceof EndBasketEvent);
  		assertTrue(reader.read() instanceof EndTransferEvent);
@@ -644,9 +666,9 @@ public class CsvReaderTest {
 		IoxEvent event = reader.read();
 		if(event instanceof ObjectEvent){
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("AU", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Australia", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("10", iomObj.getattrvalue(MODEL3_ATTR_ID));
+        	assertEquals("AU", iomObj.getattrvalue(MODEL3_ATTR_ABBREVIATION));
+        	assertEquals("Australia", iomObj.getattrvalue(MODEL3_ATTR_STATE));
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
@@ -709,8 +731,8 @@ public class CsvReaderTest {
 		
  		CsvReader reader=new CsvReader(new File(TEST_IN,"HeaderPresent.csv"));
 		reader.setModel(tdM);
-		assertTrue(reader.read() instanceof StartTransferEvent);
 		reader.setFirstLineIsHeader(true);
+		assertTrue(reader.read() instanceof StartTransferEvent);
 		assertTrue(reader.read() instanceof StartBasketEvent);
 		IoxEvent event=reader.read();
 		if(event instanceof ObjectEvent){
@@ -816,7 +838,7 @@ public class CsvReaderTest {
     		reader.read();
     		fail();
     	}catch(IoxException ex){
-    		assertTrue(ex.getMessage().contains("attributes size of first line: 4 not found in iliModel: model"));
+    		assertTrue(ex.getMessage().contains("attributes size of first line: 4 not found in iliModel: model3"));
     	}
 		reader.close();
 		reader=null;
