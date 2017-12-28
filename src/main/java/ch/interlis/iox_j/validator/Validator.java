@@ -272,6 +272,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				validateObject(iomObj,null);
 			} catch (IoxException e) {
 				errs.addEvent(errFact.logInfoMsg("failed to validate object {0}", iomObj.toString()));
+			}catch(RuntimeException e) {
+				EhiLogger.traceState("failing object: "+iomObj.toString());
+				throw e;
 			}
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
@@ -620,7 +623,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							 int structc=iomObj.getattrvaluecount(attrName);
 							 for(int structi=0;structi<structc;structi++){
 								 IomObject structEle=iomObj.getattrobj(attrName, structi);
-								 validateConstraints(structEle, structType);
+								 if(structEle!=null) {
+									 validateConstraints(structEle, structType);
+								 }
 							 }
 						}
 					}
@@ -2489,10 +2494,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							 int structc=iomObj.getattrvaluecount(attrName);
 							 for(int structi=0;structi<structc;structi++){
 								 IomObject structEle=iomObj.getattrobj(attrName, structi);
-									IomObject coord=getDefaultCoord(structEle);
-									if (coord!=null){
-										return coord;
-									}
+								 if(structEle!=null) {
+										IomObject coord=getDefaultCoord(structEle);
+										if (coord!=null){
+											return coord;
+										}
+								 }
 							 }
 						}else if (type instanceof PolylineType){
 							PolylineType polylineType=(PolylineType)type;
@@ -2664,7 +2671,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							configOffOufputReduction.add(ValidationConfig.TYPE+":"+attrQName);
 							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration type=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 						}
-					}else{
+					}else if(structEle==null) {
+							 logMsg(validateType,"Attribute {0} requires a structure {1}", attrPath,((CompositionType)type).getComponentType().getScopedName(null));
+					}else {
 						String tag=structEle.getobjecttag();
 						Object modelele=tag2class.get(tag);
 						if(modelele==null){
@@ -2682,8 +2691,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								 logMsg(validateType,"Attribute {0} requires a non-abstract structure", attrPath);
 							}
 						}
+						validateObject(structEle, attrPath+"["+structi+"]");
 					}
-				 validateObject(structEle, attrPath+"["+structi+"]");
 			 }
 		}else{
 			if(ValidationConfig.OFF.equals(validateMultiplicity)){

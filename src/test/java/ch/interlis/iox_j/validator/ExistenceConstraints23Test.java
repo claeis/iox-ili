@@ -991,7 +991,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob innerhalb einer Struktur eine Existence Constraint erstellt werden kann.
+	// Es wird getestet, ob innerhalb einer Struktur eine Existence Constraint geprueft wird.
 	// Es darf keine Fehlermeldung ausgegeben werden, da die Attributewerte miteinander uebereinstimmen.
 	@Test
 	public void existenceConstraintInStructure_Ok() throws Exception {
@@ -1014,6 +1014,27 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
+	}
+	// Es wird getestet, dass das Constraint innerhlab einer Struktur ueberlesen wird, falls faelschlicherweise kein Strukturelement vorhanden ist
+	@Test
+	public void existenceConstraintInStructureButPrimitiveValue_Fail() throws Exception {
+		Iom_jObject conditionClass=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", OID1);
+		conditionClass.setattrvalue("attr1", "lars");
+		Iom_jObject baseClassD=new Iom_jObject("ExistenceConstraints23.Topic.ClassD", OID2);
+		baseClassD.setattrvalue("attr1", "lars"); // sollte eigentlich ein Strukturelement sein, darf nicht zum Absturz fuehren
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
+		validator.validate(new ObjectEvent(conditionClass));
+		validator.validate(new ObjectEvent(baseClassD));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn

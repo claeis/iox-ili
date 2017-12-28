@@ -5,10 +5,11 @@ ideas/open issues
 LATEST
 -----------------------------
 
-iox-ili 1.20.1 (2017-12-04)
+iox-ili 1.20.1 (2017-12-xx)
 -----------------------------
-- validator: improve UNIQUE validation performance 
-- validator: fix cardinality validation of cross topic roles
+- Validator: improve UNIQUE validation performance 
+- Validator: fix cardinality validation of cross topic roles
+- Validator: fix NPE if primitive value instead of struct value
 - Iligml20Writer: fixed "max one reference value allowed"
 - added IoxStatistics
 - CsvReader: support character encoding
