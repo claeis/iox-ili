@@ -5,7 +5,7 @@ ideas/open issues
 LATEST
 -----------------------------
 
-iox-ili 1.20.1 (2017-12-xx)
+iox-ili 1.20.1 (2017-12-29)
 -----------------------------
 - Validator: improve UNIQUE validation performance 
 - Validator: fix cardinality validation of cross topic roles
