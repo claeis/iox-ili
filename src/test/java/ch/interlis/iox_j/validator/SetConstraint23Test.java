@@ -36,6 +36,7 @@ public class SetConstraint23Test {
 	private final static String ILI_CLASSC=TOPIC+".ClassC";
 	private final static String ILI_CLASSD=TOPIC+".ClassD";
 	private final static String ILI_CLASSE=TOPIC+".ClassE";
+	private final static String ILI_CLASSBP=TOPIC+".ClassBp";
 	// START BASKET EVENT
 	private final static String BID1="b1";
 	private final static String BID2="b2";
@@ -70,6 +71,29 @@ public class SetConstraint23Test {
 		validator.validate(new StartBasketEvent(TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObj));
 		validator.validate(new ObjectEvent(iomObj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet, was geschieht, wenn die Pre-Bedingung und die second Bedingung wahr ist
+	// und die Klasse: ClassB von der Klasse: ClassBP erweitert wird.
+	@Test
+	public void subClassPreAndSecondConstraintAreTrue_Ok(){
+		Iom_jObject iomObjClassBP=new Iom_jObject(ILI_CLASSBP, OID1);
+		iomObjClassBP.setattrvalue("Art", "b");
+		Iom_jObject iomObjClassBP2=new Iom_jObject(ILI_CLASSBP, OID2);
+		iomObjClassBP2.setattrvalue("Art", "c");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjClassBP));
+		validator.validate(new ObjectEvent(iomObjClassBP2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
@@ -241,6 +265,26 @@ public class SetConstraint23Test {
 	//#########################################################//
 	//######## FAIL FUNCTIONS #################################//
 	//#########################################################//
+	
+	// Es wird getestet, was geschieht, wenn die Pre-Bedingung und die second Bedingung false sind.
+	@Test
+	public void subClassPreAndSecondConstraintAreFalse_Fail(){
+		Iom_jObject iomObjClassBP=new Iom_jObject(ILI_CLASSBP, OID1);
+		iomObjClassBP.setattrvalue("Art", "a");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjClassBP));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Set Constraint SetConstraint23.Topic.ClassB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
 	
 	// Es wird getestet ein Fehler ausgegeben wird, wenn der Pre-Constraint true ist und die Funktion: ObjectCount(ALL) false ist.
 	@Test

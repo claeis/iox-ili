@@ -5,6 +5,20 @@ ideas/open issues
 LATEST
 -----------------------------
 
+iox-ili 1.20.1 (2017-12-29)
+-----------------------------
+- Validator: improve UNIQUE validation performance 
+- Validator: fix cardinality validation of cross topic roles
+- Validator: fix NPE if primitive value instead of struct value
+- Iligml20Writer: fixed "max one reference value allowed"
+- added IoxStatistics
+- CsvReader: support character encoding
+- CsvWriter: support character encoding
+- CsvWriter: support defined attribute ordering
+- CsvReader: support query of attribute names
+- CsvReader: set line number in returned objects
+- CsvReader: ignore case of attribute names
+
 iox-ili 1.20.0 (2017-11-23)
 -----------------------------
 - implement MultiPoint wkb conversion

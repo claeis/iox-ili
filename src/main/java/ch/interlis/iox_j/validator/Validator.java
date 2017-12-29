@@ -272,6 +272,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				validateObject(iomObj,null);
 			} catch (IoxException e) {
 				errs.addEvent(errFact.logInfoMsg("failed to validate object {0}", iomObj.toString()));
+			}catch(RuntimeException e) {
+				EhiLogger.traceState("failing object: "+iomObj.toString());
+				throw e;
 			}
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
@@ -494,54 +497,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							}
 						}
 					}
-					Iterator constraintIterator=classOfCurrentObj.iterator();
-					while (constraintIterator.hasNext()) {
-						Object constraintObj = constraintIterator.next();
-						// existence constraint
-						if(constraintObj instanceof ExistenceConstraint){
-							ExistenceConstraint existenceConstraint=(ExistenceConstraint) constraintObj;
-							validateExistenceConstraint(iomObj, existenceConstraint);
-						}
-						// mandatory constraint
-						if(constraintObj instanceof MandatoryConstraint){
-							MandatoryConstraint mandatoryConstraint=(MandatoryConstraint) constraintObj;
-							validateMandatoryConstraint(iomObj, mandatoryConstraint);
-						}
-						// set constraint
-						if(constraintObj instanceof SetConstraint){
-							SetConstraint setConstraint=(SetConstraint) constraintObj;
-							String constraintName = getScopedName(setConstraint);
-							String checkSetConstraint=null;
-							if(!enforceConstraintValidation){
-								checkSetConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
-							}
-							if(ValidationConfig.OFF.equals(checkSetConstraint)){
-								if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
-									configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-									errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
-								}
-							} else {
-								collectSetConstraintObjs(checkSetConstraint, constraintName, iomObj, setConstraint);
-							}
-						}
-						// plausibility constraint
-						if(constraintObj instanceof PlausibilityConstraint){
-							PlausibilityConstraint plausibilityConstraint=(PlausibilityConstraint) constraintObj;
-							String constraintName = getScopedName(plausibilityConstraint);
-							String checkPlausibilityConstraint=null;
-							if(!enforceConstraintValidation){
-								checkPlausibilityConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
-							}
-							if(ValidationConfig.OFF.equals(checkPlausibilityConstraint)){
-								if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
-									configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-									errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
-								}
-							} else {
-								fillOfPlausibilityConstraintMap(checkPlausibilityConstraint, constraintName, plausibilityConstraint, iomObj);
-							}
-						}
-					}
+					validateConstraints(iomObj, classOfCurrentObj);
 					Iterator<ViewableTransferElement> attrIterator=classOfCurrentObj.getAttributesAndRoles2();
 					while (attrIterator.hasNext()) {
 						ViewableTransferElement objA = attrIterator.next();
@@ -573,6 +529,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							RoleDef role=targetRoleIterator.next();
 							validateRoleCardinality(role, iomObj);
 						}
+						targetRoleIterator=abstractClassDef.getOpposideForNonNavigableRoles();
+						while(targetRoleIterator.hasNext()){
+							RoleDef role=targetRoleIterator.next();
+							validateRoleCardinality(role, iomObj);
+						}
 					}
 				}
 			}
@@ -589,6 +550,86 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}else{
 				validateSetConstraint(setConstraint);
+			}
+		}
+	}
+	private void validateConstraints(IomObject iomObj, Viewable classOfIomObj) {
+		Viewable classOfCurrentObj=classOfIomObj;
+		while(classOfCurrentObj!=null) {
+			Iterator constraintIterator=classOfCurrentObj.iterator();
+			while (constraintIterator.hasNext()) {
+				Object constraintObj = constraintIterator.next();
+				// existence constraint
+				if(constraintObj instanceof ExistenceConstraint){
+					ExistenceConstraint existenceConstraint=(ExistenceConstraint) constraintObj;
+					validateExistenceConstraint(iomObj, existenceConstraint);
+				}
+				// mandatory constraint
+				if(constraintObj instanceof MandatoryConstraint){
+					MandatoryConstraint mandatoryConstraint=(MandatoryConstraint) constraintObj;
+					validateMandatoryConstraint(iomObj, mandatoryConstraint);
+				}
+				// set constraint
+				if(constraintObj instanceof SetConstraint){
+					SetConstraint setConstraint=(SetConstraint) constraintObj;
+					String constraintName = getScopedName(setConstraint);
+					String checkSetConstraint=null;
+					if(!enforceConstraintValidation){
+						checkSetConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
+					}
+					if(ValidationConfig.OFF.equals(checkSetConstraint)){
+						if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
+							configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
+							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
+						}
+					} else {
+						collectSetConstraintObjs(checkSetConstraint, constraintName, iomObj, setConstraint);
+					}
+				}
+				// plausibility constraint
+				if(constraintObj instanceof PlausibilityConstraint){
+					PlausibilityConstraint plausibilityConstraint=(PlausibilityConstraint) constraintObj;
+					String constraintName = getScopedName(plausibilityConstraint);
+					String checkPlausibilityConstraint=null;
+					if(!enforceConstraintValidation){
+						checkPlausibilityConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
+					}
+					if(ValidationConfig.OFF.equals(checkPlausibilityConstraint)){
+						if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
+							configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
+							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
+						}
+					} else {
+						fillOfPlausibilityConstraintMap(checkPlausibilityConstraint, constraintName, plausibilityConstraint, iomObj);
+					}
+				}
+			}
+			classOfCurrentObj=(Viewable) classOfCurrentObj.getExtending();
+		}
+		Iterator iter = classOfIomObj.getAttributesAndRoles2();
+		while (iter.hasNext()) {
+			ViewableTransferElement obj = (ViewableTransferElement)iter.next();
+			if (obj.obj instanceof AttributeDef) {
+				AttributeDef attr = (AttributeDef) obj.obj;
+				if(!attr.isTransient()){
+					Type proxyType=attr.getDomain();
+					if(proxyType!=null && (proxyType instanceof ObjectType)){
+						// skip implicit particles (base-viewables) of views
+					}else{
+						Type type=attr.getDomainResolvingAliases();
+						String attrName=attr.getName();
+						if (type instanceof CompositionType){
+							Viewable structType=((CompositionType) type).getComponentType();
+							 int structc=iomObj.getattrvaluecount(attrName);
+							 for(int structi=0;structi<structc;structi++){
+								 IomObject structEle=iomObj.getattrobj(attrName, structi);
+								 if(structEle!=null) {
+									 validateConstraints(structEle, structType);
+								 }
+							 }
+						}
+					}
+				}
 			}
 		}
 	}
@@ -694,16 +735,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(!loggedObjects.contains(uniquenessConstraint)){
 				loggedObjects.add(uniquenessConstraint);
 				errs.addEvent(errFact.logInfoMsg("validate unique constraint {0}...",getScopedName(uniquenessConstraint)));
-			}
-			StringBuilder contentUniqueAttrs = new StringBuilder();
-			ArrayList<String> uniqueConstraintAttrs=new ArrayList<String>();
-			// gets all constraint attribute-names.
-			Iterator iter = uniquenessConstraint.getElements().iteratorAttribute();
-			uniqueConstraintAttrs.add(aClass1.toString());
-			while (iter.hasNext()){
-				ObjectPath object = (ObjectPath)iter.next();
-				uniqueConstraintAttrs.add(object.getLastPathEl().getName());
-				contentUniqueAttrs.append(object.getLastPathEl().getName());
 			}
 			Holder<AttributeArray> values = new Holder<AttributeArray>();
 			String returnValue = validateUnique(iomObj,uniquenessConstraint, values);
@@ -1565,6 +1596,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		return buf.toString();
 	}
+	
 	private void validateRoleCardinality(RoleDef role, IomObject iomObj) {
 		String roleQName = null;
 		roleQName = getScopedName(role);
@@ -1848,16 +1880,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			boolean valueExists = false;
 			Table classA = null;
 			Table otherClass = null;
-			while (requiredInIterator.hasNext()) {
+			while (!valueExists && requiredInIterator.hasNext()) {
 				classA = null;
-				ObjectPath attrName = (ObjectPath)requiredInIterator.next();
-				otherClass = (Table) attrName.getRoot();
-				String otherAttrName = attrName.toString();
-				String attrValueThisObj = iomObj.getattrvalue(otherAttrName);
-				for (String basketId : objectPool.getBasketIds()){
+				ObjectPath otherAttrPath = (ObjectPath)requiredInIterator.next();
+				String otherAttrName = otherAttrPath.toString();
+				otherClass = (Table) otherAttrPath.getRoot();
+				String attrValueThisObj = iomObj.getattrvalue(restrictedAttrName);
+				Iterator<String> basketIdIterator=objectPool.getBasketIds().iterator();
+				while( !valueExists &&  basketIdIterator.hasNext()){
+					String basketId=basketIdIterator.next();
 					// iterate through iomObjects
 					Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
-					while (objectIterator.hasNext()){
+					while (!valueExists &&  objectIterator.hasNext()){
 						IomObject otherIomObj = objectIterator.next();
 						if (otherIomObj.getattrcount() == 0){
 						// do not validate.
@@ -1882,10 +1916,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 										SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
 										valueExists = equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, otherAttrName, restrictedAttrName);
 									} else if (type instanceof CompositionType){
-										CompositionType compositionType = (CompositionType) type;
-										valueExists = equalsCompositionValue(iomObj, compositionType, otherIomObj, otherAttrName, restrictedAttrName);
+										if(iomObj.getattrvaluecount(restrictedAttrName)==otherIomObj.getattrvaluecount(restrictedAttrName)) {
+											 for(int structi=0;structi<iomObj.getattrvaluecount(restrictedAttrName);structi++){
+												 IomObject structEle=iomObj.getattrobj(restrictedAttrName, structi);
+												 IomObject otherStructEle=otherIomObj.getattrobj(restrictedAttrName, structi);
+												 if(structEle!=null && otherStructEle!=null) {
+													 valueExists = equalsStructEle(((CompositionType) type).getComponentType(),structEle, otherStructEle);
+													 if(!valueExists) {
+														 // werte nicht gleich; weiterfahren mit naechstem Hauptobject
+														 break;
+													 }
+												 }else {
+													 break;
+												 }
+											 }
+										}
 									} else {
-										// if type is not type of alias, validate attribute names
 										if(otherIomObj.getattrvalue(otherAttrName).equals(iomObj.getattrvalue(restrictedAttrName))){
 											valueExists = true;
 										}
@@ -1907,9 +1953,67 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 	
-	private boolean equalsCompositionValue(IomObject iomObjectA, CompositionType compositionType, IomObject otherIomObj, String otherAttrName, String restrictedAttrName) {
-		IomObject compositionValueRestricted=iomObjectA.getattrobj(restrictedAttrName, 0);
-		IomObject compositionValueOther = otherIomObj.getattrobj(otherAttrName, 0);
+	private boolean equalsStructEle(Viewable aclass,IomObject iomObj, IomObject otherIomObj) {
+		Iterator iter = aclass.getAttributesAndRoles2();
+		while (iter.hasNext()) {
+			ViewableTransferElement obj = (ViewableTransferElement)iter.next();
+			if (obj.obj instanceof AttributeDef) {
+				AttributeDef attr = (AttributeDef) obj.obj;
+				if(!attr.isTransient()){
+					Type proxyType=attr.getDomain();
+					if(proxyType!=null && (proxyType instanceof ObjectType)){
+						// skip implicit particles (base-viewables) of views
+					}else{
+						String targetAttrName=attr.getName();
+						Type type=attr.getDomainResolvingAliases();
+						if(iomObj.getattrvaluecount(targetAttrName)!=otherIomObj.getattrvaluecount(targetAttrName)) {
+							return false;
+						}
+						if(iomObj.getattrvaluecount(targetAttrName)>0) {
+							if(type instanceof ReferenceType){
+								ReferenceType referenceType = (ReferenceType) type;
+								if(!equalsReferenceValue(iomObj, referenceType, otherIomObj, targetAttrName,targetAttrName)) {
+									return false;
+								}
+							} else if (type instanceof CoordType){
+								CoordType coordType = (CoordType) type;
+								if(!equalsCoordValue(iomObj, coordType, otherIomObj, targetAttrName,targetAttrName)) {
+									return false;
+								}
+							} else if (type instanceof PolylineType){
+								PolylineType polylineType = (PolylineType) type;
+								if(!equalsPolylineValue(iomObj, polylineType, otherIomObj, targetAttrName,targetAttrName)){
+									return false;
+								}
+							} else if (type instanceof SurfaceOrAreaType){
+								SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
+								if(!equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, targetAttrName,targetAttrName)) {
+									return false;
+								}
+							} else if (type instanceof CompositionType){
+								 for(int structi=0;structi<iomObj.getattrvaluecount(targetAttrName);structi++){
+									 IomObject structEle=iomObj.getattrobj(targetAttrName, structi);
+									 IomObject otherStructEle=otherIomObj.getattrobj(targetAttrName, structi);
+									 if(structEle!=null && otherStructEle!=null) {
+										 if(!equalsStructEle(((CompositionType) type).getComponentType(),structEle, otherStructEle)) {
+											 // werte nicht gleich; weiterfahren mit naechstem Hauptobject
+											 return false;
+										 }
+									 }else {
+										 return false;
+									 }
+								 }
+							} else {
+								if(!otherIomObj.getattrvalue(targetAttrName).equals(iomObj.getattrvalue(targetAttrName))){
+									return false;
+								}
+							}
+						}
+						
+					}
+				}
+			}
+		}
 		return true;
 	}
 
@@ -2241,13 +2345,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 		// Uniqueness
 		if(isObject){
-			Iterator attrI=aclass1.iterator();
-			while (attrI.hasNext()) {
-				Object obj1 = attrI.next();
-				if(obj1 instanceof UniquenessConstraint){
-					UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) obj1; // uniquenessConstraint not null.
-					validateUniquenessConstraint(iomObj, uniquenessConstraint);
+			Viewable aclass2=aclass1;
+			while(aclass2!=null) {
+				Iterator attrI=aclass2.iterator();
+				while (attrI.hasNext()) {
+					Object obj1 = attrI.next();
+					if(obj1 instanceof UniquenessConstraint){
+						UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) obj1; // uniquenessConstraint not null.
+						validateUniquenessConstraint(iomObj, uniquenessConstraint);
+					}
 				}
+				aclass2=(Viewable) aclass2.getExtending();
 			}
 		}
 		
@@ -2386,10 +2494,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							 int structc=iomObj.getattrvaluecount(attrName);
 							 for(int structi=0;structi<structc;structi++){
 								 IomObject structEle=iomObj.getattrobj(attrName, structi);
-									IomObject coord=getDefaultCoord(structEle);
-									if (coord!=null){
-										return coord;
-									}
+								 if(structEle!=null) {
+										IomObject coord=getDefaultCoord(structEle);
+										if (coord!=null){
+											return coord;
+										}
+								 }
 							 }
 						}else if (type instanceof PolylineType){
 							PolylineType polylineType=(PolylineType)type;
@@ -2463,7 +2573,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String validateUnique(IomObject currentObject,UniquenessConstraint constraint, Holder<AttributeArray> values) {
 		IomObject originObj=currentObject;
 		ArrayList<Object> accu = new ArrayList<Object>();
-		Iterator constraintIter = constraint.getElements().iteratorAttribute();
 		if(constraint.getPrefix()!=null){
 			PathEl[] attrPath = constraint.getPrefix().getPathElements();
 			for(int i=0;i<attrPath.length;i++){
@@ -2474,6 +2583,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 		}
+		Iterator constraintIter = constraint.getElements().iteratorAttribute();
 		while(constraintIter.hasNext()){
 			String uniqueAttrName = constraintIter.next().toString();
 			Object attrValue=null;
@@ -2561,7 +2671,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							configOffOufputReduction.add(ValidationConfig.TYPE+":"+attrQName);
 							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration type=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 						}
-					}else{
+					}else if(structEle==null) {
+							 logMsg(validateType,"Attribute {0} requires a structure {1}", attrPath,((CompositionType)type).getComponentType().getScopedName(null));
+					}else {
 						String tag=structEle.getobjecttag();
 						Object modelele=tag2class.get(tag);
 						if(modelele==null){
@@ -2579,8 +2691,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								 logMsg(validateType,"Attribute {0} requires a non-abstract structure", attrPath);
 							}
 						}
+						validateObject(structEle, attrPath+"["+structi+"]");
 					}
-				 validateObject(structEle, attrPath+"["+structi+"]");
 			 }
 		}else{
 			if(ValidationConfig.OFF.equals(validateMultiplicity)){

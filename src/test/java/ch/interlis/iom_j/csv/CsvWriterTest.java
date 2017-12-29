@@ -11,6 +11,8 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.Ili2cFailure;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -188,9 +190,9 @@ public class CsvWriterTest {
 		IoxEvent event=reader.read();
 		if(event instanceof ObjectEvent){
         	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schweiz", iomObj.getattrvalue(ATTRIBUTE3));
+        	assertEquals("10", iomObj.getattrvalue("id"));
+        	assertEquals("Bern", iomObj.getattrvalue("stadt"));
+        	assertEquals("Schweiz", iomObj.getattrvalue("land"));
 		}
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
@@ -248,6 +250,122 @@ public class CsvWriterTest {
 		reader=null;
 		// delete created file
 		File file=new File(TEST_IN,"object_NoModelSet_SetHeaderPresent_Ok.csv");
+		if(file.exists()) {
+			file.delete();
+		}
+	}
+	@Test
+	public void encoding_Ok() throws IoxException, IOException{
+		CsvWriter writer=null;
+		final String FILE_NAME = "encoding_Ok.csv";
+		try {
+			Settings settings=new Settings();
+			settings.setValue(CsvReader.ENCODING, "UTF8");
+			writer=new CsvWriter(new File(TEST_IN,FILE_NAME),settings);
+			writer.write(new StartTransferEvent());
+			writer.setWriteHeader(false);
+			writer.write(new StartBasketEvent("model.Topic1","bid1"));
+			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
+			iomObj.setattrvalue("land", "\u0402\u00A2");
+			writer.write(new ObjectEvent(iomObj));
+			writer.write(new EndBasketEvent());
+			writer.write(new EndTransferEvent());
+		}finally {
+	    	if(writer!=null) {
+	    		try {
+					writer.close();
+				} catch (IoxException e) {
+					throw new IoxException(e);
+				}
+	    		writer=null;
+	    	}
+		}
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILE_NAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"\u0402\u00A2\"", line);
+		reader.close();
+		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,FILE_NAME);
+		if(file.exists()) {
+			file.delete();
+		}
+	}
+	@Test
+	public void attributeDefaultOrdering_Ok() throws IoxException, IOException{
+		CsvWriter writer=null;
+		final String FILE_NAME = "attributeDefaultOrdering_Ok.csv";
+		try {
+			Settings settings=new Settings();
+			settings.setValue(CsvReader.ENCODING, "UTF8");
+			writer=new CsvWriter(new File(TEST_IN,FILE_NAME),settings);
+			writer.write(new StartTransferEvent());
+			writer.setWriteHeader(false);
+			writer.write(new StartBasketEvent("model.Topic1","bid1"));
+			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
+			iomObj.setattrvalue("id", "10");
+			iomObj.setattrvalue("stadt", "Bern");
+			iomObj.setattrvalue("land", "Schweiz");
+			writer.write(new ObjectEvent(iomObj));
+			writer.write(new EndBasketEvent());
+			writer.write(new EndTransferEvent());
+		}finally {
+	    	if(writer!=null) {
+	    		try {
+					writer.close();
+				} catch (IoxException e) {
+					throw new IoxException(e);
+				}
+	    		writer=null;
+	    	}
+		}
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILE_NAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"10\",\"Schweiz\",\"Bern\"", line);
+		reader.close();
+		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,FILE_NAME);
+		if(file.exists()) {
+			file.delete();
+		}
+	}
+	@Test
+	public void attributeDefinedOrdering_Ok() throws IoxException, IOException{
+		CsvWriter writer=null;
+		final String FILE_NAME = "attributeDefinedOrdering_Ok.csv";
+		try {
+			Settings settings=new Settings();
+			settings.setValue(CsvReader.ENCODING, "UTF8");
+			writer=new CsvWriter(new File(TEST_IN,FILE_NAME),settings);
+			writer.write(new StartTransferEvent());
+			writer.setWriteHeader(false);
+			writer.setAttributes(new String[] {"id","stadt","land"});
+			writer.write(new StartBasketEvent("model.Topic1","bid1"));
+			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
+			iomObj.setattrvalue("id", "10");
+			iomObj.setattrvalue("stadt", "Bern");
+			iomObj.setattrvalue("land", "Schweiz");
+			writer.write(new ObjectEvent(iomObj));
+			writer.write(new EndBasketEvent());
+			writer.write(new EndTransferEvent());
+		}finally {
+	    	if(writer!=null) {
+	    		try {
+					writer.close();
+				} catch (IoxException e) {
+					throw new IoxException(e);
+				}
+	    		writer=null;
+	    	}
+		}
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILE_NAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"10\",\"Bern\",\"Schweiz\"", line);
+		reader.close();
+		reader=null;
+		// delete created file
+		File file=new File(TEST_IN,FILE_NAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -1348,7 +1466,7 @@ public class CsvWriterTest {
 			writer=new CsvWriter(new File("src/test/data/CsvWriter2","pathtoCsvFileNotFound_Fail.csv"));
 			writer.setModel(td);
 		}catch(Exception e) {
-			assertTrue(e.getMessage().contains("path to create file not found"));
+			assertTrue(e.getMessage().contains("could not create file"));
 		}finally {
 	    	if(writer!=null) {
 	    		try {

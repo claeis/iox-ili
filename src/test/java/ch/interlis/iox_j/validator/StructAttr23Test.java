@@ -39,7 +39,7 @@ public class StructAttr23Test {
 		assertNotNull(td);
 	}
 	
-	// Es wird getestet ob ein Structur Attribute erstellt werden kann.
+	// Es wird ein Structur Attribute gestestet
 	@Test
 	public void structElement_Ok(){
 		Iom_jObject iomStruct=new Iom_jObject(STRUCTA, null);
@@ -60,7 +60,26 @@ public class StructAttr23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob ein numerisches Attribute einer Struktur mit einem anderen Type erstellt werden kann.
+	// Es wird getestet, ob ein Strukturattribut eine Struktur ist (und nicht ein Primitivwert)
+	@Test
+	public void structElement_Fail(){
+		Iom_jObject iomObj=new Iom_jObject(CLASSB, OID);
+		iomObj.setattrvalue(CLASSB_ATTRB2, "true");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+	}
+	
+	// Es wird getestet ob ein numerisches Attribute innerhalb einer Struktur geprueft wird
 	@Test
 	public void wrongAttrValueInStruct_Fail(){
 		Iom_jObject iomStruct=new Iom_jObject(STRUCTA, null);

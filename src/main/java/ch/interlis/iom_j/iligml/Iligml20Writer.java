@@ -524,105 +524,99 @@ import java.util.Map;
 					String val=obj.getattrprim(attrName,0);
 					// not a primitive?
 					if(val==null){
-						IomObject child=obj.getattrobj(attrName,0);
-						if (child != null)
-						{
-							// some special cases
-							if (child.getobjecttag().equals("COORD"))
+						for(int valuei=0;valuei<valueCount;valuei++) {
+							IomObject child=obj.getattrobj(attrName,0);
+							if (child != null)
 							{
-								// COORD
-								xout.writeStartElement(xmlns_attr,attrName);
-								writeCoord(child,getDefaultCrs());
-								xout.writeEndElement(/*attr*/);
-								if (valueCount > 1)
+								// some special cases
+								if (child.getobjecttag().equals("COORD"))
 								{
-									throw new IoxException("max one COORD value allowed ("+attrName+")");
-								}
-							}
-							else if (child.getobjecttag().equals("POLYLINE"))
-							{
-								// POLYLINE
-								if(attrName.startsWith(ModelUtilities.HELPER_TABLE_GEOM_ATTR_PREFIX)){
-									xout.writeStartElement(xmlns_attr,"geometry");
-								}else{
+									// COORD
 									xout.writeStartElement(xmlns_attr,attrName);
-								}
-								writePolyline(child, false,getDefaultCrs());
-								xout.writeEndElement(/*attr*/);
-								if (valueCount > 1)
-								{
-									throw new IoxException("max one POLYLINE value allowed ("+attrName+")");
-								}
-							}
-							else if (child.getobjecttag().equals("MULTISURFACE"))
-							{
-								// MULTISURFACE
-								xout.writeStartElement(xmlns_attr,attrName);
-								writeSurface(child,getDefaultCrs());
-								xout.writeEndElement(/*attr*/);
-								if (valueCount > 1)
-								{
-									throw new IoxException("max one MULTISURFACE value allowed ("+attrName+")");
-								}
-							}
-							else
-							{
-								// normal case
-								String aref = child.getobjectrefoid();
-								boolean isRef = aref != null ? true : false;
-								// Reference-attribute or Role or EmbeddedLink?
-								if (isRef)
-								{
-									String orderpos = null;
-									if (child.getobjectreforderpos() > 0)
-									{
-										orderpos = Long.toString(child.getobjectreforderpos());
-									}
-									String extref = null;
-									String bid = child.getobjectrefbid();
-									if (bid != null)
-									{
-										extref = aref;
-										aref = null;
-									}
-									xout.writeStartElement(xmlns_attr,attrName);
-									if (aref != null)
-									{
-										xout.writeAttribute(xmlns_xlink,"href", "#"+makeOid(aref));
-									}
-									else
-									{
-										// TODO how to encode extref
-										xout.writeAttribute(xmlns_xlink,"href", "#"+makeOid(extref));
-										//xout.writeAttribute("BID", makeOid(bid));
-									}
-									writeAttributeStringOptional(xmlns_ili,Iligml20Generator.ORDER_POS, orderpos);
+									writeCoord(child,getDefaultCrs());
 									xout.writeEndElement(/*attr*/);
-									if (child.getattrcount() > 0)
-									{
-										xout.writeStartElement(xmlns_attr,attrName+"."+Iligml20Generator.LINK_DATA);
-										String structType=child.getobjecttag();
-										String structTid=child.getobjectoid();
-										if(structTid==null){
-											structTid=getNewTid();
-										}
-										xout.writeStartElement(getXmlNs(structType),getXmlName(structType));
-										xout.writeAttribute(xmlns_gml,"id",structTid);
-										writeObjAttrs(child);
-										xout.writeEndElement(/*child*/);
-										xout.writeEndElement(/*attr*/);
-									}
 									if (valueCount > 1)
 									{
-										throw new IoxException("max one reference value allowed ("+attrName+")");
+										throw new IoxException("max one COORD value allowed ("+attrName+")");
+									}
+								}
+								else if (child.getobjecttag().equals("POLYLINE"))
+								{
+									// POLYLINE
+									if(attrName.startsWith(ModelUtilities.HELPER_TABLE_GEOM_ATTR_PREFIX)){
+										xout.writeStartElement(xmlns_attr,"geometry");
+									}else{
+										xout.writeStartElement(xmlns_attr,attrName);
+									}
+									writePolyline(child, false,getDefaultCrs());
+									xout.writeEndElement(/*attr*/);
+									if (valueCount > 1)
+									{
+										throw new IoxException("max one POLYLINE value allowed ("+attrName+")");
+									}
+								}
+								else if (child.getobjecttag().equals("MULTISURFACE"))
+								{
+									// MULTISURFACE
+									xout.writeStartElement(xmlns_attr,attrName);
+									writeSurface(child,getDefaultCrs());
+									xout.writeEndElement(/*attr*/);
+									if (valueCount > 1)
+									{
+										throw new IoxException("max one MULTISURFACE value allowed ("+attrName+")");
 									}
 								}
 								else
 								{
-									// struct
-									int valuei = 0;
-									while (true)
+									// normal case
+									String aref = child.getobjectrefoid();
+									boolean isRef = aref != null ? true : false;
+									// Reference-attribute or Role or EmbeddedLink?
+									if (isRef)
 									{
+										String orderpos = null;
+										if (child.getobjectreforderpos() > 0)
+										{
+											orderpos = Long.toString(child.getobjectreforderpos());
+										}
+										String extref = null;
+										String bid = child.getobjectrefbid();
+										if (bid != null)
+										{
+											extref = aref;
+											aref = null;
+										}
+										xout.writeStartElement(xmlns_attr,attrName);
+										if (aref != null)
+										{
+											xout.writeAttribute(xmlns_xlink,"href", "#"+makeOid(aref));
+										}
+										else
+										{
+											// TODO how to encode extref
+											xout.writeAttribute(xmlns_xlink,"href", "#"+makeOid(extref));
+											//xout.writeAttribute("BID", makeOid(bid));
+										}
+										writeAttributeStringOptional(xmlns_ili,Iligml20Generator.ORDER_POS, orderpos);
+										xout.writeEndElement(/*attr*/);
+										if (child.getattrcount() > 0)
+										{
+											xout.writeStartElement(xmlns_attr,attrName+"."+Iligml20Generator.LINK_DATA);
+											String structType=child.getobjecttag();
+											String structTid=child.getobjectoid();
+											if(structTid==null){
+												structTid=getNewTid();
+											}
+											xout.writeStartElement(getXmlNs(structType),getXmlName(structType));
+											xout.writeAttribute(xmlns_gml,"id",structTid);
+											writeObjAttrs(child);
+											xout.writeEndElement(/*child*/);
+											xout.writeEndElement(/*attr*/);
+										}
+									}
+									else
+									{
+										// struct
 										xout.writeStartElement(xmlns_attr,attrName);
 										String structType=child.getobjecttag();
 										String structTid=child.getobjectoid();
@@ -634,17 +628,10 @@ import java.util.Map;
 										writeObjAttrs(child);
 										xout.writeEndElement(/*child*/);
 										xout.writeEndElement(/*attr*/);
-										valuei++;
-										if (valuei >= valueCount)
-										{
-											break;
-										}
-										child = obj.getattrobj(attrName, valuei);
 									}
 								}
 							}
 						}
-
 					}else{
 						if(attr.getEnumType()!=null && !attr.isTypeFinal()){
 							val=ch.ehi.basics.tools.StringUtility.purge(val);
