@@ -4,6 +4,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- Validator: fix cut edge issue if short arcs
 
 iox-ili 1.20.1 (2017-12-29)
 -----------------------------
