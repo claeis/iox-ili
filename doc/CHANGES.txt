@@ -5,6 +5,7 @@ ideas/open issues
 LATEST
 -----------------------------
 - Validator: fix cut edge issue if short arcs
+- CsvReader: skip optional BOM in UTF-8 encoded file
 
 iox-ili 1.20.1 (2017-12-29)
 -----------------------------

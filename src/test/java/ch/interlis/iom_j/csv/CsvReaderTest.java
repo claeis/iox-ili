@@ -1,8 +1,15 @@
 package ch.interlis.iom_j.csv;
 
 import static org.junit.Assert.*;
+
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,6 +34,7 @@ public class CsvReaderTest {
 	private static final String MODEL3_ATTR_ABBREVIATION = "abbreviation";
 	private static final String MODEL3_ATTR_ID = "id";
 	private TransferDescription td=null;
+    private static final String TEST_OUT="build";
 	private static final String TEST_IN="src/test/data/CsvReader";
 	private static final String ATTRIBUTE1="attr1";
 	private static final String ATTRIBUTE2="attr2";
@@ -261,6 +269,32 @@ public class CsvReaderTest {
 		reader.close();
 		reader=null;
 	}
+    // Es wird getestet ob das BOM bei UTF-8 encoding ueberlesen wird
+    @Test
+    public void utf8_bom_Ok() throws IoxException, IOException{
+        final String FILE_NAME="TextTypeUTF8_BOM.csv";
+        // write file
+        BufferedWriter writer=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(TEST_OUT,FILE_NAME)),"UTF-8"));
+        writer.write("\u00FE\u00FF\"10\",\"AU\"");writer.newLine();
+        writer.close();
+        writer=null;
+        
+        Settings settings=new Settings();
+        settings.setValue(CsvReader.ENCODING, "UTF-8");
+        CsvReader reader=new CsvReader(new File(TEST_OUT,FILE_NAME),settings);
+        assertTrue(reader.read() instanceof StartTransferEvent);
+        assertTrue(reader.read() instanceof StartBasketEvent);
+        IoxEvent event=reader.read();
+        if(event instanceof ObjectEvent){
+            IomObject iomObj=((ObjectEvent)event).getIomObject();
+            assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
+            assertEquals("AU", iomObj.getattrvalue(ATTRIBUTE2));
+        }
+        assertTrue(reader.read() instanceof EndBasketEvent);
+        assertTrue(reader.read() instanceof EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
 	// Es wird getestet ob ein fehlender Wert als UNDEFINED gelesen wird
 	@Test
     public void attrValueUndefined_Ok() throws IoxException, FileNotFoundException{
