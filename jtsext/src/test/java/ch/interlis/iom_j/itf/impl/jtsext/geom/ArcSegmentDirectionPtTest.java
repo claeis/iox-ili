@@ -78,13 +78,24 @@ public class ArcSegmentDirectionPtTest {
 		assertEquals(-py,directionPt.y,EPSILON);
 	}
     @Test
-    public void bogenZuGrosseDist() {
+    public void bogenDistGroesserDurchmesser() {
         final double END_X=3.0;
         final double END_Y=4.0;
         ArcSegment seg=new ArcSegment(new Coordinate(5.0,0.0),new Coordinate(4.0,3.0),new Coordinate(END_X,END_Y));
         //System.out.println(seg.getRadius());
         Coordinate directionPt=seg.getDirectionPt(true,12.0);
         //System.out.println(directionPt);
+        assertEquals(END_X,directionPt.x,EPSILON);
+        assertEquals(END_Y,directionPt.y,EPSILON);
+    }
+    @Test
+    public void bogenDistGroesserSehne() {
+        final double END_X=3.0;
+        final double END_Y=4.0;
+        ArcSegment seg=new ArcSegment(new Coordinate(5.0,0.0),new Coordinate(4.0,3.0),new Coordinate(END_X,END_Y));
+        //System.out.println(seg.getRadius());
+        Coordinate directionPt=seg.getDirectionPt(true,5.0);
+        System.out.println(directionPt);
         assertEquals(END_X,directionPt.x,EPSILON);
         assertEquals(END_Y,directionPt.y,EPSILON);
     }

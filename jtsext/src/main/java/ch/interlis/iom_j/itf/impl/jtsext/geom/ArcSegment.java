@@ -240,7 +240,7 @@ public class ArcSegment extends CurveSegment {
 			double radius=getRadius();
 			Coordinate center=getCenterPoint();
 			if(atStart){
-	            if(dist/2.0>radius) {
+	            if(dist/2.0>Math.abs(radius) || dist>CurveSegment.dist(startPoint.x,startPoint.y,endPoint.x,endPoint.y)) {
 	                return endPoint;
 	            }
 				// Zentriwinkel zwischen start und directionPt
@@ -252,7 +252,7 @@ public class ArcSegment extends CurveSegment {
 				Coordinate directionPt=new Coordinate(pti_re,pti_ho);
 				return directionPt;
 			}else{
-                if(dist/2.0>radius) {
+                if(dist/2.0>Math.abs(radius) || dist>CurveSegment.dist(endPoint.x,endPoint.y,startPoint.x,startPoint.y)) {
                     return startPoint;
                 }
 				// Zentriwinkel zwischen end und directionPt

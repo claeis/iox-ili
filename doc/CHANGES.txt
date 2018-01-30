@@ -4,6 +4,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- Validator: fix cut edge issue if small radius
 - Validator: fix cut edge issue if short arcs
 - CsvReader: skip optional BOM in UTF-8 encoded file
 

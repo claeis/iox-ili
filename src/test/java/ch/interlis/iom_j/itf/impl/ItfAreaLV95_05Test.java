@@ -273,11 +273,11 @@ public class ItfAreaLV95_05Test {
 				,polygon.toString());
 	}
     @Test
-    public void testStraightShortArc() throws Iox2jtsException, IoxException {
+    public void testStraightArcSmallRadius() throws Iox2jtsException, IoxException {
         String tableBName=tableB.getScopedName(null);
         String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
         ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
-        ItfReader reader=new ItfReader(new File("src/test/data/Itf/Test2LV95_05StraightShortArc.itf"));
+        ItfReader reader=new ItfReader(new File("src/test/data/Itf/Test2LV95_05StraightArcSmallRadius.itf"));
         reader.setModel(td);
         EhiLogger.getInstance().setTraceFilter(false);
         IoxEvent event=null;
@@ -301,6 +301,37 @@ public class ItfAreaLV95_05Test {
         IomObject polygon=builder.getSurfaceObject("1");
         //System.out.println(polygon.toString());
         assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2667159.447, C2 1208679.449}, COORD {C1 2667160.843, C2 1208679.318}, ARC {A1 2667160.84, A2 1208679.317, C1 2667160.837, C2 1208679.315}, COORD {C1 2667159.447, C2 1208679.449}]}}}}}"
+              ,polygon.toString());
+    }
+    @Test
+    public void testStraightArcShortArc() throws Iox2jtsException, IoxException {
+        String tableBName=tableB.getScopedName(null);
+        String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
+        ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
+        ItfReader reader=new ItfReader(new File("src/test/data/Itf/Test2LV95_05StraightArcShortArc.itf"));
+        reader.setModel(td);
+        EhiLogger.getInstance().setTraceFilter(false);
+        IoxEvent event=null;
+         do{
+                event=reader.read();
+                if(event instanceof StartTransferEvent){
+                }else if(event instanceof StartBasketEvent){
+                }else if(event instanceof ObjectEvent){
+                    IomObject iomObj=((ObjectEvent)event).getIomObject();
+                    if(iomObj.getobjecttag().equals(formAttrTableName)){
+                        builder.addItfLinetableObject(iomObj);
+                    }else if(iomObj.getobjecttag().equals(tableBName)){
+                        builder.addGeoRef(iomObj.getobjectoid(), iomObj.getattrobj(formAttr.getName(), 0));
+                    }
+                }else if(event instanceof EndBasketEvent){
+                }else if(event instanceof EndTransferEvent){
+                }
+         }while(!(event instanceof EndTransferEvent));
+            
+        builder.buildSurfaces();
+        IomObject polygon=builder.getSurfaceObject("2");
+        //System.out.println(polygon.toString());
+        assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2666358.233, C2 1209946.127}, COORD {C1 2666358.596, C2 1209946.192}, ARC {A1 2666358.593, A2 1209946.184, C1 2666358.589, C2 1209946.177}, COORD {C1 2666358.233, C2 1209946.127}]}}}}}"
               ,polygon.toString());
     }
 }
