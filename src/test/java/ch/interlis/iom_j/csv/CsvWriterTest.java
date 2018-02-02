@@ -1,17 +1,11 @@
 package ch.interlis.iom_j.csv;
 
 import static org.junit.Assert.*;
-
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.Ili2cFailure;
 import ch.interlis.ili2c.config.Configuration;
@@ -20,7 +14,6 @@ import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
-import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
@@ -31,9 +24,6 @@ import ch.interlis.iox_j.StartTransferEvent;
 public class CsvWriterTest {
 	private TransferDescription td=null;
 	private static final String TEST_IN="src/test/data/CsvWriter";
-	private static final String ATTRIBUTE1="attr1";
-	private static final String ATTRIBUTE2="attr2";
-	private static final String ATTRIBUTE3="attr3";
 	private static final String ID="id";
 	private static final String STADT="stadt";
 	private static final String LAND="land";
@@ -53,20 +43,19 @@ public class CsvWriterTest {
 	// - Das Modell gesetzt wird
 	// - Der Header nicht gesetzt wird
 	@Test
-	public void normalTest_Ok() throws IoxException, FileNotFoundException{
-		final String OBJECT_MODEL_SET_NO_HEADER_OK_CSV = "object_ModelSet_NoHeader_Ok.csv";
-
+	public void normalTest_Ok() throws IoxException, IOException{
+		final String FILENAME="object_ModelSet_NoHeader_Ok.csv";
 		CsvWriter writer=null;
 		try {
-			writer=new CsvWriter(new File(TEST_IN,OBJECT_MODEL_SET_NO_HEADER_OK_CSV));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.write(new StartTransferEvent());
 			writer.setModel(td);
 			writer.setWriteHeader(false);
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -80,22 +69,13 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,OBJECT_MODEL_SET_NO_HEADER_OK_CSV));
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schweiz", iomObj.getattrvalue(ATTRIBUTE3));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"10\",\"Bern\",\"Schweiz\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,OBJECT_MODEL_SET_NO_HEADER_OK_CSV);
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -105,18 +85,19 @@ public class CsvWriterTest {
 	// - Das Modell gesetzt wird
 	// - Der Header mit present gesetzt wird
 	@Test
-	public void object_ModelSet_SetHeaderPresent_Ok() throws IoxException, FileNotFoundException{
+	public void object_ModelSet_SetHeaderPresent_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="object_ModelSet_SetHeaderPresent_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"object_ModelSet_SetHeaderPresent_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.write(new StartTransferEvent());
 			writer.setModel(td);
 			writer.setWriteHeader(true);
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -130,24 +111,15 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"object_ModelSet_SetHeaderPresent_Ok.csv"));
-		reader.setModel(td);
-		reader.setFirstLineIsHeader(true);
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ID));
-        	assertEquals("Bern", iomObj.getattrvalue(STADT));
-        	assertEquals("Schweiz", iomObj.getattrvalue(LAND));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"id\",\"stadt\",\"land\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"10\",\"Bern\",\"Schweiz\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"object_ModelSet_SetHeaderPresent_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -157,18 +129,19 @@ public class CsvWriterTest {
 	// - Das Modell gesetzt wird
 	// - Der Header mit absent gesetzt wird
 	@Test
-	public void object_ModelSet_SetHeaderAbsent_Ok() throws IoxException, FileNotFoundException{
+	public void object_ModelSet_SetHeaderAbsent_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="object_ModelSet_SetHeaderAbsent_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"object_ModelSet_SetHeaderAbsent_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.write(new StartTransferEvent());
 			writer.setModel(td);
 			writer.setWriteHeader(false);
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -182,24 +155,13 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"object_ModelSet_SetHeaderAbsent_Ok.csv"));
-		reader.setModel(td);
-		reader.setFirstLineIsHeader(false);
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue("id"));
-        	assertEquals("Bern", iomObj.getattrvalue("stadt"));
-        	assertEquals("Schweiz", iomObj.getattrvalue("land"));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"10\",\"Bern\",\"Schweiz\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"object_ModelSet_SetHeaderAbsent_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -209,17 +171,18 @@ public class CsvWriterTest {
 	// - Das Modell nicht gesetzt wird
 	// - Der Header mit present gesetzt wird
 	@Test
-	public void object_NoModelSet_SetHeaderPresent_Ok() throws IoxException, FileNotFoundException{
+	public void object_NoModelSet_SetHeaderPresent_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="object_NoModelSet_SetHeaderPresent_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"object_NoModelSet_SetHeaderPresent_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.write(new StartTransferEvent());
 			writer.setWriteHeader(true);
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -233,23 +196,15 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"object_NoModelSet_SetHeaderPresent_Ok.csv"));
-		reader.setFirstLineIsHeader(true);
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue("id"));
-        	assertEquals("Bern", iomObj.getattrvalue("stadt"));
-        	assertEquals("Schweiz", iomObj.getattrvalue("land"));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"id\",\"land\",\"stadt\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"10\",\"Schweiz\",\"Bern\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"object_NoModelSet_SetHeaderPresent_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -266,7 +221,7 @@ public class CsvWriterTest {
 			writer.setWriteHeader(false);
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("land", "\u0402\u00A2");
+			iomObj.setattrvalue(LAND, "\u0402\u00A2");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -303,9 +258,9 @@ public class CsvWriterTest {
 			writer.setWriteHeader(false);
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -340,12 +295,12 @@ public class CsvWriterTest {
 			writer=new CsvWriter(new File(TEST_IN,FILE_NAME),settings);
 			writer.write(new StartTransferEvent());
 			writer.setWriteHeader(false);
-			writer.setAttributes(new String[] {"id","stadt","land"});
+			writer.setAttributes(new String[] {ID,STADT,LAND});
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -375,17 +330,18 @@ public class CsvWriterTest {
 	// - Das Modell nicht gesetzt wird
 	// - Der Header mit absent gesetzt wird
 	@Test
-	public void object_NoModelSet_SetHeaderAbsent_Ok() throws IoxException, FileNotFoundException{
+	public void object_NoModelSet_SetHeaderAbsent_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="object_NoModelSet_SetHeaderAbsent_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"object_NoModelSet_SetHeaderAbsent_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.write(new StartTransferEvent());
 			writer.setWriteHeader(false);
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -399,23 +355,13 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"object_NoModelSet_SetHeaderAbsent_Ok.csv"));
-		reader.setFirstLineIsHeader(false);
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Schweiz", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE3));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"10\",\"Schweiz\",\"Bern\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"object_NoModelSet_SetHeaderAbsent_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -425,17 +371,18 @@ public class CsvWriterTest {
 	// - Das Modell nicht gesetzt wird
 	// - Der Header nicht gesetzt wird
 	@Test
-	public void object_NoModelSet_NoHeader_Ok() throws IoxException, FileNotFoundException{
+	public void object_NoModelSet_NoHeader_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="object_NoModelSet_NoHeader_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"object_NoModelSet_NoHeader_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.setWriteHeader(false);
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -449,22 +396,13 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"object_NoModelSet_NoHeader_Ok.csv"));
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Schweiz", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE3));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"10\",\"Schweiz\",\"Bern\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"object_NoModelSet_NoHeader_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -474,9 +412,10 @@ public class CsvWriterTest {
 	// - 3 Modelle gesetzt werden
 	// - Der Header mit present gesetzt wird
 	@Test
-	public void object_SetMultipleModels_SetHeaderPresent_Ok() throws IoxException, FileNotFoundException, Ili2cFailure{
+	public void object_SetMultipleModels_SetHeaderPresent_Ok() throws IoxException, Ili2cFailure, IOException{
 		// ili-datei lesen
 		TransferDescription tdM=null;
+		final String FILENAME="object_SetMultipleModels_SetHeaderPresent_Ok.csv";
 		Configuration ili2cConfig=new Configuration();
 		FileEntry fileEntryConditionClass=new FileEntry(TEST_IN+"/StadtModel4.ili", FileEntryKind.ILIMODELFILE); // first input model
 		ili2cConfig.addFileEntry(fileEntryConditionClass);
@@ -488,7 +427,7 @@ public class CsvWriterTest {
 		assertNotNull(tdM);
 		CsvWriter writer=null;
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"object_SetMultipleModels_SetHeaderPresent_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.write(new StartTransferEvent());
 			writer.setModel(tdM);
 			writer.setWriteHeader(true);
@@ -509,28 +448,15 @@ public class CsvWriterTest {
 				writer=null;
 			}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"object_SetMultipleModels_SetHeaderPresent_Ok.csv"));
-		reader.setFirstLineIsHeader(false);
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("id2", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("stadt2", iomObj.getattrvalue(ATTRIBUTE2));
-		}
-		event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE2));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"id2\",\"stadt2\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"10\",\"Bern\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"object_SetMultipleModels_SetHeaderPresent_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -541,38 +467,39 @@ public class CsvWriterTest {
 	// - Der Header mit present gesetzt wird
 	// - Mehrere Objekte erstellt werden
 	@Test
-	public void multipleObjects_ModelSet_SetHeaderPresent_Ok() throws IoxException, FileNotFoundException{
+	public void multipleObjects_ModelSet_SetHeaderPresent_Ok() throws IoxException, FileNotFoundException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="multipleObjects_ModelSet_SetHeaderPresent_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"multipleObjects_ModelSet_SetHeaderPresent_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.write(new StartTransferEvent());
 			writer.setModel(td);
 			writer.setWriteHeader(true);
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			IomObject iomObj2=new Iom_jObject("model.Topic1.Class1","oid2");
-			iomObj2.setattrvalue("id", "11");
-			iomObj2.setattrvalue("stadt", "Zuerich");
-			iomObj2.setattrvalue("land", "Deutschland");
+			iomObj2.setattrvalue(ID, "11");
+			iomObj2.setattrvalue(STADT, "Zuerich");
+			iomObj2.setattrvalue(LAND, "Deutschland");
 			writer.write(new ObjectEvent(iomObj2));
 			IomObject iomObj3=new Iom_jObject("model.Topic1.Class1","oid3");
-			iomObj3.setattrvalue("id", "12");
-			iomObj3.setattrvalue("stadt", "Luzern");
-			iomObj3.setattrvalue("land", "Italien");
+			iomObj3.setattrvalue(ID, "12");
+			iomObj3.setattrvalue(STADT, "Luzern");
+			iomObj3.setattrvalue(LAND, "Italien");
 			writer.write(new ObjectEvent(iomObj3));
 			IomObject iomObj4=new Iom_jObject("model.Topic1.Class1","oid4");
-			iomObj4.setattrvalue("id", "13");
-			iomObj4.setattrvalue("stadt", "Genf");
-			iomObj4.setattrvalue("land", "Oesterreich");
+			iomObj4.setattrvalue(ID, "13");
+			iomObj4.setattrvalue(STADT, "Genf");
+			iomObj4.setattrvalue(LAND, "Oesterreich");
 			writer.write(new ObjectEvent(iomObj4));
 			IomObject iomObj5=new Iom_jObject("model.Topic1.Class1","oid5");
-			iomObj5.setattrvalue("id", "14");
-			iomObj5.setattrvalue("stadt", "Chur");
-			iomObj5.setattrvalue("land", "Spanien");
+			iomObj5.setattrvalue(ID, "14");
+			iomObj5.setattrvalue(STADT, "Chur");
+			iomObj5.setattrvalue(LAND, "Spanien");
 			writer.write(new ObjectEvent(iomObj5));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -586,54 +513,23 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		IoxEvent event=null;
-		CsvReader reader=new CsvReader(new File(TEST_IN,"multipleObjects_ModelSet_SetHeaderPresent_Ok.csv"));
-		reader.setFirstLineIsHeader(true);
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		event=reader.read();
-		if(event instanceof ObjectEvent){
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ID));
-        	assertEquals("Bern", iomObj.getattrvalue(STADT));
-        	assertEquals("Schweiz", iomObj.getattrvalue(LAND));
-			}
-			event=reader.read();
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("11", iomObj.getattrvalue(ID));
-        	assertEquals("Zuerich", iomObj.getattrvalue(STADT));
-        	assertEquals("Deutschland", iomObj.getattrvalue(LAND));
-			}
-			event=reader.read();
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("12", iomObj.getattrvalue(ID));
-        	assertEquals("Luzern", iomObj.getattrvalue(STADT));
-        	assertEquals("Italien", iomObj.getattrvalue(LAND));
-			}
-			event=reader.read();
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("13", iomObj.getattrvalue(ID));
-        	assertEquals("Genf", iomObj.getattrvalue(STADT));
-        	assertEquals("Oesterreich", iomObj.getattrvalue(LAND));
-			}
-			event=reader.read();
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("14", iomObj.getattrvalue(ID));
-        	assertEquals("Chur", iomObj.getattrvalue(STADT));
-        	assertEquals("Spanien", iomObj.getattrvalue(LAND));
-			}
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"id\",\"stadt\",\"land\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"10\",\"Bern\",\"Schweiz\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"11\",\"Zuerich\",\"Deutschland\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"12\",\"Luzern\",\"Italien\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"13\",\"Genf\",\"Oesterreich\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"14\",\"Chur\",\"Spanien\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"multipleObjects_ModelSet_SetHeaderPresent_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -644,38 +540,39 @@ public class CsvWriterTest {
 	// - Der Header nicht gesetzt wird
 	// - Mehrere Objekte erstellt werden
 	@Test
-	public void multipleObjects_ModelSet_NoHeaderSet_Ok() throws IoxException, FileNotFoundException{
+	public void multipleObjects_ModelSet_NoHeaderSet_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="multipleObjects_ModelSet_NoHeaderSet_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"multipleObjects_ModelSet_NoHeaderSet_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.write(new StartTransferEvent());
 			writer.setModel(td);
 			writer.setWriteHeader(false);
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			IomObject iomObj2=new Iom_jObject("model.Topic1.Class1","oid2");
-			iomObj2.setattrvalue("id", "11");
-			iomObj2.setattrvalue("stadt", "Zuerich");
-			iomObj2.setattrvalue("land", "Deutschland");
+			iomObj2.setattrvalue(ID, "11");
+			iomObj2.setattrvalue(STADT, "Zuerich");
+			iomObj2.setattrvalue(LAND, "Deutschland");
 			writer.write(new ObjectEvent(iomObj2));
 			IomObject iomObj3=new Iom_jObject("model.Topic1.Class1","oid3");
-			iomObj3.setattrvalue("id", "12");
-			iomObj3.setattrvalue("stadt", "Luzern");
-			iomObj3.setattrvalue("land", "Italien");
+			iomObj3.setattrvalue(ID, "12");
+			iomObj3.setattrvalue(STADT, "Luzern");
+			iomObj3.setattrvalue(LAND, "Italien");
 			writer.write(new ObjectEvent(iomObj3));
 			IomObject iomObj4=new Iom_jObject("model.Topic1.Class1","oid4");
-			iomObj4.setattrvalue("id", "13");
-			iomObj4.setattrvalue("stadt", "Genf");
-			iomObj4.setattrvalue("land", "Oesterreich");
+			iomObj4.setattrvalue(ID, "13");
+			iomObj4.setattrvalue(STADT, "Genf");
+			iomObj4.setattrvalue(LAND, "Oesterreich");
 			writer.write(new ObjectEvent(iomObj4));
 			IomObject iomObj5=new Iom_jObject("model.Topic1.Class1","oid5");
-			iomObj5.setattrvalue("id", "14");
-			iomObj5.setattrvalue("stadt", "Chur");
-			iomObj5.setattrvalue("land", "Spanien");
+			iomObj5.setattrvalue(ID, "14");
+			iomObj5.setattrvalue(STADT, "Chur");
+			iomObj5.setattrvalue(LAND, "Spanien");
 			writer.write(new ObjectEvent(iomObj5));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -689,53 +586,21 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		IoxEvent event=null;
-		CsvReader reader=new CsvReader(new File(TEST_IN,"multipleObjects_ModelSet_NoHeaderSet_Ok.csv"));
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		event=reader.read();
-		if(event instanceof ObjectEvent){
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schweiz", iomObj.getattrvalue(ATTRIBUTE3));
-			}
-			event=reader.read();
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("11", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Zuerich", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Deutschland", iomObj.getattrvalue(ATTRIBUTE3));
-			}
-			event=reader.read();
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("12", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Luzern", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Italien", iomObj.getattrvalue(ATTRIBUTE3));
-			}
-			event=reader.read();
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("13", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Genf", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Oesterreich", iomObj.getattrvalue(ATTRIBUTE3));
-			}
-			event=reader.read();
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("14", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Chur", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Spanien", iomObj.getattrvalue(ATTRIBUTE3));
-			}
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"10\",\"Bern\",\"Schweiz\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"11\",\"Zuerich\",\"Deutschland\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"12\",\"Luzern\",\"Italien\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"13\",\"Genf\",\"Oesterreich\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"14\",\"Chur\",\"Spanien\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"multipleObjects_ModelSet_NoHeaderSet_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -746,37 +611,38 @@ public class CsvWriterTest {
 	// - Der Header nicht gesetzt wird
 	// - Mehrere Objekte erstellt werden
 	@Test
-	public void multipleObjects_NoModelSet_NoHeaderSet_Ok() throws IoxException, FileNotFoundException{
+	public void multipleObjects_NoModelSet_NoHeaderSet_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="multipleObjects_NoModelSet_NoHeaderSet_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"multipleObjects_NoModelSet_NoHeaderSet_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.setWriteHeader(false);
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			IomObject iomObj2=new Iom_jObject("model.Topic1.Class1","oid2");
-			iomObj2.setattrvalue("id", "11");
-			iomObj2.setattrvalue("stadt", "Zuerich");
-			iomObj2.setattrvalue("land", "Deutschland");
+			iomObj2.setattrvalue(ID, "11");
+			iomObj2.setattrvalue(STADT, "Zuerich");
+			iomObj2.setattrvalue(LAND, "Deutschland");
 			writer.write(new ObjectEvent(iomObj2));
 			IomObject iomObj3=new Iom_jObject("model.Topic1.Class1","oid3");
-			iomObj3.setattrvalue("id", "12");
-			iomObj3.setattrvalue("stadt", "Luzern");
-			iomObj3.setattrvalue("land", "Italien");
+			iomObj3.setattrvalue(ID, "12");
+			iomObj3.setattrvalue(STADT, "Luzern");
+			iomObj3.setattrvalue(LAND, "Italien");
 			writer.write(new ObjectEvent(iomObj3));
 			IomObject iomObj4=new Iom_jObject("model.Topic1.Class1","oid4");
-			iomObj4.setattrvalue("id", "13");
-			iomObj4.setattrvalue("stadt", "Genf");
-			iomObj4.setattrvalue("land", "Oesterreich");
+			iomObj4.setattrvalue(ID, "13");
+			iomObj4.setattrvalue(STADT, "Genf");
+			iomObj4.setattrvalue(LAND, "Oesterreich");
 			writer.write(new ObjectEvent(iomObj4));
 			IomObject iomObj5=new Iom_jObject("model.Topic1.Class1","oid5");
-			iomObj5.setattrvalue("id", "14");
-			iomObj5.setattrvalue("stadt", "Chur");
-			iomObj5.setattrvalue("land", "Spanien");
+			iomObj5.setattrvalue(ID, "14");
+			iomObj5.setattrvalue(STADT, "Chur");
+			iomObj5.setattrvalue(LAND, "Spanien");
 			writer.write(new ObjectEvent(iomObj5));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -790,53 +656,21 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		IoxEvent event=null;
-		CsvReader reader=new CsvReader(new File(TEST_IN,"multipleObjects_NoModelSet_NoHeaderSet_Ok.csv"));
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		event=reader.read();
-		if(event instanceof ObjectEvent){
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Schweiz", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE3));
-			}
-			event=reader.read();
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("11", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Deutschland", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Zuerich", iomObj.getattrvalue(ATTRIBUTE3));
-			}
-			event=reader.read();
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("12", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Italien", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Luzern", iomObj.getattrvalue(ATTRIBUTE3));
-			}
-			event=reader.read();
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("13", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Oesterreich", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Genf", iomObj.getattrvalue(ATTRIBUTE3));
-			}
-			event=reader.read();
-			{
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("14", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Spanien", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Chur", iomObj.getattrvalue(ATTRIBUTE3));
-			}
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"10\",\"Schweiz\",\"Bern\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"11\",\"Deutschland\",\"Zuerich\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"12\",\"Italien\",\"Luzern\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"13\",\"Oesterreich\",\"Genf\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"14\",\"Spanien\",\"Chur\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"multipleObjects_NoModelSet_NoHeaderSet_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -847,18 +681,19 @@ public class CsvWriterTest {
 	// - Der Header mit present gesetzt wird
 	// - Komma Zeichen innerhalb des Textes geschrieben sind
 	@Test
-	public void commaInText_Ok() throws IoxException, FileNotFoundException{
+	public void commaInText_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="commaInText_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"commaInText_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.setModel(td);
 			writer.setWriteHeader(true);
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "1,0");
-			iomObj.setattrvalue("stadt", "Be,rn");
-			iomObj.setattrvalue("land", "S,chweiz");
+			iomObj.setattrvalue(ID, "1,0");
+			iomObj.setattrvalue(STADT, "Be,rn");
+			iomObj.setattrvalue(LAND, "S,chweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -872,23 +707,15 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"commaInText_Ok.csv"));
-		reader.setFirstLineIsHeader(true);
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("1,0", iomObj.getattrvalue(ID));
-        	assertEquals("Be,rn", iomObj.getattrvalue(STADT));
-        	assertEquals("S,chweiz", iomObj.getattrvalue(LAND));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"id\",\"stadt\",\"land\"", line);
+       	line=reader.readLine();
+       	assertEquals("\"1,0\",\"Be,rn\",\"S,chweiz\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"commaInText_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -900,19 +727,20 @@ public class CsvWriterTest {
 	// - Delimiter gesetzt wird
 	// - Record Delimiter gesetzt wird
 	@Test
-	public void setDelimiter_setRecordDelimiter_NoModelSet_Ok() throws IoxException, FileNotFoundException{
+	public void setDelimiter_setRecordDelimiter_NoModelSet_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="setDelimiter_setRecordDelimiter_NoModelSet_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"setDelimiter_setRecordDelimiter_NoModelSet_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.setWriteHeader(false);
 			writer.setValueDelimiter('|');
 			writer.setValueSeparator('\\');
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -926,20 +754,13 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"setDelimiter_setRecordDelimiter_NoModelSet_Ok.csv"));
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("|10|\\|Schweiz|\\|Bern|", iomObj.getattrvalue(ATTRIBUTE1));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("|10|\\|Schweiz|\\|Bern|", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"setDelimiter_setRecordDelimiter_NoModelSet_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -950,18 +771,19 @@ public class CsvWriterTest {
 	// - Der Header nicht gesetzt wird
 	// - Delimiter gesetzt wird
 	@Test
-	public void setDelimiter_NoModelSet_Ok() throws IoxException, FileNotFoundException{
+	public void setDelimiter_NoModelSet_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="setDelimiter_NoModelSet_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"setDelimiter_NoModelSet_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.setValueDelimiter('|');
 			writer.setWriteHeader(false);
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -975,22 +797,13 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"setDelimiter_NoModelSet_Ok.csv"));
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("|10|", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("|Schweiz|", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("|Bern|", iomObj.getattrvalue(ATTRIBUTE3));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("|10|,|Schweiz|,|Bern|", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"setDelimiter_NoModelSet_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -1001,18 +814,19 @@ public class CsvWriterTest {
 	// - Der Header nicht gesetzt wird
 	// - Record Delimiter gesetzt wird
 	@Test
-	public void setRecordDelimiter_NoModelSet_Ok() throws IoxException, FileNotFoundException{
+	public void setRecordDelimiter_NoModelSet_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="setRecordDelimiter_NoModelSet_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"setRecordDelimiter_NoModelSet_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.setWriteHeader(false);
 			writer.setValueSeparator('\\');
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -1026,20 +840,13 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"setRecordDelimiter_NoModelSet_Ok.csv"));
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10\\\"Schweiz\\\"Bern", iomObj.getattrvalue(ATTRIBUTE1));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+       	assertEquals("\"10\"\\\"Schweiz\"\\\"Bern\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"setRecordDelimiter_NoModelSet_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -1055,8 +862,9 @@ public class CsvWriterTest {
 	@Test
 	public void setDelimiter_setRecordDelimiter_ModelSet_DelimitersInText_Ok() throws Exception{
 		CsvWriter writer=null;
+		final String FILENAME="setDelimiter_setRecordDelimiter_ModelSet_DelimitersInText_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"setDelimiter_setRecordDelimiter_ModelSet_DelimitersInText_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.setValueDelimiter('\\');
 			writer.setValueSeparator('\\');
 			writer.setModel(td);
@@ -1064,9 +872,9 @@ public class CsvWriterTest {
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "B\\ern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "B\\ern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -1080,14 +888,13 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		BufferedReader reader=new BufferedReader(new FileReader(new File(TEST_IN,"setDelimiter_setRecordDelimiter_ModelSet_DelimitersInText_Ok.csv")));
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
 		String line=reader.readLine();
 		assertEquals("\\10\\\\\\B\\\\ern\\\\\\Schweiz\\",line); // FIXME CsvReader fails
-		assertEquals(null,reader.readLine());
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"setDelimiter_setRecordDelimiter_ModelSet_DelimitersInText_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -1101,17 +908,18 @@ public class CsvWriterTest {
 	@Test
 	public void setDelimiter_DelimiterInText_Ok() throws Exception{
 		CsvWriter writer=null;
+		final String FILENAME="setDelimiter_DelimiterInText_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"setDelimiter_DelimiterInText_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.setValueDelimiter('|');
 			writer.setModel(td);
 			writer.setWriteHeader(false);
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schw|eiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schw|eiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -1125,13 +933,13 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		BufferedReader reader=new BufferedReader(new FileReader(new File(TEST_IN,"setDelimiter_DelimiterInText_Ok.csv")));
-       	assertEquals("|10|,|Bern|,|Schw||eiz|", reader.readLine()); // FIXME CsvReader fails
-       	assertEquals(null, reader.readLine());
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+		assertEquals("|10|,|Bern|,|Schw||eiz|", line); // FIXME CsvReader fails
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"setDelimiter_DelimiterInText_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -1143,19 +951,20 @@ public class CsvWriterTest {
 	// - Record Delimiter gesetzt wird
 	// - Record Delimiter innerhalb des Textes geschrieben sind
 	@Test
-	public void setRecordDelimiter_RecordDelimiterInText_ModelSet_Ok() throws IoxException, FileNotFoundException{
+	public void setRecordDelimiter_RecordDelimiterInText_ModelSet_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="setRecordDelimiter_RecordDelimiterInText_ModelSet_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"setRecordDelimiter_RecordDelimiterInText_ModelSet_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.setValueSeparator('\\');
 			writer.setModel(td);
 			writer.setWriteHeader(false);
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schw\\eiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schw\\eiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -1169,23 +978,13 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"setRecordDelimiter_RecordDelimiterInText_ModelSet_Ok.csv"));
-		reader.setValueSeparator('\\');
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schw\\eiz", iomObj.getattrvalue(ATTRIBUTE3));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+		assertEquals("\"10\"\\\"Bern\"\\\"Schw\\eiz\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"setRecordDelimiter_RecordDelimiterInText_ModelSet_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -1197,20 +996,21 @@ public class CsvWriterTest {
 	// - Delimiter gesetzt wird
 	// - Record Delimiter gesetzt wird
 	@Test
-	public void setDelimiter_setRecordDelimiter_HeaderSet_Ok() throws IoxException, FileNotFoundException{
+	public void setDelimiter_setRecordDelimiter_HeaderSet_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="setDelimiter_setRecordDelimiter_HeaderSet_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"setDelimiter_setRecordDelimiter_HeaderSet_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.setValueDelimiter('|');
 			writer.setValueSeparator('\\');
 			writer.setModel(td);
-			writer.setWriteHeader(false);
+			writer.setWriteHeader(true);
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -1224,24 +1024,15 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"setDelimiter_setRecordDelimiter_HeaderSet_Ok.csv"));
-		reader.setValueSeparator('\\');
-		reader.setValueDelimiter('|');
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schweiz", iomObj.getattrvalue(ATTRIBUTE3));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+		assertEquals("|id|\\|stadt|\\|land|", line);
+		line=reader.readLine();
+		assertEquals("|10|\\|Bern|\\|Schweiz|", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"setDelimiter_setRecordDelimiter_HeaderSet_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -1252,19 +1043,20 @@ public class CsvWriterTest {
 	// - Der Header mit present gesetzt wird
 	// - Delimiter gesetzt wird
 	@Test
-	public void setDelimiter_HeaderSet_Ok() throws IoxException, FileNotFoundException{
+	public void setDelimiter_HeaderSet_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="setDelimiter_HeaderSet_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"setDelimiter_HeaderSet_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.setValueDelimiter('|');
 			writer.setModel(td);
 			writer.setWriteHeader(true);
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -1278,24 +1070,15 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"setDelimiter_HeaderSet_Ok.csv"));
-		reader.setValueDelimiter('|');
-		reader.setFirstLineIsHeader(true);
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ID));
-        	assertEquals("Bern", iomObj.getattrvalue(STADT));
-        	assertEquals("Schweiz", iomObj.getattrvalue(LAND));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+		assertEquals("|id|,|stadt|,|land|", line);
+		line=reader.readLine();
+		assertEquals("|10|,|Bern|,|Schweiz|", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"setDelimiter_HeaderSet_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -1306,19 +1089,20 @@ public class CsvWriterTest {
 	// - Der Header nicht gesetzt wird
 	// - Record Delimiter gesetzt wird
 	@Test
-	public void setRecordDelimiter_ModelSet_Ok() throws IoxException, FileNotFoundException{
+	public void setRecordDelimiter_ModelSet_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="setRecordDelimiter_ModelSet_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"setRecordDelimiter_ModelSet_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.setValueSeparator('\\');
 			writer.setModel(td);
 			writer.setWriteHeader(false);
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schweiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schweiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -1332,23 +1116,13 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"setRecordDelimiter_ModelSet_Ok.csv"));
-		reader.setValueSeparator('\\');
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schweiz", iomObj.getattrvalue(ATTRIBUTE3));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+		assertEquals("\"10\"\\\"Bern\"\\\"Schweiz\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"setRecordDelimiter_ModelSet_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -1359,18 +1133,19 @@ public class CsvWriterTest {
 	// - Der Header nicht gesetzt wird
 	// - Mitten im Text ein Anfuehrungszeichen geschrieben ist
 	@Test
-	public void quoteMarkInText() throws IoxException, FileNotFoundException{
+	public void quoteMarkInText() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="quoteMarkInText.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"quoteMarkInText.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.setModel(td);
 			writer.setWriteHeader(false);
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern");
-			iomObj.setattrvalue("land", "Schw\"eiz");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern");
+			iomObj.setattrvalue(LAND, "Schw\"eiz");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -1384,22 +1159,13 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"quoteMarkInText.csv"));
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schw\"eiz", iomObj.getattrvalue(ATTRIBUTE3));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+		assertEquals("\"10\",\"Bern\",\"Schw\"\"eiz\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"quoteMarkInText.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -1410,18 +1176,19 @@ public class CsvWriterTest {
 	// - Der Header nicht gesetzt wird
 	// - Carriage-Return innerhalb des Textes geschrieben ist
 	@Test
-	public void newlineInText_Ok() throws IoxException, FileNotFoundException{
+	public void newlineInText_Ok() throws IoxException, IOException{
 		CsvWriter writer=null;
+		final String FILENAME="carriageReturnInText_Ok.csv";
 		try {
-			writer=new CsvWriter(new File(TEST_IN,"carriageReturnInText_Ok.csv"));
+			writer=new CsvWriter(new File(TEST_IN,FILENAME));
 			writer.setWriteHeader(false);
 			writer.setModel(td);
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern"+System.getProperty("line.separator")+"Zuerich");
-			iomObj.setattrvalue("land", "Schweiz"+System.getProperty("line.separator")+"Deutschland");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern"+System.getProperty("line.separator")+"Zuerich");
+			iomObj.setattrvalue(LAND, "Schweiz"+System.getProperty("line.separator")+"Deutschland");
 			writer.write(new ObjectEvent(iomObj));
 			writer.write(new EndBasketEvent());
 			writer.write(new EndTransferEvent());
@@ -1435,22 +1202,17 @@ public class CsvWriterTest {
 	    		writer=null;
 	    	}
 		}
-		CsvReader reader=new CsvReader(new File(TEST_IN,"carriageReturnInText_Ok.csv"));
-		assertTrue(reader.read() instanceof StartTransferEvent);
-		assertTrue(reader.read() instanceof StartBasketEvent);
-		IoxEvent event=reader.read();
-		if(event instanceof ObjectEvent){
-        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-        	assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
-        	assertEquals("Bern"+reader.getLineSeparator()+"Zuerich", iomObj.getattrvalue(ATTRIBUTE2));
-        	assertEquals("Schweiz"+reader.getLineSeparator()+"Deutschland", iomObj.getattrvalue(ATTRIBUTE3));
-		}
-		assertTrue(reader.read() instanceof EndBasketEvent);
-		assertTrue(reader.read() instanceof EndTransferEvent);
+		java.io.LineNumberReader reader=new java.io.LineNumberReader(new java.io.InputStreamReader(new java.io.FileInputStream(new File(TEST_IN,FILENAME)),"UTF-8"));
+		String line=reader.readLine();
+		assertEquals("\"10\",\"Bern", line);
+		line=reader.readLine();
+		assertEquals("Zuerich\",\"Schweiz", line);
+		line=reader.readLine();
+		assertEquals("Deutschland\"", line);
 		reader.close();
 		reader=null;
 		// delete created file
-		File file=new File(TEST_IN,"carriageReturnInText_Ok.csv");
+		File file=new File(TEST_IN,FILENAME);
 		if(file.exists()) {
 			file.delete();
 		}
@@ -1535,9 +1297,9 @@ public class CsvWriterTest {
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern\rZuerich");
-			iomObj.setattrvalue("land", "Schweiz\rDeutschland");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern\rZuerich");
+			iomObj.setattrvalue(LAND, "Schweiz\rDeutschland");
 			writer.write(new ObjectEvent(iomObj));
 			iomObj2=new Iom_jObject("model.Topic1.Class1","oid1");
 			iomObj2.setattrvalue("name", "10");
@@ -1620,9 +1382,9 @@ public class CsvWriterTest {
 			writer.write(new StartTransferEvent());
 			writer.write(new StartBasketEvent("model.Topic1","bid1"));
 			IomObject iomObj=new Iom_jObject("model.Topic1.Class1","oid1");
-			iomObj.setattrvalue("id", "10");
-			iomObj.setattrvalue("stadt", "Bern\rZuerich");
-			iomObj.setattrvalue("land", "Schweiz\rDeutschland");
+			iomObj.setattrvalue(ID, "10");
+			iomObj.setattrvalue(STADT, "Bern\rZuerich");
+			iomObj.setattrvalue(LAND, "Schweiz\rDeutschland");
 			writer.write(new ObjectEvent(iomObj));
 			iomObj2=new Iom_jObject("model.Topic1.Class1","oid1");
 			iomObj2.setattrvalue("name", "10");
