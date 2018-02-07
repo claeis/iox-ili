@@ -6,6 +6,7 @@ LATEST
 -----------------------------
 - Validator: fix cut edge issue if small radius
 - Validator: fix cut edge issue if short arcs
+- ItfReader2: fix multiple area-refs to polygon issue
 - CsvReader: skip optional BOM in UTF-8 encoded file
 - Iox2wkb: fix conversion of surface with multiple polylines
 

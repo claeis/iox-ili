@@ -235,17 +235,20 @@ public class CompoundCurveRing extends LinearRing {
 	    			}while(seg1.getEndPoint().y==topEnv.getMaxY()); // falls seg1 eine horizontale Gerade naechstes danach liegendes Segment
 	    			seg0=top;
 	    		}
-	    		Coordinate[] coords=new Coordinate[4];
+	    		Coordinate[] coords=null;
 	    		if(seg0.getStartPoint().equals2D(seg1.getEndPoint())) {
+	                coords=new Coordinate[4];
 		    		coords[0]=seg0.getStartPoint();
 		    		coords[1]=(seg0 instanceof StraightSegment)?seg0.getEndPoint():((ArcSegment) seg0).getDirectionPt(false,CompoundCurve.ARC_MIN_DIRECTION_PT);
 		    		coords[2]=(seg1 instanceof StraightSegment)?seg1.getStartPoint():((ArcSegment) seg1).getDirectionPt(true,CompoundCurve.ARC_MIN_DIRECTION_PT);
 		    		coords[3]=coords[0];
 	    		}else {
+                    coords=new Coordinate[5];
 		    		coords[0]=(seg0 instanceof StraightSegment)?seg0.getStartPoint():((ArcSegment) seg0).getDirectionPt(false,CompoundCurve.ARC_MIN_DIRECTION_PT);
 		    		coords[1]=seg0.getEndPoint();
-		    		coords[2]=(seg1 instanceof StraightSegment)?seg1.getEndPoint():((ArcSegment) seg1).getDirectionPt(true,CompoundCurve.ARC_MIN_DIRECTION_PT);
-		    		coords[3]=coords[0];
+                    coords[2]=seg1.getStartPoint();
+		    		coords[3]=(seg1 instanceof StraightSegment)?seg1.getEndPoint():((ArcSegment) seg1).getDirectionPt(true,CompoundCurve.ARC_MIN_DIRECTION_PT);
+		    		coords[4]=coords[0];
 	    		}
 	    		return CGAlgorithms.isCCW(coords);
 	        }

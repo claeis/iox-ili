@@ -107,6 +107,21 @@ public class CompoundCurveRingIsCCWTest {
 		CompoundCurveRing ring=fact.createCompoundCurveRing(line);
 		assertEquals(false,CompoundCurveRing.isCCW(ring));
 	}
+    @Test
+    public void isCWHoechsteGerade() {
+        JtsextGeometryFactory fact=new JtsextGeometryFactory();
+        ArrayList<CurveSegment> segs=new ArrayList<CurveSegment>();
+        
+        addCoord(segs,110.0,  139.0);  
+        addCoord(segs,110.0,  140.0); // hoechstes Segment
+        addCoord(segs,120.0,  140.0);
+        addCoord(segs,109.0,  110.0); // links vom Anfang des hoechsten Segments
+        addCoord(segs,110.0,  139.0); 
+
+        CompoundCurve line=new CompoundCurve(segs,fact);
+        CompoundCurveRing ring=fact.createCompoundCurveRing(line);
+        assertEquals(false,CompoundCurveRing.isCCW(ring));
+    }
 	@Test
 	public void isCCW() {
 		JtsextGeometryFactory fact=new JtsextGeometryFactory();
@@ -168,5 +183,21 @@ public class CompoundCurveRingIsCCWTest {
 		CompoundCurveRing ring=fact.createCompoundCurveRing(line);
 		assertEquals(true,CompoundCurveRing.isCCW(ring));
 	}
+    @Test
+    public void isCCWHoechsteGerade() {
+        JtsextGeometryFactory fact=new JtsextGeometryFactory();
+        ArrayList<CurveSegment> segs=new ArrayList<CurveSegment>();
+        
+        addCoord(segs,120.0,  139.0);  
+        addCoord(segs,120.0,  140.0); // hoechstes Segment
+        addCoord(segs,110.0,  140.0);
+        addCoord(segs,121.0,  110.0); // rechts vom Anfang des hoechsten Segments
+        
+        addCoord(segs,120.0,  139.0); 
+
+        CompoundCurve line=new CompoundCurve(segs,fact);
+        CompoundCurveRing ring=fact.createCompoundCurveRing(line);
+        assertEquals(true,CompoundCurveRing.isCCW(ring));
+    }
 
 }
