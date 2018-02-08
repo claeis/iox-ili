@@ -9,6 +9,7 @@ LATEST
 - ItfReader2: fix multiple area-refs to polygon issue
 - CsvReader: skip optional BOM in UTF-8 encoded file
 - Iox2wkb: fix conversion of surface with multiple polylines
+- Iox2wkb: fix segmentation of ARCs
 
 iox-ili 1.20.1 (2017-12-29)
 -----------------------------

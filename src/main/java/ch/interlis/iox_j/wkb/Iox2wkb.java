@@ -398,34 +398,35 @@ public class Iox2wkb {
 
 			// Zwischenpunkte erzeugen, so dass maximale Pfeilhoehe nicht 
 			// ueberschritten wird
-			
-			double Z1O[]=new double[1];
-			double Z2O[]=new double[1];
-			double DETAO[]=new double[1];
-			double SIGNO[]=new double[1];
-			HrgUtility.CTRC3P(pt1_re,pt1_ho,  arcPt_re,arcPt_ho,pt2_re,pt2_ho, Z1O,Z2O,DETAO,SIGNO);
-			
-			// Kreismittelpunkt
-			double thetaM=DETAO[0];
-			double reM=Z1O[0];
-			double hoM=Z2O[0];
-			double r=CurveSegment.dist(pt1_re,pt1_ho,reM,hoM);
 
+			double Z1O[]=new double[1];
+            double Z2O[]=new double[1];
+            double DETAO[]=new double[1];
+            double SIGNO[]=new double[1];
+            HrgUtility.CTRC3P(pt1_re,pt1_ho,  arcPt_re,arcPt_ho,pt2_re,pt2_ho, Z1O,Z2O,DETAO,SIGNO);
+            double rSign=SIGNO[0];
+            
+            // Kreismittelpunkt
+            double thetaM=DETAO[0];
+            double reM=Z1O[0];
+            double hoM=Z2O[0];
+            double rAbs=CurveSegment.dist(pt1_re,pt1_ho,reM,hoM);
+			
 			// mindest Winkelschrittweite
-			double theta=2*Math.acos(1-p/Math.abs(r));
+            double theta=2*Math.acos(1-p/rAbs);
 
 			if(a>2*p){
 				// Zentriwinkel zwischen pt1 und arcPt
-				double alpha=2.0*Math.asin(a/2.0/Math.abs(r));
+				double alpha=2.0*Math.asin(a/2.0/rAbs);
 				// anzahl Schritte
 				int alphan=(int)Math.ceil(alpha/theta);
 				// Winkelschrittweite
-				double alphai=alpha/(alphan*(r>0.0?1:-1));
+				double alphai=alpha/(alphan*rSign);
 				double ri=Math.atan2(pt1_re-reM,pt1_ho-hoM);
 				for(int i=1;i<alphan;i++){
 					ri += alphai;
-					double pti_re=reM + Math.abs(r) * Math.sin(ri);
-					double pti_ho=hoM + Math.abs(r) * Math.cos(ri);
+					double pti_re=reM + rAbs * Math.sin(ri);
+					double pti_ho=hoM + rAbs * Math.cos(ri);
 					writeCoord(pti_re, pti_ho,0.0);
 					pointc++;
 				}
@@ -436,16 +437,16 @@ public class Iox2wkb {
 
 			if(b>2*p){
 				// Zentriwinkel zwischen arcPt und pt2
-				double beta=2.0*Math.asin(b/2.0/Math.abs(r));
+				double beta=2.0*Math.asin(b/2.0/rAbs);
 				// anzahl Schritte
 				int betan=(int)Math.ceil((beta/theta));
 				// Winkelschrittweite
-				double betai=beta/(betan*(r>0.0?1:-1));
+				double betai=beta/(betan*rSign);
 				double ri=Math.atan2(arcPt_re-reM,arcPt_ho-hoM);
 				for(int i=1;i<betan;i++){
 					ri += betai;
-					double pti_re=reM + Math.abs(r) * Math.sin(ri);
-					double pti_ho=hoM + Math.abs(r) * Math.cos(ri);
+					double pti_re=reM + rAbs * Math.sin(ri);
+					double pti_ho=hoM + rAbs * Math.cos(ri);
 					writeCoord(pti_re, pti_ho,0.0);
 					pointc++;
 				}
