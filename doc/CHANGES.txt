@@ -4,6 +4,9 @@ ideas/open issues
 
 LATEST
 -----------------------------
+
+iox-ili 1.20.2 (2018-02-08)
+-----------------------------
 - Validator: fix cut edge issue if small radius
 - Validator: fix cut edge issue if short arcs
 - ItfReader2: fix multiple area-refs to polygon issue
