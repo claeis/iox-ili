@@ -86,6 +86,16 @@ public class CsvReader implements IoxReader,IoxIliReader {
 				encoding=Charset.defaultCharset().name();
 			}
 			reader=new BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(inputFile),encoding));
+			if(encoding.equals("UTF-8")) {
+	            reader.mark(2);
+	            int c1=reader.read();
+	            int c2=reader.read();
+	            if(c1==0xFE && c2==0xFF) {
+	                // skip BOM
+	            }else {
+	                reader.reset();
+	            }
+			}
 			init();
 		}catch(java.io.IOException ex){
 			throw new IoxException(ex);

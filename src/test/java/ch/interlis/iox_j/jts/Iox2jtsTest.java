@@ -3,15 +3,18 @@ package ch.interlis.iox_j.jts;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iox.IoxException;
 
 public class Iox2jtsTest{
 		
 	private Iox2jts conv=new Iox2jts();
+	private com.vividsolutions.jts.geom.Coordinate[] coords=null;
 	
 	// Es wird getestet ob ein iox Multicoord(2d) erfolgreich in ein JTS MultiPoint(2d) konvertiert werden kann.
 	@Test
@@ -24,12 +27,17 @@ public class Iox2jtsTest{
 		coordStart.setattrvalue("C2", "11");
 		coordEnd.setattrvalue("C1", "20");
 		coordEnd.setattrvalue("C2", "21");
-		// convert
-		MultiPoint jtsMultiPoint=conv.multicoord2JTS(multicoord);
-		// test
-		assertEquals(2,jtsMultiPoint.getNumPoints());
-		assertEquals("POINT (10 11)", jtsMultiPoint.getGeometryN(0).toString());
-		assertEquals("POINT (20 21)", jtsMultiPoint.getGeometryN(1).toString());
+		try {
+			// convert
+			MultiPoint jtsMultiPoint=conv.multicoord2JTS(multicoord);
+			// test
+			assertEquals(2,jtsMultiPoint.getNumPoints());
+			Coordinate[] coordinates=jtsMultiPoint.getCoordinates();
+			assertEquals(new com.vividsolutions.jts.geom.Coordinate(10.0, 11.0),coordinates[0]);
+			assertEquals(new com.vividsolutions.jts.geom.Coordinate(20.0, 21.0),coordinates[1]);
+		}catch(Iox2jtsException e) {
+			throw new IoxException(e);
+		}
 	}
 	
 	// Es wird getestet ob ein iox Multicoord(3d) erfolgreich in ein JTS MultiPoint(3d) konvertiert werden kann.
@@ -46,13 +54,17 @@ public class Iox2jtsTest{
 		coordEnd.setattrvalue("C1", "20");
 		coordEnd.setattrvalue("C2", "21");
 		coordEnd.setattrvalue("C3", "22");
-		// convert
-		MultiPoint jtsMultiPoint=conv.multicoord2JTS(multicoord);
-		// test
-		assertEquals(2,jtsMultiPoint.getNumPoints());
-		Coordinate[] coordinates=jtsMultiPoint.getCoordinates();
-		assertEquals(new com.vividsolutions.jts.geom.Coordinate(10.0, 11.0, 12.0),coordinates[0]);
-		assertEquals(new com.vividsolutions.jts.geom.Coordinate(20.0, 21.0, 22.0),coordinates[1]);
+		try {
+			// convert
+			MultiPoint jtsMultiPoint=conv.multicoord2JTS(multicoord);
+			// test
+			assertEquals(2,jtsMultiPoint.getNumPoints());
+			Coordinate[] coordinates=jtsMultiPoint.getCoordinates();
+			assertEquals(new com.vividsolutions.jts.geom.Coordinate(10.0, 11.0, 12.0),coordinates[0]);
+			assertEquals(new com.vividsolutions.jts.geom.Coordinate(20.0, 21.0, 22.0),coordinates[1]);
+		}catch(Iox2jtsException e) {
+			throw new IoxException(e);
+		}
 	}
 	
 	// Es wird getestet ob ein iox Multipolyline erfolgreich in ein JTS MultiLineString konvertiert werden kann.
@@ -87,13 +99,42 @@ public class Iox2jtsTest{
 		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
 		endSegment3.setattrvalue("C1", "60");
 		endSegment3.setattrvalue("C2", "61");
-		// convert
-		MultiLineString jtsMultiLineString=conv.multipolyline2JTS(multiPolyline, 0);
-		// test
-		assertEquals(3,jtsMultiLineString.getNumGeometries());
-		assertEquals("LINESTRING (10 11, 20 21)", jtsMultiLineString.getGeometryN(0).toString());
-		assertEquals("LINESTRING (30 31, 40 41)", jtsMultiLineString.getGeometryN(1).toString());
-		assertEquals("LINESTRING (50 51, 60 61)", jtsMultiLineString.getGeometryN(2).toString());
+		try {
+			// convert
+			MultiLineString jtsMultiLineString=conv.multipolyline2JTS(multiPolyline, 0);
+			// test
+			assertEquals(3,jtsMultiLineString.getNumGeometries());
+	
+			Geometry line1=jtsMultiLineString.getGeometryN(0);
+			coords=line1.getCoordinates();
+			assertEquals(1, line1.getNumGeometries());
+			{
+				com.vividsolutions.jts.geom.Coordinate coord=new com.vividsolutions.jts.geom.Coordinate(new Double("10"), new Double("11"));
+				assertEquals(coord, coords[0]);
+				com.vividsolutions.jts.geom.Coordinate coord2=new com.vividsolutions.jts.geom.Coordinate(new Double("20"), new Double("21"));
+				assertEquals(coord2, coords[1]);
+			}
+			Geometry line2=jtsMultiLineString.getGeometryN(1);
+			coords=line2.getCoordinates();
+			assertEquals(1, line2.getNumGeometries());
+			{
+				com.vividsolutions.jts.geom.Coordinate coord=new com.vividsolutions.jts.geom.Coordinate(new Double("30"), new Double("31"));
+				assertEquals(coord, coords[0]);
+				com.vividsolutions.jts.geom.Coordinate coord2=new com.vividsolutions.jts.geom.Coordinate(new Double("40"), new Double("41"));
+				assertEquals(coord2, coords[1]);
+			}
+			Geometry line3=jtsMultiLineString.getGeometryN(2);
+			coords=line3.getCoordinates();
+			assertEquals(1, line3.getNumGeometries());
+			{
+				com.vividsolutions.jts.geom.Coordinate coord=new com.vividsolutions.jts.geom.Coordinate(new Double("50"), new Double("51"));
+				assertEquals(coord, coords[0]);
+				com.vividsolutions.jts.geom.Coordinate coord2=new com.vividsolutions.jts.geom.Coordinate(new Double("60"), new Double("61"));
+				assertEquals(coord2, coords[1]);
+			}
+		}catch(Iox2jtsException e) {
+			throw new IoxException(e);
+		}
 	}
 
 	// Es wird getestet ob ein iox Multisurface erfolgreich in ein JTS MultiPolygon konvertiert werden kann.
@@ -223,11 +264,73 @@ public class Iox2jtsTest{
 			endSegment3Inner.setattrvalue("C1", "500000.001");
 			endSegment3Inner.setattrvalue("C2", "77000.001");
 		}
-		// convert
-		MultiPolygon jtsMultipolygon=conv.multisurface2JTS(multiSurface, 0, 2056);
-		// test
-		assertEquals(2,jtsMultipolygon.getNumGeometries());
-		assertEquals("POLYGON ((480000 70000, 500000 80000, 500000 80000, 550000 90000, 550000 90000, 480000 70000), (500000 77000, 500000 78000, 500000 78000, 505000 78000, 505000 78000, 500000 77000))", jtsMultipolygon.getGeometryN(0).toString());
-		assertEquals("POLYGON ((480000.001 70000.001, 500000.001 80000.001, 500000.001 80000.001, 550000.001 90000.001, 550000.001 90000.001, 480000.001 70000.001), (500000.001 77000.001, 500000.001 78000.001, 500000.001 78000.001, 505000.001 78000.001, 505000.001 78000.001, 500000.001 77000.001))", jtsMultipolygon.getGeometryN(1).toString());
+		try {
+			// convert
+			MultiPolygon jtsMultipolygon=conv.multisurface2JTS(multiSurface, 0, 2056);
+			// multi polygon
+			assertEquals(2,jtsMultipolygon.getNumGeometries());
+			// polygon1
+			Geometry polygon1=jtsMultipolygon.getGeometryN(0);
+			assertEquals(1,polygon1.getNumGeometries());
+			coords=polygon1.getCoordinates();
+			{
+				com.vividsolutions.jts.geom.Coordinate coord=new com.vividsolutions.jts.geom.Coordinate(new Double("480000"), new Double("70000"));
+				assertEquals(coord, coords[0]);
+				com.vividsolutions.jts.geom.Coordinate coord2=new com.vividsolutions.jts.geom.Coordinate(new Double("500000"), new Double("80000"));
+				assertEquals(coord2, coords[1]);
+				com.vividsolutions.jts.geom.Coordinate coord3=new com.vividsolutions.jts.geom.Coordinate(new Double("500000"), new Double("80000"));
+				assertEquals(coord3, coords[2]);
+				com.vividsolutions.jts.geom.Coordinate coord4=new com.vividsolutions.jts.geom.Coordinate(new Double("550000"), new Double("90000"));
+				assertEquals(coord4, coords[3]);
+				com.vividsolutions.jts.geom.Coordinate coord5=new com.vividsolutions.jts.geom.Coordinate(new Double("550000"), new Double("90000"));
+				assertEquals(coord5, coords[4]);
+				com.vividsolutions.jts.geom.Coordinate coord6=new com.vividsolutions.jts.geom.Coordinate(new Double("480000"), new Double("70000"));
+				assertEquals(coord6, coords[5]);
+				com.vividsolutions.jts.geom.Coordinate coord7=new com.vividsolutions.jts.geom.Coordinate(new Double("500000"), new Double("77000"));
+				assertEquals(coord7, coords[6]);
+				com.vividsolutions.jts.geom.Coordinate coord8=new com.vividsolutions.jts.geom.Coordinate(new Double("500000"), new Double("78000"));
+				assertEquals(coord8, coords[7]);
+				com.vividsolutions.jts.geom.Coordinate coord9=new com.vividsolutions.jts.geom.Coordinate(new Double("500000"), new Double("78000"));
+				assertEquals(coord9, coords[8]);
+				com.vividsolutions.jts.geom.Coordinate coord10=new com.vividsolutions.jts.geom.Coordinate(new Double("505000"), new Double("78000"));
+				assertEquals(coord10, coords[9]);
+				com.vividsolutions.jts.geom.Coordinate coord11=new com.vividsolutions.jts.geom.Coordinate(new Double("505000"), new Double("78000"));
+				assertEquals(coord11, coords[10]);
+				com.vividsolutions.jts.geom.Coordinate coord12=new com.vividsolutions.jts.geom.Coordinate(new Double("500000"), new Double("77000"));
+				assertEquals(coord12, coords[11]);
+			}
+			// polygon2
+			Geometry polygon2=jtsMultipolygon.getGeometryN(1);
+			assertEquals(1,polygon2.getNumGeometries());
+			coords=polygon2.getCoordinates();
+			{
+				com.vividsolutions.jts.geom.Coordinate coord=new com.vividsolutions.jts.geom.Coordinate(new Double("480000.001"), new Double("70000.001"));
+				assertEquals(coord, coords[0]);
+				com.vividsolutions.jts.geom.Coordinate coord2=new com.vividsolutions.jts.geom.Coordinate(new Double("500000.001"), new Double("80000.001"));
+				assertEquals(coord2, coords[1]);
+				com.vividsolutions.jts.geom.Coordinate coord3=new com.vividsolutions.jts.geom.Coordinate(new Double("500000.001"), new Double("80000.001"));
+				assertEquals(coord3, coords[2]);
+				com.vividsolutions.jts.geom.Coordinate coord4=new com.vividsolutions.jts.geom.Coordinate(new Double("550000.001"), new Double("90000.001"));
+				assertEquals(coord4, coords[3]);
+				com.vividsolutions.jts.geom.Coordinate coord5=new com.vividsolutions.jts.geom.Coordinate(new Double("550000.001"), new Double("90000.001"));
+				assertEquals(coord5, coords[4]);
+				com.vividsolutions.jts.geom.Coordinate coord6=new com.vividsolutions.jts.geom.Coordinate(new Double("480000.001"), new Double("70000.001"));
+				assertEquals(coord6, coords[5]);
+				com.vividsolutions.jts.geom.Coordinate coord7=new com.vividsolutions.jts.geom.Coordinate(new Double("500000.001"), new Double("77000.001"));
+				assertEquals(coord7, coords[6]);
+				com.vividsolutions.jts.geom.Coordinate coord8=new com.vividsolutions.jts.geom.Coordinate(new Double("500000.001"), new Double("78000.001"));
+				assertEquals(coord8, coords[7]);
+				com.vividsolutions.jts.geom.Coordinate coord9=new com.vividsolutions.jts.geom.Coordinate(new Double("500000.001"), new Double("78000.001"));
+				assertEquals(coord9, coords[8]);
+				com.vividsolutions.jts.geom.Coordinate coord10=new com.vividsolutions.jts.geom.Coordinate(new Double("505000.001"), new Double("78000.001"));
+				assertEquals(coord10, coords[9]);
+				com.vividsolutions.jts.geom.Coordinate coord11=new com.vividsolutions.jts.geom.Coordinate(new Double("505000.001"), new Double("78000.001"));
+				assertEquals(coord11, coords[10]);
+				com.vividsolutions.jts.geom.Coordinate coord12=new com.vividsolutions.jts.geom.Coordinate(new Double("500000.001"), new Double("77000.001"));
+				assertEquals(coord12, coords[11]);
+			}
+		}catch(Iox2jtsException e) {
+			throw new IoxException(e);
+		}
 	}
 }

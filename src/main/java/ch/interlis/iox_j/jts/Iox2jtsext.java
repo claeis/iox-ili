@@ -160,7 +160,7 @@ public class Iox2jtsext {
 	/** Converts a POLYLINE to a JTS CoordinateList.
 	 * @param polylineObj INTERLIS POLYLINE structure
 	 * @param isSurfaceOrArea true if called as part of a SURFACE conversion.
-	 * @param p maximum stroke to use when removing ARCs
+	 * @param p not used anymore
 	 * @return JTS CoordinateList
 	 * @throws Iox2jtsException
 	 */
@@ -281,7 +281,7 @@ public class Iox2jtsext {
 	}
 	/** Converts a SURFACE to a JTS Polygon.
 	 * @param obj INTERLIS SURFACE structure
-	 * @param strokeP maximum stroke to use when removing ARCs
+	 * @param strokeP not used any more
 	 * @return JTS Polygon
 	 * @throws Iox2jtsException
 	 */

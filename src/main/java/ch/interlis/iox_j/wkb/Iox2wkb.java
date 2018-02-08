@@ -34,7 +34,7 @@ import ch.interlis.iom_j.itf.impl.hrg.HrgUtility;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 
-/** Utility to convert from INTERLIS to JTS geometry types.
+/** Utility to convert from INTERLIS to WKB geometry.
  * @author ceis
  * 
  * 
@@ -398,34 +398,35 @@ public class Iox2wkb {
 
 			// Zwischenpunkte erzeugen, so dass maximale Pfeilhoehe nicht 
 			// ueberschritten wird
-			
-			double Z1O[]=new double[1];
-			double Z2O[]=new double[1];
-			double DETAO[]=new double[1];
-			double SIGNO[]=new double[1];
-			HrgUtility.CTRC3P(pt1_re,pt1_ho,  arcPt_re,arcPt_ho,pt2_re,pt2_ho, Z1O,Z2O,DETAO,SIGNO);
-			
-			// Kreismittelpunkt
-			double thetaM=DETAO[0];
-			double reM=Z1O[0];
-			double hoM=Z2O[0];
-			double r=CurveSegment.dist(pt1_re,pt1_ho,reM,hoM);
 
+			double Z1O[]=new double[1];
+            double Z2O[]=new double[1];
+            double DETAO[]=new double[1];
+            double SIGNO[]=new double[1];
+            HrgUtility.CTRC3P(pt1_re,pt1_ho,  arcPt_re,arcPt_ho,pt2_re,pt2_ho, Z1O,Z2O,DETAO,SIGNO);
+            double rSign=SIGNO[0];
+            
+            // Kreismittelpunkt
+            double thetaM=DETAO[0];
+            double reM=Z1O[0];
+            double hoM=Z2O[0];
+            double rAbs=CurveSegment.dist(pt1_re,pt1_ho,reM,hoM);
+			
 			// mindest Winkelschrittweite
-			double theta=2*Math.acos(1-p/Math.abs(r));
+            double theta=2*Math.acos(1-p/rAbs);
 
 			if(a>2*p){
 				// Zentriwinkel zwischen pt1 und arcPt
-				double alpha=2.0*Math.asin(a/2.0/Math.abs(r));
+				double alpha=2.0*Math.asin(a/2.0/rAbs);
 				// anzahl Schritte
 				int alphan=(int)Math.ceil(alpha/theta);
 				// Winkelschrittweite
-				double alphai=alpha/(alphan*(r>0.0?1:-1));
+				double alphai=alpha/(alphan*rSign);
 				double ri=Math.atan2(pt1_re-reM,pt1_ho-hoM);
 				for(int i=1;i<alphan;i++){
 					ri += alphai;
-					double pti_re=reM + Math.abs(r) * Math.sin(ri);
-					double pti_ho=hoM + Math.abs(r) * Math.cos(ri);
+					double pti_re=reM + rAbs * Math.sin(ri);
+					double pti_ho=hoM + rAbs * Math.cos(ri);
 					writeCoord(pti_re, pti_ho,0.0);
 					pointc++;
 				}
@@ -436,16 +437,16 @@ public class Iox2wkb {
 
 			if(b>2*p){
 				// Zentriwinkel zwischen arcPt und pt2
-				double beta=2.0*Math.asin(b/2.0/Math.abs(r));
+				double beta=2.0*Math.asin(b/2.0/rAbs);
 				// anzahl Schritte
 				int betan=(int)Math.ceil((beta/theta));
 				// Winkelschrittweite
-				double betai=beta/(betan*(r>0.0?1:-1));
+				double betai=beta/(betan*rSign);
 				double ri=Math.atan2(arcPt_re-reM,arcPt_ho-hoM);
 				for(int i=1;i<betan;i++){
 					ri += betai;
-					double pti_re=reM + Math.abs(r) * Math.sin(ri);
-					double pti_ho=hoM + Math.abs(r) * Math.cos(ri);
+					double pti_re=reM + rAbs * Math.sin(ri);
+					double pti_ho=hoM + rAbs * Math.cos(ri);
 					writeCoord(pti_re, pti_ho,0.0);
 					pointc++;
 				}
@@ -501,10 +502,19 @@ public class Iox2wkb {
 	 * @return JTS CoordinateList
 	 * @throws Iox2wkbException
 	 */
-	public byte[] polyline2wkb(IomObject polylineObj,boolean isSurfaceOrArea,boolean asCompoundCurve,double p)
+    public byte[] polyline2wkb(IomObject polylineObj,boolean isSurfaceOrArea,boolean asCompoundCurve,double p)
+    throws Iox2wkbException
+    {
+        if(polylineObj==null){
+            return null;
+        }
+        IomObject polylineObjs[]=new IomObject[] {polylineObj};
+        return polyline2wkb(polylineObjs, isSurfaceOrArea, asCompoundCurve, p);
+    }
+	public byte[] polyline2wkb(IomObject polylineObjs[],boolean isSurfaceOrArea,boolean asCompoundCurve,double p)
 	throws Iox2wkbException
 	{
-		if(polylineObj==null){
+		if(polylineObjs==null){
 			return null;
 		}
 		byte ret[]=null;
@@ -525,140 +535,150 @@ public class Iox2wkb {
 			
 			java.util.ArrayList<Integer> patches=new java.util.ArrayList<Integer>();
 			
-			// is POLYLINE?
-			if(isSurfaceOrArea){
-				IomObject lineattr=polylineObj.getattrobj("lineattr",0);
-				if(lineattr!=null){
-					//writeAttrs(out,lineattr);
-					throw new Iox2wkbException("Lineattributes not supported");							
-				}
-			}
-			boolean clipped=polylineObj.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
-			if(clipped){
-				throw new Iox2wkbException("clipped polyline not supported");
-			}
-			for(int sequencei=0;sequencei<polylineObj.getattrvaluecount("sequence");sequencei++){
-				if(clipped){
-					//out.startElement(tags::get_CLIPPED(),0,0);
-				}else{
-					// an unclipped polyline should have only one sequence element
-					if(sequencei>0){
-						throw new Iox2wkbException("unclipped polyline with multi 'sequence' elements");
-					}
-				}
-				int coordc=0;
-				int coordcPos=0;
-				int currentComponent=0;
-				IomObject arcStartPt=null;
-				IomObject sequence=polylineObj.getattrobj("sequence",sequencei);
-				int segmentc=sequence.getattrvaluecount("segment");
-				for(int segmenti=0;segmenti<segmentc;segmenti++){
-					IomObject segment=sequence.getattrobj("segment",segmenti);
-					//EhiLogger.debug("segmenttag "+segment.getobjecttag());
-					if(segment.getobjecttag().equals("COORD")){
-						// COORD
-						if(asCompoundCurve){
-							if(segmenti==0 && segmentc>=2 && sequence.getattrobj("segment",segmenti+1).getobjecttag().equals("ARC")){
-								// us it as startpoint of first arc
-							}else{
-								if(currentComponent!=WKBConstants.wkbLineString){
-									if(currentComponent!=0){
-										// finish last component
-										patches.add(coordcPos);
-										patches.add(coordc);
-									}
-									// start LineString
-									writeByteOrder();
-									writeGeometryType(WKBConstants.wkbLineString);
-									// remember position of size
-									coordcPos=os.size();
-									coordc=0;
-									// write dummy size
-									os.writeInt(0);
-									// new component
-									currentComponent=WKBConstants.wkbLineString;
-									size++;
-									// not first segment
-									if(arcStartPt!=null){
-										// write start point
-										writeCoord(arcStartPt);
-										coordc++;
-									}
-								}
-								writeCoord(segment);
-								coordc++;
-							}
-						}else{
-							writeCoord(segment);
-							coordc++;
-						}
-					}else if(segment.getobjecttag().equals("ARC")){
-						// ARC
-						if(asCompoundCurve){
-							if(currentComponent!=WKBConstants.wkbCircularString){
-								if(currentComponent!=0){
-									// finish last component
-									patches.add(coordcPos);
-									patches.add(coordc);
-								}
-								// start CircularString
-								writeByteOrder();
-								writeGeometryType(WKBConstants.wkbCircularString);
-								// remember position of size
-								coordcPos=os.size();
-								coordc=0;
-								// write dummy size
-								os.writeInt(0);
-								// new component
-								currentComponent=WKBConstants.wkbCircularString;
-								size++;
-								// write start point
-								writeCoord(arcStartPt);
-								coordc++;
-							}
-							// write intermediate point
-							String a1=segment.getattrvalue("A1");
-							String a2=segment.getattrvalue("A2");
-							double arcPt_re;
-							try{
-								arcPt_re = Double.parseDouble(a1);
-							}catch(Exception ex){
-								throw new Iox2wkbException("failed to read A1 <"+a1+">",ex);
-							}
-							double arcPt_ho;
-							try{
-								arcPt_ho = Double.parseDouble(a2);
-							}catch(Exception ex){
-								throw new Iox2wkbException("failed to read A2 <"+a2+">",ex);
-							}
-							writeCoord(arcPt_re,arcPt_ho,0.0);
-							coordc++;
-							// write end point
-							writeCoord(segment);
-							coordc++;
-						}else{
-							int pointc=arc2JTS(arcStartPt,segment,p);
-							coordc+=pointc;
-						}
-					}else{
-						// custum line form
-						throw new Iox2wkbException("custom line form not supported");
-						//out.startElement(segment->getTag(),0,0);
-						//writeAttrs(out,segment);
-						//out.endElement(/*segment*/);
-					}
-					arcStartPt=segment;
-				}
-				if(clipped){
-					//out.endElement(/*CLIPPED*/);
-				}
-				if(asCompoundCurve){
-					// finish last component
-					patches.add(coordcPos);
-					patches.add(coordc);
-				}else{
-					size+=coordc;
-				}
+            int coordc=0;
+            int coordcPos=0;
+            int currentComponent=0;
+            IomObject arcStartPt=null;
+			for(IomObject polylineObj:polylineObjs) {
+		        if(polylineObj==null){
+		            continue;
+		        }
+	            // is POLYLINE?
+	            if(isSurfaceOrArea){
+	                IomObject lineattr=polylineObj.getattrobj("lineattr",0);
+	                if(lineattr!=null){
+	                    //writeAttrs(out,lineattr);
+	                    throw new Iox2wkbException("Lineattributes not supported");                         
+	                }
+	            }
+	            boolean clipped=polylineObj.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
+	            if(clipped){
+	                throw new Iox2wkbException("clipped polyline not supported");
+	            }
+	            for(int sequencei=0;sequencei<polylineObj.getattrvaluecount("sequence");sequencei++){
+	                if(clipped){
+	                    //out.startElement(tags::get_CLIPPED(),0,0);
+	                }else{
+	                    // an unclipped polyline should have only one sequence element
+	                    if(sequencei>0){
+	                        throw new Iox2wkbException("unclipped polyline with multi 'sequence' elements");
+	                    }
+	                }
+	                IomObject sequence=polylineObj.getattrobj("sequence",sequencei);
+	                int segmentc=sequence.getattrvaluecount("segment");
+	                for(int segmenti=0;segmenti<segmentc;segmenti++){
+	                    IomObject segment=sequence.getattrobj("segment",segmenti);
+	                    //EhiLogger.debug("segmenttag "+segment.getobjecttag());
+	                    if(segment.getobjecttag().equals("COORD")){
+	                        // COORD
+	                        if(currentComponent!=0 && segmenti==0) {
+	                            // first COORD, not the first POLYLINE
+	                            // ignore it; should be the same as last written coord
+	                        }else {
+	                            if(asCompoundCurve){
+	                                if(segmenti==0 && segmentc>=2 && sequence.getattrobj("segment",segmenti+1).getobjecttag().equals("ARC")){
+	                                    // us it as startpoint of first arc
+	                                }else{
+	                                    if(currentComponent!=WKBConstants.wkbLineString){
+	                                        if(currentComponent!=0){
+	                                            // finish last component
+	                                            patches.add(coordcPos);
+	                                            patches.add(coordc);
+	                                        }
+	                                        // start LineString
+	                                        writeByteOrder();
+	                                        writeGeometryType(WKBConstants.wkbLineString);
+	                                        // remember position of size
+	                                        coordcPos=os.size();
+	                                        coordc=0;
+	                                        // write dummy size
+	                                        os.writeInt(0);
+	                                        // new component
+	                                        currentComponent=WKBConstants.wkbLineString;
+	                                        size++;
+	                                        // not first segment
+	                                        if(arcStartPt!=null){
+	                                            // write start point
+	                                            writeCoord(arcStartPt);
+	                                            coordc++;
+	                                        }
+	                                    }
+	                                    writeCoord(segment);
+	                                    coordc++;
+	                                }
+	                            }else{
+	                                writeCoord(segment);
+	                                coordc++;
+	                            }
+	                        }
+	                    }else if(segment.getobjecttag().equals("ARC")){
+	                        // ARC
+	                        if(asCompoundCurve){
+	                            if(currentComponent!=WKBConstants.wkbCircularString){
+	                                if(currentComponent!=0){
+	                                    // finish last component
+	                                    patches.add(coordcPos);
+	                                    patches.add(coordc);
+	                                }
+	                                // start CircularString
+	                                writeByteOrder();
+	                                writeGeometryType(WKBConstants.wkbCircularString);
+	                                // remember position of size
+	                                coordcPos=os.size();
+	                                coordc=0;
+	                                // write dummy size
+	                                os.writeInt(0);
+	                                // new component
+	                                currentComponent=WKBConstants.wkbCircularString;
+	                                size++;
+	                                // write start point
+	                                writeCoord(arcStartPt);
+	                                coordc++;
+	                            }
+	                            // write intermediate point
+	                            String a1=segment.getattrvalue("A1");
+	                            String a2=segment.getattrvalue("A2");
+	                            double arcPt_re;
+	                            try{
+	                                arcPt_re = Double.parseDouble(a1);
+	                            }catch(Exception ex){
+	                                throw new Iox2wkbException("failed to read A1 <"+a1+">",ex);
+	                            }
+	                            double arcPt_ho;
+	                            try{
+	                                arcPt_ho = Double.parseDouble(a2);
+	                            }catch(Exception ex){
+	                                throw new Iox2wkbException("failed to read A2 <"+a2+">",ex);
+	                            }
+	                            writeCoord(arcPt_re,arcPt_ho,0.0);
+	                            coordc++;
+	                            // write end point
+	                            writeCoord(segment);
+	                            coordc++;
+	                        }else{
+	                            int pointc=arc2JTS(arcStartPt,segment,p);
+	                            coordc+=pointc;
+	                        }
+	                    }else{
+	                        // custum line form
+	                        throw new Iox2wkbException("custom line form not supported");
+	                        //out.startElement(segment->getTag(),0,0);
+	                        //writeAttrs(out,segment);
+	                        //out.endElement(/*segment*/);
+	                    }
+	                    arcStartPt=segment;
+	                }
+	                if(clipped){
+	                    //out.endElement(/*CLIPPED*/);
+	                }
+	                if(asCompoundCurve){
+	                    // finish last component
+	                    patches.add(coordcPos);
+	                    patches.add(coordc);
+	                }else{
+	                    size+=coordc;
+	                }
+	            }
 			}
 			ret=os.toByteArray();
 			// fix size of components
@@ -779,16 +799,24 @@ public class Iox2wkb {
 			    
 				for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
 					IomObject boundary=surface.getattrobj("boundary",boundaryi);
-					if(asCurvePolygon){
+					int polylinec = boundary.getattrvaluecount("polyline");
+                    if(asCurvePolygon){
 						Iox2wkb helper=new Iox2wkb(outputDimension,os.order());
-						for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
-							IomObject polyline=boundary.getattrobj("polyline",polylinei);
-							os.write(helper.polyline2wkb(polyline,true,asCurvePolygon,strokeP));
+						if(polylinec==1) {
+                            IomObject polyline=boundary.getattrobj("polyline",0);
+                            os.write(helper.polyline2wkb(polyline,true,asCurvePolygon,strokeP));
+						}else {
+						    IomObject polylines[]=new IomObject[polylinec];
+	                        for(int polylinei=0;polylinei<polylinec;polylinei++){
+	                            IomObject polyline=boundary.getattrobj("polyline",polylinei);
+	                            polylines[polylinei]=polyline;
+	                        }
+                            os.write(helper.polyline2wkb(polylines,true,asCurvePolygon,strokeP));
 						}
 					}else{
 						//IFMEFeature fmeLine=session.createFeature();
 						com.vividsolutions.jts.geom.CoordinateList jtsLine=new com.vividsolutions.jts.geom.CoordinateList();
-						for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
+						for(int polylinei=0;polylinei<polylinec;polylinei++){
 							IomObject polyline=boundary.getattrobj("polyline",polylinei);
 							jtsLine.addAll(polyline2coordlist(polyline,true,strokeP));
 						}
