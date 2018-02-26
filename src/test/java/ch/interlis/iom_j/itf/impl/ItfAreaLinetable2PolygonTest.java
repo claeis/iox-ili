@@ -319,13 +319,14 @@ MULTISURFACE {surface SURFACE {
 		//System.out.println(linetableObj);
 		builder.addItfLinetableObject(linetableObj);
 		
+		String lineTid="2";
 		polyline=newPolyline();
 		addCoord(polyline,110.0,  110.0);
 		addCoord(polyline,115.0,  115.0); 
 		addCoord(polyline,115.0,  120.0); 
 		addCoord(polyline,112.0,  120.0); 
 		addCoord(polyline,110.0,  110.0);
-		linetableObj=createLinetableObj("2",tableName,geomAttr,polyline);
+		linetableObj=createLinetableObj(lineTid,tableName,geomAttr,polyline);
 		//System.out.println(linetableObj);
 		builder.addItfLinetableObject(linetableObj);
 
@@ -335,7 +336,7 @@ MULTISURFACE {surface SURFACE {
 			builder.buildSurfaces();
 			fail();
 		}catch(IoxException ex){
-			IoxAssert.assertStartsWith("no area-ref to polygon",ex.getMessage());
+			IoxAssert.assertStartsWith("no area-ref to polygon of line tid "+lineTid,ex.getMessage());
 		}
 	}
 	@Test
