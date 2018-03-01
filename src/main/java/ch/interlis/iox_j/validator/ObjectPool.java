@@ -31,7 +31,8 @@ public class ObjectPool {
 	private boolean doItfOidPerTable;
 	private HashMap<String,Object> tag2class;
 	private ObjectPoolManager objPoolManager=null;
-	Map<String, Map<ObjectPoolKey, IomObject>> collectionOfBaskets = new java.util.TreeMap<String, Map<ObjectPoolKey, IomObject>>();
+	private Map<String, Map<ObjectPoolKey, IomObject>> collectionOfBaskets = new java.util.HashMap<String, Map<ObjectPoolKey, IomObject>>();
+	private java.util.TreeSet<String> bids=new java.util.TreeSet<String>();
 	
 	public ObjectPool(boolean doItfOidPerTable, IoxLogging errs, LogEventFactory errFact, HashMap<String,Object> tag2class,ObjectPoolManager objPoolManager){
 		this.doItfOidPerTable = doItfOidPerTable;
@@ -86,6 +87,7 @@ public class ObjectPool {
 		} else {
 			collectionOfObjects=objPoolManager.newObjectPoolImpl2(new JavaSerializer()); // new HashMap<ObjectPoolKey, IomObject>();
 			collectionOfBaskets.put(currentBasketId, collectionOfObjects);
+			bids.add(currentBasketId);
 		}
 		if(collectionOfObjects.containsKey(key)){
 			return collectionOfObjects.get(key);
@@ -99,11 +101,11 @@ public class ObjectPool {
 	}
 	
 	public Set<String> getBasketIds(){
-		return collectionOfBaskets.keySet();
+		return bids;
 	}
 	
 	public String getBidOfObject(String oid, Viewable classObj){
-		for(String basketId : collectionOfBaskets.keySet()){
+		for(String basketId : bids){
 			Map<ObjectPoolKey, IomObject> collectionOfObjects = collectionOfBaskets.get(basketId);
 			if(doItfOidPerTable){
 				IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, classObj, basketId));
@@ -121,7 +123,7 @@ public class ObjectPool {
 	}
 	
 	public IomObject getObject(String oid, ArrayList<Viewable> classes, Holder<String> retBasketId) {
-		for(String basketId : collectionOfBaskets.keySet()){
+		for(String basketId : bids){
 			Map<ObjectPoolKey, IomObject> collectionOfObjects = collectionOfBaskets.get(basketId);
 			if(doItfOidPerTable){
 				for(Viewable aClass : classes){
