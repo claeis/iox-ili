@@ -374,7 +374,7 @@ public class ItfAreaLinetable2Polygon {
 					if(!hitPolys.containsKey(poly)){
 						IoxInvalidDataException ex=null;
 						try {
-							ex=new IoxInvalidDataException("no area-ref to polygon",geomattrIliqname,Jtsext2iox.JTS2surface(poly));
+							ex=new IoxInvalidDataException("no area-ref to polygon of lines "+getTids(poly),geomattrIliqname,Jtsext2iox.JTS2surface(poly));
 						} catch (Iox2jtsException e) {
 							throw new IllegalStateException(e);
 						}

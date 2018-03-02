@@ -171,7 +171,7 @@ public class ItfAreaLV95_05Test {
 			builder.buildSurfaces();
 			fail();
 		} catch (IoxInvalidDataException e) {
-			assertEquals("Test2LV95_05.TopicB.TableB.Form: no area-ref to polygon",e.getMessage());
+			assertEquals("Test2LV95_05.TopicB.TableB.Form: no area-ref to polygon of lines hole",e.getMessage());
 		}
 		IomObject polygon=builder.getSurfaceObject("10");
 		//System.out.println(polygon.toString());
