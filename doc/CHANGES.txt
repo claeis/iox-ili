@@ -5,7 +5,7 @@ ideas/open issues
 LATEST
 -----------------------------
 
-iox-ili 1.20.3 (2018-03-02)
+iox-ili 1.20.4 (2018-03-02)
 -----------------------------
 - Validator: improved performance
 - Validator: validate UNIQUE (LOCAL) against current object (and not all)
