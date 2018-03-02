@@ -5,6 +5,12 @@ ideas/open issues
 LATEST
 -----------------------------
 
+iox-ili 1.20.3 (2018-03-02)
+-----------------------------
+- Validator: improved performance
+- Validator: validate UNIQUE (LOCAL) against current object (and not all)
+- ItfReader2: show line tids in "no area-ref to polygon" error message
+
 iox-ili 1.20.2 (2018-02-08)
 -----------------------------
 - Validator: fix cut edge issue if small radius

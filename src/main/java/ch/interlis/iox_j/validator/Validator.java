@@ -736,22 +736,47 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				loggedObjects.add(uniquenessConstraint);
 				errs.addEvent(errFact.logInfoMsg("validate unique constraint {0}...",getScopedName(uniquenessConstraint)));
 			}
-			Holder<AttributeArray> values = new Holder<AttributeArray>();
-			String returnValue = validateUnique(iomObj,uniquenessConstraint, values);
-			if (returnValue == null){
-				// ok
-			} else {
-				String msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
-				if(msg!=null && msg.length()>0){
-					logMsg(checkUniqueConstraint,msg);
-				} else {
-					logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), returnValue);
-				}
-			}
+		    HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues = null;
+		    if(uniquenessConstraint.getLocal()) {
+	            seenValues= new HashMap<UniquenessConstraint, HashMap<AttributeArray, String>>();
+		    }else {
+	            seenValues=seenUniqueConstraintValues;
+		    }
+		    String iomObjOid=iomObj.getobjectoid();
+	        if(uniquenessConstraint.getPrefix()!=null){
+	            PathEl[] attrPath = uniquenessConstraint.getPrefix().getPathElements();
+	            visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid,attrPath,0,iomObj);
+	        }else {
+                visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid,null,0,iomObj);
+	        }
+
 		}
 	}
 	
-	private HashMap<SetConstraint,Collection<String>> setConstraints=new HashMap<SetConstraint,Collection<String>>();
+	private void visitStructEle(String checkUniqueConstraint,UniquenessConstraint uniquenessConstraint, HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues, String iomObjOid, PathEl[] attrPath, int i, IomObject iomObj) {
+	    if(attrPath==null || i>=attrPath.length) {
+            Holder<AttributeArray> values = new Holder<AttributeArray>();
+            String returnValue = validateUnique(seenValues,iomObjOid,iomObj,uniquenessConstraint, values);
+            if (returnValue == null){
+                // ok
+            } else {
+                String msg=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.MSG);
+                if(msg!=null && msg.length()>0){
+                    logMsg(checkUniqueConstraint,msg);
+                } else {
+                    logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), returnValue);
+                }
+            }
+	        return;
+	    }
+        String attrName = attrPath[i].getName();
+        int structElec=iomObj.getattrvaluecount(attrName);
+        for(int structElei=0;structElei<structElec;structElei++) {
+            IomObject structEle=iomObj.getattrobj(attrName, structElei);
+            visitStructEle(checkUniqueConstraint,uniquenessConstraint, seenValues, iomObjOid, attrPath,i+1,structEle);
+        }
+    }
+    private HashMap<SetConstraint,Collection<String>> setConstraints=new HashMap<SetConstraint,Collection<String>>();
 	private Iterator<String> allObjIterator=null;
 	
 	private void collectSetConstraintObjs(String validationKind, String constraintName, IomObject iomObj, SetConstraint setConstraintObj) {
@@ -2260,7 +2285,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	// Declaration of the uniqueness of Oid's.
 	String uniquenessOfOid = null;
-	// HashMap of unique constraints.
+	// HashMap of global unique constraints.
 	HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenUniqueConstraintValues = new HashMap<UniquenessConstraint, HashMap<AttributeArray, String>>();
 	// List of all object Oid's and associated classPath's of uniqueness validate of Oid's.
 	Map<String , String> uniqueObjectIDs = new HashMap<String, String>();
@@ -2570,19 +2595,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return null;
 	}
 	
-	private String validateUnique(IomObject currentObject,UniquenessConstraint constraint, Holder<AttributeArray> values) {
-		IomObject originObj=currentObject;
-		ArrayList<Object> accu = new ArrayList<Object>();
-		if(constraint.getPrefix()!=null){
-			PathEl[] attrPath = constraint.getPrefix().getPathElements();
-			for(int i=0;i<attrPath.length;i++){
-				String prefixAttrName = attrPath[i].getName();
-				IomObject prefixValue=currentObject.getattrobj(prefixAttrName, 0);
-				if(prefixValue!=null){
-					currentObject=prefixValue;
-				}
-			}
-		}
+	private String validateUnique(HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues,String originObjOid,IomObject currentObject,UniquenessConstraint constraint, Holder<AttributeArray> valuesRet) {
+        ArrayList<Object> values = new ArrayList<Object>();
 		Iterator constraintIter = constraint.getElements().iteratorAttribute();
 		while(constraintIter.hasNext()){
 			String uniqueAttrName = constraintIter.next().toString();
@@ -2603,26 +2617,26 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(attrValue==null){
 				return null;
 			}
-			accu.add(attrValue);
+			values.add(attrValue);
 		}
-		values.value=new AttributeArray(accu);
-		HashMap<AttributeArray, String> allValues = null;
-		if (seenUniqueConstraintValues.containsKey(constraint)){
-			allValues = seenUniqueConstraintValues.get(constraint);
+		valuesRet.value=new AttributeArray(values);
+		HashMap<AttributeArray, String> allAlreadySeenValues = null;
+		if (seenValues.containsKey(constraint)){
+			allAlreadySeenValues = seenValues.get(constraint);
 			
 			
-			String oidOfNonUniqueObj = allValues.get(values.value);
+			String oidOfNonUniqueObj = allAlreadySeenValues.get(valuesRet.value);
 			if(oidOfNonUniqueObj!=null){
 				// duplicate found.
 				return oidOfNonUniqueObj;
 			}
 			// values not yet seen.
 			// keep oid for futher error messages.
-			allValues.put(values.value, originObj.getobjectoid());
+			allAlreadySeenValues.put(valuesRet.value, originObjOid);
 		} else {
-			allValues = new HashMap<AttributeArray, String>();
-			allValues.put(values.value, originObj.getobjectoid());
-			seenUniqueConstraintValues.put(constraint, allValues);
+			allAlreadySeenValues = new HashMap<AttributeArray, String>();
+			allAlreadySeenValues.put(valuesRet.value, originObjOid);
+			seenValues.put(constraint, allAlreadySeenValues);
 		}
 		return null;
 	}

@@ -107,28 +107,12 @@ MODEL UniqueConstraints23
 		  UNIQUE (LOCAL) attr2 : attr1, attr2;
 		END ClassH;
 		
-		CLASS ClassI =
-		  attr1 : BAG {1..*} OF StructA;
-		  UNIQUE (LOCAL) attr1 : attr1;
-		END ClassI;
-		
-		CLASS ClassJ =
-		  attr2 : BAG {1..*} OF StructA;
-		  UNIQUE (LOCAL) attr2 : attr1, attr2;
-		  UNIQUE (LOCAL) attr2 : attr1;
-		END ClassJ;
-		
 		CLASS ClassK =
-		  attr1 : LIST {1..*} OF StructE;
+		  attr1 : LIST {0..*} OF StructE;
 		  attr2 : 0..10;
 		  UNIQUE (LOCAL) attr1 : attr1;
 		  UNIQUE attr2;
 		END ClassK;
-		
-		CLASS ClassL =
-		  attr1 : BAG {1..*} OF StructF;
-		  UNIQUE (LOCAL) attr1 -> attr1f: attr1g;
-		END ClassL;
 		
 		CLASS ClassM =
 		  attr1 : BAG {1..*} OF StructH;
@@ -148,15 +132,6 @@ MODEL UniqueConstraints23
 		  attro2 : BAG {1..*} OF StructO;
 		  UNIQUE (LOCAL) attro2 : surface2d;
 		END ClassO2;
-		
-		STRUCTURE StructP =
-			area2d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-		END StructP;
-		
-		CLASS ClassP2 =
-		  attr1 : BAG {1..*} OF StructP;
-		  UNIQUE (LOCAL) attr1 : area2d;
-		END ClassP2;
 		
 		CLASS ClassP =
 		  area2d : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
