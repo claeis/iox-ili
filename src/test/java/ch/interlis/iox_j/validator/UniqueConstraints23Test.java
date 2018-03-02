@@ -43,22 +43,15 @@ public class UniqueConstraints23Test {
 	private final static String CLASSC=TOPIC+".ClassC";
 	private final static String CLASSD=TOPIC+".ClassD";
 	private final static String CLASSE=TOPIC+".ClassE";
-	private final static String CLASSF=TOPIC+".ClassF";
 	private final static String CLASSG=TOPIC+".ClassG";
 	private final static String CLASSH=TOPIC+".ClassH";
-	private final static String CLASSI=TOPIC+".ClassI";
-	private final static String CLASSJ=TOPIC+".ClassJ";
 	private final static String CLASSK=TOPIC+".ClassK";
-	private final static String CLASSL=TOPIC+".ClassL";
 	private final static String CLASSM=TOPIC+".ClassM";
 	private final static String CLASSN=TOPIC+".ClassN";
-	private final static String CLASSN2=TOPIC+".ClassN2";
 	private final static String CLASSN3=TOPIC+".ClassN3";
 	private final static String CLASSO=TOPIC+".ClassO";
 	private final static String CLASSO2=TOPIC+".ClassO2";
 	private final static String CLASSP=TOPIC+".ClassP";
-	private final static String CLASSP2=TOPIC+".ClassP2";
-	private final static String CLASSQ=TOPIC+".ClassQ";
 	private final static String CLASSA1=TOPIC+".ClassA1";
 	private final static String CLASSB1=TOPIC+".ClassB1";
 	private final static String CLASSC1=TOPIC+".ClassC1";
@@ -438,18 +431,18 @@ public class UniqueConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
-	// In beiden Objekten wird je auf ein attribute einer Struktur verwiesen, welche unterschiedliche values beinhalten. Somit darf keine Fehlermeldung ausgegeben werden.
+    // Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
+    // In einem Objekt sind zwei Strukturelemente mit unterschiedlichem Wert. 
+    // Somit muss eine Fehlermeldung ausgegeben werden.
 	@Test
-	public void local_UniqueAttrValueAttr1IsDifferent_Ok(){
+	public void local_oneAttr_oneObj_Unique_Ok(){
 		Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
 		struct1.setattrvalue("attr1", "2");
 		Iom_jObject obj1=new Iom_jObject(CLASSG, OID1);
 		obj1.addattrobj("attr2", struct1);
 		Iom_jObject struct2=new Iom_jObject(STRUCTA, null);
 		struct2.setattrvalue("attr1", "1");
-		Iom_jObject obj2=new Iom_jObject(CLASSG, OID2);
-		obj2.addattrobj("attr2", struct2);
+		obj1.addattrobj("attr2", struct2);
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -458,10 +451,7 @@ public class UniqueConstraints23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(struct1));
-		validator.validate(new ObjectEvent(struct2));
 		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
@@ -472,7 +462,7 @@ public class UniqueConstraints23Test {
 	// In beiden Objekten wird je auf ein attribute einer Struktur verwiesen, in attr1 wurden die Attribute mit den Selben Values erstellt.
 	// Es darf keine Fehlermeldung ausgegeben werden, da Unique mit (attr1 und attr2) erstellt wurde.
 	@Test
-	public void local_UniqueAttrValueAttr2IsDifferent_Ok(){
+	public void local_twoAttr_Unique_Ok(){
 		Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
 		struct1.setattrvalue("attr1", "1");
 		struct1.setattrvalue("attr2", "5");
@@ -505,7 +495,7 @@ public class UniqueConstraints23Test {
 	// In beiden Objekten wird je auf ein attribute einer Struktur verwiesen, in attr2 wurden die Attribute mit den Selben Values erstellt.
 	// Es darf keine Fehlermeldung ausgegeben werden, da Unique mit (attr1 und attr2) erstellt wurde.
 	@Test
-	public void local_BothAttrValuesOfUniqueStructureAreDifferent_Ok(){
+	public void local_twoAttr_Unique2_Ok(){
 		Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
 		struct1.setattrvalue("attr1", "6");
 		struct1.setattrvalue("attr2", "2");
@@ -533,110 +523,11 @@ public class UniqueConstraints23Test {
 		// Asserts.
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
-//	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
-//	// In beiden Objekten wird je auf ein attribute einer Struktur verwiesen, beide Objekte haben verschiedene attr-Values.
-//	// Somit darf keine Fehlermeldung ausgegeben werden.
-//	@Test
-//	public void local_BagUnique_BothDiff_Ok(){
-//		Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
-//		struct1.setattrvalue("attr1", "2");
-//		struct1.setattrvalue("attr2", "2");
-//		Iom_jObject obj1=new Iom_jObject(CLASSI, OID1);
-//		obj1.addattrobj("attr1", struct1);
-//		Iom_jObject struct2=new Iom_jObject(STRUCTA, null);
-//		struct2.setattrvalue("attr1", "1");
-//		struct2.setattrvalue("attr2", "2");
-//		Iom_jObject obj2=new Iom_jObject(CLASSI, OID2);
-//		obj2.addattrobj("attr1", struct2);
-//		// Create and run validator.
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(TOPIC,BID));
-//		validator.validate(new ObjectEvent(struct1));
-//		validator.validate(new ObjectEvent(struct2));
-//		validator.validate(new ObjectEvent(obj1));
-//		validator.validate(new ObjectEvent(obj2));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts.
-//		assertTrue(logger.getErrs().size()==0);
-//	}
-//	
-//	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
-//	// In beiden Objekten wird je auf ein attribute einer Struktur verwiesen, beide Attribute-Values sind unterschiedlich erstellt worden.
-//	// Somit darf keine Fehlermeldung ausgegeben werden.
-//	@Test
-//	public void local_BagUnique_BothDifferent_Ok(){
-//		Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
-//		struct1.setattrvalue("attr1", "1");
-//		struct1.setattrvalue("attr2", "2");
-//		Iom_jObject struct2=new Iom_jObject(STRUCTA, null);
-//		struct2.setattrvalue("attr1", "3");
-//		struct2.setattrvalue("attr2", "4");
-//		Iom_jObject obj2=new Iom_jObject(CLASSI, "o2");
-//		obj2.addattrobj("attr1", struct2);
-//		Iom_jObject obj1=new Iom_jObject(CLASSI, "o1");
-//		obj1.addattrobj("attr1", struct1);
-//		// Create and run validator.
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent(TOPIC,BID));
-//		validator.validate(new ObjectEvent(struct1));
-//		validator.validate(new ObjectEvent(struct2));
-//		validator.validate(new ObjectEvent(obj1));
-//		validator.validate(new ObjectEvent(obj2));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts.
-//		assertTrue(logger.getErrs().size()==0);
-//	}
-	
-	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
-	// In beiden Objekten wird je auf ein attribute einer Struktur verwiesen, beide  Attribute-Values sind unterschiedlich.
-	// Somit darf keine Fehlermeldung ausgegeben werden: Da entweder attr1 Unique ist oder (attr1 und attr2) Unique sind.
-	@Test
-	public void local_BothUniqueAttrValuesOfStructAAreDifferent_Ok(){
-		Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
-		struct1.setattrvalue("attr1", "1");
-		struct1.setattrvalue("attr2", "2");
-		Iom_jObject obj1=new Iom_jObject(CLASSJ, OID1);
-		obj1.addattrobj("attr2", struct1);
-		Iom_jObject struct2=new Iom_jObject(STRUCTA, null);
-		struct2.setattrvalue("attr1", "3");
-		struct2.setattrvalue("attr2", "4");
-		Iom_jObject obj2=new Iom_jObject(CLASSJ, OID2);
-		obj2.addattrobj("attr2", struct2);
-		// Create and run validator.
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(struct1));
-		validator.validate(new ObjectEvent(struct2));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts.
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
+		
 	// In beiden Objekten wird je ueber eine Structure auf ein attribute einer SURFACE verwiesen, Beide Attribute wurden mit unterschiedlichen Values erstellt.
 	// Somit darf keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void uniqueSurfaceValuesOfStructureAreDifferent_Ok(){
+	public void local_oneSurfaceAttr_Unique_Ok(){
 		// Set object.
 		Iom_jObject struct1=new Iom_jObject(STRUCTO, null);
 		{
@@ -723,98 +614,7 @@ public class UniqueConstraints23Test {
 		// Asserts.
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
-	// In beiden Objekten wird je ueber eine Structure auf ein attribute einer AREA verwiesen, Beide Attribute wurden mit unterschiedlichen Values erstellt.
-	// Somit darf keine Fehlermeldung ausgegeben werden.
-	@Test
-	public void uniqueAreaValuesOfStructureAreDifferent_Ok(){
-		// Set object.
-		Iom_jObject struct1=new Iom_jObject(STRUCTP, null);
-		{
-			IomObject multisurfaceValue=struct1.addattrobj("area2d", "MULTISURFACE");
-			IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-			IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-			// polyline
-			IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-			IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-			IomObject startSegment=segments.addattrobj("segment", "COORD");
-			startSegment.setattrvalue("C1", "480000.000");
-			startSegment.setattrvalue("C2", "70000.000");
-			IomObject endSegment=segments.addattrobj("segment", "COORD");
-			endSegment.setattrvalue("C1", "500000.000");
-			endSegment.setattrvalue("C2", "80000.000");
-			// polyline 2
-			IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-			IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-			IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-			startSegment2.setattrvalue("C1", "500000.000");
-			startSegment2.setattrvalue("C2", "80000.000");
-			IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-			endSegment2.setattrvalue("C1", "550000.000");
-			endSegment2.setattrvalue("C2", "90000.000");
-			// polyline 3
-			IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-			IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-			IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-			startSegment3.setattrvalue("C1", "550000.000");
-			startSegment3.setattrvalue("C2", "90000.000");
-			IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-			endSegment3.setattrvalue("C1", "480000.000");
-			endSegment3.setattrvalue("C2", "70000.000");
-		}
-		Iom_jObject struct2=new Iom_jObject(STRUCTP, null);
-		{
-			IomObject multisurfaceValue=struct2.addattrobj("area2d", "MULTISURFACE");
-			IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-			IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-			// polyline
-			IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-			IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-			IomObject startSegment=segments.addattrobj("segment", "COORD");
-			startSegment.setattrvalue("C1", "500000.000");
-			startSegment.setattrvalue("C2", "70000.000");
-			IomObject endSegment=segments.addattrobj("segment", "COORD");
-			endSegment.setattrvalue("C1", "520000.000");
-			endSegment.setattrvalue("C2", "80000.000");
-			// polyline 2
-			IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-			IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-			IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-			startSegment2.setattrvalue("C1", "520000.000");
-			startSegment2.setattrvalue("C2", "80000.000");
-			IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-			endSegment2.setattrvalue("C1", "550000.000");
-			endSegment2.setattrvalue("C2", "90000.000");
-			// polyline 3
-			IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-			IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-			IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-			startSegment3.setattrvalue("C1", "550000.000");
-			startSegment3.setattrvalue("C2", "90000.000");
-			IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-			endSegment3.setattrvalue("C1", "500000.000");
-			endSegment3.setattrvalue("C2", "70000.000");
-		}
-		Iom_jObject obj1=new Iom_jObject(CLASSP2,OID1);
-		obj1.addattrobj("attr1", struct1);
-		Iom_jObject obj2=new Iom_jObject(CLASSP2,OID2);
-		obj2.addattrobj("attr1", struct2);
-		// Create and run validator.
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts.
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
+		
 	// In beiden Objekten einer Association werden auf die Attribute: attr1 verwiesen, Beide Attribute wurden mit unterschiedlichen Values erstellt.
 	// Somit darf keine Fehlermeldung ausgegeben werden.
 	@Test
@@ -971,49 +771,10 @@ public class UniqueConstraints23Test {
 	}
 	
 	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
-	// In beiden Objekten wird je auf ein attribute einer unterschiedlichen Struktur verwiesen, attr3b wurde mit unterschiedlichen Values erstellt.
-	// Somit darf keine Fehlermeldung ausgegeben werden.
-	@Test
-	public void local_UniqueAttrValuesAreDifferent_Ok(){
-		// object 1
-		Iom_jObject struct1=new Iom_jObject(STRUCTG, null);
-		struct1.setattrvalue("attr1g", "5");
-		Iom_jObject struct2=new Iom_jObject(STRUCTF, null);
-		struct2.addattrobj("attr1f", struct1);
-		Iom_jObject obj1=new Iom_jObject(CLASSL, OID1);
-		obj1.addattrobj("attr1", struct2);
-		// object 2
-		Iom_jObject struct4=new Iom_jObject(STRUCTG, null);
-		struct4.setattrvalue("attr1g", "8");
-		Iom_jObject struct3=new Iom_jObject(STRUCTF, null);
-		struct3.addattrobj("attr1f", struct4);
-		Iom_jObject obj2=new Iom_jObject(CLASSL, OID2);
-		obj2.addattrobj("attr1", struct3);
-		// Create and run validator.
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(struct1));
-		validator.validate(new ObjectEvent(struct2));
-		validator.validate(new ObjectEvent(struct3));
-		validator.validate(new ObjectEvent(struct4));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts.
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
 	// In beiden Objekten wird je auf ein attribute einer unterschiedlichen Struktur verwiesen, Beide Attribute wurden mit unterschiedlichen Values erstellt.
 	// Somit darf keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void local_UniqueAttrValuesOver3StructureAreDifferent_Ok(){
+	public void local_subStruct_oneAttr_Unique_Ok(){
 		// object 1
 		Iom_jObject struct3=new Iom_jObject(STRUCTJ, null);
 		struct3.setattrvalue("attr1j", "8");
@@ -1595,17 +1356,21 @@ public class UniqueConstraints23Test {
 	}
 	
 	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
-	// In beiden Objekten wird je auf ein attribute einer Struktur verwiesen, welche die selben values beinhalten. Somit muss eine Fehlermeldung ausgegeben werden.
+	// In einem Objekt sind zwei Strukturelemente mit dem selben Wert. 
+	// Somit muss eine Fehlermeldung ausgegeben werden.
 	@Test
-	public void local_UniqueAttr1ExistTwice_False(){
-		Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
-		struct1.setattrvalue("attr1", "1");
+	public void local_oneAttr_oneObj_Duplicate_False(){
 		Iom_jObject obj1=new Iom_jObject(CLASSG, OID1);
-		obj1.addattrobj("attr2", struct1);
-		Iom_jObject struct2=new Iom_jObject(STRUCTA, null);
-		struct2.setattrvalue("attr1", "1");
-		Iom_jObject obj2=new Iom_jObject(CLASSG, OID2);
-		obj2.addattrobj("attr2", struct2);
+		{
+	        Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
+	        struct1.setattrvalue("attr1", "1");
+	        obj1.addattrobj("attr2", struct1);
+		}
+		{
+	        Iom_jObject struct2=new Iom_jObject(STRUCTA, null);
+	        struct2.setattrvalue("attr1", "1");
+	        obj1.addattrobj("attr2", struct2);
+		}
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1614,22 +1379,46 @@ public class UniqueConstraints23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(struct1));
-		validator.validate(new ObjectEvent(struct2));
 		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("Unique is violated! Values 1 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
+    // Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
+    // In beiden Objekten ist ein Strukturattribut mit dem selben Wert (was bei einem LOCAL Unique zulaessig ist).
+    @Test
+    public void local_oneAttr_twoObj_Duplicate_Ok(){
+        Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
+        struct1.setattrvalue("attr1", "1");
+        Iom_jObject obj1=new Iom_jObject(CLASSG, OID1);
+        obj1.addattrobj("attr2", struct1);
+        Iom_jObject struct2=new Iom_jObject(STRUCTA, null);
+        struct2.setattrvalue("attr1", "1");
+        Iom_jObject obj2=new Iom_jObject(CLASSG, OID2);
+        obj2.addattrobj("attr2", struct2);
+        // Create and run validator.
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(obj1));
+        validator.validate(new ObjectEvent(obj2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts.
+        assertEquals(0,logger.getErrs().size());
+    }
 	
 	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
 	// In beiden Objekten wird je auf ein attribute einer Struktur verwiesen, welche die selben 2 Values der Attribute beinhalten.
 	// Somit muss eine Fehlermeldung ausgegeben werden, welche besagt, dass beide Attribute-Values, bereits im vorherigen Objekt erstellt wurden.
 	@Test
-	public void local_UniqueAttr1AndAttr2ExistTwice_False(){
+	public void local_twoAttr_Duplicate_False(){
 		Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
 		struct1.setattrvalue("attr1", "1");
 		struct1.setattrvalue("attr2", "2");
@@ -1638,8 +1427,7 @@ public class UniqueConstraints23Test {
 		Iom_jObject struct2=new Iom_jObject(STRUCTA, null);
 		struct2.setattrvalue("attr1", "1");
 		struct2.setattrvalue("attr2", "2");
-		Iom_jObject obj2=new Iom_jObject(CLASSH, OID2);
-		obj2.addattrobj("attr2", struct2);
+		obj1.addattrobj("attr2", struct2);
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1651,155 +1439,18 @@ public class UniqueConstraints23Test {
 		validator.validate(new ObjectEvent(struct1));
 		validator.validate(new ObjectEvent(struct2));
 		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("Unique is violated! Values 1, 2 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
-	
-	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
-	// In beiden Objekten wird je auf ein attribute einer Struktur verwiesen, beide Attribute attr1 und attr2 wurden mit den Selben Attribute-Values erstellt.
-	// Somit darf nur 1 Fehlermeldung ausgegeben werden: Da nur attr1 Unique ist.
-	@Test
-	public void local_UniqueAttr1AndAttr2_OfStructExistTwice_False(){
-		Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
-		struct1.setattrvalue("attr1", "1");
-		struct1.setattrvalue("attr2", "2");
-		Iom_jObject obj1=new Iom_jObject(CLASSI, OID1);
-		obj1.addattrobj("attr1", struct1);
-		Iom_jObject struct2=new Iom_jObject(STRUCTA, null);
-		struct2.setattrvalue("attr1", "1");
-		struct2.setattrvalue("attr2", "2");
-		Iom_jObject obj2=new Iom_jObject(CLASSI, OID2);
-		obj2.addattrobj("attr1", struct2);
-		// Create and run validator.
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(struct1));
-		validator.validate(new ObjectEvent(struct2));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values 1 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
-	// In beiden Objekten wird je auf ein attribute einer Struktur verwiesen, attr1 ist doppelt erstellt.
-	// Somit muss eine Fehlermeldung ausgegeben werden, welche besagt, dass attr1, bereits im vorherigen Objekt erstellt wurde.
-	@Test
-	public void local_UniqueAttrValuesOfBagExistTwice_False(){
-		Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
-		struct1.setattrvalue("attr1", "1");
-		struct1.setattrvalue("attr2", "4");
-		Iom_jObject obj1=new Iom_jObject(CLASSI, OID1);
-		obj1.addattrobj("attr1", struct1);
-		Iom_jObject struct2=new Iom_jObject(STRUCTA, null);
-		struct2.setattrvalue("attr1", "1");
-		struct2.setattrvalue("attr2", "5");
-		Iom_jObject obj2=new Iom_jObject(CLASSI, OID2);
-		obj2.addattrobj("attr1", struct2);
-		// Create and run validator.
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(struct1));
-		validator.validate(new ObjectEvent(struct2));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values 1 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
-	// In beiden Objekten wird je auf ein attribute einer Struktur verwiesen, beide Attribute wurden mit den Selben Attribute-Values erstellt.
-	// Somit muessen 2 Fehlermeldungen ausgegeben werden: Eine fuer Unique attr1,attr2 und eine fuer Unique attr1.
-	@Test
-	public void local_UniqueAttrValuesAttr1AndAttr2_OfStructExistTwice_False(){
-		Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
-		struct1.setattrvalue("attr1", "1");
-		struct1.setattrvalue("attr2", "2");
-		Iom_jObject obj1=new Iom_jObject(CLASSJ, OID1);
-		obj1.addattrobj("attr2", struct1);
-		Iom_jObject struct2=new Iom_jObject(STRUCTA, null);
-		struct2.setattrvalue("attr1", "1");
-		struct2.setattrvalue("attr2", "2");
-		Iom_jObject obj2=new Iom_jObject(CLASSJ, OID2);
-		obj2.addattrobj("attr2", struct2);
-		// Create and run validator.
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(struct1));
-		validator.validate(new ObjectEvent(struct2));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts.
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("Unique is violated! Values 1, 2 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Unique is violated! Values 1 already exist in Object: o1", logger.getErrs().get(1).getEventMsg());
-	}
-	
-	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
-	// In beiden Objekten wird je auf ein attribute einer Struktur verwiesen, die attr2 Attribute wurden mit den Selben Values erstellt.
-	// Somit darf keine Fehlermeldung ausgegeben werden, da nur attr1 als Unique definiert ist.
-	@Test
-	public void local_UniqueAttrValuesOfAttr2ExistTwice_False(){
-		Iom_jObject struct1=new Iom_jObject(STRUCTA, null);
-		struct1.setattrvalue("attr1", "2");
-		struct1.setattrvalue("attr2", "2");
-		Iom_jObject obj1=new Iom_jObject(CLASSJ, OID1);
-		obj1.addattrobj("attr2", struct1);
-		Iom_jObject struct2=new Iom_jObject(STRUCTA, null);
-		struct2.setattrvalue("attr1", "1");
-		struct2.setattrvalue("attr2", "2");
-		Iom_jObject obj2=new Iom_jObject(CLASSJ, OID2);
-		obj2.addattrobj("attr2", struct2);
-		// Create and run validator.
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(struct1));
-		validator.validate(new ObjectEvent(struct2));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts.
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
+		
 	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint und einen GLOBAL Uniqueness Constraint.
-	// In beiden Objekten wird je auf ein attribute einer unterschiedlichen Struktur verwiesen, die Attribute wurden mit gleichen Values erstellt.
-	// Somit muessen 2 Fehlermeldungen ausgegeben werden, da attr2 Unique ist und in StructE attr1 und attr2 Unique ist.
+	// In beiden Objekten ist ein Strukturelement mit den selben Werten, was fuer ein lokal Unique ok ist.
+    // In beiden Objekten ist bei einem globalen Unique der selbe Wert, was falsch ist.
 	@Test
-	public void local_UniqueAttrValueAttr1ExistTwice_UniqueGlobalAttrValueAttr2ExistTwice_False(){
+	public void local_multipleConstraints_oneAttr_oneObj_Duplicate_False(){
 		Iom_jObject struct2=new Iom_jObject(STRUCTE, null);
 		struct2.setattrvalue("attr1", "1");
 		struct2.setattrvalue("attr2", "2");
@@ -1808,9 +1459,9 @@ public class UniqueConstraints23Test {
 		struct1.setattrvalue("attr2", "2");
 		Iom_jObject obj1=new Iom_jObject(CLASSK, OID1);
 		obj1.addattrobj("attr1", struct1);
+        obj1.addattrobj("attr1", struct2);
 		obj1.setattrvalue("attr2", "8");
 		Iom_jObject obj2=new Iom_jObject(CLASSK, OID2);
-		obj2.addattrobj("attr1", struct2);
 		obj2.setattrvalue("attr2", "8");
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1820,35 +1471,36 @@ public class UniqueConstraints23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(struct2));
-		validator.validate(new ObjectEvent(struct1));
 		validator.validate(new ObjectEvent(obj1));
 		validator.validate(new ObjectEvent(obj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("Unique is violated! Values 1 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals(2,logger.getErrs().size());
+        assertEquals("Unique is violated! Values 1 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("Unique is violated! Values 8 already exist in Object: o1", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint und einen GLOBAL Uniqueness Constraint.
-	// In beiden Objekten wird je auf ein attribute einer unterschiedlichen Struktur verwiesen, die Attribute in der Structure wurde attr1 mit gleichen Values erstellt.
-	// Somit muss 1 Fehlermeldung ausgegeben werden, da nur in der StructE attr1 Unique ist.
+	// In beiden Objekten sind im Strukturelement die selben Werte, was bei einem lokalen Unique ok ist.
 	@Test
-	public void local_UniqueGlobalAttrValueAttr2_OfStructExistTwice_False(){
-		Iom_jObject struct2=new Iom_jObject(STRUCTE, null);
-		struct2.setattrvalue("attr1", "1");
-		struct2.setattrvalue("attr2", "2");
-		Iom_jObject struct1=new Iom_jObject(STRUCTE, null);
-		struct1.setattrvalue("attr1", "1");
-		struct1.setattrvalue("attr2", "2");
-		Iom_jObject obj1=new Iom_jObject(CLASSK, OID1);
-		obj1.addattrobj("attr1", struct1);
-		obj1.setattrvalue("attr2", "8");
+	public void local_multipleConstraints_oneAttr_twoObj_Duplicate_Ok(){
+        Iom_jObject obj1=new Iom_jObject(CLASSK, OID1);
+        obj1.setattrvalue("attr2", "8");
+	    {
+	        Iom_jObject struct1=new Iom_jObject(STRUCTE, null);
+	        struct1.setattrvalue("attr1", "1");
+	        struct1.setattrvalue("attr2", "2");
+	        obj1.addattrobj("attr1", struct1);
+	    }
 		Iom_jObject obj2=new Iom_jObject(CLASSK, OID2);
-		obj2.addattrobj("attr1", struct2);
 		obj2.setattrvalue("attr2", "6");
+        {
+            Iom_jObject struct2=new Iom_jObject(STRUCTE, null);
+            struct2.setattrvalue("attr1", "1");
+            struct2.setattrvalue("attr2", "2");
+            obj2.addattrobj("attr1", struct2);
+        }
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1857,55 +1509,12 @@ public class UniqueConstraints23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(struct2));
-		validator.validate(new ObjectEvent(struct1));
 		validator.validate(new ObjectEvent(obj1));
 		validator.validate(new ObjectEvent(obj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values 1 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
-	// In beiden Objekten wird je auf ein attribute einer unterschiedlichen Struktur verwiesen, attr3b wurde mit den Selben Values erstellt.
-	// Somit muss eine Fehlermeldung ausgegeben werden. Unique 5 Constraint1 existiert bereits in object oid1.
-	@Test
-	public void local_UniqueAttrValuesAttr1_OfStructExistTwice_False(){
-		// object 1
-		Iom_jObject struct1=new Iom_jObject(STRUCTG, null);
-		struct1.setattrvalue("attr1g", "5");
-		Iom_jObject struct2=new Iom_jObject(STRUCTF, null);
-		struct2.addattrobj("attr1f", struct1);
-		Iom_jObject obj1=new Iom_jObject(CLASSL, OID1);
-		obj1.addattrobj("attr1", struct2);
-		// object 2
-		Iom_jObject struct4=new Iom_jObject(STRUCTG, null);
-		struct4.setattrvalue("attr1g", "5");
-		Iom_jObject struct3=new Iom_jObject(STRUCTF, null);
-		struct3.addattrobj("attr1f", struct4);
-		Iom_jObject obj2=new Iom_jObject(CLASSL, OID2);
-		obj2.addattrobj("attr1", struct3);
-		// Create and run validator.
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(struct1));
-		validator.validate(new ObjectEvent(struct2));
-		validator.validate(new ObjectEvent(struct3));
-		validator.validate(new ObjectEvent(struct4));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values 5 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals(0,logger.getErrs().size());
 	}
 	
 	// In beiden Objekten wird je auf ein attribute einer AREA verwiesen, Beide Attribute wurden mit den Selben Values erstellt.
@@ -2000,25 +1609,27 @@ public class UniqueConstraints23Test {
 	// In beiden Objekten wird je auf ein attribute einer unterschiedlichen Struktur verwiesen, Beide Attribute wurden mit den Selben Values erstellt.
 	// Somit muss eine Fehlermeldung ausgegeben werden. Da attr1j als Unique definiert wurde.
 	@Test
-	public void local_UniqueAttrValuesAttr1AndAttr2_Over3StructsExistTwice_False(){
+	public void local_subStruct_oneAttr_Duplicate_False(){
 		// object 1
-		Iom_jObject struct3=new Iom_jObject(STRUCTJ, null);
-		struct3.setattrvalue("attr1j", "5");
-		Iom_jObject struct2=new Iom_jObject(STRUCTI, null);
-		struct2.addattrobj("attr1i", struct3);
-		Iom_jObject struct1=new Iom_jObject(STRUCTH, null);
-		struct1.addattrobj("attr1h", struct2);
-		Iom_jObject obj1=new Iom_jObject(CLASSM, OID1);
-		obj1.addattrobj("attr1", struct1);
-		// object 2
-		Iom_jObject struct30=new Iom_jObject(STRUCTJ, null);
-		struct30.setattrvalue("attr1j", "5");
-		Iom_jObject struct20=new Iom_jObject(STRUCTI, null);
-		struct20.addattrobj("attr1i", struct30);
-		Iom_jObject struct10=new Iom_jObject(STRUCTH, null);
-		struct10.addattrobj("attr1h", struct20);
-		Iom_jObject obj2=new Iom_jObject(CLASSM, OID2);
-		obj2.addattrobj("attr1", struct10);
+        Iom_jObject obj1=new Iom_jObject(CLASSM, OID1);
+        {
+            Iom_jObject struct3=new Iom_jObject(STRUCTJ, null);
+            struct3.setattrvalue("attr1j", "5");
+            Iom_jObject struct2=new Iom_jObject(STRUCTI, null);
+            struct2.addattrobj("attr1i", struct3);
+            Iom_jObject struct1=new Iom_jObject(STRUCTH, null);
+            struct1.addattrobj("attr1h", struct2);
+            obj1.addattrobj("attr1", struct1);
+        }
+        {
+            Iom_jObject struct30=new Iom_jObject(STRUCTJ, null);
+            struct30.setattrvalue("attr1j", "5");
+            Iom_jObject struct20=new Iom_jObject(STRUCTI, null);
+            struct20.addattrobj("attr1i", struct30);
+            Iom_jObject struct10=new Iom_jObject(STRUCTH, null);
+            struct10.addattrobj("attr1h", struct20);
+            obj1.addattrobj("attr1", struct10);
+        }
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -2027,18 +1638,11 @@ public class UniqueConstraints23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(struct1));
-		validator.validate(new ObjectEvent(struct2));
-		validator.validate(new ObjectEvent(struct3));
-		validator.validate(new ObjectEvent(struct10));
-		validator.validate(new ObjectEvent(struct20));
-		validator.validate(new ObjectEvent(struct30));
 		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("Unique is violated! Values 5 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
@@ -2067,99 +1671,7 @@ public class UniqueConstraints23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Unique is violated! Values REF {} already exist in Object: UniqueConstraints23.Topic.assoB", logger.getErrs().get(0).getEventMsg());
 	}
-	
-	// In beiden Objekten wird je ueber eine AREA auf ein attribute einer AREA verwiesen, Beide Attribute wurden mit den Selben Values erstellt.
-	// Somit muss eine Fehlermeldung ausgegeben werden.
-	@Test
-	public void uniqueAttrValuesOfArea_OfStructureExistTwice_False(){
-		// Set object.
-		Iom_jObject struct1=new Iom_jObject(STRUCTP, null);
-		{
-			IomObject multisurfaceValue=struct1.addattrobj("area2d", "MULTISURFACE");
-			IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-			IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-			// polyline
-			IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-			IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-			IomObject startSegment=segments.addattrobj("segment", "COORD");
-			startSegment.setattrvalue("C1", "480000.000");
-			startSegment.setattrvalue("C2", "70000.000");
-			IomObject endSegment=segments.addattrobj("segment", "COORD");
-			endSegment.setattrvalue("C1", "500000.000");
-			endSegment.setattrvalue("C2", "80000.000");
-			// polyline 2
-			IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-			IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-			IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-			startSegment2.setattrvalue("C1", "500000.000");
-			startSegment2.setattrvalue("C2", "80000.000");
-			IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-			endSegment2.setattrvalue("C1", "550000.000");
-			endSegment2.setattrvalue("C2", "90000.000");
-			// polyline 3
-			IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-			IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-			IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-			startSegment3.setattrvalue("C1", "550000.000");
-			startSegment3.setattrvalue("C2", "90000.000");
-			IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-			endSegment3.setattrvalue("C1", "480000.000");
-			endSegment3.setattrvalue("C2", "70000.000");
-		}
-		Iom_jObject struct2=new Iom_jObject(STRUCTP, null);
-		{
-			IomObject multisurfaceValue=struct2.addattrobj("area2d", "MULTISURFACE");
-			IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-			IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-			// polyline
-			IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-			IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-			IomObject startSegment=segments.addattrobj("segment", "COORD");
-			startSegment.setattrvalue("C1", "480000.000");
-			startSegment.setattrvalue("C2", "70000.000");
-			IomObject endSegment=segments.addattrobj("segment", "COORD");
-			endSegment.setattrvalue("C1", "500000.000");
-			endSegment.setattrvalue("C2", "80000.000");
-			// polyline 2
-			IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-			IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-			IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-			startSegment2.setattrvalue("C1", "500000.000");
-			startSegment2.setattrvalue("C2", "80000.000");
-			IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-			endSegment2.setattrvalue("C1", "550000.000");
-			endSegment2.setattrvalue("C2", "90000.000");
-			// polyline 3
-			IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-			IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-			IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-			startSegment3.setattrvalue("C1", "550000.000");
-			startSegment3.setattrvalue("C2", "90000.000");
-			IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-			endSegment3.setattrvalue("C1", "480000.000");
-			endSegment3.setattrvalue("C2", "70000.000");
-		}
-		Iom_jObject obj1=new Iom_jObject(CLASSP2,OID1);
-		obj1.addattrobj("attr1", struct1);
-		Iom_jObject obj2=new Iom_jObject(CLASSP2,OID2);
-		obj2.addattrobj("attr1", struct2);
-		// Create and run validator.
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.000, C2 70000.000}, COORD {C1 500000.000, C2 80000.000}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 500000.000, C2 80000.000}, COORD {C1 550000.000, C2 90000.000}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 550000.000, C2 90000.000}, COORD {C1 480000.000, C2 70000.000}]}}]}}} already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
-	}
-	
+		
 	// In beiden Objekten einer Association werden auf die Attribute: attr1 verwiesen, Beide Attribute wurden mit den Selben Values: text erstellt.
 	// Somit muss eine Fehlermeldung ausgegeben werden.
 	@Test
@@ -2195,7 +1707,7 @@ public class UniqueConstraints23Test {
 	// In beiden Objekten wird je ueber eine Structure auf ein attribute einer SURFACE verwiesen, Beide Attribute wurden mit den Selben Values erstellt.
 	// Somit muss eine Fehlermeldung ausgegeben werden.
 	@Test
-	public void uniqueAttrValuesOfSurface_InStructureExistTwice_False(){
+	public void local_oneSurfaceAttr_Duplicate_False(){
 		// Set object.
 		Iom_jObject struct1=new Iom_jObject(STRUCTO, null);
 		{
@@ -2265,8 +1777,7 @@ public class UniqueConstraints23Test {
 		}
 		Iom_jObject obj1=new Iom_jObject(CLASSO2,OID1);
 		obj1.addattrobj("attro2", struct1);
-		Iom_jObject obj2=new Iom_jObject(CLASSO2,OID2);
-		obj2.addattrobj("attro2", struct2);
+		obj1.addattrobj("attro2", struct2);
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -2276,11 +1787,10 @@ public class UniqueConstraints23Test {
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
 		validator.validate(new ObjectEvent(obj1));
-		validator.validate(new ObjectEvent(obj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("Unique is violated! Values MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.000, C2 70000.000}, COORD {C1 500000.000, C2 80000.000}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 500000.000, C2 80000.000}, COORD {C1 550000.000, C2 90000.000}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 550000.000, C2 90000.000}, COORD {C1 480000.000, C2 70000.000}]}}]}}} already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
