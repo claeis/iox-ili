@@ -336,7 +336,7 @@ MULTISURFACE {surface SURFACE {
 			builder.buildSurfaces();
 			fail();
 		}catch(IoxException ex){
-			IoxAssert.assertStartsWith("no area-ref to polygon of line tid "+lineTid,ex.getMessage());
+			IoxAssert.assertStartsWith("no area-ref to polygon of lines "+lineTid,ex.getMessage());
 		}
 	}
 	@Test

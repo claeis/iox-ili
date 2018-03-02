@@ -5,6 +5,7 @@ ideas/open issues
 LATEST
 -----------------------------
 - Validator: improved performance
+- ItfReader2: show line tids in "no area-ref to polygon" error message
 
 iox-ili 1.20.2 (2018-02-08)
 -----------------------------
