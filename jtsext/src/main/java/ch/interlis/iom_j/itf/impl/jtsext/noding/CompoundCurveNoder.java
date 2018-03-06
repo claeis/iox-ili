@@ -114,11 +114,13 @@ public class CompoundCurveNoder
 			  for(int endSeg:nodes.get(line)){
 				  CompoundCurve newLine=null;
 					newLine = fact.createCompoundCurve(line.getSegments().subList(startSeg, endSeg));
+					newLine.setUserData(line.getUserData());
 					nodedStrings.add(newLine);
 				  startSeg=endSeg;
 			  }
 			  CompoundCurve newLine=null;
 				newLine = fact.createCompoundCurve(line.getSegments().subList(startSeg, line.getNumSegments()));
+                newLine.setUserData(line.getUserData());
 				nodedStrings.add(newLine);
 		  }
 	  }

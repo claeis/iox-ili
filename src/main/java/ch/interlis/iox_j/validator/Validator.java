@@ -394,8 +394,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(intersections!=null){
 				for(Intersection is:intersections){
 					//logMsg(areaOverlapValidation,"intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
-					EhiLogger.logError("intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
-					EhiLogger.traceState("overlap "+is.getOverlap()+", seg1 "+is.getSegment1()+", seg2 "+is.getSegment2());
+					EhiLogger.logError(is.toShortString());
+					EhiLogger.traceState(is.toString());
 				}
 				logMsg(areaOverlapValidation,"failed to validate AREA {0}", getScopedName(attr));
 			}

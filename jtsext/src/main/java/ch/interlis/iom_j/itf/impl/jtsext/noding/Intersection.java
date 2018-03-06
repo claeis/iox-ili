@@ -63,14 +63,27 @@ public class Intersection {
 	}
 	@Override
 	public String toString() {
+	    Object seg1UserData=seg1.getUserData();
+        Object seg2UserData=seg2.getUserData();
 		return "Intersection"
 				+ " overlap " + overlap
 				+", coord1 " + pt[0].toString()+(pt.length==2?(", coord2 "+pt[1].toString()):"") 
-				+ ", tid1 " + seg1.getUserData()
-				+ ", tid2 " + seg2.getUserData()
+				+ ", tid1 " + (seg1UserData!=null?seg1UserData:curve1.getUserData())
+				+ ", tid2 " + (seg2UserData!=null?seg2UserData:curve2.getUserData())
 				+ ", idx1 "+curve1.getSegments().indexOf(seg1)+", idx2 "+curve2.getSegments().indexOf(seg2)
 				+ ", seg1 " + seg1 + ", seg2 " + seg2
 				;
 		
 	}
+    public String toShortString() {
+        Object seg1UserData=seg1.getUserData();
+        Object seg2UserData=seg2.getUserData();
+        return "Intersection"
+                + " overlap " + overlap
+                +", coord1 " + pt[0].toString()+(pt.length==2?(", coord2 "+pt[1].toString()):"") 
+                + ", tid1 " + (seg1UserData!=null?seg1UserData:curve1.getUserData())
+                + ", tid2 " + (seg2UserData!=null?seg2UserData:curve2.getUserData())
+                ;
+        
+    }
 }

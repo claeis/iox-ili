@@ -274,19 +274,25 @@ public class ItfSurfaceLinetable2Polygon {
 		if(segv==null){
 			return;
 		}
+		for(CompoundCurve seg:segv) {
+		    seg.setUserData(mainTid);
+		}
 		
 		Holder<Polygon> poly=new Holder<Polygon>();
 		ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
-		createPolygon(mainTid, segv,maxOverlaps,newVertexOffset,dataerrs,linetableIliqname,ignorePolygonBuildingErrors,null,poly);
-		 if(ValidationConfig.WARNING.equals(validationType)){
-				for(IoxInvalidDataException err:dataerrs){
-					errFact.addEvent(errFact.logWarning(err));
-				}
-		 }else{
-				for(IoxInvalidDataException err:dataerrs){
-					errFact.addEvent(errFact.logError(err));
-				}
-		 }
+		try {
+	        createPolygon(mainTid, segv,maxOverlaps,newVertexOffset,dataerrs,linetableIliqname,ignorePolygonBuildingErrors,null,poly);
+		}finally {
+	         if(ValidationConfig.WARNING.equals(validationType)){
+	                for(IoxInvalidDataException err:dataerrs){
+	                    errFact.addEvent(errFact.logWarning(err));
+	                }
+	         }else{
+	                for(IoxInvalidDataException err:dataerrs){
+	                    errFact.addEvent(errFact.logError(err));
+	                }
+	         }
+		}
 	}
 	private static ArrayList<CompoundCurve> createLineset(IomObject iomPolygon,String validationType,double tolerance,LogEventFactory errFact) throws IoxException {
 		Holder<Boolean> foundErrs=new Holder<Boolean>();
