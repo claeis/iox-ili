@@ -1080,7 +1080,8 @@ public class Surface23Test {
 	///////////////////////////////// FAILING Tests //////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////
 	
-	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn sie sich an sich selber ueberschneidet.
+	// Es soll getestet werden, ob cut edge Fehlermeldungen ausgegeben werden,
+	// wenn sich 2 Linien an 4 Eckpunkten ueberschneiden.
 	@Test
 	public void surface2dOverlabOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1155,11 +1156,16 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==5);
+		assertEquals("cut edge tid o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(2).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(3).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(4).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn sie 2 Innerboundaries besitzt, welche sich ueberschneiden.
+	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
+	// wenn 2 Innerboundaries einander Ueberschneiden.
 	@Test
 	public void surface2dIntersectionOfInnerboundaries_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1200,58 +1206,58 @@ public class Surface23Test {
 		IomObject polylineValueInner = innerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segmentsInner=polylineValueInner.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		startSegmentInner.setattrvalue("C1", "480000.000");
-		startSegmentInner.setattrvalue("C2", "70000.000");
+		startSegmentInner.setattrvalue("C1", "560000.000");
+		startSegmentInner.setattrvalue("C2", "170000.000");
 		IomObject endSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		endSegmentInner.setattrvalue("C1", "500000.000");
-		endSegmentInner.setattrvalue("C2", "78000.000");
+		endSegmentInner.setattrvalue("C1", "680000.000");
+		endSegmentInner.setattrvalue("C2", "90000.000");
 		// polyline 2
 		IomObject polylineValue2Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments2Inner=polylineValue2Inner.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		startSegment2Inner.setattrvalue("C1", "500000.000");
-		startSegment2Inner.setattrvalue("C2", "78000.000");
+		startSegment2Inner.setattrvalue("C1", "680000.000");
+		startSegment2Inner.setattrvalue("C2", "90000.000");
 		IomObject endSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		endSegment2Inner.setattrvalue("C1", "505000.000");
-		endSegment2Inner.setattrvalue("C2", "78000.000");
+		endSegment2Inner.setattrvalue("C1", "680000.000");
+		endSegment2Inner.setattrvalue("C2", "230000.000");
 		// polyline 3
 		IomObject polylineValue3Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3Inner=polylineValue3Inner.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
-		startSegment3Inner.setattrvalue("C1", "505000.000");
-		startSegment3Inner.setattrvalue("C2", "78000.000");
+		startSegment3Inner.setattrvalue("C1", "680000.000");
+		startSegment3Inner.setattrvalue("C2", "230000.000");
 		IomObject endSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
-		endSegment3Inner.setattrvalue("C1", "480000.000");
-		endSegment3Inner.setattrvalue("C2", "70000.000");
+		endSegment3Inner.setattrvalue("C1", "560000.000");
+		endSegment3Inner.setattrvalue("C2", "170000.000");
 		// 2. inner boundary
 		IomObject innerBoundary2 = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		// polyline
 		IomObject polylineValueInner2 = innerBoundary2.addattrobj("polyline", "POLYLINE");
 		IomObject segmentsInner2=polylineValueInner2.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegmentInner2=segmentsInner2.addattrobj("segment", "COORD");
-		startSegmentInner2.setattrvalue("C1", "480000.000");
-		startSegmentInner2.setattrvalue("C2", "70000.000");
+		startSegmentInner2.setattrvalue("C1", "500000.000");
+		startSegmentInner2.setattrvalue("C2", "90000.000");
 		IomObject endSegmentInner2=segmentsInner2.addattrobj("segment", "COORD");
-		endSegmentInner2.setattrvalue("C1", "500000.000");
-		endSegmentInner2.setattrvalue("C2", "78000.000");
+		endSegmentInner2.setattrvalue("C1", "600000.000");
+		endSegmentInner2.setattrvalue("C2", "170000.000");
 		// polyline 2
 		IomObject polylineValue2Inner2 = innerBoundary2.addattrobj("polyline", "POLYLINE");
 		IomObject segments2Inner2=polylineValue2Inner2.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment2Inner2=segments2Inner2.addattrobj("segment", "COORD");
-		startSegment2Inner2.setattrvalue("C1", "500000.000");
-		startSegment2Inner2.setattrvalue("C2", "78000.000");
+		startSegment2Inner2.setattrvalue("C1", "600000.000");
+		startSegment2Inner2.setattrvalue("C2", "170000.000");
 		IomObject endSegment2Inner2=segments2Inner2.addattrobj("segment", "COORD");
-		endSegment2Inner2.setattrvalue("C1", "505000.000");
-		endSegment2Inner2.setattrvalue("C2", "78000.000");
+		endSegment2Inner2.setattrvalue("C1", "500000.000");
+		endSegment2Inner2.setattrvalue("C2", "230000.000");
 		// polyline 3
 		IomObject polylineValue3Inner2 = innerBoundary2.addattrobj("polyline", "POLYLINE");
 		IomObject segments3Inner2=polylineValue3Inner2.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3Inner2=segments3Inner2.addattrobj("segment", "COORD");
-		startSegment3Inner2.setattrvalue("C1", "505000.000");
-		startSegment3Inner2.setattrvalue("C2", "78000.000");
+		startSegment3Inner2.setattrvalue("C1", "500000.000");
+		startSegment3Inner2.setattrvalue("C2", "230000.000");
 		IomObject endSegment3Inner2=segments3Inner2.addattrobj("segment", "COORD");
-		endSegment3Inner2.setattrvalue("C1", "480000.000");
-		endSegment3Inner2.setattrvalue("C2", "70000.000");
+		endSegment3Inner2.setattrvalue("C1", "500000.000");
+		endSegment3Inner2.setattrvalue("C2", "90000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1263,11 +1269,14 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==3);
+		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
 	}	
 	
-	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn  sie 2 Boundaries beinhaltet, welche sich ueberschneiden.
+	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
+	// wenn die Outerboundary die Innerboundary Ueberschneidet.
 	@Test
 	public void surface2DIntersectionErrs_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1342,11 +1351,13 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn sich 2 Linien ueberschneiden.
+	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
+	// wenn 2 Linien von unterschiedlichen boundaries einander ueberschneiden.
 	@Test
 	public void surface3dOverlabOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1433,11 +1444,16 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==5);
+		assertEquals("cut edge tid o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(2).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(3).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(4).getEventMsg());
 	}
 	
-	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn  sich die 2 Innerboundaries ueberschneiden.
+	// Es soll getestet werden, ob eine Invalid ring lines Fehlermeldung ausgegeben wird,
+	// wenn 2 Boundaries keinen geschlossenen Ring bilden.
 	@Test
 	public void surface3dInvalidRingLines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1559,11 +1575,18 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==7);
+		assertEquals("invald ring line", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(1).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(2).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(3).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(4).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(5).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(6).getEventMsg());
 	}	
 	
-	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn  sich die Innerboundary mit der Outerboundary ueberschneidet.
+	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
+	// wenn sich die Innerboundary mit der Outerboundary ueberschneidet.
 	@Test
 	public void surface3dIntersectionOfInnerOuterBoundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1650,8 +1673,9 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// Es wird getestet, ob eine Polygon erstellt werden kann, wenn der Typ der Polygon nicht vom Typ Multisurface ist.

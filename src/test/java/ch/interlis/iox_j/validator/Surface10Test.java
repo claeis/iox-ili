@@ -1160,7 +1160,8 @@ public class Surface10Test {
 	//########## FAILING TESTS ###################################/
 	//############################################################/
 
-	// Es wird getestet ob eine Surface erstellt werden kann, welche sich selber an 4 Punkten ueberschneidet.
+	// Es wird getestet ob cut edge Fehlermeldung ausgegeben werden,
+	// wenn sich 2 Linien an 4 Punkten ueberschneiden.
 	@Test
 	public void surfaceOverlapOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1235,11 +1236,16 @@ public class Surface10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==5);
+		assertEquals("cut edge tid o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(2).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(3).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(4).getEventMsg());
 	}
 	
-	// Es wird getestet ob eineSurface mit einer Innerboundary, welche sich an 2 Stellen mit der Outerboundary ueberschneidet, erstellt werden kann.
+	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
+	// wenn die Outerboundary, die Innerboundary ueberschneidet.
 	@Test
 	public void surfaceIntersectionErrs_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1314,11 +1320,13 @@ public class Surface10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Surface welche 2 sich ueberschneidende innerboundaries beinhaltet, erstellt werden kann.
+	// Es soll getestet werden, ob eine Invalid ring line Fehlermeldung ausgegeben wird,
+	// wenn die Boundary keine geschlossene Flaeche bildet.
 	@Test
 	public void surfaceInvalidRingLines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1422,11 +1430,18 @@ public class Surface10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==7);
+		assertEquals("invald ring line", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(1).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(2).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(3).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(4).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(5).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(6).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Surface mit sich ueberschneidenden Linien in 3d Koordinatenpunkte, erstellt werden kann.
+	// Es soll getestet werden, ob cut edge Fehlermeldungen ausgegeben werden,
+	// wenn 2 Linien von unterschiedlichen boundaries sich an 4 Eckpunkten ueberschneiden.
 	@Test
 	public void surface3dOverlapOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1513,11 +1528,16 @@ public class Surface10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==5);
+		assertEquals("cut edge tid o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(2).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(3).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(4).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Surface in 3d mit 2 Innerboundaries, welche die Outerboundary ueberschneidet, erstellt werden kann.
+	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
+	// wenn sich die Innerboundary mit der Outerboundary Ueberschneidet.
 	@Test
 	public void surface3dIntersectionErrs_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1604,11 +1624,13 @@ public class Surface10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Flaeche erstellt werden kann, wenn die Boundary Linien keine gueltige Flaeche darstellen.
+	// Es wird getestet ob die Fehlemeldung: Invalid ring line ausgegeben wird,
+	// wenn die Boundary Linien keine gueltige Flaeche darstellen.
 	@Test
 	public void surface3dInvalidRingLines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1730,8 +1752,14 @@ public class Surface10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==7);
+		assertEquals("invald ring line", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(1).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(2).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(3).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(4).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(5).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(6).getEventMsg());
 	}
 	
 	// Es wird getestet ob der Typ von surface vom Typ Multisurface ist.

@@ -914,7 +914,8 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die Linien des Polygons sich ueberschneiden.
+	// Es soll getestet werden ob die Ueberschneidung zweier Boundaries, der selben Polygon,
+	// zu cut edge Fehlermeldung an 4 Eckpunkten fuehrt.
 	@Test
 	public void area2dOverlapOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -989,11 +990,16 @@ public class Area10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==5);
+		assertEquals("cut edge tid o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(2).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(3).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(4).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die 2 Innerboundaries ueberschneiden.
+	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
+	// wenn 2 Innerboundaries einander Ueberschneiden.
 	@Test
 	public void area2dInnerboundariesOverlapEachOther_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1008,84 +1014,93 @@ public class Area10Test {
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
 		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
+		endSegment.setattrvalue("C1", "700000.000");
+		endSegment.setattrvalue("C2", "70000.000");
 		// polyline 2
 		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "500000.000");
-		startSegment2.setattrvalue("C2", "80000.000");
+		startSegment2.setattrvalue("C1", "700000.000");
+		startSegment2.setattrvalue("C2", "70000.000");
 		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "550000.000");
-		endSegment2.setattrvalue("C2", "90000.000");
+		endSegment2.setattrvalue("C1", "700000.000");
+		endSegment2.setattrvalue("C2", "250000.000");
 		// polyline 3
 		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "550000.000");
-		startSegment3.setattrvalue("C2", "90000.000");
+		startSegment3.setattrvalue("C1", "700000.000");
+		startSegment3.setattrvalue("C2", "250000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
 		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
+		endSegment3.setattrvalue("C2", "250000.000");
+		// polyline 4
+		IomObject polylineValue4 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments4=polylineValue4.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment4=segments4.addattrobj("segment", "COORD");
+		startSegment4.setattrvalue("C1", "480000.000");
+		startSegment4.setattrvalue("C2", "250000.000");
+		IomObject endSegment4=segments4.addattrobj("segment", "COORD");
+		endSegment4.setattrvalue("C1", "480000.000");
+		endSegment4.setattrvalue("C2", "70000.000");
 		// inner boundary
 		IomObject innerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		// polyline
 		IomObject polylineValueInner = innerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segmentsInner=polylineValueInner.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		startSegmentInner.setattrvalue("C1", "480000.000");
-		startSegmentInner.setattrvalue("C2", "70000.000");
+		startSegmentInner.setattrvalue("C1", "560000.000");
+		startSegmentInner.setattrvalue("C2", "170000.000");
 		IomObject endSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		endSegmentInner.setattrvalue("C1", "500000.000");
-		endSegmentInner.setattrvalue("C2", "78000.000");
+		endSegmentInner.setattrvalue("C1", "680000.000");
+		endSegmentInner.setattrvalue("C2", "90000.000");
 		// polyline 2
 		IomObject polylineValue2Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments2Inner=polylineValue2Inner.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		startSegment2Inner.setattrvalue("C1", "500000.000");
-		startSegment2Inner.setattrvalue("C2", "78000.000");
+		startSegment2Inner.setattrvalue("C1", "680000.000");
+		startSegment2Inner.setattrvalue("C2", "90000.000");
 		IomObject endSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		endSegment2Inner.setattrvalue("C1", "505000.000");
-		endSegment2Inner.setattrvalue("C2", "78000.000");
+		endSegment2Inner.setattrvalue("C1", "680000.000");
+		endSegment2Inner.setattrvalue("C2", "230000.000");
 		// polyline 3
 		IomObject polylineValue3Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3Inner=polylineValue3Inner.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
-		startSegment3Inner.setattrvalue("C1", "505000.000");
-		startSegment3Inner.setattrvalue("C2", "78000.000");
+		startSegment3Inner.setattrvalue("C1", "680000.000");
+		startSegment3Inner.setattrvalue("C2", "230000.000");
 		IomObject endSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
-		endSegment3Inner.setattrvalue("C1", "480000.000");
-		endSegment3Inner.setattrvalue("C2", "70000.000");
+		endSegment3Inner.setattrvalue("C1", "560000.000");
+		endSegment3Inner.setattrvalue("C2", "170000.000");
 		// 2. inner boundary
 		IomObject innerBoundary2 = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		// polyline
 		IomObject polylineValueInner2 = innerBoundary2.addattrobj("polyline", "POLYLINE");
 		IomObject segmentsInner2=polylineValueInner2.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegmentInner2=segmentsInner2.addattrobj("segment", "COORD");
-		startSegmentInner2.setattrvalue("C1", "480000.000");
-		startSegmentInner2.setattrvalue("C2", "70000.000");
+		startSegmentInner2.setattrvalue("C1", "500000.000");
+		startSegmentInner2.setattrvalue("C2", "90000.000");
 		IomObject endSegmentInner2=segmentsInner2.addattrobj("segment", "COORD");
-		endSegmentInner2.setattrvalue("C1", "500000.000");
-		endSegmentInner2.setattrvalue("C2", "78000.000");
+		endSegmentInner2.setattrvalue("C1", "600000.000");
+		endSegmentInner2.setattrvalue("C2", "170000.000");
 		// polyline 2
 		IomObject polylineValue2Inner2 = innerBoundary2.addattrobj("polyline", "POLYLINE");
 		IomObject segments2Inner2=polylineValue2Inner2.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment2Inner2=segments2Inner2.addattrobj("segment", "COORD");
-		startSegment2Inner2.setattrvalue("C1", "500000.000");
-		startSegment2Inner2.setattrvalue("C2", "78000.000");
+		startSegment2Inner2.setattrvalue("C1", "600000.000");
+		startSegment2Inner2.setattrvalue("C2", "170000.000");
 		IomObject endSegment2Inner2=segments2Inner2.addattrobj("segment", "COORD");
-		endSegment2Inner2.setattrvalue("C1", "505000.000");
-		endSegment2Inner2.setattrvalue("C2", "78000.000");
+		endSegment2Inner2.setattrvalue("C1", "500000.000");
+		endSegment2Inner2.setattrvalue("C2", "230000.000");
 		// polyline 3
 		IomObject polylineValue3Inner2 = innerBoundary2.addattrobj("polyline", "POLYLINE");
 		IomObject segments3Inner2=polylineValue3Inner2.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3Inner2=segments3Inner2.addattrobj("segment", "COORD");
-		startSegment3Inner2.setattrvalue("C1", "505000.000");
-		startSegment3Inner2.setattrvalue("C2", "78000.000");
+		startSegment3Inner2.setattrvalue("C1", "500000.000");
+		startSegment3Inner2.setattrvalue("C2", "230000.000");
 		IomObject endSegment3Inner2=segments3Inner2.addattrobj("segment", "COORD");
-		endSegment3Inner2.setattrvalue("C1", "480000.000");
-		endSegment3Inner2.setattrvalue("C2", "70000.000");
+		endSegment3Inner2.setattrvalue("C1", "500000.000");
+		endSegment3Inner2.setattrvalue("C2", "90000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1097,11 +1112,15 @@ public class Area10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==4);
+		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
+		assertEquals("failed to validate AREA Datatypes10.Topic.FlaechenTable.areaWithoutOverlaps2d", logger.getErrs().get(3).getEventMsg());
 	}	
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich 2 Linien an 4 Ecken ueberschneiden.
+	// Es soll getestet werden ob die Ueberschneidung zweier Boundaries, der selben Polygon,
+	// zu cut edge Fehlermeldung an 4 Eckpunkten fuehrt.
 	@Test
 	public void area3dOverlapOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1188,11 +1207,15 @@ public class Area10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==5);
+		assertEquals("cut edge tid o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(2).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(3).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(4).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich 2 Innerboundaries des Polygons ueberschneiden.
+	// Es wird getestet, ob die Ueberschneidung der 2 Innerboundaries der Polygon zu einer Fehlermeldung fuehrt.
 	@Test
 	public void area3dIntersectionOfInnerboundaries_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1208,65 +1231,76 @@ public class Area10Test {
 		startSegment.setattrvalue("C2", "70000.000");
 		startSegment.setattrvalue("C3", "5000.000");
 		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
+		endSegment.setattrvalue("C1", "700000.000");
+		endSegment.setattrvalue("C2", "70000.000");
 		endSegment.setattrvalue("C3", "5000.000");
 		// polyline 2
 		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "500000.000");
-		startSegment2.setattrvalue("C2", "80000.000");
+		startSegment2.setattrvalue("C1", "700000.000");
+		startSegment2.setattrvalue("C2", "70000.000");
 		startSegment2.setattrvalue("C3", "5000.000");
 		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "550000.000");
-		endSegment2.setattrvalue("C2", "90000.000");
+		endSegment2.setattrvalue("C1", "700000.000");
+		endSegment2.setattrvalue("C2", "250000.000");
 		endSegment2.setattrvalue("C3", "5000.000");
 		// polyline 3
 		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "550000.000");
-		startSegment3.setattrvalue("C2", "90000.000");
+		startSegment3.setattrvalue("C1", "700000.000");
+		startSegment3.setattrvalue("C2", "250000.000");
 		startSegment3.setattrvalue("C3", "5000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
 		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
+		endSegment3.setattrvalue("C2", "250000.000");
 		endSegment3.setattrvalue("C3", "5000.000");
+		// polyline 4
+		IomObject polylineValue4 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		IomObject segments4=polylineValue4.addattrobj("sequence", "SEGMENTS");
+		IomObject startSegment4=segments4.addattrobj("segment", "COORD");
+		startSegment4.setattrvalue("C1", "480000.000");
+		startSegment4.setattrvalue("C2", "250000.000");
+		startSegment4.setattrvalue("C3", "5000.000");
+		IomObject endSegment4=segments4.addattrobj("segment", "COORD");
+		endSegment4.setattrvalue("C1", "480000.000");
+		endSegment4.setattrvalue("C2", "70000.000");
+		endSegment4.setattrvalue("C3", "5000.000");
 		// inner boundary
 		IomObject innerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		// polyline
 		IomObject polylineValueInner = innerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segmentsInner=polylineValueInner.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		startSegmentInner.setattrvalue("C1", "480000.000");
-		startSegmentInner.setattrvalue("C2", "70000.000");
+		startSegmentInner.setattrvalue("C1", "560000.000");
+		startSegmentInner.setattrvalue("C2", "170000.000");
 		startSegmentInner.setattrvalue("C3", "5000.000");
 		IomObject endSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		endSegmentInner.setattrvalue("C1", "500000.000");
-		endSegmentInner.setattrvalue("C2", "78000.000");
+		endSegmentInner.setattrvalue("C1", "680000.000");
+		endSegmentInner.setattrvalue("C2", "90000.000");
 		endSegmentInner.setattrvalue("C3", "5000.000");
 		// polyline 2
 		IomObject polylineValue2Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments2Inner=polylineValue2Inner.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		startSegment2Inner.setattrvalue("C1", "500000.000");
-		startSegment2Inner.setattrvalue("C2", "78000.000");
+		startSegment2Inner.setattrvalue("C1", "680000.000");
+		startSegment2Inner.setattrvalue("C2", "90000.000");
 		startSegment2Inner.setattrvalue("C3", "5000.000");
 		IomObject endSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		endSegment2Inner.setattrvalue("C1", "505000.000");
-		endSegment2Inner.setattrvalue("C2", "78000.000");
+		endSegment2Inner.setattrvalue("C1", "680000.000");
+		endSegment2Inner.setattrvalue("C2", "230000.000");
 		endSegment2Inner.setattrvalue("C3", "5000.000");
 		// polyline 3
 		IomObject polylineValue3Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3Inner=polylineValue3Inner.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
-		startSegment3Inner.setattrvalue("C1", "505000.000");
-		startSegment3Inner.setattrvalue("C2", "78000.000");
+		startSegment3Inner.setattrvalue("C1", "680000.000");
+		startSegment3Inner.setattrvalue("C2", "230000.000");
 		startSegment3Inner.setattrvalue("C3", "5000.000");
 		IomObject endSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
-		endSegment3Inner.setattrvalue("C1", "480000.000");
-		endSegment3Inner.setattrvalue("C2", "70000.000");
+		endSegment3Inner.setattrvalue("C1", "560000.000");
+		endSegment3Inner.setattrvalue("C2", "170000.000");
 		endSegment3Inner.setattrvalue("C3", "5000.000");
 		// 2. inner boundary
 		IomObject innerBoundary2 = surfaceValue.addattrobj("boundary", "BOUNDARY");
@@ -1274,34 +1308,34 @@ public class Area10Test {
 		IomObject polylineValueInner2 = innerBoundary2.addattrobj("polyline", "POLYLINE");
 		IomObject segmentsInner2=polylineValueInner2.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegmentInner2=segmentsInner2.addattrobj("segment", "COORD");
-		startSegmentInner2.setattrvalue("C1", "480000.000");
-		startSegmentInner2.setattrvalue("C2", "70000.000");
+		startSegmentInner2.setattrvalue("C1", "500000.000");
+		startSegmentInner2.setattrvalue("C2", "90000.000");
 		startSegmentInner2.setattrvalue("C3", "5000.000");
 		IomObject endSegmentInner2=segmentsInner2.addattrobj("segment", "COORD");
-		endSegmentInner2.setattrvalue("C1", "500000.000");
-		endSegmentInner2.setattrvalue("C2", "78000.000");
+		endSegmentInner2.setattrvalue("C1", "600000.000");
+		endSegmentInner2.setattrvalue("C2", "170000.000");
 		endSegmentInner2.setattrvalue("C3", "5000.000");
 		// polyline 2
 		IomObject polylineValue2Inner2 = innerBoundary2.addattrobj("polyline", "POLYLINE");
 		IomObject segments2Inner2=polylineValue2Inner2.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment2Inner2=segments2Inner2.addattrobj("segment", "COORD");
-		startSegment2Inner2.setattrvalue("C1", "500000.000");
-		startSegment2Inner2.setattrvalue("C2", "78000.000");
+		startSegment2Inner2.setattrvalue("C1", "600000.000");
+		startSegment2Inner2.setattrvalue("C2", "170000.000");
 		startSegment2Inner2.setattrvalue("C3", "5000.000");
 		IomObject endSegment2Inner2=segments2Inner2.addattrobj("segment", "COORD");
-		endSegment2Inner2.setattrvalue("C1", "505000.000");
-		endSegment2Inner2.setattrvalue("C2", "78000.000");
+		endSegment2Inner2.setattrvalue("C1", "500000.000");
+		endSegment2Inner2.setattrvalue("C2", "230000.000");
 		endSegment2Inner2.setattrvalue("C3", "5000.000");
 		// polyline 3
 		IomObject polylineValue3Inner2 = innerBoundary2.addattrobj("polyline", "POLYLINE");
 		IomObject segments3Inner2=polylineValue3Inner2.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3Inner2=segments3Inner2.addattrobj("segment", "COORD");
-		startSegment3Inner2.setattrvalue("C1", "505000.000");
-		startSegment3Inner2.setattrvalue("C2", "78000.000");
+		startSegment3Inner2.setattrvalue("C1", "500000.000");
+		startSegment3Inner2.setattrvalue("C2", "230000.000");
 		startSegment3Inner2.setattrvalue("C3", "5000.000");
 		IomObject endSegment3Inner2=segments3Inner2.addattrobj("segment", "COORD");
-		endSegment3Inner2.setattrvalue("C1", "480000.000");
-		endSegment3Inner2.setattrvalue("C2", "70000.000");
+		endSegment3Inner2.setattrvalue("C1", "500000.000");
+		endSegment3Inner2.setattrvalue("C2", "90000.000");
 		endSegment3Inner2.setattrvalue("C3", "5000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1314,11 +1348,15 @@ public class Area10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==4);
+		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
+		assertEquals("failed to validate AREA Datatypes10.Topic.FlaechenTable.areaWithoutOverlaps3d", logger.getErrs().get(3).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn sich die Innerboundary mit der Outerboundary ueberschneidet.
+	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
+	// wenn sich die Innerboundary mit der Outerboundary Ueberschneidet.
 	@Test
 	public void area3dInnerboundaryIntersectOuterboundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1405,11 +1443,14 @@ public class Area10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==3);
+		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
+		assertEquals("failed to validate AREA Datatypes10.Topic.FlaechenTable.areaWithoutOverlaps3d", logger.getErrs().get(2).getEventMsg());
 	}
 	
-	// Es wird getestet, ob ein 2d Polygon erstellt werden kann, wenn der Innerboundary die Outerboundary ueberschneidet.
+	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
+	// wenn sich die Innerboundary mit der Outerboundary ueberschneidet.
 	@Test
 	public void area2dInnerboundaryIntersectOuterboundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1484,8 +1525,10 @@ public class Area10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==3);
+		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
+		assertEquals("failed to validate AREA Datatypes10.Topic.FlaechenTable.areaWithoutOverlaps2d", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	// Es wird getestet, ob ein Polygon erstellt werden kann, wenn die 2 Polygone sich auf einer Linie an drei Punkten beruehren.
