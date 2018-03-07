@@ -384,7 +384,7 @@ public class ItfSurfaceLinetable2Polygon {
 		if(!cutEdges.isEmpty()){
 			for(Object edge:cutEdges){
 				try {
-					dataerrs.add(new IoxInvalidDataException("cut edge "+IoxInvalidDataException.formatTids(((CompoundCurve) edge).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)edge)));
+					dataerrs.add(new IoxInvalidDataException("cut edge "+IoxInvalidDataException.formatTids((CompoundCurve) edge),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)edge)));
 				} catch (Iox2jtsException e) {
 					throw new IllegalStateException(e);
 				}
@@ -397,7 +397,7 @@ public class ItfSurfaceLinetable2Polygon {
 		if(!dangles.isEmpty()){
 			for(Object dangle:dangles){
 				try {
-					dataerrs.add(new IoxInvalidDataException("dangle "+IoxInvalidDataException.formatTids(((CompoundCurve) dangle).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)dangle)));
+					dataerrs.add(new IoxInvalidDataException("dangle "+IoxInvalidDataException.formatTids((CompoundCurve) dangle),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)dangle)));
 				} catch (Iox2jtsException e) {
 					throw new IllegalStateException(e);
 				}
@@ -410,7 +410,7 @@ public class ItfSurfaceLinetable2Polygon {
 		if(!invalidRingLines.isEmpty()){
 			for(Object invalidRingLine:invalidRingLines){
 				try {
-					dataerrs.add(new IoxInvalidDataException("invald ring line"+IoxInvalidDataException.formatTids(((CompoundCurve) invalidRingLine).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)invalidRingLine)));
+					dataerrs.add(new IoxInvalidDataException("invald ring line"+IoxInvalidDataException.formatTids((CompoundCurve) invalidRingLine),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)invalidRingLine)));
 				} catch (Iox2jtsException e) {
 					throw new IllegalStateException(e);
 				}

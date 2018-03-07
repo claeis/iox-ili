@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iox.IoxException;
 
 public class IoxInvalidDataException extends IoxException {
@@ -86,6 +87,19 @@ public class IoxInvalidDataException extends IoxException {
 		}
 		return ret.toString();
 	}
+    public static String formatTids(CompoundCurve curve) {
+        String tids[]=curve.getSegmentTids();
+        if(tids==null || tids.length==0) {
+            StringBuilder ret=new StringBuilder();
+            Object tid=curve.getUserData();
+            if(tid!=null) {
+                ret.append("tid ");
+                ret.append(tid);
+            }
+            return ret.toString();
+        }
+        return formatTids(tids);
+    }
 
 	public IomObject getGeom() {
 		return geom;
