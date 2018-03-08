@@ -1405,8 +1405,9 @@ public class Area23Test {
 	///////////////////////////////// FAILING Tests //////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////	
 	
-	// Es soll getestet werden, ob eine Intersection Fehlermeldung bei einer Ueberschneidung
-	// zweier Linien von 2 unterschiedlichen Innerboundaries ausgegeben wird.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
+	// wenn auf einem "geraden Segment" der OuterBoundary, ein "gerades Segment" der InnerBoundary liegt.
+	// Beide Segmente teilen die selben Anfangs und Endpunkte.
 	@Test
 	public void area2dIntersectionOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1610,8 +1611,9 @@ public class Area23Test {
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(3).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob cut edge Fehlermeldungen ausgegeben werden,
-	// wenn sich die Outerboundary der Polygon mit sich selber ueberschneidet.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
+	// wenn auf einem "geraden Segment" der OuterBoundary, ein "gerades Segment" der InnerBoundary liegt.
+	// Beide Segmente teilen die selben Anfangs und Endpunkte.
 	@Test
 	public void area3dIntersectionOfOwnOuterboundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);

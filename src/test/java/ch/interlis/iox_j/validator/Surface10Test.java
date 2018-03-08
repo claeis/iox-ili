@@ -1159,9 +1159,10 @@ public class Surface10Test {
 	//############################################################/
 	//########## FAILING TESTS ###################################/
 	//############################################################/
-
-	// Es wird getestet ob cut edge Fehlermeldung ausgegeben werden,
-	// wenn sich 2 Linien an 4 Punkten ueberschneiden.
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
+	// wenn auf einem "geraden Segment" der OuterBoundary, ein "gerades Segment" der InnerBoundary liegt.
+	// Beide Segmente teilen die selben Anfangs und Endpunkte.
 	@Test
 	public void surfaceOverlapOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1325,8 +1326,8 @@ public class Surface10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Invalid ring line Fehlermeldung ausgegeben wird,
-	// wenn die Boundary keine geschlossene Flaeche bildet.
+	// Es soll getestet werden, ob die Fehlermeldung: "invalid ring line" ausgegeben wird,
+	// wenn die ring lines der 2d Surface nicht geschlossen sind.
 	@Test
 	public void surfaceInvalidRingLines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1440,8 +1441,9 @@ public class Surface10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(6).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob cut edge Fehlermeldungen ausgegeben werden,
-	// wenn 2 Linien von unterschiedlichen boundaries sich an 4 Eckpunkten ueberschneiden.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
+	// wenn auf einem "geraden Segment" der OuterBoundary, ein "gerades Segment" der InnerBoundary liegt.
+	// Beide Segmente teilen die selben Anfangs und Endpunkte.
 	@Test
 	public void surface3dOverlapOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1629,8 +1631,8 @@ public class Surface10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es wird getestet ob die Fehlemeldung: Invalid ring line ausgegeben wird,
-	// wenn die Boundary Linien keine gueltige Flaeche darstellen.
+	// Es soll getestet werden, ob die Fehlermeldung: "invalid ring line" ausgegeben wird,
+	// wenn die ring lines der 3d Surface nicht geschlossen sind.
 	@Test
 	public void surface3dInvalidRingLines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);

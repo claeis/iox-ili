@@ -914,8 +914,9 @@ public class Area10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden ob die Ueberschneidung zweier Boundaries, der selben Polygon,
-	// zu cut edge Fehlermeldung an 4 Eckpunkten fuehrt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
+	// wenn auf einem "geraden Segment" der OuterBoundary, ein "gerades Segment" der InnerBoundary liegt.
+	// Beide Segmente teilen die selben Anfangs und Endpunkte.
 	@Test
 	public void area2dOverlapOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1119,8 +1120,9 @@ public class Area10Test {
 		assertEquals("failed to validate AREA Datatypes10.Topic.FlaechenTable.areaWithoutOverlaps2d", logger.getErrs().get(3).getEventMsg());
 	}	
 	
-	// Es soll getestet werden ob die Ueberschneidung zweier Boundaries, der selben Polygon,
-	// zu cut edge Fehlermeldung an 4 Eckpunkten fuehrt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
+	// wenn auf einem "geraden Segment" der OuterBoundary, ein "gerades Segment" der InnerBoundary liegt.
+	// Beide Segmente teilen die selben Anfangs und Endpunkte.
 	@Test
 	public void area3dOverlapOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);

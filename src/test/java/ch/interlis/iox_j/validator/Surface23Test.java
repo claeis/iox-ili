@@ -1080,8 +1080,9 @@ public class Surface23Test {
 	///////////////////////////////// FAILING Tests //////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////
 	
-	// Es soll getestet werden, ob cut edge Fehlermeldungen ausgegeben werden,
-	// wenn sich 2 Linien an 4 Eckpunkten ueberschneiden.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
+	// wenn auf einem "geraden Segment" der OuterBoundary, ein "gerades Segment" der InnerBoundary liegt.
+	// Beide Segmente teilen die selben Anfangs und Endpunkte.
 	@Test
 	public void surface2dOverlabOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1356,8 +1357,9 @@ public class Surface23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
-	// wenn 2 Linien von unterschiedlichen boundaries einander ueberschneiden.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
+	// wenn auf einem "geraden Segment" der OuterBoundary, ein "gerades Segment" der InnerBoundary liegt.
+	// Beide Segmente teilen die selben Anfangs und Endpunkte.
 	@Test
 	public void surface3dOverlabOf2Lines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -1452,8 +1454,8 @@ public class Surface23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(4).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Invalid ring lines Fehlermeldung ausgegeben wird,
-	// wenn 2 Boundaries keinen geschlossenen Ring bilden.
+	// Es soll getestet werden, ob die Fehlermeldung: "invalid ring line" ausgegeben wird,
+	// wenn die ring lines der 3d Surface nicht geschlossen sind.
 	@Test
 	public void surface3dInvalidRingLines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
