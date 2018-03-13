@@ -269,13 +269,41 @@ public class CsvReaderTest {
 		reader.close();
 		reader=null;
 	}
-    // Es wird getestet ob das BOM bei UTF-8 encoding ueberlesen wird
+    // Es wird getestet, ob das BOM bei UTF-8 encoding ueberlesen wird (Version 1)
     @Test
-    public void utf8_bom_Ok() throws IoxException, IOException{
-        final String FILE_NAME="TextTypeUTF8_BOM.csv";
+    public void utf8_bom_v1_Ok() throws IoxException, IOException{
+        final String FILE_NAME="TextTypeUTF8_BOM_v1.csv";
         // write file
         BufferedWriter writer=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(TEST_OUT,FILE_NAME)),"UTF-8"));
         writer.write("\u00FE\u00FF\"10\",\"AU\"");writer.newLine();
+        writer.close();
+        writer=null;
+        
+        Settings settings=new Settings();
+        settings.setValue(CsvReader.ENCODING, "UTF-8");
+        CsvReader reader=new CsvReader(new File(TEST_OUT,FILE_NAME),settings);
+        assertTrue(reader.read() instanceof StartTransferEvent);
+        assertTrue(reader.read() instanceof StartBasketEvent);
+        IoxEvent event=reader.read();
+        if(event instanceof ObjectEvent){
+            IomObject iomObj=((ObjectEvent)event).getIomObject();
+            assertEquals("10", iomObj.getattrvalue(ATTRIBUTE1));
+            assertEquals("AU", iomObj.getattrvalue(ATTRIBUTE2));
+        }
+        assertTrue(reader.read() instanceof EndBasketEvent);
+        assertTrue(reader.read() instanceof EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
+    // Es wird getestet, ob das BOM bei UTF-8 encoding ueberlesen wird (Version 2)
+    @Test
+    public void utf8_bom_v2_Ok() throws IoxException, IOException{
+        final String FILE_NAME="TextTypeUTF8_BOM_v2.csv";
+        // write file
+        BufferedWriter writer=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(TEST_OUT,FILE_NAME)),"UTF-8"));
+        char bom = 0xFEFF;
+        writer.write(bom);
+        writer.write("\"10\",\"AU\"");writer.newLine();
         writer.close();
         writer=null;
         
