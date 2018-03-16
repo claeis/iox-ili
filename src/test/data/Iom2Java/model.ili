@@ -1,0 +1,36 @@
+INTERLIS 2.3;
+
+MODEL Model AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" =
+	
+	TOPIC Topic=
+		DOMAIN
+		   !!@CRS=EPSG:2056
+		   Lkoord = COORD 2460000.000 .. 2870000.000 [INTERLIS.m],
+		      				1045000.000 .. 1310000.000 [INTERLIS.m],
+		      				ROTATION 2 -> 1;
+		
+		CLASS ClassA =
+			attr1: TEXT*10;
+		END ClassA;
+		
+		STRUCTURE CodeReference =
+			ref: REFERENCE TO ClassA;
+		END CodeReference;
+		
+		CLASS ClassRef =
+			attr1: CodeReference;
+		END ClassRef;
+		
+		CLASS Surface =
+		   attr1: TEXT*10;
+		   attr2: SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.05;
+		END Surface;
+		
+		CLASS Area =
+		   attr1: TEXT*10;
+		   attr3: AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.05;
+		END Area;
+		
+	END Topic;
+	
+END Model.

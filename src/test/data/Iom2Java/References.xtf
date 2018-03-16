@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+	<HEADERSECTION SENDER="ili2pg-3.6.0-20161230" VERSION="2.3">
+		<MODELS>
+			<MODEL NAME="Model" VERSION="2016-07-08" URI="mailto:ceis@localhost"></MODEL>
+		</MODELS>
+	</HEADERSECTION>
+	<DATASECTION>
+		<Model.Topic BID="b1">
+		
+			<Model.Topic.ClassA TID="o1">
+				<attr1>abc</attr1>
+			</Model.Topic.ClassA>
+		
+			<Model.Topic.ClassRef TID="o2">
+				<attr1>
+				    <Model.Topic.CodeReference>
+				    	<ref REF="o1"/>
+				    </Model.Topic.CodeReference>
+			    </attr1>
+			</Model.Topic.ClassRef>
+		</Model.Topic>
+	</DATASECTION>
+</TRANSFER>
