@@ -820,7 +820,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}else{
 			if(!constraintOutputReduction.contains(setConstraintObj+":"+constraintName)){
 				constraintOutputReduction.add(setConstraintObj+":"+constraintName);
-				errs.addEvent(errFact.logInfoMsg("validate plausibility constraint {0}...",getScopedName(setConstraintObj)));
+				errs.addEvent(errFact.logInfoMsg("validate set constraint {0}...",getScopedName(setConstraintObj)));
 			}
 			if(objs!=null && objs.size()>0){
 				for(String oid:objs){
