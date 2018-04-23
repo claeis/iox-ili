@@ -539,18 +539,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 		for(SetConstraint setConstraint:setConstraints.keySet()){
-			if(!loggedObjects.contains(setConstraint)){
-				loggedObjects.add(setConstraint);
-				errs.addEvent(errFact.logInfoMsg("validate set constraint {0}...",getScopedName(setConstraint)));
-			}
-			if(ValidationConfig.OFF.equals(setConstraint)){
-				if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+getScopedName(setConstraint))){
-					configOffOufputReduction.add(ValidationConfig.CHECK+":"+getScopedName(setConstraint));
-					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", getScopedName(setConstraint)));
-				}
-			}else{
-				validateSetConstraint(setConstraint);
-			}
+			validateSetConstraint(setConstraint);
 		}
 	}
 	private void validateConstraints(IomObject iomObj, Viewable classOfIomObj) {
