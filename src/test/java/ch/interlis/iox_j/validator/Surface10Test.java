@@ -2,7 +2,6 @@ package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
@@ -620,7 +619,6 @@ public class Surface10Test {
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
 	// wenn auf einem "geraden Segment" der OuterBoundary, ein "gerades Segment" der InnerBoundary liegt.
 	// Beide Segmente teilen die selben Anfangs und Endpunkte.
-	@Ignore("expected: 1 cut edge, but get 4 cut edge messages.")
 	@Test
 	public void lineOfInnerBoundaryLiesOverLineOfOuterBoundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -671,7 +669,7 @@ public class Surface10Test {
 		IomObject segments2Inner=polylineValue2Inner.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
 		startSegment2Inner.setattrvalue("C1", "500000.000");
-		startSegment2Inner.setattrvalue("C2", "78000.000");
+		startSegment2Inner.setattrvalue("C2", "80000.000");
 		IomObject endSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
 		endSegment2Inner.setattrvalue("C1", "505000.000");
 		endSegment2Inner.setattrvalue("C2", "78000.000");
@@ -695,9 +693,10 @@ public class Surface10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
+		assertTrue(logger.getErrs().size()==3);
 		assertEquals("cut edge tid o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
+		assertEquals("cut edge tid o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
