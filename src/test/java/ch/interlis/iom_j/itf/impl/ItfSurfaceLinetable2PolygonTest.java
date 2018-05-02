@@ -281,7 +281,7 @@ public class ItfSurfaceLinetable2PolygonTest {
 			builder.buildSurfaces();
 			fail();
 		}catch(IoxException ex){
-			IoxAssert.assertStartsWith("cut edges", ex.getMessage());
+			IoxAssert.assertStartsWith("intersections", ex.getMessage());
 		}
 		//IomObject polygon=builder.getSurfaceObject(mainObjectTid);
 		//System.out.println(polygon);

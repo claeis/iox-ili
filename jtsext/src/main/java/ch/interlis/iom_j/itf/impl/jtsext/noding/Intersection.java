@@ -15,6 +15,7 @@ public class Intersection {
 	CurveSegment seg1;
 	CurveSegment seg2;
 	Double overlap;
+	boolean overlay=false;
 	public Intersection(Coordinate pt1,CompoundCurve g1,CompoundCurve g2,CurveSegment s1,CurveSegment s2,Double overlap){
 		pt=new Coordinate[1];
 		pt[0]=new Coordinate(pt1);
@@ -24,7 +25,7 @@ public class Intersection {
 		seg2=s2;
 		this.overlap=overlap;
 	}
-	public Intersection(Coordinate pt1,Coordinate pt2,CompoundCurve g1,CompoundCurve g2,CurveSegment s1,CurveSegment s2,Double overlap){
+	public Intersection(Coordinate pt1,Coordinate pt2,CompoundCurve g1,CompoundCurve g2,CurveSegment s1,CurveSegment s2,Double overlap,boolean isOverlay){
 		pt=new Coordinate[2];
 		pt[0]=new Coordinate(pt1);
 		pt[1]=new Coordinate(pt2);
@@ -33,6 +34,7 @@ public class Intersection {
 		seg1=s1;
 		seg2=s2;
 		this.overlap=overlap;
+		overlay=isOverlay;
 	}
 	public Coordinate[] getPt() {
 		return pt;
@@ -86,4 +88,7 @@ public class Intersection {
                 ;
         
     }
+	public boolean isOverlay() {
+		return overlay;
+	}
 }

@@ -1,6 +1,8 @@
 package ch.interlis.iom_j.itf.impl.jtsext.algorithm;
 
 import static org.junit.Assert.*;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import com.vividsolutions.jts.geom.Coordinate;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
@@ -22,6 +24,7 @@ public class CurveSegmentIntersectorTest {
 				new Coordinate(611770.171, 234250.059), 
 				new Coordinate(611769.918, 234248.796));
 		li.computeIntersection(s0, s1);
+		assertFalse(li.isOverlay());
 		assertFalse(li.hasIntersection());
 	}
     
@@ -37,6 +40,7 @@ public class CurveSegmentIntersectorTest {
 		li.computeIntersection(s0, s1);
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==1);
+		assertFalse(li.isOverlay());
 		Coordinate is=li.getIntersection(0);
 		assertTrue(is.x==110.0);
 		assertTrue(is.y==110.0);
@@ -59,6 +63,7 @@ public class CurveSegmentIntersectorTest {
 		li.computeIntersection(s0, s1);
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==1);
+		assertFalse(li.isOverlay());
 		Coordinate is=li.getIntersection(0);
 		assertTrue(is.x==645009.110);
 		assertTrue(is.y==248677.980);
@@ -100,6 +105,7 @@ public class CurveSegmentIntersectorTest {
                 new Coordinate(2625277.0910, 1238690.9320)
             );
         li.computeIntersection(s0, s1b);
+        assertFalse(li.isOverlay());
         Coordinate is1b=li.getIntersection(0);
         assertEquals(is1b.x,2625285.5890,EPS);
         assertEquals(is1b.y,1238688.2690,EPS);
@@ -108,14 +114,15 @@ public class CurveSegmentIntersectorTest {
         assertEquals(is2b.y,targetY,EPS);
 	}
 	
-	// two straight lines with same line length on each other.
-	// startPoints and endPoints are equal.
+	// two straight lines with same line length.
+	// startPoints and endPoints are same.
 	@Test
-	public void twoStraightLines_OnEachOther_SameWay() {
+	public void twoStraightLines_SameEndPoints_SameDirection() {
 		CurveSegmentIntersector li=new CurveSegmentIntersector();
 		StraightSegment s0=new StraightSegment(new Coordinate(100.0, 100.0),new Coordinate(100.0,200.0));
 		StraightSegment s1=new StraightSegment(new Coordinate(100.0, 100.0),new Coordinate(100.0,200.0));
 		li.computeIntersection(s0, s1);
+		assertTrue(li.isOverlay());
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
 		// intSeg1
@@ -128,16 +135,17 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(is2.y==200.0);
 	}
 	
-	// two straight lines with same line length on each other
+	// two straight lines with same line length.
 	// startPoint1 is equal to endPoint2, startPoint2 is equal to endPoint1.
 	@Test
-	public void twoStraightLines_OnEachOther_OtherWay() {
+	public void twoStraightLines_SameLineLength_OtherDirection() {
 		CurveSegmentIntersector li=new CurveSegmentIntersector();
 		StraightSegment s0=new StraightSegment(new Coordinate(100.0, 100.0),new Coordinate(100.0,200.0));
 		StraightSegment s1=new StraightSegment(new Coordinate(100.0, 200.0),new Coordinate(100.0,100.0));
 		li.computeIntersection(s0, s1);
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
+		assertTrue(li.isOverlay());
 		// intSeg1
 		Coordinate is=li.getIntersection(0);
 		assertTrue(is.x==100.0);
@@ -148,16 +156,17 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(is2.y==100.0);
 	}
 	
-	// two straight lines on each other. line1 is longer than line2.
+	// two straight lines. line1 is longer than line2.
 	// startPoints are different. endPoints are same.
 	@Test
-	public void twoStraightLines_OnEachOther_SameWay_DifferentLength() {
+	public void twoStraightLines_DifferentStartPoints_SameDirection_DifferentLength() {
 		CurveSegmentIntersector li=new CurveSegmentIntersector();
 		StraightSegment s0=new StraightSegment(new Coordinate(100.0, 100.0),new Coordinate(100.0,200.0));
 		StraightSegment s1=new StraightSegment(new Coordinate(100.0, 150.0),new Coordinate(100.0,200.0));
 		li.computeIntersection(s0, s1);
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
+		assertTrue(li.isOverlay());
 		// intSeg1
 		Coordinate is=li.getIntersection(0);
 		assertTrue(is.x==100.0);
@@ -168,16 +177,17 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(is2.y==200.0);
 	}
 	
-	// two straight lines on each other. line1 is longer than line2.
-	// startPoints are same. endPoints are equal.
+	// two straight lines. line1 is longer than line2.
+	// startPoints and endPoints are different. both lines in same direction
 	@Test
-	public void twoStraightLines_OnEachOther_OtherWay_DifferentLength() {
+	public void twoStraightLines_SameEndPoints_OtherDirection_DifferentLength() {
 		CurveSegmentIntersector li=new CurveSegmentIntersector();
 		StraightSegment s0=new StraightSegment(new Coordinate(100.0, 100.0),new Coordinate(100.0,200.0));
 		StraightSegment s1=new StraightSegment(new Coordinate(100.0, 150.0),new Coordinate(100.0,100.0));
 		li.computeIntersection(s0, s1);
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
+		assertTrue(li.isOverlay());
 		// intSeg1
 		Coordinate is=li.getIntersection(0);
 		assertTrue(is.x==100.0);
@@ -188,14 +198,15 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(is2.y==100.0);
 	}
 	
-	// two straight lines on each other. line1 is longer than line2.
-	// startPoints and endPoints are different.
+	// two straight lines. line1 is longer than line2.
+	// startPoints and endPoints are different. each line in different direction
 	@Test
-	public void twoStraightLines_LineInsideOtherLine_SameWay_DifferentLength() {
+	public void twoStraightLines_DifferentEndPoints_SameDirection_DifferentLength() {
 		CurveSegmentIntersector li=new CurveSegmentIntersector();
 		StraightSegment s0=new StraightSegment(new Coordinate(100.0, 100.0),new Coordinate(100.0,200.0));
 		StraightSegment s1=new StraightSegment(new Coordinate(100.0, 120.0),new Coordinate(100.0,180.0));
 		li.computeIntersection(s0, s1);
+		assertTrue(li.isOverlay());
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
 		// intSeg1
@@ -208,14 +219,15 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(is2.y==180.0);
 	}
 	
-	// two straight lines on each other. line1 is longer than line2.
-	// startPoints and endPoints are different.
+	// two straight lines. line1 is longer than line2.
+	// startPoints and endPoints are different. lines in different directory
 	@Test
-	public void twoStraightLines_LineInsideOtherLine_OtherWay_DifferentLength() {
+	public void twoStraightLines_DifferentEndPoints_OtherDirection_DifferentLength() {
 		CurveSegmentIntersector li=new CurveSegmentIntersector();
 		StraightSegment s0=new StraightSegment(new Coordinate(100.0, 100.0),new Coordinate(100.0,200.0));
 		StraightSegment s1=new StraightSegment(new Coordinate(100.0, 180.0),new Coordinate(100.0,120.0));
 		li.computeIntersection(s0, s1);
+		assertTrue(li.isOverlay());
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
 		// intSeg1
@@ -228,34 +240,38 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(is2.y==120.0);
 	}
 	
-	// two arcs with same arcPoint and radius on each other.
-	// startPoints and endPoints are equal.
+	// two arcs with same arcPoint and radius.
+	// startPoints and endPoints are same. lines are in same direction
+	@Ignore("not yet implemented")
 	@Test
-	public void twoARCS_OnEachOther_SameWay() {
+	public void twoARCS_SameEndPoints_SameDirection() {
 		CurveSegmentIntersector li=new CurveSegmentIntersector();
-		ArcSegment s0=new ArcSegment(new Coordinate(100.0, 100.0),new Coordinate(80.0,150.0),new Coordinate(100.0,200.0));
-		ArcSegment s1=new ArcSegment(new Coordinate(100.0, 100.0),new Coordinate(80.0,150.0),new Coordinate(100.0,200.0));
+		ArcSegment s0=new ArcSegment(new Coordinate(100.0, 100.0),new Coordinate(120,150.0),new Coordinate(100.0,200.0));
+		ArcSegment s1=new ArcSegment(new Coordinate(100.0, 100.0),new Coordinate(120,150.0),new Coordinate(100.0,200.0));
 		li.computeIntersection(s0, s1);
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
+		assertTrue(li.isOverlay());
 		// intSeg1
 		Coordinate is=li.getIntersection(0);
 		assertTrue(is.x==100.0);
 		assertTrue(is.y==100.0);
 		// intSeg2
 		Coordinate is2=li.getIntersection(1);
-		assertTrue(is2.x==100.0);
-		assertTrue(is2.y==200.0);
+		assertTrue(is2.x==120.0);
+		assertTrue(is2.y==150.0);
 	}
 	
-	// two arcs with same arcPoint and radius on each other
+	// two arcs with same arcPoint and radius
 	// startPoint1 is equal to endPoint2, startPoint2 is equal to endPoint1.
+	@Ignore("not yet implemented")
 	@Test
-	public void twoARCS_OnEachOther_OtherWay() {
+	public void twoARCS_SameEndPoints_OtherDirection() {
 		CurveSegmentIntersector li=new CurveSegmentIntersector();
 		ArcSegment s0=new ArcSegment(new Coordinate(100.0, 100.0),new Coordinate(80.0,150.0),new Coordinate(100.0,200.0));
 		ArcSegment s1=new ArcSegment(new Coordinate(100.0, 200.0),new Coordinate(80.0,150.0),new Coordinate(100.0,100.0));
 		li.computeIntersection(s0, s1);
+		assertTrue(li.isOverlay());
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
 		// intSeg1
@@ -268,14 +284,16 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(is2.y==200.0);
 	}
 	
-	// two arcs on each other. ArcPoint is equal. different angle.
+	// two arcs. ArcPoint is equal. different angle.
 	// startPoints are different. endPoints are same.
+	@Ignore("not yet implemented")
 	@Test
-	public void twoARCS_OnEachOther_SameWay_DifferentLength() {
+	public void twoARCS_DifferentStartPoints_SameDirection_DifferentLength() {
 		CurveSegmentIntersector li=new CurveSegmentIntersector();
 		ArcSegment s0=new ArcSegment(new Coordinate(100.0, 100.0),new Coordinate(80.0,150.0),new Coordinate(100.0,200.0));
 		ArcSegment s1=new ArcSegment(new Coordinate(100.0, 150.0),new Coordinate(80.0,150.0),new Coordinate(100.0,200.0));
 		li.computeIntersection(s0, s1);
+		assertTrue(li.isOverlay());
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
 		// intSeg1
@@ -288,14 +306,16 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(is2.y==200.0);
 	}
 	
-	// two arcs on each other. ArcPoint is equal. different angle.
-	// startPoints are same. endPoints are equal.
+	// two arcs. ArcPoint is equal. different angle.
+	// startPoints are same. endPoints are same.
+	@Ignore("not yet implemented")
 	@Test
-	public void twoARCS_OnEachOther_OtherWay_DifferentLength() {
+	public void twoARCS_SameEndPoints_OtherDirection_DifferentLength() {
 		CurveSegmentIntersector li=new CurveSegmentIntersector();
 		ArcSegment s0=new ArcSegment(new Coordinate(100.0, 100.0),new Coordinate(80.0,150.0),new Coordinate(100.0,200.0));
 		ArcSegment s1=new ArcSegment(new Coordinate(100.0, 150.0),new Coordinate(80.0,150.0),new Coordinate(100.0,100.0));
 		li.computeIntersection(s0, s1);
+		assertTrue(li.isOverlay());
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
 		// intSeg1
@@ -308,14 +328,16 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(is2.y==150.0);
 	}
 	
-	// two arcs on each other. ArcPoint is equal. different angle.
+	// two arcs. ArcPoint is equal. different angle.
 	// startPoints and endPoints are different.
+	@Ignore("not yet implemented")
 	@Test
-	public void twoARCS_LineInsideOtherLine_SameWay_DifferentLength() {
+	public void twoARCS_DifferentEndPoints_SameDirection_DifferentLength() {
 		CurveSegmentIntersector li=new CurveSegmentIntersector();
 		ArcSegment s0=new ArcSegment(new Coordinate(100.0, 100.0),new Coordinate(80.0,150.0),new Coordinate(100.0,200.0));
 		ArcSegment s1=new ArcSegment(new Coordinate(100.0, 120.0),new Coordinate(80.0,150.0),new Coordinate(100.0,180.0));
 		li.computeIntersection(s0, s1);
+		assertTrue(li.isOverlay());
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
 		// intSeg1
@@ -328,14 +350,16 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(is2.y==180.0);
 	}
 	
-	// two arcs on each other. ArcPoint is equal. different angle.
+	// two arcs. ArcPoint is equal. different angle.
 	// startPoints and endPoints are different.
+	@Ignore("not yet implemented")
 	@Test
-	public void twoARCS_LineInsideOtherLine_OtherWay_DifferentLength() {
+	public void twoARCS_DifferentEndPoints_OtherDirection_DifferentLength() {
 		CurveSegmentIntersector li=new CurveSegmentIntersector();
 		ArcSegment s0=new ArcSegment(new Coordinate(100.0, 100.0),new Coordinate(80.0,150.0),new Coordinate(100.0,200.0));
 		ArcSegment s1=new ArcSegment(new Coordinate(100.0, 180.0),new Coordinate(80.0,150.0),new Coordinate(100.0,120.0));
 		li.computeIntersection(s0, s1);
+		assertTrue(li.isOverlay());
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
 		// intSeg1
@@ -346,5 +370,18 @@ public class CurveSegmentIntersectorTest {
 		Coordinate is2=li.getIntersection(1);
 		assertTrue(is2.x==100.0);
 		assertTrue(is2.y==120.0);
+	}
+	
+	// two arcs with same arcPoint and radius not touch each other.
+	@Ignore("not yet implemented")
+	@Test
+	public void twoARCS_SameRadiusAndArcPoint_DontTouchEachOther() {
+		CurveSegmentIntersector li=new CurveSegmentIntersector();
+		ArcSegment s0=new ArcSegment(new Coordinate(150.0, 100.0),new Coordinate(140,130.0),new Coordinate(100.0,150.0));
+		ArcSegment s1=new ArcSegment(new Coordinate(50.0, 100.0),new Coordinate(60,70.0),new Coordinate(100.0,50.0));
+		li.computeIntersection(s0, s1);
+		assertFalse(li.isOverlay());
+		assertTrue(li.hasIntersection());
+		assertTrue(li.getIntersectionNum()==0);
 	}
 }

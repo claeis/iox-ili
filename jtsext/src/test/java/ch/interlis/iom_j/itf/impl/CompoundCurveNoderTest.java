@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ch.interlis.iom.IomObject;
@@ -66,11 +67,12 @@ public class CompoundCurveNoderTest {
 	    segs.add(A);
 	    segs.add(B);
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
-		validator.checkValid();
-		Collection<? extends CompoundCurve> noded=validator.getNodedSubstrings();
-		//System.out.println(noded);
-		assertEquals("[COMPOUNDCURVE ((50 10, 20 10)), COMPOUNDCURVE ((20 10, 20 40)), COMPOUNDCURVE ((20 40, 50 40)), COMPOUNDCURVE ((10 10, 20 10)), COMPOUNDCURVE ((20 10, 20 40)), COMPOUNDCURVE ((20 40, 10 40, 10 10))]", noded.toString());
-	    
+		try{
+			validator.checkValid();
+			fail();
+		}catch(RuntimeException ex){
+			assertTrue(ex.getMessage().startsWith("intersection"));
+		}
 	}
 	@Test
 	public void Line1openRing() throws ParseException {

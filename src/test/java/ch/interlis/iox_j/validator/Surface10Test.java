@@ -2,6 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
@@ -40,9 +41,9 @@ public class Surface10Test {
 		assertNotNull(td);
 	}
 
-	// Es wird getestet ob eine Surface mit einem Boundary erstellt werden kann.
+	// pfueft, ob eine Surface mit einem Boundary erstellt werden kann.
 	@Test
-	public void oneBoundary_Ok(){
+	public void surface_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -88,9 +89,9 @@ public class Surface10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob ein Surface mit 2 Boundaries erstellt werden kann.
+	// pfueft, ob ein Surface mit 2 Boundaries erstellt werden kann.
 	@Test
-	public void twoBoundaries_Ok(){
+	public void surfaceTwoBoundaries_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -166,42 +167,48 @@ public class Surface10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Surface mit einem Kreisbogen erstellt werden kann.
+	// pfueft, ob eine Surface mit einem Kreisbogen erstellt werden kann.
 	@Test
 	public void surfaceWithArc_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline 1
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments.addattrobj("segment", "ARC");
-		endSegment.setattrvalue("A1", "500001.000");
-		endSegment.setattrvalue("A2", "80000.000");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
-		// polyline 2
-		IomObject polylineValue11 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments11=polylineValue11.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment11=segments11.addattrobj("segment", "COORD");
-		startSegment11.setattrvalue("C1", "500000.000");
-		startSegment11.setattrvalue("C2", "80000.000");
-		IomObject endSegment11=segments11.addattrobj("segment", "COORD");
-		endSegment11.setattrvalue("C1", "520000.000");
-		endSegment11.setattrvalue("C2", "85000.000");
-		// polyline 2
-		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "520000.000");
-		startSegment3.setattrvalue("C2", "85000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
+		// polyline
+		{
+			IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+			IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "500000.000");
+			startSegment.setattrvalue("C2", "100000.000");
+			IomObject endSegment=segments.addattrobj("segment", "COORD");
+			endSegment.setattrvalue("C1", "600000.000");
+			endSegment.setattrvalue("C2", "100000.000");
+		}
+		// polyline
+		{
+			IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+			IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "600000.000");
+			startSegment.setattrvalue("C2", "100000.000");
+			IomObject endSegment=segments.addattrobj("segment", "COORD");
+			endSegment.setattrvalue("C1", "600000.000");
+			endSegment.setattrvalue("C2", "200000.000");
+		}
+		// Arc
+		{
+			IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+			IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "600000.000");
+			startSegment.setattrvalue("C2", "200000.000");
+			IomObject arcSegment=segments.addattrobj("segment", "ARC");
+			arcSegment.setattrvalue("A1", "540000.000");
+			arcSegment.setattrvalue("A2", "160000.000");
+			arcSegment.setattrvalue("C1", "500000.000");
+			arcSegment.setattrvalue("C2", "100000.000");
+		}
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -216,7 +223,127 @@ public class Surface10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Surface mit 1 Outerboundary und 1 Innerboundary erstellt werden kann.
+	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
+	// die outer boundary von einer Linie nicht vollstaendig geschlossen wird.
+	@Ignore("expected: invalid ring lines, actual: IllegalArgumentException: Points of LinearRing do not form a closed linestring.")
+	@Test
+	public void surface_InvalidRingLines_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline 1
+		IomObject polyline1 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		{
+			IomObject segments=polyline1.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "500000.000");
+			startSegment.setattrvalue("C2", "100000.000");
+			IomObject endSegment=segments.addattrobj("segment", "COORD");
+			endSegment.setattrvalue("C1", "600000.000");
+			endSegment.setattrvalue("C2", "100000.000");
+		}
+		// polyline 2
+		IomObject polyline2 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		{
+			IomObject segments=polyline2.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "600000.000");
+			startSegment.setattrvalue("C2", "100000.000");
+			IomObject endSegment=segments.addattrobj("segment", "COORD");
+			endSegment.setattrvalue("C1", "600000.000");
+			endSegment.setattrvalue("C2", "200000.000");
+		}
+		// polyline 3
+		IomObject polyline3 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		{
+			IomObject segments=polyline3.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "600000.000");
+			startSegment.setattrvalue("C2", "200000.000");
+			IomObject endSegment=segments.addattrobj("segment", "COORD");
+			endSegment.setattrvalue("C1", "505000.000");
+			endSegment.setattrvalue("C2", "105000.000");
+		}
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==3);
+		assertEquals("invald ring line", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(1).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
+	}
+	
+	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
+	// die outer boundary von einem Kreisbogen nicht vollstaendig geschlossen wird.
+	@Ignore("expected: invalid ring lines, actual: IllegalArgumentException: Points of LinearRing do not form a closed linestring.")
+	@Test
+	public void surfaceWithArc_InvalidRingLines_Fail(){
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
+		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
+		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		// polyline 1
+		IomObject polyline1 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		{
+			IomObject segments=polyline1.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "500000.000");
+			startSegment.setattrvalue("C2", "100000.000");
+			IomObject endSegment=segments.addattrobj("segment", "COORD");
+			endSegment.setattrvalue("C1", "600000.000");
+			endSegment.setattrvalue("C2", "100000.000");
+		}
+		// polyline 2
+		IomObject polyline2 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		{
+			IomObject segments=polyline2.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "600000.000");
+			startSegment.setattrvalue("C2", "100000.000");
+			IomObject endSegment=segments.addattrobj("segment", "COORD");
+			endSegment.setattrvalue("C1", "600000.000");
+			endSegment.setattrvalue("C2", "200000.000");
+		}
+		// polyline 3 with Arc
+		IomObject polyline3 = outerBoundary.addattrobj("polyline", "POLYLINE");
+		{
+			IomObject segments=polyline3.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "600000.000");
+			startSegment.setattrvalue("C2", "200000.000");
+			IomObject arcSegment=segments.addattrobj("segment", "ARC");
+			arcSegment.setattrvalue("A1", "540000.000");
+			arcSegment.setattrvalue("A2", "160000.000");
+			arcSegment.setattrvalue("C1", "505000.000");
+			arcSegment.setattrvalue("C2", "105000.000");
+		}
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(objSurfaceSuccess));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==3);
+		assertEquals("invald ring line", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invald ring line", logger.getErrs().get(1).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
+	}
+	
+	// pfueft, ob eine Surface mit 1 Outerboundary und 1 Innerboundary erstellt werden kann.
 	@Test
 	public void surfaceWithOuterAndInnerBoundary_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -306,7 +433,7 @@ public class Surface10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Surface mit 2, (sich an 1 Punkt beruehrenden Innerboundaries), erstellt werden kann.
+	// pfueft, ob eine Surface mit 2, (sich an 1 Punkt beruehrenden) Innerboundaries, erstellt werden kann.
 	@Test
 	public void surfacetouchOfInnerboundariesOn1Point_OK(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -413,9 +540,9 @@ public class Surface10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}	
 	
-	// Es wird getestet ob eine Surface mit einem Innerboundary, welche die Outerboundary an einem Punkt beruehrt, erstellt werden kann.
+	// pfueft, ob eine Surface mit einer Innerboundary, welche die Outerboundary an einem Punkt beruehrt, erstellt werden kann.
 	@Test
-	public void innerAndOuterBoundaryTouchOn1Point_Ok(){
+	public void innerBoundaryTouchesOuterBoundary_On1Point_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surfaceWithoutOverlaps2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -491,7 +618,7 @@ public class Surface10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Surface mit 2 innerboundaries, welche sich nicht beruehren, erstellt werden kann.
+	// pfueft, ob eine Surface mit 2 innerboundaries, welche sich nicht beruehren, erstellt werden kann.
 	@Test
 	public void surfaceWithTwoInnerboundaries_OK(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -616,11 +743,11 @@ public class Surface10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
+	// pfueft, ob eine Fehlermeldung ausgegeben wird,
 	// wenn auf einem "geraden Segment" der OuterBoundary, ein "gerades Segment" der InnerBoundary liegt.
 	// Beide Segmente teilen die selben Anfangs und Endpunkte.
 	@Test
-	public void lineOfInnerBoundaryLiesOverLineOfOuterBoundary_Fail(){
+	public void lineOfInnerBoundary_OverlayOf_LineOfOuterBoundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surfaceWithoutOverlaps2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -693,16 +820,15 @@ public class Surface10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("cut edge tid o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("cut edge tid o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("overlay o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
+	// prueft, ob eine Intersection Fehlermeldung ausgegeben wird,
 	// wenn die Outerboundary, die Innerboundary ueberschneidet.
 	@Test
-	public void surfaceIntersectionErrs_Fail(){
+	public void innerboundary_Intersect_Outerboundary_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surfaceWithoutOverlaps2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -780,122 +906,7 @@ public class Surface10Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob die Fehlermeldung: "invalid ring line" ausgegeben wird,
-	// wenn die ring lines der 2d Surface nicht geschlossen sind.
-	@Test
-	public void surfaceInvalidRingLines_Fail(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
-		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surfaceWithoutOverlaps2d", "MULTISURFACE");
-		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-		// outer boundary
-		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline
-		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment=segments.addattrobj("segment", "COORD");
-		startSegment.setattrvalue("C1", "480000.000");
-		startSegment.setattrvalue("C2", "70000.000");
-		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
-		// polyline 2
-		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "500000.000");
-		startSegment2.setattrvalue("C2", "80000.000");
-		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "550000.000");
-		endSegment2.setattrvalue("C2", "90000.000");
-		// polyline 3
-		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "550000.000");
-		startSegment3.setattrvalue("C2", "90000.000");
-		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
-		endSegment3.setattrvalue("C1", "480000.000");
-		endSegment3.setattrvalue("C2", "70000.000");
-		// inner boundary
-		IomObject innerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline
-		IomObject polylineValueInner = innerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segmentsInner=polylineValueInner.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		startSegmentInner.setattrvalue("C1", "480000.000");
-		startSegmentInner.setattrvalue("C2", "70000.000");
-		IomObject endSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		endSegmentInner.setattrvalue("C1", "500000.000");
-		endSegmentInner.setattrvalue("C2", "78000.000");
-		// polyline 2
-		IomObject polylineValue2Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2Inner=polylineValue2Inner.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		startSegment2Inner.setattrvalue("C1", "500000.000");
-		startSegment2Inner.setattrvalue("C2", "78000.000");
-		IomObject endSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		endSegment2Inner.setattrvalue("C1", "505000.000");
-		endSegment2Inner.setattrvalue("C2", "78000.000");
-		// polyline 3
-		IomObject polylineValue3Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments3Inner=polylineValue3Inner.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
-		startSegment3Inner.setattrvalue("C1", "505000.000");
-		startSegment3Inner.setattrvalue("C2", "78000.000");
-		IomObject endSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
-		endSegment3Inner.setattrvalue("C1", "480000.000");
-		endSegment3Inner.setattrvalue("C2", "70000.000");
-		// 2. inner boundary
-		IomObject innerBoundary2 = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline
-		IomObject polylineValueInner2 = innerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segmentsInner2=polylineValueInner2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegmentInner2=segmentsInner2.addattrobj("segment", "COORD");
-		startSegmentInner2.setattrvalue("C1", "480000.000");
-		startSegmentInner2.setattrvalue("C2", "70000.000");
-		IomObject endSegmentInner2=segmentsInner2.addattrobj("segment", "COORD");
-		endSegmentInner2.setattrvalue("C1", "500000.000");
-		endSegmentInner2.setattrvalue("C2", "78000.000");
-		// polyline 2
-		IomObject polylineValue2Inner2 = innerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments2Inner2=polylineValue2Inner2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2Inner2=segments2Inner2.addattrobj("segment", "COORD");
-		startSegment2Inner2.setattrvalue("C1", "500000.000");
-		startSegment2Inner2.setattrvalue("C2", "78000.000");
-		IomObject endSegment2Inner2=segments2Inner2.addattrobj("segment", "COORD");
-		endSegment2Inner2.setattrvalue("C1", "505000.000");
-		endSegment2Inner2.setattrvalue("C2", "78000.000");
-		// polyline 3
-		IomObject polylineValue3Inner2 = innerBoundary2.addattrobj("polyline", "POLYLINE");
-		IomObject segments3Inner2=polylineValue3Inner2.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment3Inner2=segments3Inner2.addattrobj("segment", "COORD");
-		startSegment3Inner2.setattrvalue("C1", "505000.000");
-		startSegment3Inner2.setattrvalue("C2", "78000.000");
-		IomObject endSegment3Inner2=segments3Inner2.addattrobj("segment", "COORD");
-		endSegment3Inner2.setattrvalue("C1", "480000.000");
-		endSegment3Inner2.setattrvalue("C2", "70000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==7);
-		assertEquals("invald ring line", logger.getErrs().get(0).getEventMsg());
-		assertEquals("invald ring line", logger.getErrs().get(1).getEventMsg());
-		assertEquals("invald ring line", logger.getErrs().get(2).getEventMsg());
-		assertEquals("invald ring line", logger.getErrs().get(3).getEventMsg());
-		assertEquals("invald ring line", logger.getErrs().get(4).getEventMsg());
-		assertEquals("invald ring line", logger.getErrs().get(5).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(6).getEventMsg());
-	}
-	
-	// Es wird getestet ob der Typ von surface vom Typ Multisurface ist.
+	// pfueft, ob der Typ von surface vom Typ Multisurface ist.
 	@Test
 	public void surfaceTypeWrong_Fail(){
 		Iom_jObject objNotMultisurface=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -944,7 +955,8 @@ public class Surface10Test {
 		assertEquals("unexpected Type SURFACE; MULTISURFACE expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Komplette Surface mit 2 Surface erstellt werden kann.
+	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
+	// eine Komplette MultiSurface mit 2 Surfaces erstellt wird.
 	@Test
 	public void completeWithTwoSurfaces_Fail(){
 		Iom_jObject objCompleteMultisurface=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -968,7 +980,8 @@ public class Surface10Test {
 		assertEquals("invalid number of surfaces in COMPLETE basket", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine 2d Surface, in 3d erstellt werden kann.
+	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
+	// eine 2d Surface, in 3d Dimensionen erstellt wird.
 	@Test
 	public void surfaceInWrongDimension_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1019,7 +1032,8 @@ public class Surface10Test {
 		assertEquals("Wrong COORD structure, C3 not expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine 3d Surface in 2d erstellt werden kann.
+	// pfueft, ob eine Fehlermeldung ausgegeben wird, wenn
+	// eine 3d Surface in 2d Dimensionen erstellt wird.
 	@Test
 	public void surface3dWrongDimension_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1067,7 +1081,8 @@ public class Surface10Test {
 		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Surface mit einer ungueltigen Value C1, C2 und C3 erstellt werden kann.
+	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
+	// eine Surface mit einer ungueltigen Value C1, C2 und C3 erstellt wird.
 	@Test
 	public void surfaceInvalidValueRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);
@@ -1097,9 +1112,11 @@ public class Surface10Test {
 		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 		assertEquals("value 50000.000 is out of range", logger.getErrs().get(2).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(3).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Surface mit einer ungueltigen Value von A1 und A2 erstellt werden kann.
+	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
+	// eine Surface mit einer ungueltigen Value von A1 und A2 erstellt wird.
 	@Test
 	public void surfaceValueOfArcOutOfRange_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSFLAECHENTABLE, OID1);

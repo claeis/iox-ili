@@ -344,7 +344,10 @@ public class ItfSurfaceLinetable2Polygon {
 				p01 = e0.getSegments().get(segIndex0).getEndPoint();
 				p10 = e1.getSegments().get(segIndex1).getStartPoint();
 				p11 = e1.getSegments().get(segIndex1).getEndPoint();
-				if(e0!=e1 &&
+				if(is.isOverlay()) {
+					dataerrs.add(new IoxInvalidDataException("overlay "+mainTid,linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
+					hasIntersections=true;
+				}else if(e0!=e1 &&
 						(segIndex0==0 || segIndex0==e0.getSegments().size()-1) 
 						&& (segIndex1==0 || segIndex1==e1.getSegments().size()-1) 
 						&& is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
@@ -362,6 +365,7 @@ public class ItfSurfaceLinetable2Polygon {
 					String []tids=new String[2];
 					tids[0]=(String) is.getCurve1().getUserData();
 					tids[1]=(String) is.getCurve2().getUserData();
+					
 					dataerrs.add(new IoxInvalidDataException("intersection "+IoxInvalidDataException.formatTids(tids),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
 					if(is.getPt().length==2){
 						dataerrs.add(new IoxInvalidDataException("intersection "+IoxInvalidDataException.formatTids(tids),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[1])));
@@ -477,13 +481,15 @@ public class ItfSurfaceLinetable2Polygon {
 			li.computeIntersection(seg0, seg1);
 			if(li.hasIntersection()){
 				if(li.getIntersectionNum()==2){ 
-					if(seg.getNumSegments()==2 && seg0.getStartPoint().equals2D(seg1.getEndPoint())){
+					if(li.isOverlay()) {
+						// hier ignorieren; wird danach im CompoundCurveNoder rapportiert
+					}else if(seg.getNumSegments()==2 && seg0.getStartPoint().equals2D(seg1.getEndPoint())){
 						// Ring als eine Linie, zwei Segmente
 					}else if(li.getOverlap()!=null && li.getOverlap()<maxOverlaps){
 						// aufeinanderfolgende Segmente der selben Linie
 						Intersection is = new Intersection(
 								li.getIntersection(0), li.getIntersection(1),
-								seg, seg, seg0, seg1, li.getOverlap());
+								seg, seg, seg0, seg1, li.getOverlap(),false);
 						EhiLogger.traceState("valoverlap " + is.toString());
 						
 						  // overlap entfernen

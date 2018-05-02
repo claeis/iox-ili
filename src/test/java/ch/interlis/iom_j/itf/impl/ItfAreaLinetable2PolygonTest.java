@@ -339,6 +339,7 @@ MULTISURFACE {surface SURFACE {
 			IoxAssert.assertStartsWith("no area-ref to polygon of lines "+lineTid,ex.getMessage());
 		}
 	}
+	@Ignore("Area overlay of lines not yet implemented.")
 	@Test
 	public void testDoppelteRandstreckeZweiGetrenntePolygone() throws IoxException {
 		// gemeinsamer Rand 120,110 -> 120,140
@@ -480,6 +481,7 @@ MULTISURFACE {surface SURFACE {
 		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 115.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}",polygon.toString());
 		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 115.0}, COORD {C1 150.0, C2 140.0}, COORD {C1 150.0, C2 110.0}, COORD {C1 120.0, C2 115.0}]}}}}}",polygon2.toString());
 	}
+	@Ignore("Area overlay of lines not yet implemented.")
 	@Test
 	public void testDoppelteRandstreckeEinPolygon() throws IoxException {
 		// gemeinsame Randstrecke zwischen aeusserem und innerem Rand

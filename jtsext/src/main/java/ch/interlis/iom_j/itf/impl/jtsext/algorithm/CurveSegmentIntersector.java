@@ -1,9 +1,7 @@
 package ch.interlis.iom_j.itf.impl.jtsext.algorithm;
 
-
 import com.vividsolutions.jts.algorithm.RobustLineIntersector;
 import com.vividsolutions.jts.geom.Coordinate;
-
 import ch.interlis.iom_j.itf.impl.hrg.HrgUtility;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
@@ -11,12 +9,14 @@ import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 public class CurveSegmentIntersector {
 	RobustLineIntersector li=new RobustLineIntersector();
 	private boolean hasIntersection_;
+	private boolean isOverlay_;
 	private int isNum;
 	private Coordinate[] is=new Coordinate[2];
 	private Double overlap=null;
 
 	public void computeIntersection(CurveSegment seg1,
 			CurveSegment seg2) {
+		isOverlay_=false;
 		overlap=null;
 		boolean seg1isArc=isTrueArc(seg1);
 		boolean seg2isArc=isTrueArc(seg2);
@@ -60,18 +60,23 @@ public class CurveSegmentIntersector {
 			Coordinate startPt2;
 			Coordinate endPt2;
 			startPt1 = seg1.getStartPoint();
-			  endPt1 = seg1.getEndPoint();
-			  startPt2 = seg2.getStartPoint();
-			  endPt2 = seg2.getEndPoint();
+			endPt1 = seg1.getEndPoint();
+			startPt2 = seg2.getStartPoint();
+			endPt2 = seg2.getEndPoint();
 			li.computeIntersection(startPt1, endPt1, startPt2,endPt2);
 			hasIntersection_=li.hasIntersection();
 			isNum=li.getIntersectionNum();
+			isOverlay_=hasIntersection_ ? isNum==2 : false;
 			for(int i=0;i<isNum;i++){
 				is[i]=li.getIntersection(i);
 			}
 		}
 	}
 
+	public boolean isOverlay() {
+		return isOverlay_;
+	}
+	
 	public static boolean isTrueArc(CurveSegment seg) {
 		if(seg instanceof ArcSegment){
 			if(!((ArcSegment) seg).isStraight()){
