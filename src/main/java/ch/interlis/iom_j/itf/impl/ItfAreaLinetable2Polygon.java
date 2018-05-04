@@ -221,7 +221,10 @@ public class ItfAreaLinetable2Polygon {
 						p01 = e0.getSegments().get(segIndex0).getEndPoint();
 						p10 = e1.getSegments().get(segIndex1).getStartPoint();
 						p11 = e1.getSegments().get(segIndex1).getEndPoint();
-						if(e0!=e1 && 
+						if(is.isOverlay()) {
+							dataerrs.add(new IoxInvalidDataException("overlay "+is.getCurve1().getUserData(),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
+							hasIntersections=true;
+						}else if(e0!=e1 && 
 								(segIndex0==0 || segIndex0==e0.getSegments().size()-1) 
 								&& (segIndex1==0 || segIndex1==e1.getSegments().size()-1) 
 								&& is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
