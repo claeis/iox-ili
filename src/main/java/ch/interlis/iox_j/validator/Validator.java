@@ -10,17 +10,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-
 import javax.xml.ws.Holder;
-
 import com.vividsolutions.jts.geom.Coordinate;
-
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
-import ch.interlis.ili2c.metamodel.AbstractLeafElement;
 import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.AttributeDef;
@@ -30,11 +25,9 @@ import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.Constant;
 import ch.interlis.ili2c.metamodel.Constant.Enumeration;
 import ch.interlis.ili2c.metamodel.Constraint;
-import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Domain;
-import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.EnumTreeValueType;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.Evaluable;
@@ -93,6 +86,7 @@ import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxLogging;
 import ch.interlis.iox.IoxValidationConfig;
 import ch.interlis.iox.StartBasketEvent;
+import ch.interlis.iox_j.IoxIntersectionException;
 import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.PipelinePool;
 import ch.interlis.iox_j.jts.Iox2jtsext;
@@ -390,12 +384,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		for(AttributeDef attr:areaAttrs.keySet()){
 			errs.addEvent(errFact.logInfoMsg("validate AREA {0}...", getScopedName(attr)));
 			ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
-			List<Intersection> intersections=allLines.validate();
-			if(intersections!=null){
-				for(Intersection is:intersections){
+			List<IoxInvalidDataException> intersections=allLines.validate();
+			if(intersections!=null && intersections.size()>0){
+				for(IoxInvalidDataException ex:intersections){ // iterate through non-overlay intersections
 					//logMsg(areaOverlapValidation,"intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
-					EhiLogger.logError(is.toShortString());
-					EhiLogger.traceState(is.toString());
+					if(ex instanceof IoxIntersectionException) {
+						logMsg(areaOverlapValidation, ((IoxIntersectionException) ex).getIntersection().toShortString());
+						EhiLogger.traceState(ex.toString());
+					}else {
+						logMsg(areaOverlapValidation, ex.getMessage());
+					}
 				}
 				logMsg(areaOverlapValidation,"failed to validate AREA {0}", getScopedName(attr));
 			}
@@ -1414,7 +1412,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							}
 						}
 					}
-					List<Intersection> intersections=polygonPool.validate();
+					List<IoxInvalidDataException> intersections=polygonPool.validate();
 					if(intersections!=null){
 						return new Value(false); // not a valid area topology
 					}
@@ -1467,7 +1465,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							}
 						}
 					}
-					List<Intersection> intersections=polygonPool.validate();
+					List<IoxInvalidDataException> intersections=polygonPool.validate();
 					if(intersections!=null) {
 						return new Value(false);
 					}
@@ -2840,14 +2838,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									if(surfaceOrAreaType instanceof SurfaceType){
 										validateSurfaceTopology(validateGeometryType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
 									}else{
-										validateSurfaceTopology(validateGeometryType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
+										boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
 										if(!ValidationConfig.OFF.equals(areaOverlapValidation)){
-											ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
-											if(allLines==null){
-												allLines=new ItfAreaPolygon2Linetable(objPoolManager); 
-												areaAttrs.put(attr,allLines);
+											
+											if(surfaceTopologyValid) {
+											
+												ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
+												if(allLines==null){
+													allLines=new ItfAreaPolygon2Linetable(objPoolManager); 
+													areaAttrs.put(attr,allLines);
+												}
+												validateAreaTopology(validateGeometryType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
+											}else {
+												// surface topology not valid
+												errs.addEvent(errFact.logInfoMsg("AREA topology not validated, validation of SURFACE topology failed"));
 											}
-											validateAreaTopology(validateGeometryType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
 										}
 									}
 								}
@@ -2915,16 +2920,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	private void validateAreaTopology(String validateType, ItfAreaPolygon2Linetable allLines,AreaType type, String mainObjTid,String internalTid,IomObject iomPolygon) throws IoxException {
 		// get lines
-		ArrayList<IomObject> lines=ItfAreaPolygon2Linetable.getLinesFromPolygon(iomPolygon);
-		allLines.addLines(mainObjTid,internalTid,lines,validateType,errFact);
+		allLines.addPolygon(mainObjTid,internalTid,iomPolygon,validateType,errFact);
 	}
 
-	private void validateSurfaceTopology(String validateType, AttributeDef attr,SurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
+	private boolean validateSurfaceTopology(String validateType, AttributeDef attr,SurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
+		boolean surfaceTopologyValid=true;
 		try {
-			ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, errFact,validateType);
+			surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, errFact,validateType);
 		} catch (IoxException e) {
+			surfaceTopologyValid=false;
 			errs.addEvent(errFact.logErrorMsg(e,"failed to validate polygon"));
 		}
+		return surfaceTopologyValid;
 	}
 	
 	private void validatePolylineTopology(String attrPath,String validateType, PolylineType type, IomObject iomValue) {

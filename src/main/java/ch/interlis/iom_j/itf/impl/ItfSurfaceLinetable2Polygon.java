@@ -6,17 +6,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
 import javax.xml.ws.Holder;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.noding.BasicSegmentString;
-import com.vividsolutions.jts.operation.valid.IsValidOp;
-import com.vividsolutions.jts.operation.valid.TopologyValidationError;
-
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.JavaSerializer;
@@ -28,7 +21,6 @@ import ch.interlis.ili2c.metamodel.PrecisionDecimal;
 import ch.interlis.ili2c.metamodel.SurfaceOrAreaType;
 import ch.interlis.ili2c.metamodel.SurfaceType;
 import ch.interlis.ili2c.metamodel.Table;
-import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.jtsext.algorithm.CurveSegmentIntersector;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
@@ -48,7 +40,6 @@ import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.jts.Jtsext2iox;
 import ch.interlis.iox_j.logging.LogEventFactory;
 import ch.interlis.iox_j.validator.ValidationConfig;
-
 
 /*
 FOREACH: Line-IomObject    
@@ -250,10 +241,11 @@ public class ItfSurfaceLinetable2Polygon {
 			throw new IoxInvalidDataException("multipolygon detected");
 		}
 	}
-	public static void validatePolygon(String mainTid,AttributeDef surfaceAttr,IomObject polygon,LogEventFactory errFact,String validationType) 
+	public static boolean validatePolygon(String mainTid,AttributeDef surfaceAttr,IomObject polygon,LogEventFactory errFact,String validationType) 
 			throws IoxException
 	{
 		String linetableIliqname=surfaceAttr.getContainer().getScopedName(null)+"."+surfaceAttr.getName();
+		boolean polygonValid=true;
 		boolean ignorePolygonBuildingErrors=false;
 		double maxOverlaps=0.0;
 		double newVertexOffset=0.0;
@@ -272,7 +264,7 @@ public class ItfSurfaceLinetable2Polygon {
 		JtsextGeometryFactory jtsFact=new JtsextGeometryFactory();
 		ArrayList<CompoundCurve> segv=createLineset(polygon,validationType,0.0,errFact);
 		if(segv==null){
-			return;
+			return true;
 		}
 		for(CompoundCurve seg:segv) {
 		    seg.setUserData(mainTid);
@@ -283,16 +275,20 @@ public class ItfSurfaceLinetable2Polygon {
 		try {
 	        createPolygon(mainTid, segv,maxOverlaps,newVertexOffset,dataerrs,linetableIliqname,ignorePolygonBuildingErrors,null,poly);
 		}finally {
-	         if(ValidationConfig.WARNING.equals(validationType)){
-	                for(IoxInvalidDataException err:dataerrs){
-	                    errFact.addEvent(errFact.logWarning(err));
-	                }
-	         }else{
-	                for(IoxInvalidDataException err:dataerrs){
-	                    errFact.addEvent(errFact.logError(err));
-	                }
-	         }
+			if(dataerrs.size()>0) {
+				polygonValid=false;
+			}
+	        if(ValidationConfig.WARNING.equals(validationType)){
+	               for(IoxInvalidDataException err:dataerrs){
+	                   errFact.addEvent(errFact.logWarning(err));
+	               }
+	        }else{
+	               for(IoxInvalidDataException err:dataerrs){
+	                   errFact.addEvent(errFact.logError(err));
+	               }
+	        } 
 		}
+		return polygonValid;
 	}
 	private static ArrayList<CompoundCurve> createLineset(IomObject iomPolygon,String validationType,double tolerance,LogEventFactory errFact) throws IoxException {
 		Holder<Boolean> foundErrs=new Holder<Boolean>();
@@ -320,6 +316,7 @@ public class ItfSurfaceLinetable2Polygon {
 			String linetableIliqname,boolean ignorePolygonBuildingErrors,String geomattrIliqname,Holder<Polygon> returnPolygon) 
 					throws IoxInvalidDataException 
 	{
+		boolean hasIntersections=false;
 		boolean isDisconnected=false;
 		for(CompoundCurve seg : segv){
 			removeValidSelfIntersections(seg,maxOverlaps,newVertexOffset);
@@ -328,7 +325,6 @@ public class ItfSurfaceLinetable2Polygon {
 		// ASSERT: segv might contain rings, but not nested rings
 		CompoundCurveNoder validator=new CompoundCurveNoder(segv,false);
 		if(!validator.isValid()){
-			boolean hasIntersections=false;
 			for(Intersection is:validator.getIntersections()){
 				CompoundCurve e0=is.getCurve1();
 				CompoundCurve e1=is.getCurve2();
@@ -451,7 +447,7 @@ public class ItfSurfaceLinetable2Polygon {
 				}else{
 					isDisconnected=true;
 					try {
-						dataerrs.add(new IoxInvalidDataException("multipolygon "+IoxInvalidDataException.formatTids(new String[] {mainTid}),geomattrIliqname,mainTid,Jtsext2iox.JTS2surface(holePoly)));
+						dataerrs.add(new IoxInvalidDataException("superfluous outerboundary "+IoxInvalidDataException.formatTids(new String[] {mainTid}),geomattrIliqname,mainTid,Jtsext2iox.JTS2surface(holePoly)));
 					} catch (Iox2jtsException e) {
 						throw new IllegalStateException(e);
 					}
