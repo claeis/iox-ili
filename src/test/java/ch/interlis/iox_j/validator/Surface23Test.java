@@ -443,9 +443,8 @@ public class Surface23Test {
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
 	// die outer boundary von einer Linie nicht vollstaendig geschlossen wird.
-	@Ignore("expected: invalid ring lines, actual: IllegalArgumentException: Points of LinearRing do not form a closed linestring.")
 	@Test
-	public void surface_InvalidRingLines_Fail(){
+	public void surface_BoundaryNotClosed_Dangles_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -494,15 +493,16 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("invald ring line", logger.getErrs().get(0).getEventMsg());
-		assertEquals("invald ring line", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
+		assertTrue(logger.getErrs().size()==4);
+		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("dangle tid o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("dangle tid o1", logger.getErrs().get(2).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(3).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
 	// die outer boundary von einem Kreisbogen nicht vollstaendig geschlossen wird.
-	@Ignore("expected: invalid ring lines, actual: IllegalArgumentException: Points of LinearRing do not form a closed linestring.")
+	@Ignore("arcs not yet implemented")
 	@Test
 	public void surfaceWithArc_InvalidRingLines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -670,10 +670,9 @@ public class Surface23Test {
 	// prueft ob eine Overlay Fehlermeldung ausgegeben wird,
 	// wenn eine Linie der InnerBoundary auf einer Linie der OuterBoundary liegt
 	// und die InnerBoundary nicht vollstaendig geschlossen ist.
-	@Ignore("expected: intersection, actual: IllegalArgumentException: Points of LinearRing do not form a closed linestring --> createLineset()")
 	@Test
 	public void innerBoundary_Overlay_OuterBoundaryLine_AndIsNotClosed_Fail(){
-		EhiLogger.getInstance().setTraceFilter(false);
+		//EhiLogger.getInstance().setTraceFilter(false);
 		Iom_jObject geometricFigure=new Iom_jObject(ILI_CLASSC, OID1);
 		IomObject multisurface=geometricFigure.addattrobj("surface2d", "MULTISURFACE");
 		IomObject surface = multisurface.addattrobj("surface", "SURFACE");

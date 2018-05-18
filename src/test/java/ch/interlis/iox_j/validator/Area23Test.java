@@ -1805,7 +1805,6 @@ public class Area23Test {
 	// wenn auf einem "geraden Segment" der OuterBoundary, ein "gerades Segment" der InnerBoundary liegt.
 	// Beide Segmente teilen die selben Anfangs und Endpunkte.
 	// Dazu wird die Innerboundary nicht geschlossen. Es soll nur die overlay Meldung ausgegeben werden.
-	@Ignore("expected: overlay, actual: Points of LinearRing do not form a closed linestring")
 	@Test
 	public void onePolygon_2Boundaries_LineOfInnerOverlayLineOfOuterBoundary_IgnoreInvalidRinglines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1898,7 +1897,6 @@ public class Area23Test {
 	// wenn auf einem "geraden Segment" der OuterBoundary, ein "gerades Segment" der InnerBoundary liegt.
 	// Beide Segmente teilen die selben Anfangs und Endpunkte.
 	// Dazu wird die Innerboundary nicht geschlossen.
-	@Ignore("expected: overlay, actual: Points of LinearRing do not form a closed linestring")
 	@Test
 	public void onePolygon_2Boundaries_LineOfInnerOverlayLineOfOuterBoundary_InnerboundaryNotClosed_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1944,24 +1942,39 @@ public class Area23Test {
 		endSegment4.setattrvalue("C2", "100000.000");
 		// inner boundary
 		IomObject innerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-		// polyline
-		IomObject polylineValueInner = innerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segmentsInner=polylineValueInner.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		startSegmentInner.setattrvalue("C1", "500000.000");
-		startSegmentInner.setattrvalue("C2", "100000.000");
-		IomObject endSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		endSegmentInner.setattrvalue("C1", "550000.000");
-		endSegmentInner.setattrvalue("C2", "150000.000");
+		{
+		// polyline 1
+			IomObject polylineValueInner = innerBoundary.addattrobj("polyline", "POLYLINE");
+			IomObject segmentsInner=polylineValueInner.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegmentInner=segmentsInner.addattrobj("segment", "COORD");
+			startSegmentInner.setattrvalue("C1", "500000.000");
+			startSegmentInner.setattrvalue("C2", "200000.000");
+			IomObject endSegmentInner=segmentsInner.addattrobj("segment", "COORD");
+			endSegmentInner.setattrvalue("C1", "500000.000");
+			endSegmentInner.setattrvalue("C2", "100000.000");
+		}
 		// polyline 2
-		IomObject polylineValue2Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
-		IomObject segments2Inner=polylineValue2Inner.addattrobj("sequence", "SEGMENTS");
-		IomObject startSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		startSegment2Inner.setattrvalue("C1", "550000.000");
-		startSegment2Inner.setattrvalue("C2", "150000.000");
-		IomObject endSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		endSegment2Inner.setattrvalue("C1", "520000.000");
-		endSegment2Inner.setattrvalue("C2", "180000.000");
+		{
+			IomObject polylineValueInner = innerBoundary.addattrobj("polyline", "POLYLINE");
+			IomObject segmentsInner=polylineValueInner.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegmentInner=segmentsInner.addattrobj("segment", "COORD");
+			startSegmentInner.setattrvalue("C1", "500000.000");
+			startSegmentInner.setattrvalue("C2", "100000.000");
+			IomObject endSegmentInner=segmentsInner.addattrobj("segment", "COORD");
+			endSegmentInner.setattrvalue("C1", "550000.000");
+			endSegmentInner.setattrvalue("C2", "150000.000");
+		}
+		// polyline 3
+		{
+			IomObject polylineValueInner = innerBoundary.addattrobj("polyline", "POLYLINE");
+			IomObject segmentsInner=polylineValueInner.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegmentInner=segmentsInner.addattrobj("segment", "COORD");
+			startSegmentInner.setattrvalue("C1", "550000.000");
+			startSegmentInner.setattrvalue("C2", "150000.000");
+			IomObject endSegmentInner=segmentsInner.addattrobj("segment", "COORD");
+			endSegmentInner.setattrvalue("C1", "520000.000");
+			endSegmentInner.setattrvalue("C2", "180000.000");
+		}
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1973,10 +1986,9 @@ public class Area23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
+		assertTrue(logger.getErrs().size()==2);
 		assertEquals("overlay o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -2207,7 +2219,6 @@ public class Area23Test {
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn Dangles erstellt wurden.
-	@Ignore("expected: dangles, actual: Points of LinearRing do not form a closed linestring")
 	@Test
 	public void onePolygon_1Boundary_Dangles_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -2281,7 +2292,7 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("overlay o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	

@@ -357,5 +357,43 @@ public class Iox2jtsext {
 		}
 		return ret;
 	}
-
+	
+	public static ArrayList<CompoundCurve> surface2JTSCompoundCurves(IomObject obj,String validationType,double tolerance,LogEventFactory errFact) throws IoxException {
+		if(obj==null){
+			return null;
+		}
+		boolean clipped=obj.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
+		if(clipped){
+			throw new IoxException("clipped surface not supported");
+		}
+		String tag=obj.getobjecttag();
+		if(!"MULTISURFACE".equals(tag)){
+			throw new IoxException("unexpected Type "+tag+"; MULTISURFACE expected");
+		}
+		int surfacec=obj.getattrvaluecount("surface");
+		if(surfacec==0){
+			throw new IoxException("at least one element surface expected");
+		}
+		ArrayList<CompoundCurve> jtsLines=new ArrayList<CompoundCurve>();
+		for(int surfacei=0;surfacei<surfacec;surfacei++){
+			if(clipped){
+				//out.startElement("CLIPPED",0,0);
+			}else{
+				// an unclipped surface should have only one surface element
+				if(surfacei>0){
+					throw new IoxException("unclipped surface with multi 'surface' elements");
+				}
+			}
+			IomObject surface=obj.getattrobj("surface",surfacei);
+			for(int boundaryi=0;boundaryi<surface.getattrvaluecount("boundary");boundaryi++){
+				IomObject boundary=surface.getattrobj("boundary",boundaryi);
+				for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
+					IomObject polyline=boundary.getattrobj("polyline",polylinei);
+					CompoundCurve jtsLine=Iox2jtsext.polyline2JTS(polyline, false, 0.0,new Holder<Boolean>(),errFact,tolerance,validationType, ValidationConfig.WARNING);
+					jtsLines.add(jtsLine);
+				}
+			}
+		}
+		return jtsLines;
+	}
 }
