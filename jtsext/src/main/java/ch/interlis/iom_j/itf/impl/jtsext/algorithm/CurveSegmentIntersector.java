@@ -45,6 +45,13 @@ public class CurveSegmentIntersector {
 				is[0]=new Coordinate(H1O[1],H2O[1]);
 				is[1]=new Coordinate(H1O[2],H2O[2]);
 				overlap=OVERLAP[0];
+	        }else if(NHO[0]==3){
+	            isOverlay_=true;
+	            hasIntersection_=true;
+	            isNum=2;
+	            is[0]=new Coordinate(H1O[1],H2O[1]);
+	            is[1]=new Coordinate(H1O[2],H2O[2]);
+	            overlap=OVERLAP[0];
 			}else{
 				hasIntersection_=false;
 				isNum=0;

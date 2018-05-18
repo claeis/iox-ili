@@ -357,6 +357,8 @@ public static void ISCICR_(double AV1I[],double AV2I[],double AW1I[],double AW2I
 				if(AV1I[JV]==AW1I[JW] && AV2I[JV]==AW2I[JW]){
 					if(NHO[0]>=2){
 						// 2 identical circles
+	                    H1O[NHO[0]] = AV1I[JV];
+	                    H2O[NHO[0]] = AV2I[JV];
 						NHO[0]=3;
 						return;
 					}
@@ -367,14 +369,6 @@ public static void ISCICR_(double AV1I[],double AV2I[],double AW1I[],double AW2I
 			}
 		}
 		 
-		
-		
-		if(NHO[0]>=2){
-			// normal end // 20150415: stimmt das?
-			return;
-		}
-		// normal end, all IPs are common arc definition pts
-
 		// calculate circle centers V and W
 		{
 			double Z1O[]=new double[1];
@@ -416,14 +410,57 @@ public static void ISCICR_(double AV1I[],double AV2I[],double AW1I[],double AW2I
 		DVWSQ =  D1*D1 + D2*D2;
 		DVW =   Math.hypot(D1, D2); // Math.sqrt(DVWSQ);
 		
-		//	DO CASE 	distance between circle centers and sumjdiff of radii
-		// 	<---CASE 	identical circle centers and radii, escape with message
 		if(RDIF<EPS && DVW < EPS){
-			// identical circles
-			NHO[0]=3;
+			// CASE identical circles
+            NHO[0] = 0;
+            double ALFA_V = PSECOS (AV1I[1],AV2I[1],V1,V2,AV1I[3],AV2I[3]);
+            double BETA_W1= PSECOS(AV1I[1],AV2I[1],V1,V2,AW1I[1],AW2I[1]);
+            if( ALFA_V != BETA_W1 && Math.signum(BETA_W1-ALFA_V) != SIGNV){ // war ==SIGNV
+                // AW1I[1],AW2I[1] lies outside the arc with center V
+            }else {
+                // AW1I[1],AW2I[1] lies inside the arc with center V
+                NHO[0] = NHO[0]+1;
+                H1O[NHO[0]] =  AW1I[1];
+                H2O[NHO[0]] = AW2I[1];
+            }
+            double BETA_W3= PSECOS(AV1I[1],AV2I[1],V1,V2,AW1I[3],AW2I[3]);
+            if( ALFA_V != BETA_W3 && Math.signum(BETA_W3-ALFA_V) != SIGNV){ // war ==SIGNV
+                // AW1I[3],AW2I[3] lies outside the arc with center V
+            }else {
+                // AW1I[3],AW2I[3] lies inside the arc with center V
+                NHO[0] = NHO[0]+1;
+                H1O[NHO[0]] =  AW1I[3];
+                H2O[NHO[0]] = AW2I[3];
+            }
+		    if(NHO[0]!=2) {
+	            double ALFA_W =  PSECOS (AW1I[1],AW2I[1],W1,W2,AW1I[3],AW2I[3]); 
+	            double BETA_V1= PSECOS (AW1I[1],AW2I[1],W1,W2,AV1I[1],AV2I[1]);
+	            if( ALFA_W != BETA_V1 && Math.signum(BETA_V1-ALFA_W) != SIGNW){ // war ==SIGNW
+	                // AV1I[1],AV2I[1] lies outside the arc with center W
+	            }else {
+	                // AV1I[1],AV2I[1] lies inside the arc with center W
+	                NHO[0] = NHO[0]+1;
+	                H1O[NHO[0]] =  AV1I[1];
+	                H2O[NHO[0]] = AV2I[1];
+	            }
+                double BETA_V3= PSECOS (AW1I[1],AW2I[1],W1,W2,AV1I[3],AV2I[3]);
+                if( ALFA_W != BETA_V1 && Math.signum(BETA_V1-ALFA_W) != SIGNW){ // war ==SIGNW
+                    // AV1I[3],AV2I[3] lies outside the arc with center W
+                }else {
+                    // AV1I[3],AV2I[3] lies inside the arc with center W
+                    NHO[0] = NHO[0]+1;
+                    H1O[NHO[0]] =  AV1I[3];
+                    H2O[NHO[0]] = AV2I[3];
+                }
+		    }
+
+            if(NHO[0]==2) {
+                NHO[0]=3;
+            }else if(NHO[0]!=0) {
+                throw new IllegalStateException("unexpected number of common points");
+            }
 			return;
-		}
-		if(DVW >= RDIF+EPS && DVW <= RSUM-EPS){
+		}else if(DVW >= RDIF+EPS && DVW <= RSUM-EPS){
 			//	CASE 	circles meet in two different points
 			// 	calculate x, e and the 2 intersection points 
 			XVF =   (RV*RV + DVWSQ - RW*RW) / (2.0 * DVW);
