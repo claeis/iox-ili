@@ -25,8 +25,6 @@ import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.jtsext.algorithm.CurveSegmentIntersector;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
-import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurveRing;
-import ch.interlis.iom_j.itf.impl.jtsext.geom.CurvePolygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
@@ -290,26 +288,8 @@ public class ItfSurfaceLinetable2Polygon {
 		}
 		return polygonValid;
 	}
-	private static ArrayList<CompoundCurve> createLineset(IomObject iomPolygon,String validationType,double tolerance,LogEventFactory errFact) throws IoxException {
-		Holder<Boolean> foundErrs=new Holder<Boolean>();
-		CurvePolygon poly=(CurvePolygon) Iox2jtsext.surface2JTS(iomPolygon, 0.0,foundErrs,errFact,tolerance,validationType);
-		if(poly==null || foundErrs.value){
-			return null;
-		}
-		ArrayList<CompoundCurve> segv=new ArrayList<CompoundCurve>();
-		// shell
-		com.vividsolutions.jts.geom.LineString shell=poly.getExteriorRing();
-		for(CompoundCurve line:((CompoundCurveRing) shell).getLines()){
-			segv.add(line);
-		}
-		int holec=poly.getNumInteriorRing();
-		for(int holei=0;holei<holec;holei++){
-			com.vividsolutions.jts.geom.LineString hole=poly.getInteriorRingN(holei);
-			for(CompoundCurve line:((CompoundCurveRing) hole).getLines()){
-				segv.add(line);
-			}
-		}
-		return segv;
+	private static ArrayList<CompoundCurve> createLineset(IomObject obj,String validationType,double tolerance,LogEventFactory errFact) throws IoxException {
+		return Iox2jtsext.surface2JTSCompoundCurves(obj, validationType, tolerance, errFact);
 	}
 	private static boolean createPolygon(String mainTid,
 			ArrayList<CompoundCurve> segv,double maxOverlaps,double newVertexOffset,ArrayList<IoxInvalidDataException> dataerrs,

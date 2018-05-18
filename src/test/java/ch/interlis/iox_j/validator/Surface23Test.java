@@ -25,6 +25,7 @@ public class Surface23Test {
 	private TransferDescription td=null;
 	// OID
 	private final static String OID1 ="o1";
+	private final static String OID2 ="o2";
 	// MODEL.TOPIC
 	private final static String ILI_TOPIC="Datatypes23.Topic";
 	// CLASS
@@ -442,9 +443,8 @@ public class Surface23Test {
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
 	// die outer boundary von einer Linie nicht vollstaendig geschlossen wird.
-	@Ignore("expected: invalid ring lines, actual: IllegalArgumentException: Points of LinearRing do not form a closed linestring.")
 	@Test
-	public void surface_InvalidRingLines_Fail(){
+	public void surface_BoundaryNotClosed_Dangles_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -493,15 +493,16 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("invald ring line", logger.getErrs().get(0).getEventMsg());
-		assertEquals("invald ring line", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
+		assertTrue(logger.getErrs().size()==4);
+		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("dangle tid o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("dangle tid o1", logger.getErrs().get(2).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(3).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
 	// die outer boundary von einem Kreisbogen nicht vollstaendig geschlossen wird.
-	@Ignore("expected: invalid ring lines, actual: IllegalArgumentException: Points of LinearRing do not form a closed linestring.")
+	@Ignore("arcs not yet implemented")
 	@Test
 	public void surfaceWithArc_InvalidRingLines_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
@@ -669,10 +670,9 @@ public class Surface23Test {
 	// prueft ob eine Overlay Fehlermeldung ausgegeben wird,
 	// wenn eine Linie der InnerBoundary auf einer Linie der OuterBoundary liegt
 	// und die InnerBoundary nicht vollstaendig geschlossen ist.
-	@Ignore("expected: intersection, actual: IllegalArgumentException: Points of LinearRing do not form a closed linestring --> createLineset()")
 	@Test
 	public void innerBoundary_Overlay_OuterBoundaryLine_AndIsNotClosed_Fail(){
-		EhiLogger.getInstance().setTraceFilter(false);
+		//EhiLogger.getInstance().setTraceFilter(false);
 		Iom_jObject geometricFigure=new Iom_jObject(ILI_CLASSC, OID1);
 		IomObject multisurface=geometricFigure.addattrobj("surface2d", "MULTISURFACE");
 		IomObject surface = multisurface.addattrobj("surface", "SURFACE");
@@ -1679,5 +1679,137 @@ public class Surface23Test {
 		assertTrue(logger.getWarn().size()==0);
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("missing outerboundary in surface2d of object o1.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// prueft ob die folgende Situation erstellt werden kann.
+	// Es wird ein aeusseres Objekt (externalObject) mit einem aeusseren und einem inneren Rand erstellt.
+	// Danach wird ein zweites, inneres Objekt (internalObject) mit nur einem aeusseren Rand erstellt 
+	// (innerhalb des inneren Randes des aeusseren Objekts).
+	// Das innere Objekt beruehrt den inneren Rand des aeusseren Objektes auf einer Strecke.
+	@Test
+	public void twoPolygon_Polygon2InsideInnerBoundaryOfPolygon1_OverlayOn1Line_Ok(){
+		// external object
+		Iom_jObject externalObject=new Iom_jObject(ILI_CLASSC, OID1);
+		IomObject externalMultisurface=externalObject.addattrobj("surface2d", "MULTISURFACE");
+		IomObject surfaceValue = externalMultisurface.addattrobj("surface", "SURFACE");
+		{
+			// outer boundary of external object
+			IomObject outerBoundaryExternalObj = surfaceValue.addattrobj("boundary", "BOUNDARY");
+			// polyline 1
+			IomObject polyline1 = outerBoundaryExternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments=polyline1.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "500000.000");
+			startSegment.setattrvalue("C2", "100000.000");
+			IomObject endSegment=segments.addattrobj("segment", "COORD");
+			endSegment.setattrvalue("C1", "600000.000");
+			endSegment.setattrvalue("C2", "100000.000");
+			// polyline 2
+			IomObject polyline2 = outerBoundaryExternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments2=polyline2.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+			startSegment2.setattrvalue("C1", "600000.000");
+			startSegment2.setattrvalue("C2", "100000.000");
+			IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+			endSegment2.setattrvalue("C1", "600000.000");
+			endSegment2.setattrvalue("C2", "200000.000");
+			// polyline 3
+			IomObject polyline3 = outerBoundaryExternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments3=polyline3.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment3=segments3.addattrobj("segment", "COORD");
+			startSegment3.setattrvalue("C1", "600000.000");
+			startSegment3.setattrvalue("C2", "200000.000");
+			IomObject endSegment3=segments3.addattrobj("segment", "COORD");
+			endSegment3.setattrvalue("C1", "500000.000");
+			endSegment3.setattrvalue("C2", "200000.000");
+			// polyline 4
+			IomObject polyline4 = outerBoundaryExternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments4=polyline4.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment4=segments4.addattrobj("segment", "COORD");
+			startSegment4.setattrvalue("C1", "500000.000");
+			startSegment4.setattrvalue("C2", "200000.000");
+			IomObject endSegment4=segments4.addattrobj("segment", "COORD");
+			endSegment4.setattrvalue("C1", "500000.000");
+			endSegment4.setattrvalue("C2", "100000.000");
+		}
+		// inner boundary of external object
+		IomObject innerBoundaryExternalObj = surfaceValue.addattrobj("boundary", "BOUNDARY");
+		{
+			// polyline 1
+			IomObject polyline1 = innerBoundaryExternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segmentsInner=polyline1.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegmentInner=segmentsInner.addattrobj("segment", "COORD");
+			startSegmentInner.setattrvalue("C1", "545000.000");
+			startSegmentInner.setattrvalue("C2", "110000.000");
+			IomObject endSegmentInner=segmentsInner.addattrobj("segment", "COORD");
+			endSegmentInner.setattrvalue("C1", "585000.000");
+			endSegmentInner.setattrvalue("C2", "185000.000");
+			// polyline 2
+			IomObject polyline2 = innerBoundaryExternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments2Inner=polyline2.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
+			startSegment2Inner.setattrvalue("C1", "585000.000");
+			startSegment2Inner.setattrvalue("C2", "185000.000");
+			IomObject endSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
+			endSegment2Inner.setattrvalue("C1", "515000.000");
+			endSegment2Inner.setattrvalue("C2", "185000.000");
+			// polyline 3
+			IomObject polyline3 = innerBoundaryExternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments3Inner=polyline3.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
+			startSegment3Inner.setattrvalue("C1", "515000.000");
+			startSegment3Inner.setattrvalue("C2", "185000.000");
+			IomObject endSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
+			endSegment3Inner.setattrvalue("C1", "545000.000");
+			endSegment3Inner.setattrvalue("C2", "110000.000");
+		}
+		// internal object
+		Iom_jObject internalObject=new Iom_jObject(ILI_CLASSC, OID2);
+		IomObject internalMultisurface=internalObject.addattrobj("surface2d", "MULTISURFACE");
+		IomObject internalSurface = internalMultisurface.addattrobj("surface", "SURFACE");
+		// outer boundary of internal object
+		IomObject outerBoundaryInternalObj = internalSurface.addattrobj("boundary", "BOUNDARY");
+		{
+			// polyline 1
+			IomObject polyline1 = outerBoundaryInternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments=polyline1.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment=segments.addattrobj("segment", "COORD");
+			startSegment.setattrvalue("C1", "545000.000");
+			startSegment.setattrvalue("C2", "130000.000");
+			IomObject endSegment=segments.addattrobj("segment", "COORD");
+			endSegment.setattrvalue("C1", "585000.000");
+			endSegment.setattrvalue("C2", "185000.000");
+			// polyline 2
+			IomObject polyline2 = outerBoundaryInternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments2=polyline2.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment2=segments2.addattrobj("segment", "COORD");
+			startSegment2.setattrvalue("C1", "585000.000");
+			startSegment2.setattrvalue("C2", "185000.000");
+			IomObject endSegment2=segments2.addattrobj("segment", "COORD");
+			endSegment2.setattrvalue("C1", "515000.000");
+			endSegment2.setattrvalue("C2", "185000.000");
+			// polyline 3
+			IomObject polyline3 = outerBoundaryInternalObj.addattrobj("polyline", "POLYLINE");
+			IomObject segments3=polyline3.addattrobj("sequence", "SEGMENTS");
+			IomObject startSegment3=segments3.addattrobj("segment", "COORD");
+			startSegment3.setattrvalue("C1", "515000.000");
+			startSegment3.setattrvalue("C2", "185000.000");
+			IomObject endSegment3=segments3.addattrobj("segment", "COORD");
+			endSegment3.setattrvalue("C1", "545000.000");
+			endSegment3.setattrvalue("C2", "130000.000");
+		}
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(externalObject));
+		validator.validate(new ObjectEvent(internalObject));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
 	}
 }
