@@ -1005,11 +1005,11 @@ MULTISURFACE {surface SURFACE {
 		}
 	}
 	
-	// prueft, ob 2 Polygone mit je einem Kreisbogen, welche beide exakt uebereinander liegen,
-	// erstellt werden koennen.
-	@Ignore("Arc not yet implemented")
+	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn 2 Polygone mit je einem Kreisbogen
+	// genau uebereinander liegen.
+	@Ignore("arcs not yet implemented")
 	@Test
-	public void test_2Polygon_MitJe1KreisbogenLiegenGenau_Aufeinander_Fail() throws IoxException {
+	public void test_2Polygon_Je1Kreisbogen_LiegenExaktAufeinander_Fail() {
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(geomAttr,0.05,3);
 		
 		IomObject polyline=newPolyline();
@@ -1035,16 +1035,22 @@ MULTISURFACE {surface SURFACE {
 		builder.addItfLinetableObject(linetableObj2);
 		String mainObj11="11";
 		builder.addGeoRef(mainObj11, newCoord(100.0, 260.0));
-		builder.buildSurfaces();
-		IomObject polygon10=builder.getSurfaceObject(mainObj10);
-		//assertEquals("",polygon10.toString());
-		IomObject polygon11=builder.getSurfaceObject(mainObj11);
-		//assertEquals("",polygon11.toString());
+		try{
+			builder.buildSurfaces();
+			fail();
+		}catch(IoxException ex){
+			IoxAssert.assertStartsWith("intersections",ex.getMessage());
+			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
+			assertEquals("overlay 1", errs.get(0).getLocalizedMessage());
+			assertEquals("overlay 1", errs.get(1).getLocalizedMessage());
+			assertEquals(2, errs.size());
+		}
 	}
 	
 	// prueft, ob 2 Polygone mit je einem Kreisbogen, welche beide
 	// unterschiedliche Kreisbogenpunkte haben, und uebereinander liegen,
 	// erstellt werden koennen.
+	@Ignore("arcs not yet implemented")
 	@Test
 	public void test_2Polygon_MitJe1KreisbogenLiegenNichtGenauAufeinander_Fail() throws IoxException {
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(geomAttr,0.05,3);
