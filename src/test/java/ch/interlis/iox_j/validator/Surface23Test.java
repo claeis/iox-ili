@@ -2,7 +2,6 @@ package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
@@ -502,9 +501,9 @@ public class Surface23Test {
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
 	// die outer boundary von einem Kreisbogen nicht vollstaendig geschlossen wird.
-	@Ignore("arcs not yet implemented")
+	// die Fehlermeldung mit den Dangles soll ausgegeben werden und nicht: lineRing not closed.
 	@Test
-	public void surfaceWithArc_InvalidRingLines_Fail(){
+	public void surfaceWithArc_BoundaryNotClosed_Dangles_Fail(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface2d", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -555,10 +554,11 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("invald ring line", logger.getErrs().get(0).getEventMsg());
-		assertEquals("invald ring line", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
+		assertTrue(logger.getErrs().size()==4);
+		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("dangle tid o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("dangle tid o1", logger.getErrs().get(2).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(3).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -1557,6 +1557,234 @@ public class Surface23Test {
 		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
 		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
 		assertEquals("value 10000.000 is out of range", logger.getErrs().get(2).getEventMsg());
+	}
+	
+	// prueft, ob 2 Polygone erstellt werden koennen, wenn 2 Polygone mit je einem Arc,
+	// welche uebereinander liegen und sich an den gleichen Punkten beruehren, erstellt werden koennen.
+	@Test
+	public void twoPolygon_WithArcsLieExactlyOnEachOther_Ok(){
+		Iom_jObject objAreaSuccess=new Iom_jObject(ILI_CLASSC, OID1);
+		{
+			IomObject multisurfaceValue=objAreaSuccess.addattrobj("surface3d", "MULTISURFACE");
+			IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+			IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+			// polyline
+			IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+			{
+				IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C2", "100000.000");
+				startSegment.setattrvalue("C3", "5000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "600000.000");
+				endSegment.setattrvalue("C2", "100000.000");
+				endSegment.setattrvalue("C3", "5000.000");
+			}
+			// polyline 2
+			IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
+			{
+				IomObject segments=polylineValue2.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "600000.000");
+				startSegment.setattrvalue("C2", "100000.000");
+				startSegment.setattrvalue("C3", "5000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "600000.000");
+				endSegment.setattrvalue("C2", "200000.000");
+				endSegment.setattrvalue("C3", "5000.000");
+			}
+			// polyline 3
+			IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
+			{
+				IomObject segments=polylineValue3.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "600000.000");
+				startSegment.setattrvalue("C2", "200000.000");
+				startSegment.setattrvalue("C3", "5000.000");
+				// Arc
+				IomObject arcSegment=segments.addattrobj("segment", "ARC");
+				arcSegment.setattrvalue("A1", "540000.000");
+				arcSegment.setattrvalue("A2", "160000.000");
+				arcSegment.setattrvalue("C1", "500000.000");
+				arcSegment.setattrvalue("C2", "100000.000");
+				arcSegment.setattrvalue("C3", "5000.000");
+			}
+		}
+		Iom_jObject objAreaSuccess2=new Iom_jObject(ILI_CLASSC, OID2);
+		{
+			IomObject multisurfaceValue=objAreaSuccess2.addattrobj("surface3d", "MULTISURFACE");
+			IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+			IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+			// polyline
+			IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+			{
+				IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C2", "100000.000");
+				startSegment.setattrvalue("C3", "5000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "600000.000");
+				endSegment.setattrvalue("C2", "100000.000");
+				endSegment.setattrvalue("C3", "5000.000");
+			}
+			// polyline 2
+			IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
+			{
+				IomObject segments=polylineValue2.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "600000.000");
+				startSegment.setattrvalue("C2", "100000.000");
+				startSegment.setattrvalue("C3", "5000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "600000.000");
+				endSegment.setattrvalue("C2", "200000.000");
+				endSegment.setattrvalue("C3", "5000.000");
+			}
+			// polyline 3
+			IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
+			{
+				IomObject segments=polylineValue3.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "600000.000");
+				startSegment.setattrvalue("C2", "200000.000");
+				startSegment.setattrvalue("C3", "5000.000");
+				// Arc
+				IomObject arcSegment=segments.addattrobj("segment", "ARC");
+				arcSegment.setattrvalue("A1", "540000.000");
+				arcSegment.setattrvalue("A2", "160000.000");
+				arcSegment.setattrvalue("C1", "500000.000");
+				arcSegment.setattrvalue("C2", "100000.000");
+				arcSegment.setattrvalue("C3", "5000.000");
+			}
+		}
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(objAreaSuccess));
+		validator.validate(new ObjectEvent(objAreaSuccess2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// prueft, ob 2 Polygone erstellt werden koennen, wenn 2 Polygone mit je einem Arc,
+	// welche uebereinander liegen und sich nicht an den gleichen Punkten beruehren, erstellt werden koennen.
+	@Test
+	public void twoPolygon_2ArcsLieNotExactlyOnEachOther_Ok(){
+		Iom_jObject objAreaSuccess=new Iom_jObject(ILI_CLASSC, OID1);
+		{
+			IomObject multisurfaceValue=objAreaSuccess.addattrobj("surface3d", "MULTISURFACE");
+			IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+			IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+			// polyline
+			IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+			{
+				IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "499996.000");
+				startSegment.setattrvalue("C2", "100000.000");
+				startSegment.setattrvalue("C3", "5000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "500000.000");
+				endSegment.setattrvalue("C2", "100005.000");
+				endSegment.setattrvalue("C3", "5000.000");
+			}
+			// polyline 2
+			IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
+			{
+				IomObject segments=polylineValue2.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C2", "100005.000");
+				startSegment.setattrvalue("C3", "5000.000");
+				// Arc
+				IomObject arcSegment=segments.addattrobj("segment", "ARC");
+				arcSegment.setattrvalue("A1", "500004.000");
+				arcSegment.setattrvalue("A2", "100003.000");
+				arcSegment.setattrvalue("C1", "500000.000");
+				arcSegment.setattrvalue("C2", "99995.000");
+				arcSegment.setattrvalue("C3", "5000.000");
+			}
+			// polyline 3
+			IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
+			{
+				IomObject segments=polylineValue3.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C2", "99995.000");
+				startSegment.setattrvalue("C3", "5000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "499996.000");
+				endSegment.setattrvalue("C2", "100000.000");
+				endSegment.setattrvalue("C3", "5000.000");
+			}
+		}
+		Iom_jObject objAreaSuccess2=new Iom_jObject(ILI_CLASSC, OID2);
+		{
+			IomObject multisurfaceValue=objAreaSuccess2.addattrobj("surface3d", "MULTISURFACE");
+			IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+			IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+			// polyline
+			IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+			{
+				IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "499996.000");
+				startSegment.setattrvalue("C2", "100000.000");
+				startSegment.setattrvalue("C3", "5000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "500000.000");
+				endSegment.setattrvalue("C2", "100005.000");
+				endSegment.setattrvalue("C3", "5000.000");
+			}
+			// polyline 2
+			IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
+			{
+				IomObject segments=polylineValue2.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C2", "100005.000");
+				startSegment.setattrvalue("C3", "5000.000");
+				// Arc
+				IomObject arcSegment=segments.addattrobj("segment", "ARC");
+				arcSegment.setattrvalue("A1", "500004.000");
+				arcSegment.setattrvalue("A2", "99997.000");
+				arcSegment.setattrvalue("C1", "500000.000");
+				arcSegment.setattrvalue("C2", "99995.000");
+				arcSegment.setattrvalue("C3", "5000.000");
+			}
+			// polyline 3
+			IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
+			{
+				IomObject segments=polylineValue3.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C2", "99995.000");
+				startSegment.setattrvalue("C3", "5000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "499996.000");
+				endSegment.setattrvalue("C2", "100000.000");
+				endSegment.setattrvalue("C3", "5000.000");
+			}
+		}
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(objAreaSuccess));
+		validator.validate(new ObjectEvent(objAreaSuccess2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		assertTrue(logger.getErrs().size()==0);
 	}
 	
 	// prueft, ob eine Surface erstellt werden kann, wenn

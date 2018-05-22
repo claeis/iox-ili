@@ -1077,7 +1077,6 @@ public class Area23Test {
 	}
 	
 	// prueft ob ein Polygon mit einem Kreisbogen erstellt werden kann.
-	@Ignore("arcs not yet implemented")
 	@Test
 	public void onePolygon_1Boundary_AreaWithArc_Ok(){
 		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1469,9 +1468,8 @@ public class Area23Test {
 	
 	// prueft, ob 2 Polygone erstellt werden koennen, wenn 2 Polygone mit je einem Arc,
 	// welche uebereinander liegen und sich an den gleichen Punkten beruehren, erstellt werden koennen.
-	@Ignore("arcs not yet implemented")
 	@Test
-	public void twoPolygon_2ArcsLieExactlyOnEachOther_Ok(){
+	public void twoPolygon_WithArcsLieExactlyOnEachOther_Ok(){
 		Iom_jObject objAreaSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		{
 			IomObject multisurfaceValue=objAreaSuccess.addattrobj("area3d", "MULTISURFACE");
@@ -1579,20 +1577,16 @@ public class Area23Test {
 		validator.validate(new ObjectEvent(objAreaSuccess2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
-		assertTrue(logger.getErrs().size()==6);
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(2).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(3).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(4).getEventMsg());
-		assertEquals("failed to validate polygons", logger.getErrs().get(5).getEventMsg());
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("polygons overlay tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area3d", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft, ob 2 Polygone erstellt werden koennen, wenn 2 Polygone mit je einem Arc,
 	// welche uebereinander liegen und sich nicht an den gleichen Punkten beruehren, erstellt werden koennen.
-	@Ignore("arcs not yet implemented")
+	@Ignore("unexpected number of common points")
 	@Test
-	public void twoPolygon_2ArcsLieNotExactlyOnEachOther_Fail(){
+	public void twoPolygon_2ArcsLieNotExactlyOnEachOther_Ok(){
 		Iom_jObject objAreaSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		{
 			IomObject multisurfaceValue=objAreaSuccess.addattrobj("area3d", "MULTISURFACE");
@@ -1603,12 +1597,12 @@ public class Area23Test {
 			{
 				IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
 				IomObject startSegment=segments.addattrobj("segment", "COORD");
-				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C1", "499996.000");
 				startSegment.setattrvalue("C2", "100000.000");
 				startSegment.setattrvalue("C3", "5000.000");
 				IomObject endSegment=segments.addattrobj("segment", "COORD");
-				endSegment.setattrvalue("C1", "600000.000");
-				endSegment.setattrvalue("C2", "100000.000");
+				endSegment.setattrvalue("C1", "500000.000");
+				endSegment.setattrvalue("C2", "100005.000");
 				endSegment.setattrvalue("C3", "5000.000");
 			}
 			// polyline 2
@@ -1616,29 +1610,29 @@ public class Area23Test {
 			{
 				IomObject segments=polylineValue2.addattrobj("sequence", "SEGMENTS");
 				IomObject startSegment=segments.addattrobj("segment", "COORD");
-				startSegment.setattrvalue("C1", "600000.000");
-				startSegment.setattrvalue("C2", "100000.000");
+				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C2", "100005.000");
 				startSegment.setattrvalue("C3", "5000.000");
-				IomObject endSegment=segments.addattrobj("segment", "COORD");
-				endSegment.setattrvalue("C1", "600000.000");
-				endSegment.setattrvalue("C2", "200000.000");
-				endSegment.setattrvalue("C3", "5000.000");
+				// Arc
+				IomObject arcSegment=segments.addattrobj("segment", "ARC");
+				arcSegment.setattrvalue("A1", "500004.000");
+				arcSegment.setattrvalue("A2", "100003.000");
+				arcSegment.setattrvalue("C1", "500000.000");
+				arcSegment.setattrvalue("C2", "99995.000");
+				arcSegment.setattrvalue("C3", "5000.000");
 			}
 			// polyline 3
 			IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
 			{
 				IomObject segments=polylineValue3.addattrobj("sequence", "SEGMENTS");
 				IomObject startSegment=segments.addattrobj("segment", "COORD");
-				startSegment.setattrvalue("C1", "600000.000");
-				startSegment.setattrvalue("C2", "200000.000");
+				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C2", "99995.000");
 				startSegment.setattrvalue("C3", "5000.000");
-				// Arc
-				IomObject arcSegment=segments.addattrobj("segment", "ARC");
-				arcSegment.setattrvalue("A1", "540000.000");
-				arcSegment.setattrvalue("A2", "160000.000");
-				arcSegment.setattrvalue("C1", "500000.000");
-				arcSegment.setattrvalue("C2", "100000.000");
-				arcSegment.setattrvalue("C3", "5000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "499996.000");
+				endSegment.setattrvalue("C2", "100000.000");
+				endSegment.setattrvalue("C3", "5000.000");
 			}
 		}
 		Iom_jObject objAreaSuccess2=new Iom_jObject(ILI_CLASSD, OID2);
@@ -1651,12 +1645,12 @@ public class Area23Test {
 			{
 				IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
 				IomObject startSegment=segments.addattrobj("segment", "COORD");
-				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C1", "499996.000");
 				startSegment.setattrvalue("C2", "100000.000");
 				startSegment.setattrvalue("C3", "5000.000");
 				IomObject endSegment=segments.addattrobj("segment", "COORD");
-				endSegment.setattrvalue("C1", "600000.000");
-				endSegment.setattrvalue("C2", "100000.000");
+				endSegment.setattrvalue("C1", "500000.000");
+				endSegment.setattrvalue("C2", "100005.000");
 				endSegment.setattrvalue("C3", "5000.000");
 			}
 			// polyline 2
@@ -1664,29 +1658,29 @@ public class Area23Test {
 			{
 				IomObject segments=polylineValue2.addattrobj("sequence", "SEGMENTS");
 				IomObject startSegment=segments.addattrobj("segment", "COORD");
-				startSegment.setattrvalue("C1", "600000.000");
-				startSegment.setattrvalue("C2", "100000.000");
+				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C2", "100005.000");
 				startSegment.setattrvalue("C3", "5000.000");
-				IomObject endSegment=segments.addattrobj("segment", "COORD");
-				endSegment.setattrvalue("C1", "600000.000");
-				endSegment.setattrvalue("C2", "200000.000");
-				endSegment.setattrvalue("C3", "5000.000");
+				// Arc
+				IomObject arcSegment=segments.addattrobj("segment", "ARC");
+				arcSegment.setattrvalue("A1", "500004.000");
+				arcSegment.setattrvalue("A2", "99997.000");
+				arcSegment.setattrvalue("C1", "500000.000");
+				arcSegment.setattrvalue("C2", "99995.000");
+				arcSegment.setattrvalue("C3", "5000.000");
 			}
 			// polyline 3
 			IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
 			{
 				IomObject segments=polylineValue3.addattrobj("sequence", "SEGMENTS");
 				IomObject startSegment=segments.addattrobj("segment", "COORD");
-				startSegment.setattrvalue("C1", "600000.000");
-				startSegment.setattrvalue("C2", "200000.000");
+				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C2", "99995.000");
 				startSegment.setattrvalue("C3", "5000.000");
-				// Arc
-				IomObject arcSegment=segments.addattrobj("segment", "ARC");
-				arcSegment.setattrvalue("A1", "540000.000");
-				arcSegment.setattrvalue("A2", "160000.000");
-				arcSegment.setattrvalue("C1", "499999.000");
-				arcSegment.setattrvalue("C2", "100001.000");
-				arcSegment.setattrvalue("C3", "5000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "499996.000");
+				endSegment.setattrvalue("C2", "100000.000");
+				endSegment.setattrvalue("C3", "5000.000");
 			}
 		}
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1700,14 +1694,10 @@ public class Area23Test {
 		validator.validate(new ObjectEvent(objAreaSuccess2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
-		assertTrue(logger.getErrs().size()==6);
+		assertTrue(logger.getErrs().size()==3);
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(2).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(3).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(4).getEventMsg());
 		assertEquals("failed to validate polygons", logger.getErrs().get(5).getEventMsg());
-	
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,

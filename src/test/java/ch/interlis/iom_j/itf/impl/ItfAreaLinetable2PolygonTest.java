@@ -2,7 +2,6 @@ package ch.interlis.iom_j.itf.impl;
 
 import static org.junit.Assert.*;
 import java.util.ArrayList;
-import org.junit.Ignore;
 import org.junit.Test;
 import com.vividsolutions.jts.geom.Polygon;
 import ch.interlis.iom.IomObject;
@@ -1007,7 +1006,6 @@ MULTISURFACE {surface SURFACE {
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn 2 Polygone mit je einem Kreisbogen
 	// genau uebereinander liegen.
-	@Ignore("arcs not yet implemented")
 	@Test
 	public void test_2Polygon_Je1Kreisbogen_LiegenExaktAufeinander_Fail() {
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(geomAttr,0.05,3);
@@ -1041,16 +1039,16 @@ MULTISURFACE {surface SURFACE {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
+			assertEquals(3, errs.size());
 			assertEquals("overlay 1", errs.get(0).getLocalizedMessage());
 			assertEquals("overlay 1", errs.get(1).getLocalizedMessage());
-			assertEquals(2, errs.size());
+			assertEquals("overlay 1", errs.get(2).getLocalizedMessage());
 		}
 	}
 	
 	// prueft, ob 2 Polygone mit je einem Kreisbogen, welche beide
 	// unterschiedliche Kreisbogenpunkte haben, und uebereinander liegen,
 	// erstellt werden koennen.
-	@Ignore("arcs not yet implemented")
 	@Test
 	public void test_2Polygon_MitJe1KreisbogenLiegenNichtGenauAufeinander_Fail() throws IoxException {
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(geomAttr,0.05,3);

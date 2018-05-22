@@ -2,8 +2,6 @@ package ch.interlis.iom_j.itf.impl;
 
 import static org.junit.Assert.*;
 import java.util.ArrayList;
-
-import org.junit.Ignore;
 import org.junit.Test;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxException;
@@ -974,7 +972,6 @@ public class ItfSurfaceLinetable2PolygonTest {
 	
 	// prueft, ob 2 Polygone mit je einem Kreisbogen, welche beide exakt uebereinander liegen,
 	// erstellt werden koennen.
-	@Ignore("arcs not yet implemented")
 	@Test
 	public void test_2Polygon_MitJe1KreisbogenLiegenGenau_Aufeinander_Ok() throws IoxException {
 		ItfSurfaceLinetable2Polygon builder=new ItfSurfaceLinetable2Polygon(REFATTR,GEOMATTR,0.05,3);
@@ -1012,7 +1009,6 @@ public class ItfSurfaceLinetable2PolygonTest {
 	// prueft, ob 2 Polygone mit je einem Kreisbogen, welche beide
 	// unterschiedliche Kreisbogenpunkte haben und uebereinander liegen,
 	// erstellt werden koennen.
-	@Ignore("arcs not yet implemented")
 	@Test
 	public void test_2Polygon_MitJe1KreisbogenLiegenNichtGenauAufeinander_Ok() throws IoxException {
 		ItfSurfaceLinetable2Polygon builder=new ItfSurfaceLinetable2Polygon(REFATTR,GEOMATTR,0.05,3);
