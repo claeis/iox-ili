@@ -28,6 +28,7 @@ import ch.interlis.ili2c.metamodel.Constraint;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Domain;
+import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.EnumTreeValueType;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.Evaluable;
@@ -2649,9 +2650,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				 validateGeometryType=defaultGeometryTypeValidation;
 			 }
 		 }
-		 
+		
 		Type type0 = attr.getDomain();
-		Type type = attr.getDomainResolvingAliases();
+		Type type = attr.getDomainResolvingAll();
 		if (type instanceof CompositionType){
 			 int structc=iomObj.getattrvaluecount(attrName);
 				if(ValidationConfig.OFF.equals(validateMultiplicity)){
@@ -2703,9 +2704,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}else{
 				Object topologyDone=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
+				if(type0==null) {
+					 type0=attr.getDomainResolvingAll();
+				}
 				if(topologyDone==null){
 					 int structc=iomObj.getattrvaluecount(attrName);
-					 if(attr.getDomain().isMandatoryConsideringAliases() && structc==0){
+					 if(structc==0 && isAttributeMandatory(attr)) {
 						 if(doItfLineTables && type instanceof SurfaceType){
 							 // SURFACE; no attrValue in maintable
 						 }else{
@@ -2716,7 +2720,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					Boolean topologyValidationOk=(Boolean)pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY_VALIDATION_OK);
 					if(topologyValidationOk==null || topologyValidationOk){
 						 int structc=iomObj.getattrvaluecount(attrName);
-						 if(attr.getDomain().isMandatoryConsideringAliases() && structc==0){
+						 if(structc==0 && isAttributeMandatory(attr)) {
 							 logMsg(validateMultiplicity,"Attribute {0} requires a value", attrPath);
 						 }
 					}else{
@@ -2918,6 +2922,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
+	private static boolean isAttributeMandatory(AttributeDef attr) {
+		Type attrType=attr.getDomain();
+		if(attrType==null) {
+			if(attr instanceof LocalAttribute){
+				Evaluable[] ev = (((LocalAttribute)attr).getBasePaths());
+				attrType=((ObjectPath)ev[0]).getType();
+			}else {
+				throw new IllegalArgumentException("unexpected attribute type "+attr.getScopedName());
+			}
+		}
+		return attrType.isMandatoryConsideringAliases();
+	}
+	
 	private void validateAreaTopology(String validateType, ItfAreaPolygon2Linetable allLines,AreaType type, String mainObjTid,String internalTid,IomObject iomPolygon) throws IoxException {
 		// get lines
 		allLines.addPolygon(mainObjTid,internalTid,iomPolygon,validateType,errFact);

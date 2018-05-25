@@ -1,0 +1,60 @@
+INTERLIS 2.3;
+
+MODEL AttributeDef23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" =
+	TOPIC AttrMultiplicity =
+		DOMAIN
+			LabelOptional = TEXT*10;
+			LabelMandatory = MANDATORY TEXT*10;
+			Label EXTENDS LabelOptional = MANDATORY;
+					              
+		CLASS ClassA =
+		   attrOptional : TEXT*10;
+		END ClassA;
+
+		CLASS ClassAp EXTENDS ClassA =
+		   attrOptional (EXTENDED) : MANDATORY; !! attrOptional is now mandatory
+		END ClassAp;
+		
+		CLASS ClassB =
+		   attrMandatory : MANDATORY TEXT*10;
+		END ClassB;
+		
+		CLASS ClassC =
+		   attrOptional : LabelOptional;
+		END ClassC;
+		
+		CLASS ClassD =
+		   attrMandatory : MANDATORY LabelOptional;
+		END ClassD;
+		
+		CLASS ClassE =
+		   attrMandatory : LabelMandatory;
+		END ClassE;
+
+		CLASS ClassF =
+		   attrMandatory : Label;
+		END ClassF;
+		
+	END AttrMultiplicity;
+	
+	TOPIC AttrIndirectType =
+		CLASS ClassA =
+			attrOptional : TEXT*10;
+		END ClassA;
+		
+        VIEW ClassV1
+    		PROJECTION OF Base~AttributeDef23.AttrIndirectType.ClassA;
+    		=
+      	 	ALL OF Base;
+    	END ClassV1;
+    	
+    	VIEW ClassV2
+    		PROJECTION OF Base~AttributeDef23.AttrIndirectType.ClassA;
+    		=
+      	 	attrOptionalZusatz := Base->attrOptional;
+    	END ClassV2;
+    	
+	END AttrIndirectType;
+		
+END AttributeDef23.
