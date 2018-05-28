@@ -76,7 +76,7 @@ public class ReaderFactoryTest {
 	public void xtf23Reader_Ok() throws IoxException {
 		IoxReader reader=null;
 		new ReaderFactory();
-		reader=new ReaderFactory().createReader(new File("src/test/data/Xtf23Reader/SimpleCoord23a.xtf"),null);
+		reader=new ReaderFactory().createReader(new File("src/test/data/Xtf23Reader/dataSection/SimpleCoord23a.xtf"),null);
 		assertTrue(reader instanceof XtfReader);
 	}
 	
