@@ -382,12 +382,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
 	private void validateAllAreas() {
+		setCurrentMainObj(null);
 		for(AttributeDef attr:areaAttrs.keySet()){
 			errs.addEvent(errFact.logInfoMsg("validate AREA {0}...", getScopedName(attr)));
 			ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
 			List<IoxInvalidDataException> intersections=allLines.validate();
 			if(intersections!=null && intersections.size()>0){
 				for(IoxInvalidDataException ex:intersections){ // iterate through non-overlay intersections
+					String tid1=ex.getTid();
+					String iliqname=ex.getIliqname();
+					errFact.setTid(tid1);
+					errFact.setIliqname(iliqname);
 					//logMsg(areaOverlapValidation,"intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
 					if(ex instanceof IoxIntersectionException) {
 						logMsg(areaOverlapValidation, ((IoxIntersectionException) ex).getIntersection().toShortString());
@@ -396,6 +401,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						logMsg(areaOverlapValidation, ex.getMessage());
 					}
 				}
+				setCurrentMainObj(null);
 				logMsg(areaOverlapValidation,"failed to validate AREA {0}", getScopedName(attr));
 			}
 		}
@@ -1377,8 +1383,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if (surfaceAttr.isUndefined()){
 					return Value.createSkipEvaluation();
 				} // if surfaceBag is undefined
+				String objTag=null;
+				if(iomObj!=null){
+					objTag=iomObj.getobjecttag();
+				}
+				Object aModelele=tag2class.get(objTag);
+				Viewable eleClass=(Viewable) aModelele;
+				String iliClassQName=getScopedName(eleClass);
 				if(surfaceBag.isUndefined()){
-					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(objPoolManager); // create new pool of polygons
+					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(iliClassQName, objPoolManager); // create new pool of polygons
 					if(objects.getViewable()!=null){
 						Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
 						while(objectIterator.hasNext()){
@@ -1420,7 +1433,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					return new Value(true); // valid areas
 				} else {
 					// if surfaceBag is defined
-					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(objPoolManager);
+					ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(iliClassQName, objPoolManager);
 					if(objects.getViewable()!=null){
 						Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
 						while(objectIterator.hasNext()){
@@ -2481,7 +2494,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	
 	private void setCurrentMainObj(IomObject iomObj) {
 		errFact.setDataObj(iomObj);
-		currentMainOid=iomObj.getobjectoid();
+		if(iomObj!=null) {
+			currentMainOid=iomObj.getobjectoid();
+		}else {
+			currentMainOid=null;
+		}
 	}
 
 	private IomObject getDefaultCoord(IomObject iomObj) {
@@ -2632,6 +2649,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void validateAttrValue(IomObject iomObj, AttributeDef attr,String attrPath) throws IoxException {
 		 String attrName = attr.getName();
 		 String attrQName = getScopedName(attr);
+		 String objTag=null;
+		 if(iomObj!=null){
+		 	objTag=iomObj.getobjecttag();
+		 }
+		 Object aModelele=tag2class.get(objTag);
+		 Viewable eleClass=(Viewable) aModelele;
+		 String iliClassQName=getScopedName(eleClass);
 		 if(attrPath==null){
 			 attrPath=attrName;
 		 }else{
@@ -2849,7 +2873,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 											
 												ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
 												if(allLines==null){
-													allLines=new ItfAreaPolygon2Linetable(objPoolManager); 
+													allLines=new ItfAreaPolygon2Linetable(iliClassQName, objPoolManager); 
 													areaAttrs.put(attr,allLines);
 												}
 												validateAreaTopology(validateGeometryType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);

@@ -36,10 +36,12 @@ public class ItfAreaPolygon2Linetable {
 	private Collection<? extends Polygon> polygons=null;
 	private Collection<IomObject> ioxlines=null;
 	private ObjectPoolManager recman=null;
-	public ItfAreaPolygon2Linetable(ObjectPoolManager recman1){
+	private String iliqname=null;
+	public ItfAreaPolygon2Linetable(String iliqname1, ObjectPoolManager recman1){
 		lines=new FileBasedCollection<CompoundCurve>(recman1,new CompoundCurveSerializer());
 		polygons=new java.util.ArrayList<Polygon>();
 		recman=recman1;
+		iliqname=iliqname1;
 	}
 	public void addLines(String mainObjTid,String internalTid,ArrayList<IomObject> ioxlines) throws IoxException {
 		for(IomObject ioxline:ioxlines){
@@ -110,6 +112,7 @@ public class ItfAreaPolygon2Linetable {
 				Coordinate p01;
 				Coordinate p11;
 				Coordinate p10;
+				String tid1=(String) e0.getUserData();
 				p00 = e0.getSegments().get(segIndex0).getStartPoint();
 				p01 = e0.getSegments().get(segIndex0).getEndPoint();
 				p10 = e1.getSegments().get(segIndex1).getStartPoint();
@@ -122,7 +125,7 @@ public class ItfAreaPolygon2Linetable {
 				   is.isIntersection(p11)) {
 				   // ignore intersections that are the result of identical segments
 				}else {
-					intersectionsWithoutCompleteOverlays.add(new IoxIntersectionException(is));
+					intersectionsWithoutCompleteOverlays.add(new IoxIntersectionException(iliqname, tid1, is));
 				}
 			}
 			
