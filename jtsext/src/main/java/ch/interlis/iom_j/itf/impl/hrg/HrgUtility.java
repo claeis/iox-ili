@@ -413,51 +413,144 @@ public static void ISCICR_(double AV1I[],double AV2I[],double AW1I[],double AW2I
 		if(RDIF<EPS && DVW < EPS){
 			// CASE identical circles
             NHO[0] = 0;
-            double ALFA_V = PSECOS (AV1I[1],AV2I[1],V1,V2,AV1I[3],AV2I[3]);
-            double BETA_W1= PSECOS(AV1I[1],AV2I[1],V1,V2,AW1I[1],AW2I[1]);
-            if( ALFA_V != BETA_W1 && Math.signum(BETA_W1-ALFA_V) != SIGNV){ // war ==SIGNV
-                // AW1I[1],AW2I[1] lies outside the arc with center V
-            }else {
-                // AW1I[1],AW2I[1] lies inside the arc with center V
-                NHO[0] = NHO[0]+1;
-                H1O[NHO[0]] =  AW1I[1];
-                H2O[NHO[0]] = AW2I[1];
-            }
-            double BETA_W3= PSECOS(AV1I[1],AV2I[1],V1,V2,AW1I[3],AW2I[3]);
-            if( ALFA_V != BETA_W3 && Math.signum(BETA_W3-ALFA_V) != SIGNV){ // war ==SIGNV
-                // AW1I[3],AW2I[3] lies outside the arc with center V
-            }else {
-                // AW1I[3],AW2I[3] lies inside the arc with center V
-                NHO[0] = NHO[0]+1;
-                H1O[NHO[0]] =  AW1I[3];
-                H2O[NHO[0]] = AW2I[3];
-            }
-		    if(NHO[0]!=2) {
-	            double ALFA_W =  PSECOS (AW1I[1],AW2I[1],W1,W2,AW1I[3],AW2I[3]); 
-	            double BETA_V1= PSECOS (AW1I[1],AW2I[1],W1,W2,AV1I[1],AV2I[1]);
-	            if( ALFA_W != BETA_V1 && Math.signum(BETA_V1-ALFA_W) != SIGNW){ // war ==SIGNW
-	                // AV1I[1],AV2I[1] lies outside the arc with center W
-	            }else {
-	                // AV1I[1],AV2I[1] lies inside the arc with center W
-	                NHO[0] = NHO[0]+1;
-	                H1O[NHO[0]] =  AV1I[1];
-	                H2O[NHO[0]] = AV2I[1];
-	            }
-                double BETA_V3= PSECOS (AW1I[1],AW2I[1],W1,W2,AV1I[3],AV2I[3]);
-                if( ALFA_W != BETA_V1 && Math.signum(BETA_V1-ALFA_W) != SIGNW){ // war ==SIGNW
-                    // AV1I[3],AV2I[3] lies outside the arc with center W
+            if(SIGNV==SIGNW) {
+                // same direction
+                // calc start of overlay
+                if(AV1I[1]==AW1I[1] && AV2I[1]==AW2I[1]) {
+                    // same start point
+                    NHO[0] = NHO[0]+1;
+                    H1O[NHO[0]] =  AV1I[1];
+                    H2O[NHO[0]] = AV2I[1];
                 }else {
-                    // AV1I[3],AV2I[3] lies inside the arc with center W
+                    double ALFA_V = PSECOS (AV1I[1],AV2I[1],V1,V2,AV1I[3],AV2I[3]);
+                    double BETA_W1= PSECOS(AV1I[1],AV2I[1],V1,V2,AW1I[1],AW2I[1]);
+                    if( ALFA_V != BETA_W1 && Math.signum(BETA_W1-ALFA_V) != SIGNV){ // war ==SIGNV
+                        // AW1I[1],AW2I[1] lies outside the arc with center V
+                        double ALFA_W =  PSECOS (AW1I[1],AW2I[1],W1,W2,AW1I[3],AW2I[3]); 
+                        double BETA_V1= PSECOS (AW1I[1],AW2I[1],W1,W2,AV1I[1],AV2I[1]);
+                        if( ALFA_W != BETA_V1 && Math.signum(BETA_V1-ALFA_W) != SIGNW){ // war ==SIGNW
+                            // AV1I[1],AV2I[1] lies outside the arc with center W
+                            // same circle, but no overlay
+                            NHO[0] = 0;
+                            return;
+                        }else {
+                            // AV1I[1],AV2I[1] lies inside the arc with center W
+                            NHO[0] = NHO[0]+1;
+                            H1O[NHO[0]] =  AV1I[1];
+                            H2O[NHO[0]] = AV2I[1];
+                        }
+                    }else {
+                        // AW1I[1],AW2I[1] lies inside the arc with center V
+                        NHO[0] = NHO[0]+1;
+                        H1O[NHO[0]] =  AW1I[1];
+                        H2O[NHO[0]] = AW2I[1];
+                    }
+                    
+                }
+                
+                // calc end of overlay
+                if(AV1I[3]==AW1I[3] && AV2I[3]==AW2I[3]) {
+                    // same end point
                     NHO[0] = NHO[0]+1;
                     H1O[NHO[0]] =  AV1I[3];
                     H2O[NHO[0]] = AV2I[3];
+                }else {
+                    double ALFA_V = PSECOS (AV1I[1],AV2I[1],V1,V2,AV1I[3],AV2I[3]);
+                    double BETA_W3= PSECOS(AV1I[1],AV2I[1],V1,V2,AW1I[3],AW2I[3]);
+                    if( ALFA_V != BETA_W3 && Math.signum(BETA_W3-ALFA_V) != SIGNV){ // war ==SIGNV
+                        // AW1I[3],AW2I[3] lies outside the arc with center V
+                        double ALFA_W =  PSECOS (AW1I[1],AW2I[1],W1,W2,AW1I[3],AW2I[3]); 
+                        double BETA_V3= PSECOS (AW1I[1],AW2I[1],W1,W2,AV1I[3],AV2I[3]);
+                        if( ALFA_W != BETA_V3 && Math.signum(BETA_V3-ALFA_W) != SIGNW){ // war ==SIGNW
+                            // AV1I[3],AV2I[3] lies outside the arc with center W
+                            // same circle, but no overlay
+                            NHO[0] = 0;
+                            return;
+                        }else {
+                            // AV1I[3],AV2I[3] lies inside the arc with center W
+                            NHO[0] = NHO[0]+1;
+                            H1O[NHO[0]] =  AV1I[3];
+                            H2O[NHO[0]] = AV2I[3];
+                        }
+                    }else {
+                        // AW1I[3],AW2I[3] lies inside the arc with center V
+                        NHO[0] = NHO[0]+1;
+                        H1O[NHO[0]] =  AW1I[3];
+                        H2O[NHO[0]] = AW2I[3];
+                    }
                 }
-		    }
-
+            }else {
+                // opposide direction
+                // calc start of overlay
+                if(AV1I[1]==AW1I[3] && AV2I[1]==AW2I[3]) {
+                    // same start point
+                    NHO[0] = NHO[0]+1;
+                    H1O[NHO[0]] =  AV1I[1];
+                    H2O[NHO[0]] = AV2I[1];
+                }else {
+                    double ALFA_V = PSECOS (AV1I[1],AV2I[1],V1,V2,AV1I[3],AV2I[3]);
+                    double BETA_W3= PSECOS(AV1I[1],AV2I[1],V1,V2,AW1I[3],AW2I[3]);
+                    if( ALFA_V != BETA_W3 && Math.signum(BETA_W3-ALFA_V) != SIGNV){ // war ==SIGNV
+                        // AW1I[3],AW2I[3] lies outside the arc with center V
+                        double ALFA_W =  PSECOS (AW1I[1],AW2I[1],W1,W2,AW1I[3],AW2I[3]); 
+                        double BETA_V1= PSECOS (AW1I[1],AW2I[1],W1,W2,AV1I[1],AV2I[1]);
+                        if( ALFA_W != BETA_V1 && Math.signum(BETA_V1-ALFA_W) != SIGNW){ // war ==SIGNW
+                            // AV1I[1],AV2I[1] lies outside the arc with center W
+                            // same circle, but no overlay
+                            NHO[0] = 0;
+                            return;
+                        }else {
+                            // AV1I[1],AV2I[1] lies inside the arc with center W
+                            NHO[0] = NHO[0]+1;
+                            H1O[NHO[0]] =  AV1I[1];
+                            H2O[NHO[0]] = AV2I[1];
+                        }
+                    }else {
+                        // AW1I[3],AW2I[3] lies inside the arc with center V
+                        NHO[0] = NHO[0]+1;
+                        H1O[NHO[0]] =  AW1I[3];
+                        H2O[NHO[0]] = AW2I[3];
+                    }
+                    
+                }
+                
+                // calc end of overlay
+                if(AV1I[3]==AW1I[1] && AV2I[3]==AW2I[1]) {
+                    // same end point
+                    NHO[0] = NHO[0]+1;
+                    H1O[NHO[0]] =  AV1I[3];
+                    H2O[NHO[0]] = AV2I[3];
+                }else {
+                    double ALFA_V = PSECOS (AV1I[1],AV2I[1],V1,V2,AV1I[3],AV2I[3]);
+                    double BETA_W1= PSECOS(AV1I[1],AV2I[1],V1,V2,AW1I[1],AW2I[1]);
+                    if( ALFA_V != BETA_W1 && Math.signum(BETA_W1-ALFA_V) != SIGNV){ // war ==SIGNV
+                        // AW1I[1],AW2I[1] lies outside the arc with center V
+                        double ALFA_W =  PSECOS (AW1I[1],AW2I[1],W1,W2,AW1I[3],AW2I[3]); 
+                        double BETA_V1= PSECOS (AW1I[1],AW2I[1],W1,W2,AV1I[1],AV2I[1]);
+                        if( ALFA_W != BETA_V1 && Math.signum(BETA_V1-ALFA_W) != SIGNW){ // war ==SIGNW
+                            // AV1I[1],AV2I[1] lies outside the arc with center W
+                            // same circle, but no overlay
+                            NHO[0] = 0;
+                            return;
+                        }else {
+                            // AV1I[1],AV2I[1] lies inside the arc with center W
+                            NHO[0] = NHO[0]+1;
+                            H1O[NHO[0]] =  AV1I[1];
+                            H2O[NHO[0]] = AV2I[1];
+                        }
+                    }else {
+                        // AW1I[1],AW2I[1] lies inside the arc with center V
+                        NHO[0] = NHO[0]+1;
+                        H1O[NHO[0]] =  AW1I[1];
+                        H2O[NHO[0]] = AW2I[1];
+                    }
+                }
+                
+            }
             if(NHO[0]==2) {
                 NHO[0]=3;
             }else if(NHO[0]!=0) {
-                throw new IllegalStateException("unexpected number of common points");
+                throw new IllegalStateException("unexpected number ("+NHO[0]+") of common points");
             }
 			return;
 		}else if(DVW >= RDIF+EPS && DVW <= RSUM-EPS){
