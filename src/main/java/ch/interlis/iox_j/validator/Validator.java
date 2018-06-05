@@ -1,6 +1,10 @@
 package ch.interlis.iox_j.validator;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -3215,25 +3219,36 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(value!=null){
 			PrecisionDecimal minimum=((NumericType) type).getMinimum();
 			PrecisionDecimal maximum=((NumericType) type).getMaximum();
-		BigDecimal rounded = new BigDecimal(
-				value.toString()).setScale(
-				value.getExponent(),
-				BigDecimal.ROUND_HALF_UP);
-		BigDecimal min_general = new BigDecimal(
-				minimum.toString()).setScale(
-				minimum.getExponent(),
-				BigDecimal.ROUND_HALF_UP);
-		BigDecimal max_general = new BigDecimal(
-				maximum.toString()).setScale(
-				maximum.getExponent(),
-				BigDecimal.ROUND_HALF_UP);
-		  if (rounded.compareTo (min_general) == -1
-			  || rounded.compareTo (max_general) == +1){
-				 logMsg(validateType,"value {0} is out of range", valueStr);
-		  }
+			BigDecimal min_general = new BigDecimal(minimum.toString());
+			BigDecimal max_general = new BigDecimal(maximum.toString());
+			BigDecimal valueBigDec = new BigDecimal(value.toString());
+			int precision= minimum.getAccuracy();
+			BigDecimal rounded=roundNumeric(precision,valueStr);
+			if (rounded!=null && (rounded.compareTo(min_general)==-1 || rounded.compareTo(max_general)==+1)){
+				logMsg(validateType,"value {0} is out of range", rounded.toString());
+			}
 		}
 	}
-
+	
+	public static BigDecimal roundNumeric(int precision, String valueStr) {
+		if(valueStr==null) {
+			return null;
+		}
+		double valueDouble=Double.valueOf(valueStr);
+		boolean isNegative=valueDouble<0;
+		
+		BigDecimal value=new BigDecimal(valueStr);
+		BigDecimal rounded=null;
+		if(value!=null) {
+			if(isNegative){
+				rounded=value.setScale(precision, BigDecimal.ROUND_HALF_DOWN);
+			}else {
+				rounded=value.setScale(precision, BigDecimal.ROUND_HALF_UP);
+			}
+		}
+		return rounded;
+	}
+	
 	public boolean isValidUuid(String valueStr) {
 		return valueStr.length() == 36 && valueStr.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}?");
 	}

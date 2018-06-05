@@ -661,82 +661,6 @@ public class Datatypes23Test {
 		// Assert
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
-	// Die kleinste Nummern Angabe wird getestet.
-	@Test
-	public void numericIntTypeMinOk(){
-		Iom_jObject objMinLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objMinLength.setattrvalue("numericInt", "0");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objMinLength));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	// Die groesste Numnern Angabe wird getestet.
-	@Test
-	public void numericIntTypeMaxOk(){
-		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objMaxLength.setattrvalue("numericInt", "10");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objMaxLength));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	// Die kleinste Dezimale Angabe wird getestet.
-	@Test
-	public void numericDecTypeMinOk(){
-		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objMaxLength.setattrvalue("numericDec", "0.0");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objMaxLength));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	// Die groesste Dezimale Zahl wird getestet.
-	@Test
-	public void numericDecTypeMaxOk(){
-		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objMaxLength.setattrvalue("numericDec", "10.0");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objMaxLength));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
 
 	// Das kleinste Element einer Aufzaehlung wird getestet.
 	@Test
@@ -1208,6 +1132,9 @@ public class Datatypes23Test {
 	///////////////////////////////// FAILING Tests //////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////
 
+	
+	
+	
 	// Es wird getestet, ob true auch gross geschrieben werden kann.
 	@Test
 	public void booleanUppercaseFail(){
@@ -1930,126 +1857,6 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("invalid format of datetime value <2016-2-29V12:59:59.999>", logger.getErrs().get(0).getEventMsg());
 	}
-	
-	// Falsches Format bei NumericType unzulaessig.
-	@Test
-	public void numericTypeWrongFormatFail(){
-		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objWrongFormat.setattrvalue("numericInt", "a");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objWrongFormat));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <a> is not a number", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Numeric Laenge zu klein. 0-10. Kann nicht minus sein.
-	@Test
-	public void numericTypeMinWrongFail(){
-		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objWrongFormat.setattrvalue("numericInt", "-1");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objWrongFormat));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value -1 is out of range", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Numeric Laenge zu gross. 0-10. Kann nicht 11 sein.
-	@Test
-	public void numericTypeMaxWrongFail(){
-		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objWrongFormat.setattrvalue("numericInt", "11");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objWrongFormat));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 11 is out of range", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Es muss eine Zahl eingegeben werden bei einer Numeric Dezimalen.
-	@Test
-	public void numericTypeDecWrongFormatFail(){
-		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objWrongFormat.setattrvalue("numericDec", "a");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objWrongFormat));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <a> is not a number", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Dezimales Minimum unterschritten.
-	@Test
-	public void numericTypeDecMinWrongFail(){
-		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objWrongFormat.setattrvalue("numericDec", "-1");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objWrongFormat));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value -1 is out of range", logger.getErrs().get(0).getEventMsg());
-	}
-	
-	// Dezimales Maximum ueberschritten.
-	@Test
-	public void numericTypeDecMaxWrongFail(){
-		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objWrongFormat.setattrvalue("numericDec", "11");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-		validator.validate(new ObjectEvent(objWrongFormat));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 11 is out of range", logger.getErrs().get(0).getEventMsg());
-	}
 
 	// Es wird die Eingabe einer ungueltigen Sub Value getestet.
 	@Test
@@ -2210,7 +2017,7 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Attribute uritext is length restricted to 1023", logger.getErrs().get(0).getEventMsg());
 	}
-
+	
 	@Test
 	public void coordType2DRangeFail(){
 		Iom_jObject obj1=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
@@ -2294,5 +2101,70 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <undecided> is not a BOOLEAN", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// eine Fehlermeldung wird erwartet, da 9(4) auf 90 abgerundet werden soll,
+	// und somit der gueltige Bereich unterschritten wird.
+	@Test
+	public void coordType_Rounding_Down_Fail(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		IomObject coordValue=objWrongFormat.addattrobj("lcoord", "COORD");
+		coordValue.setattrvalue("C1", "479999.9994");
+		coordValue.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value 479999.999 is out of range", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// prueft, ob 9(5) erfolgreich auf 100 aufgerundet wird.
+	@Test
+	public void coordType_Rounding_UpFrom5_Ok(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		IomObject coordValue=objWrongFormat.addattrobj("lcoord", "COORD");
+		coordValue.setattrvalue("C1", "479999.9995");
+		coordValue.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// prueft, ob 9(6) erfolgreich auf 100 aufgerundet wird.
+	@Test
+	public void coordType_Rounding_Up_Ok(){
+		Iom_jObject objWrongFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		IomObject coordValue=objWrongFormat.addattrobj("lcoord", "COORD");
+		coordValue.setattrvalue("C1", "479999.9996");
+		coordValue.setattrvalue("C2", "70000.000");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objWrongFormat));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
 	}
 }
