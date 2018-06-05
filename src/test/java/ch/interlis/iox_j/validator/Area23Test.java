@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
@@ -14,7 +13,6 @@ import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
-import ch.interlis.iox.IoxException;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
@@ -677,10 +675,10 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==5);
-		assertEquals("Intersection overlap null, coord1 (500000.0, 77000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection overlap null, coord1 (503500.0, 77000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(1).getEventMsg());
-		assertEquals("Intersection overlap null, coord1 (500000.0, 77285.71428571429, NaN), tid1 o1, tid2 o2", logger.getErrs().get(2).getEventMsg());
-		assertEquals("Intersection overlap null, coord1 (503669.06474820146, 77338.12949640288, NaN), tid1 o1, tid2 o2", logger.getErrs().get(3).getEventMsg());
+		assertEquals("Intersection coord1 (500000.0, 77000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (503500.0, 77000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Intersection coord1 (500000.0, 77285.71428571429, NaN), tid1 o1, tid2 o2", logger.getErrs().get(2).getEventMsg());
+		assertEquals("Intersection coord1 (503669.06474820146, 77338.12949640288, NaN), tid1 o1, tid2 o2", logger.getErrs().get(3).getEventMsg());
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(4).getEventMsg());
 	}
 	
@@ -844,10 +842,10 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==5);
-		assertEquals("Intersection overlap null, coord1 (545000.0, 200000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection overlap null, coord1 (555000.0, 200000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(1).getEventMsg());
-		assertEquals("Intersection overlap null, coord1 (547000.0, 180000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(2).getEventMsg());
-		assertEquals("Intersection overlap null, coord1 (553000.0, 180000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(3).getEventMsg());
+		assertEquals("Intersection coord1 (545000.0, 200000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (555000.0, 200000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Intersection coord1 (547000.0, 180000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(2).getEventMsg());
+		assertEquals("Intersection coord1 (553000.0, 180000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(3).getEventMsg());
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(4).getEventMsg());
 	}
 	
@@ -1465,8 +1463,8 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==3);
-		assertEquals("Intersection overlap null, coord1 (540000.0, 150000.0, NaN), coord2 (540000.0, 160000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection overlap null, coord1 (540000.0, 160000.0, NaN), coord2 (540000.0, 200000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Overlay coord1 (540000.0, 150000.0, NaN), coord2 (540000.0, 160000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (540000.0, 160000.0, NaN), coord2 (540000.0, 200000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(1).getEventMsg());
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(2).getEventMsg());
 	}
 	
@@ -2902,8 +2900,8 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==3);
-		assertEquals("Intersection overlap null, coord1 (540000.0, 100000.0, NaN), coord2 (540000.0, 150000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection overlap null, coord1 (540000.0, 150000.0, NaN), coord2 (540000.0, 200000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Overlay coord1 (540000.0, 100000.0, NaN), coord2 (540000.0, 150000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (540000.0, 150000.0, NaN), coord2 (540000.0, 200000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(1).getEventMsg());
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(2).getEventMsg());
 	}
 	
