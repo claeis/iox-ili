@@ -340,18 +340,22 @@ import java.util.ArrayList;
 		@Override
 		public void setattrvalue(String attrName, String value) 
 		{
-			if (attrv.containsKey(attrName))
-			{
-				ArrayList valuev = attrv.get(attrName);
-				valuev.clear();
-				valuev.add(value);
-			}
-			else
-			{
-				ArrayList valuev = new ArrayList();
-				valuev.add(value);
-				attrv.put(attrName, valuev);
-			}
+		    if(value==null) {
+	              throw new IllegalArgumentException("illegal value null for "+attrName);
+		    }else {
+	            if (attrv.containsKey(attrName))
+	            {
+	                ArrayList valuev = attrv.get(attrName);
+	                valuev.clear();
+	                valuev.add(value);
+	            }
+	            else
+	            {
+	                ArrayList valuev = new ArrayList();
+	                valuev.add(value);
+	                attrv.put(attrName, valuev);
+	            }
+		    }
 		}
 
 		private int consistency;

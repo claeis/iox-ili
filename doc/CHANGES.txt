@@ -7,6 +7,7 @@ LATEST
 - Validator xtf: include TIDs in AREA intersection error message
 - changed/improved overlay handling
 - CsvReader: fixed UTF-8 BOM handling
+- API: throw exception if one sets a IomObject attribute to null
 
 iox-ili 1.20.4 (2018-03-02)
 -----------------------------
