@@ -1,6 +1,6 @@
 package ch.interlis.iom_j.itf.impl.jtsext.noding;
 
-class CurvePairInt {
+public class CurvePairInt {
 	  public int c0=-1;
 	  public int c1=-1;
 	  public CurvePairInt(int e0,int e1)

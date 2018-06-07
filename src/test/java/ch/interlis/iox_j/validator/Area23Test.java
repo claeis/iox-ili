@@ -1,6 +1,9 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -13,6 +16,8 @@ import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iox.IoxEvent;
+import ch.interlis.iox.IoxException;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
@@ -1588,7 +1593,7 @@ public class Area23Test {
 	// welche uebereinander liegen und sich nicht an den gleichen Punkten beruehren, erstellt werden koennen.
 	@Ignore("unexpected number of common points")
 	@Test
-	public void twoPolygon_2ArcsLieNotExactlyOnEachOther_Ok(){
+	public void twoPolygon_2ArcsLieNotExactlyOnEachOther_1ArcHas1PointMore_Ok(){
 		Iom_jObject objAreaSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		{
 			IomObject multisurfaceValue=objAreaSuccess.addattrobj("area3d", "MULTISURFACE");
@@ -3920,5 +3925,335 @@ public class Area23Test {
 		assertEquals("o1",eventImpl.getSourceObjectXtfId());
 		LogEventImpl eventImpl2=(LogEventImpl) logger.getErrs().get(1);
 		assertEquals(null,eventImpl2.getSourceObjectXtfId());
+	}
+	
+	// prueft, ob eine Polygon, welche genau ueber einem InnerBoundary einer anderen Polygon liegt,
+	// erstellt werden kann.
+	@Test
+	public void twoPolygon_Polygon2ExactlyOverInnerBoundaryOfPolygon1_Ok(){
+		Iom_jObject obj1=new Iom_jObject(ILI_CLASSD, OID1);
+		IomObject multisurface=obj1.addattrobj("area2d", "MULTISURFACE");
+		IomObject surfaceValue = multisurface.addattrobj("surface", "SURFACE");
+		{
+			IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+			{
+				// polyline 1
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C2", "100000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "600000.000");
+				endSegment.setattrvalue("C2", "100000.000");
+			}
+			{
+				// polyline 2
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "600000.000");
+				startSegment.setattrvalue("C2", "100000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "600000.000");
+				endSegment.setattrvalue("C2", "200000.000");
+			}
+			{
+				// polyline 3
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "600000.000");
+				startSegment.setattrvalue("C2", "200000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "500000.000");
+				endSegment.setattrvalue("C2", "200000.000");
+			}
+			{
+				// polyline 4
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C2", "200000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "500000.000");
+				endSegment.setattrvalue("C2", "100000.000");
+			}
+			IomObject innerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+			{
+				// polyline 1
+				IomObject polyline = innerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "540000.000");
+				startSegment.setattrvalue("C2", "140000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "560000.000");
+				endSegment.setattrvalue("C2", "140000.000");
+			}
+			{
+				// polyline 2
+				IomObject polyline = innerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "560000.000");
+				startSegment.setattrvalue("C2", "140000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "560000.000");
+				endSegment.setattrvalue("C2", "160000.000");
+			}
+			{
+				// polyline 3
+				IomObject polyline = innerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "560000.000");
+				startSegment.setattrvalue("C2", "160000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "540000.000");
+				endSegment.setattrvalue("C2", "160000.000");
+			}
+			{
+				// polyline 4
+				IomObject polyline = innerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "540000.000");
+				startSegment.setattrvalue("C2", "160000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "540000.000");
+				endSegment.setattrvalue("C2", "140000.000");
+			}
+		}
+		Iom_jObject obj2=new Iom_jObject(ILI_CLASSD, OID2);
+		IomObject multisurface2=obj2.addattrobj("area2d", "MULTISURFACE");
+		IomObject surfaceValue2 = multisurface2.addattrobj("surface", "SURFACE");
+		{
+			IomObject outerBoundary = surfaceValue2.addattrobj("boundary", "BOUNDARY");
+			{
+				// polyline 1
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "540000.000");
+				startSegment.setattrvalue("C2", "140000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "560000.000");
+				endSegment.setattrvalue("C2", "140000.000");
+			}
+			{
+				// polyline 2
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "560000.000");
+				startSegment.setattrvalue("C2", "140000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "560000.000");
+				endSegment.setattrvalue("C2", "160000.000");
+			}
+			{
+				// polyline 3
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "560000.000");
+				startSegment.setattrvalue("C2", "160000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "540000.000");
+				endSegment.setattrvalue("C2", "160000.000");
+			}
+			{
+				// polyline 4
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "540000.000");
+				startSegment.setattrvalue("C2", "160000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "540000.000");
+				endSegment.setattrvalue("C2", "140000.000");
+			}
+		}
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(obj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	
+	// es wird eine Fehlermeldung erwartet, da ein Polygon, nicht genau ueber einem InnerBoundary einer anderen Polygon liegt.
+	@Test
+	public void twoPolygon_Polygon2OverlapsInnerBoundaryOfPolygon1_False(){
+		Iom_jObject obj1=new Iom_jObject(ILI_CLASSD, OID1);
+		IomObject multisurface=obj1.addattrobj("area2d", "MULTISURFACE");
+		IomObject surfaceValue = multisurface.addattrobj("surface", "SURFACE");
+		{
+			IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+			{
+				// polyline 1
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C2", "100000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "600000.000");
+				endSegment.setattrvalue("C2", "100000.000");
+			}
+			{
+				// polyline 2
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "600000.000");
+				startSegment.setattrvalue("C2", "100000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "600000.000");
+				endSegment.setattrvalue("C2", "200000.000");
+			}
+			{
+				// polyline 3
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "600000.000");
+				startSegment.setattrvalue("C2", "200000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "500000.000");
+				endSegment.setattrvalue("C2", "200000.000");
+			}
+			{
+				// polyline 4
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "500000.000");
+				startSegment.setattrvalue("C2", "200000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "500000.000");
+				endSegment.setattrvalue("C2", "100000.000");
+			}
+			IomObject innerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+			{
+				// polyline 1
+				IomObject polyline = innerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "540000.000");
+				startSegment.setattrvalue("C2", "140000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "560000.000");
+				endSegment.setattrvalue("C2", "140000.000");
+			}
+			{
+				// polyline 2
+				IomObject polyline = innerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "560000.000");
+				startSegment.setattrvalue("C2", "140000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "560000.000");
+				endSegment.setattrvalue("C2", "160000.000");
+			}
+			{
+				// polyline 3
+				IomObject polyline = innerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "560000.000");
+				startSegment.setattrvalue("C2", "160000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "540000.000");
+				endSegment.setattrvalue("C2", "160000.000");
+			}
+			{
+				// polyline 4
+				IomObject polyline = innerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "540000.000");
+				startSegment.setattrvalue("C2", "160000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "540000.000");
+				endSegment.setattrvalue("C2", "140000.000");
+			}
+		}
+		Iom_jObject obj2=new Iom_jObject(ILI_CLASSD, OID2);
+		IomObject multisurface2=obj2.addattrobj("area2d", "MULTISURFACE");
+		IomObject surfaceValue2 = multisurface2.addattrobj("surface", "SURFACE");
+		{
+			IomObject outerBoundary = surfaceValue2.addattrobj("boundary", "BOUNDARY");
+			{
+				// polyline 1
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "540000.000");
+				startSegment.setattrvalue("C2", "140000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "560000.000");
+				endSegment.setattrvalue("C2", "140000.000");
+			}
+			{
+				// polyline 2
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "560000.000");
+				startSegment.setattrvalue("C2", "140000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "580000.000");
+				endSegment.setattrvalue("C2", "180000.000");
+			}
+			{
+				// polyline 3
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "580000.000");
+				startSegment.setattrvalue("C2", "180000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "540000.000");
+				endSegment.setattrvalue("C2", "160000.000");
+			}
+			{
+				// polyline 4
+				IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+				IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+				IomObject startSegment=segments.addattrobj("segment", "COORD");
+				startSegment.setattrvalue("C1", "540000.000");
+				startSegment.setattrvalue("C2", "160000.000");
+				IomObject endSegment=segments.addattrobj("segment", "COORD");
+				endSegment.setattrvalue("C1", "540000.000");
+				endSegment.setattrvalue("C2", "140000.000");
+			}
+		}
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(obj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("polygons overlay tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(1).getEventMsg());
 	}
 }

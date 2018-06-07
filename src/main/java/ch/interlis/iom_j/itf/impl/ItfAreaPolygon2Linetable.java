@@ -20,7 +20,9 @@ import ch.ehi.iox.objpool.impl.JavaSerializer;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CurvePolygon;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
+import ch.interlis.iom_j.itf.impl.jtsext.noding.CurvePairInt;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox_j.IoxIntersectionException;
@@ -33,7 +35,7 @@ import ch.interlis.iox_j.validator.ValidationConfig;
 
 public class ItfAreaPolygon2Linetable {
 	private Collection<? extends CompoundCurve> lines=null;
-	private Collection<? extends Polygon> polygons=null;
+	private List<Polygon> polygons=null;
 	private Collection<IomObject> ioxlines=null;
 	private ObjectPoolManager recman=null;
 	private String iliqname=null;
@@ -78,7 +80,7 @@ public class ItfAreaPolygon2Linetable {
 			}else{
 				polygon.setUserData(mainObjTid);
 			}
-			((Collection)polygons).add(polygon);
+			polygons.add(polygon);
 		}
 		
 		for(IomObject ioxline:ioxlines){
@@ -136,41 +138,37 @@ public class ItfAreaPolygon2Linetable {
 			if(polygons==null) {
 				return null;
 			}
-			Object[] polygonArr=polygons.toArray();
 			STRtree polyidx=new STRtree();
 			
 			// fill the polygon index
 			for (int i=0;i<polygons.size();i++) {
-				Polygon currentPolygon=(Polygon) polygonArr[i];
+				Polygon currentPolygon=polygons.get(i);
 				if(currentPolygon!=null) {
 					Envelope env=new Envelope(currentPolygon.getEnvelopeInternal());
 					polyidx.insert(env, i);
 				}
 			}
 			
-			// compare polygon complete overlay intersection
+			// check if the complete polygons overlay
+			HashSet<CurvePairInt> compared=new HashSet<CurvePairInt>();
 		    for (int i0=0;i0<polygons.size();i0++) {
-		    	Polygon e0=(Polygon) polygonArr[i0];
-		    	if(e0==null) {
-		    		continue;
-		    	}
+		    	Polygon e0=polygons.get(i0);
 				List<Integer> hits=polyidx.query(e0.getEnvelopeInternal());
-				if(hits==null) {
-					continue;
-				}
-    			for (int i1 = i0+1; i1 < polygons.size(); i1++) {
-					if(!hits.contains(i1)) {
+    			for (int hitIdx = 0; hitIdx < hits.size(); hitIdx++) {
+    				int i1=hits.get(hitIdx);
+					if(i0==i1) {
     	        		continue;
     	        	}
-    	        	Polygon e1 = (Polygon) polygonArr[i1];
-    	        	if(e1==null) {
-    		    		continue;
-    		    	}
-	            	if(e0.within(e1) || e1.within(e0)){
-	            		String tid1=(String) e0.getUserData();
-	            		String tid2=(String) e1.getUserData();
-						intersectionsWithoutCompleteOverlays.add(new IoxInvalidDataException("polygons overlay tid1 "+tid1+", tid2 "+tid2));
-					}
+    				CurvePairInt pair=new CurvePairInt(i0,i1);
+    				if(!compared.contains(pair)) {
+    					compared.add(pair);
+        	        	Polygon e1 = polygons.get(i1);
+    	            	if(CurvePolygon.polygonOverlays(e0, e1)){
+    	            		String tid1=(String) e0.getUserData();
+    	            		String tid2=(String) e1.getUserData();
+    						intersectionsWithoutCompleteOverlays.add(new IoxInvalidDataException("polygons overlay tid1 "+tid1+", tid2 "+tid2));
+    					}
+    				}
 				}
 		    }
 			if(!intersectionsWithoutCompleteOverlays.isEmpty()) {
