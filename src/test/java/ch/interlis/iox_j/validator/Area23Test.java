@@ -1,11 +1,7 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
@@ -16,8 +12,6 @@ import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
-import ch.interlis.iox.IoxEvent;
-import ch.interlis.iox.IoxException;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
@@ -1591,7 +1585,6 @@ public class Area23Test {
 	
 	// prueft, ob 2 Polygone erstellt werden koennen, wenn 2 Polygone mit je einem Arc,
 	// welche uebereinander liegen und sich nicht an den gleichen Punkten beruehren, erstellt werden koennen.
-	@Ignore("unexpected number of common points")
 	@Test
 	public void twoPolygon_2ArcsLieNotExactlyOnEachOther_1ArcHas1PointMore_Ok(){
 		Iom_jObject objAreaSuccess=new Iom_jObject(ILI_CLASSD, OID1);
@@ -1701,10 +1694,9 @@ public class Area23Test {
 		validator.validate(new ObjectEvent(objAreaSuccess2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate polygons", logger.getErrs().get(5).getEventMsg());
+		assertTrue(logger.getErrs().size()==2);
+		assertEquals("polygons overlay tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area3d", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -3927,8 +3919,8 @@ public class Area23Test {
 		assertEquals(null,eventImpl2.getSourceObjectXtfId());
 	}
 	
-	// prueft, ob eine Polygon, welche genau ueber einem InnerBoundary einer anderen Polygon liegt,
-	// erstellt werden kann.
+	// prueft, ob die Validierung die ueberdeckung feststellt, wenn ein Polygon,
+	// genau ueber einem InnerBoundary einer anderen Polygon liegt.
 	@Test
 	public void twoPolygon_Polygon2ExactlyOverInnerBoundaryOfPolygon1_Ok(){
 		Iom_jObject obj1=new Iom_jObject(ILI_CLASSD, OID1);
@@ -4090,7 +4082,6 @@ public class Area23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
 	
 	// es wird eine Fehlermeldung erwartet, da ein Polygon, nicht genau ueber einem InnerBoundary einer anderen Polygon liegt.
 	@Test
