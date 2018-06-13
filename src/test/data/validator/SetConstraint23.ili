@@ -1,13 +1,25 @@
 INTERLIS 2.3;
 MODEL SetConstraint23
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
-	
 	TOPIC TopicA=
+		DOMAIN
+			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+						   70000.000 .. 310000.000 [INTERLIS.m],
+						ROTATION 2 -> 1;
+	
 		CLASS Class1 =
 		END Class1;
 		
 		CLASS Class2 =
 		END Class2;
+		
+		CLASS Class3 =
+			Geometrie3 : MANDATORY SURFACE WITH (STRAIGHTS, ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.050;
+		END Class3;
+		
+		CLASS Class4 =
+			Geometrie4 : MANDATORY AREA WITH (STRAIGHTS, ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.050;
+		END Class4;
 		
 		ASSOCIATION assoc1 =
 		  r1 -- {0..*} Class1;
@@ -16,6 +28,14 @@ MODEL SetConstraint23
 		
 		CONSTRAINTS OF Class1 =
 			SET CONSTRAINT INTERLIS.objectCount(r2) == 2;
+		END;
+		
+		CONSTRAINTS OF Class3 =
+			SET CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie3);
+		END;
+		
+		CONSTRAINTS OF Class4 =
+			SET CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie4);
 		END;
 
 	END TopicA;

@@ -243,17 +243,7 @@ MODEL Function23
 			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZD, UNDEFINED, >> Geometrie);
 			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZA, UNDEFINED, >> Geometrie);
 		END ClassZD;
-		
-		CLASS ClassZZ =
-			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-		END ClassZZ;
-		
-        CLASS ClassZE =
-			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZZ, UNDEFINED, >> Geometrie);
-			MANDATORY CONSTRAINT INTERLIS.areAreas(>ClassZE, UNDEFINED, >> Geometrie);
-		END ClassZE;
-        
+		 
         STRUCTURE StructF =
 			Surface: SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
 		END StructF;
