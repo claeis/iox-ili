@@ -1100,8 +1100,8 @@ public class MandatoryConstraints23 {
 	@Test
 	public void decimalGreaterThan_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
-		iomObjA.setattrvalue("attr1", "6");
-		iomObjA.setattrvalue("attr2", "5.9");
+		iomObjA.setattrvalue("attr1", "5.9");
+		iomObjA.setattrvalue("attr2", "5.4");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1688,7 +1688,7 @@ public class MandatoryConstraints23 {
 	@Test
 	public void decimalNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID);
-		iomObjA.setattrvalue("attr1", "5.000001");
+		iomObjA.setattrvalue("attr1", "4.444444");
 		iomObjA.setattrvalue("attr2", "4.999999");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();

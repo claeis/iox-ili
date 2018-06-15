@@ -2059,6 +2059,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Wrong COORD structure, unknown property <C4>", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Die dreidimensionale Koordinate muss aus einem c1,c2 und einem c3 bestehen, sonst ist die 3d Koordinate zu zweidimensional. 

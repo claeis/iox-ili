@@ -100,6 +100,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_DO_ITF_OIDPERTABLE_DO="doItfOidPerTable";
 	public static final String CONFIG_CUSTOM_FUNCTIONS="ch.interlis.iox_j.validator.customFunctions";
 	public static final String CONFIG_OBJECT_RESOLVERS="ch.interlis.iox_j.validator.objectResolvers";
+	// the object count result as value in map with the appropriate function as key.
 	private Map<Function, Value> functions=new HashMap<Function, Value>();
 	private ObjectPoolManager objPoolManager=null;
 	private ObjectPool objectPool = null;
@@ -1278,6 +1279,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					return new Value(value.getComplexObjects().size());
 				}else if(value.getViewable()!=null) {
 					for(Function aFunction:functions.keySet()) {
+						// contains/equal would not work here, because it is an object compare.
 						if(aFunction==currentFunction) {
 							Value objCount=functions.get(currentFunction);
 							return objCount;
@@ -1285,6 +1287,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 					Value objectCount=null;
 					objectCount = evaluateObjectCount(value);
+					// put the result of object count as value to the current function.
 					functions.put(currentFunction, objectCount);
 					return objectCount;
 				}
@@ -1389,10 +1392,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						return isArea;
 					}
 				}
-				Value isArea=null;
-				
-				isArea = evaluateAreArea(iomObj, value, surfaceBag, surfaceAttr);
-				
+				Value isArea = evaluateAreArea(iomObj, value, surfaceBag, surfaceAttr);
 				functions.put(currentFunction, isArea);
 				return isArea;
 			} else {
@@ -2398,37 +2398,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 		}
-		
-		// Uniqueness
-		if(isObject){
-			Viewable aclass2=aclass1;
-			while(aclass2!=null) {
-				Iterator attrI=aclass2.iterator();
-				while (attrI.hasNext()) {
-					Object obj1 = attrI.next();
-					if(obj1 instanceof UniquenessConstraint){
-						UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) obj1; // uniquenessConstraint not null.
-						validateUniquenessConstraint(iomObj, uniquenessConstraint);
-					}
-				}
-				aclass2=(Viewable) aclass2.getExtending();
-			}
-		}
-		
-		if(isObject){
-			if(addToPool){
-				{
-					// check if object id is unique in transferfile
-					IomObject objectValue = objectPool.addObject(iomObj,currentBasketId);
-					if(objectValue!=null){
-						Object modelElement=tag2class.get(objectValue.getobjecttag());
-						Viewable classValueOfKey= (Viewable) modelElement;
-						errs.addEvent(errFact.logErrorMsg("OID {0} of object {1} already exists in {2}.", objectValue.getobjectoid(), iomObj.getobjecttag(), classValueOfKey.toString()));
-					}
-				}
-			}
-		}
-		
+
 		HashSet<String> propNames=new HashSet<String>();
 		Iterator iter = aclass1.getAttributesAndRoles2();
 		while (iter.hasNext()) {
@@ -2508,6 +2478,37 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			 }
 		}
+		
+		// Uniqueness
+		if(isObject){
+			Viewable aclass2=aclass1;
+			while(aclass2!=null) {
+				Iterator attrI=aclass2.iterator();
+				while (attrI.hasNext()) {
+					Object obj1 = attrI.next();
+					if(obj1 instanceof UniquenessConstraint){
+						UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) obj1; // uniquenessConstraint not null.
+						validateUniquenessConstraint(iomObj, uniquenessConstraint);
+					}
+				}
+				aclass2=(Viewable) aclass2.getExtending();
+			}
+		}
+		
+		if(isObject){
+			if(addToPool){
+				{
+					// check if object id is unique in transferfile
+					IomObject objectValue = objectPool.addObject(iomObj,currentBasketId);
+					if(objectValue!=null){
+						Object modelElement=tag2class.get(objectValue.getobjecttag());
+						Viewable classValueOfKey= (Viewable) modelElement;
+						errs.addEvent(errFact.logErrorMsg("OID {0} of object {1} already exists in {2}.", objectValue.getobjectoid(), iomObj.getobjecttag(), classValueOfKey.toString()));
+					}
+				}
+			}
+		}
+		
 		// validate if no superfluous properties
 		int propc=iomObj.getattrcount();
 		for(int propi=0;propi<propc;propi++){
@@ -2925,7 +2926,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}else if(type instanceof NumericType){
 					String valueStr=iomObj.getattrvalue(attrName);
 					if(valueStr!=null){
-						validateNumericType(validateType, (NumericType)type, valueStr);							
+						String newValueStr=validateNumericType(validateType, (NumericType)type, valueStr);
+						if(newValueStr!=null) {
+							iomObj.setattrvalue(attrName, newValueStr);
+						}
 					}else{
 						IomObject structValue=iomObj.getattrobj(attrName, 0);
 						if(structValue!=null){
@@ -3146,7 +3150,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void validateCoordType(String validateType, CoordType coordType, IomObject coordValue) {
 		if (coordType.getDimensions().length >= 1){
 			if (coordValue.getattrvalue("C1") != null){
-				validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"));
+				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1")));
 			} else if (coordValue.getattrvalue("A1") != null) {
 				logMsg(validateType, "Not a type of COORD");
 			} else {
@@ -3160,7 +3164,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		if (coordType.getDimensions().length >= 2){
 			if (coordValue.getattrvalue("C2") != null){
-				validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"));
+				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2")));
 			} else if (coordValue.getattrvalue("A2") != null) {
 				logMsg(validateType, "Not a type of COORD");
 			} else {
@@ -3169,7 +3173,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		if (coordType.getDimensions().length == 3){
 			if (coordValue.getattrvalue("C3") != null){
-				validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"));
+				coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3")));
 			} else {
 				logMsg(validateType, "Wrong COORD structure, C3 expected");
 			}
@@ -3189,36 +3193,42 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	private void validateARCSType(String validateType, CoordType coordType, IomObject coordValue) {
-		if (coordType.getDimensions().length == 2){
-			if (coordValue.getattrvalue("C3") != null){
-				logMsg(validateType, "Wrong ARC structure, C3 not expected");
+		int dimLength=coordType.getDimensions().length;
+		String c1=coordValue.getattrvalue("C1");
+		String c2=coordValue.getattrvalue("C2");
+		String c3=coordValue.getattrvalue("C3");
+		String a1=coordValue.getattrvalue("A1");
+		String a2=coordValue.getattrvalue("A2");
+		
+		boolean wrongArcStructure=false;
+		int c1Count=coordValue.getattrvaluecount("C1");
+		if (dimLength>=2 && dimLength<=3){
+			if(a1!=null && a2!=null && c1!=null && c2!=null){
+				coordValue.setattrvalue("A1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], a1));
+				coordValue.setattrvalue("A2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], a2));
+				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], c1));
+				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], c2));
+				if(dimLength==2) {
+					if(c3!=null) {
+						logMsg(validateType, "Wrong ARC structure, C3 not expected");
+					}
+				}else if(dimLength==3) {
+					if(c3!=null) {
+						coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], c3));
+					}else {
+						logMsg(validateType, "Wrong ARC structure, C3 expected");
+					}
+				}
+			}else {
+				wrongArcStructure=true;
 			}
-		} else if (coordType.getDimensions().length == 3){
-			if (coordValue.getattrvalue("C3") == null){
-				logMsg(validateType, "Wrong ARC structure, C3 expected");
-			}
+		}else {
+			wrongArcStructure=true;
 		}
-		if (coordType.getDimensions().length >= 2){
-			if (coordValue.getattrvalue("A1") != null && coordValue.getattrvalue("A2") != null && coordValue.getattrvalue("C1") != null && coordValue.getattrvalue("C2") != null && coordValue.getattrvalue("C3") == null){
-				// if in ili, 2 coords are defined, then in coordValue.getDimensions()[0,1] are only 0 or 1 valid.
-				validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("A1"));
-				validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("A2"));
-				validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"));
-				validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"));
-			} else if (coordValue.getattrvalue("A1") != null && coordValue.getattrvalue("A2") != null && coordValue.getattrvalue("C1") != null && coordValue.getattrvalue("C2") != null && coordValue.getattrvalue("C3") != null){
-				//  if in ili, 3 coords are defined, then in coordValue.getDimensions()[0,1,2] are only 0 or 1 or 2 valid.
-				validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("A1"));
-				validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("A2"));
-				validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"));
-				validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"));
-				validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"));
-			// a 2d Arc depends on: A1, A2, C1, C2. 
-			} else if (coordValue.getattrvalue("A1") == null || coordValue.getattrvalue("A2") == null || coordValue.getattrvalue("C1") == null || coordValue.getattrvalue("C2") == null){
-				logMsg(validateType, "A1, A2, C1, C2 expected! (C3 is expected if 3d)");
-			} else {
-				logMsg(validateType, "Wrong ARC structure");
-			}
+		if(wrongArcStructure) {
+			logMsg(validateType, "Wrong ARC structure");
 		}
+		
 		// validate if no superfluous properties
 		int propc=coordValue.getattrcount();
 		for(int propi=0;propi<propc;propi++){
@@ -3235,13 +3245,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private void validateNumericType(String validateType, NumericType type, String valueStr) {
+	private String validateNumericType(String validateType, NumericType type, String valueStr) {
 		PrecisionDecimal value=null;
 		try {
 			value=new PrecisionDecimal(valueStr);
 		} catch (NumberFormatException e) {
 			 logMsg(validateType,"value <{0}> is not a number", valueStr);
 		}
+		BigDecimal rounded=null;
 		if(value!=null){
 			PrecisionDecimal minimum=((NumericType) type).getMinimum();
 			PrecisionDecimal maximum=((NumericType) type).getMaximum();
@@ -3249,11 +3260,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			BigDecimal max_general = new BigDecimal(maximum.toString());
 			BigDecimal valueBigDec = new BigDecimal(value.toString());
 			int precision= minimum.getAccuracy();
-			BigDecimal rounded=roundNumeric(precision,valueStr);
+			rounded=roundNumeric(precision,valueStr);
 			if (rounded!=null && (rounded.compareTo(min_general)==-1 || rounded.compareTo(max_general)==+1)){
 				logMsg(validateType,"value {0} is out of range", rounded.toString());
 			}
 		}
+		if(rounded==null) {
+			return null;
+		}
+		return rounded.toPlainString();
 	}
 	
 	public static BigDecimal roundNumeric(int precision, String valueStr) {

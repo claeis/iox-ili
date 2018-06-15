@@ -118,6 +118,89 @@ public class UniqueConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+	// Dieser Test darf keine Fehlermeldung ausgeben,
+	// da der Wert 4 richtig abgerundet wird.
+	@Test
+	public void attr2IsUnique_RoundedDown_Ok(){
+		// Set object.
+		Iom_jObject obj1=new Iom_jObject(CLASSC,OID1);
+		obj1.setattrvalue("attr1", "Ralf");
+		obj1.setattrvalue("attr2", "19.400");
+		Iom_jObject obj2=new Iom_jObject(CLASSC,OID2);
+		obj2.setattrvalue("attr1", "Ralf");
+		obj2.setattrvalue("attr2", "20.000");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(obj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Dieser Test soll eine Fehlermeldung ausgeben,
+	// da nach dem Aufrunden von attr2, beide Werte die selbe Groesse haben.
+	@Test
+	public void attr2IsUnique_RoundedUp_Fail(){
+		// Set object.
+		Iom_jObject obj1=new Iom_jObject(CLASSC,OID1);
+		obj1.setattrvalue("attr1", "Ralf");
+		obj1.setattrvalue("attr2", "19.900");
+		Iom_jObject obj2=new Iom_jObject(CLASSC,OID2);
+		obj2.setattrvalue("attr1", "Ralf");
+		obj2.setattrvalue("attr2", "20.000");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(obj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Dieser Test soll eine Fehlermeldung ausgeben,
+	// da nach dem Aufrunden von attr2, beide Werte die selbe Groesse haben.
+	@Test
+	public void attr2IsUnique_RoundedUpTo5_Fail(){
+		// Set object.
+		Iom_jObject obj1=new Iom_jObject(CLASSC,OID1);
+		obj1.setattrvalue("attr1", "Ralf");
+		obj1.setattrvalue("attr2", "19.500");
+		Iom_jObject obj2=new Iom_jObject(CLASSC,OID2);
+		obj2.setattrvalue("attr1", "Ralf");
+		obj2.setattrvalue("attr2", "20.000");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(obj2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+	}
+	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn kein Unique definiert wurde, jedoch das attr2 der beiden Objekte die gleichen Werte enthaelt.
 	@Test
 	public void noAttrsAreUnique_Attr2ValueExistTwice_Ok(){

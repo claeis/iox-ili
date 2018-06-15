@@ -269,8 +269,8 @@ MODEL MandatoryConstraints23
 		END ClassLessThanC;
 		
 		CLASS ClassGreaterThanOrEqualA =
-			attr1 : 0..10;
-			attr2 : 0..10;
+			attr1 : 0.000 .. 10.000;
+			attr2 : 0.000 .. 10.000;
 			MANDATORY CONSTRAINT
 			attr1 >= attr2;
 		END ClassGreaterThanOrEqualA;
