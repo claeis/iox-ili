@@ -25,16 +25,17 @@ public class UniqueConstraints23Test {
 	private final static String OID2 = "o2";
 	private final static String OID3 = "o3";
 	private final static String OID4 = "o4";
-	private final static String OID5 = "o5";
-	private final static String OID6 = "o6";
 	// BID
 	private final static String BID = "b1";
 	// TOPIC
 	private final static String TOPIC="UniqueConstraints23.Topic";
+	private final static String EMBEDDED_UNIQUE_TOPIC="UniqueConstraints23.EmbeddedUnique";
 	// ASSOCIATION
 	private final static String ASSOCA=TOPIC+".assoA";
 	private final static String ASSOCB=TOPIC+".assoB";
-	private final static String ASSOCC=TOPIC+".assoC";
+	private final static String EMBEDDED_UNIQUE_ASSOCAB=EMBEDDED_UNIQUE_TOPIC+".assocAB";
+	private final static String EMBEDDED_UNIQUE_ASSOCCD=EMBEDDED_UNIQUE_TOPIC+".assocCD";
+	private final static String EMBEDDED_UNIQUE_ASSOCEF=EMBEDDED_UNIQUE_TOPIC+".assocEF";
 	// CLASS
 	private final static String CLASSA=TOPIC+".ClassA";
 	private final static String CLASSB=TOPIC+".ClassB";
@@ -56,25 +57,19 @@ public class UniqueConstraints23Test {
 	private final static String CLASSB1=TOPIC+".ClassB1";
 	private final static String CLASSC1=TOPIC+".ClassC1";
 	private final static String CLASSD1=TOPIC+".ClassD1";
-	private final static String CLASSE1=TOPIC+".ClassE1";
-	private final static String CLASSF1=TOPIC+".ClassF1";
-	private final static String CLASSG1=TOPIC+".ClassG1";
-	private final static String CLASSH1=TOPIC+".ClassH1";
-	private final static String CLASSI1=TOPIC+".ClassI1";
+	private final static String EMBEDDED_UNIQUE_CLASSA=EMBEDDED_UNIQUE_TOPIC+".ClassA";
+	private final static String EMBEDDED_UNIQUE_CLASSB=EMBEDDED_UNIQUE_TOPIC+".ClassB";
+	private final static String EMBEDDED_UNIQUE_CLASSC=EMBEDDED_UNIQUE_TOPIC+".ClassC";
+	private final static String EMBEDDED_UNIQUE_CLASSD=EMBEDDED_UNIQUE_TOPIC+".ClassD";
+	private final static String EMBEDDED_UNIQUE_CLASSE=EMBEDDED_UNIQUE_TOPIC+".ClassE";
+	private final static String EMBEDDED_UNIQUE_CLASSF=EMBEDDED_UNIQUE_TOPIC+".ClassF";
 	// STRUCTURE
 	private final static String STRUCTA=TOPIC+".StructA";
-	private final static String STRUCTB=TOPIC+".StructB";
-	private final static String STRUCTC=TOPIC+".StructC";
-	private final static String STRUCTD=TOPIC+".StructD";
 	private final static String STRUCTE=TOPIC+".StructE";
-	private final static String STRUCTF=TOPIC+".StructF";
-	private final static String STRUCTG=TOPIC+".StructG";
 	private final static String STRUCTH=TOPIC+".StructH";
 	private final static String STRUCTI=TOPIC+".StructI";
 	private final static String STRUCTJ=TOPIC+".StructJ";
-	private final static String STRUCTK=TOPIC+".StructK";
 	private final static String STRUCTO=TOPIC+".StructO";
-	private final static String STRUCTP=TOPIC+".StructP";
 	private final static String UNDEFINED=TOPIC+".ClassUndefined";
 	private final static String EMPTYTEXT=TOPIC+".ClassEmptyText";
 	
@@ -757,28 +752,6 @@ public class UniqueConstraints23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}	
-	
-	// Die Objekte referenzieren auf die Rolle: c1. Es wird nur von 1 Objekt auf die Rolle c1 verweisen.
-	// Somit darf keine Fehlermeldung ausgegeben werden, da c1 nicht ueber 2 Mal angesprochen wird.
-	@Test
-	public void uniqueAttrValuesOfRoleC1_InEmbeddedAssociationIsDifferent_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(CLASSC1,OID1);
-		Iom_jObject iomObjB=new Iom_jObject(CLASSD1,OID2);
-		iomObjB.addattrobj("c1", "REF").setobjectrefoid(OID1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjA));
-		validator.validate(new ObjectEvent(iomObjB));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
 
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn eine Konstante in  einem UniquenessConstraint undefiniert (gar nicht erstellt) ist.
 	// attr1 ist UNIQUE und noch einmal UNIQUE mit attr2 zusammen. Jedoch wird attr1 nicht erstellt.
@@ -1936,5 +1909,285 @@ public class UniqueConstraints23Test {
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Unique is violated! Values 1 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft, ob das eingebettete Unique-Constraint innerhalb der Association funktioniert.
+	// Da die Rolle: a1 als UNIQUE definiert ist und nur 1 Mal angesprochen wird,
+	// wird erwartet, dass dieser Test funktioniert.
+	@Test
+	public void uniqueAttrValuesOfRole_InEmbeddedAssociation_Ok() {
+		String attrAB="attrAB";
+		Iom_jObject obj_A_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSA,OID1);
+		Iom_jObject obj_A_2=new Iom_jObject(EMBEDDED_UNIQUE_CLASSA,OID2);
+		
+		Iom_jObject obj_B_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSB,OID3);
+		IomObject attrObj_AB=obj_B_3.addattrobj("a1", EMBEDDED_UNIQUE_ASSOCAB);
+		attrObj_AB.setobjectrefoid(OID1);
+		attrObj_AB.setattrvalue(attrAB, "text1");
+		
+		Iom_jObject obj_B_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSB,OID4);
+		IomObject attrObj2_AB=obj_B_4.addattrobj("a1", EMBEDDED_UNIQUE_ASSOCAB);
+		attrObj2_AB.setobjectrefoid(OID2);
+		attrObj2_AB.setattrvalue(attrAB, "text1");
+		
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj_A_1));
+		validator.validate(new ObjectEvent(obj_A_2));
+		validator.validate(new ObjectEvent(obj_B_3));
+		validator.validate(new ObjectEvent(obj_B_4));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Prueft, ob das eingebettete Unique-Constraint innerhalb der Association funktioniert.
+	// Da die Rolle: a1 als UNIQUE definiert ist und mehr als 1 Mal angesprochen wird,
+	// wird erwartet, dass dieser Test eine Fehlermeldung ausgibt.
+	@Test
+	public void uniqueAttrValuesOfRole_InEmbeddedAssociation_False() {
+		String attrAB="attrAB";
+		Iom_jObject obj_A_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSA,OID1);
+		
+		Iom_jObject obj_B_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSB,OID3);
+		IomObject attrObj_AB=obj_B_3.addattrobj("a1", EMBEDDED_UNIQUE_ASSOCAB);
+		attrObj_AB.setobjectrefoid(OID1);
+		attrObj_AB.setattrvalue(attrAB, "text1");
+		
+		Iom_jObject obj_B_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSB,OID4);
+		IomObject attrObj2_AB=obj_B_4.addattrobj("a1", EMBEDDED_UNIQUE_ASSOCAB);
+		attrObj2_AB.setobjectrefoid(OID1);
+		attrObj2_AB.setattrvalue(attrAB, "text1");
+		
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj_A_1));
+		validator.validate(new ObjectEvent(obj_B_3));
+		validator.validate(new ObjectEvent(obj_B_4));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Unique is violated! Values o1 already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
+	
+	}
+	
+	// Prueft, ob das eingebettete Unique-Constraint innerhalb der Association funktioniert.
+	// Da das Attribute: attrCD als UNIQUE definiert ist und die jeweiligen Werte unterschiedlich sind,
+	// wird erwartet, dass dieser Test funktioniert.
+	@Test
+	public void uniqueAttrValuesOfAttr_InEmbeddedAssociation_Ok() {
+		String attrCD="attrCD";
+		Iom_jObject obj_C_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSC,OID1);
+		
+		Iom_jObject obj_D_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSD,OID3);
+		IomObject attrObj_CD=obj_D_3.addattrobj("c1", EMBEDDED_UNIQUE_ASSOCCD);
+		attrObj_CD.setobjectrefoid(OID1);
+		attrObj_CD.setattrvalue(attrCD, "text1");
+		
+		Iom_jObject obj_D_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSD,OID4);
+		IomObject attrObj2_CD=obj_D_4.addattrobj("c1", EMBEDDED_UNIQUE_ASSOCCD);
+		attrObj2_CD.setobjectrefoid(OID1);
+		attrObj2_CD.setattrvalue(attrCD, "text2");
+		
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj_C_1));
+		validator.validate(new ObjectEvent(obj_D_3));
+		validator.validate(new ObjectEvent(obj_D_4));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Prueft, ob das eingebettete Unique-Constraint innerhalb der Association funktioniert.
+	// Da das Attribute: attrCD als UNIQUE definiert ist und die jeweiligen Werte gleich sind,
+	// wird erwartet, dass dieser Test eine Fehlermeldung ausgibt.
+	@Test
+	public void uniqueAttrValuesOfAttr_InEmbeddedAssociation_False() {
+		String attrCD="attrCD";
+		Iom_jObject obj_C_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSC,OID1);
+		
+		Iom_jObject obj_D_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSD,OID3);
+		IomObject attrObj_CD=obj_D_3.addattrobj("c1", EMBEDDED_UNIQUE_ASSOCCD);
+		attrObj_CD.setobjectrefoid(OID1);
+		attrObj_CD.setattrvalue(attrCD, "text1");
+		
+		Iom_jObject obj_D_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSD,OID4);
+		IomObject attrObj2_CD=obj_D_4.addattrobj("c1", EMBEDDED_UNIQUE_ASSOCCD);
+		attrObj2_CD.setobjectrefoid(OID1);
+		attrObj2_CD.setattrvalue(attrCD, "text1");
+		
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj_C_1));
+		validator.validate(new ObjectEvent(obj_D_3));
+		validator.validate(new ObjectEvent(obj_D_4));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Unique is violated! Values text1 already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft, ob das eingebettete Unique-Constraint innerhalb der Association funktioniert.
+	// Da das Attribute: attrEF und die Rolle: e1 als UNIQUE definiert sind und das Attribute mehr als 1 Mal angesprochen wird,
+	// wird erwartet, dass dieser Test funktioniert.
+	@Test
+	public void uniqueAttrValuesOfRoleAndAttr_InEmbeddedAssociation_AttrSame_Ok() {
+		String attrEF="attrEF";
+		Iom_jObject obj_E_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSE,OID1);
+		Iom_jObject obj_E_2=new Iom_jObject(EMBEDDED_UNIQUE_CLASSE,OID2);
+		
+		Iom_jObject obj_F_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID3);
+		IomObject attrObj_EF=obj_F_3.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
+		attrObj_EF.setobjectrefoid(OID1);
+		attrObj_EF.setattrvalue(attrEF, "text1");
+		
+		Iom_jObject obj_F_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID4);
+		IomObject attrObj2_EF=obj_F_4.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
+		attrObj2_EF.setobjectrefoid(OID2);
+		attrObj2_EF.setattrvalue(attrEF, "text1");
+		
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj_E_1));
+		validator.validate(new ObjectEvent(obj_E_2));
+		validator.validate(new ObjectEvent(obj_F_3));
+		validator.validate(new ObjectEvent(obj_F_4));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Prueft, ob das eingebettete Unique-Constraint innerhalb der Association funktioniert.
+	// Da das Attribute: attrEF und die Rolle: e1 als UNIQUE definiert sind und die Rolle mehr als 1 Mal angesprochen wird,
+	// wird erwartet, dass dieser Test funktioniert.
+	@Test
+	public void uniqueAttrValuesOfRoleAndAttr_InEmbeddedAssociation_RoleSame_Ok() {
+		String attrEF="attrEF";
+		Iom_jObject obj_E_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSE,OID1);
+		
+		Iom_jObject obj_F_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID3);
+		IomObject attrObj_EF=obj_F_3.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
+		attrObj_EF.setobjectrefoid(OID1);
+		attrObj_EF.setattrvalue(attrEF, "text1");
+		
+		Iom_jObject obj_F_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID4);
+		IomObject attrObj2_EF=obj_F_4.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
+		attrObj2_EF.setobjectrefoid(OID1);
+		attrObj2_EF.setattrvalue(attrEF, "text2");
+		
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj_E_1));
+		validator.validate(new ObjectEvent(obj_F_3));
+		validator.validate(new ObjectEvent(obj_F_4));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Prueft, ob das eingebettete Unique-Constraint innerhalb der Association funktioniert.
+	// Da das Attribute: attrEF und die Rolle: e1 als UNIQUE definiert sind und beide unterschiedliche Werte besitzen,
+	// wird erwartet, dass dieser Test funktioniert.
+	@Test
+	public void uniqueAttrValuesOfRoleAndAttr_InEmbeddedAssociation_BothDifferent_Ok() {
+		String attrEF="attrEF";
+		Iom_jObject obj_E_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSE,OID1);
+		Iom_jObject obj_E_2=new Iom_jObject(EMBEDDED_UNIQUE_CLASSE,OID2);
+		
+		Iom_jObject obj_F_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID3);
+		IomObject attrObj_EF=obj_F_3.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
+		attrObj_EF.setobjectrefoid(OID1);
+		attrObj_EF.setattrvalue(attrEF, "text1");
+		
+		Iom_jObject obj_F_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID4);
+		IomObject attrObj2_EF=obj_F_4.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
+		attrObj2_EF.setobjectrefoid(OID2);
+		attrObj2_EF.setattrvalue(attrEF, "text2");
+		
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj_E_1));
+		validator.validate(new ObjectEvent(obj_E_2));
+		validator.validate(new ObjectEvent(obj_F_3));
+		validator.validate(new ObjectEvent(obj_F_4));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Prueft, ob das eingebettete Unique-Constraint innerhalb der Association funktioniert.
+	// Da das Attribute: attrEF und die Rolle: e1 als UNIQUE definiert sind und beide mehr als 1 Mal angesprochen werden,
+	// wird erwartet, dass dieser Test eine Fehlermeldung ausgibt.
+	@Test
+	public void uniqueAttrValuesOfRoleAndAttr_InEmbeddedAssociation_False() {
+		String attrEF="attrEF";
+		Iom_jObject obj_E_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSE,OID1);
+		
+		Iom_jObject obj_F_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID3);
+		IomObject attrObj_EF=obj_F_3.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
+		attrObj_EF.setobjectrefoid(OID1);
+		attrObj_EF.setattrvalue(attrEF, "text1");
+		
+		Iom_jObject obj_F_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID4);
+		IomObject attrObj2_EF=obj_F_4.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
+		attrObj2_EF.setobjectrefoid(OID1);
+		attrObj2_EF.setattrvalue(attrEF, "text1");
+		
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new ObjectEvent(obj_E_1));
+		validator.validate(new ObjectEvent(obj_F_3));
+		validator.validate(new ObjectEvent(obj_F_4));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Unique is violated! Values o1, text1 already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
 	}
 }

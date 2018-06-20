@@ -485,7 +485,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								}
 							} else if(additionalConstraint instanceof UniquenessConstraint){
 								UniquenessConstraint uniquenessConstraint = (UniquenessConstraint) additionalConstraint; // uniquenessConstraint not null.
-								validateUniquenessConstraint(iomObj, uniquenessConstraint);
+								validateUniquenessConstraint(iomObj, uniquenessConstraint, null);
 							} else if(additionalConstraint instanceof PlausibilityConstraint){
 								PlausibilityConstraint plausibilityConstraint = (PlausibilityConstraint) additionalConstraint;
 								String constraintName = getScopedName(plausibilityConstraint);
@@ -699,7 +699,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 	
-	private void validateUniquenessConstraint(IomObject iomObj, UniquenessConstraint uniquenessConstraint) {
+	private void validateUniquenessConstraint(IomObject iomObj, UniquenessConstraint uniquenessConstraint, RoleDef role) {
 		String constraintName = getScopedName(uniquenessConstraint);
 		String checkUniqueConstraint=null;
 		if(!enforceConstraintValidation){
@@ -741,18 +741,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		    String iomObjOid=iomObj.getobjectoid();
 	        if(uniquenessConstraint.getPrefix()!=null){
 	            PathEl[] attrPath = uniquenessConstraint.getPrefix().getPathElements();
-	            visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid,attrPath,0,iomObj);
+	            visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid,attrPath,0,iomObj, role);
 	        }else {
-                visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid,null,0,iomObj);
+                visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid,null,0,iomObj, role);
 	        }
 
 		}
 	}
 	
-	private void visitStructEle(String checkUniqueConstraint,UniquenessConstraint uniquenessConstraint, HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues, String iomObjOid, PathEl[] attrPath, int i, IomObject iomObj) {
+	private void visitStructEle(String checkUniqueConstraint,UniquenessConstraint uniquenessConstraint, HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues, String iomObjOid, PathEl[] attrPath, int i, IomObject iomObj, RoleDef role) {
 	    if(attrPath==null || i>=attrPath.length) {
             Holder<AttributeArray> values = new Holder<AttributeArray>();
-            String returnValue = validateUnique(seenValues,iomObjOid,iomObj,uniquenessConstraint, values);
+            String returnValue = validateUnique(seenValues,iomObjOid,iomObj,uniquenessConstraint, values, role);
             if (returnValue == null){
                 // ok
             } else {
@@ -769,7 +769,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         int structElec=iomObj.getattrvaluecount(attrName);
         for(int structElei=0;structElei<structElec;structElei++) {
             IomObject structEle=iomObj.getattrobj(attrName, structElei);
-            visitStructEle(checkUniqueConstraint,uniquenessConstraint, seenValues, iomObjOid, attrPath,i+1,structEle);
+            visitStructEle(checkUniqueConstraint,uniquenessConstraint, seenValues, iomObjOid, attrPath,i+1,structEle, role);
         }
     }
     private HashMap<SetConstraint,Collection<String>> setConstraints=new HashMap<SetConstraint,Collection<String>>();
@@ -2424,8 +2424,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					int propc=iomObj.getattrvaluecount(roleName);
 					for(int propi=0;propi<propc;propi++){
 						if (obj.embedded) {
-							AssociationDef roleOwner = (AssociationDef) role
-									.getContainer();
+							AssociationDef roleOwner = (AssociationDef) role.getContainer();
+							
+							Viewable classOfCurrentObj = roleOwner;
+							if(classOfCurrentObj!=null) {
+								Iterator constraintIterator=classOfCurrentObj.iterator();
+								while (constraintIterator.hasNext()) {
+									Object constraintObj = constraintIterator.next();
+									// role is unique?
+									if(constraintObj instanceof UniquenessConstraint){
+										UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) constraintObj;
+										validateUniquenessConstraint(iomObj, uniquenessConstraint, role);
+									}
+								}
+							}
+							
 							if (roleOwner.getDerivedFrom() == null) {
 								// not just a link?
 								IomObject structvalue = iomObj.getattrobj(roleName, propi);
@@ -2488,7 +2501,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					Object obj1 = attrI.next();
 					if(obj1 instanceof UniquenessConstraint){
 						UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) obj1; // uniquenessConstraint not null.
-						validateUniquenessConstraint(iomObj, uniquenessConstraint);
+						validateUniquenessConstraint(iomObj, uniquenessConstraint, null);
 					}
 				}
 				aclass2=(Viewable) aclass2.getExtending();
@@ -2631,7 +2644,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return null;
 	}
 	
-	private String validateUnique(HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues,String originObjOid,IomObject currentObject,UniquenessConstraint constraint, Holder<AttributeArray> valuesRet) {
+	private String validateUnique(HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues,String originObjOid,IomObject currentObject,UniquenessConstraint constraint, Holder<AttributeArray> valuesRet, RoleDef role) {
         ArrayList<Object> values = new ArrayList<Object>();
 		Iterator constraintIter = constraint.getElements().iteratorAttribute();
 		while(constraintIter.hasNext()){
@@ -2648,6 +2661,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			} else {
 				attrValue=currentObject.getattrvalue(uniqueAttrName);
+				if(attrValue==null) {
+					if(role!=null) {
+						structValue=currentObject.getattrobj(role.getName(), 0);
+						if(structValue!=null) {
+							attrValue=structValue.getattrvalue(uniqueAttrName);
+						}
+					}
+				}
 			}
 			// if one of the attrValues is undefined, object is excluded from unique constraint
 			if(attrValue==null){

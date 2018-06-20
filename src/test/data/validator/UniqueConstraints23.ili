@@ -235,4 +235,53 @@ MODEL UniqueConstraints23
 		END ClassN3;
 		
 	END Topic;
+
+	TOPIC EmbeddedUnique=
+
+		CLASS ClassA =
+			attrA : TEXT*10;
+		END ClassA;
+		
+		CLASS ClassB =
+			attrB : TEXT*10;
+		END ClassB;
+
+		ASSOCIATION assocAB =
+		  a1 -- {0..1} ClassA;
+		  b1 -- {0..2} ClassB;
+		  UNIQUE a1;
+		END assocAB;
+
+		CLASS ClassC =
+			attrC : TEXT*10;
+		END ClassC;
+		
+		CLASS ClassD =
+			attrD : TEXT*10;
+		END ClassD;
+		
+		ASSOCIATION assocCD =
+		  c1 -- {0..1} ClassC;
+		  d1 -- {0..2} ClassD;
+		  attrCD : TEXT*10;
+		  UNIQUE attrCD;
+		END assocCD;
+		
+		CLASS ClassE =
+			attrE : TEXT*10;
+		END ClassE;
+		
+		CLASS ClassF =
+			attrF : TEXT*10;
+		END ClassF;
+		
+		ASSOCIATION assocEF =
+		  e1 -- {0..1} ClassE;
+		  f1 -- {0..2} ClassF;
+		  attrEF : TEXT*10;
+		  UNIQUE e1, attrEF;
+		END assocEF;
+		
+	END EmbeddedUnique;
+	
 END UniqueConstraints23.
