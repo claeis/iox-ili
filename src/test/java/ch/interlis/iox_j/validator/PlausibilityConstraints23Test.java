@@ -194,4 +194,122 @@ public class PlausibilityConstraints23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist nicht gesetzt.
+	// Es wird eine Fehlermeldung erwartet.
+	@Test
+	public void percentageLessThanMinScope_ConstraintDisableSet_NotSet_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
+		iomObjA.setattrvalue("attr1", "7");
+		iomObjA.setattrvalue("attr2", "5");
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSA, OID2);
+		iomObjB.setattrvalue("attr1", "7");
+		iomObjB.setattrvalue("attr2", "5");
+		Iom_jObject iomObjC=new Iom_jObject(ILI_CLASSA, OID3);
+		iomObjC.setattrvalue("attr1", "5");
+		iomObjC.setattrvalue("attr2", "7");
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSA, OID4);
+		iomObjD.setattrvalue("attr1", "5");
+		iomObjD.setattrvalue("attr2", "7");
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSA, OID5);
+		iomObjE.setattrvalue("attr1", "5");
+		iomObjE.setattrvalue("attr2", "7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new ObjectEvent(iomObjC));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist Eingeschaltet.
+	// Es wird eine Fehlermeldung erwartet.
+	@Test
+	public void percentageLessThanMinScope_ConstraintDisableSet_ON_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
+		iomObjA.setattrvalue("attr1", "7");
+		iomObjA.setattrvalue("attr2", "5");
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSA, OID2);
+		iomObjB.setattrvalue("attr1", "7");
+		iomObjB.setattrvalue("attr2", "5");
+		Iom_jObject iomObjC=new Iom_jObject(ILI_CLASSA, OID3);
+		iomObjC.setattrvalue("attr1", "5");
+		iomObjC.setattrvalue("attr2", "7");
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSA, OID4);
+		iomObjD.setattrvalue("attr1", "5");
+		iomObjD.setattrvalue("attr2", "7");
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSA, OID5);
+		iomObjE.setattrvalue("attr1", "5");
+		iomObjE.setattrvalue("attr2", "7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.ON);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new ObjectEvent(iomObjC));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Plausibility Constraint PlausibilityConstraint23.Topic.ClassA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist Ausgeschaltet.
+	// Es wird erwartet dass keine Fehlermeldung ausgegeben wird.
+	@Test
+	public void percentageLessThanMinScope_ConstraintDisableSet_OFF_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
+		iomObjA.setattrvalue("attr1", "7");
+		iomObjA.setattrvalue("attr2", "5");
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSA, OID2);
+		iomObjB.setattrvalue("attr1", "7");
+		iomObjB.setattrvalue("attr2", "5");
+		Iom_jObject iomObjC=new Iom_jObject(ILI_CLASSA, OID3);
+		iomObjC.setattrvalue("attr1", "5");
+		iomObjC.setattrvalue("attr2", "7");
+		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSA, OID4);
+		iomObjD.setattrvalue("attr1", "5");
+		iomObjD.setattrvalue("attr2", "7");
+		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSA, OID5);
+		iomObjE.setattrvalue("attr1", "5");
+		iomObjE.setattrvalue("attr2", "7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB));
+		validator.validate(new ObjectEvent(iomObjC));
+		validator.validate(new ObjectEvent(iomObjD));
+		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 }

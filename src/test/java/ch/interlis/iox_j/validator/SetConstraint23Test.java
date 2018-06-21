@@ -333,4 +333,89 @@ public class SetConstraint23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist nicht gesetzt.
+	// Es wird eine Fehlermeldung erwartet.
+	@Test
+	public void lessThanConditionCount_ConstraintDisableSet_NotSet_False(){
+		Iom_jObject iomObj1=new Iom_jObject(TOPICA_CLASS1, OID1);
+		Iom_jObject iomObj2=new Iom_jObject(TOPICA_CLASS2, OID2);
+		// association 1
+		Iom_jObject iomObjAssoc1=new Iom_jObject(TOPICA_ASSOC_ASSOC1, null);
+		iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R1, "REF").setobjectrefoid(OID1);
+		iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R2, "REF").setobjectrefoid(OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPICA,BID1));
+		validator.validate(new ObjectEvent(iomObj1));
+		validator.validate(new ObjectEvent(iomObj2));
+		validator.validate(new ObjectEvent(iomObjAssoc1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Set Constraint SetConstraint23.TopicA.Class1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist Eingeschaltet.
+	// Es wird eine Fehlermeldung erwartet.
+	@Test
+	public void lessThanConditionCount_ConstraintDisableSet_ON_False(){
+		Iom_jObject iomObj1=new Iom_jObject(TOPICA_CLASS1, OID1);
+		Iom_jObject iomObj2=new Iom_jObject(TOPICA_CLASS2, OID2);
+		// association 1
+		Iom_jObject iomObjAssoc1=new Iom_jObject(TOPICA_ASSOC_ASSOC1, null);
+		iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R1, "REF").setobjectrefoid(OID1);
+		iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R2, "REF").setobjectrefoid(OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.ON);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPICA,BID1));
+		validator.validate(new ObjectEvent(iomObj1));
+		validator.validate(new ObjectEvent(iomObj2));
+		validator.validate(new ObjectEvent(iomObjAssoc1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Set Constraint SetConstraint23.TopicA.Class1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist Ausgeschaltet.
+	// Es wird erwartet dass keine Fehlermeldung ausgegeben wird.
+	@Test
+	public void lessThanConditionCount_ConstraintDisableSet_OFF_Ok(){
+		Iom_jObject iomObj1=new Iom_jObject(TOPICA_CLASS1, OID1);
+		Iom_jObject iomObj2=new Iom_jObject(TOPICA_CLASS2, OID2);
+		// association 1
+		Iom_jObject iomObjAssoc1=new Iom_jObject(TOPICA_ASSOC_ASSOC1, null);
+		iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R1, "REF").setobjectrefoid(OID1);
+		iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R2, "REF").setobjectrefoid(OID2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPICA,BID1));
+		validator.validate(new ObjectEvent(iomObj1));
+		validator.validate(new ObjectEvent(iomObj2));
+		validator.validate(new ObjectEvent(iomObjAssoc1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 }

@@ -8,6 +8,7 @@ LATEST
 - changed/improved overlay handling
 - CsvReader: fixed UTF-8 BOM handling
 - API: throw exception if one sets a IomObject attribute to null
+- Validator: allow to disable constraint validation
 
 iox-ili 1.20.4 (2018-03-02)
 -----------------------------

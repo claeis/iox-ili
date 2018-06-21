@@ -678,4 +678,77 @@ public class AdditionalConstraints23Test {
 		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
 		assertEquals("Set Constraint AdditionalModelH.AdditionalTopicH.AdditionalClassH.Constraint1 is not true.", logger.getErrs().get(3).getEventMsg());
 	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist nicht gesetzt.
+	// Es wird eine Fehlermeldung erwartet.
+	@Test
+	public void plausibilityConstraintFail_ConstraintDisableSet_NotSet_False(){
+		Iom_jObject obj1=new Iom_jObject(CLASSF, OID1);
+		obj1.setattrvalue("attr1", "5");
+		obj1.setattrvalue("attr2", "7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelG;");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Plausibility Constraint AdditionalModelG.AdditionalTopicG.AdditionalClassG.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist Eingeschaltet.
+	// Es wird eine Fehlermeldung erwartet.
+	@Test
+	public void plausibilityConstraintFail_ConstraintDisableSet_ON_False(){
+		Iom_jObject obj1=new Iom_jObject(CLASSF, OID1);
+		obj1.setattrvalue("attr1", "5");
+		obj1.setattrvalue("attr2", "7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.ON);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelG;");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Plausibility Constraint AdditionalModelG.AdditionalTopicG.AdditionalClassG.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist Ausgeschaltet.
+	// Es wird erwartet dass keine Fehlermeldung ausgegeben wird.
+	@Test
+	public void plausibilityConstraintFail_ConstraintDisableSet_OFF_Ok(){
+		Iom_jObject obj1=new Iom_jObject(CLASSF, OID1);
+		obj1.setattrvalue("attr1", "5");
+		obj1.setattrvalue("attr2", "7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelG;");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 }

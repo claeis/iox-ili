@@ -2190,4 +2190,90 @@ public class UniqueConstraints23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Unique is violated! Values o1, text1 already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
 	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist nicht gesetzt.
+	// Es wird eine Fehlermeldung erwartet.
+	@Test
+	public void uniqueAttrValuesSame_ConstraintDisableSet_NotSet_Fail(){
+		// Set object.
+		Iom_jObject obj1=new Iom_jObject(CLASSB,OID1);
+		obj1.setattrvalue("attr1", "Ralf");
+		obj1.setattrvalue("attr2", "20");
+		Iom_jObject objA=new Iom_jObject(CLASSB,OID2);
+		objA.setattrvalue("attr1", "Ralf");
+		objA.setattrvalue("attr2", "20");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(objA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist Eingeschaltet.
+	// Es wird eine Fehlermeldung erwartet.
+	@Test
+	public void uniqueAttrValuesSame_ConstraintDisableSet_ON_Fail(){
+		// Set object.
+		Iom_jObject obj1=new Iom_jObject(CLASSB,OID1);
+		obj1.setattrvalue("attr1", "Ralf");
+		obj1.setattrvalue("attr2", "20");
+		Iom_jObject objA=new Iom_jObject(CLASSB,OID2);
+		objA.setattrvalue("attr1", "Ralf");
+		objA.setattrvalue("attr2", "20");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.ON);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(objA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist Ausgeschaltet.
+	// Es wird erwartet dass keine Fehlermeldung ausgegeben wird.
+	@Test
+	public void uniqueAttrValuesSame_ConstraintDisableSet_OFF_Ok(){
+		// Set object.
+		Iom_jObject obj1=new Iom_jObject(CLASSB,OID1);
+		obj1.setattrvalue("attr1", "Ralf");
+		obj1.setattrvalue("attr2", "20");
+		Iom_jObject objA=new Iom_jObject(CLASSB,OID2);
+		objA.setattrvalue("attr1", "Ralf");
+		objA.setattrvalue("attr2", "20");
+		// Create and run validator.
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new ObjectEvent(objA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts.
+		assertTrue(logger.getErrs().size()==0);
+	}
 }
