@@ -321,6 +321,7 @@ private boolean removeOverlap(CurveSegmentIntersector li,Coordinate node,
 						  throw new IllegalStateException("unexpected overlap tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
 					  }
 				  }else{
+					  li.isOverlay(); // TODO ceis 20180501 is overlay a special case here?
 					  Coordinate is0=li.getIntersection(0);
 					  Coordinate is1=li.getIntersection(1);
 					  if(is0.equals2D(node)){
@@ -402,6 +403,7 @@ private Coordinate getIntersection(CurveSegmentIntersector li,Coordinate node,
 						  throw new IllegalStateException("unexpected overlap");
 					  }
 				  }else{
+					  li.isOverlay(); // TODO ceis 20180501 is overlay a special case here?
 					  Coordinate is0=li.getIntersection(0);
 					  Coordinate is1=li.getIntersection(1);
 					  if(is0.equals2D(node)){

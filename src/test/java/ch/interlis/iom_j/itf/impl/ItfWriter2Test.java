@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ch.interlis.ili2c.Ili2cFailure;
@@ -202,6 +203,7 @@ public class ItfWriter2Test {
 		writer.close();
 		writer=null;
 	}
+	@Ignore("Area overlay of lines not yet implemented.")
 	@Test
 	public void testAreaWithHole() throws Iox2jtsException, IoxException {
 		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestAreaWithHole.itf"),td);
@@ -209,7 +211,7 @@ public class ItfWriter2Test {
 		writer.write(new StartBasketEvent("Test1.TopicB","bid1"));
 		IomObject iomObj=new Iom_jObject("Test1.TopicB.TableB","10");
 		IomObject polyline=newPolyline();
-		addCoord(polyline,110,110);
+		addCoord(polyline,110.0,  110.0);
 		addCoord(polyline,120.0,  110.0); 
 		addCoord(polyline,120.0,  140.0); 
 		addCoord(polyline,110.0,  140.0); 

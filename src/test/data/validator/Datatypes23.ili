@@ -64,8 +64,12 @@ MODEL Datatypes23
 		   aBoolean : BOOLEAN;
 		   
 		   !! NumericType
-		   numericInt : 0 .. 10;
-		   numericDec : 0.0 .. 10.0;
+		   numericInt : -10 .. 10;
+		   numericInt2 : -9 .. 9;
+		   numericInt3 : -199999 .. 199999;
+		   numericDec : -10.0 .. 10.0;
+		   numericDec2 : -0.001 .. 0.001;
+		   numericDec3 : -1.999999999999 .. 1.999999999999;
 		   numericNum : numerictype;
 		   !!numCountClockWise : numericCounterClockwise;
 		   !!numCountClock : numericCounterClock;

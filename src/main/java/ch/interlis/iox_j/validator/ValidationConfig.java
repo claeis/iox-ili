@@ -40,6 +40,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	public static final String PARAMETER = "PARAMETER";
 	public static final String VALIDATION = "validation";
 	public static final String AREA_OVERLAP_VALIDATION = "areaOverlapValidation";
+	public static final String CONSTRAINT_VALIDATION = "constraintValidation";
 	public static final String DEFAULT_GEOMETRY_TYPE_VALIDATION = "defaultGeometryTypeValidation";
 	public static final String ADDITIONAL_MODELS="additionalModels";
 	public static final String ALLOW_ONLY_MULTIPLICITY_REDUCTION="allowOnlyMultiplicityReduction";

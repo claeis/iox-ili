@@ -3,36 +3,17 @@ package ch.interlis.iom_j.itf.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-
-
-
-
-import com.vividsolutions.jts.algorithm.BoundaryNodeRule;
 import com.vividsolutions.jts.algorithm.locate.SimplePointInAreaLocator;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Location;
-import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.TopologyException;
 import com.vividsolutions.jts.index.strtree.STRtree;
-import com.vividsolutions.jts.noding.FastNodingValidator;
-import com.vividsolutions.jts.noding.BasicSegmentString;
-import com.vividsolutions.jts.noding.FastSegmentSetIntersectionFinder;
-import com.vividsolutions.jts.operation.IsSimpleOp;
-import com.vividsolutions.jts.operation.polygonize.Polygonizer;
-import com.vividsolutions.jts.operation.valid.IsValidOp;
-import com.vividsolutions.jts.operation.valid.TopologyValidationError;
-
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.JavaSerializer;
@@ -41,17 +22,13 @@ import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
-import ch.interlis.ili2c.metamodel.SurfaceType;
 import ch.interlis.ili2c.metamodel.Table;
-import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
-import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurveRing;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurvePolygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
-import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 import ch.interlis.iom_j.itf.impl.jtsext.operation.polygonize.IoxPolygonizer;
@@ -221,7 +198,10 @@ public class ItfAreaLinetable2Polygon {
 						p01 = e0.getSegments().get(segIndex0).getEndPoint();
 						p10 = e1.getSegments().get(segIndex1).getStartPoint();
 						p11 = e1.getSegments().get(segIndex1).getEndPoint();
-						if(e0!=e1 && 
+						if(is.isOverlay()) {
+							dataerrs.add(new IoxInvalidDataException("overlay "+is.getCurve1().getUserData(),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
+							hasIntersections=true;
+						}else if(e0!=e1 && 
 								(segIndex0==0 || segIndex0==e0.getSegments().size()-1) 
 								&& (segIndex1==0 || segIndex1==e1.getSegments().size()-1) 
 								&& is.getOverlap()!=null && is.getOverlap()<maxOverlaps){
@@ -265,7 +245,7 @@ public class ItfAreaLinetable2Polygon {
 			if(!cutEdges.isEmpty()){
 				for(Object edge:cutEdges){
 					try {
-						dataerrs.add(new IoxInvalidDataException("cut edge "+IoxInvalidDataException.formatTids(((CompoundCurve) edge).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)edge)));
+						dataerrs.add(new IoxInvalidDataException("cut edge "+IoxInvalidDataException.formatTids((CompoundCurve) edge),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)edge)));
 					} catch (Iox2jtsException e) {
 						throw new IllegalStateException(e);
 					}
@@ -278,7 +258,7 @@ public class ItfAreaLinetable2Polygon {
 			if(!dangles.isEmpty()){
 				for(Object dangle:dangles){
 						try {
-							dataerrs.add(new IoxInvalidDataException("dangle "+IoxInvalidDataException.formatTids(((CompoundCurve) dangle).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)dangle)));
+							dataerrs.add(new IoxInvalidDataException("dangle "+IoxInvalidDataException.formatTids((CompoundCurve) dangle),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)dangle)));
 						} catch (Iox2jtsException e) {
 							throw new IllegalStateException(e);
 						}
@@ -291,7 +271,7 @@ public class ItfAreaLinetable2Polygon {
 			if(!invalidRingLines.isEmpty()){
 				for(Object invalidRingLine:invalidRingLines){
 					try {
-						dataerrs.add(new IoxInvalidDataException("invald ring line "+IoxInvalidDataException.formatTids(((CompoundCurve) invalidRingLine).getSegmentTids()),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)invalidRingLine)));
+						dataerrs.add(new IoxInvalidDataException("invald ring line "+IoxInvalidDataException.formatTids((CompoundCurve) invalidRingLine),linetableIliqname,null,Jtsext2iox.JTS2polyline((CompoundCurve)invalidRingLine)));
 					} catch (Iox2jtsException e) {
 						throw new IllegalStateException(e);
 					}

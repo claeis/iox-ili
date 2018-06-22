@@ -232,7 +232,7 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 										String attrName=attr.getName();
 										String lineTableName=tableQName+"_"+attrName;
 										EhiLogger.logState("build linetable "+lineTableName+"...");
-										ItfAreaPolygon2Linetable allLines=new ItfAreaPolygon2Linetable(recman);
+										ItfAreaPolygon2Linetable allLines=new ItfAreaPolygon2Linetable(tableQName, recman);
 										// FORALL main objects
 										java.util.Map<String, IomObject> pool=getObjectPool(tableQName);
 										for(String mainObjTid : pool.keySet()){

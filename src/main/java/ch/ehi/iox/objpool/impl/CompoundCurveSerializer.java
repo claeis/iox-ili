@@ -38,6 +38,7 @@ public class CompoundCurveSerializer implements Serializer<CompoundCurve> {
 				throw new IllegalStateException();
 			}
 		}
+        writeString(byteStream,(String) value.getUserData());
 		writeInt(byteStream,MAGIC);
 		return byteStream.toByteArray();
 	}
@@ -112,10 +113,12 @@ public class CompoundCurveSerializer implements Serializer<CompoundCurve> {
 			}
 			segs.add(seg);
 		}
+        String userData=readString(in);
 		if(readInt(in)!=MAGIC){
 			throw new IllegalArgumentException();
 		}
 		CompoundCurve ret=new CompoundCurve(segs, factory);
+		ret.setUserData(userData);
 		return ret;
 	}
 

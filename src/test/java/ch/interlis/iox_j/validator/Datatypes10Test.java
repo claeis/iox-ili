@@ -195,7 +195,7 @@ public class Datatypes10Test {
 	@Test
 	public void bereichMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("bereich", "10.4");
+		objTest.setattrvalue("bereich", "9.94");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -210,13 +210,14 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Dezimal 0.0 wird gerundet auf (0).
-	// -0.4 gerundet =  0. valid.
-	// -0.5 gerundet = -1. unvalid.
+	// Dezimal -0.05 wird gerundet auf (0).
+	// -0.04 gerundet =  0. valid.
+	// -0.05 gerundet =  0. valid.
+	// -0.06 gerundet = -1. unvalid.
 	@Test
 	public void bereichMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("bereich", "-0.4");
+		objTest.setattrvalue("bereich", "-0.05");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -235,7 +236,7 @@ public class Datatypes10Test {
 	@Test
 	public void bereich2MaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("bereich2", "10.499");
+		objTest.setattrvalue("bereich2", "9.999");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -254,7 +255,7 @@ public class Datatypes10Test {
 	@Test
 	public void bereich2MinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("bereich2", "-0.499");
+		objTest.setattrvalue("bereich2", "0.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -330,7 +331,7 @@ public class Datatypes10Test {
 	@Test
 	public void laengeMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("laenge", "10.4");
+		objTest.setattrvalue("laenge", "9.94");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -349,7 +350,7 @@ public class Datatypes10Test {
 	@Test
 	public void laengeMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("laenge", "0.5");
+		objTest.setattrvalue("laenge", "0.95");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -387,7 +388,7 @@ public class Datatypes10Test {
 	@Test
 	public void flaecheMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("flaeche", "10.4");
+		objTest.setattrvalue("flaeche", "9.94");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -406,7 +407,7 @@ public class Datatypes10Test {
 	@Test
 	public void flaecheMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("flaeche", "0.5");
+		objTest.setattrvalue("flaeche", "0.95");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -425,7 +426,7 @@ public class Datatypes10Test {
 	@Test
 	public void flaeche2ThirdPositionAfterDotOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("flaeche2", "99.000");
+		objTest.setattrvalue("flaeche2", "98.999");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -444,7 +445,7 @@ public class Datatypes10Test {
 	@Test
 	public void winkelRadianMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("radians", "10.4");
+		objTest.setattrvalue("radians", "10.0");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -463,7 +464,7 @@ public class Datatypes10Test {
 	@Test
 	public void winkelRadianMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("radians", "0.5");
+		objTest.setattrvalue("radians", "1.0");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -482,7 +483,7 @@ public class Datatypes10Test {
 	@Test
 	public void winkelGradsMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("grads", "10.4");
+		objTest.setattrvalue("grads", "10.04");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -501,7 +502,7 @@ public class Datatypes10Test {
 	@Test
 	public void winkelGradsMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("grads", "0.5");
+		objTest.setattrvalue("grads", "0.95");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -520,7 +521,7 @@ public class Datatypes10Test {
 	@Test
 	public void winkelDegreesMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("degrees", "10.4");
+		objTest.setattrvalue("degrees", "10.04");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -539,7 +540,7 @@ public class Datatypes10Test {
 	@Test
 	public void winkelDegreesMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("degrees", "0.5");
+		objTest.setattrvalue("degrees", "0.95");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1784,5 +1785,68 @@ public class Datatypes10Test {
 		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
 	}
 
-
+	// eine Fehlermeldung wird erwartet, da 9(4) auf 90 abgerundet werden soll,
+	// und somit der gueltige Bereich unterschritten wird.
+	@Test
+	public void coordType_Rounding_Down_Fail(){
+		Iom_jObject obj=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+		IomObject coordValue=obj.addattrobj("koord2", "COORD");
+		coordValue.setattrvalue("C1", "5.55");
+		coordValue.setattrvalue("C2", "99.94");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+		validator.validate(new ObjectEvent(obj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value 99.9 is out of range", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// prueft, ob 9(5) erfolgreich auf 100 aufgerundet wird.
+	@Test
+	public void coordType_Rounding_UpFrom5_Ok(){
+		Iom_jObject obj=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+		IomObject coordValue=obj.addattrobj("koord2", "COORD");
+		coordValue.setattrvalue("C1", "5.55");
+		coordValue.setattrvalue("C2", "99.95");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+		validator.validate(new ObjectEvent(obj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// prueft, ob 9(6) erfolgreich auf 100 aufgerundet wird.
+	@Test
+	public void coordType_Rounding_Up_Ok(){
+		Iom_jObject obj=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+		IomObject coordValue=obj.addattrobj("koord2", "COORD");
+		coordValue.setattrvalue("C1", "5.55");
+		coordValue.setattrvalue("C2", "99.96");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+		validator.validate(new ObjectEvent(obj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
 }

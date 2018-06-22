@@ -29,7 +29,7 @@ public class GetModelsTest {
 	
 	@Test
 	public void xtf23Reader_Ok() throws IoxException {
-		List<String> models=IoxUtility.getModels(new File("src/test/data/Xtf23Reader/SimpleCoord23a.xtf"));
+		List<String> models=IoxUtility.getModels(new File("src/test/data/Xtf23Reader/dataSection/SimpleCoord23a.xtf"));
 		java.util.ArrayList<String> expectedModels=new java.util.ArrayList<String>();
 		expectedModels.add("SimpleCoord23");
 		assertEquals(expectedModels,models);

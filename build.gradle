@@ -1,5 +1,5 @@
 group 'ch.interlis'
-version '1.20.4'+System.getProperty('release','-SNAPSHOT')
+version '1.20.5'+System.getProperty('release','-SNAPSHOT')
 
 apply plugin: "java"
 apply plugin: "maven"
@@ -12,6 +12,7 @@ sourceCompatibility = "1.6"
 targetCompatibility = "1.6"
 
 dependencies {
+    compile group: 'ch.ehi', name: 'ehibasics', version: '1.2.0'
     compile group: 'ch.interlis', name: 'iox-api', version: '1.0.3'
     compile group: 'ch.interlis', name: 'ili2c-core', version: '4.7.7'
 	compile group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.5.1'

@@ -2,6 +2,7 @@ package ch.interlis.iom_j.csv;
 
 import static org.junit.Assert.*;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -274,8 +275,20 @@ public class CsvReaderTest {
     public void utf8_bom_Ok() throws IoxException, IOException{
         final String FILE_NAME="TextTypeUTF8_BOM.csv";
         // write file
-        BufferedWriter writer=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(TEST_OUT,FILE_NAME)),"UTF-8"));
-        writer.write("\u00FE\u00FF\"10\",\"AU\"");writer.newLine();
+        BufferedOutputStream writer=new BufferedOutputStream(new FileOutputStream(new File(TEST_OUT,FILE_NAME)));
+        writer.write(0xEF);
+        writer.write(0xBB);
+        writer.write(0xBF);
+        writer.write('\"');
+        writer.write('1');
+        writer.write('0');
+        writer.write('\"');
+        writer.write(',');
+        writer.write('\"');
+        writer.write('A');
+        writer.write('U');
+        writer.write('\"');
+        writer.write('\n');
         writer.close();
         writer=null;
         

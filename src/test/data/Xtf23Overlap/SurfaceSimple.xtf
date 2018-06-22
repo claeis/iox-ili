@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+	<HEADERSECTION SENDER="ili2pg-3.6.0-20161230" VERSION="2.3">
+		<MODELS>
+			<MODEL NAME="Overlap23" VERSION="2016-07-08" URI="mailto:ceis@localhost"></MODEL>
+		</MODELS>
+	</HEADERSECTION>
+	<DATASECTION>
+		<Overlap23.Topic BID="Overlap23.Topic">
+			<Overlap23.Topic.Surface TID="1">
+				<surface>
+					<SURFACE>
+						<BOUNDARY>
+							<POLYLINE>
+								<COORD>
+									<C1>2600000.000</C1>
+									<C2>1050000.000</C2>
+								</COORD>
+								<COORD>
+									<C1>2600000.000</C1>
+									<C2>1050025.000</C2>
+								</COORD>
+								<COORD>
+									<C1>2600025.000</C1>
+									<C2>1050025.000</C2>
+								</COORD>
+								<COORD>
+									<C1>2600025.000</C1>
+									<C2>1050000.000</C2>
+								</COORD>
+								<COORD>
+									<C1>2600000.000</C1>
+									<C2>1050000.000</C2>
+								</COORD>
+							</POLYLINE>
+						</BOUNDARY>
+					</SURFACE>
+				</surface>
+			</Overlap23.Topic.Surface>
+		</Overlap23.Topic>
+	</DATASECTION>
+</TRANSFER>

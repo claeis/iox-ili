@@ -6,11 +6,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.ws.Holder;
-
+import ch.ehi.basics.types.OutParam;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.JavaSerializer;
-import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.Viewable;
@@ -122,7 +120,7 @@ public class ObjectPool {
 		return null;
 	}
 	
-	public IomObject getObject(String oid, ArrayList<Viewable> classes, Holder<String> retBasketId) {
+	public IomObject getObject(String oid, ArrayList<Viewable> classes, OutParam<String> retBasketId) {
 		for(String basketId : bids){
 			Map<ObjectPoolKey, IomObject> collectionOfObjects = collectionOfBaskets.get(basketId);
 			if(doItfOidPerTable){

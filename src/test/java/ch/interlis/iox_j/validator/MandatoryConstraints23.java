@@ -1100,8 +1100,8 @@ public class MandatoryConstraints23 {
 	@Test
 	public void decimalGreaterThan_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
-		iomObjA.setattrvalue("attr1", "6");
-		iomObjA.setattrvalue("attr2", "5.9");
+		iomObjA.setattrvalue("attr1", "5.9");
+		iomObjA.setattrvalue("attr2", "5.4");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1688,7 +1688,7 @@ public class MandatoryConstraints23 {
 	@Test
 	public void decimalNotEqual_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID);
-		iomObjA.setattrvalue("attr1", "5.000001");
+		iomObjA.setattrvalue("attr1", "4.444444");
 		iomObjA.setattrvalue("attr2", "4.999999");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -2975,5 +2975,75 @@ public class MandatoryConstraints23 {
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassDefinedB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassDefinedB.Constraint2 is not true.", logger.getErrs().get(1).getEventMsg());
 		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassDefinedB.Constraint3 is not true.", logger.getErrs().get(2).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist nicht gesetzt.
+	// Es wird eine Fehlermeldung erwartet.
+	@Test
+	public void valuesNotEqual_ConstraintDisableSet_NotSet_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
+		iomObjA.setattrvalue("attr1", "true");
+		iomObjA.setattrvalue("attr2", "false");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualI.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist Eingeschaltet.
+	// Es wird eine Fehlermeldung erwartet.
+	@Test
+	public void valuesNotEqual_ConstraintDisableSet_ON_False(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
+		iomObjA.setattrvalue("attr1", "true");
+		iomObjA.setattrvalue("attr2", "false");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.ON);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.ClassEqualI.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist Ausgeschaltet.
+	// Es wird erwartet dass keine Fehlermeldung ausgegeben wird.
+	@Test
+	public void valuesNotEqual_ConstraintDisableSet_OFF_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
+		iomObjA.setattrvalue("attr1", "true");
+		iomObjA.setattrvalue("attr2", "false");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
 	}
 }

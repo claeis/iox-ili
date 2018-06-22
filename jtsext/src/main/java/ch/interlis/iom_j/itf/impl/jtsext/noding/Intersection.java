@@ -15,6 +15,7 @@ public class Intersection {
 	CurveSegment seg1;
 	CurveSegment seg2;
 	Double overlap;
+	boolean overlay=false;
 	public Intersection(Coordinate pt1,CompoundCurve g1,CompoundCurve g2,CurveSegment s1,CurveSegment s2,Double overlap){
 		pt=new Coordinate[1];
 		pt[0]=new Coordinate(pt1);
@@ -24,7 +25,7 @@ public class Intersection {
 		seg2=s2;
 		this.overlap=overlap;
 	}
-	public Intersection(Coordinate pt1,Coordinate pt2,CompoundCurve g1,CompoundCurve g2,CurveSegment s1,CurveSegment s2,Double overlap){
+	public Intersection(Coordinate pt1,Coordinate pt2,CompoundCurve g1,CompoundCurve g2,CurveSegment s1,CurveSegment s2,Double overlap,boolean isOverlay){
 		pt=new Coordinate[2];
 		pt[0]=new Coordinate(pt1);
 		pt[1]=new Coordinate(pt2);
@@ -33,6 +34,7 @@ public class Intersection {
 		seg1=s1;
 		seg2=s2;
 		this.overlap=overlap;
+		overlay=isOverlay;
 	}
 	public Coordinate[] getPt() {
 		return pt;
@@ -63,14 +65,46 @@ public class Intersection {
 	}
 	@Override
 	public String toString() {
+	    Object seg1UserData=seg1.getUserData();
+        Object seg2UserData=seg2.getUserData();
+        if(isOverlay()) {
+    		return "Overlay"
+    				+" coord1 " + pt[0].toString()+", coord2 "+pt[1].toString()
+    				+ ", tid1 " + (seg1UserData!=null?seg1UserData:curve1.getUserData())
+    				+ ", tid2 " + (seg2UserData!=null?seg2UserData:curve2.getUserData())
+    				+ ", idx1 "+curve1.getSegments().indexOf(seg1)+", idx2 "+curve2.getSegments().indexOf(seg2)
+    				+ ", seg1 " + seg1 + ", seg2 " + seg2
+    				;        	
+        }
 		return "Intersection"
-				+ " overlap " + overlap
-				+", coord1 " + pt[0].toString()+(pt.length==2?(", coord2 "+pt[1].toString()):"") 
-				+ ", tid1 " + seg1.getUserData()
-				+ ", tid2 " + seg2.getUserData()
+				+ (pt.length==2?" overlap " + overlap+",":"")
+				+" coord1 " + pt[0].toString()+(pt.length==2?(", coord2 "+pt[1].toString()):"") 
+				+ ", tid1 " + (seg1UserData!=null?seg1UserData:curve1.getUserData())
+				+ ", tid2 " + (seg2UserData!=null?seg2UserData:curve2.getUserData())
 				+ ", idx1 "+curve1.getSegments().indexOf(seg1)+", idx2 "+curve2.getSegments().indexOf(seg2)
 				+ ", seg1 " + seg1 + ", seg2 " + seg2
 				;
 		
+	}
+    public String toShortString() {
+        Object seg1UserData=seg1.getUserData();
+        Object seg2UserData=seg2.getUserData();
+        if(isOverlay()) {
+            return "Overlay"
+                    +" coord1 " + pt[0].toString()+", coord2 "+pt[1].toString() 
+                    + ", tid1 " + (seg1UserData!=null?seg1UserData:curve1.getUserData())
+                    + ", tid2 " + (seg2UserData!=null?seg2UserData:curve2.getUserData())
+                    ;
+        }
+        return "Intersection"
+                + (pt.length==2?" overlap " + overlap+",":"")
+                +" coord1 " + pt[0].toString()+(pt.length==2?(", coord2 "+pt[1].toString()):"") 
+                + ", tid1 " + (seg1UserData!=null?seg1UserData:curve1.getUserData())
+                + ", tid2 " + (seg2UserData!=null?seg2UserData:curve2.getUserData())
+                ;
+        
+    }
+	public boolean isOverlay() {
+		return overlay;
 	}
 }
