@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.xml.ws.Holder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Polygon;
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.basics.types.OutParam;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.JavaSerializer;
 import ch.interlis.ili2c.metamodel.AttributeDef;
@@ -231,7 +231,7 @@ public class ItfSurfaceLinetable2Polygon {
 			LineSet lineset=new LineSet(true,linattrTab,helperTableGeomAttrName);
 			
 			ArrayList<CompoundCurve> segv=lineset.buildBoundaries(lines,jtsFact);
-			Holder<Polygon> poly=new Holder<Polygon>();
+			OutParam<Polygon> poly=new OutParam<Polygon>();
 			isDisconnected |= createPolygon(mainTid, segv,maxOverlaps,newVertexOffset,dataerrs,linetableIliqname,ignorePolygonBuildingErrors,geomattrIliqname,poly);
 			polygons.put(mainTid, poly.value);
 		}
@@ -268,7 +268,7 @@ public class ItfSurfaceLinetable2Polygon {
 		    seg.setUserData(mainTid);
 		}
 		
-		Holder<Polygon> poly=new Holder<Polygon>();
+		OutParam<Polygon> poly=new OutParam<Polygon>();
 		ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
 		try {
 	        createPolygon(mainTid, segv,maxOverlaps,newVertexOffset,dataerrs,linetableIliqname,ignorePolygonBuildingErrors,null,poly);
@@ -293,7 +293,7 @@ public class ItfSurfaceLinetable2Polygon {
 	}
 	private static boolean createPolygon(String mainTid,
 			ArrayList<CompoundCurve> segv,double maxOverlaps,double newVertexOffset,ArrayList<IoxInvalidDataException> dataerrs,
-			String linetableIliqname,boolean ignorePolygonBuildingErrors,String geomattrIliqname,Holder<Polygon> returnPolygon) 
+			String linetableIliqname,boolean ignorePolygonBuildingErrors,String geomattrIliqname,OutParam<Polygon> returnPolygon) 
 					throws IoxInvalidDataException 
 	{
 		boolean hasIntersections=false;

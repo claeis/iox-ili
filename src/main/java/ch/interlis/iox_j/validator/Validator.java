@@ -10,10 +10,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.xml.ws.Holder;
 import com.vividsolutions.jts.geom.Coordinate;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
+import ch.ehi.basics.types.OutParam;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AreaType;
@@ -761,7 +761,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	
 	private void visitStructEle(String checkUniqueConstraint,UniquenessConstraint uniquenessConstraint, HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues, String iomObjOid, PathEl[] attrPath, int i, IomObject iomObj, RoleDef role) {
 	    if(attrPath==null || i>=attrPath.length) {
-            Holder<AttributeArray> values = new Holder<AttributeArray>();
+	        OutParam<AttributeArray> values = new OutParam<AttributeArray>();
             String returnValue = validateUnique(seenValues,iomObjOid,iomObj,uniquenessConstraint, values, role);
             if (returnValue == null){
                 // ok
@@ -1741,7 +1741,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				sep=",";
 				possibleTargetClasses.append(roleDestinationClass.getScopedName(null));
 			}
-			Holder<String> bidOfTargetObj = new Holder<String>();
+			OutParam<String> bidOfTargetObj = new OutParam<String>();
 			IomObject targetObj = (IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
 			String oid = iomObj.getobjectoid();
 			if(oid==null){
@@ -1838,7 +1838,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							targetOid=refAttrStruct.getobjectrefoid();
 						}
 						String targetObjClassStr = null;
-						Holder<String> bidOfTargetObj = new Holder<String>();
+						OutParam<String> bidOfTargetObj = new OutParam<String>();
 						IomObject targetObject = null;
 						if(targetOid!=null){
 							targetObject=(IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
@@ -2660,7 +2660,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return null;
 	}
 	
-	private String validateUnique(HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues,String originObjOid,IomObject currentObject,UniquenessConstraint constraint, Holder<AttributeArray> valuesRet, RoleDef role) {
+	private String validateUnique(HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues,String originObjOid,IomObject currentObject,UniquenessConstraint constraint, OutParam<AttributeArray> valuesRet, RoleDef role) {
         ArrayList<Object> values = new ArrayList<Object>();
 		Iterator constraintIter = constraint.getElements().iteratorAttribute();
 		while(constraintIter.hasNext()){
@@ -3049,7 +3049,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void validatePolylineTopology(String attrPath,String validateType, PolylineType type, IomObject iomValue) {
 		CompoundCurve seg=null;
 		try {
-			Holder<Boolean> foundErrs=new Holder<Boolean>();
+		    OutParam<Boolean> foundErrs=new OutParam<Boolean>();
 			seg = Iox2jtsext.polyline2JTS(iomValue, false, 0.0,foundErrs,errFact,0.0,validateType,ValidationConfig.WARNING);
 			if(seg==null || foundErrs.value){
 				return;

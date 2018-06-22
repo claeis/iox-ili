@@ -2,17 +2,16 @@ package ch.interlis.iom_j.itf.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import javax.xml.ws.Holder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.basics.types.OutParam;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.CompoundCurveSerializer;
 import ch.ehi.iox.objpool.impl.FileBasedCollection;
@@ -58,7 +57,7 @@ public class ItfAreaPolygon2Linetable {
 	}
 	public void addLines(String mainObjTid,String internalTid,ArrayList<IomObject> ioxlines,String validationType,LogEventFactory errs) throws IoxException {
 		for(IomObject ioxline:ioxlines){
-			Holder<Boolean> foundErrs=new Holder<Boolean>();
+			OutParam<Boolean> foundErrs=new OutParam<Boolean>();
 			CompoundCurve line=Iox2jtsext.polyline2JTS(ioxline, false, 0.0,foundErrs,errs,0.0,validationType,ValidationConfig.WARNING);
 			if(line!=null){
 				if(internalTid!=null){
@@ -72,7 +71,7 @@ public class ItfAreaPolygon2Linetable {
 	}
 	public void addPolygon(String mainObjTid,String internalTid,IomObject iomPolygon,String validationType,LogEventFactory errs) throws IoxException {
 		ArrayList<IomObject> ioxlines=ItfAreaPolygon2Linetable.getLinesFromPolygon(iomPolygon);
-		Holder<Boolean> foundErrs=new Holder<Boolean>();
+		OutParam<Boolean> foundErrs=new OutParam<Boolean>();
 		Polygon polygon=Iox2jtsext.surface2JTS(iomPolygon, 0.0,foundErrs,errs,0.0,validationType);
 		if(polygon!=null){
 			if(internalTid!=null){

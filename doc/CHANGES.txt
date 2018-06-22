@@ -2,13 +2,15 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
-LATEST
+iox-ili 1.20.5 (2018-06-22)
 -----------------------------
 - Validator xtf: include TIDs in AREA intersection error message
 - changed/improved overlay handling
 - CsvReader: fixed UTF-8 BOM handling
 - API: throw exception if one sets a IomObject attribute to null
 - Validator: allow to disable constraint validation
+- ehibasics-1.2.0
+- replaced javax.xml.ws.Holder by ch.ehi.basics.types.OutParam
 
 iox-ili 1.20.4 (2018-03-02)
 -----------------------------
