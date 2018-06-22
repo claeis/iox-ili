@@ -1,6 +1,8 @@
 package ch.interlis.iox_j;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import ch.interlis.iom.IomObject;
@@ -78,8 +80,11 @@ public class IoxInvalidDataException extends IoxException {
 			}else{
 				ret.append("tid ");
 			}
+			List<String> tidv=new ArrayList<String>();
+			tidv.addAll(Arrays.asList(tids));
+			Collections.sort(tidv);
 			String sep="";
-			for(String tid:tids){
+			for(String tid:tidv){
 				ret.append(sep);
 				ret.append(tid);
 				sep=", ";
