@@ -266,7 +266,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			currentBasketId = ((ch.interlis.iox.StartBasketEvent) event).getBid();
 			validateUniqueBasketId(startBasketEvent);
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
-			IomObject iomObj=((ch.interlis.iox.ObjectEvent)event).getIomObject();
+			IomObject iomObj=new ch.interlis.iom_j.Iom_jObject(((ch.interlis.iox.ObjectEvent)event).getIomObject());
 			try {
 				validateObject(iomObj,null);
 			} catch (IoxException e) {

@@ -5,6 +5,10 @@ ideas/open issues
 LATEST
 -----------------------------
 
+iox-ili 1.20.6 (2018-06-22)
+-----------------------------
+- Validator: clone IomObject to keep modifications (rounding) local
+
 iox-ili 1.20.5 (2018-06-22)
 -----------------------------
 - Validator xtf: include TIDs in AREA intersection error message

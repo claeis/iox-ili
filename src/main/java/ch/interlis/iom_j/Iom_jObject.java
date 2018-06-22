@@ -46,6 +46,31 @@ import java.util.ArrayList;
             tag = tag1;
             oid = oid1;
 		}
+        public Iom_jObject(ch.interlis.iom.IomObject src)
+        {
+            this(src.getobjecttag(),src.getobjectoid());
+            this.col=src.getobjectcol();
+            this.consistency=src.getobjectconsistency();
+            this.line=src.getobjectline();
+            this.op=src.getobjectoperation();
+            this.orderpos=src.getobjectreforderpos();
+            this.refbid=src.getobjectrefbid();
+            this.refoid=src.getobjectrefoid();
+            int attrc=src.getattrcount();
+            for(int attri=0;attri<attrc;attri++) {
+                String attrName=src.getattrname(attri);
+                int valuec=src.getattrvaluecount(attrName);
+                for(int valuei=0;valuei<valuec;valuei++) {
+                    String valueStr=src.getattrprim(attrName, valuei);
+                    if(valueStr!=null) {
+                        addattrvalue(attrName,valueStr);
+                    }else {
+                        ch.interlis.iom.IomObject valueObj=src.getattrobj(attrName, valuei);
+                        addattrobj(attrName, new Iom_jObject(valueObj));
+                    }
+                }
+            }
+        }
 		/** @deprecated
 		 */
 		@Deprecated
@@ -92,6 +117,26 @@ import java.util.ArrayList;
 					attrv.put(attrName, valuev);
 				}
 		}
+        private void addattrvalue(
+            String attrName,
+            String attrValue) {
+                if(attrValue==null){
+                    throw new IllegalArgumentException("illegal argument obj (=null)");
+                }
+                if (attrv.containsKey(attrName))
+                {
+                    // found, add
+                    ArrayList valuev = attrv.get(attrName);
+                    valuev.add(attrValue);
+                }
+                else
+                {
+                    // not found, add
+                    ArrayList valuev = new ArrayList();
+                    valuev.add(attrValue);
+                    attrv.put(attrName, valuev);
+                }
+        }
 
 		/** @deprecated
 		 */
@@ -500,5 +545,4 @@ import java.util.ArrayList;
 			ret.append("}");
 			return ret.toString();
 		}
-
 }
