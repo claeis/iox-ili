@@ -2,6 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
@@ -4251,6 +4252,7 @@ public class Area23Test {
 	// prueft ob ein Polygon korrekt auf 3 Stellen nach dem Komma gerundet wird
 	// und dabei keine Fehler festgestellt werden.
 	@Test
+	@Ignore("correct rounding should be verified by input data that is only rounded valid but not rounded invalid; tests should not depend on a modified IomObject")
 	public void onePolygon_1Boundary_Area_RoundingTo3DecPoints_Ok(){
 		Iom_jObject resObj=new Iom_jObject(ILI_CLASSD, OID2);
 		IomObject multisurfaceValue=resObj.addattrobj("area2d", "MULTISURFACE");
