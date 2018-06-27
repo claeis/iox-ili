@@ -4,6 +4,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- Validator: fixed validation of extended association/roledef
 
 iox-ili 1.20.6 (2018-06-22)
 -----------------------------
