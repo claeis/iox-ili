@@ -124,7 +124,7 @@ public class Association23Test {
 	public void embeddedAsso_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
 		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OID2);
-		iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(OID1);
+		iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(iomObjA.getobjectoid());
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -139,6 +139,25 @@ public class Association23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    public void embeddedAssoExtended_Ok(){
+        Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSAP, OID1);
+        Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSBP, OID2);
+        iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(iomObjA.getobjectoid());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+        validator.validate(new ObjectEvent(iomObjA));
+        validator.validate(new ObjectEvent(iomObjB));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
 	
 	// Wenn von der KlasseB, welche ueber KlasseBP eine Beziehung zur KlasseA ueber die KlasseAP ueber den Rollennamen: a1,
 	// 1 Mal besteht soll keine Fehlermeldung ausgegeben werden.
