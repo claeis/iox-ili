@@ -5,6 +5,7 @@ ideas/open issues
 LATEST
 -----------------------------
 - Validator: fixed validation of extended association/roledef
+- ItfReader2: catch/report line building errors
 
 iox-ili 1.20.6 (2018-06-22)
 -----------------------------
