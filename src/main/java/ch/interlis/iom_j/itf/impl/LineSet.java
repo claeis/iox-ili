@@ -20,6 +20,7 @@ import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
 import ch.interlis.iox.IoxException;
+import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.jts.Iox2jts;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 import ch.interlis.iox_j.jts.Iox2jtsext;
@@ -184,8 +185,13 @@ public class LineSet {
 		ArrayList<CompoundCurve> segv=new ArrayList<CompoundCurve>(); 
 		java.util.Iterator<String> tids=boundaryTids.iterator();
 		for(ArrayList<CurveSegment> boundaryLine:boundaries){
-			CompoundCurve boundary=jtsFact.createCompoundCurve(boundaryLine);
-			String tid=tids.next();
+            String tid=tids.next();
+            CompoundCurve boundary=null;
+            try {
+                boundary=jtsFact.createCompoundCurve(boundaryLine);
+            }catch(RuntimeException ex) {
+                throw new IoxInvalidDataException("failed to create line "+tid,ex);
+            }
 			boundary.setUserData(tid);
 			boundary.setSegmentsUserData(tid);
 			segv.add(boundary);

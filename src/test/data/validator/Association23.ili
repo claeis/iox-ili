@@ -77,6 +77,10 @@ MODEL Association23
 		  a1 -- {0..1} ClassA;
 		  b1 -- {0..1} ClassB;
 		END ab1;
+		ASSOCIATION ab1Extended EXTENDS ab1 =
+		  a1 (EXTENDED) -- {0..1} ClassAp;
+		  b1 (EXTENDED) -- {0..1} ClassBp;
+		END ab1Extended;
 		
 		ASSOCIATION ab2 =
 		  a2 -- {0..*} ClassA;

@@ -2433,7 +2433,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			if (isObject && obj.obj instanceof RoleDef) {
 				RoleDef role = (RoleDef) obj.obj;
-				if (role.getExtending() == null) {
+				{ // if (role.getExtending() == null)
 					String refoid = null;
 					String roleName = role.getName();
 					// a role of an embedded association?
@@ -2717,12 +2717,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void validateAttrValue(IomObject iomObj, AttributeDef attr,String attrPath) throws IoxException {
 		 String attrName = attr.getName();
 		 String attrQName = getScopedName(attr);
-		 String objTag=null;
-		 if(iomObj!=null){
-		 	objTag=iomObj.getobjecttag();
-		 }
-		 Object aModelele=tag2class.get(objTag);
-		 Viewable eleClass=(Viewable) aModelele;
+		 String objTag=iomObj.getobjecttag();
+		 Viewable eleClass=(Viewable) tag2class.get(objTag);
 		 String iliClassQName=getScopedName(eleClass);
 		 if(attrPath==null){
 			 attrPath=attrName;
