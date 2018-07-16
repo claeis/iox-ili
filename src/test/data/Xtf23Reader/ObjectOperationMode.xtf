@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+	<HEADERSECTION SENDER="xtf23Reader" VERSION="2.3">
+		<MODELS>
+			<MODEL NAME="DataTest1" VERSION="2011-12-22" URI="http://interlis.ch"></MODEL>
+		</MODELS>
+	</HEADERSECTION>
+	<DATASECTION>
+		<DataTest1.TopicA BID="bid1" KIND="FULL">
+			<DataTest1.TopicA.ClassA TID="oid1" OPERATION="INSERT"></DataTest1.TopicA.ClassA>
+			<DataTest1.TopicA.ClassA TID="oid2" OPERATION="UPDATE"></DataTest1.TopicA.ClassA>
+			<DataTest1.TopicA.ClassA TID="oid3" OPERATION="DELETE"></DataTest1.TopicA.ClassA>
+		</DataTest1.TopicA>
+		<DataTest1.TopicA BID="bid2" KIND="UPDATE">
+			<DataTest1.TopicA.ClassA TID="oid4" OPERATION="INSERT"></DataTest1.TopicA.ClassA>
+			<DataTest1.TopicA.ClassA TID="oid5" OPERATION="UPDATE"></DataTest1.TopicA.ClassA>
+			<DataTest1.TopicA.ClassA TID="oid6" OPERATION="DELETE"></DataTest1.TopicA.ClassA>
+		</DataTest1.TopicA>
+		<DataTest1.TopicA BID="bid3" KIND="INITIAL">
+			<DataTest1.TopicA.ClassA TID="oid7" OPERATION="INSERT"></DataTest1.TopicA.ClassA>
+			<DataTest1.TopicA.ClassA TID="oid8" OPERATION="UPDATE"></DataTest1.TopicA.ClassA>
+			<DataTest1.TopicA.ClassA TID="oid9" OPERATION="DELETE"></DataTest1.TopicA.ClassA>
+		</DataTest1.TopicA>
+	</DATASECTION>
+</TRANSFER>

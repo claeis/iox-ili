@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+	<HEADERSECTION SENDER="xtf23Reader" VERSION="2.3">
+		<MODELS>
+			<MODEL NAME="DataTest1" VERSION="2011-12-22" URI="http://interlis.ch"></MODEL>
+		</MODELS>
+	</HEADERSECTION>
+	<DATASECTION>
+		<DataTest1.TopicB BID="bidB">
+			<DataTest1.TopicB.Coord1D TID="oid1D">
+				<attr1>
+					<COORD>
+						<C1>480000.000</C1>
+					</COORD>
+				</attr1>
+			</DataTest1.TopicB.Coord1D>
+			
+			<DataTest1.TopicB.Coord2D TID="oid2D">
+				<attr2>
+					<COORD>
+						<C1>480000.000</C1>
+						<C2>70000.000</C2>
+					</COORD>
+				</attr2>
+			</DataTest1.TopicB.Coord2D>
+			
+			<DataTest1.TopicB.Coord3D TID="oid3D">
+				<attr3>
+					<COORD>
+						<C1>480000.000</C1>
+						<C2>70000.000</C2>
+						<C3>5000.000</C3>
+					</COORD>
+				</attr3>
+			</DataTest1.TopicB.Coord3D>
+		</DataTest1.TopicB>
+	</DATASECTION>
+</TRANSFER>

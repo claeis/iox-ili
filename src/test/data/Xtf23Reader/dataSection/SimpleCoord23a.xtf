@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
-	<HEADERSECTION SENDER="ili2fgdb-3.10.0-20170630" VERSION="2.3">
+	<HEADERSECTION SENDER="ili2c-4.5.22-20160520" VERSION="2.3">
 		<MODELS>
-			<MODEL NAME="SimpleCoord23" VERSION="2016-12-21" URI="mailto:ce@eisenhutinformatik.ch"></MODEL>
+			<MODEL NAME="SimpleCoord23" VERSION="2011-12-22" URI="http://interlis.ch"></MODEL>
 		</MODELS>
 	</HEADERSECTION>
 	<DATASECTION>

@@ -4,11 +4,30 @@
 		<MODELS>
 			<MODEL NAME="Test1" VERSION="2011-12-22" URI="http://interlis.ch"></MODEL>
 		</MODELS>
+		<ALIAS>
+			<ENTRIES FOR="">
+				<TAGENTRY FROM="" TO=""></TAGENTRY>
+				<TAGENTRY FROM="" TO=""></TAGENTRY>
+			</ENTRIES>
+			<ENTRIES FOR="">
+				<VALENTRY TAG="" ATTR="" FROM="" TO=""></VALENTRY>
+				<VALENTRY TAG="" ATTR="" FROM="" TO=""></VALENTRY>
+			</ENTRIES>
+			<ENTRIES FOR="">
+				<DELENTRY TAG=""></DELENTRY>
+				<DELENTRY TAG="" ATTR=""></DELENTRY>
+			</ENTRIES>
+		</ALIAS>
+		<OIDSPACES>
+			<OIDSPACE NAME="" OIDDOMAIN=""></OIDSPACE>
+			<OIDSPACE NAME="" OIDDOMAIN=""></OIDSPACE>
+		</OIDSPACES>
+		<COMMENT>
+			beliebiger Text ohne Tags (inkl. carriage return
+			(Wagenruecklauf) (#xD), line feed (Zeilenvorschub) (#xA)
+			und Tabulatorzeichen (#x9)).
+		</COMMENT>
 	</HEADERSECTION>
 	<DATASECTION>
-		<Test1.TopicA BID="b1">
-			<Test1.TopicA.ClassA TID="ok1">
-			</Test1.TopicA.ClassA>
-		</Test1.TopicA>
 	</DATASECTION>
 </TRANSFER>

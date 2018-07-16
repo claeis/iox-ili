@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+	<HEADERSECTION SENDER="xtf23Reader" VERSION="2.3">
+		<MODELS>
+			<MODEL NAME="Association" VERSION="2011-12-22" URI="http://interlis.ch"></MODEL>
+		</MODELS>
+	</HEADERSECTION>
+	<DATASECTION>
+		<Association.Transport BID="bid">
+			<Association.Transport.Schiff TID="oid1">
+			</Association.Transport.Schiff>
+			<Association.Transport.Hafen TID="oid2">
+				<bezSchiff REF="oid1" ORDER_POS="6"></bezSchiff>
+			</Association.Transport.Hafen>
+		</Association.Transport>
+	</DATASECTION>
+</TRANSFER>

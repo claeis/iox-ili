@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+	<HEADERSECTION SENDER="xtf23Reader" VERSION="2.3">
+		<MODELS>
+			<MODEL NAME="DataTest1" VERSION="2011-12-22" URI="http://interlis.ch"></MODEL>
+		</MODELS>
+	</HEADERSECTION>
+	<DATASECTION>
+		<DataTest1.TopicA BID="bidA" CONSISTENCY="COMPLETE"></DataTest1.TopicA>
+		<DataTest1.TopicA BID="bidB" CONSISTENCY="INCOMPLETE"></DataTest1.TopicA>
+		<DataTest1.TopicA BID="bidC" CONSISTENCY="INCONSISTENT"></DataTest1.TopicA>
+		<DataTest1.TopicA BID="bidD" CONSISTENCY="ADAPTED"></DataTest1.TopicA>
+	</DATASECTION>
+</TRANSFER>
