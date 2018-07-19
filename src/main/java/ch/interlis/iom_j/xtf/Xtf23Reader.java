@@ -1273,7 +1273,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 				event=skipSpacesAndGetNextEvent(event);
 				sequence.addattrobj("segment", readSegment(event, segmentType));
 				event=reader.nextEvent();
-				if(!event.isCharacters()){
+				if(!event.isCharacters() && event.getEventType()!=XMLEvent.COMMENT){
 					throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
 				}
 				event=skipSpacesAndGetNextEvent(event);
