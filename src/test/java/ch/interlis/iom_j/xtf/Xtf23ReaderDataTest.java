@@ -226,7 +226,7 @@ public class Xtf23ReaderDataTest {
 		reader=null;
 	}
 	
-	// Es wird getestet ob Strukturen mit Unterstrukturen, Attributen und Referenzen ohne Fehler erstellt werden koennen.
+	// Es wird getestet ob Strukturen mit Attributen/Rollen und Referenzen ohne Fehler erstellt werden koennen.
 	@Test
 	public void testStructure2Type_Ok()  throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"Structures2.xtf"));
