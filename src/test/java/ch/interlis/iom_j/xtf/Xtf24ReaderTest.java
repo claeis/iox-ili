@@ -2,9 +2,7 @@ package ch.interlis.iom_j.xtf;
 
 import static org.junit.Assert.*;
 import java.io.File;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.junit.Before;
 import org.junit.Test;
 import ch.interlis.ili2c.Ili2cFailure;

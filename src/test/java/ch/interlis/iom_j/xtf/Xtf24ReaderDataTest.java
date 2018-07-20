@@ -425,8 +425,22 @@ public class Xtf24ReaderDataTest {
 	
 	// Es wird getestet ob ein Surface mit mehreren boundaries ohne Fehler erstellt werden kann.
 	@Test
-	public void testSurface_Ok()  throws Iox2jtsException, IoxException {
+	public void testSurface_Ok() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Surface.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicB.ClassQ oid oidQ {formQ MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.011, C1 480000.011, C2 70000.011}, COORD {C3 5000.012, C1 490000.012, C2 80000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.021, C1 480000.021, C2 70000.021}, COORD {C3 5000.022, C1 490000.022, C2 80000.022}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.031, A1 480000.031, A2 70000.031, r 31, C1 480000.031, C2 70000.031}, COORD {C3 5000.032, C1 480000.032, C2 70000.032}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.041, C1 480000.041, C2 70000.041}, COORD {C3 5000.042, C1 490000.042, C2 80000.042}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.211, C1 480000.211, C2 70000.211}, COORD {C3 5000.212, C1 490000.212, C2 80000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.221, C1 480000.221, C2 70000.221}, COORD {C3 5000.222, C1 490000.222, C2 80000.222}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.231, A1 480000.231, A2 70000.231, r 31, C1 480000.231, C2 70000.231}, COORD {C3 5000.232, C1 480000.232, C2 70000.232}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C3 5000.241, C1 480000.241, C2 70000.241}, COORD {C3 5000.242, C1 490000.242, C2 80000.242}]}}]}]}}}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob ein Surface mit mehreren boundaries und diversen Kommentaren ohne Fehler erstellt werden kann.
+	@Test
+	public void testCommentary_Ok() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"CommentsInFile.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
