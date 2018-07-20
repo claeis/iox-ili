@@ -305,7 +305,6 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 							associationIsValid(iomObj);
 						}
 						state=AFTER_OBJECT;
-						System.out.println(iomObj.toString());
                     	return new ch.interlis.iox_j.ObjectEvent(iomObj); // return object
 	                }else if(event.isEndElement()) { // end basket
 						state=AFTER_ENDBASKET;
