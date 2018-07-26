@@ -53,6 +53,20 @@ public class Xtf24ReaderDataTest {
 		reader=null;
 	}
 	
+	// Es wird getestet ob Texte ohne Fehler auf einer Linie gelesen werden koennen.
+	@Test
+	public void xml1Line_Ok() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Xml1Line.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
 	// Es wird getestet ob Attribute mit den Selben Namen in unterschiedlichen Klassen ohne Fehler erstellt werden koennen.
 	@Test
 	public void testSameAttrNamesInDifClasses_Ok()  throws Iox2jtsException, IoxException {
@@ -329,7 +343,7 @@ public class Xtf24ReaderDataTest {
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassL oid oidS {attrL1 StructA {attrS1 text}}
+		assertTrue(reader.read() instanceof  ObjectEvent); // DataTest1.TopicA.ClassL oid oidS {attrL1 DataTest1.TopicA.StructA {attrS1 text}}
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();

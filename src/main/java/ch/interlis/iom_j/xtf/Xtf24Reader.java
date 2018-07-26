@@ -12,7 +12,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Characters;
-import javax.xml.stream.events.Comment;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
@@ -42,19 +41,17 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 	private java.io.InputStream inputFile=null;
     private ArrayList<String> models=new ArrayList<String>();
 	private Topic currentTopic=null;
+	private Viewable viewable=null;
 	private TransferDescription td;
 	private int state = START;
 	
     // state
     private static final int START=0;
     private static final int AFTER_STARTTRANSFER=1;
-    private static final int AFTER_STARTDATASECTION = 2;
-    private static final int AFTER_STARTBASKET=3;
-    private static final int AFTER_OBJECT=4;
-    private static final int AFTER_ENDBASKET=5;
-    private static final int AFTER_ENDDATASECTION = 6;
-    private static final int AFTER_ENDTRANSFER=7;
-    private static final int END=8;
+    private static final int AFTER_STARTBASKET=2;
+    private static final int AFTER_OBJECT=3;
+    private static final int AFTER_ENDBASKET=4;
+    private static final int AFTER_ENDTRANSFER=5;
     
     // ili elements
     private HashMap<QName, Topic> iliTopics=null;
@@ -101,7 +98,6 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
     private static final QName QNAME_GEOM_POLYLINE = new QName(NAMESPACE_GEOM, "polyline");
     private static final QName QNAME_GEOM_MULTIPOLYLINE = new QName(NAMESPACE_GEOM, "multipolyline");
     private static final QName QNAME_GEOM_LINESTRING = new QName(NAMESPACE_GEOM, "linestring");
-    private static final QName QNAME_GEOM_BOUNDARY = new QName(NAMESPACE_GEOM, "boundary");
     private static final QName QNAME_GEOM_ORIENTABLECURVE = new QName(NAMESPACE_GEOM, "orientablecurve");
 	private static final QName QNAME_GEOM_COMPOSITECURVE = new QName(NAMESPACE_GEOM, "compositecurve");
 	private static final QName QNAME_GEOM_SURFACE = new QName(NAMESPACE_GEOM, "surface");
@@ -112,7 +108,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 	private static final QName QNAME_GEOM_INTERIOR = new QName(NAMESPACE_GEOM, "interior");
     
     /** Creates a new reader.
-     * @param in
+     * @param in Input stream to read from
      * @throws IoxException
      */
 	public Xtf24Reader(java.io.InputStream in) throws IoxException{
@@ -120,7 +116,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 	}
 	
 	/** Creates a new reader.
-	 * @param in Input reader to read from
+	 * @param in Input stream reader to read from
 	 * @throws IoxException
 	 */
 	public Xtf24Reader(java.io.InputStreamReader in) throws IoxException{
@@ -181,190 +177,136 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 	 */
 	@Override
 	public IoxEvent read() throws IoxException {
+		IomObject iomObj=null;
 		try {
 			javax.xml.stream.events.XMLEvent event=null;
-			while(reader.hasNext()) {
-				if(event==null) {
-					event=reader.nextEvent();
-					event=skipSpacesAndGetNextEvent(event);
+			if(state==START){
+				// after start
+				event=reader.nextEvent();
+				if(event.isStartDocument()){
+					; // skip start document event
+				}else {
+					throw new IoxSyntaxException(event2msgtext(event));
 				}
-				if(state==START){
-					// after start
-					if(event.isStartDocument()){
-						event=reader.nextEvent();
-						event=skipSpacesAndGetNextEvent(event);
-					}else {
-						throw new IoxSyntaxException(event2msgtext(event));
+				event=reader.nextEvent();
+				event=skipSpacesAndGetNextEvent(event);
+				// after start document
+				if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_ILI_TRANSFER)){
+					; // skip start transfer event
+                }else {
+                	throw new IoxSyntaxException(event2msgtext(event));
+                }
+				event=reader.nextEvent();
+				event=skipSpacesAndGetNextEvent(event);
+				XtfStartTransferEvent startTransferEvent=null;
+            	// after start transfer
+                if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_XML_HEADERSECTION)){
+                	startTransferEvent=new XtfStartTransferEvent();
+					event=readHeaderSection(event, startTransferEvent); // start header section
+                }else {
+                	throw new IoxSyntaxException(event2msgtext(event));
+                }
+                event=reader.nextEvent();
+                event=skipSpacesAndGetNextEvent(event);
+                // after header section
+                if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_XML_DATASECTION)){ // start data section
+                	; // skip start data section event
+	        	}else {
+	        		throw new IoxSyntaxException(event2msgtext(event)); // not data section
+	        	}
+                // after end header section
+            	HashMap<String,IomObject> modelx=new HashMap<String,IomObject>();
+        		for(String modelName:models){
+                    IomObject model=createIomObject(ch.interlis.iom_j.xtf.impl.MyHandler.HEADER_OBJECT_MODELENTRY,hsNextOid());
+        			model.setattrvalue(ch.interlis.iom_j.xtf.impl.MyHandler.HEADER_OBJECT_MODELENTRY_NAME,modelName);
+        			modelx.put(model.getobjectoid(),model);
+        		}
+        		startTransferEvent.setHeaderObjects(modelx); // header additional info
+                state=AFTER_STARTTRANSFER;
+                return startTransferEvent; // return start transfer
+            }
+			
+			// after start data section
+			if(state==AFTER_STARTTRANSFER) {
+				event=reader.nextEvent(); // after start transfer
+				event=skipSpacesAndGetNextEvent(event);
+                if(event.isStartElement()){ // start basket
+                	state=AFTER_STARTBASKET;
+                	return createBasket(event); // create new basket
+                }else if(event.isEndElement()){
+					state=AFTER_ENDBASKET;
+					// see processing below
+                }else{
+            		throw new IoxSyntaxException(event2msgtext(event));
+            	}
+			}
+			
+			// after start basket
+			if(state==AFTER_STARTBASKET) {
+				event=reader.nextEvent();
+				event=skipSpacesAndGetNextEvent(event);
+				if(event.isStartElement()) { // start object
+					state=AFTER_OBJECT;
+					iomObj=readObject(event, iomObj); // read object
+					setOperation(event.asStartElement(), iomObj);
+					setConsistency(event.asStartElement(), iomObj);
+					if(viewable instanceof AssociationDef){
+						associationIsValid(iomObj);
 					}
-					// after start document
-					if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_ILI_TRANSFER)){
-						event=reader.nextEvent();
-						event=skipSpacesAndGetNextEvent(event);
-						state=AFTER_STARTTRANSFER;
-	                }else {
-	                	throw new IoxSyntaxException(event2msgtext(event));
-	                }
-					XtfStartTransferEvent ret=null;
-	            	// after start transfer
-					if(state==AFTER_STARTTRANSFER) {
-		                if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_XML_HEADERSECTION)){
-		                	ret=new XtfStartTransferEvent();
-							event=readHeaderSection(event, ret); // start header section
-							event=reader.nextEvent(); // end header section
-							event=skipSpacesAndGetNextEvent(event);
-		                }else {
-		                	throw new IoxSyntaxException(event2msgtext(event));
-		                }
-					}else {
-						throw new IoxSyntaxException(event2msgtext(event));
+                	return new ch.interlis.iox_j.ObjectEvent(iomObj); // return object
+                }else if(event.isEndElement()) { // end basket
+					state=AFTER_ENDBASKET;
+		        	return new ch.interlis.iox_j.EndBasketEvent(); // return end basket
+                }
+			}
+			
+			// after object
+			if(state==AFTER_OBJECT) {
+				event=reader.nextEvent();
+				event=skipSpacesAndGetNextEvent(event);
+				if(event.isStartElement()){
+					iomObj=readObject(event, iomObj); // read object
+					setOperation(event.asStartElement(), iomObj);
+					setConsistency(event.asStartElement(), iomObj);
+					if(viewable instanceof AssociationDef){
+						associationIsValid(iomObj);
 					}
-	                // after end header section
-	                
-	                if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_XML_DATASECTION)) { // start data section
-	                	HashMap<String,IomObject> modelx=new HashMap<String,IomObject>();
-		        		
-		        		for(String modelName:models){
-		                    IomObject model=createIomObject(ch.interlis.iom_j.xtf.impl.MyHandler.HEADER_OBJECT_MODELENTRY,hsNextOid());
-		        			model.setattrvalue(ch.interlis.iom_j.xtf.impl.MyHandler.HEADER_OBJECT_MODELENTRY_NAME,modelName);
-		        			modelx.put(model.getobjectoid(),model);
-		        		}
-		        		ret.setHeaderObjects(modelx);
-	                }else {
-	                	throw new IoxException("expected data section");
-	                }
-	                state=AFTER_STARTDATASECTION;
-	                return ret; // return start transfer inside data section
-	            }
-				
-				// after start data section
-				if(state==AFTER_STARTDATASECTION) {
-	                if(event.isStartElement()){ // start basket
-	                	StartElement element = (StartElement) event;
-	                	currentTopic=getIliTopic(element.getName());
-	                	if(currentTopic==null){
-	                		throw new IoxSyntaxException(event2msgtext(event));
-	                	}
-	                	QName gmlId = QNAME_ILI_BID;
-	                	Attribute bid = element.getAttributeByName(gmlId);
-	                	if(bid!=null){
-	                		ch.interlis.iox_j.StartBasketEvent newObj=new ch.interlis.iox_j.StartBasketEvent(currentTopic.getScopedName(), bid.getValue());
-	                		ch.interlis.iox_j.StartBasketEvent bidObj=setBasketCodingContent(element, newObj);
-	                		state=AFTER_STARTBASKET;
-	                		return bidObj;
-	                	}else{
-	                		throw new IoxSyntaxException(event2msgtext(event));
-	                	}
-	                }else if(event.isEndElement()){
-	                	if(event.asEndElement().getName().equals(QNAME_XML_DATASECTION)){ // end datasection
-				        	event=reader.nextEvent();
-							event=skipSpacesAndGetNextEvent(event);
-							state=AFTER_ENDDATASECTION;
-							continue;
-	                	}else{
-	                		throw new IoxSyntaxException(event2msgtext(event));
-	                	}
-	                }
-				}
-				
-				// after start basket
-				if(state==AFTER_STARTBASKET) {
-					event=skipSpacesAndGetNextEvent(event);
-					if(event.isStartElement()) {
-						if(event.asStartElement().getName().equals(QNAME_ILI_DELETE)) { // start DeleteObject
-			    			return deleteObject(event);
-			    		}
-	                	Viewable viewable=null; // start IomObject
-	                    StartElement element = (StartElement) event;
-	                	String topicName=currentTopic.getName();
-	                	String className=element.getName().getLocalPart();
-	                	QName extendedQName=new QName(element.getName().getNamespaceURI(), topicName+"."+className);
-	                	viewable=getIliClass(extendedQName);
-	                	if(viewable==null){
-	                		viewable=getIliClass(element.getName());
-	                	}
-	                    if(viewable==null){
-	                    	throw new IoxException("class or association "+element.getName().getLocalPart()+" not found");
-	                    }
-	                    Attribute oid = element.getAttributeByName(QNAME_ILI_TID);
-	                    if(element.getAttributeByName(QNAME_ILI_BID) != null){
-	                    	throw new IoxSyntaxException(event2msgtext(event));
-	                    }
-	                	IomObject iomObj=null;
-	                	try{
-	                		if(oid!=null){
-	                			iomObj=createIomObject(viewable.getScopedName(), oid.getValue());
-	                		}else{
-	                			iomObj=createIomObject(viewable.getScopedName(), null);
-	                		}
-	                	}catch(IoxSyntaxException ioxEx){
-	                		throw ioxEx;
-	                	}
-						iomObj=readAttribute(event, viewable, iomObj); // read object attribute
-						setAdditionalObjectInfo(element, iomObj);
-						if(viewable instanceof AssociationDef){
-							associationIsValid(iomObj);
-						}
-						state=AFTER_OBJECT;
-                    	return new ch.interlis.iox_j.ObjectEvent(iomObj); // return object
-	                }else if(event.isEndElement()) { // end basket
-						state=AFTER_ENDBASKET;
-			        	return new ch.interlis.iox_j.EndBasketEvent(); // return end basket
-	                }
-				}
-				
-				// after object
-				if(state==AFTER_OBJECT) {
-					event=skipSpacesAndGetNextEvent(event);
-					if(event.isStartElement()){
-			        	state=AFTER_STARTBASKET; // start new object
-			        	continue;
-			        }else if(event.isEndElement()){
-			        	event=reader.nextEvent();
-						state=AFTER_ENDBASKET; // close basket
-			        	return new ch.interlis.iox_j.EndBasketEvent();
-			        }
-				}
-				
-				// after end basket
-				if(state==AFTER_ENDBASKET) {
-			    	if(event.isStartElement()){
-			        	state=AFTER_STARTDATASECTION; // start new basket
-			        	continue;
-			        }else if(event.isEndElement() && event.asEndElement().getName().equals(QNAME_XML_DATASECTION)){ // end data section
-			        	event=reader.nextEvent();
-						event=skipSpacesAndGetNextEvent(event);
-						state=AFTER_ENDDATASECTION;
-			        }
-				}
-				
-				// after end data section
-				if(state==AFTER_ENDDATASECTION) {
-			    	if(event.isEndElement()){
-			        	if(event.isEndElement() && event.asEndElement().getName().equals(QNAME_ILI_TRANSFER)) { // end transfer
-							event=reader.nextEvent();
-							event=skipSpacesAndGetNextEvent(event);
-							state=AFTER_ENDTRANSFER;
-			        	}else {
-			        		throw new IoxSyntaxException(event2msgtext(event));
-			        	}
-			    	}else {
-		        		throw new IoxSyntaxException(event2msgtext(event));
+                	return new ch.interlis.iox_j.ObjectEvent(iomObj); // return object
+		        }else if(event.isEndElement()){
+					state=AFTER_ENDBASKET; // close basket
+		        	return new ch.interlis.iox_j.EndBasketEvent();
+		        }
+			}
+			
+			// after end basket
+			if(state==AFTER_ENDBASKET) {
+				event=reader.nextEvent();
+				event=skipSpacesAndGetNextEvent(event);
+		    	if(event.isStartElement()){
+		    		state=AFTER_STARTBASKET;
+		        	return createBasket(event); // create new basket
+		        }else if(event.isEndElement()) {
+		        	if(event.asEndElement().getName().equals(QNAME_XML_DATASECTION)){ // end data section
+		        		event=reader.nextEvent();
+		        		event=skipSpacesAndGetNextEvent(event);
 		        	}
-				}
-				
-				// after end transfer
-				if(state==AFTER_ENDTRANSFER) {
-		    		if(event.isEndDocument()) { // end document
-						state=END;
-	                }else {
-	                	throw new IoxSyntaxException(event2msgtext(event));
-	                }
-				}
-				
-	            // after end document
-				if(state==END){
-					return new ch.interlis.iox_j.EndTransferEvent(); // return end transfer
-	            }
+		        	if(event.asEndElement().getName().equals(QNAME_ILI_TRANSFER)) { // end transfer
+						event=reader.nextEvent();
+						event=skipSpacesAndGetNextEvent(event);
+						if(event.isEndDocument()) { // end document
+							state=AFTER_ENDTRANSFER;
+							return new ch.interlis.iox_j.EndTransferEvent(); // return end transfer
+						}else {
+							throw new IoxSyntaxException(event2msgtext(event));
+						}
+					}else {
+						throw new IoxSyntaxException(event2msgtext(event));
+					}
+		        }
+			}
+			// after end transfer
+			if(state==AFTER_ENDTRANSFER) {
+				throw new IoxSyntaxException(event2msgtext(event));
 			}
 		}catch(javax.xml.stream.XMLStreamException ex){
 			throw new IoxException(ex);
@@ -372,7 +314,81 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		return null;
 	}
 	
-	private IoxEvent deleteObject(XMLEvent event) throws IoxException {
+	private IomObject readObject(XMLEvent event, IomObject iomObj) throws IoxException {
+		try {
+			if(event.isStartElement()) {
+				// DeleteObject
+				if(event.asStartElement().getName().equals(QNAME_ILI_DELETE)) {
+					return deleteObject(event);
+				}
+				// IomObject
+		        StartElement element = (StartElement) event;
+		    	String topicName=currentTopic.getName();
+		    	String className=element.getName().getLocalPart();
+		    	QName extendedQName=new QName(element.getName().getNamespaceURI(), topicName+"."+className);
+		    	viewable=getIliClass(extendedQName);
+		    	if(viewable==null){
+		    		viewable=getIliClass(element.getName());
+		    	}
+		        if(viewable==null){
+		        	throw new IoxException("class or association "+element.getName().getLocalPart()+" not found");
+		        }
+		        Attribute oid = element.getAttributeByName(QNAME_ILI_TID);
+		        if(element.getAttributeByName(QNAME_ILI_BID) != null){
+		        	throw new IoxSyntaxException(event2msgtext(event));
+		        }
+		    	try {
+		    		// create IomObject
+		    		if(oid!=null){
+		    			iomObj=createIomObject(viewable.getScopedName(), oid.getValue());
+		    		}else{
+		    			iomObj=createIomObject(viewable.getScopedName(), null);
+		    		}
+		    	}catch(IoxSyntaxException ioxEx){
+		    		throw ioxEx;
+		    	}
+		    	event=reader.nextEvent(); // after create iomObj
+                event=skipSpacesAndGetNextEvent(event);
+                // attributes
+		    	while(reader.hasNext() && !event.isEndElement()){
+		    		iomObj=readAttribute(event, iomObj); // read object attribute
+	        		event=reader.nextEvent();
+	        		event=skipSpacesAndGetNextEvent(event);
+	        	}
+			}
+			if(event.isEndElement()){
+				return iomObj;
+			}else if(event.isCharacters()){
+				throw new IoxSyntaxException(event2msgtext(event));
+			}
+		}catch(javax.xml.stream.XMLStreamException ex){
+			throw new IoxException(ex);
+		}
+		return iomObj;
+	}
+	
+	private IoxEvent createBasket(javax.xml.stream.events.XMLEvent event) throws XMLStreamException, IoxException {
+		event=skipSpacesAndGetNextEvent(event);
+		StartElement element = (StartElement) event;
+		currentTopic=getIliTopic(element.getName());
+		if(currentTopic==null){
+			throw new IoxSyntaxException(event2msgtext(event));
+		}
+		QName gmlId = QNAME_ILI_BID;
+		Attribute bid = element.getAttributeByName(gmlId);
+		if(bid!=null){
+			ch.interlis.iox_j.StartBasketEvent newObj=new ch.interlis.iox_j.StartBasketEvent(currentTopic.getScopedName(), bid.getValue());
+			newObj=setState(element, newObj);
+			newObj=setIncrementalKind(element, newObj);
+			newObj=setDomain(element, newObj);
+			newObj=setConsistency(element, newObj);
+			return newObj;
+		}else{
+			throw new IoxSyntaxException(event2msgtext(event));
+		}
+	}
+	
+	private IomObject deleteObject(XMLEvent event) throws IoxException {
 		IomObject objToDelete=null;
 		try {
 			if(event.asStartElement().getAttributeByName(QNAME_ILI_TID)!=null){
@@ -393,7 +409,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		}catch(javax.xml.stream.XMLStreamException ex){
 			throw new IoxException(ex);
 		}
-		return new ch.interlis.iox_j.ObjectEvent(objToDelete);
+		return objToDelete;
 	}
 
 	private XMLEvent readHeaderSection(XMLEvent startElementHeaderSection, XtfStartTransferEvent xtfEvent) throws IoxException {
@@ -401,17 +417,19 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 			XMLEvent event=null;
 			// header section
             if(startElementHeaderSection.asStartElement().getName().equals(QNAME_XML_HEADERSECTION)){
-            	event=reader.nextEvent();
-				event=skipSpacesAndGetNextEvent(event);
+            	; // skip start header section event
             }else {
             	throw new IoxSyntaxException(event2msgtext(event));
             }
+            event=reader.nextEvent();
+            event=skipSpacesAndGetNextEvent(event);
 			// start models
 			if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_XML_MODELS)){
-				event=readHeaderSectionModels(event);
+				; // skip start models event
 			}else {
 				throw new IoxSyntaxException(event2msgtext(event));
 			}
+			event=readHeaderSectionModels(event);
 			if(event.isEndElement()) {
 				// end header section
 				if(event.asEndElement().getName().equals(QNAME_XML_HEADERSECTION)){
@@ -439,11 +457,12 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 						}
 						// end sender
 						if(event.isEndElement() && event.asEndElement().getName().equals(QNAME_XML_HEADERSECTION_SENDER)) {
-							event=reader.nextEvent();
-							event=skipSpacesAndGetNextEvent(event);
+							; // skip end header section event
 						}else {
 							throw new IoxSyntaxException(event2msgtext(event));
 						}
+						event=reader.nextEvent();
+						event=skipSpacesAndGetNextEvent(event);
 					}else if(senderCount>1) {
 						throw new IoxSyntaxException(event2msgtext(event));
 					}
@@ -461,11 +480,12 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 						}
 		        		// end comment
 		        		if(event.isEndElement() && event.asEndElement().getName().equals(QNAME_XML_HEADERSECTION_COMMENT)) {
-		        			event=reader.nextEvent();
-		        			event=skipSpacesAndGetNextEvent(event);
+		        			; // skip end header section event
 		        		}else {
 		        			throw new IoxSyntaxException(event2msgtext(event));
 		        		}
+		        		event=reader.nextEvent();
+		        		event=skipSpacesAndGetNextEvent(event);
 		        	}else if(commentCount>1) {
 		        		throw new IoxSyntaxException(event2msgtext(event));
 					}
@@ -493,11 +513,12 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		XMLEvent event=null;
 		// start models
 		if(startElementModels.isStartElement() && startElementModels.asStartElement().getName().equals(QNAME_XML_MODELS)){
-			event=reader.nextEvent();
-			event=skipSpacesAndGetNextEvent(event);
+			; // skip start models event
 		}else {
 			throw new IoxSyntaxException(event2msgtext(event));
 		}
+		event=reader.nextEvent();
+		event=skipSpacesAndGetNextEvent(event);
 		if(event.isEndElement()){
 			throw new IoxSyntaxException(event2msgtext(event));
 		}
@@ -524,10 +545,11 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 	private XMLEvent readModel(XMLEvent startElementModel) throws IoxException, XMLStreamException {
 		XMLEvent event=null;
 		if(startElementModel.isStartElement() && startElementModel.asStartElement().getName().equals(QNAME_XML_MODEL)) {
-			event=reader.nextEvent();
+			; // skip start model event
 		}else {
  			throw new IoxSyntaxException(event2msgtext(event)); 
 		}
+		event=reader.nextEvent();
 		
 		if(event.isCharacters()) {
 	    	// add model to models
@@ -538,11 +560,12 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		
         // end element Model
  		if(event.isEndElement() && event.asEndElement().getName().equals(QNAME_XML_MODEL)) {
- 			event=reader.nextEvent();
-        	event=skipSpacesAndGetNextEvent(event);
+ 			; // skip end model event
  		}else {
  			throw new IoxSyntaxException(event2msgtext(event)); 
  		}
+ 		event=reader.nextEvent();
+ 		event=skipSpacesAndGetNextEvent(event);
  		return event;
 	}
 	
@@ -576,7 +599,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		}
 	}
 
-	private IomObject setAdditionalObjectInfo(StartElement element, IomObject iomObj) throws IoxException {
+	private IomObject setOperation(StartElement element, IomObject iomObj) throws IoxException {
 		Attribute operation = element.getAttributeByName(QNAME_ILI_OPERATION);
         if(operation!=null){
         	String attrValue=operation.getValue();
@@ -590,6 +613,10 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 				throw new IoxSyntaxException("unexpected operation <"+attrValue+">");
         	}
         }
+        return iomObj;
+	}
+
+	private IomObject setConsistency(StartElement element, IomObject iomObj) throws IoxException {
         Attribute consistency = element.getAttributeByName(QNAME_ILI_CONSISTENCY); // not to define in role
         if(consistency!=null){
         	String attrValue=consistency.getValue();
@@ -603,17 +630,25 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
         }
         return iomObj;
 	}
-
-	private ch.interlis.iox_j.StartBasketEvent setBasketCodingContent(StartElement element, ch.interlis.iox_j.StartBasketEvent startBasketEvent) throws IoxException {
+	
+	private ch.interlis.iox_j.StartBasketEvent setState(StartElement element, ch.interlis.iox_j.StartBasketEvent startBasketEvent) throws IoxException {
 		Iterator codingObjIter=element.getAttributes();
-		String[] genericAndConcreteDomains=null;
 		while(codingObjIter.hasNext()){
 			Attribute codingObj=(Attribute) codingObjIter.next();
 			if(codingObj.getName().equals(QNAME_ILI_STARTSTATE)){
 				startBasketEvent.setStartstate(codingObj.getValue());
 			}else if(codingObj.getName().equals(QNAME_ILI_ENDSTATE)){
 				startBasketEvent.setEndstate(codingObj.getValue());
-			}else if(codingObj.getName().equals(QNAME_ILI_KIND)){
+			}
+		}
+		return startBasketEvent;
+	}
+	
+	private ch.interlis.iox_j.StartBasketEvent setIncrementalKind(StartElement element, ch.interlis.iox_j.StartBasketEvent startBasketEvent) throws IoxException {
+		Iterator codingObjIter=element.getAttributes();
+		while(codingObjIter.hasNext()){
+			Attribute codingObj=(Attribute) codingObjIter.next();
+			if(codingObj.getName().equals(QNAME_ILI_KIND)){
 				if(codingObj.getValue().equals("FULL")){
 					startBasketEvent.setKind(IomConstants.IOM_FULL);
 				}else if(codingObj.getValue().equals("UPDATE")){
@@ -621,14 +656,33 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 				}else if(codingObj.getValue().equals("INITIAL")){
 					startBasketEvent.setKind(IomConstants.IOM_INITIAL);
 				}
-			}else if(codingObj.getName().equals(QNAME_ILI_DOMAIN)){
+			}
+		}
+		return startBasketEvent;
+	}
+	
+	private ch.interlis.iox_j.StartBasketEvent setDomain(StartElement element, ch.interlis.iox_j.StartBasketEvent startBasketEvent) throws IoxException {
+		Iterator codingObjIter=element.getAttributes();
+		String[] genericAndConcreteDomains=null;
+		while(codingObjIter.hasNext()){
+			Attribute codingObj=(Attribute) codingObjIter.next();
+			if(codingObj.getName().equals(QNAME_ILI_DOMAIN)){
 				String domainValue=codingObj.getValue();
 				genericAndConcreteDomains=domainValue.split(" "); // genericAndConcreteDomains.getValues(genericDomain=concreteDomain)
 				for(String singleDomain : genericAndConcreteDomains){
 					String[] domains=singleDomain.split("=");
 					startBasketEvent.addDomain(domains[0], domains[1]);
 				}
-			}else if(codingObj.getName().equals(QNAME_ILI_CONSISTENCY)){
+			}
+		}
+		return startBasketEvent;
+	}
+	
+	private ch.interlis.iox_j.StartBasketEvent setConsistency(StartElement element, ch.interlis.iox_j.StartBasketEvent startBasketEvent) throws IoxException {
+		Iterator codingObjIter=element.getAttributes();
+		while(codingObjIter.hasNext()){
+			Attribute codingObj=(Attribute) codingObjIter.next();
+			if(codingObj.getName().equals(QNAME_ILI_CONSISTENCY)){
 				if(codingObj.getValue().equals("COMPLETE")){
 					startBasketEvent.setConsistency(IomConstants.IOM_COMPLETE);
 				}else if(codingObj.getValue().equals("INCOMPLETE")){
@@ -639,11 +693,10 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		return startBasketEvent;
 	}
 
-	private static String collectXMLElement(XMLEventReader reader, XMLEvent event) throws XMLStreamException {
+	private static XMLEvent collectXMLElement(XMLEventReader reader, XMLEvent event, java.io.StringWriter strw) throws XMLStreamException {
         XMLOutputFactory xmloutputf = XMLOutputFactory.newInstance();
         xmloutputf.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES,true);
         XMLEventFactory xmlef = XMLEventFactory.newInstance();
-        java.io.StringWriter strw=new java.io.StringWriter();
         XMLEventWriter xmlw = xmloutputf.createXMLEventWriter(strw); 
         xmlw.add(xmlef.createStartDocument());
         xmlw.add(event);
@@ -669,15 +722,9 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
         xmlw.add(xmlef.createEndDocument());
         xmlw.flush();
         xmlw.close();
-        return strw.toString();
+        return event;
     }
 	
-	/** Read Characters of characterEvent and check if whitespace. Return nextEvent()
-	 * @param event
-	 * @return XMLEvent event
-	 * @throws XMLStreamException
-	 * @throws IoxSyntaxException
-	 */
 	private XMLEvent skipSpacesAndGetNextEvent(XMLEvent event) throws XMLStreamException, IoxSyntaxException {
 		while(event.isCharacters() || event.getEventType()==XMLEvent.COMMENT){
         	if(event.isCharacters() && event.getEventType()!=XMLEvent.COMMENT) {
@@ -832,235 +879,218 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
         
     /** Read Events inside object
      * @param event
-     * @param aClass
      * @param iomObj
      * @return IomObject
      * @throws IoxException
      * @throws XMLStreamException
      */
-    private IomObject readAttribute(XMLEvent event, Viewable aClass, IomObject iomObj) throws XMLStreamException, IoxException {
+    private IomObject readAttribute(XMLEvent event, IomObject iomObj) throws XMLStreamException, IoxException {
 	     try {   
     		String attrName=null;
-	        while(reader.hasNext()){
-	        	try{
-	                event=reader.nextEvent();
-	                event=skipSpacesAndGetNextEvent(event);
-	            }catch(javax.xml.stream.XMLStreamException ex){
-	                throw new IoxException(ex);
-	            }
-	            if(attrName!=null){
-	                throw new IllegalStateException("attrName != null");
-	            }
-	            if(event.isStartElement()){
-	            	StartElement element = (StartElement) event;
-	            	QName qName=element.getName();
-	            	Element prop=getIliProperty(aClass, qName);
-	            	if(prop==null){
-	        			throw new IoxSyntaxException("unexpected element: "+qName.getLocalPart());
-	            	}else{
-	            		attrName=prop.getName();
-		            	XMLEvent peekEvent2=reader.peek();
-		            	if(!peekEvent2.isEndElement()){
-		            		event=reader.nextEvent(); // <class>
-		            	}
-		                XMLEvent peekEvent=reader.peek();
-		                if(!peekEvent.isEndElement()){
-		                	// current event is an attribute
-		                	event=skipSpacesAndGetNextEvent(event);
-		                }
-		                if(event.isCharacters() && prop instanceof AttributeDef){ // primitive attribute
-		            		Characters character = (Characters) event;
-		                    String characterValue=character.getData();
-		                    if(characterValue.contains("OTHERS")){
-		                    	throw new IoxException("OTHERS not yet implemented.");
+            if(event.isStartElement()){
+            	// object contains attribute
+            	StartElement element = (StartElement) event;
+            	QName qName=element.getName();
+            	Element prop=getIliProperty(viewable, qName);
+            	if(prop==null){
+            		throw new IoxSyntaxException("unexpected element: "+qName.getLocalPart());
+            	}
+            	// attribute
+        		attrName=prop.getName();
+		    	if(attrName!=null){
+		    		if(prop instanceof RoleDef){
+        				RoleDef role=(RoleDef) prop;
+        				if(role.getContainer()!=null){
+        					Container elementContainer=role.getContainer();
+        					if(elementContainer instanceof AssociationDef){
+        						AssociationDef association=(AssociationDef) elementContainer;
+        						if(!(association instanceof Viewable)) {
+            						viewable=(Viewable) association;
+        						}
+        						iomObj=readReference(viewable,iomObj, element, role,association);
+        						event=reader.nextEvent(); // after role
+        						attrName=null;
+        					}
+            			}
+        			}else {
+        				event=reader.nextEvent(); // after start attribute
+        				event=skipCommentary(event);
+        			}
+		    	}else {
+		    		throw new IoxSyntaxException(event2msgtext(event));
+		    	}
+		    	if(!reader.peek().isEndElement()) {
+	    			event=skipSpacesAndGetNextEvent(event);
+		    	}
+                if(event.isCharacters() && prop instanceof AttributeDef){ // primitive attribute
+            		Characters character = (Characters) event;
+                    String characterValue=character.getData();
+                    if(characterValue.contains("OTHERS")){
+                    	throw new IoxException("OTHERS not yet implemented.");
+                    }
+            		iomObj.setattrvalue(attrName, characterValue);
+            		event=reader.nextEvent(); // after characters
+            		if(event.isEndElement()){ // end attribute
+            			attrName=null;
+            		}else{
+            			throw new IoxSyntaxException(event2msgtext(event));
+            		}
+                }
+                if(event.isStartElement()) { // object
+	                if(event.asStartElement().getName().equals(QNAME_GEOM_COORD)){
+	            		event=reader.nextEvent(); // <coords>
+	                    event=skipSpacesAndGetNextEvent(event);
+	                    if(!event.isStartElement()){
+	                    	throw new IoxSyntaxException(event2msgtext(event));
+	                    }
+	                    IomObject returnedSegment=readSegment(event, SEGMENTTYPE_COORD);
+	                    if(returnedSegment.getattrcount()==0){
+	                    	throw new IoxException("expected coord. unexpected event: "+event.asStartElement().getName().getLocalPart());
+	                    }
+						iomObj.addattrobj(attrName, returnedSegment);
+	                    event=reader.nextEvent(); // <coord>
+	                    event=skipSpacesAndGetNextEvent(event);
+	                    if(event.isEndElement()){
+	                        attrName=null;
+	                    }else{
+	                    	throw new IoxSyntaxException(event2msgtext(event));
+	                    }
+	                }else if(event.asStartElement().getName().equals(QNAME_GEOM_MULTICOORD)){
+	                    if(!event.isStartElement()){
+	                    	throw new IoxSyntaxException(event2msgtext(event));
+	                    }
+	            		event=reader.nextEvent(); // <multicoord>
+	            		event=skipSpacesAndGetNextEvent(event);
+	            		if(!event.isStartElement()){
+	                    	throw new IoxSyntaxException(event2msgtext(event));
+	                    }
+	            		IomObject returnedObj=readSequence(event);
+	                    if(returnedObj.getattrcount()==0){
+	                    	throw new IoxException("expected multicoord. unexpected event: "+event.asStartElement().getName().getLocalPart());
+	                    }
+	                    iomObj.addattrobj(attrName, returnedObj);
+	                    event=reader.nextEvent(); // <coord>
+	                    event=skipSpacesAndGetNextEvent(event);
+	                    if(event.isEndElement()){
+	                        attrName=null;
+	                    }else{
+	                    	throw new IoxSyntaxException(event2msgtext(event));
+	                    }
+	                }else if(event.asStartElement().getName().equals(QNAME_GEOM_POLYLINE)){
+	                    IomObject polyline = readPolyline(event);
+	                    if(polyline.getattrcount()==0){
+	                    	throw new IoxException("expected polyline. unexpected event: "+event.asStartElement().getName().getLocalPart());
+	                    }
+	                    iomObj.addattrobj(attrName, polyline);
+	                    event=reader.nextEvent(); // <polyline>
+	                    event=skipSpacesAndGetNextEvent(event);
+	                    if(event.isEndElement()){ // </attribute>
+	                        attrName=null;
+	                    }else{
+	                    	throw new IoxSyntaxException(event2msgtext(event));
+	                    }
+	                }else if(event.asStartElement().getName().equals(QNAME_GEOM_MULTIPOLYLINE)){
+	                    IomObject multiPolyline = readMultiPolyline(event);
+	                    if(multiPolyline.getattrcount()==0){
+	                    	throw new IoxException("expected multipolyline. unexpected event: "+event.asStartElement().getName().getLocalPart());
+	                    }
+	                    iomObj.addattrobj(attrName, multiPolyline);
+	                    event=reader.nextEvent(); // <multipolyline>
+	                    event=skipSpacesAndGetNextEvent(event);
+	                    if(event.isEndElement()){ // </attribute>
+	                        attrName=null;
+	                    }else{
+	                    	throw new IoxSyntaxException(event2msgtext(event));
+	                    }
+	                }else if((event.asStartElement().getName().equals(QNAME_GEOM_LINESTRING))
+	                		|| (event.asStartElement().getName().equals(QNAME_GEOM_ORIENTABLECURVE))
+	                		|| (event.asStartElement().getName().equals(QNAME_GEOM_COMPOSITECURVE))){
+	                	throw new IoxException("unsupported geometry "+event.asStartElement().getName().getLocalPart());
+	                }else if(event.asStartElement().getName().equals(QNAME_GEOM_SURFACE)){
+	                    // SURFACE (surface/area)
+	                	IomObject multiSurface=createIomObject("MULTISURFACE", null);
+	                	IomObject surface=readSurface(event);
+	                	if(surface.getattrcount()==0){
+	                    	throw new IoxException("expected surface. unexpected event: "+event.asStartElement().getName().getLocalPart());
+	                    }
+	                	multiSurface.addattrobj("surface", surface);
+	                	if(!event.isStartElement()){
+	                		throw new IoxSyntaxException(event2msgtext(event));
+	                	}
+	                	iomObj.addattrobj(attrName, multiSurface);
+	                	event=reader.nextEvent(); // <surface>
+	                	event=skipSpacesAndGetNextEvent(event);
+	                	if(event.isEndElement()){
+	                        attrName=null;
+	                    }else{
+	                    	throw new IoxSyntaxException(event2msgtext(event));
+	                    }
+	                }else if((event.asStartElement().getName().equals(QNAME_GEOM_MULTISURFACE) || event.asStartElement().getName().equals(QNAME_GEOM_MULTIAREA))){
+	                    // MULTISURFACE (surfaces and/or areas)
+	                	IomObject multisurface=readMultiSurface(event);
+	                	if(multisurface.getattrcount()==0){
+	                    	throw new IoxException("expected multisurface. unexpected event: "+event.asStartElement().getName().getLocalPart());
+	                    }
+	                    if(!event.isStartElement()){
+	                    	throw new IoxSyntaxException(event2msgtext(event));
+	                    }
+	                    iomObj.addattrobj(attrName, multisurface);
+	                    event=reader.nextEvent(); // <surface>
+	                    event=skipSpacesAndGetNextEvent(event);
+	                    if(event.isEndElement()){ // </attribute>
+	                        attrName=null;
+	                    }else{
+	                    	throw new IoxSyntaxException(event2msgtext(event));
+	                    }
+	                }else{
+	            		QName subQName=((StartElement) event).getName();
+	            		viewable=getIliClass(subQName);
+	            		if(viewable==null){
+	            			// blackBox
+	            			java.io.StringWriter strw=new java.io.StringWriter();
+	                    	event=collectXMLElement(reader,event, strw); // <blackbox></blackbox>
+	            			iomObj.setattrvalue(attrName, strw.toString());
+	            			if(!event.isEndElement()){
+		                    	throw new IoxSyntaxException(event2msgtext(event));
 		                    }
-		            		iomObj.setattrvalue(attrName, characterValue);
-		            		event=reader.nextEvent(); // <characters>
-		            		if(event.isEndElement()){ // check if end attribute
-		            			attrName=null;
-		            		}else{
-		            			throw new IoxSyntaxException(event2msgtext(event));
-		            		}
-		                }else if(event.isEndElement()){
-		                	attrName=null;
-		                	continue;
-		                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_COORD)){
-		            		event=reader.nextEvent(); // <coords>
-		                    event=skipSpacesAndGetNextEvent(event);
+	            		}else {
+	            			// structure
+		                	IomObject structObj=createIomObject(viewable.getName(), null);
+		                    iomObj.addattrobj(attrName, readObject(event, structObj));
 		                    if(!event.isStartElement()){
 		                    	throw new IoxSyntaxException(event2msgtext(event));
 		                    }
-		                    IomObject returnedSegment=readSegment(event, SEGMENTTYPE_COORD);
-		                    if(returnedSegment.getattrcount()==0){
-		                    	throw new IoxException("expected coord. unexpected event: "+event.asStartElement().getName().getLocalPart());
-		                    }
-							iomObj.addattrobj(attrName, returnedSegment);
-		                    event=reader.nextEvent(); // <coord>
-		                    event=skipSpacesAndGetNextEvent(event); // <characters>
-		                    if(event.isEndElement()){
-		                        attrName=null;
-		                    }else{
-		                    	throw new IoxSyntaxException(event2msgtext(event));
-		                    }
-		                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_MULTICOORD)){
-		                    if(!event.isStartElement()){
-		                    	throw new IoxSyntaxException(event2msgtext(event));
-		                    }
-		            		event=reader.nextEvent(); // <multicoord> --> <characters>
-		            		event=skipSpacesAndGetNextEvent(event); // <characters> --> <coord>
-		            		if(!event.isStartElement()){
-		                    	throw new IoxSyntaxException(event2msgtext(event));
-		                    }
-		            		IomObject returnedObj=readSequence(event);
-		                    if(returnedObj.getattrcount()==0){
-		                    	throw new IoxException("expected multicoord. unexpected event: "+event.asStartElement().getName().getLocalPart());
-		                    }
-		                    iomObj.addattrobj(attrName, returnedObj);
-		                    event=reader.nextEvent(); // <coord> --> <characters>
-		                    event=skipSpacesAndGetNextEvent(event); // <characters> --> <multicoord>
-		                    if(event.isEndElement()){
-		                        attrName=null;
-		                    }else{
-		                    	throw new IoxSyntaxException(event2msgtext(event));
-		                    }
-		                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_POLYLINE)){
-		                    IomObject polyline = readPolyline(event);
-		                    if(polyline.getattrcount()==0){
-		                    	throw new IoxException("expected polyline. unexpected event: "+event.asStartElement().getName().getLocalPart());
-		                    }
-		                    iomObj.addattrobj(attrName, polyline);
-		                    event=reader.nextEvent(); // <polyline>
-		                    event=skipSpacesAndGetNextEvent(event);
-		                    if(event.isEndElement()){ // </attribute>
-		                        attrName=null;
-		                    }else{
-		                    	throw new IoxSyntaxException(event2msgtext(event));
-		                    }
-		                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_MULTIPOLYLINE)){
-		                    IomObject multiPolyline = readMultiPolyline(event);
-		                    if(multiPolyline.getattrcount()==0){
-		                    	throw new IoxException("expected multipolyline. unexpected event: "+event.asStartElement().getName().getLocalPart());
-		                    }
-		                    iomObj.addattrobj(attrName, multiPolyline);
-		                    event=reader.nextEvent(); // <multipolyline>
-		                    event=skipSpacesAndGetNextEvent(event);
-		                    if(event.isEndElement()){ // </attribute>
-		                        attrName=null;
-		                    }else{
-		                    	throw new IoxSyntaxException(event2msgtext(event));
-		                    }
-		                }else if((event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_LINESTRING))
-		                		|| (event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_ORIENTABLECURVE))
-		                		|| (event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_COMPOSITECURVE))){
-		                	throw new IoxException("unsupported geometry "+event.asStartElement().getName().getLocalPart());
-		                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_SURFACE)){
-		                    // SURFACE (surface/area)
-		                	IomObject multiSurface=createIomObject("MULTISURFACE", null);
-		                	IomObject surface=readSurface(event);
-		                	if(surface.getattrcount()==0){
-		                    	throw new IoxException("expected surface. unexpected event: "+event.asStartElement().getName().getLocalPart());
-		                    }
-		                	multiSurface.addattrobj("surface", surface);
-		                	if(!event.isStartElement()){
-		                		throw new IoxSyntaxException(event2msgtext(event));
-		                	}
-		                	iomObj.addattrobj(attrName, multiSurface);
-		                	event=reader.nextEvent(); // <surface>
-		                	event=skipSpacesAndGetNextEvent(event);
-		                	if(event.isEndElement()){
-		                        attrName=null;
-		                    }else{
-		                    	throw new IoxSyntaxException(event2msgtext(event));
-		                    }
-		                }else if(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_GEOM_MULTISURFACE) || event.asStartElement().getName().equals(QNAME_GEOM_MULTIAREA))){
-		                    // MULTISURFACE (surfaces and/or areas)
-		                	IomObject multisurface=readMultiSurface(event);
-		                	if(multisurface.getattrcount()==0){
-		                    	throw new IoxException("expected multisurface. unexpected event: "+event.asStartElement().getName().getLocalPart());
-		                    }
-		                    if(!event.isStartElement()){
-		                    	throw new IoxSyntaxException(event2msgtext(event));
-		                    }
-		                    iomObj.addattrobj(attrName, multisurface);
-		                    event=reader.nextEvent(); // <surface>
-		                    event=skipSpacesAndGetNextEvent(event);
-		                    if(event.isEndElement()){ // </attribute>
-		                        attrName=null;
-		                    }else{
-		                    	throw new IoxSyntaxException(event2msgtext(event));
-		                    }
-		                }else{
-	            			if(prop instanceof RoleDef){
-	            				RoleDef role=(RoleDef) prop;
-	            				if(role.getContainer()!=null){
-	            					Container elementContainer=role.getContainer();
-	            					if(elementContainer instanceof AssociationDef){
-	            						AssociationDef association=(AssociationDef) elementContainer;
-	            						if(association instanceof Viewable){
-	            							Viewable viewable=(Viewable) association;
-	                						iomObj=readReference(aClass,iomObj, element, role,association);
-	                						event=reader.nextEvent(); // <role>
-	                						event=reader.nextEvent(); // </role>
-	                						attrName=null;
-	            						}
-	            					}
-	                			}
-	            			}else{
-	            				// structure
-	    	            		QName subQName=((StartElement) event).getName();
-	    	            		Viewable iliStruct=getIliClass(subQName);
-	    	            		if(iliStruct==null){
-	    	                    	String xmlCollection = collectXMLElement(reader,event); // <blackbox></blackbox>
-	    	            			iomObj.setattrvalue(attrName, xmlCollection);
-	    	            			event=reader.nextEvent();
-	    		                    event=skipSpacesAndGetNextEvent(event);
-	    		                    if(event.isEndElement()){ // </attribute>
-	    		                        attrName=null;
-	    		                    }else{
-	    		                    	throw new IoxSyntaxException(event2msgtext(event));
-	    		                    }
-	    	            		}else{
-	    		                	IomObject structObj=createIomObject(iliStruct.getName(), null);
-	    		                    iomObj.addattrobj(attrName, readAttribute(event, iliStruct, structObj));
-	    		                    if(!event.isStartElement()){
-	    		                    	throw new IoxSyntaxException(event2msgtext(event));
-	    		                    }
-	    		                    event=reader.nextEvent(); // <structure>
-	    		                    event=skipSpacesAndGetNextEvent(event);
-	    		                    if(event.isEndElement()){ // </attribute>
-	    		                        attrName=null;
-	    		                    }else{
-	    		                    	throw new IoxSyntaxException(event2msgtext(event));
-	    		                    }
-	    	            		}
-	            			}
-		                }
-	            	}
-	            }else if(event.isEndElement() && attrName==null){
-	                return iomObj;
-	            }else if(event.isEndElement() && attrName!=null){
-	                event=skipSpacesAndGetNextEvent(event);
-	                if(!event.isEndElement()){
-	                	throw new IoxSyntaxException(event2msgtext(event));
-	                }
-	                event=reader.nextEvent(); //</attribute>
-	                attrName=null;
-	            }else if(event instanceof Comment){
-	                continue;
-	            }else{
-	            	throw new IoxSyntaxException(event2msgtext(event));
-	            }
-	        }
+	            		}
+	            		event=reader.nextEvent();
+	                    event=skipSpacesAndGetNextEvent(event);
+        			}
+            	}else if(event.isEndElement()) {
+		            if(attrName!=null){
+		            	attrName=null;
+		            }
+		            if(attrName==null){
+		                return iomObj;
+		            }
+            	}
+            }
 	    }catch(javax.xml.stream.XMLStreamException ex){
 			throw new IoxException(ex);
 		}
-        return null;
+        return iomObj;
     }
 
 	private IomObject readReference(Viewable aclass,IomObject iomObj, StartElement element, RoleDef role, AssociationDef association) throws IoxException{
 		String refOid=element.getAttributeByName(QNAME_ILI_REF).getValue();
 		if(refOid.length()<=1){
-			throw new IoxException("unexpected reference format "+refOid);
+			throw new IoxException("unexpected reference value <"+refOid+">");
+		}
+		Attribute attrRefBid=element.getAttributeByName(QNAME_ILI_BID);
+		String refBid=null;
+		if(attrRefBid!=null) {
+			refBid=attrRefBid.getValue();
+			if(refBid.length()<=1){
+				throw new IoxException("unexpected reference value <"+refBid+">");
+			}
 		}
 		Long orderPos=null;
         Attribute orderPosAttr = element.getAttributeByName(QNAME_ILI_ORDERPOS);
@@ -1077,9 +1107,15 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		if(aclass.isExtending(association)){
 			// role of a standalone association
 			iomObj.addattrobj(role.getName(),"REF").setobjectrefoid(refOid);
+			if(refBid!=null) {
+				iomObj.addattrobj(role.getName(),"REF").setobjectrefbid(refBid); // set reference
+			}
 			IomObject anObject=iomObj.getattrobj(role.getName(), 0);
 			if(orderPos!=null){
 				anObject.setobjectreforderpos(orderPos);
+			}
+			if(refBid!=null) {
+				anObject.setobjectrefbid(refBid);
 			}
 		}else{
 			// embedded role
@@ -1087,6 +1123,9 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 			IomObject aObject=iomObj.getattrobj(role.getName(), 0);
 			if(orderPos!=null){
 				aObject.setobjectreforderpos(orderPos);
+			}
+			if(refBid!=null) {
+				aObject.setobjectrefbid(refBid);
 			}
 		}
 		return iomObj;
@@ -1258,6 +1297,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		}
 		return segment;
 	}
+	
 	private int hsOid=0;
 	private String hsNextOid(){
 		hsOid++;
