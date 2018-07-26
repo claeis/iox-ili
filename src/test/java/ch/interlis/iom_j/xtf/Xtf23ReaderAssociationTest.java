@@ -15,7 +15,7 @@ public class Xtf23ReaderAssociationTest {
 
 	private final static String TEST_IN="src/test/data/Xtf23Reader/associations";
 	
-	// prueft, ob eine eingebettete Referenz erstellt werden kann.
+	// prueft, ob eine eingebettete Referenz gelesen werden kann.
 	@Test
 	public void embedded_Ok() throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"Embedded_0to1.xtf"));
@@ -29,7 +29,21 @@ public class Xtf23ReaderAssociationTest {
 		reader=null;
 	}
 	
-	// prueft, ob eine stand-alone Beziehung mit Attributen erstellt werden kann.
+	// prueft, ob eine eingebettete Referenz mit einer REF (oid, bid) gelesen werden kann.
+	@Test
+	public void embedded_ClassPathRef_Ok() throws Iox2jtsException, IoxException {
+		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"Embedded_0to1_OidAndBid.xtf"));
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // Association.Mensch.Mann oid oid1 {}
+		assertTrue(reader.read() instanceof  ObjectEvent); // Association.Mensch.Frau oid oid2 {bezMann -> oid1 REF {}}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// prueft, ob eine stand-alone Beziehung mit Attributen gelesen werden kann.
 	@Test
 	public void standAlone_WithAttributes_Ok() throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"StandAlone_WithAttributes.xtf"));
@@ -44,7 +58,7 @@ public class Xtf23ReaderAssociationTest {
 		reader=null;
 	}
 	
-	// prueft, ob eine SETORDERPOS Klasse erstellt werden kann.
+	// prueft, ob eine SETORDERPOS Klasse gelesen werden kann.
 	@Test
 	public void setOrderPos_Ok() throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"SetOrderPos.xtf"));
@@ -61,7 +75,7 @@ public class Xtf23ReaderAssociationTest {
 		reader=null;
 	}
 	
-	// prueft, ob innerhalb einer eingebetteten Referenz eine Reihenfolge-Positionierung erstellt werden kann.
+	// prueft, ob innerhalb einer eingebetteten Referenz eine Reihenfolge-Positionierung gelesen werden kann.
 	@Test
 	public void embedded_1to1_OrderPos_Ok() throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"Embedded_1to1_OrderPos.xtf"));
@@ -75,7 +89,7 @@ public class Xtf23ReaderAssociationTest {
 		reader=null;
 	}
 	
-	// prueft, ob eine Stand-Alone Beziehung erstellt werden kann.
+	// prueft, ob eine Stand-Alone Beziehung gelesen werden kann.
 	@Test
 	public void standAlone_Ok() throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"StandAlone.xtf"));

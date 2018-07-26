@@ -11,13 +11,14 @@ import ch.interlis.iox.IoxException;
 import ch.interlis.iox.ObjectEvent;
 import ch.interlis.iox.StartBasketEvent;
 import ch.interlis.iox.StartTransferEvent;
+import ch.interlis.iox_j.IoxSyntaxException;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 
 public class Xtf23ReaderDataTest {
 
 	private final static String TEST_IN="src/test/data/Xtf23Reader/dataSection/";
 	
-	// prueft ob eine leere DataSection erstellt werden kann.
+	// prueft ob eine leere DataSection gelesen werden kann.
 	@Test
 	public void testDatasection_Empty_Ok() throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"EmptyDataSection.xtf"));
@@ -27,7 +28,7 @@ public class Xtf23ReaderDataTest {
 		reader=null;
 	}
 	
-	// prueft ob ein leerer Basket erstellt werden kann.
+	// prueft ob ein leerer Basket gelesen werden kann.
 	@Test
 	public void testBasket_Empty_Ok() throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"EmptyBasket.xtf"));
@@ -71,7 +72,7 @@ public class Xtf23ReaderDataTest {
 		reader=null;
 	}
 	
-	// prueft ob ein leeres Objekt erstellt werden kann.
+	// prueft ob ein leeres Objekt gelesen werden kann.
 	@Test
 	public void testEmptyObjects_Ok() throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"EmptyObjects.xtf"));
@@ -98,7 +99,6 @@ public class Xtf23ReaderDataTest {
 		assertEquals("DataTest1.TopicA.ClassC", obj1.getIomObject().getobjecttag());
 		assertEquals("oidC", obj1.getIomObject().getobjectoid());
 		assertEquals("true", obj1.getIomObject().getattrvalue("attrBoolean1"));
-		assertEquals("false", obj1.getIomObject().getattrvalue("attrBoolean2"));
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
@@ -143,6 +143,22 @@ public class Xtf23ReaderDataTest {
 		assertTrue(reader.read() instanceof  ObjectEvent); // DataTest1.TopicA.ClassH oid oidH {attrH1 5kidok-_, attrH2 igjH-m_, attrH3 1234, attrH4 Interlis12345, attrH5 123e4567-e89b-12d3-a456-426655440000}
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob die OID= mit einer Value eine Fehlermeldung ausgiebt.
+	@Test
+	public void testOidType_Fail()  throws Iox2jtsException, IoxException {
+		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"OidTypesFail.xtf"));
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxSyntaxException ex){
+			assertTrue((ex).getMessage().contains("Unexpected XML event 12345 found."));
+		}
 		reader.close();
 		reader=null;
 	}
@@ -282,7 +298,7 @@ public class Xtf23ReaderDataTest {
 		reader=null;
 	}
 	
-	// Es wird getestet ob eine Gerade vom Typ Polyline ohne Fehler erstellt werden kann.
+	// Es wird getestet ob eine Gerade vom Typ Polyline ohne Fehler gelesen werden kann.
 	@Test
 	public void testPolylinesWithStraights_Ok()  throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"PolylineWithStraights.xtf"));
@@ -295,7 +311,7 @@ public class Xtf23ReaderDataTest {
 		reader=null;
 	}
 	
-	// Es wird getestet ob ein Bogen vom Typ Polyline ohne Fehler erstellt werden kann.
+	// Es wird getestet ob ein Bogen vom Typ Polyline ohne Fehler gelesen werden kann.
 	@Test
 	public void testPolylinesWithArcs_Ok()  throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"PolylineWithArcs.xtf"));
@@ -308,7 +324,7 @@ public class Xtf23ReaderDataTest {
 		reader=null;
 	}
 	
-	// Es wird getestet ob ein Bogen mit einem Radius vom Typ Polyline ohne Fehler erstellt werden kann.
+	// Es wird getestet ob ein Bogen mit einem Radius vom Typ Polyline ohne Fehler gelesen werden kann.
 	@Test
 	public void testPolylinesWithArcsRadius_Ok()  throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"PolylineWithArcsRadius.xtf"));
@@ -321,7 +337,7 @@ public class Xtf23ReaderDataTest {
 		reader=null;
 	}
 	
-	// Es wird getestet ob ein Surface mit mehreren boundaries ohne Fehler erstellt werden kann.
+	// Es wird getestet ob ein Surface mit mehreren boundaries ohne Fehler gelesen werden kann.
 	@Test
 	public void testSurface_Ok()  throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"Surface.xtf"));
@@ -334,7 +350,7 @@ public class Xtf23ReaderDataTest {
 		reader=null;
 	}
 	
-	// Es wird getestet ob ein Surface mit mehreren boundaries und mehreren Kommentaren ohne Fehler erstellt werden kann.
+	// Es wird getestet ob ein Surface mit mehreren boundaries und mehreren Kommentaren ohne Fehler gelesen werden kann.
 	@Test
 	public void testCommentary_Ok() throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"CommentsInFile.xtf"));
@@ -347,7 +363,7 @@ public class Xtf23ReaderDataTest {
 		reader=null;
 	}
 
-	// Es wird getestet ob eine Area mit mehreren boundaries ohne Fehler erstellt werden kann.
+	// Es wird getestet ob eine Area mit mehreren boundaries ohne Fehler gelesen werden kann.
 	@Test
 	public void testArea_Ok()  throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"Area.xtf"));
@@ -360,7 +376,7 @@ public class Xtf23ReaderDataTest {
 		reader=null;
 	}
 	
-	// Es wird getestet ob eine View, innerhalb eines TopicView, welche nicht transient ist, ohne Fehlermeldung erstellt werden kann.
+	// Es wird getestet ob eine View, innerhalb eines TopicView, welche nicht transient ist, ohne Fehlermeldung gelesen werden kann.
 	@Test
 	public void testView_Ok()  throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"View.xtf"));
@@ -495,7 +511,7 @@ public class Xtf23ReaderDataTest {
 		reader=null;
 	}
 	
-	// Es wird getestet ob eine Klasse mit den Selben Namen wie das Topic hat ohne Fehler erstellt werden kann.
+	// Es wird getestet ob eine Klasse mit den Selben Namen wie das Topic hat ohne Fehler gelesen werden kann.
 	@Test
 	public void testTopicNameLikeClassName_Ok() throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"TopicNameLikeClassName.xtf"));

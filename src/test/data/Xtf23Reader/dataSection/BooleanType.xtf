@@ -9,7 +9,6 @@
 		<DataTest1.TopicA BID="bidA">
 			<DataTest1.TopicA.ClassC TID="oidC">
 				<attrBoolean1>true</attrBoolean1>
-				<attrBoolean2>false</attrBoolean2>
 			</DataTest1.TopicA.ClassC>
 		</DataTest1.TopicA>
 	</DATASECTION>

@@ -81,9 +81,9 @@ public class Xtf23ReaderHeaderTest {
 		try{
 			reader.read();
 			fail();
-		}catch(IoxException ioxEx){
-			assertTrue((ioxEx).getMessage().contains("expected data section"));
-	        assertTrue(ioxEx instanceof IoxException);
+		}catch(IoxSyntaxException ioxEx){
+			assertTrue((ioxEx).getMessage().contains("Unexpected XML event HEADERSECTION found."));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;

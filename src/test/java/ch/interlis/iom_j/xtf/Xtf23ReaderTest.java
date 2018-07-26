@@ -12,6 +12,7 @@ import ch.interlis.iox.IoxException;
 import ch.interlis.iox.ObjectEvent;
 import ch.interlis.iox.StartBasketEvent;
 import ch.interlis.iox.StartTransferEvent;
+import ch.interlis.iox_j.IoxSyntaxException;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 
 public class Xtf23ReaderTest {
@@ -23,6 +24,35 @@ public class Xtf23ReaderTest {
 	public void transferElement_Ok() throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"ValidTransferElement.xtf"));
 		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob ein xtf file mit Textzeichen zwischen den Zeilen erkannt wird und eine Fehlermeldung ausgegeben wird.
+	@Test
+	public void testTextBetweenLines_Fail() throws Iox2jtsException, IoxException {
+		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"TextBetweenLines.xtf"));
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ex){
+			assertTrue((ex).getMessage().contains("Unexpected XML event abcdefg"));
+    		assertTrue(ex instanceof IoxSyntaxException);
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob ein xtf file auf 1 Linie ohne Fehler gelesen werden kann.
+	@Test
+	public void testXML1Line_Ok() throws Iox2jtsException, IoxException {
+		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"Xml1Line.xtf"));
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;

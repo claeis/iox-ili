@@ -12,7 +12,7 @@
 				<attrH2>igjH-m_</attrH2>
 				<attrH3>1234</attrH3>
 				<attrH4>Interlis12345</attrH4>
-				<attrH5>123e4567-e89b-12d3-a456-426655440000</attrH5>
+				<attrH5 OID="123e4567-e89b-12d3-a456-426655440000"></attrH5>
 			</DataTest1.TopicA.ClassH>
 		</DataTest1.TopicA>
 	</DATASECTION>
