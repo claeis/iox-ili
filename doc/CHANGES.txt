@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- removed "illegal value null for ObjTag" log messages
 
 iox-ili 1.20.7 (2018-07-05)
 -----------------------------
