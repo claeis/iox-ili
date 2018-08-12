@@ -424,11 +424,15 @@ public static void ISCICR_(double AV1I[],double AV2I[],double AW1I[],double AW2I
                 }else {
                     double ALFA_V = PSECOS (AV1I[1],AV2I[1],V1,V2,AV1I[3],AV2I[3]);
                     double BETA_W1= PSECOS(AV1I[1],AV2I[1],V1,V2,AW1I[1],AW2I[1]);
-                    if( ALFA_V != BETA_W1 && Math.signum(BETA_W1-ALFA_V) != SIGNV){ // war ==SIGNV
+                    // is start of W outside of V?
+                    if( (AV1I[3]==AW1I[1] && AV2I[3]==AW2I[1]) // is end of V == start of W 
+                            || ( ALFA_V != BETA_W1 && Math.signum(BETA_W1-ALFA_V) != SIGNV)){ // war ==SIGNV
                         // AW1I[1],AW2I[1] lies outside the arc with center V
                         double ALFA_W =  PSECOS (AW1I[1],AW2I[1],W1,W2,AW1I[3],AW2I[3]); 
                         double BETA_V1= PSECOS (AW1I[1],AW2I[1],W1,W2,AV1I[1],AV2I[1]);
-                        if( ALFA_W != BETA_V1 && Math.signum(BETA_V1-ALFA_W) != SIGNW){ // war ==SIGNW
+                        // is end of W outside start of V?
+                        if( (AV1I[1]==AW1I[3] && AV2I[1]==AW2I[3]) // is end of W == start of V
+                                || (ALFA_W != BETA_V1 && Math.signum(BETA_V1-ALFA_W) != SIGNW)){ // war ==SIGNW
                             // AV1I[1],AV2I[1] lies outside the arc with center W
                             // same circle, but no overlay
                             NHO[0] = 0;
@@ -490,11 +494,13 @@ public static void ISCICR_(double AV1I[],double AV2I[],double AW1I[],double AW2I
                 }else {
                     double ALFA_V = PSECOS (AV1I[1],AV2I[1],V1,V2,AV1I[3],AV2I[3]);
                     double BETA_W3= PSECOS(AV1I[1],AV2I[1],V1,V2,AW1I[3],AW2I[3]);
-                    if( ALFA_V != BETA_W3 && Math.signum(BETA_W3-ALFA_V) != SIGNV){ // war ==SIGNV
+                    if( (AV1I[3]==AW1I[3] && AV2I[3]==AW2I[3]) // is end of V == start of W
+                            || (ALFA_V != BETA_W3 && Math.signum(BETA_W3-ALFA_V) != SIGNV)){ // war ==SIGNV
                         // AW1I[3],AW2I[3] lies outside the arc with center V
                         double ALFA_W =  PSECOS (AW1I[1],AW2I[1],W1,W2,AW1I[3],AW2I[3]); 
                         double BETA_V1= PSECOS (AW1I[1],AW2I[1],W1,W2,AV1I[1],AV2I[1]);
-                        if( ALFA_W != BETA_V1 && Math.signum(BETA_V1-ALFA_W) != SIGNW){ // war ==SIGNW
+                        if( (AV1I[1]==AW1I[1] && AV2I[1]==AW2I[1]) // is end of W == start of V
+                                || (ALFA_W != BETA_V1 && Math.signum(BETA_V1-ALFA_W) != SIGNW)){ // war ==SIGNW
                             // AV1I[1],AV2I[1] lies outside the arc with center W
                             // same circle, but no overlay
                             NHO[0] = 0;
