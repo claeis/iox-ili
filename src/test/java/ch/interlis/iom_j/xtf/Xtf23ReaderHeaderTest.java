@@ -156,7 +156,9 @@ public class Xtf23ReaderHeaderTest {
 			reader.read();
 			fail();
 		}catch(IoxException ioxEx){
-			assertTrue((ioxEx).getMessage().contains("Open quote is expected for attribute \"NAME\" associated with an  element type  \"MODEL\"."));
+		    String msg=(ioxEx).getMessage();
+		    System.out.println(msg);
+			assertTrue(msg.contains("Open quote is expected"));
 		}
 		reader.close();
 		reader=null;
