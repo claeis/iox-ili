@@ -62,14 +62,33 @@ public class XtfErrorsLogger implements LogListener {
 		}
 		if(event instanceof IoxLogEvent){
 			IoxLogEvent ioxEvent=(IoxLogEvent)event;
-			iomObj.setObjTag(ioxEvent.getSourceObjectTag());
-			iomObj.setTid(ioxEvent.getSourceObjectXtfId());
-			iomObj.setTechId(ioxEvent.getSourceObjectTechId());
-			iomObj.setUserId(ioxEvent.getSourceObjectUsrId()); 
-			iomObj.setIliQName(ioxEvent.getModelEleQName());
-			iomObj.setDataSource(ioxEvent.getDataSource());
-			if(ioxEvent.getSourceLineNr()!=null){
-				iomObj.setLine(ioxEvent.getSourceLineNr());
+			String sourceObjectTag = ioxEvent.getSourceObjectTag();
+			if(sourceObjectTag!=null) {
+	            iomObj.setObjTag(sourceObjectTag);
+			}
+			String sourceObjectXtfId = ioxEvent.getSourceObjectXtfId();
+			if(sourceObjectXtfId!=null) {
+	            iomObj.setTid(sourceObjectXtfId);
+			}
+			String sourceObjectTechId = ioxEvent.getSourceObjectTechId();
+			if(sourceObjectTechId!=null) {
+	            iomObj.setTechId(sourceObjectTechId);
+			}
+			String sourceObjectUsrId = ioxEvent.getSourceObjectUsrId();
+			if(sourceObjectUsrId!=null) {
+	            iomObj.setUserId(sourceObjectUsrId); 
+			}
+			String modelEleQName = ioxEvent.getModelEleQName();
+			if(modelEleQName!=null) {
+	            iomObj.setIliQName(modelEleQName);
+			}
+			String dataSource = ioxEvent.getDataSource();
+			if(dataSource!=null) {
+	            iomObj.setDataSource(dataSource);
+			}
+			Integer sourceLineNr = ioxEvent.getSourceLineNr();
+            if(sourceLineNr!=null){
+				iomObj.setLine(sourceLineNr);
 			}
 			if(ioxEvent.getGeomC1()!=null && ioxEvent.getGeomC2()!=null){
 				Iom_jObject iomCoord=new Iom_jObject("COORD",null);

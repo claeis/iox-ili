@@ -80,6 +80,17 @@ public class Xtf24ReaderHeaderTest {
 		reader=null;
 	}
 	
+	// Im Header wird 1 Mal Models, 1 Mal Sender und 1 Mal Comments auf einer Linie erstellt.
+	@Test
+	public void xml1Line_Ok() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN_HEADER,"Xml1Line.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof StartTransferEvent);
+		assertTrue(reader.read() instanceof EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
 	// Es werden mehrere Model innerhalb von Models erstellt.
 	@Test
 	public void testHeaderMultipleModelDefined_Ok() throws Iox2jtsException, IoxException {
@@ -208,7 +219,7 @@ public class Xtf24ReaderHeaderTest {
 			fail();
 		}catch(IoxException ioxEx){
 			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"comments"));
-	        assertTrue(ioxEx instanceof IoxSyntaxException);
+	        assertTrue(ioxEx instanceof IoxException);
 		}
 		reader.close();
 		reader=null;

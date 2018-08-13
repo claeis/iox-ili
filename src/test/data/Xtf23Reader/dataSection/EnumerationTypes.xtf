@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+	<HEADERSECTION SENDER="xtf23Reader" VERSION="2.3">
+		<MODELS>
+			<MODEL NAME="DataTest1" VERSION="2011-12-22" URI="http://interlis.ch"></MODEL>
+		</MODELS>
+	</HEADERSECTION>
+	<DATASECTION>
+		<DataTest1.TopicA BID="bidA">
+			<DataTest1.TopicA.ClassF TID="oidF1">
+				<attrF1>rot.dunkelrot</attrF1>
+				<attrF2>unten</attrF2>
+				<attrF3>Werktage.Montag</attrF3>
+				<attrF4>Werktage.Dienstag</attrF4>
+			</DataTest1.TopicA.ClassF>
+			<DataTest1.TopicA.ClassF TID="oidF2">
+				<attrF1>gruen.hellgruen</attrF1>
+				<attrF2>mitte</attrF2>
+				<attrF3>Werktage.Sonntag</attrF3>
+				<attrF4>Werktage.Samstag</attrF4>
+			</DataTest1.TopicA.ClassF>
+			<DataTest1.TopicA.ClassF TID="oidF3">
+				<attrG1>rot</attrG1>
+				<attrG2>rot.dunkelrot</attrG2>
+				<attrG3>rot</attrG3>
+			</DataTest1.TopicA.ClassF>
+		</DataTest1.TopicA>
+	</DATASECTION>
+</TRANSFER>

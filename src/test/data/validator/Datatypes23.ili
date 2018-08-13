@@ -53,7 +53,7 @@ MODEL Datatypes23
 		   textUnlimited : TEXT;
 		   mtextLimited : MTEXT*10;
 		   mtextUnlimited : MTEXT;
-		   nametext : NAME;
+		   nametext : INTERLIS.NAME;
 		   uritext : URI;
 		   
 		   !! AlignmentType

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- after xml version-->
+<!-- before TRANSFER--><TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3"><!-- after TRANSFER-->
+	<!-- before HEADERSECTION--><HEADERSECTION SENDER="ili2c-4.5.22-20160520" VERSION="2.3"><!-- after HEADERSECTION-->
+		<!-- before MODELS--><MODELS><!-- after MODELS-->
+		<!-- before MODEL--><MODEL NAME="Test1" VERSION="2011-12-22" URI="http://interlis.ch"></MODEL><!-- after end MODELS-->
+		<!-- before end MODELS--></MODELS><!-- after end MODELS-->
+		<!-- before ALIAS--><ALIAS><!-- after ALIAS-->
+			<!-- before ENTRIES--><ENTRIES FOR=""><!-- after -->
+				<!-- before TAGENTRY--><TAGENTRY FROM="" TO=""></TAGENTRY><!-- after end TAGENTRY-->
+				<!-- before TAGENTRY--><TAGENTRY FROM="" TO=""></TAGENTRY><!-- after end TAGENTRY-->
+			<!-- before end ENTRIES--></ENTRIES><!-- after end ENTRIES-->
+			<!-- before ENTRIES--><ENTRIES FOR=""><!-- after ENTRIES-->
+				<!-- before VALENTRY--><VALENTRY TAG="" ATTR="" FROM="" TO=""></VALENTRY><!-- after end VALENTRY-->
+				<!-- before VALENTRY--><VALENTRY TAG="" ATTR="" FROM="" TO=""></VALENTRY><!-- after end VALENTRY-->
+			<!-- before end ENTRIES--></ENTRIES><!-- after end ENTRIES-->
+			<!-- before ENTRIES--><ENTRIES FOR=""><!-- after ENTRIES-->
+				<!-- before DELENTRY--><DELENTRY TAG=""></DELENTRY><!-- after end DELENTRY-->
+				<!-- before DELENTRY--><DELENTRY TAG="" ATTR=""></DELENTRY><!-- after end DELENTRY-->
+			<!-- before end ENTRIES--></ENTRIES><!-- after end ENTRIES-->
+		<!-- before end ALIAS--></ALIAS><!-- after end ALIAS-->
+		<!-- before OIDSPACES--><OIDSPACES><!-- after OIDSPACES-->
+			<!-- before OIDSPACE--><OIDSPACE NAME="" OIDDOMAIN=""></OIDSPACE><!-- after end OIDSPACE-->
+			<!-- before OIDSPACE--><OIDSPACE NAME="" OIDDOMAIN=""></OIDSPACE><!-- after end OIDSPACE-->
+		<!-- before end OIDSPACES--></OIDSPACES><!-- after end OIDSPACES-->
+		<!-- before COMMENT--><COMMENT><!-- after COMMENT-->
+			beliebiger Text ohne Tags (inkl. carriage return
+			(Wagenruecklauf) (#xD), line feed (Zeilenvorschub) (#xA)
+			und Tabulatorzeichen (#x9)).
+		</COMMENT><!-- after end COMMENT-->
+<!-- before end HEADERSECTION--></HEADERSECTION><!-- after end HEADERSECTION-->
+	<!-- before DATASECTION--><DATASECTION><!-- after DATASECTION-->
+	<!-- before end DATASECTION--></DATASECTION><!-- after end DATASECTION-->
+<!-- before end TRANSFER--></TRANSFER><!-- after end TRANSFER-->

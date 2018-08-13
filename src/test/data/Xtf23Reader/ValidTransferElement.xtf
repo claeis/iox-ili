@@ -6,9 +6,5 @@
 		</MODELS>
 	</HEADERSECTION>
 	<DATASECTION>
-		<Test1.TopicA BID="b1">
-			<Test1.TopicA.ClassA TID="ok1">
-			</Test1.TopicA.ClassA>
-		</Test1.TopicA>
 	</DATASECTION>
 </TRANSFER>

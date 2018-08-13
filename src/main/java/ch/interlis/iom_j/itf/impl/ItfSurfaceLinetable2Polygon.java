@@ -321,7 +321,13 @@ public class ItfSurfaceLinetable2Polygon {
 				p10 = e1.getSegments().get(segIndex1).getStartPoint();
 				p11 = e1.getSegments().get(segIndex1).getEndPoint();
 				if(is.isOverlay()) {
-					dataerrs.add(new IoxInvalidDataException("overlay "+mainTid,linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
+                    String []tids=new String[2];
+                    tids[0]=(String) is.getCurve1().getUserData();
+                    tids[1]=(String) is.getCurve2().getUserData();
+                    if(tids[0].equals(tids[1])) {
+                        tids[1]=null;
+                    }
+					dataerrs.add(new IoxInvalidDataException(is.toShortString(),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
 					hasIntersections=true;
 				}else if(e0!=e1 &&
 						(segIndex0==0 || segIndex0==e0.getSegments().size()-1) 

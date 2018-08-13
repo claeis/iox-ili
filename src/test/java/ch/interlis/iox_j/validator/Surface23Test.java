@@ -663,7 +663,7 @@ public class Surface23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("overlay o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 300000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
@@ -769,7 +769,7 @@ public class Surface23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("overlay o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 300000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
@@ -865,7 +865,7 @@ public class Surface23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==3);
-		assertEquals("overlay o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 290000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
 		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
 	}
@@ -973,7 +973,7 @@ public class Surface23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==3);
-		assertEquals("overlay o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 300000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
 		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
 	}
@@ -1070,7 +1070,7 @@ public class Surface23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("overlay o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 300000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	

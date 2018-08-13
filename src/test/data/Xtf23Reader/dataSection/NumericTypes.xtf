@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+	<HEADERSECTION SENDER="xtf23Reader" VERSION="2.3">
+		<MODELS>
+			<MODEL NAME="DataTest1" VERSION="2011-12-22" URI="http://interlis.ch"></MODEL>
+		</MODELS>
+	</HEADERSECTION>
+	<DATASECTION>
+		<DataTest1.TopicA BID="bidA2">
+			<DataTest1.TopicA.ClassB TID="oidB">
+				<attrNrDec>6.15</attrNrDec>
+				<attrWertNormal>6.15</attrWertNormal>
+				<attrWertExakt>6.15</attrWertExakt>
+			</DataTest1.TopicA.ClassB>
+		</DataTest1.TopicA>
+	</DATASECTION>
+</TRANSFER>

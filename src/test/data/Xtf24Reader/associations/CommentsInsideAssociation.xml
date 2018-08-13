@@ -8,18 +8,16 @@
 	<ili:datasection>
 		<Fail1 ili:bid="bid">
 			<ClassA ili:tid="oid1">
-			<!--comment1-->
 			</ClassA>
 			<ClassB ili:tid="oid2">
-			<!--comment2-->
 			</ClassB>
-			<Beziehung>
-				<!--comment3-->
-				<roleA ili:ref="oid1"/>
-				<!--comment4-->
-				<roleB ili:ref="oid2"/>
-				<!--comment5-->
-			</Beziehung>
+			<!--comment before start Beziehung --><Beziehung><!--comment after start Beziehung -->
+				<!--comment after start Beziehung -->
+				<!--comment before start roleA --><roleA ili:ref="oid1"/><!--comment after start roleA -->
+				<!--comment before start roleB --><roleB ili:ref="oid2"/><!--comment after start roleB -->
+			<!--comment before end Beziehung --></Beziehung><!--1.comment after end Beziehung -->
+			<!--2. comment after end Beziehung -->
+			<!--3. comment after end Beziehung -->
 		</Fail1>
 	</ili:datasection>
 </ili:transfer>

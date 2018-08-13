@@ -74,21 +74,27 @@ public class IoxInvalidDataException extends IoxException {
 	}
 	public static String formatTids(String tids[]) {
 		StringBuilder ret=new StringBuilder();
-		if(tids!=null && tids.length>0){
-			if(tids.length>1){
-				ret.append("tids ");
-			}else{
-				ret.append("tid ");
-			}
-			List<String> tidv=new ArrayList<String>();
-			tidv.addAll(Arrays.asList(tids));
-			Collections.sort(tidv);
-			String sep="";
-			for(String tid:tidv){
-				ret.append(sep);
-				ret.append(tid);
-				sep=", ";
-			}
+		if(tids!=null){
+	        List<String> tidv=new ArrayList<String>();
+	        for(String tid:tids) {
+	            if(tid!=null && tid.length()>0) {
+	                tidv.add(tid);
+	            }
+	        }
+	        if(tidv.size()>0){
+	            if(tidv.size()>1){
+	                ret.append("tids ");
+	            }else{
+	                ret.append("tid ");
+	            }
+	            Collections.sort(tidv);
+	            String sep="";
+	            for(String tid:tidv){
+	                ret.append(sep);
+	                ret.append(tid);
+	                sep=", ";
+	            }
+	        }
 		}
 		return ret.toString();
 	}

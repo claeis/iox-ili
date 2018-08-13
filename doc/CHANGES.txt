@@ -1,9 +1,15 @@
 ideas/open issues
 ----------------------------
 - add xml validation
+- add Xtf23Reader
 
 LATEST
 -----------------------------
+
+iox-ili 1.20.8 (2018-08-13)
+-----------------------------
+- removed "illegal value null for ObjTag" log messages
+- fixed Arc/Arc overlay detection if two halves of a circle
 
 iox-ili 1.20.7 (2018-07-05)
 -----------------------------

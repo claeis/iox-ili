@@ -2168,4 +2168,122 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+	// Eine gueltige Name mit der maximalen Anzahl an Zeichen wird erstellt.
+	@Test
+	public void nameTypeIsValidOk(){
+		Iom_jObject iomObj=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		iomObj.setattrvalue("nametext", ch.ehi.basics.tools.StringUtility.STRING(255, 'a'));
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Die Gueltigkeit einer NAME wird auf einen leeren Wert getestet.
+	@Test
+	public void nameTypeIsEmptyFail(){
+		Iom_jObject iomObj=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		iomObj.setattrvalue("nametext", "");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("invalid format of INTERLIS.NAME value <>", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Das erste Zeichen der Value ist kein Buchstabe. Somit soll eine Fehlermeldung ausgegeben werden.
+	@Test
+	public void nameTypeValueStartsWithNumberFail(){
+		Iom_jObject iomObj=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		iomObj.setattrvalue("nametext", "5NameText");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("invalid format of INTERLIS.NAME value <5NameText>", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Der Wert beinhaltet das gueltige Zeichen underline '_'.
+	@Test
+	public void nameTypeValueContainsValidSpecialCharOk(){
+		Iom_jObject iomObj=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		iomObj.setattrvalue("nametext", "Name_Text");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Der Wert beinhaltet ein ungueltiges Zeichen '-'. Somit soll eine Fehlermeldung ausgegeben werden.
+	@Test
+	public void nameTypeValueContainsInvalidSpecialCharsFail(){
+		Iom_jObject iomObj=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		iomObj.setattrvalue("nametext", "Name-Text");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("invalid format of INTERLIS.NAME value <Name-Text>", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Der Wert ist ein KeyWord. Somit soll eine Fehlermeldung ausgegeben werden.
+	@Test
+	public void nameTypeValueContainsKeyWordFail(){
+		Iom_jObject iomObj=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		iomObj.setattrvalue("nametext", "ANYSTRUCTURE");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value <ANYSTRUCTURE> is a keyword", logger.getErrs().get(0).getEventMsg());
+	}
 }

@@ -10,6 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import com.vividsolutions.jts.geom.Coordinate;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
@@ -2897,6 +2899,24 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							logMsg(validateType, "datetime value <{0}> is not in range", valueStr);
 						}
 					}
+				} else if(isDomainName(attr)) {
+					// Value is not null
+					String valueStr = iomObj.getattrvalue(attrName);
+					if (valueStr!=null) {
+						validateTextType(iomObj, attrPath, attrName, validateType, type, valueStr);
+						if (isAKeyword(valueStr)) {
+							logMsg(validateType,"value <{0}> is a keyword", valueStr);
+						}else{
+							// value is not a keyword
+						}
+						Pattern pattern=Pattern.compile("[a-zA-Z]{1}([a-zA-Z0-9\\_]{1,})");
+						Matcher matcher=pattern.matcher(valueStr);
+						if(matcher!=null && matcher.matches()){
+							// value matched pattern
+						}else {
+							logMsg(validateType,"invalid format of INTERLIS.NAME value <{0}>", valueStr);
+						}
+					}
 				}else if (type instanceof PolylineType){
 					PolylineType polylineType=(PolylineType)type;
 					IomObject polylineValue=iomObj.getattrobj(attrName, 0);
@@ -2989,26 +3009,31 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}else if(type instanceof ReferenceType){
 				}else if(type instanceof TextType){
 					String value=iomObj.getattrvalue(attrName);
-					if(value!=null){
-						int maxLength=((TextType) type).getMaxLength();
-						TextType textType = (TextType) type;
-						if(maxLength!=-1){
-							if(value.length()>maxLength){
-								 logMsg(validateType,"Attribute {0} is length restricted to {1}", attrPath,Integer.toString(maxLength));
-							}
-						}
-						if(((TextType) type).isNormalized()){
-							if(value.indexOf('\n')>=0 || value.indexOf('\r')>=0 || value.indexOf('\t')>=0){
-								 logMsg(validateType,"Attribute {0} must not contain control characters", attrPath);
-							}
-						}
-					}else{
-						IomObject structValue=iomObj.getattrobj(attrName, 0);
-						if(structValue!=null){
-							logMsg(validateType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
-						}
-					}
+					validateTextType(iomObj, attrPath, attrName, validateType, type, value);
 				}
+			}
+		}
+	}
+
+	private void validateTextType(IomObject iomObj, String attrPath, String attrName, String validateType, Type type,
+			String value) {
+		if(value!=null){
+			int maxLength=((TextType) type).getMaxLength();
+			TextType textType = (TextType) type;
+			if(maxLength!=-1){
+				if(value.length()>maxLength){
+					 logMsg(validateType,"Attribute {0} is length restricted to {1}", attrPath,Integer.toString(maxLength));
+				}
+			}
+			if(((TextType) type).isNormalized()){
+				if(value.indexOf('\n')>=0 || value.indexOf('\r')>=0 || value.indexOf('\t')>=0){
+					 logMsg(validateType,"Attribute {0} must not contain control characters", attrPath);
+				}
+			}
+		}else{
+			IomObject structValue=iomObj.getattrobj(attrName, 0);
+			if(structValue!=null){
+				logMsg(validateType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
 			}
 		}
 	}
@@ -3304,6 +3329,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return rounded.toPlainString();
 	}
 	
+	private boolean isAKeyword(String valueStr) {
+		HashSet<String> keyWords=Ili23KeyWords.getAllKeyWords();
+		if(keyWords.contains(valueStr)){
+			// value is a keyword
+			return true;
+		}
+		// not a keyword
+		return false;
+	}
+	
 	public static BigDecimal roundNumeric(int precision, String valueStr) {
 		if(valueStr==null) {
 			return null;
@@ -3325,6 +3360,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	
 	public boolean isValidUuid(String valueStr) {
 		return valueStr.length() == 36 && valueStr.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}?");
+	}
+	
+	private static boolean isDomainName(AttributeDef attr){
+		TransferDescription td=(TransferDescription) attr.getContainer(TransferDescription.class);
+		Type type=attr.getDomain();
+		while(type instanceof TypeAlias) {
+			if (((TypeAlias) type).getAliasing() == td.INTERLIS.NAME) {
+				return true;
+			}
+			type=((TypeAlias) type).getAliasing().getType();
+		}
+		return false;
 	}
 	
 	private void logMsg(String validateKind,String msg,String... args){

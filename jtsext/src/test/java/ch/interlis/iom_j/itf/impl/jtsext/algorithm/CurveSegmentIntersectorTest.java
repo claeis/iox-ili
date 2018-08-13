@@ -437,4 +437,27 @@ public class CurveSegmentIntersectorTest {
 		assertFalse(li.isOverlay());
 		assertFalse(li.hasIntersection());
 	}
+    // two arcs with same center 100/100 and radius 50 that touch each other at the endpoints.
+    @Test
+    public void twoARCS_SameRadiusAndCenter_Touch_DontOverlay() {
+        CurveSegmentIntersector li=new CurveSegmentIntersector();
+        ArcSegment s0=new ArcSegment(new Coordinate(50.0, 100.0),new Coordinate(100.0,150.0),new Coordinate(150.0,100.0));
+        //System.out.println(s0.getCenterPoint()+" r "+s0.getRadius()+" "+s0.getSign());
+        ArcSegment s1=new ArcSegment(new Coordinate(150.0, 100.0),new Coordinate(100.0,50.0),new Coordinate(50.0,100.0));
+        //System.out.println(s1.getCenterPoint()+" r "+s1.getRadius()+" "+s1.getSign());
+        li.computeIntersection(s0, s1);
+        assertFalse(li.isOverlay());
+        assertFalse(li.hasIntersection());
+    }
+    @Test
+    public void twoARCS_SameRadiusAndCenter_Touch_DontOverlay_real() {
+        CurveSegmentIntersector li=new CurveSegmentIntersector();
+        ArcSegment s0=new ArcSegment(new Coordinate(2654828.912, 1223354.671),new Coordinate(2654829.982, 1223353.601),new Coordinate(2654831.052, 1223354.671));
+        //System.out.println(s0.getCenterPoint()+" r "+s0.getRadius()+" "+s0.getSign());
+        ArcSegment s1=new ArcSegment(new Coordinate(2654831.052, 1223354.671),new Coordinate(2654829.982, 1223355.741),new Coordinate(2654828.912, 1223354.671));
+        //System.out.println(s1.getCenterPoint()+" r "+s1.getRadius()+" "+s1.getSign());
+        li.computeIntersection(s0, s1);
+        assertFalse(li.isOverlay());
+        assertFalse(li.hasIntersection());
+    }
 }

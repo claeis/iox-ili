@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
+import ch.interlis.iox_j.IoxInvalidDataException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -90,10 +91,18 @@ public class Intersection {
         Object seg1UserData=seg1.getUserData();
         Object seg2UserData=seg2.getUserData();
         if(isOverlay()) {
+            String tids[]=new String[2];
+            tids[0]=(String) (seg1UserData!=null?seg1UserData:curve1.getUserData());
+            tids[1]=(String) (seg2UserData!=null?seg2UserData:curve2.getUserData());
+            Coordinate coord0=pt[0];
+            Coordinate coord1=pt[1];
+            if(coord0.compareTo(coord1)>0) {
+                coord0=pt[1];
+                coord1=pt[0];
+            }
             return "Overlay"
-                    +" coord1 " + pt[0].toString()+", coord2 "+pt[1].toString() 
-                    + ", tid1 " + (seg1UserData!=null?seg1UserData:curve1.getUserData())
-                    + ", tid2 " + (seg2UserData!=null?seg2UserData:curve2.getUserData())
+                    +" coord1 " + coord0.toString()+", coord2 "+coord1.toString() 
+                    + ", " + IoxInvalidDataException.formatTids(tids)
                     ;
         }
         return "Intersection"

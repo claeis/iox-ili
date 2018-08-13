@@ -2,9 +2,7 @@ package ch.interlis.iom_j.xtf;
 
 import static org.junit.Assert.*;
 import java.io.File;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.junit.Before;
 import org.junit.Test;
 import ch.interlis.ili2c.Ili2cFailure;
@@ -55,10 +53,42 @@ public class Xtf24ReaderTest {
 		reader=null;
 	}
 	
+	// Es wird getestet ob ein xtf file mit Textzeichen zwischen den Zeilen erkannt wird und eine Fehlermeldung ausgegeben wird.
+	@Test
+	public void testTextBetweenLines_Fail() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"TextBetweenLines.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		try{
+			reader.read();
+			fail();
+		}catch(IoxException ex){
+			assertTrue((ex).getMessage().contains(CHAR_ELE_FAIL+"text12345"));
+    		assertTrue(ex instanceof IoxSyntaxException);
+		}
+		reader.close();
+		reader=null;
+	}
+	
+	// Es wird getestet ob ein xtf file auf 1 Linie ohne Fehler gelesen werden kann.
+	@Test
+	public void testXML1Line_Ok() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Xml1Line.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent);
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
 	// In diesem Test sollen Kommentare innerhalb der events erstellt werden.
 	// Dabei sollen die Kommentare ignoriert, beziehungsweise gelesen und nicht interpretiert werden.
 	@Test
-	public void testComments_Ok()  throws Iox2jtsException, IoxException {
+	public void testComments_Ok() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"CommentsInFile.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof StartTransferEvent);
@@ -354,8 +384,8 @@ public class Xtf24ReaderTest {
 			reader.read();
 			fail();
 		}catch(IoxException ioxEx){
-			assertTrue((ioxEx).getMessage().contains("expected data section"));
-	        assertTrue(ioxEx instanceof IoxException);
+			assertTrue((ioxEx).getMessage().contains(END_ELE_FAIL+"transfer"));
+	        assertTrue(ioxEx instanceof IoxSyntaxException);
 		}
 		reader.close();
 		reader=null;

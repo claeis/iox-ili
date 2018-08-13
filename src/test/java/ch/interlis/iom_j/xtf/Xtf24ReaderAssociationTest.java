@@ -149,6 +149,36 @@ public class Xtf24ReaderAssociationTest {
 		reader=null;
 	}
 	
+	@Test
+	public void xml1Line_Ok() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Xml1Line.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // Association.Baum.Ast oid oid1 {}
+		assertTrue(reader.read() instanceof  ObjectEvent); // Association.Baum.Blatt oid oid2 {}
+		assertTrue(reader.read() instanceof  ObjectEvent); // Association.Baum.Beziehung {bezAst -> oid1 REF {}, bezBlatt -> oid2 REF {}}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
+	@Test
+	public void alone_WithAttributes_Ok() throws Iox2jtsException, IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Alone_WithAttributes.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+		assertTrue(reader.read() instanceof  ObjectEvent); // Association.Baum.Ast oid oid1 {}
+		assertTrue(reader.read() instanceof  ObjectEvent); // Association.Baum.Blatt oid oid2 {}
+		assertTrue(reader.read() instanceof  ObjectEvent); // Association.Baum2.Beziehung {attr1 5, attr2 6, attr3 7, bezAst -> oid1 REF {}, bezBlatt -> oid2 REF {}}
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+		reader=null;
+	}
+	
 	// Kommentare innerhalb von Associations muessen ignoriert werden.
 	@Test
 	public void commentsInsideAssociation_Ok() throws Iox2jtsException, IoxException {
@@ -246,7 +276,6 @@ public class Xtf24ReaderAssociationTest {
 		assertTrue(reader.read() instanceof  StartBasketEvent);
 		assertTrue(reader.read() instanceof  ObjectEvent); // Association.Autos.Auto oid oid1 {}
 		assertTrue(reader.read() instanceof  ObjectEvent); // Association.Autos.Garage oid oid2 {bezAuto -> oid1 REF {}}
-		assertTrue(reader.read() instanceof  ObjectEvent); // ili:delete tid=22.
 		try{
 			reader.read();
 			fail();
@@ -314,8 +343,6 @@ public class Xtf24ReaderAssociationTest {
 			assertTrue((ioxEx).getMessage().contains("expected at least 2 roles in ASSOCIATION Association.Baum.Beziehung"));
 	        assertTrue(ioxEx instanceof IoxException);
 		}
-		assertTrue(reader.read() instanceof  EndBasketEvent);
-		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
