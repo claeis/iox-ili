@@ -288,7 +288,7 @@ public class ItfSurfaceLinetable2PolygonTest {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("Overlay coord1 (100.0, 400.0, NaN), coord2 (100.0, 100.0, NaN), tid1 2, tid2 1", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (100.0, 100.0, NaN), coord2 (100.0, 400.0, NaN), tids 1, 2", errs.get(0).getLocalizedMessage());
 			assertEquals(1, errs.size());
 		}
 	}
@@ -377,7 +377,7 @@ public class ItfSurfaceLinetable2PolygonTest {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("Overlay coord1 (100.0, 300.0, NaN), coord2 (100.0, 100.0, NaN), tid1 2, tid2 1", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (100.0, 100.0, NaN), coord2 (100.0, 300.0, NaN), tids 1, 2", errs.get(0).getLocalizedMessage());
 			assertEquals(1, errs.size());
 		}
 	}
@@ -420,7 +420,7 @@ public class ItfSurfaceLinetable2PolygonTest {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("Overlay coord1 (100.0, 300.0, NaN), coord2 (100.0, 100.0, NaN), tid1 2, tid2 1", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (100.0, 100.0, NaN), coord2 (100.0, 300.0, NaN), tids 1, 2", errs.get(0).getLocalizedMessage());
 			assertEquals(1, errs.size());
 		}
 	}
@@ -464,7 +464,7 @@ public class ItfSurfaceLinetable2PolygonTest {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("Overlay coord1 (100.0, 400.0, NaN), coord2 (100.0, 100.0, NaN), tid1 2, tid2 1", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (100.0, 100.0, NaN), coord2 (100.0, 400.0, NaN), tids 1, 2", errs.get(0).getLocalizedMessage());
 			assertEquals(1, errs.size());
 		}
 	}
@@ -511,7 +511,7 @@ public class ItfSurfaceLinetable2PolygonTest {
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
 			assertEquals("intersection tids 1, 2", errs.get(0).getLocalizedMessage());
-			assertEquals("Overlay coord1 (260.0, 400.0, NaN), coord2 (260.0, 360.0, NaN), tid1 2, tid2 2", errs.get(1).getLocalizedMessage());
+			assertEquals("Overlay coord1 (260.0, 360.0, NaN), coord2 (260.0, 400.0, NaN), tids 2, 2", errs.get(1).getLocalizedMessage());
 			assertEquals(2, errs.size());
 		}
 	}
@@ -686,7 +686,7 @@ public class ItfSurfaceLinetable2PolygonTest {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("Overlay coord1 (200.0, 240.0, NaN), coord2 (240.0, 240.0, NaN), tid1 3, tid2 2", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (200.0, 240.0, NaN), coord2 (240.0, 240.0, NaN), tids 2, 3", errs.get(0).getLocalizedMessage());
 			assertEquals(1, errs.size());
 		}
 	}
