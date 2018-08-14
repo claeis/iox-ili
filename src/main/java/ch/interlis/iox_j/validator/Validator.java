@@ -168,6 +168,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		
 		this.config=config;
+		this.config.setTransientObject(InterlisFunction.IOX_DATA_POOL,pipelinePool);
 		this.pipelinePool=pipelinePool;
 		objPoolManager=new ObjectPoolManager();
 		Map<String,Class> cf=(Map<String, Class>) config.getTransientObject(CONFIG_CUSTOM_FUNCTIONS);

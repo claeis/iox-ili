@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- add PipelinePool to Settings so that custom functions can use it
 
 iox-ili 1.20.8 (2018-08-13)
 -----------------------------
