@@ -113,7 +113,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 					  String iliQName=stripQuotes(entry.getKey());
 					  Toml config=(Toml)entryO;
 						for (java.util.Map.Entry<String, Object> configEntry : config.entrySet()) {
-							String paramName=configEntry.getKey();
+							String paramName=stripQuotes(configEntry.getKey());
 							if(configEntry.getValue() instanceof String){
 								String paramValue=(String) configEntry.getValue();
 								setConfigValue(iliQName,paramName,paramValue);
