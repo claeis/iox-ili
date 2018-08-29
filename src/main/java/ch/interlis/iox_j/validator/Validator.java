@@ -199,6 +199,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(!allObjectsAccessible){
 			errs.addEvent(errFact.logInfoMsg("assume unknown/external objects"));
 		}
+        disableRounding=ValidationConfig.TRUE.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_ROUNDING));
+        if(disableRounding){
+            errs.addEvent(errFact.logInfoMsg("disable rounding"));
+        }
 		boolean allowOnlyRelaxedMultiplicity=ValidationConfig.ON.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ALLOW_ONLY_MULTIPLICITY_REDUCTION));
 		if(allowOnlyRelaxedMultiplicity){
 			errs.addEvent(errFact.logInfoMsg("only multiplicity validation relaxable"));
@@ -2340,6 +2344,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	// List of all object Oid's and associated classPath's of uniqueness validate of Oid's.
 	Map<String , String> uniqueObjectIDs = new HashMap<String, String>();
 	HashSet<Object> loggedObjects=new HashSet<Object>();
+    private boolean disableRounding=false;
 	
 	private void validateObject(IomObject iomObj,String attrPath) throws IoxException {
 		// validate if object is null
@@ -3332,7 +3337,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			BigDecimal max_general = new BigDecimal(maximum.toString());
 			BigDecimal valueBigDec = new BigDecimal(value.toString());
 			int precision= minimum.getAccuracy();
-			rounded=roundNumeric(precision,valueStr);
+			if(disableRounding) {
+                rounded=valueBigDec;
+			}else {
+	            rounded=roundNumeric(precision,valueBigDec);
+			}
 			if (rounded!=null && (rounded.compareTo(min_general)==-1 || rounded.compareTo(max_general)==+1)){
 				logMsg(validateType,"value {0} is out of range", rounded.toString());
 			}
@@ -3354,13 +3363,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
 	public static BigDecimal roundNumeric(int precision, String valueStr) {
-		if(valueStr==null) {
-			return null;
-		}
-		double valueDouble=Double.valueOf(valueStr);
-		boolean isNegative=valueDouble<0;
-		
-		BigDecimal value=new BigDecimal(valueStr);
+        if(valueStr==null) {
+            return null;
+        }
+        return roundNumeric(precision, new BigDecimal(valueStr));
+	}
+	public static BigDecimal roundNumeric(int precision, BigDecimal value) {
+        if(value==null) {
+            return null;
+        }
+        boolean isNegative=value.signum()==-1;
 		BigDecimal rounded=null;
 		if(value!=null) {
 			if(isNegative){
