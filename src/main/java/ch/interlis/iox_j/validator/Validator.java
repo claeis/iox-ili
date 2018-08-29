@@ -2440,73 +2440,86 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					String refoid = null;
 					String roleName = role.getName();
 					// a role of an embedded association?
-					int propc=iomObj.getattrvaluecount(roleName);
-					for(int propi=0;propi<propc;propi++){
-						if (obj.embedded) {
-							AssociationDef roleOwner = (AssociationDef) role.getContainer();
-							
-							Viewable classOfCurrentObj = roleOwner;
-							if(classOfCurrentObj!=null) {
-								Iterator constraintIterator=classOfCurrentObj.iterator();
-								while (constraintIterator.hasNext()) {
-									Object constraintObj = constraintIterator.next();
-									// role is unique?
-									if(constraintObj instanceof UniquenessConstraint){
-										UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) constraintObj;
-										validateUniquenessConstraint(iomObj, uniquenessConstraint, role);
-									}
-								}
-							}
-							
-							if (roleOwner.getDerivedFrom() == null) {
-								// not just a link?
-								IomObject structvalue = iomObj.getattrobj(roleName, propi);
-								propNames.add(roleName);
-								if (roleOwner.getAttributes().hasNext()
-										|| roleOwner
-												.getLightweightAssociations()
-												.iterator().hasNext()) {
-								// TODO handle attributes of link
-								}
-								if (structvalue != null) {
-									refoid = structvalue.getobjectrefoid();
-									long orderPos = structvalue
-											.getobjectreforderpos();
-									if (orderPos != 0) {
-										// refoid,orderPos
-										// ret.setStringAttribute(roleName,
-										// refoid);
-										// ret.setStringAttribute(roleName+".orderPos",
-										// Long.toString(orderPos));
-									} else {
-										// refoid
-										// ret.setStringAttribute(roleName,
-										// refoid);
-									}
-								} else {
-									refoid = null;
-								}
-							}
-						} else {
-							IomObject structvalue = iomObj.getattrobj(roleName, propi);
-							propNames.add(roleName);
-							refoid = structvalue.getobjectrefoid();
-							long orderPos = structvalue
-									.getobjectreforderpos();
-							if (orderPos != 0) {
-								// refoid,orderPos
-								// ret.setStringAttribute(roleName, refoid);
-								// ret.setStringAttribute(roleName+".orderPos",
-								// Long.toString(orderPos));
-							} else {
-								// refoid
-								// ret.setStringAttribute(roleName, refoid);
-							}
-						}
-						if (refoid != null) {
-							linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
-						}
-					}
+                    if (obj.embedded) {
+                        int propc=iomObj.getattrvaluecount(roleName);
+                        if(propc>=1) {
+                            AssociationDef roleOwner = (AssociationDef) role.getContainer();
+                            
+                            Viewable classOfCurrentObj = roleOwner;
+                            if(classOfCurrentObj!=null) {
+                                Iterator constraintIterator=classOfCurrentObj.iterator();
+                                while (constraintIterator.hasNext()) {
+                                    Object constraintObj = constraintIterator.next();
+                                    // role is unique?
+                                    if(constraintObj instanceof UniquenessConstraint){
+                                        UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) constraintObj;
+                                        validateUniquenessConstraint(iomObj, uniquenessConstraint, role);
+                                    }
+                                }
+                            }
+                            
+                            if (roleOwner.getDerivedFrom() == null) {
+                                // not just a link?
+                                IomObject structvalue = iomObj.getattrobj(roleName, 0);
+                                propNames.add(roleName);
+                                if (roleOwner.getAttributes().hasNext()
+                                        || roleOwner
+                                                .getLightweightAssociations()
+                                                .iterator().hasNext()) {
+                                // TODO handle attributes of link
+                                }
+                                if (structvalue != null) {
+                                    refoid = structvalue.getobjectrefoid();
+                                    long orderPos = structvalue
+                                            .getobjectreforderpos();
+                                    if (orderPos != 0) {
+                                        // refoid,orderPos
+                                        // ret.setStringAttribute(roleName,
+                                        // refoid);
+                                        // ret.setStringAttribute(roleName+".orderPos",
+                                        // Long.toString(orderPos));
+                                    } else {
+                                        // refoid
+                                        // ret.setStringAttribute(roleName,
+                                        // refoid);
+                                    }
+                                } else {
+                                    refoid = null;
+                                }
+                            }
+                            if(propc>1) {
+                                errs.addEvent(errFact.logErrorMsg("Role {0} requires only one reference property",role.getScopedName()));
+                            }
+                            if(refoid==null) {
+                                errs.addEvent(errFact.logErrorMsg("Role {0} requires a reference to another object",role.getScopedName()));
+                            }
+                        }
+                    } else {
+                        int propc=iomObj.getattrvaluecount(roleName);
+                        if(propc==1) {
+                            IomObject structvalue = iomObj.getattrobj(roleName, 0);
+                            propNames.add(roleName);
+                            refoid = structvalue.getobjectrefoid();
+                            long orderPos = structvalue
+                                    .getobjectreforderpos();
+                            if (orderPos != 0) {
+                                // refoid,orderPos
+                                // ret.setStringAttribute(roleName, refoid);
+                                // ret.setStringAttribute(roleName+".orderPos",
+                                // Long.toString(orderPos));
+                            } else {
+                                // refoid
+                                // ret.setStringAttribute(roleName, refoid);
+                            }
+                        }
+                        if(refoid==null) {
+                            addToPool = false;
+                            errs.addEvent(errFact.logErrorMsg("Role {0} requires a reference to another object",role.getScopedName()));
+                        }
+                    }
+                    if (refoid != null) {
+                        linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
+                    }
 				}
 			 }
 		}

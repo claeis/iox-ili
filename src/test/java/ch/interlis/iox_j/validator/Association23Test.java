@@ -234,16 +234,12 @@ public class Association23Test {
 		assertEquals(0,logger.getErrs().size());
 	}
 	
-	// Wenn in einer Stand Alone Association von der KlasseB eine Beziehung zur KlasseA ueber den Rollennamen: a1,
-	// Von der Klasse A eine Beziehung zur KlasseB ueber den Rollennamen: b1,
-	// je, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden.
+	// Wenn in einer optionalen N:N Association keine Verbindung besteht, 
+	// soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void standAloneAsso_0toN_Ok(){
+	public void standAloneAsso_NtoN_noLink_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
 		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OID2);
-		Iom_jObject iomObjAB=new Iom_jObject(ILI_ASSOC_AB2, null);
-		iomObjAB.addattrobj(ILI_ASSOC_AB2_A2, "REF").setobjectrefoid(OID1);
-		iomObjAB.addattrobj(ILI_ASSOC_AB2_B2, "REF").setobjectrefoid(OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -253,18 +249,16 @@ public class Association23Test {
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjB));
-		validator.validate(new ObjectEvent(iomObjAB));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE ueber den Rollennamen: e1,
-	// Von der KlasseE eine Beziehung zur KlasseF ueber den Rollennamen: f1,
-	// je, 1 Mal besteht soll keine Fehlermeldung ausgegeben werden.
+    // Wenn in einer zwingenden N:N Association eine Verbindung besteht, 
+    // soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void standAloneAsso_1toN_Ok(){
+	public void standAloneAsso_NtoN_Ok(){
 		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OID1);
 		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OID2);
 		Iom_jObject iomLinkEF=new Iom_jObject(ILI_ASSOC_EF1, null);
@@ -648,6 +642,27 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("b1 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(0).getEventMsg());
 	}
+    @Test
+    public void embeddedAsso_MultipleRef_Fail(){
+        Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
+        Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OID2);
+        iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(iomObjA.getobjectoid());
+        iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF").setobjectrefoid(iomObjA.getobjectoid());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+        validator.validate(new ObjectEvent(iomObjA));
+        validator.validate(new ObjectEvent(iomObjB));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()>0);
+        assertEquals("Role Association23.Topic.ab1.a1 requires only one reference property", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// Wenn von der KlasseB, welche ueber KlasseBP eine Beziehung zur KlasseA ueber die KlasseAP ueber den Rollennamen: a1,
 	// 1 Mal besteht soll keine Fehlermeldung ausgegeben werden.
@@ -676,15 +691,15 @@ public class Association23Test {
 	}
 	
 	// Wenn von der KlasseB eine Beziehung zur KlasseA ueber den Rollennamen: ad1,
-	// Von der KlasseB eine Beziehung zur KlasseD ueber den Rollennamen: ad1,
-	// je, 0-1 Mal besteht und eine davon richtig ist, soll keine Fehlermeldung ausgegeben werden.
+	// Und von der KlasseD eine Beziehung zur KlasseA ueber den Rollennamen: ad1,
+	// je 1 Mal besteht, soll eine Fehlermeldung ausgegeben werden.
 	@Test
 	public void embeddedAsso_BooleanOperatorOR_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
 		Iom_jObject iomObjD=new Iom_jObject(ILI_CLASSD, OBJ_OID4);
-		Iom_jObject iomObjB2=new Iom_jObject(ILI_CLASSB, OID2);
-		iomObjB2.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(OID1);
-		iomObjB2.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(OBJ_OID4);
+		Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OID2);
+		iomObjB.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(iomObjA.getobjectoid());
+		iomObjD.addattrobj(ILI_ASSOC_ABD1_AD1, "REF").setobjectrefoid(iomObjA.getobjectoid());
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -694,12 +709,12 @@ public class Association23Test {
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjA));
 		validator.validate(new ObjectEvent(iomObjD));
-		validator.validate(new ObjectEvent(iomObjB2));
+		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("ad1 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(0).getEventMsg());
+		assertEquals("bd1 should associate 0 to 1 target objects (instead of 2)", logger.getErrs().get(0).getEventMsg());
 	}
 		
 	// Wenn von der KlasseB eine Beziehung zur KlasseA ueber den Rollennamen: a1, 0 bis 1 Mal besteht soll keine Fehlermeldung ausgegeben werden. 
@@ -728,8 +743,6 @@ public class Association23Test {
 	@Test
 	public void standAloneAsso_CardinalityWrong_Fail(){
 		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OID2);
-		Iom_jObject iomObjAp=new Iom_jObject(ILI_ASSOC_EF1, null);
-		iomObjAp.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -744,6 +757,51 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("e1 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
 	}
+    // Wenn in einer zwingenden N:N Association keine Verbindung besteht, 
+    // soll eine Fehlermeldung ausgegeben werden.
+    @Test
+    public void standAloneAsso_NtoN_noLink_Fail(){
+        Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OID1);
+        Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OID2);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+        validator.validate(new ObjectEvent(iomObjE));
+        validator.validate(new ObjectEvent(iomObjF));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals("f1 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
+        assertEquals("e1 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(1).getEventMsg());
+    }
+    // Wenn in einer N:N Association der Link ohne Referenzen ist, 
+    // soll eine Fehlermeldung ausgegeben werden.
+    @Test
+    public void standAloneAsso_NtoN_noRefInLink_Fail(){
+        Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
+        Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OID2);
+        Iom_jObject iomObj_ab=new Iom_jObject(ILI_ASSOC_AB2, null);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+        validator.validate(new ObjectEvent(iomObjA));
+        validator.validate(new ObjectEvent(iomObjB));
+        validator.validate(new ObjectEvent(iomObj_ab));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()>0);
+        assertEquals("Role Association23.Topic.ab2.a2 requires a reference to another object", logger.getErrs().get(0).getEventMsg());
+        assertEquals("Role Association23.Topic.ab2.b2 requires a reference to another object", logger.getErrs().get(1).getEventMsg());
+    }
 	
 	// Die OID a1 der Klasse A, welche von der Klasse B mit der Rolle b1 Verbunden wird, existiert nicht.
 	@Test

@@ -6,6 +6,7 @@ ideas/open issues
 LATEST
 -----------------------------
 - add PipelinePool to Settings so that custom functions can use it
+- Validator: fixed validation of number of reference properties  
 
 iox-ili 1.20.8 (2018-08-13)
 -----------------------------
