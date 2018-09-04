@@ -2936,7 +2936,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							logMsg(validateType,"invalid format of INTERLIS.NAME value <{0}>", valueStr);
 						}
 					}
-				}else if (type instanceof PolylineType){
+				}else if (isDomainUri(attr)) { 
+                    // Value is not null
+                    String valueStr = iomObj.getattrvalue(attrName);
+                    if (valueStr!=null) {
+                        validateTextType(iomObj, attrPath, attrName, validateType, type, valueStr);
+                        
+                        // see http://blog.dieweltistgarnichtso.net/constructing-a-regular-expression-that-matches-uris
+                        Pattern pattern = Pattern.compile("((?<=\\()[A-Za-z][A-Za-z0-9\\+\\.\\-]*:([A-Za-z0-9\\.\\-_~:/\\?#\\[\\]@!\\$&'\\(\\)\\*\\+,;=]|%[A-Fa-f0-9]{2})+(?=\\)))|([A-Za-z][A-Za-z0-9\\+\\.\\-]*:([A-Za-z0-9\\.\\-_~:/\\?#\\[\\]@!\\$&'\\(\\)\\*\\+,;=]|%[A-Fa-f0-9]{2})+)");
+                        Matcher matcher=pattern.matcher(valueStr);
+                        if(matcher!=null && matcher.matches()){
+                         // value matched pattern
+                        }else {
+                            logMsg(validateType,"invalid format of INTERLIS.URI value <{0}>", valueStr);
+                        }
+                    }
+				} else if (type instanceof PolylineType){
 					PolylineType polylineType=(PolylineType)type;
 					IomObject polylineValue=iomObj.getattrobj(attrName, 0);
 					if (polylineValue != null){
@@ -3399,6 +3414,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		return false;
 	}
+	
+    private static boolean isDomainUri(AttributeDef attr){
+        TransferDescription td=(TransferDescription) attr.getContainer(TransferDescription.class);
+        Type type=attr.getDomain();
+        while(type instanceof TypeAlias) {
+            if (((TypeAlias) type).getAliasing() == td.INTERLIS.URI) {
+                return true;
+            }
+            type=((TypeAlias) type).getAliasing().getType();
+        }
+        return false;
+    }
 	
 	private void logMsg(String validateKind,String msg,String... args){
 		 if(ValidationConfig.OFF.equals(validateKind)){
