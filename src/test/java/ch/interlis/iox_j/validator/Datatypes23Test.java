@@ -2286,4 +2286,63 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <ANYSTRUCTURE> is a keyword", logger.getErrs().get(0).getEventMsg());
 	}
+	
+    // Eine gueltige URI wird erstellt.
+    @Test
+    public void uriTypeIsValidOk(){
+        Iom_jObject iomObj=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        iomObj.setattrvalue("uritext", "mailto:ce@localhost");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(iomObj));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
+    
+    // Eine ungueltige URI wird getestet.
+    @Test
+    public void uriTypeValueFail(){
+        Iom_jObject iomObj=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        iomObj.setattrvalue("uritext", "ce@localhost");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(iomObj));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("invalid format of INTERLIS.URI value <ce@localhost>", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    // Die Gueltigkeit einer URI wird auf einen leeren Wert getestet.
+    @Test
+    public void uriTypeIsEmptyFail(){
+        Iom_jObject iomObj=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        iomObj.setattrvalue("uritext", "");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(iomObj));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("invalid format of INTERLIS.URI value <>", logger.getErrs().get(0).getEventMsg());
+    }
 }
