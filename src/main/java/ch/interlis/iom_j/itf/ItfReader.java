@@ -300,7 +300,7 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 									String maintableref=ModelUtilities.getHelperTableMainTableRef(surfaceOrAreaAttr);
 									String ref=null;
 									if(propv.length<2) {
-                                        throw new IoxException(itfLine.getLineNumber(),"missing reference to maintable "+aclass.getScopedName());
+                                        throw new IoxInvalidDataException(itfLine.getLineNumber(),"missing reference to maintable "+aclass.getScopedName());
 									}else {
 									    ref=propv[1];
 									}
