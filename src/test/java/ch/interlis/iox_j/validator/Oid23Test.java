@@ -37,6 +37,7 @@ public class Oid23Test {
 	private TransferDescription td=null;
 	// START EVENT BASKET
 	private final static String BID = "b1";
+	private final static String BID2 = " ()";
 		
 	@Before
 	public void setUp() throws Exception {
@@ -51,6 +52,78 @@ public class Oid23Test {
 	//#############################################################//
 	//######################## SUCCESS ############################//
 	//#############################################################//
+	
+	// In diesem Test werden verschiedenen Object ID's getestet.
+	// Es darf keine Fehlermeldung ausgegeben werden.
+    @Test
+    public void validateOid_Ok() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB, "1");
+        Iom_jObject objB2=new Iom_jObject(CLASSB, "b1");
+        Iom_jObject objB3=new Iom_jObject(CLASSB, "1b");
+        Iom_jObject objB4=new Iom_jObject(CLASSB, "_b1");
+        Iom_jObject objB5=new Iom_jObject(CLASSB, "_b1.");
+        Iom_jObject objB6=new Iom_jObject(CLASSB, "b1-");
+        Iom_jObject objB7=new Iom_jObject(CLASSB, "1b_");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new ObjectEvent(objB2));
+        validator.validate(new ObjectEvent(objB3));
+        validator.validate(new ObjectEvent(objB4));
+        validator.validate(new ObjectEvent(objB5));
+        validator.validate(new ObjectEvent(objB6));
+        validator.validate(new ObjectEvent(objB7));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
+
+    // Als Syntax gibt es ein Fehler beim Object ID.
+    // Da die OID " o1" ist Falsch als Syntax, muss eine Fehlermeldung ausgegeben werden.
+    @Test
+    public void validateOid_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB, " o1");
+        Iom_jObject objB2=new Iom_jObject(CLASSB, OID2);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new ObjectEvent(objB2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("value < o1> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    // Da die OID hat kein Wert, muss eine Fehlermeldung ausgegeben werden.
+    @Test
+    public void validateOidNull_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB, null);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Class Oid23.Topic.ClassB has to have an OID", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// Es wird getestet ob die Definition von 2 unterschiedlichen Oid's moeglich ist.
 	@Test
