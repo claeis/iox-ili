@@ -45,6 +45,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	public static final String ADDITIONAL_MODELS="additionalModels";
 	public static final String ALLOW_ONLY_MULTIPLICITY_REDUCTION="allowOnlyMultiplicityReduction";
 	public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
+    public static final String DISABLE_ROUNDING="disableRounding";
 	// PipelinePool
 	public static final String TOPOLOGY_VALIDATION_OK="topologyValidationOk";
 	public void mergeIliMetaAttrs(TransferDescription td){
@@ -113,7 +114,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 					  String iliQName=stripQuotes(entry.getKey());
 					  Toml config=(Toml)entryO;
 						for (java.util.Map.Entry<String, Object> configEntry : config.entrySet()) {
-							String paramName=configEntry.getKey();
+							String paramName=stripQuotes(configEntry.getKey());
 							if(configEntry.getValue() instanceof String){
 								String paramValue=(String) configEntry.getValue();
 								setConfigValue(iliQName,paramName,paramValue);

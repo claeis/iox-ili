@@ -54,14 +54,15 @@ public class ItfScanner {
 	{
 		String str;
 		cursor.setKind(ItfLineKind.EOF);
-		cursor.setLineNumber(is.getLineNumber());
 		try{
 			if(lookAheadDone){
 				str=lookAheadStr;
+                cursor.setLineNumber(lookAheadLineNr);
 				lookAheadDone=false;
 			}else{
 				do{
 					str=is.readLine();
+			        cursor.setLineNumber(is.getLineNumber());
 				}while(str!=null && str.length()==0); // skip empty lines
 			}
 		}catch(java.io.IOException ex){
@@ -130,6 +131,7 @@ public class ItfScanner {
 	private boolean lookAheadDone=false;
 	private int lookAheadKind=0;
 	private String lookAheadStr=null;
+	private int lookAheadLineNr=0;
 	public int nextKind()
 	throws IoxException
 	{
@@ -139,6 +141,7 @@ public class ItfScanner {
 		try{
 			do{
 				lookAheadStr=is.readLine();
+				lookAheadLineNr=is.getLineNumber();
 			}while(lookAheadStr!=null && lookAheadStr.length()==0); // skip empty lines
 			lookAheadDone=true;
 		}catch(java.io.IOException ex){

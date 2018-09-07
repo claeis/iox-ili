@@ -96,6 +96,7 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
+	public static final String REGEX_FOR_ID_VALIDATION = "^[0-9a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
 	public static final String CONFIG_DO_ITF_LINETABLES="ch.interlis.iox_j.validator.doItfLinetables";
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
@@ -120,6 +121,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String areaOverlapValidation=null;
 	private String constraintValidation=null;
 	private String defaultGeometryTypeValidation=null;
+	Pattern patternForIdValidation = null;
 	private boolean enforceTypeValidation=false;
 	private boolean enforceConstraintValidation=false;
 	private boolean enforceTargetValidation=false;
@@ -168,6 +170,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		
 		this.config=config;
+		this.patternForIdValidation = Pattern.compile(REGEX_FOR_ID_VALIDATION);
+		this.config.setTransientObject(InterlisFunction.IOX_DATA_POOL,pipelinePool);
 		this.pipelinePool=pipelinePool;
 		objPoolManager=new ObjectPoolManager();
 		Map<String,Class> cf=(Map<String, Class>) config.getTransientObject(CONFIG_CUSTOM_FUNCTIONS);
@@ -198,6 +202,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(!allObjectsAccessible){
 			errs.addEvent(errFact.logInfoMsg("assume unknown/external objects"));
 		}
+        disableRounding=ValidationConfig.TRUE.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_ROUNDING));
+        if(disableRounding){
+            errs.addEvent(errFact.logInfoMsg("disable rounding"));
+        }
 		boolean allowOnlyRelaxedMultiplicity=ValidationConfig.ON.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ALLOW_ONLY_MULTIPLICITY_REDUCTION));
 		if(allowOnlyRelaxedMultiplicity){
 			errs.addEvent(errFact.logInfoMsg("only multiplicity validation relaxable"));
@@ -266,11 +274,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		} else if (event instanceof ch.interlis.iox.StartBasketEvent){
 			StartBasketEvent startBasketEvent = ((ch.interlis.iox.StartBasketEvent) event);
 			currentBasketId = ((ch.interlis.iox.StartBasketEvent) event).getBid();
-			validateUniqueBasketId(startBasketEvent);
+			if (isValidId(currentBasketId)) {
+			    validateUniqueBasketId(startBasketEvent);
+			} else {
+                errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid BID", currentBasketId==null?"":currentBasketId));
+			}
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=new ch.interlis.iom_j.Iom_jObject(((ch.interlis.iox.ObjectEvent)event).getIomObject());
 			try {
-				validateObject(iomObj,null);
+                validateObject(iomObj,null);
 			} catch (IoxException e) {
 				errs.addEvent(errFact.logInfoMsg("failed to validate object {0}", iomObj.toString()));
 			}catch(RuntimeException e) {
@@ -284,7 +296,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 	}
-	public void doSecondPass() {
+	private boolean isValidId(String valueStr) {
+	    if(valueStr==null) {
+	        return false;
+	    }
+	    
+	    Matcher matcher = patternForIdValidation.matcher(valueStr);
+	    if (matcher.matches()) {
+	        return true;
+	    } else {
+	        return false;
+	    }
+    }
+
+    public void doSecondPass() {
 		errs.addEvent(errFact.logInfoMsg("second validation pass..."));
 		iterateThroughAllObjects();
 		validateAllAreas();
@@ -2339,6 +2364,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	// List of all object Oid's and associated classPath's of uniqueness validate of Oid's.
 	Map<String , String> uniqueObjectIDs = new HashMap<String, String>();
 	HashSet<Object> loggedObjects=new HashSet<Object>();
+    private boolean disableRounding=false;
 	
 	private void validateObject(IomObject iomObj,String attrPath) throws IoxException {
 		// validate if object is null
@@ -2380,19 +2406,25 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				AssociationDef modelAssociationDef = (AssociationDef) aclass1;
 				Domain oidType=((AbstractClassDef) modelAssociationDef).getOid();
 				if (modelAssociationDef.isIdentifiable() || oidType!=null){
-					if (iomObj.getobjectoid() == null){
+                    String oid = iomObj.getobjectoid();
+					if (oid == null){
 						errs.addEvent(errFact.logErrorMsg("Association {0} has to have an OID", iomObj.getobjecttag()));
 						addToPool = false;
-					}
-				} 
+					}else if (!isValidId(oid)) {
+	                    errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID", oid));                 
+	                }
+				}
 			} else if (aclass1 instanceof Table){
 				Table classValueTable = (Table) aclass1;
 				// class
 				if (classValueTable.isIdentifiable()){
-					if (iomObj.getobjectoid() == null){
+                    String oid = iomObj.getobjectoid();
+					if (oid == null){
 						errs.addEvent(errFact.logErrorMsg("Class {0} has to have an OID", iomObj.getobjecttag()));
 						addToPool = false;
-					}
+					}else if (!isValidId(oid)) {
+                        errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID", oid));                 
+                    }
 				// structure	
 				} else {
 					addToPool = false;
@@ -2439,73 +2471,86 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					String refoid = null;
 					String roleName = role.getName();
 					// a role of an embedded association?
-					int propc=iomObj.getattrvaluecount(roleName);
-					for(int propi=0;propi<propc;propi++){
-						if (obj.embedded) {
-							AssociationDef roleOwner = (AssociationDef) role.getContainer();
-							
-							Viewable classOfCurrentObj = roleOwner;
-							if(classOfCurrentObj!=null) {
-								Iterator constraintIterator=classOfCurrentObj.iterator();
-								while (constraintIterator.hasNext()) {
-									Object constraintObj = constraintIterator.next();
-									// role is unique?
-									if(constraintObj instanceof UniquenessConstraint){
-										UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) constraintObj;
-										validateUniquenessConstraint(iomObj, uniquenessConstraint, role);
-									}
-								}
-							}
-							
-							if (roleOwner.getDerivedFrom() == null) {
-								// not just a link?
-								IomObject structvalue = iomObj.getattrobj(roleName, propi);
-								propNames.add(roleName);
-								if (roleOwner.getAttributes().hasNext()
-										|| roleOwner
-												.getLightweightAssociations()
-												.iterator().hasNext()) {
-								// TODO handle attributes of link
-								}
-								if (structvalue != null) {
-									refoid = structvalue.getobjectrefoid();
-									long orderPos = structvalue
-											.getobjectreforderpos();
-									if (orderPos != 0) {
-										// refoid,orderPos
-										// ret.setStringAttribute(roleName,
-										// refoid);
-										// ret.setStringAttribute(roleName+".orderPos",
-										// Long.toString(orderPos));
-									} else {
-										// refoid
-										// ret.setStringAttribute(roleName,
-										// refoid);
-									}
-								} else {
-									refoid = null;
-								}
-							}
-						} else {
-							IomObject structvalue = iomObj.getattrobj(roleName, propi);
-							propNames.add(roleName);
-							refoid = structvalue.getobjectrefoid();
-							long orderPos = structvalue
-									.getobjectreforderpos();
-							if (orderPos != 0) {
-								// refoid,orderPos
-								// ret.setStringAttribute(roleName, refoid);
-								// ret.setStringAttribute(roleName+".orderPos",
-								// Long.toString(orderPos));
-							} else {
-								// refoid
-								// ret.setStringAttribute(roleName, refoid);
-							}
-						}
-						if (refoid != null) {
-							linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
-						}
-					}
+                    if (obj.embedded) {
+                        int propc=iomObj.getattrvaluecount(roleName);
+                        if(propc>=1) {
+                            AssociationDef roleOwner = (AssociationDef) role.getContainer();
+                            
+                            Viewable classOfCurrentObj = roleOwner;
+                            if(classOfCurrentObj!=null) {
+                                Iterator constraintIterator=classOfCurrentObj.iterator();
+                                while (constraintIterator.hasNext()) {
+                                    Object constraintObj = constraintIterator.next();
+                                    // role is unique?
+                                    if(constraintObj instanceof UniquenessConstraint){
+                                        UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) constraintObj;
+                                        validateUniquenessConstraint(iomObj, uniquenessConstraint, role);
+                                    }
+                                }
+                            }
+                            
+                            if (roleOwner.getDerivedFrom() == null) {
+                                // not just a link?
+                                IomObject structvalue = iomObj.getattrobj(roleName, 0);
+                                propNames.add(roleName);
+                                if (roleOwner.getAttributes().hasNext()
+                                        || roleOwner
+                                                .getLightweightAssociations()
+                                                .iterator().hasNext()) {
+                                // TODO handle attributes of link
+                                }
+                                if (structvalue != null) {
+                                    refoid = structvalue.getobjectrefoid();
+                                    long orderPos = structvalue
+                                            .getobjectreforderpos();
+                                    if (orderPos != 0) {
+                                        // refoid,orderPos
+                                        // ret.setStringAttribute(roleName,
+                                        // refoid);
+                                        // ret.setStringAttribute(roleName+".orderPos",
+                                        // Long.toString(orderPos));
+                                    } else {
+                                        // refoid
+                                        // ret.setStringAttribute(roleName,
+                                        // refoid);
+                                    }
+                                } else {
+                                    refoid = null;
+                                }
+                            }
+                            if(propc>1) {
+                                errs.addEvent(errFact.logErrorMsg("Role {0} requires only one reference property",role.getScopedName()));
+                            }
+                            if(refoid==null) {
+                                errs.addEvent(errFact.logErrorMsg("Role {0} requires a reference to another object",role.getScopedName()));
+                            }
+                        }
+                    } else {
+                        int propc=iomObj.getattrvaluecount(roleName);
+                        if(propc==1) {
+                            IomObject structvalue = iomObj.getattrobj(roleName, 0);
+                            propNames.add(roleName);
+                            refoid = structvalue.getobjectrefoid();
+                            long orderPos = structvalue
+                                    .getobjectreforderpos();
+                            if (orderPos != 0) {
+                                // refoid,orderPos
+                                // ret.setStringAttribute(roleName, refoid);
+                                // ret.setStringAttribute(roleName+".orderPos",
+                                // Long.toString(orderPos));
+                            } else {
+                                // refoid
+                                // ret.setStringAttribute(roleName, refoid);
+                            }
+                        }
+                        if(refoid==null) {
+                            addToPool = false;
+                            errs.addEvent(errFact.logErrorMsg("Role {0} requires a reference to another object",role.getScopedName()));
+                        }
+                    }
+                    if (refoid != null) {
+                        linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
+                    }
 				}
 			 }
 		}
@@ -2917,7 +2962,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							logMsg(validateType,"invalid format of INTERLIS.NAME value <{0}>", valueStr);
 						}
 					}
-				}else if (type instanceof PolylineType){
+				}else if (isDomainUri(attr)) { 
+                    // Value is not null
+                    String valueStr = iomObj.getattrvalue(attrName);
+                    if (valueStr!=null) {
+                        validateTextType(iomObj, attrPath, attrName, validateType, type, valueStr);
+                        
+                        // see http://blog.dieweltistgarnichtso.net/constructing-a-regular-expression-that-matches-uris
+                        Pattern pattern = Pattern.compile("((?<=\\()[A-Za-z][A-Za-z0-9\\+\\.\\-]*:([A-Za-z0-9\\.\\-_~:/\\?#\\[\\]@!\\$&'\\(\\)\\*\\+,;=]|%[A-Fa-f0-9]{2})+(?=\\)))|([A-Za-z][A-Za-z0-9\\+\\.\\-]*:([A-Za-z0-9\\.\\-_~:/\\?#\\[\\]@!\\$&'\\(\\)\\*\\+,;=]|%[A-Fa-f0-9]{2})+)");
+                        Matcher matcher=pattern.matcher(valueStr);
+                        if(matcher!=null && matcher.matches()){
+                         // value matched pattern
+                        }else {
+                            logMsg(validateType,"invalid format of INTERLIS.URI value <{0}>", valueStr);
+                        }
+                    }
+				} else if (type instanceof PolylineType){
 					PolylineType polylineType=(PolylineType)type;
 					IomObject polylineValue=iomObj.getattrobj(attrName, 0);
 					if (polylineValue != null){
@@ -3318,7 +3378,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			BigDecimal max_general = new BigDecimal(maximum.toString());
 			BigDecimal valueBigDec = new BigDecimal(value.toString());
 			int precision= minimum.getAccuracy();
-			rounded=roundNumeric(precision,valueStr);
+			if(disableRounding) {
+                rounded=valueBigDec;
+			}else {
+	            rounded=roundNumeric(precision,valueBigDec);
+			}
 			if (rounded!=null && (rounded.compareTo(min_general)==-1 || rounded.compareTo(max_general)==+1)){
 				logMsg(validateType,"value {0} is out of range", rounded.toString());
 			}
@@ -3340,13 +3404,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
 	public static BigDecimal roundNumeric(int precision, String valueStr) {
-		if(valueStr==null) {
-			return null;
-		}
-		double valueDouble=Double.valueOf(valueStr);
-		boolean isNegative=valueDouble<0;
-		
-		BigDecimal value=new BigDecimal(valueStr);
+        if(valueStr==null) {
+            return null;
+        }
+        return roundNumeric(precision, new BigDecimal(valueStr));
+	}
+	public static BigDecimal roundNumeric(int precision, BigDecimal value) {
+        if(value==null) {
+            return null;
+        }
+        boolean isNegative=value.signum()==-1;
 		BigDecimal rounded=null;
 		if(value!=null) {
 			if(isNegative){
@@ -3373,6 +3440,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		return false;
 	}
+	
+    private static boolean isDomainUri(AttributeDef attr){
+        TransferDescription td=(TransferDescription) attr.getContainer(TransferDescription.class);
+        Type type=attr.getDomain();
+        while(type instanceof TypeAlias) {
+            if (((TypeAlias) type).getAliasing() == td.INTERLIS.URI) {
+                return true;
+            }
+            type=((TypeAlias) type).getAliasing().getType();
+        }
+        return false;
+    }
 	
 	private void logMsg(String validateKind,String msg,String... args){
 		 if(ValidationConfig.OFF.equals(validateKind)){
