@@ -147,7 +147,7 @@ public class Bid23Test {
 	//######################### FAIL ##############################//
 	//#############################################################//
 	
-    // Es muss in diesem Test ein Fehler sein. Die werden nicht gleiche BID und TID erstellen möchtet.
+    // Es muss ein Fehler geben, da die OID nicht verschieden zu der BID ist
     @Test
     public void validateBIDequalsOID_Fail() throws Exception {
         Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
