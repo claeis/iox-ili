@@ -5,9 +5,15 @@ ideas/open issues
 
 LATEST
 -----------------------------
+
+iox-ili 1.20.9 (2018-09-07)
+-----------------------------
 - add PipelinePool to Settings so that custom functions can use it
 - Validator: fixed validation of number of reference properties  
 - Validator: disableRounding=true/false
+- Validator: validate URI values
+- Validator: validate TID/BID values
+- fix quoted parameter names read from TOML file
 - ItfReader: fixed wrong line number of first object in a table
 - ItfReader: fixed strange error message if surface line table without reference
 
