@@ -58,7 +58,7 @@ public class Oid23Test {
     @Test
     public void validateOid_Ok() throws Exception {
         Iom_jObject objB1=new Iom_jObject(CLASSB, "1");
-        Iom_jObject objB2=new Iom_jObject(CLASSB, "b1");
+        Iom_jObject objB2=new Iom_jObject(CLASSB, "x1");
         Iom_jObject objB3=new Iom_jObject(CLASSB, "1b");
         Iom_jObject objB4=new Iom_jObject(CLASSB, "_b1");
         Iom_jObject objB5=new Iom_jObject(CLASSB, "_b1.");
@@ -82,47 +82,6 @@ public class Oid23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertTrue(logger.getErrs().size()==0);
-    }
-
-    // Als Syntax gibt es ein Fehler beim Object ID.
-    // Da die OID " o1" ist Falsch als Syntax, muss eine Fehlermeldung ausgegeben werden.
-    @Test
-    public void validateOid_Fail() throws Exception {
-        Iom_jObject objB1=new Iom_jObject(CLASSB, " o1");
-        Iom_jObject objB2=new Iom_jObject(CLASSB, OID2);
-        ValidationConfig modelConfig=new ValidationConfig();
-        LogCollector logger=new LogCollector();
-        LogEventFactory errFactory=new LogEventFactory();
-        Settings settings=new Settings();
-        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(TOPIC,BID));
-        validator.validate(new ObjectEvent(objB1));
-        validator.validate(new ObjectEvent(objB2));
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
-        // Asserts
-        assertTrue(logger.getErrs().size()==1);
-        assertEquals("value < o1> is not a valid OID", logger.getErrs().get(0).getEventMsg());
-    }
-    
-    // Da die OID hat kein Wert, muss eine Fehlermeldung ausgegeben werden.
-    @Test
-    public void validateOidNull_Fail() throws Exception {
-        Iom_jObject objB1=new Iom_jObject(CLASSB, null);
-        ValidationConfig modelConfig=new ValidationConfig();
-        LogCollector logger=new LogCollector();
-        LogEventFactory errFactory=new LogEventFactory();
-        Settings settings=new Settings();
-        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(TOPIC,BID));
-        validator.validate(new ObjectEvent(objB1));
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
-        // Asserts
-        assertTrue(logger.getErrs().size()==1);
-        assertEquals("Class Oid23.Topic.ClassB has to have an OID", logger.getErrs().get(0).getEventMsg());
     }
 	
 	// Es wird getestet ob die Definition von 2 unterschiedlichen Oid's moeglich ist.
@@ -148,8 +107,8 @@ public class Oid23Test {
 	// Es wird getestet ob die Definition eines Objectes welches die Oid ueber eine Referenz einer Association enthaelt, moeglich ist.
 	@Test
 	public void definitionOfEmbeddedAssociatianWithoutId_Ok(){
-		final String OBJ_B1="b1";
-		final String OBJ_C1="c1";
+		final String OBJ_B1="o_b1";
+		final String OBJ_C1="o_c1";
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
 		Iom_jObject objC1=new Iom_jObject(CLASSC, OBJ_C1);
 		objC1.addattrobj("b1", "REF").setobjectrefoid(OBJ_B1);
@@ -171,8 +130,8 @@ public class Oid23Test {
 	// Es wird getestet ob die Definition einer Association ohne Oid moeglich ist.
 	@Test
 	public void associatianWithoutId_Ok(){
-		final String OBJ_B1="b1";
-		final String OBJ_C1="c1";
+		final String OBJ_B1="o_b1";
+		final String OBJ_C1="o_c1";
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
 		Iom_jObject objC1=new Iom_jObject(CLASSC, OBJ_C1);
 		Iom_jObject objBC=new Iom_jObject(ASSOCIATIONB2, null);
@@ -197,8 +156,8 @@ public class Oid23Test {
 	// Es wird getestet ob die Definition einer Association mit einer Oid moeglich ist.
 	@Test
 	public void associatianWithId_Ok(){
-		final String OBJ_B1="b1";
-		final String OBJ_C1="c1";
+		final String OBJ_B1="o_b1";
+		final String OBJ_C1="o_c1";
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
 		Iom_jObject objC1=new Iom_jObject(CLASSC, OBJ_C1);
 		Iom_jObject objBC=new Iom_jObject(ASSOCIATIONB3, "bc1");
@@ -223,8 +182,8 @@ public class Oid23Test {
 	// Es wird getestet ob die Definition einer Association mit einer uuoid als Oid moeglich ist.
 	@Test
 	public void associatianWithOidUUOID_Ok(){
-		final String OBJ_B1="b1";
-		final String OBJ_C1="c1";
+		final String OBJ_B1="o_b1";
+		final String OBJ_C1="o_c1";
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
 		Iom_jObject objC1=new Iom_jObject(CLASSC, OBJ_C1);
 		Iom_jObject objBC=new Iom_jObject(ASSOCIATIONB4, "123e4567-e89b-12d3-a456-426655440000");
@@ -249,7 +208,7 @@ public class Oid23Test {
 	// Es wird getestet ob eine Klasse mit einer Oid, eine BAG einer Struktur erstellen kann.
 	@Test
 	public void struct_Ok(){
-		final String OBJ_B1="b1";
+		final String OBJ_B1="o_b1";
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
 		objB1.addattrobj("attrB2", STRUCTA);
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -270,10 +229,51 @@ public class Oid23Test {
 	//######################### FAIL ##############################//
 	//#############################################################//
 	
+    // Als Syntax gibt es ein Fehler beim Object ID.
+    // Da die OID " o1" ist Falsch als Syntax, muss eine Fehlermeldung ausgegeben werden.
+    @Test
+    public void validateOid_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB, " o1");
+        Iom_jObject objB2=new Iom_jObject(CLASSB, OID2);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new ObjectEvent(objB2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("value < o1> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+    }
+	
+    // Da die OID hat kein Wert, muss eine Fehlermeldung ausgegeben werden.
+    @Test
+    public void validateOidNull_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB, null);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Class Oid23.Topic.ClassB has to have an OID", logger.getErrs().get(0).getEventMsg());
+    }
+	
 	// Es wird getestet ob die Definition von zwei gleichen Klassen und oids moeglich ist.
 	@Test
 	public void duplicateOidsOfSameTable_Fail() throws Exception {
-		final String OBJ_B1="b1";
+		final String OBJ_B1="o_b1";
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
 		Iom_jObject objB2=new Iom_jObject(CLASSB, OBJ_B1);
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -289,13 +289,13 @@ public class Oid23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("OID b1 of object Oid23.Topic.ClassB already exists in CLASS Oid23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("OID o_b1 of object Oid23.Topic.ClassB already exists in CLASS Oid23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die Definition von einer gleichen Oid in verschiedenen Tables moeglich ist.
 	@Test
 	public void duplicateOidDifferentTable_Fail() throws Exception {
-		final String OBJ_B1="b1";
+		final String OBJ_B1="o_b1";
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
 		Iom_jObject objB2=new Iom_jObject(CLASSC, OBJ_B1);
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -311,13 +311,13 @@ public class Oid23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("OID b1 of object Oid23.Topic.ClassC already exists in CLASS Oid23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("OID o_b1 of object Oid23.Topic.ClassC already exists in CLASS Oid23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die Definition einer undefinierten oid welche zu einer Klasse refereziert wird, moeglich sein kann.
 	@Test
 	public void undefinedOid_Fail(){
-		final String OBJ_B1="b1";
+		final String OBJ_B1="o_b1";
 		final String OBJ_B2=null;
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
 		Iom_jObject objB2=new Iom_jObject(CLASSB, OBJ_B2);
@@ -340,8 +340,8 @@ public class Oid23Test {
 	// Es wird getestet ob eine Association ohne Oid erstellt werden kann, wenn diese Stand Alone ist.
 	@Test
 	public void associatianWithId_Fail(){
-		final String OBJ_B1="b1";
-		final String OBJ_C1="c1";
+		final String OBJ_B1="o_b1";
+		final String OBJ_C1="o_c1";
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
 		Iom_jObject objC1=new Iom_jObject(CLASSC, OBJ_C1);
 		Iom_jObject objBC=new Iom_jObject(ASSOCIATIONB3, null);
@@ -367,8 +367,8 @@ public class Oid23Test {
 	// Es wird getestet ob eine Association ohne Oid erstellt werden kann, wenn diese Stand Alone ist.
 	@Test
 	public void associatianWithOid_Fail(){
-		final String OBJ_B1="b1";
-		final String OBJ_C1="c1";
+		final String OBJ_B1="o_b1";
+		final String OBJ_C1="o_c1";
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
 		Iom_jObject objC1=new Iom_jObject(CLASSC, OBJ_C1);
 		Iom_jObject objBC=new Iom_jObject(ASSOCIATIONB4, null);

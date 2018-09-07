@@ -2372,10 +2372,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(isObject){
 			setCurrentMainObj(iomObj);
 		}
-
 		
+		// validate that OID is not a BID
+		String objectoid = iomObj.getobjectoid();
+		if (objectoid != null && !objectoid.equals("")) {
+	        if (uniquenessOfBid.containsKey(objectoid)) {
+	            errs.addEvent(errFact.logErrorMsg("OID <{0}> is equal to a BID", objectoid));
+	        }		    
+		}
+
 		String tag=iomObj.getobjecttag();
-		//EhiLogger.debug("tag "+tag);
 		Object modelele=tag2class.get(tag);
 		if(modelele==null){
 			if(!unknownTypev.contains(tag)){
