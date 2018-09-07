@@ -50,6 +50,84 @@ public class Bid23Test {
 	//######################## SUCCESS ############################//
 	//#############################################################//
 	
+	// In diesem Test werden verschiedenen Basket ID's getestet.
+	// Es darf keine Fehlermeldung ausgegeben werden.
+    @Test
+    public void validateBid_Ok() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
+        Iom_jObject objB2=new Iom_jObject(CLASSB, OID2);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,"1"));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new StartBasketEvent(TOPIC,"b1"));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new StartBasketEvent(TOPIC,"1b"));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new StartBasketEvent(TOPIC,"_b1"));
+        validator.validate(new ObjectEvent(objB2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new StartBasketEvent(TOPIC,"_b1."));
+        validator.validate(new ObjectEvent(objB2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new StartBasketEvent(TOPIC,"b1-"));
+        validator.validate(new ObjectEvent(objB2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new StartBasketEvent(TOPIC,"1b_"));
+        validator.validate(new ObjectEvent(objB2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
+
+    // Als Syntax gibt es ein Fehler beim Basket ID.
+    // Da die BID " 123" ist Falsch als Syntax, muss eine Fehlermeldung ausgegeben werden.
+    @Test
+    public void validateBid_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC," 123"));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);//
+        assertEquals("value < 123> is not a valid BID", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    // Da die BID hat kein Wert, muss eine Fehlermeldung ausgegeben werden.
+    @Test
+    public void validateBidNull_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,null));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("value <> is not a valid BID", logger.getErrs().get(0).getEventMsg());
+    }
+    
 	// In diesem Test werden 2 unterschiedliche Basket Id's erstellt.
 	// Es darf keine Fehlermeldung ausgegeben werden.
 	@Test

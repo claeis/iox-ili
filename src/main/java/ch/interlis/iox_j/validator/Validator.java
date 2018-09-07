@@ -96,6 +96,7 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
+	public static final String REGEX_FOR_ID_VALIDATION = "^[0-9a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
 	public static final String CONFIG_DO_ITF_LINETABLES="ch.interlis.iox_j.validator.doItfLinetables";
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
@@ -120,6 +121,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String areaOverlapValidation=null;
 	private String constraintValidation=null;
 	private String defaultGeometryTypeValidation=null;
+	Pattern patternForIdValidation = null;
 	private boolean enforceTypeValidation=false;
 	private boolean enforceConstraintValidation=false;
 	private boolean enforceTargetValidation=false;
@@ -168,6 +170,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		
 		this.config=config;
+		this.patternForIdValidation = Pattern.compile(REGEX_FOR_ID_VALIDATION);
 		this.config.setTransientObject(InterlisFunction.IOX_DATA_POOL,pipelinePool);
 		this.pipelinePool=pipelinePool;
 		objPoolManager=new ObjectPoolManager();
@@ -271,11 +274,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		} else if (event instanceof ch.interlis.iox.StartBasketEvent){
 			StartBasketEvent startBasketEvent = ((ch.interlis.iox.StartBasketEvent) event);
 			currentBasketId = ((ch.interlis.iox.StartBasketEvent) event).getBid();
-			validateUniqueBasketId(startBasketEvent);
+			if (isValidId(currentBasketId)) {
+			    validateUniqueBasketId(startBasketEvent);
+			} else {
+                errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid BID", currentBasketId==null?"":currentBasketId));
+			}
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=new ch.interlis.iom_j.Iom_jObject(((ch.interlis.iox.ObjectEvent)event).getIomObject());
 			try {
-				validateObject(iomObj,null);
+                validateObject(iomObj,null);
 			} catch (IoxException e) {
 				errs.addEvent(errFact.logInfoMsg("failed to validate object {0}", iomObj.toString()));
 			}catch(RuntimeException e) {
@@ -289,7 +296,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 	}
-	public void doSecondPass() {
+	private boolean isValidId(String valueStr) {
+	    if(valueStr==null) {
+	        return false;
+	    }
+	    
+	    Matcher matcher = patternForIdValidation.matcher(valueStr);
+	    if (matcher.matches()) {
+	        return true;
+	    } else {
+	        return false;
+	    }
+    }
+
+    public void doSecondPass() {
 		errs.addEvent(errFact.logInfoMsg("second validation pass..."));
 		iterateThroughAllObjects();
 		validateAllAreas();
@@ -2386,19 +2406,25 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				AssociationDef modelAssociationDef = (AssociationDef) aclass1;
 				Domain oidType=((AbstractClassDef) modelAssociationDef).getOid();
 				if (modelAssociationDef.isIdentifiable() || oidType!=null){
-					if (iomObj.getobjectoid() == null){
+                    String oid = iomObj.getobjectoid();
+					if (oid == null){
 						errs.addEvent(errFact.logErrorMsg("Association {0} has to have an OID", iomObj.getobjecttag()));
 						addToPool = false;
-					}
-				} 
+					}else if (!isValidId(oid)) {
+	                    errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID", oid));                 
+	                }
+				}
 			} else if (aclass1 instanceof Table){
 				Table classValueTable = (Table) aclass1;
 				// class
 				if (classValueTable.isIdentifiable()){
-					if (iomObj.getobjectoid() == null){
+                    String oid = iomObj.getobjectoid();
+					if (oid == null){
 						errs.addEvent(errFact.logErrorMsg("Class {0} has to have an OID", iomObj.getobjecttag()));
 						addToPool = false;
-					}
+					}else if (!isValidId(oid)) {
+                        errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID", oid));                 
+                    }
 				// structure	
 				} else {
 					addToPool = false;
