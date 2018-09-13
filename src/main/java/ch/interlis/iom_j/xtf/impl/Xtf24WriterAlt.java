@@ -262,7 +262,7 @@ import java.util.Iterator;
 							{
 								// COORD
 								xout.writeStartElement(xmlns_attr,iliAttrName);
-								writeCoord("point",child);
+								writeCoord("coord",child);
 								xout.writeEndElement(/*attr*/);
 								if (valueCount > 1)
 								{
