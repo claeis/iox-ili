@@ -35,8 +35,11 @@ import ch.interlis.iom_j.xtf.OidSpace;
 import ch.interlis.iom_j.xtf.XtfModel;
 import ch.interlis.iom_j.xtf.XtfStartTransferEvent;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 
 	/** Writer of an INTERLIS 2 transfer file.
 	 * @author ceis
@@ -159,10 +162,10 @@ import java.util.Iterator;
         public void writeStartBasket(String type, String bid)
 		throws IoxException
         {
-            writeStartBasket(type,bid,IomConstants.IOM_COMPLETE, IomConstants.IOM_FULL,null,null,null);
+            writeStartBasket(type,bid,IomConstants.IOM_COMPLETE, IomConstants.IOM_FULL,null,null,null,null);
         }
         @Override
-        public void writeStartBasket(String type,String bid,int consistency, int kind,String startstate,String endstate, String[] topicv)
+        public void writeStartBasket(String type,String bid,int consistency, int kind,String startstate,String endstate, String[] topicv,String domains)
 		throws IoxException
         {
 			try{
@@ -177,6 +180,7 @@ import java.util.Iterator;
 					xout.writeAttribute(iliNs,XSD24Generator.ENDSTATE_ATTR, endstate);
 				}
 				writeAttributeStringOptional(iliNs,XSD24Generator.CONSISTENCY_ATTR, encodeConsistency(consistency));
+                writeAttributeStringOptional(iliNs,"domains", domains);
 				newline();
 			}catch(XMLStreamException ex){
 				throw new IoxException(ex);
