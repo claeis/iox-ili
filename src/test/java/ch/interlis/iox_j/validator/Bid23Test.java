@@ -11,6 +11,7 @@ import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iox.IoxValidationDataPool;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
@@ -87,46 +88,6 @@ public class Bid23Test {
         // Asserts
         assertTrue(logger.getErrs().size()==0);
     }
-
-    // Als Syntax gibt es ein Fehler beim Basket ID.
-    // Da die BID " 123" ist Falsch als Syntax, muss eine Fehlermeldung ausgegeben werden.
-    @Test
-    public void validateBid_Fail() throws Exception {
-        Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
-        ValidationConfig modelConfig=new ValidationConfig();
-        LogCollector logger=new LogCollector();
-        LogEventFactory errFactory=new LogEventFactory();
-        Settings settings=new Settings();
-        
-        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(TOPIC," 123"));
-        validator.validate(new ObjectEvent(objB1));
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
-        // Asserts
-        assertTrue(logger.getErrs().size()==1);//
-        assertEquals("value < 123> is not a valid BID", logger.getErrs().get(0).getEventMsg());
-    }
-    
-    // Da die BID hat kein Wert, muss eine Fehlermeldung ausgegeben werden.
-    @Test
-    public void validateBidNull_Fail() throws Exception {
-        Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
-        ValidationConfig modelConfig=new ValidationConfig();
-        LogCollector logger=new LogCollector();
-        LogEventFactory errFactory=new LogEventFactory();
-        Settings settings=new Settings();
-        
-        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(TOPIC,null));
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
-        // Asserts
-        assertTrue(logger.getErrs().size()==1);
-        assertEquals("value <> is not a valid BID", logger.getErrs().get(0).getEventMsg());
-    }
     
 	// In diesem Test werden 2 unterschiedliche Basket Id's erstellt.
 	// Es darf keine Fehlermeldung ausgegeben werden.
@@ -185,6 +146,65 @@ public class Bid23Test {
 	//#############################################################//
 	//######################### FAIL ##############################//
 	//#############################################################//
+	
+    // Es muss ein Fehler geben, da die OID nicht verschieden zu der BID ist
+    @Test
+    public void validateBIDequalsOID_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,OID1));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1,logger.getErrs().size());
+        assertEquals("OID <o1> is equal to a BID", logger.getErrs().get(0).getEventMsg());
+    }
+	
+    // Als Syntax gibt es ein Fehler beim Basket ID.
+    // Da die BID " 123" ist Falsch als Syntax, muss eine Fehlermeldung ausgegeben werden.
+    @Test
+    public void validateBid_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC," 123"));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);//
+        assertEquals("value < 123> is not a valid BID", logger.getErrs().get(0).getEventMsg());
+    }
+	
+    // Da die BID hat kein Wert, muss eine Fehlermeldung ausgegeben werden.
+    @Test
+    public void validateBidNull_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,null));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("value <> is not a valid BID", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// In diesem Test wird die Basket id, 2 Mal erstellt.
 	// Da die BID b1 bereits existiert, muss eine Fehlermeldung ausgegeben werden.
