@@ -283,5 +283,22 @@ MODEL UniqueConstraints23
 		END assocEF;
 		
 	END EmbeddedUnique;
+
+	TOPIC LinkObjUnique=
+
+		CLASS ClassA =
+			attrA : TEXT*10;
+		END ClassA;
+		
+		CLASS ClassB =
+			attrB : TEXT*10;
+		END ClassB;
+
+		ASSOCIATION assocAB =
+		  a1 -- {0..*} ClassA;
+		  b1 -- {0..*} ClassB;
+		  UNIQUE a1->attrA,b1->attrB;
+		END assocAB;
+	END LinkObjUnique;
 	
 END UniqueConstraints23.
