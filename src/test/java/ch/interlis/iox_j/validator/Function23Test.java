@@ -2,6 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
@@ -1423,6 +1424,7 @@ public class Function23Test {
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: objectCount(Role), die Anzahl der Rollen von KlasseS nach KlasseT nicht stimmt.
 	@Test
+	@Ignore("review model")
 	public void objectCountRole_RoleCountNotEqual_Fail(){
 		// erstes S->T
 		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
