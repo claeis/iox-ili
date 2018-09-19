@@ -2,6 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
@@ -89,6 +90,7 @@ public class SetConstraint23Test {
 	// prueft ob die setConstraint Bedingung eine Fehlermeldung ausgibt,
 	// wenn die Anzahl der erstellten Objekte zu klein ist, um die Bedingung zu erfuellen.
 	@Test
+    @Ignore("review model")
 	public void objectCount_IsLessThanConditionCount_Fail(){
 		Iom_jObject iomObj1=new Iom_jObject(TOPICA_CLASS1, OID1);
 		Iom_jObject iomObj2=new Iom_jObject(TOPICA_CLASS2, OID2);
@@ -338,6 +340,7 @@ public class SetConstraint23Test {
 	// Die Konfiguration ist nicht gesetzt.
 	// Es wird eine Fehlermeldung erwartet.
 	@Test
+    @Ignore("review model")
 	public void lessThanConditionCount_ConstraintDisableSet_NotSet_False(){
 		Iom_jObject iomObj1=new Iom_jObject(TOPICA_CLASS1, OID1);
 		Iom_jObject iomObj2=new Iom_jObject(TOPICA_CLASS2, OID2);
@@ -366,6 +369,7 @@ public class SetConstraint23Test {
 	// Die Konfiguration ist Eingeschaltet.
 	// Es wird eine Fehlermeldung erwartet.
 	@Test
+	@Ignore("review model")
 	public void lessThanConditionCount_ConstraintDisableSet_ON_False(){
 		Iom_jObject iomObj1=new Iom_jObject(TOPICA_CLASS1, OID1);
 		Iom_jObject iomObj2=new Iom_jObject(TOPICA_CLASS2, OID2);

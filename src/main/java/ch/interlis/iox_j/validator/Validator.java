@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -30,10 +31,12 @@ import ch.interlis.ili2c.metamodel.Constraint;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Domain;
+import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.EnumTreeValueType;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.Evaluable;
 import ch.interlis.ili2c.metamodel.ExistenceConstraint;
+import ch.interlis.ili2c.metamodel.Expression;
 import ch.interlis.ili2c.metamodel.Expression.Conjunction;
 import ch.interlis.ili2c.metamodel.Expression.DefinedCheck;
 import ch.interlis.ili2c.metamodel.Expression.Disjunction;
@@ -58,6 +61,8 @@ import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.Objects;
 import ch.interlis.ili2c.metamodel.PathEl;
 import ch.interlis.ili2c.metamodel.PathElAbstractClassRole;
+import ch.interlis.ili2c.metamodel.PathElAssocRole;
+import ch.interlis.ili2c.metamodel.PathElRefAttr;
 import ch.interlis.ili2c.metamodel.PlausibilityConstraint;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
@@ -1197,9 +1202,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(classConstant!=null){
 					if(classConstant.getValue() instanceof Viewable){
 						Viewable classValue = (Viewable) classConstant.getValue();
-						while(classValue.getExtending()!=null){
-							classValue = (Viewable) classValue.getExtending();
-						}
 						return new Value(classValue);
 					}
 				}
@@ -1347,24 +1349,28 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			} else if (currentFunction.getScopedName(null).equals("INTERLIS.isOfClass")){
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = functionCall.getArguments();
-				Value childViewable=evaluateExpression(validationKind, usageScope, iomObj,arguments[0]);
-				if (childViewable.skipEvaluation()){
-					return childViewable;
+				Value paramObject=evaluateExpression(validationKind, usageScope, iomObj,arguments[0]);
+				if (paramObject.skipEvaluation()){
+					return paramObject;
 				}
-				if (childViewable.isUndefined()){
+				if (paramObject.isUndefined()){
 					return Value.createSkipEvaluation();
 				}
-				Value parentViewable=evaluateExpression(validationKind, usageScope, iomObj,arguments[1]);
-				if (parentViewable.skipEvaluation()){
-					return parentViewable;
+				Value paramClass=evaluateExpression(validationKind, usageScope, iomObj,arguments[1]);
+				if (paramClass.skipEvaluation()){
+					return paramClass;
 				}
-				if (parentViewable.isUndefined()){
+				if (paramClass.isUndefined()){
 					return Value.createSkipEvaluation();
 				}
-				if(childViewable.getViewable().equals(parentViewable.getViewable())){
+				Viewable paramObjectViewable = paramObject.getViewable();
+				if (paramObject.getComplexObjects() != null) {
+				    paramObjectViewable=(Viewable)td.getElement(paramObject.getComplexObjects().iterator().next().getobjecttag());				    
+				}
+				if(paramObjectViewable.equals(paramClass.getViewable())){
 					return new Value(true);
 				}
-				if(parentViewable.getViewable().isExtending(childViewable.getViewable())){
+				if(paramObjectViewable.isExtending(paramClass.getViewable())){
 					return new Value(true);					
 				}
 				return new Value(false);
@@ -1402,7 +1408,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if (targetViewable.isUndefined()){
 					return Value.createSkipEvaluation();
 				}
-				return new Value(targetViewable.getViewable());
+				return new Value((Viewable)td.getElement(targetViewable.getComplexObjects().iterator().next().getobjecttag()));
 			} else if (currentFunction.getScopedName(null).equals("INTERLIS.areAreas")){
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = functionCall.getArguments();
@@ -1469,75 +1475,171 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			//TODO INTERLIS.convertUnit
 			//TODO instance of InspectionFactor
 			//TODO instance of LengthOfReferencedText
-		} else if(expression instanceof ObjectPath){
+		} else if(expression instanceof ObjectPath) {
 			// object path	
 			ObjectPath objectPathObj = (ObjectPath) expression;
-			PathEl pathEl = (PathEl) objectPathObj.getLastPathEl();
-			if(pathEl instanceof PathElAbstractClassRole){
-				PathElAbstractClassRole abstractClassRole = (PathElAbstractClassRole) pathEl;
-				if (abstractClassRole.getRole()!=null){
-					RoleDef role = (RoleDef) abstractClassRole.getRole();
-					AbstractClassDef destinationClass = role.getDestination();
-					while(destinationClass.getExtending()!=null){
-						destinationClass.getExtending();
-					}
-					Viewable pathElementOfClassRole = (Viewable) destinationClass;
-					return new Value(pathElementOfClassRole);
-				}
-			} else if(pathEl instanceof StructAttributeRef){
-				StructAttributeRef structAttributeRefValue = (StructAttributeRef) pathEl;
-				if(structAttributeRefValue.getAttr() instanceof LocalAttribute){
-					LocalAttribute localAttributeValue = (LocalAttribute) structAttributeRefValue.getAttr();
-					if(localAttributeValue.getDomain() instanceof CompositionType){
-						CompositionType compositionValue = (CompositionType) localAttributeValue.getDomain();
-						if(compositionValue.getComponentType() instanceof Viewable){
-							Viewable referredStructOfAttr = (Viewable) compositionValue.getComponentType();
-							return new Value(referredStructOfAttr);
-						}
-					}
-				}
-			} else if(pathEl instanceof AttributeRef){
-				AttributeRef attrRef = (AttributeRef) pathEl;
-				Type type = attrRef.getAttr().getDomain();
-				String attrName = objectPathObj.getLastPathEl().getName();
-				if (iomObj.getattrvaluecount(attrName) == 0) {
-					return Value.createUndefined();
-				} else {
-					String objValue = iomObj.getattrvalue(attrName);
-					if (objValue != null) {
-						if (objValue.equals("true")) {
-							return new Value(true);
-						} else if (objValue.equals("false")) {
-							return new Value(false);
-							// if null, then complex value.
-						} else {
-							if (type instanceof TypeAlias) {
-								Type aliasedType = ((TypeAlias) type).getAliasing().getType();
-								if (aliasedType instanceof EnumerationType) {
-									String refTypeName = ((TypeAlias) type)
-											.getAliasing().getName();
-									return new Value(aliasedType, objValue,
-											refTypeName);
-								}
-								return new Value(aliasedType, objValue);
-							}
-							if (type instanceof EnumerationType) {
-								return new Value(type, objValue);
-							}
-						}
-						return new Value(type, objValue);
-					} else {
-						List<IomObject> objects = new ArrayList<IomObject>();
-						int attrValueCount = iomObj.getattrvaluecount(attrName);
-						// iterate, because it's a list of attrObjects.
-						for (int i = 0; i < attrValueCount; i++) {
-							objects.add(iomObj.getattrobj(attrName, i));
-						}
-						return new Value(objects);
-					}
-				}
+			PathEl[] pathElements = objectPathObj.getPathElements();
+			final int lastPathIndex = pathElements.length - 1;
+			
+			for (int k = 0; k < pathElements.length; k++) {
+	            PathEl currentPathEl = pathElements[k];
+			    if (currentPathEl instanceof PathElAbstractClassRole || currentPathEl instanceof PathElAssocRole) {
+	                RoleDef role = null;
+			        if (currentPathEl instanceof PathElAbstractClassRole) {
+	                    PathElAbstractClassRole abstractClassRole = (PathElAbstractClassRole) currentPathEl;
+                        role = (RoleDef) abstractClassRole.getRole();
+	                } else if (currentPathEl instanceof PathElAssocRole) {
+	                    role = ((PathElAssocRole) currentPathEl).getRole();
+	                }
+			        
+	                if (role == null) {
+                        throw new IllegalStateException("Role is not be empty!");
+                    } else {
+	                    String targetOid = null;
+	                    IomObject roleDefValue = iomObj.getattrobj(role.getName(), 0);
+	                    if (roleDefValue != null){
+	                        targetOid = roleDefValue.getobjectrefoid();
+	                    }
+	                    if(targetOid==null){
+	                        return Value.createUndefined(); 
+	                    }
+	                    Iterator<AbstractClassDef> targetClassIterator = role.iteratorDestination();
+	                    ArrayList<Viewable> destinationClasses = new ArrayList<Viewable>();
+	                    // find target classes.
+	                    while(targetClassIterator.hasNext()){
+	                        Viewable roleDestinationClass = (Viewable) targetClassIterator.next();
+	                        destinationClasses.add(roleDestinationClass);
+	                    }
+	                    OutParam<String> bidOfTargetObj = new OutParam<String>();
+	                    IomObject targetObj = (IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
+	                    if(targetObj==null) {
+	                        return Value.createUndefined(); 
+	                    }
+	                    
+	                    if (k != lastPathIndex) {
+	                        iomObj=targetObj;
+	                    }else {
+	                        List<IomObject> objects = new ArrayList<IomObject>();
+	                        objects.add(targetObj);
+	                        return new Value(objects);
+	                    }
+	                }
+			    } else if (currentPathEl instanceof StructAttributeRef) {
+	                StructAttributeRef structAttributeRefValue = (StructAttributeRef) currentPathEl;
+	                if(structAttributeRefValue.getAttr() instanceof LocalAttribute){
+	                    LocalAttribute localAttributeValue = (LocalAttribute) structAttributeRefValue.getAttr();
+	                    if (!(localAttributeValue.getDomain() instanceof CompositionType)) {
+	                        throw new IllegalStateException();
+	                    } 
+	                    
+	                    CompositionType type = (CompositionType) localAttributeValue.getDomain();
+	                    String currentAttrName = localAttributeValue.getName();
+	                    if (iomObj.getattrvaluecount(currentAttrName) == 0) {
+	                        return Value.createUndefined();
+	                    } else {
+	                        IomObject targetObj = iomObj = getIomObjWithIndex(iomObj, structAttributeRefValue, currentAttrName);
+	                        if (k!=lastPathIndex) {
+	                            iomObj = targetObj;
+	                        }else {
+	                            String attrValue = iomObj.getattrvalue(currentAttrName);
+	                            if (attrValue != null) {
+	                                if (attrValue.equals("true")) {
+	                                    return new Value(true);
+	                                } else if (attrValue.equals("false")) {
+	                                    return new Value(false);
+	                                } else {
+	                                    return new Value(type, attrValue);
+	                                }
+	                            } else {
+	                                List<IomObject> objects = new ArrayList<IomObject>();
+	                                objects.add(targetObj);
+	                                return new Value(objects);
+	                            }
+	                        }	                        
+	                    }
+	                }
+			    } else if (currentPathEl instanceof AttributeRef){
+	                AttributeRef attrRef = (AttributeRef) currentPathEl;
+	                Type type = attrRef.getAttr().getDomain();
+	                String currentAttrName = currentPathEl.getName();
+	                if (iomObj.getattrvaluecount(currentAttrName) == 0) {
+	                    return Value.createUndefined(); 
+	                } else {
+	                    // not the last pathEl?
+	                    if (k!=lastPathIndex) {
+                            iomObj = iomObj.getattrobj(currentAttrName,0);
+	                    }else {
+	                        String attrValue = iomObj.getattrvalue(currentAttrName);
+	                        if (attrValue != null) {
+	                            if (attrValue.equals("true")) {
+	                                return new Value(true);
+	                            } else if (attrValue.equals("false")) {
+	                                return new Value(false);
+	                            // if null, then complex value.
+	                            } else {
+	                                if (type instanceof TypeAlias) {
+	                                    Type aliasedType = ((TypeAlias) type).getAliasing().getType();
+	                                    if (aliasedType instanceof EnumerationType) {
+	                                        String refTypeName = ((TypeAlias) type)
+	                                                .getAliasing().getName();
+	                                        return new Value(aliasedType, attrValue,
+	                                                refTypeName);
+	                                    }
+	                                    return new Value(aliasedType, attrValue);
+	                                }
+	                                if (type instanceof EnumerationType) {
+	                                    return new Value(type, attrValue);
+	                                }
+	                            }
+	                            return new Value(type, attrValue);
+	                        } else {
+	                            List<IomObject> objects = new ArrayList<IomObject>();
+	                            int attrValueCount = iomObj.getattrvaluecount(currentAttrName);
+	                            // iterate, because it's a list of attrObjects.
+	                            for (int i = 0; i < attrValueCount; i++) {
+	                                objects.add(iomObj.getattrobj(currentAttrName, i));
+	                            }
+	                            return new Value(objects);
+	                        }
+	                    }
+	                }
+			    } else if (currentPathEl instanceof PathElRefAttr) {
+			        PathElRefAttr pathElRefAttr = (PathElRefAttr) currentPathEl;
+			        
+			        if (!(pathElRefAttr.getAttr() instanceof LocalAttribute)) {
+			            throw new IllegalStateException();
+			        }
+			        
+                    LocalAttribute localAttributeValue = (LocalAttribute) pathElRefAttr.getAttr();
+                    if (!(localAttributeValue.getDomain() instanceof ReferenceType)) {
+                        throw new IllegalStateException();
+                    }
+                    
+                    ReferenceType referenceType = (ReferenceType) localAttributeValue.getDomain();
+                    
+                    String targetOid=null;
+                    IomObject tmpIomObject = iomObj.getattrobj(currentPathEl.getName(), 0);
+                    if (tmpIomObject != null) {
+                        targetOid = tmpIomObject.getobjectrefoid();
+                    }
+                    if(targetOid==null) {
+                        return Value.createUndefined(); 
+                    }
+                    
+                    IomObject targetObj = getIomObjectFromObjectPool(referenceType, targetOid);
+                    if(targetObj==null) {
+                        return Value.createUndefined(); 
+                    }
+                    if (k != lastPathIndex) {
+                        iomObj=targetObj;
+                    }else {
+                        List<IomObject> objects = new ArrayList<IomObject>();
+                        objects.add(targetObj);
+                        return new Value(objects);
+                    }
+			    }
 			}
-		} else if(expression instanceof Objects){
+		} else if(expression instanceof Objects) {
 			// objects
 			Iterator<String> objectIterator = allObjIterator;
 			List<IomObject> listOfIomObjects = new ArrayList<IomObject>();
@@ -1561,7 +1663,32 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		//TODO instance of ViewableAlias
 	}
 	
-	private Value evaluateObjectCount(Value value) {
+	private IomObject getIomObjWithIndex(IomObject iomObj, StructAttributeRef structAttributeRefValue, String currentAttrName) {
+        int expectedIndex = (int) (long) structAttributeRefValue.getIndex();
+        int attrValueCount = iomObj.getattrvaluecount(currentAttrName);
+        if (structAttributeRefValue.getIndex() == structAttributeRefValue.eFIRST) {
+            iomObj = iomObj.getattrobj(currentAttrName, 0);
+        } else if (structAttributeRefValue.getIndex() == structAttributeRefValue.eLAST) {
+            iomObj = iomObj.getattrobj(currentAttrName, attrValueCount - 1);
+        } else {
+            if (expectedIndex <= attrValueCount && expectedIndex > 0) {
+                iomObj = iomObj.getattrobj(currentAttrName, expectedIndex - 1);
+                if (iomObj == null) {
+                    throw new IllegalStateException("There is no record found for this index!");
+                }
+            } else {
+                throw new IllegalStateException("There is no record found for this index!");
+            }
+        }
+        return iomObj;
+    }
+    private IomObject getIomObjectFromObjectPool(ReferenceType referenceType, String targetOid) {
+        OutParam<String> bidOfTargetObj = new OutParam<String>();
+        ArrayList<Viewable> destinationClasses=new ArrayList<Viewable>();
+        destinationClasses.add(referenceType.getReferred());
+        return (IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
+    }
+    private Value evaluateObjectCount(Value value) {
 		Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
 		int counter = 0;
 		while(objectIterator.hasNext()){
