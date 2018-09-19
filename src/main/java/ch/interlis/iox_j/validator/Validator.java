@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -30,10 +31,12 @@ import ch.interlis.ili2c.metamodel.Constraint;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Domain;
+import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.EnumTreeValueType;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.Evaluable;
 import ch.interlis.ili2c.metamodel.ExistenceConstraint;
+import ch.interlis.ili2c.metamodel.Expression;
 import ch.interlis.ili2c.metamodel.Expression.Conjunction;
 import ch.interlis.ili2c.metamodel.Expression.DefinedCheck;
 import ch.interlis.ili2c.metamodel.Expression.Disjunction;
@@ -1199,9 +1202,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(classConstant!=null){
 					if(classConstant.getValue() instanceof Viewable){
 						Viewable classValue = (Viewable) classConstant.getValue();
-						while(classValue.getExtending()!=null){
-							classValue = (Viewable) classValue.getExtending();
-						}
 						return new Value(classValue);
 					}
 				}
@@ -1349,24 +1349,28 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			} else if (currentFunction.getScopedName(null).equals("INTERLIS.isOfClass")){
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = functionCall.getArguments();
-				Value childViewable=evaluateExpression(validationKind, usageScope, iomObj,arguments[0]);
-				if (childViewable.skipEvaluation()){
-					return childViewable;
+				Value paramObject=evaluateExpression(validationKind, usageScope, iomObj,arguments[0]);
+				if (paramObject.skipEvaluation()){
+					return paramObject;
 				}
-				if (childViewable.isUndefined()){
+				if (paramObject.isUndefined()){
 					return Value.createSkipEvaluation();
 				}
-				Value parentViewable=evaluateExpression(validationKind, usageScope, iomObj,arguments[1]);
-				if (parentViewable.skipEvaluation()){
-					return parentViewable;
+				Value paramClass=evaluateExpression(validationKind, usageScope, iomObj,arguments[1]);
+				if (paramClass.skipEvaluation()){
+					return paramClass;
 				}
-				if (parentViewable.isUndefined()){
+				if (paramClass.isUndefined()){
 					return Value.createSkipEvaluation();
 				}
-				if(childViewable.getViewable().equals(parentViewable.getViewable())){
+				Viewable paramObjectViewable = paramObject.getViewable();
+				if (paramObject.getComplexObjects() != null) {
+				    paramObjectViewable=(Viewable)td.getElement(paramObject.getComplexObjects().iterator().next().getobjecttag());				    
+				}
+				if(paramObjectViewable.equals(paramClass.getViewable())){
 					return new Value(true);
 				}
-				if(parentViewable.getViewable().isExtending(childViewable.getViewable())){
+				if(paramObjectViewable.isExtending(paramClass.getViewable())){
 					return new Value(true);					
 				}
 				return new Value(false);
@@ -1404,7 +1408,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if (targetViewable.isUndefined()){
 					return Value.createSkipEvaluation();
 				}
-				return new Value(targetViewable.getViewable());
+				return new Value((Viewable)td.getElement(targetViewable.getComplexObjects().iterator().next().getobjecttag()));
 			} else if (currentFunction.getScopedName(null).equals("INTERLIS.areAreas")){
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = functionCall.getArguments();
@@ -1533,23 +1537,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	                    if (iomObj.getattrvaluecount(currentAttrName) == 0) {
 	                        return Value.createUndefined();
 	                    } else {
+	                        IomObject targetObj = iomObj = getIomObjWithIndex(iomObj, structAttributeRefValue, currentAttrName);
 	                        if (k!=lastPathIndex) {
-	                            int expectedIndex = (int) (long) structAttributeRefValue.getIndex();
-	                            int attrValueCount = iomObj.getattrcount();
-	                            if (structAttributeRefValue.getIndex() == structAttributeRefValue.eFIRST) {
-	                                String attrName = iomObj.getattrname(0);
-	                                iomObj = iomObj.getattrobj(attrName, 0);
-	                            } else if (structAttributeRefValue.getIndex() == structAttributeRefValue.eLAST) {
-	                                String attrName = iomObj.getattrname(attrValueCount - 1);
-	                                iomObj = iomObj.getattrobj(attrName, 0);
-	                            } else {
-	                                if (expectedIndex <= attrValueCount && expectedIndex >= 0) {
-	                                    String attrName = iomObj.getattrname(expectedIndex - 1);
-	                                    iomObj = iomObj.getattrobj(attrName, 0);
-	                                } else {
-	                                    throw new IllegalStateException("There is no record of this index!");
-	                                }
-	                            }
+	                            iomObj = targetObj;
 	                        }else {
 	                            String attrValue = iomObj.getattrvalue(currentAttrName);
 	                            if (attrValue != null) {
@@ -1562,11 +1552,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	                                }
 	                            } else {
 	                                List<IomObject> objects = new ArrayList<IomObject>();
-	                                int attrValueCount = iomObj.getattrvaluecount(currentAttrName);
-	                                // iterate, because it's a list of attrObjects.
-	                                for (int i = 0; i < attrValueCount; i++) {
-	                                    objects.add(iomObj.getattrobj(currentAttrName, i));
-	                                }
+	                                objects.add(targetObj);
 	                                return new Value(objects);
 	                            }
 	                        }	                        
@@ -1677,7 +1663,26 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		//TODO instance of ViewableAlias
 	}
 	
-	private IomObject getIomObjectFromObjectPool(ReferenceType referenceType, String targetOid) {
+	private IomObject getIomObjWithIndex(IomObject iomObj, StructAttributeRef structAttributeRefValue, String currentAttrName) {
+        int expectedIndex = (int) (long) structAttributeRefValue.getIndex();
+        int attrValueCount = iomObj.getattrvaluecount(currentAttrName);
+        if (structAttributeRefValue.getIndex() == structAttributeRefValue.eFIRST) {
+            iomObj = iomObj.getattrobj(currentAttrName, 0);
+        } else if (structAttributeRefValue.getIndex() == structAttributeRefValue.eLAST) {
+            iomObj = iomObj.getattrobj(currentAttrName, attrValueCount - 1);
+        } else {
+            if (expectedIndex <= attrValueCount && expectedIndex > 0) {
+                iomObj = iomObj.getattrobj(currentAttrName, expectedIndex - 1);
+                if (iomObj == null) {
+                    throw new IllegalStateException("There is no record found for this index!");
+                }
+            } else {
+                throw new IllegalStateException("There is no record found for this index!");
+            }
+        }
+        return iomObj;
+    }
+    private IomObject getIomObjectFromObjectPool(ReferenceType referenceType, String targetOid) {
         OutParam<String> bidOfTargetObj = new OutParam<String>();
         ArrayList<Viewable> destinationClasses=new ArrayList<Viewable>();
         destinationClasses.add(referenceType.getReferred());

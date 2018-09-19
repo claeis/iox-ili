@@ -194,9 +194,12 @@ MODEL Function23
         STRUCTURE StructBp EXTENDS StructB =
         END StructBp;
         
+        STRUCTURE StructBpp EXTENDS StructBp =
+        END StructBpp;
+        
         CLASS ClassV =
            attrV1 : BAG {1..*} OF StructB;
-           MANDATORY CONSTRAINT INTERLIS.isOfClass(attrV1[1],>StructAp);
+           MANDATORY CONSTRAINT INTERLIS.isOfClass(attrV1[1],>StructBp);
         END ClassV;
         
         CLASS ClassW =
@@ -221,11 +224,6 @@ MODEL Function23
            attrY1 : BAG {1..*} OF StructB;
            MANDATORY CONSTRAINT INTERLIS.myClass(attrY1[1]) == >StructBp;
         END ClassY;
-        
-        CLASS ClassZ =
-           attrZ1 : BAG {1..*} OF StructB;
-           MANDATORY CONSTRAINT INTERLIS.myClass(attrZ1[1]) == >StructAp;
-        END ClassZ;
         
         CLASS ClassZA =
 			Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
