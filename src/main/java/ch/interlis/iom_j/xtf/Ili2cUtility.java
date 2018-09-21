@@ -76,7 +76,11 @@ public class Ili2cUtility {
 					}
 					
 				}
-				mapping.defineClass(tag, (ViewableProperty[])propv.toArray(new ViewableProperty[propv.size()]));
+				// is an object possible in the transfer file?
+				if(propv!=null) {
+				    // define the "class" of that object
+	                mapping.defineClass(tag, (ViewableProperty[])propv.toArray(new ViewableProperty[propv.size()]));
+				}
 				
 			}
 		}else{
