@@ -79,6 +79,7 @@ import ch.interlis.ili2c.metamodel.Topic;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.Type;
 import ch.interlis.ili2c.metamodel.TypeAlias;
+import ch.interlis.ili2c.metamodel.UniqueEl;
 import ch.interlis.ili2c.metamodel.UniquenessConstraint;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
@@ -520,7 +521,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									}
 								} else if(additionalConstraint instanceof UniquenessConstraint){
 									UniquenessConstraint uniquenessConstraint = (UniquenessConstraint) additionalConstraint; // uniquenessConstraint not null.
-									validateUniquenessConstraint(iomObj, uniquenessConstraint, null);
+					                String iomObjOid=iomObj.getobjectoid();
+					                if(iomObjOid==null && classOfCurrentObj instanceof AssociationDef) {
+					                    iomObjOid=ObjectPool.getAssociationId(iomObj, (AssociationDef) classOfCurrentObj);
+					                }
+									validateUniquenessConstraint(iomObj, iomObjOid,uniquenessConstraint, null);
 								} else if(additionalConstraint instanceof PlausibilityConstraint){
 									PlausibilityConstraint plausibilityConstraint = (PlausibilityConstraint) additionalConstraint;
 									String constraintName = getScopedName(plausibilityConstraint);
@@ -740,7 +745,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 	
-	private void validateUniquenessConstraint(IomObject iomObj, UniquenessConstraint uniquenessConstraint, RoleDef role) {
+	private void validateUniquenessConstraint(IomObject iomObj, String iomObjOid,UniquenessConstraint uniquenessConstraint, RoleDef role) {
 		if(!ValidationConfig.OFF.equals(constraintValidation)){
 			String constraintName = getScopedName(uniquenessConstraint);
 			String checkUniqueConstraint=null;
@@ -780,7 +785,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			    }else {
 		            seenValues=seenUniqueConstraintValues;
 			    }
-			    String iomObjOid=iomObj.getobjectoid();
 		        if(uniquenessConstraint.getPrefix()!=null){
 		            PathEl[] attrPath = uniquenessConstraint.getPrefix().getPathElements();
 		            visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid,attrPath,0,iomObj, role);
@@ -1480,165 +1484,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			ObjectPath objectPathObj = (ObjectPath) expression;
 			PathEl[] pathElements = objectPathObj.getPathElements();
 			final int lastPathIndex = pathElements.length - 1;
-			
-			for (int k = 0; k < pathElements.length; k++) {
-	            PathEl currentPathEl = pathElements[k];
-			    if (currentPathEl instanceof PathElAbstractClassRole || currentPathEl instanceof PathElAssocRole) {
-	                RoleDef role = null;
-			        if (currentPathEl instanceof PathElAbstractClassRole) {
-	                    PathElAbstractClassRole abstractClassRole = (PathElAbstractClassRole) currentPathEl;
-                        role = (RoleDef) abstractClassRole.getRole();
-	                } else if (currentPathEl instanceof PathElAssocRole) {
-	                    role = ((PathElAssocRole) currentPathEl).getRole();
-	                }
-			        
-	                if (role == null) {
-                        throw new IllegalStateException("Role is not be empty!");
-                    } else {
-	                    String targetOid = null;
-	                    IomObject roleDefValue = iomObj.getattrobj(role.getName(), 0);
-	                    if (roleDefValue != null){
-	                        targetOid = roleDefValue.getobjectrefoid();
-	                    }
-	                    if(targetOid==null){
-	                        return Value.createUndefined(); 
-	                    }
-	                    Iterator<AbstractClassDef> targetClassIterator = role.iteratorDestination();
-	                    ArrayList<Viewable> destinationClasses = new ArrayList<Viewable>();
-	                    // find target classes.
-	                    while(targetClassIterator.hasNext()){
-	                        Viewable roleDestinationClass = (Viewable) targetClassIterator.next();
-	                        destinationClasses.add(roleDestinationClass);
-	                    }
-	                    OutParam<String> bidOfTargetObj = new OutParam<String>();
-	                    IomObject targetObj = (IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
-	                    if(targetObj==null) {
-	                        return Value.createUndefined(); 
-	                    }
-	                    
-	                    if (k != lastPathIndex) {
-	                        iomObj=targetObj;
-	                    }else {
-	                        List<IomObject> objects = new ArrayList<IomObject>();
-	                        objects.add(targetObj);
-	                        return new Value(objects);
-	                    }
-	                }
-			    } else if (currentPathEl instanceof StructAttributeRef) {
-	                StructAttributeRef structAttributeRefValue = (StructAttributeRef) currentPathEl;
-	                if(structAttributeRefValue.getAttr() instanceof LocalAttribute){
-	                    LocalAttribute localAttributeValue = (LocalAttribute) structAttributeRefValue.getAttr();
-	                    if (!(localAttributeValue.getDomain() instanceof CompositionType)) {
-	                        throw new IllegalStateException();
-	                    } 
-	                    
-	                    CompositionType type = (CompositionType) localAttributeValue.getDomain();
-	                    String currentAttrName = localAttributeValue.getName();
-	                    if (iomObj.getattrvaluecount(currentAttrName) == 0) {
-	                        return Value.createUndefined();
-	                    } else {
-	                        IomObject targetObj = iomObj = getIomObjWithIndex(iomObj, structAttributeRefValue, currentAttrName);
-	                        if (k!=lastPathIndex) {
-	                            iomObj = targetObj;
-	                        }else {
-	                            String attrValue = iomObj.getattrvalue(currentAttrName);
-	                            if (attrValue != null) {
-	                                if (attrValue.equals("true")) {
-	                                    return new Value(true);
-	                                } else if (attrValue.equals("false")) {
-	                                    return new Value(false);
-	                                } else {
-	                                    return new Value(type, attrValue);
-	                                }
-	                            } else {
-	                                List<IomObject> objects = new ArrayList<IomObject>();
-	                                objects.add(targetObj);
-	                                return new Value(objects);
-	                            }
-	                        }	                        
-	                    }
-	                }
-			    } else if (currentPathEl instanceof AttributeRef){
-	                AttributeRef attrRef = (AttributeRef) currentPathEl;
-	                Type type = attrRef.getAttr().getDomain();
-	                String currentAttrName = currentPathEl.getName();
-	                if (iomObj.getattrvaluecount(currentAttrName) == 0) {
-	                    return Value.createUndefined(); 
-	                } else {
-	                    // not the last pathEl?
-	                    if (k!=lastPathIndex) {
-                            iomObj = iomObj.getattrobj(currentAttrName,0);
-	                    }else {
-	                        String attrValue = iomObj.getattrvalue(currentAttrName);
-	                        if (attrValue != null) {
-	                            if (attrValue.equals("true")) {
-	                                return new Value(true);
-	                            } else if (attrValue.equals("false")) {
-	                                return new Value(false);
-	                            // if null, then complex value.
-	                            } else {
-	                                if (type instanceof TypeAlias) {
-	                                    Type aliasedType = ((TypeAlias) type).getAliasing().getType();
-	                                    if (aliasedType instanceof EnumerationType) {
-	                                        String refTypeName = ((TypeAlias) type)
-	                                                .getAliasing().getName();
-	                                        return new Value(aliasedType, attrValue,
-	                                                refTypeName);
-	                                    }
-	                                    return new Value(aliasedType, attrValue);
-	                                }
-	                                if (type instanceof EnumerationType) {
-	                                    return new Value(type, attrValue);
-	                                }
-	                            }
-	                            return new Value(type, attrValue);
-	                        } else {
-	                            List<IomObject> objects = new ArrayList<IomObject>();
-	                            int attrValueCount = iomObj.getattrvaluecount(currentAttrName);
-	                            // iterate, because it's a list of attrObjects.
-	                            for (int i = 0; i < attrValueCount; i++) {
-	                                objects.add(iomObj.getattrobj(currentAttrName, i));
-	                            }
-	                            return new Value(objects);
-	                        }
-	                    }
-	                }
-			    } else if (currentPathEl instanceof PathElRefAttr) {
-			        PathElRefAttr pathElRefAttr = (PathElRefAttr) currentPathEl;
-			        
-			        if (!(pathElRefAttr.getAttr() instanceof LocalAttribute)) {
-			            throw new IllegalStateException();
-			        }
-			        
-                    LocalAttribute localAttributeValue = (LocalAttribute) pathElRefAttr.getAttr();
-                    if (!(localAttributeValue.getDomain() instanceof ReferenceType)) {
-                        throw new IllegalStateException();
-                    }
-                    
-                    ReferenceType referenceType = (ReferenceType) localAttributeValue.getDomain();
-                    
-                    String targetOid=null;
-                    IomObject tmpIomObject = iomObj.getattrobj(currentPathEl.getName(), 0);
-                    if (tmpIomObject != null) {
-                        targetOid = tmpIomObject.getobjectrefoid();
-                    }
-                    if(targetOid==null) {
-                        return Value.createUndefined(); 
-                    }
-                    
-                    IomObject targetObj = getIomObjectFromObjectPool(referenceType, targetOid);
-                    if(targetObj==null) {
-                        return Value.createUndefined(); 
-                    }
-                    if (k != lastPathIndex) {
-                        iomObj=targetObj;
-                    }else {
-                        List<IomObject> objects = new ArrayList<IomObject>();
-                        objects.add(targetObj);
-                        return new Value(objects);
-                    }
-			    }
-			}
+
+			return getValueFromObjectPath(iomObj, pathElements, lastPathIndex,null);
 		} else if(expression instanceof Objects) {
 			// objects
 			Iterator<String> objectIterator = allObjIterator;
@@ -1662,6 +1509,177 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		//TODO instance of ViewableAggregate
 		//TODO instance of ViewableAlias
 	}
+    private Value getValueFromObjectPath(IomObject iomObj, PathEl[] pathElements, final int lastPathIndex,RoleDef firstRole) {
+        for (int k = 0; k < pathElements.length; k++) {
+            PathEl currentPathEl = pathElements[k];
+            if (currentPathEl instanceof PathElAbstractClassRole || currentPathEl instanceof PathElAssocRole) {
+                RoleDef role = null;
+                if (currentPathEl instanceof PathElAbstractClassRole) {
+                    PathElAbstractClassRole abstractClassRole = (PathElAbstractClassRole) currentPathEl;
+                    role = (RoleDef) abstractClassRole.getRole();
+                } else if (currentPathEl instanceof PathElAssocRole) {
+                    role = ((PathElAssocRole) currentPathEl).getRole();
+                }
+                
+                if (role == null) {
+                    throw new IllegalStateException("Role is not be empty!");
+                } else {
+                    if(k==0 && role==firstRole) {
+                        // special case for embedded association
+                        if (k != lastPathIndex) {
+                            ; // the current object is already the first path element
+                        }else {
+                            List<IomObject> objects = new ArrayList<IomObject>();
+                            objects.add(iomObj);
+                            return new Value(objects);
+                        }
+                    }else {
+                        String targetOid = null;
+                        IomObject roleDefValue = iomObj.getattrobj(role.getName(), 0);
+                        if (roleDefValue != null){
+                            targetOid = roleDefValue.getobjectrefoid();
+                        }
+                        if(targetOid==null){
+                            return Value.createUndefined(); 
+                        }
+                        Iterator<AbstractClassDef> targetClassIterator = role.iteratorDestination();
+                        ArrayList<Viewable> destinationClasses = new ArrayList<Viewable>();
+                        // find target classes.
+                        while(targetClassIterator.hasNext()){
+                            Viewable roleDestinationClass = (Viewable) targetClassIterator.next();
+                            destinationClasses.add(roleDestinationClass);
+                        }
+                        if (k != lastPathIndex) {
+                            OutParam<String> bidOfTargetObj = new OutParam<String>();
+                            IomObject targetObj = (IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
+                            if(targetObj==null) {
+                                return Value.createUndefined(); 
+                            }
+                            iomObj=targetObj;
+                        }else {
+                            List<IomObject> objects = new ArrayList<IomObject>();
+                            objects.add(roleDefValue);
+                            return new Value(objects);
+                        }
+                    }
+                }
+            } else if (currentPathEl instanceof StructAttributeRef) {
+                StructAttributeRef structAttributeRefValue = (StructAttributeRef) currentPathEl;
+                if(structAttributeRefValue.getAttr() instanceof LocalAttribute){
+                    LocalAttribute localAttributeValue = (LocalAttribute) structAttributeRefValue.getAttr();
+                    if (!(localAttributeValue.getDomain() instanceof CompositionType)) {
+                        throw new IllegalStateException();
+                    } 
+                    
+                    CompositionType type = (CompositionType) localAttributeValue.getDomain();
+                    String currentAttrName = localAttributeValue.getName();
+                    if (iomObj.getattrvaluecount(currentAttrName) == 0) {
+                        return Value.createUndefined();
+                    } else {
+                        IomObject targetObj = iomObj = getIomObjWithIndex(iomObj, structAttributeRefValue, currentAttrName);
+                        if (k!=lastPathIndex) {
+                            iomObj = targetObj;
+                        }else {
+                            String attrValue = iomObj.getattrvalue(currentAttrName);
+                            if (attrValue != null) {
+                                if (attrValue.equals("true")) {
+                                    return new Value(true);
+                                } else if (attrValue.equals("false")) {
+                                    return new Value(false);
+                                } else {
+                                    return new Value(type, attrValue);
+                                }
+                            } else {
+                                List<IomObject> objects = new ArrayList<IomObject>();
+                                objects.add(targetObj);
+                                return new Value(objects);
+                            }
+                        }	                        
+                    }
+                }
+            } else if (currentPathEl instanceof AttributeRef){
+                AttributeRef attrRef = (AttributeRef) currentPathEl;
+                Type type = attrRef.getAttr().getDomain();
+                String currentAttrName = currentPathEl.getName();
+                if (iomObj.getattrvaluecount(currentAttrName) == 0) {
+                    return Value.createUndefined(); 
+                } else {
+                    // not the last pathEl?
+                    if (k!=lastPathIndex) {
+                        iomObj = iomObj.getattrobj(currentAttrName,0);
+                    }else {
+                        String attrValue = iomObj.getattrvalue(currentAttrName);
+                        if (attrValue != null) {
+                            if (attrValue.equals("true")) {
+                                return new Value(true);
+                            } else if (attrValue.equals("false")) {
+                                return new Value(false);
+                            // if null, then complex value.
+                            } else {
+                                if (type instanceof TypeAlias) {
+                                    Type aliasedType = ((TypeAlias) type).getAliasing().getType();
+                                    if (aliasedType instanceof EnumerationType) {
+                                        String refTypeName = ((TypeAlias) type)
+                                                .getAliasing().getName();
+                                        return new Value(aliasedType, attrValue,
+                                                refTypeName);
+                                    }
+                                    return new Value(aliasedType, attrValue);
+                                }
+                                if (type instanceof EnumerationType) {
+                                    return new Value(type, attrValue);
+                                }
+                            }
+                            return new Value(type, attrValue);
+                        } else {
+                            List<IomObject> objects = new ArrayList<IomObject>();
+                            int attrValueCount = iomObj.getattrvaluecount(currentAttrName);
+                            // iterate, because it's a list of attrObjects.
+                            for (int i = 0; i < attrValueCount; i++) {
+                                objects.add(iomObj.getattrobj(currentAttrName, i));
+                            }
+                            return new Value(objects);
+                        }
+                    }
+                }
+            } else if (currentPathEl instanceof PathElRefAttr) {
+                PathElRefAttr pathElRefAttr = (PathElRefAttr) currentPathEl;
+                
+                if (!(pathElRefAttr.getAttr() instanceof LocalAttribute)) {
+                    throw new IllegalStateException();
+                }
+                
+                LocalAttribute localAttributeValue = (LocalAttribute) pathElRefAttr.getAttr();
+                if (!(localAttributeValue.getDomain() instanceof ReferenceType)) {
+                    throw new IllegalStateException();
+                }
+                
+                ReferenceType referenceType = (ReferenceType) localAttributeValue.getDomain();
+                
+                String targetOid=null;
+                IomObject tmpIomObject = iomObj.getattrobj(currentPathEl.getName(), 0);
+                if (tmpIomObject != null) {
+                    targetOid = tmpIomObject.getobjectrefoid();
+                }
+                if(targetOid==null) {
+                    return Value.createUndefined(); 
+                }
+                
+                IomObject targetObj = getIomObjectFromObjectPool(referenceType, targetOid);
+                if(targetObj==null) {
+                    return Value.createUndefined(); 
+                }
+                if (k != lastPathIndex) {
+                    iomObj=targetObj;
+                }else {
+                    List<IomObject> objects = new ArrayList<IomObject>();
+                    objects.add(targetObj);
+                    return new Value(objects);
+                }
+            }
+        }
+        return Value.createUndefined();
+    }
 	
 	private IomObject getIomObjWithIndex(IomObject iomObj, StructAttributeRef structAttributeRefValue, String currentAttrName) {
         int expectedIndex = (int) (long) structAttributeRefValue.getIndex();
@@ -2607,24 +2625,28 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     if (obj.embedded) {
                         int propc=iomObj.getattrvaluecount(roleName);
                         if(propc>=1) {
+                            IomObject embeddedLinkObj = iomObj.getattrobj(roleName, 0);
                             AssociationDef roleOwner = (AssociationDef) role.getContainer();
                             
                             Viewable classOfCurrentObj = roleOwner;
                             if(classOfCurrentObj!=null) {
+                                String iomObjOid=iomObj.getobjectoid();
+                                if(iomObjOid==null && aclass1 instanceof AssociationDef) {
+                                    iomObjOid=ObjectPool.getAssociationId(iomObj, (AssociationDef) aclass1);
+                                }
                                 Iterator constraintIterator=classOfCurrentObj.iterator();
                                 while (constraintIterator.hasNext()) {
                                     Object constraintObj = constraintIterator.next();
                                     // role is unique?
                                     if(constraintObj instanceof UniquenessConstraint){
                                         UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) constraintObj;
-                                        validateUniquenessConstraint(iomObj, uniquenessConstraint, role);
+                                        validateUniquenessConstraint(embeddedLinkObj, iomObjOid,uniquenessConstraint, role);
                                     }
                                 }
                             }
                             
                             if (roleOwner.getDerivedFrom() == null) {
                                 // not just a link?
-                                IomObject structvalue = iomObj.getattrobj(roleName, 0);
                                 propNames.add(roleName);
                                 if (roleOwner.getAttributes().hasNext()
                                         || roleOwner
@@ -2632,9 +2654,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                                 .iterator().hasNext()) {
                                 // TODO handle attributes of link
                                 }
-                                if (structvalue != null) {
-                                    refoid = structvalue.getobjectrefoid();
-                                    long orderPos = structvalue
+                                if (embeddedLinkObj != null) {
+                                    refoid = embeddedLinkObj.getobjectrefoid();
+                                    long orderPos = embeddedLinkObj
                                             .getobjectreforderpos();
                                     if (orderPos != 0) {
                                         // refoid,orderPos
@@ -2690,18 +2712,24 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 		// Uniqueness
 		if(isObject){
-			Viewable aclass2=aclass1;
-			while(aclass2!=null) {
-				Iterator attrI=aclass2.iterator();
-				while (attrI.hasNext()) {
-					Object obj1 = attrI.next();
-					if(obj1 instanceof UniquenessConstraint){
-						UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) obj1; // uniquenessConstraint not null.
-						validateUniquenessConstraint(iomObj, uniquenessConstraint, null);
-					}
-				}
-				aclass2=(Viewable) aclass2.getExtending();
-			}
+		    if(addToPool) {
+	            Viewable aclass2=aclass1;
+	            String iomObjOid=iomObj.getobjectoid();
+	            if(iomObjOid==null && aclass1 instanceof AssociationDef) {
+	                iomObjOid=ObjectPool.getAssociationId(iomObj, (AssociationDef) aclass1);
+	            }
+	            while(aclass2!=null) {
+	                Iterator attrI=aclass2.iterator();
+	                while (attrI.hasNext()) {
+	                    Object obj1 = attrI.next();
+	                    if(obj1 instanceof UniquenessConstraint){
+	                        UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) obj1; // uniquenessConstraint not null.
+	                        validateUniquenessConstraint(iomObj, iomObjOid,uniquenessConstraint, null);
+	                    }
+	                }
+	                aclass2=(Viewable) aclass2.getExtending();
+	            }
+		    }
 		}
 		
 		if(isObject){
@@ -2844,52 +2872,44 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         ArrayList<Object> values = new ArrayList<Object>();
 		Iterator constraintIter = constraint.getElements().iteratorAttribute();
 		while(constraintIter.hasNext()){
-			String uniqueAttrName = constraintIter.next().toString();
-			Object attrValue=null;
-			IomObject structValue=null;
-			structValue=currentObject.getattrobj(uniqueAttrName,0);
-			if(structValue!=null){
-				// ref == oid als attrValue. sonst iomobject als attrvalue.
-				if(structValue.getobjectrefoid()!=null){
-					attrValue = structValue.getobjectrefoid();
-				} else {
-					attrValue=structValue;
-				}
-			} else {
-				attrValue=currentObject.getattrvalue(uniqueAttrName);
-				if(attrValue==null) {
-					if(role!=null) {
-						structValue=currentObject.getattrobj(role.getName(), 0);
-						if(structValue!=null) {
-							attrValue=structValue.getattrvalue(uniqueAttrName);
-						}
-					}
-				}
+		    Object next = constraintIter.next();
+		    ObjectPath objectPathObj = (ObjectPath) next;
+		    PathEl[] pathElements = objectPathObj.getPathElements();
+		    int lastPathIndex = pathElements.length - 1;
+		    
+		    Value value = getValueFromObjectPath(currentObject, pathElements, lastPathIndex,role);
+		    if(value.isUndefined()) {
+		        return null;
+		    }else if(value.skipEvaluation()) {
+		        return null;
+		    }else if(value.getValue() != null) {
+			    values.add(value.getValue());
+			} else if (value.getComplexObjects() != null) {
+			    IomObject complexValue = value.getComplexObjects().iterator().next();
+			    if(complexValue.getobjectrefoid() != null) {
+			        values.add(complexValue.getobjectrefoid());
+			    } else {
+			        values.add(complexValue);
+			    }
+			}else {
+			    throw new IllegalStateException("unexpected value in unique");
 			}
-			// if one of the attrValues is undefined, object is excluded from unique constraint
-			if(attrValue==null){
-				return null;
-			}
-			values.add(attrValue);
 		}
 		valuesRet.value=new AttributeArray(values);
-		HashMap<AttributeArray, String> allAlreadySeenValues = null;
+		HashMap<AttributeArray, String> alreadySeenValues = null;
 		if (seenValues.containsKey(constraint)){
-			allAlreadySeenValues = seenValues.get(constraint);
-			
-			
-			String oidOfNonUniqueObj = allAlreadySeenValues.get(valuesRet.value);
+			alreadySeenValues = seenValues.get(constraint);
+			String oidOfNonUniqueObj = alreadySeenValues.get(valuesRet.value);
+
+			// If exist a duplicate record
 			if(oidOfNonUniqueObj!=null){
-				// duplicate found.
 				return oidOfNonUniqueObj;
 			}
-			// values not yet seen.
-			// keep oid for futher error messages.
-			allAlreadySeenValues.put(valuesRet.value, originObjOid);
+			alreadySeenValues.put(valuesRet.value, originObjOid);
 		} else {
-			allAlreadySeenValues = new HashMap<AttributeArray, String>();
-			allAlreadySeenValues.put(valuesRet.value, originObjOid);
-			seenValues.put(constraint, allAlreadySeenValues);
+			alreadySeenValues = new HashMap<AttributeArray, String>();
+			alreadySeenValues.put(valuesRet.value, originObjOid);
+			seenValues.put(constraint, alreadySeenValues);
 		}
 		return null;
 	}
