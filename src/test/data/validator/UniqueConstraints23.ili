@@ -285,7 +285,8 @@ MODEL UniqueConstraints23
 	END EmbeddedUnique;
 
 	TOPIC LinkObjUnique=
- 		CLASS ClassA =
+
+		CLASS ClassA =
 			attrA : TEXT*10;
 		END ClassA;
 		
@@ -293,7 +294,7 @@ MODEL UniqueConstraints23
 			attrB : TEXT*10;
 		END ClassB;
 
- 		ASSOCIATION assocAB =
+		ASSOCIATION assocAB =
 		  a1 -- {0..*} ClassA;
 		  b1 -- {0..*} ClassB;
 		  UNIQUE a1->attrA,b1->attrB;

@@ -110,7 +110,8 @@ public class XtfWriterBase implements IoxWriter {
 				}
 			}else if(event instanceof StartBasketEvent){
 				StartBasketEvent e=(StartBasketEvent)event;
-				alt.writeStartBasket(e.getType(),e.getBid(),e.getConsistency(),e.getKind(),e.getStartstate(),e.getEndstate(),e.getTopicv());
+				alt.writeStartBasket(e.getType(),e.getBid(),e.getConsistency(),e.getKind(),e.getStartstate(),e.getEndstate(),e.getTopicv(),
+				            (e instanceof ch.interlis.iox_j.StartBasketEvent)?XtfWriter.domainsToString(((ch.interlis.iox_j.StartBasketEvent)e).getDomains()):null);
 			}else if(event instanceof ObjectEvent){
 				ObjectEvent e=(ObjectEvent)event;
 				alt.writeObject(e.getIomObject());

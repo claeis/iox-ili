@@ -25,6 +25,9 @@ package ch.interlis.iom_j.xtf;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
 
 import ch.interlis.iom_j.ViewableProperties;
 import ch.interlis.iom_j.ViewableProperty;
@@ -76,5 +79,21 @@ public class XtfWriter extends XtfWriterBase {
 		super(buffer, Ili2cUtility.getIoxMappingTable(td), td.getLastModel().getIliVersion());
 		setModels(Ili2cUtility.buildModelList(td));
 	}
+    public static String domainsToString(Map<String, String> genericDomains) {
+        String domains;
+        ArrayList<String> genericNames=new ArrayList<String>(genericDomains.keySet());
+        Collections.sort(genericNames);
+        StringBuffer domainsBuf=new StringBuffer();
+        String sep="";
+        for(String genericName:genericNames) {
+            String concreteName=genericDomains.get(genericName);
+            domainsBuf.append(sep);sep=" ";
+            domainsBuf.append(genericName);
+            domainsBuf.append("=");
+            domainsBuf.append(concreteName);
+        }
+        domains=domainsBuf.toString();
+        return domains;
+    }
 
 }

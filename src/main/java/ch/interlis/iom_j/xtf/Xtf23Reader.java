@@ -44,7 +44,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 	private static final int AFTER_ENDTRANSFER=5;
 	
 	// namespace
-	private static final String NAMESPACE_ILIXMLBASE="http://www.interlis.ch/INTERLIS2.3";
+	public static final String NAMESPACE_ILIXMLBASE="http://www.interlis.ch/INTERLIS2.3";
     
     // segmentType
     private enum SegmentType {C1,C2,C3,A1,A2,R}

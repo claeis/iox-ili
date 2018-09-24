@@ -1,8 +1,13 @@
 package ch.interlis.iom_j.xtf;
 
+import java.awt.Event;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
@@ -134,7 +139,50 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 			throw new IoxException(ex);
 		}
 	}
-	
+    public static IoxReader createReader(java.io.File xtffile) throws IoxException{
+        javax.xml.stream.XMLInputFactory inputFactory = javax.xml.stream.XMLInputFactory.newInstance();
+        XMLEventReader reader=null;
+        java.io.FileInputStream in=null;
+        javax.xml.stream.events.XMLEvent event=null;
+        try {
+            in=new java.io.FileInputStream(xtffile);
+            reader = inputFactory.createXMLEventReader(in);
+            event=reader.nextEvent();
+            while(event!=null && !event.isStartElement()){
+                event=reader.nextEvent();
+            }
+        } catch (XMLStreamException e) {
+            throw new IoxException(e);
+        } catch (FileNotFoundException e) {
+            throw new IoxException(e);
+        }finally {
+            if(reader!=null) {
+                try {
+                    reader.close();
+                } catch (XMLStreamException e) {
+                }
+                reader=null;
+            }
+            if(in!=null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
+                in=null;
+            }
+        }
+        if(event!=null) {
+            String ns=event.asStartElement().getName().getNamespaceURI();
+            if(ns.equals(NAMESPACE_ILIXMLBASE_INTERLIS)) {
+                return new Xtf24Reader(xtffile);
+            }else if(ns.equals(Xtf23Reader.NAMESPACE_ILIXMLBASE)) {
+                return new XtfReader(xtffile);
+            }else {
+                throw new IoxException("unexpected namesapce "+ns);
+            }
+        }
+        return new XtfReader(xtffile);
+    }
 	/** Initialize reader.
 	 * @param in
 	 * @throws IoxException
@@ -667,16 +715,26 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		while(codingObjIter.hasNext()){
 			Attribute codingObj=(Attribute) codingObjIter.next();
 			if(codingObj.getName().equals(QNAME_ILI_DOMAIN)){
-				String domainValue=codingObj.getValue();
-				genericAndConcreteDomains=domainValue.split(" "); // genericAndConcreteDomains.getValues(genericDomain=concreteDomain)
-				for(String singleDomain : genericAndConcreteDomains){
-					String[] domains=singleDomain.split("=");
-					startBasketEvent.addDomain(domains[0], domains[1]);
+				Map<String,String> domains=parseDomains(codingObj.getValue());
+				for(String genericDomain:domains.keySet()) {
+                    startBasketEvent.addDomain(genericDomain, domains.get(genericDomain));
 				}
 			}
 		}
 		return startBasketEvent;
 	}
+    public static Map<String,String> parseDomains(String domainValue) {
+        HashMap<String,String> ret=new HashMap<String,String>();
+        if(domainValue==null || domainValue.trim().length()==0) {
+            return ret;
+        }
+        String genericAndConcreteDomains[]=domainValue.split(" ");
+        for(String singleDomain : genericAndConcreteDomains){
+            String[] domains=singleDomain.split("=");
+            ret.put(domains[0], domains[1]);
+        }
+        return ret;
+    }
 	
 	private ch.interlis.iox_j.StartBasketEvent setConsistency(StartElement element, ch.interlis.iox_j.StartBasketEvent startBasketEvent) throws IoxException {
 		Iterator codingObjIter=element.getAttributes();
