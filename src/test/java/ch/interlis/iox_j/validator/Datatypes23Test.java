@@ -1050,7 +1050,7 @@ public class Datatypes23Test {
 	@Test
 	public void textTypeUriMaxLengthOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objMaxLength.setattrvalue("uritext", ch.ehi.basics.tools.StringUtility.STRING(1023, 'a'));
+		objMaxLength.setattrvalue("uritext", "id:"+ch.ehi.basics.tools.StringUtility.STRING(1020, 'a'));
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -2014,7 +2014,7 @@ public class Datatypes23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
+		assertTrue(logger.getErrs().size()>=1);
 		assertEquals("Attribute uritext is length restricted to 1023", logger.getErrs().get(0).getEventMsg());
 	}
 	
@@ -2036,7 +2036,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10000.000 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10000.000 is out of range in attribute 'C2'", logger.getErrs().get(0).getEventMsg());
 	}
 	// Es wird ein Fehler ausgegeben, weil die Koordinate nicht 4 Dimensional sein darf.
 	@Test
@@ -2124,7 +2124,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 479999.999 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 479999.999 is out of range in attribute 'C1'", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob 9(5) erfolgreich auf 100 aufgerundet wird.

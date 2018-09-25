@@ -3192,7 +3192,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}else if(type instanceof NumericType){
 					String valueStr=iomObj.getattrvalue(attrName);
 					if(valueStr!=null){
-						String newValueStr=validateNumericType(validateType, (NumericType)type, valueStr);
+						String newValueStr=validateNumericType(validateType, (NumericType)type, valueStr, attrName);
 						if(newValueStr!=null) {
 							iomObj.setattrvalue(attrName, newValueStr);
 						}
@@ -3421,7 +3421,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void validateCoordType(String validateType, CoordType coordType, IomObject coordValue) {
 		if (coordType.getDimensions().length >= 1){
 			if (coordValue.getattrvalue("C1") != null){
-				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1")));
+				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"), "C1"));
 			} else if (coordValue.getattrvalue("A1") != null) {
 				logMsg(validateType, "Not a type of COORD");
 			} else {
@@ -3435,7 +3435,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		if (coordType.getDimensions().length >= 2){
 			if (coordValue.getattrvalue("C2") != null){
-				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2")));
+				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"), "C2"));
 			} else if (coordValue.getattrvalue("A2") != null) {
 				logMsg(validateType, "Not a type of COORD");
 			} else {
@@ -3444,7 +3444,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		if (coordType.getDimensions().length == 3){
 			if (coordValue.getattrvalue("C3") != null){
-				coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3")));
+				coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"), "C3"));
 			} else {
 				logMsg(validateType, "Wrong COORD structure, C3 expected");
 			}
@@ -3475,17 +3475,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		int c1Count=coordValue.getattrvaluecount("C1");
 		if (dimLength>=2 && dimLength<=3){
 			if(a1!=null && a2!=null && c1!=null && c2!=null){
-				coordValue.setattrvalue("A1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], a1));
-				coordValue.setattrvalue("A2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], a2));
-				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], c1));
-				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], c2));
+				coordValue.setattrvalue("A1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], a1, "A1"));
+				coordValue.setattrvalue("A2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], a2, "A2"));
+				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], c1, "C1"));
+				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], c2, "C2"));
 				if(dimLength==2) {
 					if(c3!=null) {
 						logMsg(validateType, "Wrong ARC structure, C3 not expected");
 					}
 				}else if(dimLength==3) {
 					if(c3!=null) {
-						coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], c3));
+						coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], c3, "C3"));
 					}else {
 						logMsg(validateType, "Wrong ARC structure, C3 expected");
 					}
@@ -3516,7 +3516,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private String validateNumericType(String validateType, NumericType type, String valueStr) {
+	private String validateNumericType(String validateType, NumericType type, String valueStr, String attrName) {
 		PrecisionDecimal value=null;
 		try {
 			value=new PrecisionDecimal(valueStr);
@@ -3537,7 +3537,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	            rounded=roundNumeric(precision,valueBigDec);
 			}
 			if (rounded!=null && (rounded.compareTo(min_general)==-1 || rounded.compareTo(max_general)==+1)){
-				logMsg(validateType,"value {0} is out of range", rounded.toString());
+				logMsg(validateType,"value {0} is out of range in attribute '{1}'", rounded.toString(), attrName);
 			}
 		}
 		if(rounded==null) {
