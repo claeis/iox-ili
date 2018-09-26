@@ -1959,7 +1959,7 @@ public class UniqueConstraints23Test {
 	// wird erwartet, dass dieser Test funktioniert.
 	@Test
 	public void uniqueAttrValuesOfRole_InEmbeddedAssociation_Ok() {
-		String attrAB="attrAB";
+		String attrAB="attrB";
 		Iom_jObject obj_A_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSA,OID1);
 		Iom_jObject obj_A_2=new Iom_jObject(EMBEDDED_UNIQUE_CLASSA,OID2);
 		

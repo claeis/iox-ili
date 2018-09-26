@@ -47,6 +47,7 @@ import ch.interlis.ili2c.metamodel.Expression.Inequality;
 import ch.interlis.ili2c.metamodel.Expression.LessThan;
 import ch.interlis.ili2c.metamodel.Expression.LessThanOrEqual;
 import ch.interlis.ili2c.metamodel.Expression.Negation;
+import ch.interlis.ili2c.metamodel.Extendable;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.Function;
 import ch.interlis.ili2c.metamodel.FunctionCall;
@@ -2648,12 +2649,47 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             if (roleOwner.getDerivedFrom() == null) {
                                 // not just a link?
                                 propNames.add(roleName);
-                                if (roleOwner.getAttributes().hasNext()
-                                        || roleOwner
-                                                .getLightweightAssociations()
-                                                .iterator().hasNext()) {
-                                // TODO handle attributes of link
+                                
+                                //Validate if no superfluous properties
+                                if (roleOwner.getAttributes().hasNext()) {
+                                    Iterator<Extendable> attributes = roleOwner.getAttributes();
+                                    int i = 0;
+                                    while (attributes.hasNext()) {
+                                        LocalAttribute localAttr = (LocalAttribute) attributes.next();
+                                        String attrName = embeddedLinkObj.getattrname(i);
+                                        if (!localAttr.getName().contains(attrName)) {
+                                            errs.addEvent(errFact.logErrorMsg("unknown property <{0}>", attrName));
+                                        }
+                                        i++;
+                                    }
+                                } else if (roleOwner.getLightweightAssociations().iterator().hasNext()) {
+                                    Iterator<RoleDef> iterator = roleOwner.getLightweightAssociations().iterator();
+                                    int i = 0;
+                                    while (iterator.hasNext()) {
+                                        RoleDef roleDef = iterator.next();
+                                        String attrName = embeddedLinkObj.getattrname(i);
+                                        if (!roleDef.getName().contains(attrName)) {
+                                            errs.addEvent(errFact.logErrorMsg("unknown property <{0}>", attrName));
+                                        }
+                                        i++;
+                                    }
+                                } else if (roleOwner.getRoleWhereEmbedded().iteratorDestination().hasNext() && embeddedLinkObj.getattrcount() > 0) {
+                                    Iterator<AbstractClassDef> iDestination = roleOwner.getRoleWhereEmbedded().iteratorDestination();
+                                    int i = 0;
+                                    while (iDestination.hasNext()) {
+                                        AbstractClassDef classDef = iDestination.next();
+                                        Iterator attributes = classDef.getAttributes();
+                                        while (attributes.hasNext()) {
+                                            LocalAttribute localAttr = (LocalAttribute) attributes.next();
+                                            String attrName = embeddedLinkObj.getattrname(i);
+                                            if (!localAttr.getName().contains(attrName)) {
+                                                errs.addEvent(errFact.logErrorMsg("unknown property <{0}>", attrName));
+                                            }
+                                            i++;
+                                        }
+                                    }
                                 }
+
                                 if (embeddedLinkObj != null) {
                                     refoid = embeddedLinkObj.getobjectrefoid();
                                     long orderPos = embeddedLinkObj
