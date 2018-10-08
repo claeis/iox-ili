@@ -2645,9 +2645,9 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==6);
-		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
-		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
-		assertEquals("value 10000.000 is out of range", logger.getErrs().get(2).getEventMsg());
+		assertEquals("value 4800000.000 is out of range in attribute 'C1'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 700000.000 is out of range in attribute 'C2'", logger.getErrs().get(1).getEventMsg());
+		assertEquals("value 10000.000 is out of range in attribute 'C3'", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn die Polygon mit einem ungueltigen Kreisbogen erstellt wird.
@@ -2704,8 +2704,8 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
-		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
+		assertEquals("value 4800000.000 is out of range in attribute 'A1'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 700000.000 is out of range in attribute 'A2'", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn der Type area nicht vom Type Multisurface ist.

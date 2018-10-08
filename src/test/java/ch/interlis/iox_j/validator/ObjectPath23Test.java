@@ -40,6 +40,7 @@ public class ObjectPath23Test {
 
     // STRUCTURE
     private final static String STRUCTD1 = TOPIC + ".StructD1";
+    private final static String STRUCTS = TOPIC + ".StructS";
 
     // TD
     private TransferDescription td = null;
@@ -201,6 +202,54 @@ public class ObjectPath23Test {
         assertEquals(0, logger.getErrs().size());
     }
     
+    @Test
+    public void structure_OK() throws Exception {
+        Iom_jObject objE1 = new Iom_jObject(CLASSE, OID1);
+        Iom_jObject objStructD1 = (Iom_jObject) objE1.addattrobj("attrE2", STRUCTD1);
+        Iom_jObject objStructS3 = (Iom_jObject) objStructD1.addattrobj("attrD3", STRUCTS);
+        objStructS3.setattrvalue("attrS1", "S1");
+
+        Iom_jObject objStructS4 = (Iom_jObject) objStructD1.addattrobj("attrD4", STRUCTS);
+        objStructS4.setattrvalue("attrS1", "S1");
+
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(objE1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+    
+    @Test
+    public void structure_OK_AttrValues_NULL() throws Exception {
+        Iom_jObject objE1 = new Iom_jObject(CLASSE, OID1);
+        Iom_jObject objStructD1 = (Iom_jObject) objE1.addattrobj("attrE2", STRUCTD1);
+        Iom_jObject objStructS3 = (Iom_jObject) objStructD1.addattrobj("attrD3", STRUCTS);
+        objStructS3.setattrvalue("attrS1", "");
+
+        Iom_jObject objStructS4 = (Iom_jObject) objStructD1.addattrobj("attrD4", STRUCTS);
+        objStructS4.setattrvalue("attrS1", "");
+
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(objE1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+    
     //############################################################/
     //########## FAILING TESTS ###################################/
     //############################################################/    
@@ -249,18 +298,14 @@ public class ObjectPath23Test {
                 logger.getErrs().get(0).getEventMsg());
     }
 
-    @Ignore("Requires implementation in Value.compareTo()")
     @Test
     public void structure_Fail() throws Exception {
-        Iom_jObject objC1 = new Iom_jObject(CLASSC1, OID2);
-        objC1.setattrvalue("attrC1", "C1");
-
         Iom_jObject objE1 = new Iom_jObject(CLASSE, OID1);
         Iom_jObject objStructD1 = (Iom_jObject) objE1.addattrobj("attrE2", STRUCTD1);
-        Iom_jObject objStructS3 = (Iom_jObject) objStructD1.addattrobj("attrD3", STRUCTD1);
+        Iom_jObject objStructS3 = (Iom_jObject) objStructD1.addattrobj("attrD3", STRUCTS);
         objStructS3.setattrvalue("attrS1", "S1");
 
-        Iom_jObject objStructS4 = (Iom_jObject) objStructD1.addattrobj("attrD4", STRUCTD1);
+        Iom_jObject objStructS4 = (Iom_jObject) objStructD1.addattrobj("attrD4", STRUCTS);
         objStructS4.setattrvalue("attrS2", "S2");
 
         ValidationConfig modelConfig = new ValidationConfig();
@@ -271,12 +316,37 @@ public class ObjectPath23Test {
         validator.validate(new StartTransferEvent());
         validator.validate(new StartBasketEvent(TOPIC, BID));
         validator.validate(new ObjectEvent(objE1));
-        validator.validate(new ObjectEvent(objC1));
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
         assertTrue(logger.getErrs().size() == 1);
-        assertEquals("Mandatory Constraint ObjectPath23.Topic.ClassB.Constraint1 is not true.",
+        assertEquals("Mandatory Constraint ObjectPath23.Topic.ClassE.Constraint1 is not true.",
+                logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void structure_Fail_AttrValue_NULL() throws Exception {
+        Iom_jObject objE1 = new Iom_jObject(CLASSE, OID1);
+        Iom_jObject objStructD1 = (Iom_jObject) objE1.addattrobj("attrE2", STRUCTD1);
+        Iom_jObject objStructS3 = (Iom_jObject) objStructD1.addattrobj("attrD3", STRUCTS);
+        objStructS3.setattrvalue("attrS1", "S1");
+
+        Iom_jObject objStructS4 = (Iom_jObject) objStructD1.addattrobj("attrD4", STRUCTS);
+        objStructS4.setattrvalue("attrS2", "");
+
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(objE1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size() == 1);
+        assertEquals("Mandatory Constraint ObjectPath23.Topic.ClassE.Constraint1 is not true.",
                 logger.getErrs().get(0).getEventMsg());
     }
 

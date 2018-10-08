@@ -47,6 +47,7 @@ import ch.interlis.ili2c.metamodel.Expression.Inequality;
 import ch.interlis.ili2c.metamodel.Expression.LessThan;
 import ch.interlis.ili2c.metamodel.Expression.LessThanOrEqual;
 import ch.interlis.ili2c.metamodel.Expression.Negation;
+import ch.interlis.ili2c.metamodel.Extendable;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.Function;
 import ch.interlis.ili2c.metamodel.FunctionCall;
@@ -288,7 +289,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=new ch.interlis.iom_j.Iom_jObject(((ch.interlis.iox.ObjectEvent)event).getIomObject());
 			try {
-                validateObject(iomObj,null);
+                validateObject(iomObj,null,null);
 			} catch (IoxException e) {
 				errs.addEvent(errFact.logInfoMsg("failed to validate object {0}", iomObj.toString()));
 			}catch(RuntimeException e) {
@@ -1681,7 +1682,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         return Value.createUndefined();
     }
 	
-	private IomObject getIomObjWithIndex(IomObject iomObj, StructAttributeRef structAttributeRefValue, String currentAttrName) {
+    private IomObject getIomObjWithIndex(IomObject iomObj, StructAttributeRef structAttributeRefValue, String currentAttrName) {
         int expectedIndex = (int) (long) structAttributeRefValue.getIndex();
         int attrValueCount = iomObj.getattrvaluecount(currentAttrName);
         if (structAttributeRefValue.getIndex() == structAttributeRefValue.eFIRST) {
@@ -2511,7 +2512,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	HashSet<Object> loggedObjects=new HashSet<Object>();
     private boolean disableRounding=false;
 	
-	private void validateObject(IomObject iomObj,String attrPath) throws IoxException {
+	private void validateObject(IomObject iomObj,String attrPath,Viewable assocClass) throws IoxException {
 		// validate if object is null
 		boolean isObject = attrPath==null;
 		if(isObject){
@@ -2527,7 +2528,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 
 		String tag=iomObj.getobjecttag();
-		Object modelele=tag2class.get(tag);
+        Object modelele=null;
+		if(assocClass!=null && "REF".equals(tag)) {
+		    modelele=assocClass;
+		}else {
+	        modelele=tag2class.get(tag);
+		}
 		if(modelele==null){
 			if(!unknownTypev.contains(tag)){
 				errs.addEvent(errFact.logErrorMsg("unknown class <{0}>",tag));
@@ -2612,7 +2618,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						// skip implicit particles (base-viewables) of views
 					}else{
 						propNames.add(attr.getName());
-						validateAttrValue(iomObj,attr,null);
+						validateAttrValue(aclass1,iomObj,attr,null);
 					}
 				}
 			}
@@ -2648,12 +2654,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             if (roleOwner.getDerivedFrom() == null) {
                                 // not just a link?
                                 propNames.add(roleName);
-                                if (roleOwner.getAttributes().hasNext()
-                                        || roleOwner
-                                                .getLightweightAssociations()
-                                                .iterator().hasNext()) {
-                                // TODO handle attributes of link
+                                
+                                //Validate if no superfluous properties
+                                if(propc>0) {
+                                    validateObject(embeddedLinkObj,roleName,roleOwner);
                                 }
+                                
                                 if (embeddedLinkObj != null) {
                                     refoid = embeddedLinkObj.getobjectrefoid();
                                     long orderPos = embeddedLinkObj
@@ -2914,11 +2920,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return null;
 	}
 
-	private void validateAttrValue(IomObject iomObj, AttributeDef attr,String attrPath) throws IoxException {
+	private void validateAttrValue(Viewable eleClass,IomObject iomObj, AttributeDef attr,String attrPath) throws IoxException {
 		 String attrName = attr.getName();
 		 String attrQName = getScopedName(attr);
-		 String objTag=iomObj.getobjecttag();
-		 Viewable eleClass=(Viewable) tag2class.get(objTag);
 		 String iliClassQName=getScopedName(eleClass);
 		 if(attrPath==null){
 			 attrPath=attrName;
@@ -2981,7 +2985,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								 logMsg(validateType,"Attribute {0} requires a non-abstract structure", attrPath);
 							}
 						}
-						validateObject(structEle, attrPath+"["+structi+"]");
+						validateObject(structEle, attrPath+"["+structi+"]",null);
 					}
 			 }
 		}else{
@@ -3192,7 +3196,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}else if(type instanceof NumericType){
 					String valueStr=iomObj.getattrvalue(attrName);
 					if(valueStr!=null){
-						String newValueStr=validateNumericType(validateType, (NumericType)type, valueStr);
+						String newValueStr=validateNumericType(validateType, (NumericType)type, valueStr, attrName);
 						if(newValueStr!=null) {
 							iomObj.setattrvalue(attrName, newValueStr);
 						}
@@ -3421,7 +3425,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void validateCoordType(String validateType, CoordType coordType, IomObject coordValue) {
 		if (coordType.getDimensions().length >= 1){
 			if (coordValue.getattrvalue("C1") != null){
-				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1")));
+				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"), "C1"));
 			} else if (coordValue.getattrvalue("A1") != null) {
 				logMsg(validateType, "Not a type of COORD");
 			} else {
@@ -3435,7 +3439,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		if (coordType.getDimensions().length >= 2){
 			if (coordValue.getattrvalue("C2") != null){
-				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2")));
+				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"), "C2"));
 			} else if (coordValue.getattrvalue("A2") != null) {
 				logMsg(validateType, "Not a type of COORD");
 			} else {
@@ -3444,7 +3448,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		if (coordType.getDimensions().length == 3){
 			if (coordValue.getattrvalue("C3") != null){
-				coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3")));
+				coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"), "C3"));
 			} else {
 				logMsg(validateType, "Wrong COORD structure, C3 expected");
 			}
@@ -3475,17 +3479,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		int c1Count=coordValue.getattrvaluecount("C1");
 		if (dimLength>=2 && dimLength<=3){
 			if(a1!=null && a2!=null && c1!=null && c2!=null){
-				coordValue.setattrvalue("A1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], a1));
-				coordValue.setattrvalue("A2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], a2));
-				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], c1));
-				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], c2));
+				coordValue.setattrvalue("A1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], a1, "A1"));
+				coordValue.setattrvalue("A2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], a2, "A2"));
+				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], c1, "C1"));
+				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], c2, "C2"));
 				if(dimLength==2) {
 					if(c3!=null) {
 						logMsg(validateType, "Wrong ARC structure, C3 not expected");
 					}
 				}else if(dimLength==3) {
 					if(c3!=null) {
-						coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], c3));
+						coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], c3, "C3"));
 					}else {
 						logMsg(validateType, "Wrong ARC structure, C3 expected");
 					}
@@ -3516,7 +3520,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private String validateNumericType(String validateType, NumericType type, String valueStr) {
+	private String validateNumericType(String validateType, NumericType type, String valueStr, String attrName) {
 		PrecisionDecimal value=null;
 		try {
 			value=new PrecisionDecimal(valueStr);
@@ -3537,7 +3541,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	            rounded=roundNumeric(precision,valueBigDec);
 			}
 			if (rounded!=null && (rounded.compareTo(min_general)==-1 || rounded.compareTo(max_general)==+1)){
-				logMsg(validateType,"value {0} is out of range", rounded.toString());
+				logMsg(validateType,"value {0} is out of range in attribute '{1}'", rounded.toString(), attrName);
 			}
 		}
 		if(rounded==null) {

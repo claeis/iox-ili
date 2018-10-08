@@ -182,6 +182,8 @@ public class Value {
 					// compare surfaces and areas
 					if(iomObj.getobjecttag().equals("MULTISURFACE") && iomObjOther.getobjecttag().equals("MULTISURFACE")){
 						return compareSurfaceOrAreaTo(iomObj, iomObjOther);
+					} else {
+					    return compareToTwoIomObj(iomObj, iomObjOther);
 					}
 				}
 			}
@@ -224,8 +226,59 @@ public class Value {
 		// incompatible type
 		throw new IllegalArgumentException("incompatible values");
 	}
-	
-	private int compareViewable(Viewable viewable2, Viewable viewable3) {
+
+    private double compareToTwoIomObj(IomObject iomObj, IomObject iomObjOther) {
+        if (iomObj.getattrcount() != iomObjOther.getattrcount()) {
+            return -1;
+        }
+        
+        if (iomObj.getobjectrefbid() != null && iomObjOther.getobjectrefbid() != null) {
+            if (!iomObj.getobjectrefbid().equals(iomObjOther.getobjectrefbid())) {
+                return -1;
+            }
+        } else if ((iomObj.getobjectrefbid() != null && iomObjOther.getobjectrefbid() == null) ) {
+            return 1;
+        } else if ((iomObj.getobjectrefbid() == null && iomObjOther.getobjectrefbid() != null)) {
+            return -1;
+        }
+        
+        if (iomObj.getobjectoid() != null && iomObjOther.getobjectoid() != null) {
+            if (!iomObj.getobjectoid().equals(iomObjOther.getobjectoid())) {
+                return -1;
+            }
+        } else if ((iomObj.getobjectoid() != null && iomObjOther.getobjectoid() == null) || 
+                (iomObj.getobjectoid() == null && iomObjOther.getobjectoid() != null)) {
+            return -1;
+        }
+        
+        if (iomObj.getobjecttag() != null && iomObjOther.getobjecttag() != null) {
+            if (!iomObj.getobjecttag().equals(iomObjOther.getobjecttag())) {
+                return -1;
+            }            
+        } else if ((iomObj.getobjecttag() != null && iomObjOther.getobjecttag() == null) || 
+                (iomObj.getobjecttag() == null && iomObjOther.getobjecttag() != null)) {
+            return -1;
+        }
+        
+        int count = iomObj.getattrcount();
+        for (int i = 0; i < count; i++) {
+            String attrNameIomObj = iomObj.getattrname(i);
+            
+            // simple(string) or complex(IomObject) or null
+            iomObj.getattrvaluecount(attrNameIomObj); // number of values per attribute name
+            
+           // iomObj.getattrobj(attrNameIomObj, )
+            String attrNameValue = iomObj.getattrvalue(attrNameIomObj);
+            String attrNameValueOther = iomObjOther.getattrvalue(attrNameIomObj);
+            if (!attrNameValue.equals(attrNameValueOther)) {
+                return -1;
+            }
+        }
+
+        return 0;
+    }
+
+    private int compareViewable(Viewable viewable2, Viewable viewable3) {
 		return (viewable3.equals(viewable2) ? 0 : (!viewable3.equals(viewable2) ? 1 : -1));
 	}
 

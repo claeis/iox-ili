@@ -2036,7 +2036,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10000.000 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10000.000 is out of range in attribute 'C2'", logger.getErrs().get(0).getEventMsg());
 	}
 	// Es wird ein Fehler ausgegeben, weil die Koordinate nicht 4 Dimensional sein darf.
 	@Test
@@ -2124,7 +2124,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 479999.999 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 479999.999 is out of range in attribute 'C1'", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob 9(5) erfolgreich auf 100 aufgerundet wird.
