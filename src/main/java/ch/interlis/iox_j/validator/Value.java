@@ -228,9 +228,7 @@ public class Value {
 	}
 
     private double compareToTwoIomObj(IomObject iomObj, IomObject iomObjOther) {
-        if (iomObj.getattrcount() != iomObjOther.getattrcount() || 
-                iomObj.getobjectline() != iomObjOther.getobjectline() || 
-                iomObj.getobjectcol() != iomObjOther.getobjectcol()) {
+        if (iomObj.getattrcount() != iomObjOther.getattrcount()) {
             return -1;
         }
         
@@ -238,8 +236,9 @@ public class Value {
             if (!iomObj.getobjectrefbid().equals(iomObjOther.getobjectrefbid())) {
                 return -1;
             }
-        } else if ((iomObj.getobjectrefbid() != null && iomObjOther.getobjectrefbid() == null) || 
-                (iomObj.getobjectrefbid() == null && iomObjOther.getobjectrefbid() != null)) {
+        } else if ((iomObj.getobjectrefbid() != null && iomObjOther.getobjectrefbid() == null) ) {
+            return 1;
+        } else if ((iomObj.getobjectrefbid() == null && iomObjOther.getobjectrefbid() != null)) {
             return -1;
         }
         
@@ -261,16 +260,16 @@ public class Value {
             return -1;
         }
         
-        int count = iomObjOther.getattrcount();
+        int count = iomObj.getattrcount();
         for (int i = 0; i < count; i++) {
             String attrNameIomObj = iomObj.getattrname(i);
-            String attrNameIomObjOther = iomObjOther.getattrname(i);
-            if (!attrNameIomObj.equals(attrNameIomObjOther)) {
-                return -1;
-            }
             
+            // simple(string) or complex(IomObject) or null
+            iomObj.getattrvaluecount(attrNameIomObj); // number of values per attribute name
+            
+           // iomObj.getattrobj(attrNameIomObj, )
             String attrNameValue = iomObj.getattrvalue(attrNameIomObj);
-            String attrNameValueOther = iomObjOther.getattrvalue(attrNameIomObjOther);
+            String attrNameValueOther = iomObjOther.getattrvalue(attrNameIomObj);
             if (!attrNameValue.equals(attrNameValueOther)) {
                 return -1;
             }
