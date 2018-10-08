@@ -141,12 +141,12 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
     @Test
-    public void embeddedAsso_superfuousAttr_Ok(){
+    public void embeddedAsso_Attr_Ok(){
         Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
         Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OID2);
-        IomObject linkObj=iomObjB.addattrobj(ILI_ASSOC_AB1_A1, "REF");
+        IomObject linkObj=iomObjB.addattrobj("a1Attr", "REF");
         linkObj.setobjectrefoid(iomObjA.getobjectoid());
-        linkObj.setattrvalue("attrB1", "test1");
+        linkObj.setattrvalue("attrAssoc", "1");
         ValidationConfig modelConfig=new ValidationConfig();
         LogCollector logger=new LogCollector();
         LogEventFactory errFactory=new LogEventFactory();
@@ -160,6 +160,28 @@ public class Association23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(0,logger.getErrs().size());
+    }
+    @Test
+    public void embeddedAsso_InvalidAttrValue_Fail(){
+        Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OID1);
+        Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OID2);
+        IomObject linkObj=iomObjB.addattrobj("a1Attr", "REF");
+        linkObj.setobjectrefoid(iomObjA.getobjectoid());
+        linkObj.setattrvalue("attrAssoc", "test1");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+        validator.validate(new ObjectEvent(iomObjA));
+        validator.validate(new ObjectEvent(iomObjB));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1,logger.getErrs().size());
+        assertEquals("value <test1> is not a number", logger.getErrs().get(0).getEventMsg());
     }
     @Test
     public void embeddedAssoExtended_Ok(){

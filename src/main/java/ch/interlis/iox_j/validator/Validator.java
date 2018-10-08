@@ -289,7 +289,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=new ch.interlis.iom_j.Iom_jObject(((ch.interlis.iox.ObjectEvent)event).getIomObject());
 			try {
-                validateObject(iomObj,null);
+                validateObject(iomObj,null,null);
 			} catch (IoxException e) {
 				errs.addEvent(errFact.logInfoMsg("failed to validate object {0}", iomObj.toString()));
 			}catch(RuntimeException e) {
@@ -1682,7 +1682,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         return Value.createUndefined();
     }
 	
-	private IomObject getIomObjWithIndex(IomObject iomObj, StructAttributeRef structAttributeRefValue, String currentAttrName) {
+    private IomObject getIomObjWithIndex(IomObject iomObj, StructAttributeRef structAttributeRefValue, String currentAttrName) {
         int expectedIndex = (int) (long) structAttributeRefValue.getIndex();
         int attrValueCount = iomObj.getattrvaluecount(currentAttrName);
         if (structAttributeRefValue.getIndex() == structAttributeRefValue.eFIRST) {
@@ -2512,7 +2512,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	HashSet<Object> loggedObjects=new HashSet<Object>();
     private boolean disableRounding=false;
 	
-	private void validateObject(IomObject iomObj,String attrPath) throws IoxException {
+	private void validateObject(IomObject iomObj,String attrPath,Viewable assocClass) throws IoxException {
 		// validate if object is null
 		boolean isObject = attrPath==null;
 		if(isObject){
@@ -2528,7 +2528,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 
 		String tag=iomObj.getobjecttag();
-		Object modelele=tag2class.get(tag);
+        Object modelele=null;
+		if(assocClass!=null && "REF".equals(tag)) {
+		    modelele=assocClass;
+		}else {
+	        modelele=tag2class.get(tag);
+		}
 		if(modelele==null){
 			if(!unknownTypev.contains(tag)){
 				errs.addEvent(errFact.logErrorMsg("unknown class <{0}>",tag));
@@ -2613,7 +2618,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						// skip implicit particles (base-viewables) of views
 					}else{
 						propNames.add(attr.getName());
-						validateAttrValue(iomObj,attr,null);
+						validateAttrValue(aclass1,iomObj,attr,null);
 					}
 				}
 			}
@@ -2651,45 +2656,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                 propNames.add(roleName);
                                 
                                 //Validate if no superfluous properties
-                                if (roleOwner.getAttributes().hasNext()) {
-                                    Iterator<Extendable> attributes = roleOwner.getAttributes();
-                                    int i = 0;
-                                    while (attributes.hasNext()) {
-                                        LocalAttribute localAttr = (LocalAttribute) attributes.next();
-                                        String attrName = embeddedLinkObj.getattrname(i);
-                                        if (!localAttr.getName().contains(attrName)) {
-                                            errs.addEvent(errFact.logErrorMsg("unknown property <{0}>", attrName));
-                                        }
-                                        i++;
-                                    }
-                                } else if (roleOwner.getLightweightAssociations().iterator().hasNext()) {
-                                    Iterator<RoleDef> iterator = roleOwner.getLightweightAssociations().iterator();
-                                    int i = 0;
-                                    while (iterator.hasNext()) {
-                                        RoleDef roleDef = iterator.next();
-                                        String attrName = embeddedLinkObj.getattrname(i);
-                                        if (!roleDef.getName().contains(attrName)) {
-                                            errs.addEvent(errFact.logErrorMsg("unknown property <{0}>", attrName));
-                                        }
-                                        i++;
-                                    }
-                                } else if (roleOwner.getRoleWhereEmbedded().iteratorDestination().hasNext() && embeddedLinkObj.getattrcount() > 0) {
-                                    Iterator<AbstractClassDef> iDestination = roleOwner.getRoleWhereEmbedded().iteratorDestination();
-                                    int i = 0;
-                                    while (iDestination.hasNext()) {
-                                        AbstractClassDef classDef = iDestination.next();
-                                        Iterator attributes = classDef.getAttributes();
-                                        while (attributes.hasNext()) {
-                                            LocalAttribute localAttr = (LocalAttribute) attributes.next();
-                                            String attrName = embeddedLinkObj.getattrname(i);
-                                            if (!localAttr.getName().contains(attrName)) {
-                                                errs.addEvent(errFact.logErrorMsg("unknown property <{0}>", attrName));
-                                            }
-                                            i++;
-                                        }
-                                    }
+                                if(propc>0) {
+                                    validateObject(embeddedLinkObj,roleName,roleOwner);
                                 }
-
+                                
                                 if (embeddedLinkObj != null) {
                                     refoid = embeddedLinkObj.getobjectrefoid();
                                     long orderPos = embeddedLinkObj
@@ -2950,11 +2920,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return null;
 	}
 
-	private void validateAttrValue(IomObject iomObj, AttributeDef attr,String attrPath) throws IoxException {
+	private void validateAttrValue(Viewable eleClass,IomObject iomObj, AttributeDef attr,String attrPath) throws IoxException {
 		 String attrName = attr.getName();
 		 String attrQName = getScopedName(attr);
-		 String objTag=iomObj.getobjecttag();
-		 Viewable eleClass=(Viewable) tag2class.get(objTag);
 		 String iliClassQName=getScopedName(eleClass);
 		 if(attrPath==null){
 			 attrPath=attrName;
@@ -3017,7 +2985,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								 logMsg(validateType,"Attribute {0} requires a non-abstract structure", attrPath);
 							}
 						}
-						validateObject(structEle, attrPath+"["+structi+"]");
+						validateObject(structEle, attrPath+"["+structi+"]",null);
 					}
 			 }
 		}else{
