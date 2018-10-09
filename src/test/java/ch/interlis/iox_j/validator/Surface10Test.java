@@ -760,9 +760,9 @@ public class Surface10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==4);
-		assertEquals("value 4800000.000 is out of range in attribute 'C1'", logger.getErrs().get(0).getEventMsg());
-		assertEquals("value 700000.000 is out of range in attribute 'C2'", logger.getErrs().get(1).getEventMsg());
-		assertEquals("value 50000.000 is out of range in attribute 'C3'", logger.getErrs().get(2).getEventMsg());
+		assertEquals("value 4800000.000 is out of range in attribute surface3d", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 700000.000 is out of range in attribute surface3d", logger.getErrs().get(1).getEventMsg());
+		assertEquals("value 50000.000 is out of range in attribute surface3d", logger.getErrs().get(2).getEventMsg());
 		assertEquals("failed to validate polygon", logger.getErrs().get(3).getEventMsg());
 	}
 	
@@ -800,8 +800,8 @@ public class Surface10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==3);
-		assertEquals("value 4800000.000 is out of range in attribute 'A1'", logger.getErrs().get(0).getEventMsg());
-		assertEquals("value 700000.000 is out of range in attribute 'A2'", logger.getErrs().get(1).getEventMsg());
+		assertEquals("value 4800000.000 is out of range in attribute surface3d", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 700000.000 is out of range in attribute surface3d", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// pruefe ob die Fehlermeldung ausgegeben wird, wenn die outerboundary nicht existiert.

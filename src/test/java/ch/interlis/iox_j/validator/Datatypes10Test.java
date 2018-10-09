@@ -998,7 +998,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.5 is out of range in attribute 'bereich'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.5 is out of range in attribute bereich", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn die Zahleneingabe kleiner ist, als definiert wurde.
@@ -1018,7 +1018,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value -0.5 is out of range in attribute 'bereich'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value -0.5 is out of range in attribute bereich", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn der Bereich (auf 3 Kommastellen gerundet) groesser ist als definiert.
@@ -1038,7 +1038,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.500 is out of range in attribute 'bereich2'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.500 is out of range in attribute bereich2", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt eine Fehlermeldung aus, wenn der Bereich kleiner ist (auf 3 Stellen gerundet), als definiert.
@@ -1058,7 +1058,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value -0.500 is out of range in attribute 'bereich2'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value -0.500 is out of range in attribute bereich2", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Gibt einen Fehler aus, wenn die Hierarchie nicht richtig eingegeben wurde.
@@ -1078,7 +1078,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value mehr.mehr.vier is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value mehr.mehr.vier is not a member of the enumeration in attribute aufzaehlung", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn der Typ afuzaelung nicht richtig geschrieben wurde.
@@ -1118,7 +1118,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value meter.ml is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value meter.ml is not a member of the enumeration in attribute aufzaehlung2Oberauszaehlungen", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn  die Aufzaehlung nicht in der selber Enumeratiobn sich befindet. Test 2.
@@ -1138,7 +1138,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value liter.mm is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value liter.mm is not a member of the enumeration in attribute aufzaehlung2Oberauszaehlungen", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Gibt einen Fehler aus, wenn die Laenge zu hoch ist.
@@ -1158,7 +1158,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.5 is out of range in attribute 'laenge'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.5 is out of range in attribute laenge", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn die Laenge zu kurz ist.
@@ -1178,7 +1178,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 0.4 is out of range in attribute 'laenge'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 0.4 is out of range in attribute laenge", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn die Laenge nicht numerisch ist.
@@ -1238,7 +1238,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.5 is out of range in attribute 'flaeche'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.5 is out of range in attribute flaeche", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn die Flaechendefinition zu klein ist.
@@ -1258,7 +1258,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 0.4 is out of range in attribute 'flaeche'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 0.4 is out of range in attribute flaeche", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn die Flaeche nicht numerisch, sondern aus Buchstaben besteht.
@@ -1318,7 +1318,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.5 is out of range in attribute 'radians'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.5 is out of range in attribute radians", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn der Radian kleiner ist, als erlaubt.
@@ -1338,7 +1338,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 0.4 is out of range in attribute 'radians'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 0.4 is out of range in attribute radians", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn grads groesser definiert wurde, als erlaubt.
@@ -1358,7 +1358,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.5 is out of range in attribute 'grads'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.5 is out of range in attribute grads", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn grads kleiner definiert wurde, als erlaubt.
@@ -1378,7 +1378,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 0.4 is out of range in attribute 'grads'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 0.4 is out of range in attribute grads", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn degrees groesser ist, als erlaubt.
@@ -1398,7 +1398,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.5 is out of range in attribute 'degrees'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.5 is out of range in attribute degrees", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn degrees kleiner ist, als erlaubt.
@@ -1418,7 +1418,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 0.4 is out of range in attribute 'degrees'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 0.4 is out of range in attribute degrees", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn radian Type: abc keine Nummer ist.
@@ -1518,7 +1518,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <15801225> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <15801225> is not in range in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn das Datum die maximale Definition uebersteigt.
@@ -1538,7 +1538,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 				assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <30001225> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <30001225> is not in range in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn das Datum des Monats zu tief ist.
@@ -1558,7 +1558,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <20160025> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <20160025> is not in range in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn das Datum des Monats zu hoch ist.
@@ -1578,7 +1578,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <20161325> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <20161325> is not in range in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn das Datum des Tages zu tief ist.
@@ -1598,7 +1598,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <20161200> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <20161200> is not in range in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn das Datum des Tages zu hoch ist.
@@ -1618,7 +1618,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <20161232> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <20161232> is not in range in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Datum darf nicht mit Dots getrennt werden, sonst wird ein Fehler ausgegeben.
@@ -1638,7 +1638,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016.12.25> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <2016.12.25> is not a valid Date in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird ein Fehler ausgegeben, wenn das Datum zu kurz geschrieben wird.
@@ -1658,7 +1658,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016125> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <2016125> is not a valid Date in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird ein Fehler ausgegeben, wenn das Datum zu lang geschrieben wurde.
@@ -1678,7 +1678,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <201612251> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <201612251> is not a valid Date in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es wird ein Fehler ausgegeben, wenn die Horizontale nicht existiert.
@@ -1698,7 +1698,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value Top is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value Top is not a member of the enumeration in attribute horizAlignment", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird ein Fehler ausgegeben, wenn die Vertikale nicht existiert.
@@ -1718,7 +1718,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value Left is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value Left is not a member of the enumeration in attribute vertAlignment", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird ein Fehler ausgegeben, wenn die Koordinate eine falsche dimension aufweist.
@@ -1805,7 +1805,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 99.9 is out of range in attribute 'C2'", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 99.9 is out of range in attribute koord2", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob 9(5) erfolgreich auf 100 aufgerundet wird.
