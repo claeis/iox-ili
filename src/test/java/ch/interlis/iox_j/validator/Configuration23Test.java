@@ -1524,7 +1524,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("value <undecided> is not a BOOLEAN", logger.getWarn().get(0).getEventMsg());
+		assertEquals("value <undecided> is not a BOOLEAN in attribute aBoolean", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// parameter=default=off
@@ -1569,7 +1569,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("value 10000.000 is out of range in attribute 'C2'",logger.getWarn().get(0).getEventMsg());
+		assertEquals("value 10000.000 is out of range in attribute lcoord",logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// target=on. Erwarte den Fehler:

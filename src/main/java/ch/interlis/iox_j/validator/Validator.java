@@ -2950,7 +2950,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(ValidationConfig.OFF.equals(validateMultiplicity)){
 					if(!configOffOufputReduction.contains(ValidationConfig.MULTIPLICITY+":"+attrQName)){
 						configOffOufputReduction.add(ValidationConfig.MULTIPLICITY+":"+attrQName);
-						errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration multiplicity=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
+						errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration multiplicity=off in attribute {1}", attrQName, attrName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 					}
 				}else{
 					 Cardinality card = ((CompositionType)type).getCardinality();
@@ -2963,7 +2963,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(ValidationConfig.OFF.equals(validateType)){
 						if(!configOffOufputReduction.contains(ValidationConfig.TYPE+":"+attrQName)){
 							configOffOufputReduction.add(ValidationConfig.TYPE+":"+attrQName);
-							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration type=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
+							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration type=off in attribute {1}", attrQName, attrName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 						}
 					}else if(structEle==null) {
 							 logMsg(validateType,"Attribute {0} requires a structure {1}", attrPath,((CompositionType)type).getComponentType().getScopedName(null));
@@ -2972,7 +2972,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						Object modelele=tag2class.get(tag);
 						if(modelele==null){
 							if(!unknownTypev.contains(tag)){
-								errs.addEvent(errFact.logErrorMsg("unknown class <{0}>",tag));
+								errs.addEvent(errFact.logErrorMsg("unknown class <{0}> in attribute {1}",tag, attrName));
 							}
 						}else{
 							Viewable structEleClass=(Viewable) modelele;
@@ -3024,7 +3024,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(ValidationConfig.OFF.equals(validateType)){
 				if(!configOffOufputReduction.contains(ValidationConfig.TYPE+":"+attrQName)){
 					configOffOufputReduction.add(ValidationConfig.TYPE+":"+attrQName);
-					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration type=off", attrQName, iomObj.getobjecttag(), iomObj.getobjectoid()));
+					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration type=off in attribute {1}", attrQName, attrName, iomObj.getobjecttag(), iomObj.getobjectoid()));
 				}
 			}else{
 				if (attr.isDomainIli1Date()) {
@@ -3042,13 +3042,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							if (year >= 1582 && year <= 2999 && month >= 01 && month <= 12
 									&& day >= 01 && day <= 31) {
 							} else {
-								logMsg(validateType, "value <{0}> is not in range", valueStr);
+								logMsg(validateType, "value <{0}> is not in range in attribute {1}", valueStr, attrName);
 							}
 						} catch (NumberFormatException numberformatexception) {
-							logMsg(validateType, "value <{0}> is not a valid Date", valueStr);
+							logMsg(validateType, "value <{0}> is not a valid Date in attribute {1}", valueStr, attrName);
 						}
 					} else {
-						logMsg(validateType, "value <{0}> is not a valid Date", valueStr);
+						logMsg(validateType, "value <{0}> is not a valid Date in attribute {1}", valueStr, attrName);
 					}
 				} else if (attr.isDomainBoolean()) {
 					// Value has to be not null and ("true" or "false")
@@ -3056,7 +3056,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if (valueStr == null || valueStr.equals("true") || valueStr.equals("false")){
 						// Value okay, skip it
 					} else {
-						logMsg(validateType, "value <{0}> is not a BOOLEAN", valueStr);
+						logMsg(validateType, "value <{0}> is not a BOOLEAN in attribute {1}", valueStr, attrName);
 					}
 				} else if (attr.isDomainIliUuid()) {
 					// Value is exactly 36 chars long and matches the regex
@@ -3064,7 +3064,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if (valueStr == null || isValidUuid(valueStr)) {
 							// Value ok, Skip it
 					} else {
-						logMsg(validateType, "value <{0}> is not a valid UUID", valueStr);
+						logMsg(validateType, "value <{0}> is not a valid UUID in attribute {1}", valueStr, attrName);
 					}
 				} else if (attr.isDomainIli2Date()) {
 					// Value matches regex and is not null and is in range of type.
@@ -3072,9 +3072,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					FormattedType subType = (FormattedType) type;
 					if (valueStr != null){
 						if (!valueStr.matches(subType.getRegExp())) {
-							logMsg(validateType, "invalid format of date value <{0}>", valueStr);
+							logMsg(validateType, "invalid format of date value <{0}> in attribue {1}", valueStr, attrName);
 						} else if(!subType.isValueInRange(valueStr)){
-							logMsg(validateType, "date value <{0}> is not in range", valueStr);
+							logMsg(validateType, "date value <{0}> is not in range in attribute {1}", valueStr, attrName);
 						}
 					}
 				} else if (attr.isDomainIli2Time()) {
@@ -3084,9 +3084,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
 					if (valueStr != null){
 						if (!valueStr.matches(subType.getRegExp()) || valueStr.length() < 9 || valueStr.length() > 12){
-							logMsg(validateType, "invalid format of time value <{0}>", valueStr);
+							logMsg(validateType, "invalid format of time value <{0}> in attribute {1}", valueStr, attrName);
 						} else if(!subType.isValueInRange(valueStr)){
-							logMsg(validateType, "time value <{0}> is not in range", valueStr);
+							logMsg(validateType, "time value <{0}> is not in range in attribute {1}", valueStr, attrName);
 						}
 					}
 				} else if (attr.isDomainIli2DateTime()) {
@@ -3096,9 +3096,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
 					if (valueStr != null){
 						if (!valueStr.matches(subType.getRegExp()) || valueStr.length() < 18 || valueStr.length() > 23) {
-							logMsg(validateType, "invalid format of datetime value <{0}>", valueStr);
+							logMsg(validateType, "invalid format of datetime value <{0}> in attribute {1}", valueStr, attrName);
 						} else if(!subType.isValueInRange(valueStr)){
-							logMsg(validateType, "datetime value <{0}> is not in range", valueStr);
+							logMsg(validateType, "datetime value <{0}> is not in range in attribute {1}", valueStr, attrName);
 						}
 					}
 				} else if(isDomainName(attr)) {
@@ -3107,7 +3107,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if (valueStr!=null) {
 						validateTextType(iomObj, attrPath, attrName, validateType, type, valueStr);
 						if (isAKeyword(valueStr)) {
-							logMsg(validateType,"value <{0}> is a keyword", valueStr);
+							logMsg(validateType,"value <{0}> is a keyword in attribute {1}", valueStr, attrName);
 						}else{
 							// value is not a keyword
 						}
@@ -3116,7 +3116,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						if(matcher!=null && matcher.matches()){
 							// value matched pattern
 						}else {
-							logMsg(validateType,"invalid format of INTERLIS.NAME value <{0}>", valueStr);
+							logMsg(validateType,"invalid format of INTERLIS.NAME value <{0}> in attribute {1}", valueStr, attrName);
 						}
 					}
 				}else if (isDomainUri(attr)) { 
@@ -3131,14 +3131,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         if(matcher!=null && matcher.matches()){
                          // value matched pattern
                         }else {
-                            logMsg(validateType,"invalid format of INTERLIS.URI value <{0}>", valueStr);
+                            logMsg(validateType,"invalid format of INTERLIS.URI value <{0}> in attribute {1}", valueStr, attrName);
                         }
                     }
 				} else if (type instanceof PolylineType){
 					PolylineType polylineType=(PolylineType)type;
 					IomObject polylineValue=iomObj.getattrobj(attrName, 0);
 					if (polylineValue != null){
-						boolean isValid=validatePolyline(validateGeometryType, polylineType, polylineValue);
+						boolean isValid=validatePolyline(validateGeometryType, polylineType, polylineValue, attrName);
 						if(isValid){
 							validatePolylineTopology(attrPath,validateGeometryType, polylineType, polylineValue);
 						}
@@ -3191,7 +3191,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}else if(type instanceof CoordType){
 					IomObject coord=iomObj.getattrobj(attrName, 0);
 					if (coord!=null){
-						validateCoordType(validateGeometryType, (CoordType)type, coord);
+						validateCoordType(validateGeometryType, (CoordType)type, coord, attrName);
 					}
 				}else if(type instanceof NumericType){
 					String valueStr=iomObj.getattrvalue(attrName);
@@ -3210,7 +3210,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					String value=iomObj.getattrvalue(attrName);
 					if(value!=null){
 						if(!((EnumerationType) type).getValues().contains(value)){
-							 logMsg(validateType,"value {0} is not a member of the enumeration", value);
+							 logMsg(validateType,"value {0} is not a member of the enumeration in attribute {1}", value, attrName);
 						}
 					}else{
 						IomObject structValue=iomObj.getattrobj(attrName, 0);
@@ -3356,7 +3356,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}    
 						for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
 							IomObject polyline=boundary.getattrobj("polyline",polylinei);
-							validatePolyline(validateType, surfaceOrAreaType, polyline);
+							validatePolyline(validateType, surfaceOrAreaType, polyline, attrName);
 							// add line to shell or hole
 						}
 					    // add shell or hole to surface
@@ -3371,7 +3371,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	// returns true if valid
-	private boolean validatePolyline(String validateType, LineType polylineType, IomObject polylineValue) {
+	private boolean validatePolyline(String validateType, LineType polylineType, IomObject polylineValue, String attrName) {
 		boolean foundErrs=false;
 		if (polylineValue.getobjecttag().equals("POLYLINE")){
 			boolean clipped = polylineValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
@@ -3393,14 +3393,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						IomObject segment=sequence.getattrobj("segment",segmenti);
 						if(segment.getobjecttag().equals("COORD")){
 							if(lineformNames.contains("STRAIGHTS") || segmenti==0){
-								validateCoordType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment);
+								validateCoordType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment, attrName);
 							}else{
 								logMsg(validateType, "unexpected COORD");
 								foundErrs = foundErrs || true;
 							}
 						} else if (segment.getobjecttag().equals("ARC")){
 							if(lineformNames.contains("ARCS") && segmenti>0){
-								validateARCSType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment);
+								validateARCSType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment, attrName);
 							}else{
 								logMsg(validateType, "unexpected ARC");
 								foundErrs = foundErrs || true;
@@ -3422,10 +3422,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return !foundErrs;
 	}
 
-	private void validateCoordType(String validateType, CoordType coordType, IomObject coordValue) {
+	private void validateCoordType(String validateType, CoordType coordType, IomObject coordValue, String attrName) {
 		if (coordType.getDimensions().length >= 1){
 			if (coordValue.getattrvalue("C1") != null){
-				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"), "C1"));
+				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"), attrName));
 			} else if (coordValue.getattrvalue("A1") != null) {
 				logMsg(validateType, "Not a type of COORD");
 			} else {
@@ -3439,7 +3439,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		if (coordType.getDimensions().length >= 2){
 			if (coordValue.getattrvalue("C2") != null){
-				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"), "C2"));
+				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"), attrName));
 			} else if (coordValue.getattrvalue("A2") != null) {
 				logMsg(validateType, "Not a type of COORD");
 			} else {
@@ -3448,7 +3448,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		if (coordType.getDimensions().length == 3){
 			if (coordValue.getattrvalue("C3") != null){
-				coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"), "C3"));
+				coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"), attrName));
 			} else {
 				logMsg(validateType, "Wrong COORD structure, C3 expected");
 			}
@@ -3467,7 +3467,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private void validateARCSType(String validateType, CoordType coordType, IomObject coordValue) {
+	private void validateARCSType(String validateType, CoordType coordType, IomObject coordValue, String attrName) {
 		int dimLength=coordType.getDimensions().length;
 		String c1=coordValue.getattrvalue("C1");
 		String c2=coordValue.getattrvalue("C2");
@@ -3479,17 +3479,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		int c1Count=coordValue.getattrvaluecount("C1");
 		if (dimLength>=2 && dimLength<=3){
 			if(a1!=null && a2!=null && c1!=null && c2!=null){
-				coordValue.setattrvalue("A1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], a1, "A1"));
-				coordValue.setattrvalue("A2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], a2, "A2"));
-				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], c1, "C1"));
-				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], c2, "C2"));
+				coordValue.setattrvalue("A1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], a1, attrName));
+				coordValue.setattrvalue("A2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], a2, attrName));
+				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], c1, attrName));
+				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], c2, attrName));
 				if(dimLength==2) {
 					if(c3!=null) {
 						logMsg(validateType, "Wrong ARC structure, C3 not expected");
 					}
 				}else if(dimLength==3) {
 					if(c3!=null) {
-						coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], c3, "C3"));
+						coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], c3, attrName));
 					}else {
 						logMsg(validateType, "Wrong ARC structure, C3 expected");
 					}
@@ -3541,7 +3541,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	            rounded=roundNumeric(precision,valueBigDec);
 			}
 			if (rounded!=null && (rounded.compareTo(min_general)==-1 || rounded.compareTo(max_general)==+1)){
-				logMsg(validateType,"value {0} is out of range in attribute '{1}'", rounded.toString(), attrName);
+				logMsg(validateType,"value {0} is out of range in attribute {1}", rounded.toString(), attrName);
 			}
 		}
 		if(rounded==null) {
