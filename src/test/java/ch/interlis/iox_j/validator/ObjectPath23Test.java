@@ -41,6 +41,7 @@ public class ObjectPath23Test {
     // STRUCTURE
     private final static String STRUCTD1 = TOPIC + ".StructD1";
     private final static String STRUCTS = TOPIC + ".StructS";
+    private final static String STRUCTS3 = TOPIC + ".StructS3";
 
     // TD
     private TransferDescription td = null;
@@ -207,10 +208,12 @@ public class ObjectPath23Test {
         Iom_jObject objE1 = new Iom_jObject(CLASSE, OID1);
         Iom_jObject objStructD1 = (Iom_jObject) objE1.addattrobj("attrE2", STRUCTD1);
         Iom_jObject objStructS3 = (Iom_jObject) objStructD1.addattrobj("attrD3", STRUCTS);
-        objStructS3.setattrvalue("attrS1", "S1");
-
+        Iom_jObject objStructS8 = (Iom_jObject) objStructS3.addattrobj("attrS3", STRUCTS3);
+        objStructS8.setattrvalue("attrS8", "S1");
+        
         Iom_jObject objStructS4 = (Iom_jObject) objStructD1.addattrobj("attrD4", STRUCTS);
-        objStructS4.setattrvalue("attrS1", "S1");
+        Iom_jObject objStructS9 = (Iom_jObject) objStructS4.addattrobj("attrS3", STRUCTS3);
+        objStructS9.setattrvalue("attrS8", "S1");
 
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
@@ -303,10 +306,12 @@ public class ObjectPath23Test {
         Iom_jObject objE1 = new Iom_jObject(CLASSE, OID1);
         Iom_jObject objStructD1 = (Iom_jObject) objE1.addattrobj("attrE2", STRUCTD1);
         Iom_jObject objStructS3 = (Iom_jObject) objStructD1.addattrobj("attrD3", STRUCTS);
-        objStructS3.setattrvalue("attrS1", "S1");
+        Iom_jObject objStructS8 = (Iom_jObject) objStructS3.addattrobj("attrS3", STRUCTS3);
+        objStructS8.setattrvalue("attrS8", "S1");
 
         Iom_jObject objStructS4 = (Iom_jObject) objStructD1.addattrobj("attrD4", STRUCTS);
-        objStructS4.setattrvalue("attrS2", "S2");
+        Iom_jObject objStructS9 = (Iom_jObject) objStructS4.addattrobj("attrS3", STRUCTS3);
+        objStructS9.setattrvalue("attrS8", "S2");       
 
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();

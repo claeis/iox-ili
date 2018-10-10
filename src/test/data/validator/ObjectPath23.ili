@@ -11,10 +11,15 @@ MODEL ObjectPath23
 		CLASS ClassC1 =
 			attrC1 : TEXT*10;
 		END ClassC1;
-
+		
+		STRUCTURE StructS3 =
+			attrS8 : TEXT*10;
+			attrS9 : TEXT*10;
+		END StructS3;
 		STRUCTURE StructS =
 			attrS1 : TEXT*10;
 			attrS2 : TEXT*10;
+			attrS3 : StructS3;
 		END StructS;
 		STRUCTURE StructD1 =
 			attrD1 : TEXT*10;
