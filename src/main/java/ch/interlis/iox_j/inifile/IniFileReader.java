@@ -6,12 +6,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PushbackReader;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import ch.interlis.iox_j.validator.ValidationConfig;
 
 public class IniFileReader {
-    static public ValidationConfig readFile(java.io.File file) throws Exception {
+
+    public static ValidationConfig readFile(java.io.File file) throws Exception {
         ValidationConfig config = null;
         config = new ValidationConfig();
         mergeIniFile(config, file);
@@ -20,107 +24,173 @@ public class IniFileReader {
 
     private static void mergeIniFile(ValidationConfig config, File file) throws Exception {
         BufferedReader br = null;
+        PushbackReader pushbackReader = null;
+        StringReader stringReader = null;
         try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(file), Charset.forName("UTF-8")));
+            String line = null;
             String key = null;
             String value = null;
             String header = null;
-            int numberOfLine = 0;
-            String line = null;
             while ((line = br.readLine()) != null) {
-                String lineWithoutCommnet = removeComments(line);
-                if (lineWithoutCommnet.isEmpty()) {
-                    numberOfLine++;
+                stringReader = new StringReader(line);
+                pushbackReader = new PushbackReader(stringReader);
+                skipSpaces(pushbackReader);
+                int c = pushbackReader.read();
+                // end of line?
+                if (c == -1) {
+                    // read next line
                     continue;
                 }
-                if (lineWithoutCommnet.startsWith("[")) {
-                    if (isValidHeader(lineWithoutCommnet)) {
-                        header = getHeaderValue(lineWithoutCommnet.substring(1, lineWithoutCommnet.length() - 1));
-                    } else {
-                        throw new Exception(
-                                "\"There is an error at the Header format! ([) or (]) missing! Line number: "
-                                        + numberOfLine);
-                    }
-
+                // Header line
+                if (c == '[') {
+                    pushbackReader.unread(c);
+                    header = parseHeaderLine(pushbackReader);
+                } else if (c == '#') {
+                    pushbackReader.unread(c);
+                    parseComment(pushbackReader);
                 } else {
-                    String[] keyAndValue = getKeyAndValue(lineWithoutCommnet);
-                    if (keyAndValue != null) {
-                        key = keyAndValue[0];
-                        value = keyAndValue[1];
-                    } else {
-                        throw new Exception("\"There is an error at the Item format! (=) must be sein! Line number: "
-                                + numberOfLine);
-                    }
-                }
-
-                if (header != null && key != null && value != null) {
+                    pushbackReader.unread(c);
+                    // Key And Value line
+                    String[] keyAndValue = parseKeyValueLine(pushbackReader);
+                    key = keyAndValue[0];
+                    value = keyAndValue[1];
                     config.setConfigValue(header, key, value);
-                    header = key = value = null;
                 }
-                numberOfLine++;
             }
         } catch (UnsupportedEncodingException e) {
             throw new Exception(e.getMessage());
         } catch (FileNotFoundException e) {
             throw new Exception(e.getMessage());
         } catch (IOException e) {
+            throw new Exception(e);
+        } catch (Exception e) {
             throw new Exception(e.getMessage());
         } finally {
             if (br != null) {
                 br.close();
             }
-
+            if (pushbackReader != null) {
+                pushbackReader.close();
+            }
+            if (stringReader != null) {
+                stringReader.close();
+            }
         }
     }
 
-    private static String stripQuotes(String line) {
-        return (line.startsWith("\"") && line.endsWith("\"")) == true ? line.substring(1, line.length() - 1) : line;
+    private static String parseHeaderLine(PushbackReader line) throws IOException {
+        int c;
+        skipSpaces(line);
+        c = line.read();
+        if (c == -1) {
+            return null;
+        }
+        if (c != '[') {
+            throw new IOException("unexpected char '" + (char) c + "' in header value");
+        }
+        skipSpaces(line);
+        String headerName = parseName(line);
+        skipSpaces(line);
+        c = line.read();
+        if (c != ']') {
+            throw new IOException("unexpected char '" + (char) c + "' in header value");
+        }
+        parseComment(line);
+        return headerName;
     }
 
-    private static String[] getKeyAndValue(String line) {
-        String values[] = line.split("=");
-        values[0] = stripQuotes(values[0]);
-        values[1] = stripQuotes(values[1]);
-        return values;
+    private static void parseComment(PushbackReader line) {
+        // no need to read comment
     }
 
-    private static String getHeaderValue(String headerValue) {
-        return (headerValue.startsWith("\"") && headerValue.endsWith("\"")) == true
-                ? headerValue.substring(1, headerValue.length() - 1)
-                : headerValue;
-    }
-
-    private static String removeComments(String currentLine) {
-        StringBuilder text = new StringBuilder();
-        int numberOfquotes = 0;
-        int numberOfBrackets = 0;
-        for (int i = 0; i < currentLine.length(); i++) {
-            char c = currentLine.charAt(i);
-            if (c == '#' && i == 0) {
-                break;
-            }
-            if (c == '[' || c == ']') {
-                numberOfBrackets++;
-            }
-            if (c == '"') {
-                numberOfquotes++;
-            }
-            if (numberOfBrackets > 0) {
-                if ((numberOfBrackets % 2) == 0 && c == '#') {
+    private static String parseName(PushbackReader line) throws IOException {
+        StringBuilder value = new StringBuilder();
+        int c = line.read();
+        if (c == '"') {
+            // quoted name
+            c = line.read();
+            while (true) {
+                // end of line?
+                if (c == -1) {
                     break;
                 }
+                // end quote character?
+                if (c == '"') {
+                    break;
+                }else if(c=='\\') {
+                    c=line.read();
+                    if (c == -1) {
+                        throw new IOException("unexpected end of name");
+                    }else if(c=='\\' || c=='"') {
+                        value.append((char) c);
+                    }else {
+                        throw new IOException("unexpected character '"+(char)c+"' after escape");
+                    }
+                }else {
+                    value.append((char) c);
+                }
+                // read next
+                c = line.read();
             }
-
-            if ((numberOfquotes % 2) == 0 && c == '#') {
-                break;
+        } else {
+            // unquoted name
+            while (true) {
+                // end of line?
+                if (c == -1) {
+                    break;
+                }
+                // space?
+                if (c == ' ' || c == '\t') {
+                    break;
+                }
+                // any non name character?
+                if (!Character.isDigit(c) && !Character.isLetter(c) && c != '_' && c != '.' && c != '-' && c != '?'
+                        && c != ':' && c != '}' && c != '{') {
+                        break;
+                }
+                // a name character, append it
+                value.append((char) c);
+                // read next
+                c = line.read();
             }
-
-            text.append(c);
+            if (c != -1) {
+                line.unread(c);
+            }
+            if (value.length() == 0) {
+                throw new IOException("unexpected end of name");
+            }
         }
-        return text.toString().trim();
+        return value.toString();
     }
 
-    private static boolean isValidHeader(String line) {
-        return line.startsWith("[") == true && line.endsWith("]") == true ? true : false;
+    private static void skipSpaces(PushbackReader line) throws IOException {
+        int c = line.read();
+        while (c == ' ' || c == '\t') {
+            c = line.read();
+        }
+        if (c != -1) {
+            line.unread(c);
+        }
     }
+
+    private static String[] parseKeyValueLine(PushbackReader line) throws IOException {
+        int c;
+        skipSpaces(line);
+        String[] keyAndValue = new String[2];
+        String key = parseName(line);
+        skipSpaces(line);
+        c = line.read();
+        if (c != '=') {
+            throw new IOException("unexpected char '" + (char) c + "' in key value");
+        }
+        skipSpaces(line);
+        String value = parseName(line);
+        skipSpaces(line);
+        parseComment(line);
+        keyAndValue[0] = key;
+        keyAndValue[1] = value;
+        return keyAndValue;
+    }
+
 }
