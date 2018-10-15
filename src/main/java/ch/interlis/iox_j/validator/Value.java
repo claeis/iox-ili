@@ -272,10 +272,10 @@ public class Value {
                 return -1;
             }
             for (int j = 0; j < actualCount; j++) {
-                IomObject iomObjActualTmp = iomObj.getattrobj(attrNameIomObj,j);
-                IomObject iomObjOtherTmp = iomObjOther.getattrobj(attrNameIomObj,j);
+                IomObject iomStructActual = iomObj.getattrobj(attrNameIomObj,j);
+                IomObject iomStructOther = iomObjOther.getattrobj(attrNameIomObj,j);
                 //Simple Value
-                if (iomObjActualTmp == null && iomObjOtherTmp == null) {
+                if (iomStructActual == null && iomStructOther == null) {
                     String attrNameValue = iomObj.getattrvalue(attrNameIomObj);
                     String attrNameValueOther = iomObjOther.getattrvalue(attrNameIomObj);
                     if (!attrNameValue.equals(attrNameValueOther)) {
@@ -283,18 +283,10 @@ public class Value {
                     }
                 } else {
                     //Complex Value
-                    int objectCount = iomObjActualTmp.getattrcount();
-                    int objectCountOther = iomObjOtherTmp.getattrcount();
-                    //Both objects should have the same number of values
-                    if (objectCount != objectCountOther) {
-                        return -1;
+                    double returnValue = compareToTwoIomObj(iomStructActual, iomStructOther);
+                    if (returnValue != 0) {
+                        return returnValue;
                     }
-                    for (int k = 0; k < objectCount; k++) {
-                        double returnValue = compareToTwoIomObj(iomObjActualTmp, iomObjOtherTmp);
-                        if (returnValue != 0) {
-                            return returnValue;
-                        }
-                    }                  
                 }
             }
         }
