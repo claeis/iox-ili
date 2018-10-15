@@ -1965,13 +1965,11 @@ public class UniqueConstraints23Test {
 		
 		Iom_jObject obj_B_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSB,OID3);
 		IomObject attrObj_AB=obj_B_3.addattrobj("a1", EMBEDDED_UNIQUE_ASSOCAB);
-		attrObj_AB.setobjectrefoid(OID1);
-		attrObj_AB.setattrvalue(attrAB, "text1");
+		attrObj_AB.setobjectrefoid(obj_A_1.getobjectoid());
 		
 		Iom_jObject obj_B_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSB,OID4);
 		IomObject attrObj2_AB=obj_B_4.addattrobj("a1", EMBEDDED_UNIQUE_ASSOCAB);
-		attrObj2_AB.setobjectrefoid(OID2);
-		attrObj2_AB.setattrvalue(attrAB, "text1");
+		attrObj2_AB.setobjectrefoid(obj_A_2.getobjectoid());
 		
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();

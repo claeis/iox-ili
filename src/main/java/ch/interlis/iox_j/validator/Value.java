@@ -246,8 +246,9 @@ public class Value {
             if (!iomObj.getobjectoid().equals(iomObjOther.getobjectoid())) {
                 return -1;
             }
-        } else if ((iomObj.getobjectoid() != null && iomObjOther.getobjectoid() == null) || 
-                (iomObj.getobjectoid() == null && iomObjOther.getobjectoid() != null)) {
+        } else if (iomObj.getobjectoid() != null && iomObjOther.getobjectoid() == null) {
+            return 1;
+        } else if (iomObj.getobjectoid() == null && iomObjOther.getobjectoid() != null) {
             return -1;
         }
         
@@ -255,23 +256,38 @@ public class Value {
             if (!iomObj.getobjecttag().equals(iomObjOther.getobjecttag())) {
                 return -1;
             }            
-        } else if ((iomObj.getobjecttag() != null && iomObjOther.getobjecttag() == null) || 
-                (iomObj.getobjecttag() == null && iomObjOther.getobjecttag() != null)) {
+        } else if (iomObj.getobjecttag() != null && iomObjOther.getobjecttag() == null) {
+            return 1;
+        } else if (iomObj.getobjecttag() == null && iomObjOther.getobjecttag() != null) {
             return -1;
         }
-        
-        int count = iomObj.getattrcount();
-        for (int i = 0; i < count; i++) {
+
+        for (int i = 0; i < iomObj.getattrcount(); i++) {
             String attrNameIomObj = iomObj.getattrname(i);
             
-            // simple(string) or complex(IomObject) or null
-            iomObj.getattrvaluecount(attrNameIomObj); // number of values per attribute name
-            
-           // iomObj.getattrobj(attrNameIomObj, )
-            String attrNameValue = iomObj.getattrvalue(attrNameIomObj);
-            String attrNameValueOther = iomObjOther.getattrvalue(attrNameIomObj);
-            if (!attrNameValue.equals(attrNameValueOther)) {
+            //Has it the same values in two elements?
+            int actualCount = iomObj.getattrvaluecount(attrNameIomObj);
+            int otherCount = iomObjOther.getattrvaluecount(attrNameIomObj);
+            if (actualCount != otherCount) {
                 return -1;
+            }
+            for (int j = 0; j < actualCount; j++) {
+                IomObject iomStructActual = iomObj.getattrobj(attrNameIomObj,j);
+                IomObject iomStructOther = iomObjOther.getattrobj(attrNameIomObj,j);
+                //Simple Value
+                if (iomStructActual == null && iomStructOther == null) {
+                    String attrNameValue = iomObj.getattrvalue(attrNameIomObj);
+                    String attrNameValueOther = iomObjOther.getattrvalue(attrNameIomObj);
+                    if (!attrNameValue.equals(attrNameValueOther)) {
+                        return -1;
+                    }
+                } else {
+                    //Complex Value
+                    double returnValue = compareToTwoIomObj(iomStructActual, iomStructOther);
+                    if (returnValue != 0) {
+                        return returnValue;
+                    }
+                }
             }
         }
 

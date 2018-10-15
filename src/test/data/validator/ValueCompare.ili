@@ -1,6 +1,6 @@
 INTERLIS 2.3;
 
-MODEL ObjectPath23
+MODEL ValueCompareTo
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-16" =
 	
 	TOPIC Topic=
@@ -77,4 +77,4 @@ MODEL ObjectPath23
 
 	END Topic;
 	
-END ObjectPath23.
+END ValueCompareTo.
