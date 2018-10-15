@@ -41,7 +41,7 @@ public class ObjectPath23Test {
     // STRUCTURE
     private final static String STRUCTD1 = TOPIC + ".StructD1";
     private final static String STRUCTS = TOPIC + ".StructS";
-    private final static String STRUCTS3 = TOPIC + ".StructS3";
+    private final static String STRUCTS3 = TOPIC + ".SubSubStruct";
 
     // TD
     private TransferDescription td = null;

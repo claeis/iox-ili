@@ -284,6 +284,11 @@ public class Value {
                 } else {
                     //Complex Value
                     int objectCount = iomObjActualTmp.getattrcount();
+                    int objectCountOther = iomObjOtherTmp.getattrcount();
+                    //Both objects should have the same number of values
+                    if (objectCount != objectCountOther) {
+                        return -1;
+                    }
                     for (int k = 0; k < objectCount; k++) {
                         double returnValue = compareToTwoIomObj(iomObjActualTmp, iomObjOtherTmp);
                         if (returnValue != 0) {
