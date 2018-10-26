@@ -18,6 +18,7 @@ import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.ehi.basics.types.OutParam;
 import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.interlis.ili2c.gui.UserSettings;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.AssociationDef;
@@ -147,6 +148,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private HashSet<String> datatypesOutputReduction=new HashSet<String>();
 	private Map<String, String> uniquenessOfBid = new HashMap<String, String>();
 	private String globalMultiplicity=null;
+	private ch.interlis.ilirepository.IliManager repositoryManager = null;
 	
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -202,6 +204,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 		
+        // get/create repository manager
+        repositoryManager = (ch.interlis.ilirepository.IliManager) config
+                .getTransientObject(UserSettings.CUSTOM_ILI_MANAGER);
+        if(repositoryManager==null) {
+            repositoryManager=new ch.interlis.ilirepository.IliManager();
+        }
 		
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(config.getValue(CONFIG_DO_ITF_OIDPERTABLE));
