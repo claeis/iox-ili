@@ -678,14 +678,13 @@ public class Function23Test {
 		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
 		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, OBJ_OID3);
 		Iom_jObject iomObjST1=new Iom_jObject(ILI_ASSOC_ST1, null);
-		iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID1);
-		iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID3);
+		iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(iomObjS1.getobjectoid());
+		iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(iomObjT1.getobjectoid());
 		// zweites S->T
-		Iom_jObject iomObjS2=new Iom_jObject(ILI_CLASSS, OBJ_OID2);
 		Iom_jObject iomObjT2=new Iom_jObject(ILI_CLASST, OBJ_OID4);
 		Iom_jObject iomObjST2=new Iom_jObject(ILI_ASSOC_ST1, null);
-		iomObjST2.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID2);
-		iomObjST2.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID4);
+		iomObjST2.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(iomObjS1.getobjectoid());
+		iomObjST2.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(iomObjT2.getobjectoid());
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -694,7 +693,6 @@ public class Function23Test {
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjS1));
-		validator.validate(new ObjectEvent(iomObjS2));
 		validator.validate(new ObjectEvent(iomObjT1));
 		validator.validate(new ObjectEvent(iomObjT2));
 		validator.validate(new ObjectEvent(iomObjST1));
@@ -955,39 +953,6 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Rolle t1, 2 mal aufgerufen wird.
-	@Test
-	public void objectCountRole_RoleCountEqual_Ok(){
-		// erstes S->T
-		// zweites S->T
-		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
-		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, OBJ_OID3);
-		Iom_jObject iomObjS2=new Iom_jObject(ILI_CLASSS, OBJ_OID2);
-		Iom_jObject iomObjT2=new Iom_jObject(ILI_CLASST, OBJ_OID4);
-		Iom_jObject iomObjST1=new Iom_jObject(ILI_ASSOC_ST1, null);
-		iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID1);
-		iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID3);
-		Iom_jObject iomObjST2=new Iom_jObject(ILI_ASSOC_ST1, null);
-		iomObjST2.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID2);
-		iomObjST2.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID4);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjS1));
-		validator.validate(new ObjectEvent(iomObjT1));
-		validator.validate(new ObjectEvent(iomObjST1));
-		validator.validate(new ObjectEvent(iomObjS2));
-		validator.validate(new ObjectEvent(iomObjT2));
-		validator.validate(new ObjectEvent(iomObjST2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
 	//#########################################################//
 	//######## FAIL FUNCTIONS #################################//
 	//#########################################################//
@@ -1442,8 +1407,8 @@ public class Function23Test {
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: objectCount(Role), die Anzahl der Rollen von KlasseS nach KlasseT nicht stimmt.
 	@Test
-	@Ignore("review model")
-	public void objectCountRole_RoleCountNotEqual_Fail(){
+	//@Ignore("review model")
+	public void objectCountRole_Fail(){
 		// erstes S->T
 		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
 		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, OBJ_OID3);
