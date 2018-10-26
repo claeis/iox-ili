@@ -148,7 +148,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private HashSet<String> datatypesOutputReduction=new HashSet<String>();
 	private Map<String, String> uniquenessOfBid = new HashMap<String, String>();
 	private String globalMultiplicity=null;
-	private ch.interlis.ilirepository.IliManager repositoryManager = null;
+	private ch.interlis.ilirepository.ReposManager repositoryManager = null;
 	
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -205,11 +205,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		
         // get/create repository manager
-        repositoryManager = (ch.interlis.ilirepository.IliManager) config
+        repositoryManager = (ch.interlis.ilirepository.ReposManager) config
                 .getTransientObject(UserSettings.CUSTOM_ILI_MANAGER);
-        if(repositoryManager==null) {
-            repositoryManager=new ch.interlis.ilirepository.IliManager();
-        }
 		
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(config.getValue(CONFIG_DO_ITF_OIDPERTABLE));
