@@ -3,26 +3,24 @@ package ch.interlis.iox_j.inifile;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 import ch.interlis.iox_j.validator.ValidationConfig;
 
 public class IniFileReader {
 
-    public static ValidationConfig readFile(java.io.File file) throws Exception {
+    public static ValidationConfig readFile(java.io.File file) throws IOException {
         ValidationConfig config = null;
         config = new ValidationConfig();
         mergeIniFile(config, file);
         return config;
     }
 
-    private static void mergeIniFile(ValidationConfig config, File file) throws Exception {
+    public static void mergeIniFile(ValidationConfig config, File file) throws IOException {
         BufferedReader br = null;
         PushbackReader pushbackReader = null;
         StringReader stringReader = null;
@@ -58,14 +56,6 @@ public class IniFileReader {
                     config.setConfigValue(header, key, value);
                 }
             }
-        } catch (UnsupportedEncodingException e) {
-            throw new Exception(e.getMessage());
-        } catch (FileNotFoundException e) {
-            throw new Exception(e.getMessage());
-        } catch (IOException e) {
-            throw new Exception(e);
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
         } finally {
             if (br != null) {
                 br.close();
