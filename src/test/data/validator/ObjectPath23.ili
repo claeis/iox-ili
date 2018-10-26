@@ -68,8 +68,113 @@ MODEL ObjectPath23
 			roleC_2 -- {0..*} ClassC1;
 			MANDATORY CONSTRAINT roleH_2->attrH1 == "H1";
 		END many2many;
+		
+		CLASS ClassS =
+		  s1 : TEXT*10;
+		END ClassS;
+		
+		CLASS ClassT =
+		  t1 : TEXT*10; 
+		END ClassT;
 
+		ASSOCIATION st1 =
+		  role_s1 -- {0..*} ClassS;
+		  role_t1 -- {0..*} ClassT;
+		  st_1 : TEXT*10;
+		END st1;
+
+		CONSTRAINTS OF ClassS =
+			MANDATORY CONSTRAINT role_t1->t1 == "value_t1";
+		END;
+
+		CONSTRAINTS OF ClassS =
+			MANDATORY CONSTRAINT \role_t1->st_1 == "value_st1"; 
+		END;
+
+		CLASS ClassU =
+		  u1 : TEXT*10; 
+		END ClassU;
+
+		ASSOCIATION tu =
+			role_s3 -- {0..*} ClassS;
+			role_u3 -- {0..1} ClassU;
+		END tu;
+
+		CONSTRAINTS OF ClassU =
+			MANDATORY CONSTRAINT INTERLIS.objectCount(role_s3->role_t1)==4;
+		END;
 
 	END Topic;
-	
+
+	TOPIC BackwardDirection =
+
+		CLASS ClassS =
+		  s1 : TEXT*10;
+		END ClassS;
+		
+		CLASS ClassT =
+		  t1 : TEXT*10; 
+		END ClassT;
+
+		ASSOCIATION st2 =
+			role_s2 -- {0..1} ClassS;
+			role_t2 -- {0..*} ClassT;
+		END st2;
+		CONSTRAINTS OF ClassS =
+			MANDATORY CONSTRAINT role_t2->t1 == "value_t1";
+		END;
+		
+	END BackwardDirection;	
+
+	TOPIC ForwardDirectionWithMoreThanOnelinkObj =
+
+		CLASS ClassX =
+		  x1 : TEXT*10; 
+		END ClassX;		
+
+		CLASS ClassY =
+		  y1 : TEXT*10;
+		END ClassY;
+
+		CLASS ClassY1 EXTENDS ClassY =
+		  y1_1 : TEXT*10;
+		END ClassY1;
+		
+		CLASS ClassZ =
+		  z1 : TEXT*10; 
+		END ClassZ;
+
+		ASSOCIATION x2y =
+			role_x -- {0..*} ClassX;
+			role_y -- {0..*} ClassY;
+		END x2y;
+
+		ASSOCIATION y2z =
+			role_y -- {0..*} ClassY;
+			role_z -- {0..*} ClassZ;
+		END y2z;
+
+		CONSTRAINTS OF ClassX =
+			MANDATORY CONSTRAINT INTERLIS.objectCount(role_y->role_z)==4;
+		END;
+
+	END ForwardDirectionWithMoreThanOnelinkObj;
+
+	TOPIC RekursivelyObject = 
+
+		CLASS ClassA =
+		  a1 : TEXT*10; 
+		END ClassA;
+
+		ASSOCIATION a2a =
+			role_a1 -- {0..*} ClassA;
+			role_a2 -- {0..*} ClassA;
+		END a2a;
+
+		CONSTRAINTS OF ClassA =
+			MANDATORY CONSTRAINT INTERLIS.objectCount(role_a2) == 3;
+		END;
+		
+	END RekursivelyObject;
+
 END ObjectPath23.

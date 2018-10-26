@@ -58,17 +58,17 @@ public class SetConstraint23Test {
 	@Test
 	public void objectCount_IsEqualToConditionCount_Ok(){
 		Iom_jObject iomObj1=new Iom_jObject(TOPICA_CLASS1, OID1);
-		Iom_jObject iomObj2=new Iom_jObject(TOPICA_CLASS2, OID3);
+		Iom_jObject iomObj2=new Iom_jObject(TOPICA_CLASS2, OID2);
 		// association 1
 		Iom_jObject iomObjAssoc1=new Iom_jObject(TOPICA_ASSOC_ASSOC1, null);
-		iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R1, "REF").setobjectrefoid(OID1);
-		iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R2, "REF").setobjectrefoid(OID3);
-		Iom_jObject iomObj3=new Iom_jObject(TOPICA_CLASS1, OID2);
+		iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R1, "REF").setobjectrefoid(iomObj1.getobjectoid());
+		iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R2, "REF").setobjectrefoid(iomObj2.getobjectoid());
+		Iom_jObject iomObj3=new Iom_jObject(TOPICA_CLASS1, OID3);
 		Iom_jObject iomObj4=new Iom_jObject(TOPICA_CLASS2, OID4);
 		// association 2
 		Iom_jObject iomObjAssoc2=new Iom_jObject(TOPICA_ASSOC_ASSOC1, null);
-		iomObjAssoc2.addattrobj(TOPICA_ASSOC_ASSOC1_R1, "REF").setobjectrefoid(OID2);
-		iomObjAssoc2.addattrobj(TOPICA_ASSOC_ASSOC1_R2, "REF").setobjectrefoid(OID4);
+		iomObjAssoc2.addattrobj(TOPICA_ASSOC_ASSOC1_R1, "REF").setobjectrefoid(iomObj1.getobjectoid());
+		iomObjAssoc2.addattrobj(TOPICA_ASSOC_ASSOC1_R2, "REF").setobjectrefoid(iomObj4.getobjectoid());
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -86,34 +86,38 @@ public class SetConstraint23Test {
 		validator.validate(new EndTransferEvent());
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
-	// prueft ob die setConstraint Bedingung eine Fehlermeldung ausgibt,
-	// wenn die Anzahl der erstellten Objekte zu klein ist, um die Bedingung zu erfuellen.
-	@Test
-    @Ignore("review model")
-	public void objectCount_IsLessThanConditionCount_Fail(){
-		Iom_jObject iomObj1=new Iom_jObject(TOPICA_CLASS1, OID1);
-		Iom_jObject iomObj2=new Iom_jObject(TOPICA_CLASS2, OID2);
-		// association 1
-		Iom_jObject iomObjAssoc1=new Iom_jObject(TOPICA_ASSOC_ASSOC1, null);
-		iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R1, "REF").setobjectrefoid(OID1);
-		iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R2, "REF").setobjectrefoid(OID2);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPICA,BID1));
-		validator.validate(new ObjectEvent(iomObj1));
-		validator.validate(new ObjectEvent(iomObj2));
-		validator.validate(new ObjectEvent(iomObjAssoc1));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Set Constraint SetConstraint23.TopicA.Class1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-	}
+    @Test
+    public void objectCount_IsEqualToConditionCount_Fail(){
+        Iom_jObject iomObj1=new Iom_jObject(TOPICA_CLASS1, OID1);
+        Iom_jObject iomObj2=new Iom_jObject(TOPICA_CLASS2, OID2);
+        // association 1
+        Iom_jObject iomObjAssoc1=new Iom_jObject(TOPICA_ASSOC_ASSOC1, null);
+        iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R1, "REF").setobjectrefoid(iomObj1.getobjectoid());
+        iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R2, "REF").setobjectrefoid(iomObj2.getobjectoid());
+        Iom_jObject iomObj3=new Iom_jObject(TOPICA_CLASS1, OID3);
+        Iom_jObject iomObj4=new Iom_jObject(TOPICA_CLASS2, OID4);
+        // association 2
+        Iom_jObject iomObjAssoc2=new Iom_jObject(TOPICA_ASSOC_ASSOC1, null);
+        iomObjAssoc2.addattrobj(TOPICA_ASSOC_ASSOC1_R1, "REF").setobjectrefoid(iomObj3.getobjectoid());
+        iomObjAssoc2.addattrobj(TOPICA_ASSOC_ASSOC1_R2, "REF").setobjectrefoid(iomObj4.getobjectoid());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPICA,BID1));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new ObjectEvent(iomObj2));
+        validator.validate(new ObjectEvent(iomObjAssoc1));
+        validator.validate(new ObjectEvent(iomObj3));
+        validator.validate(new ObjectEvent(iomObj4));
+        validator.validate(new ObjectEvent(iomObjAssoc2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Set Constraint SetConstraint23.TopicA.Class1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// prueft ob die setConstraint Bedingung mit einer WHERE Klausel erstellt werde kann,
 	// wenn die Anzahl der erstellten Objekte, mit der Anzahl der Bedingung uebereinstimmt
@@ -340,7 +344,6 @@ public class SetConstraint23Test {
 	// Die Konfiguration ist nicht gesetzt.
 	// Es wird eine Fehlermeldung erwartet.
 	@Test
-    @Ignore("review model")
 	public void lessThanConditionCount_ConstraintDisableSet_NotSet_False(){
 		Iom_jObject iomObj1=new Iom_jObject(TOPICA_CLASS1, OID1);
 		Iom_jObject iomObj2=new Iom_jObject(TOPICA_CLASS2, OID2);
@@ -369,7 +372,6 @@ public class SetConstraint23Test {
 	// Die Konfiguration ist Eingeschaltet.
 	// Es wird eine Fehlermeldung erwartet.
 	@Test
-	@Ignore("review model")
 	public void lessThanConditionCount_ConstraintDisableSet_ON_False(){
 		Iom_jObject iomObj1=new Iom_jObject(TOPICA_CLASS1, OID1);
 		Iom_jObject iomObj2=new Iom_jObject(TOPICA_CLASS2, OID2);
