@@ -172,7 +172,7 @@ MODEL ObjectPath23
 		END a2a;
 
 		CONSTRAINTS OF ClassA =
-			MANDATORY CONSTRAINT INTERLIS.objectCount(role_a2) == 3;
+			MANDATORY CONSTRAINT INTERLIS.objectCount(role_a2) == 2;
 		END;
 		
 	END RekursivelyObject;
