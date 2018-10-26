@@ -314,7 +314,7 @@ public class Value {
                     }
                 } else {
                     //Complex Value
-                    double returnValue = compareToTwoIomObj(iomStructActual, iomStructOther);
+                    double returnValue = compareIomObjTo(iomStructActual, iomStructOther);
                     if (returnValue != 0) {
                         return returnValue;
                     }
