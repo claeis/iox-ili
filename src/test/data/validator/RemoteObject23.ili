@@ -1,0 +1,51 @@
+INTERLIS 2.3;
+
+MODEL RemoteObject23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-16" =
+	
+	TOPIC Topic=
+
+		CLASS ClassA =
+			attrA : TEXT*10;
+		END ClassA;
+
+		CLASS ClassB =
+			attrB : TEXT*10;
+		END ClassB;
+
+		CLASS ClassC EXTENDS ClassB =			 
+		END ClassC;
+
+		STRUCTURE StructC =
+			!!@ ilivalid.requiredIn=bid2
+			attrC : REFERENCE TO (EXTERNAL) ClassA;
+		END StructC;
+
+		CLASS ClassD = 
+			attrD : StructC;
+		END ClassD;
+
+		STRUCTURE StructE =
+			attrE : REFERENCE TO (EXTERNAL) ClassA;
+		END StructE;
+
+		CLASS ClassE = 
+			!!@ ilivalid.requiredIn=bid2
+			attrE : StructE;
+		END ClassE;
+
+		ASSOCIATION embedded =
+			!!@ ilivalid.requiredIn=bid2
+			a1 (EXTERNAL) -- {0..1} ClassA;
+			b1 -- {0..*} ClassB;
+		END embedded;
+
+		ASSOCIATION notEmbedded =
+			!!@ ilivalid.requiredIn=bid2
+			a2 (EXTERNAL) -- {0..*} ClassA;
+			b2 -- {0..*} ClassB;
+		END notEmbedded;
+
+	END Topic;
+
+END RemoteObject23.
