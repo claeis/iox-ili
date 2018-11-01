@@ -281,6 +281,20 @@ MODEL UniqueConstraints23
 		  attrEF : TEXT*10;
 		  UNIQUE e1, attrEF;
 		END assocEF;
+
+		CLASS ClassG =
+			attrG : TEXT*10;
+		END ClassG;
+		
+		CLASS ClassH =
+			attrH : TEXT*10;
+		END ClassH;
+		
+		ASSOCIATION assocGH =
+		  g1 -- {0..1} ClassG;
+		  h1 -- {0..2} ClassH;
+		  UNIQUE g1->attrG, h1->attrH;
+		END assocGH;
 		
 	END EmbeddedUnique;
 
