@@ -1,5 +1,6 @@
 package ch.interlis.iox_j.validator;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -17,8 +19,10 @@ import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.ehi.basics.types.OutParam;
 import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.interlis.ili2c.Ili2cException;
 import ch.interlis.ili2c.gui.UserSettings;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
+import ch.interlis.ili2c.metamodel.AbstractLeafElement;
 import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.AssociationPath;
@@ -29,9 +33,11 @@ import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.Constant;
 import ch.interlis.ili2c.metamodel.Constant.Enumeration;
 import ch.interlis.ili2c.metamodel.Constraint;
+import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Domain;
+import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.EnumTreeValueType;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.Evaluable;
@@ -46,6 +52,7 @@ import ch.interlis.ili2c.metamodel.Expression.Inequality;
 import ch.interlis.ili2c.metamodel.Expression.LessThan;
 import ch.interlis.ili2c.metamodel.Expression.LessThanOrEqual;
 import ch.interlis.ili2c.metamodel.Expression.Negation;
+import ch.interlis.ili2c.metamodel.ExtendableContainer;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.Function;
 import ch.interlis.ili2c.metamodel.FunctionCall;
@@ -81,6 +88,9 @@ import ch.interlis.ili2c.metamodel.TypeAlias;
 import ch.interlis.ili2c.metamodel.UniquenessConstraint;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
+import ch.interlis.ilirepository.Dataset;
+import ch.interlis.ilirepository.IliManager;
+import ch.interlis.ilirepository.impl.RepositoryAccessException;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.ItfAreaPolygon2Linetable;
@@ -88,8 +98,11 @@ import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
+import ch.interlis.iom_j.xtf.XtfReader;
+import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxLogging;
+import ch.interlis.iox.IoxReader;
 import ch.interlis.iox.IoxValidationConfig;
 import ch.interlis.iox.StartBasketEvent;
 import ch.interlis.iox_j.IoxIntersectionException;
@@ -564,8 +577,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								String objectBid = objectPool.getBidOfObject(iomObj.getobjectoid(), classOfCurrentObj);
 								int structc=iomObj.getattrvaluecount(attrName);
 								 for(int structi=0;structi<structc;structi++){
-									 IomObject structValue=iomObj.getattrobj(attrName, structi);
-									validateReferenceAttrs(structValue, structure, objectBid);
+									IomObject structValue=iomObj.getattrobj(attrName, structi);
+									validateReferenceAttrs(attr.getScopedName(),structValue, structure, objectBid);
 								}
 							}
 						}else if(objA.obj instanceof RoleDef){
@@ -2062,6 +2075,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			OutParam<String> bidOfTargetObj = new OutParam<String>();
 			IomObject targetObj = (IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
+			if(targetObj == null) {
+		        String bid = validationConfig.getConfigValue(roleQName, ValidationConfig.REQUIRED_IN);
+		        if (bid != null) {
+		            targetObj = findExternalObject(bid, targetOid, destinationClasses, bidOfTargetObj);
+		        }
+			    
+			}
 			String oid = iomObj.getobjectoid();
 			if(oid==null){
 				oid=ObjectPool.getAssociationId(iomObj, (AssociationDef) modelElement);
@@ -2124,7 +2144,53 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 	
-	private void validateReferenceAttrs(IomObject iomStruct, Table structure, String bidOfObj){
+	private IomObject findExternalObject(String targetBid,String targetOid, ArrayList<Viewable> destinationClasses, OutParam<String> bidOfTargetObj) {
+	        if(!objectPool.getBasketIds().contains(targetBid)) {
+	            List<Dataset> dataset = null;
+	            File[] datasetFiles = null;
+	            IoxReader reader=null;
+	            try {
+	                dataset = repositoryManager.getDatasetIndex(targetBid, null);
+	                if (dataset!=null && !dataset.isEmpty()) {
+	                    datasetFiles = repositoryManager.getLocalFileOfRemoteDataset(dataset.get(0), TransferDescription.MIMETYPE_XTF);                            
+	                }
+	                if (datasetFiles != null) {
+	                    File[] files = datasetFiles.clone();
+	                    for (File file : files) {
+	                        reader = new XtfReader(file);
+	                        String currentBid=null;
+	                        while(true) {
+	                            IoxEvent currentIoxEvent = reader.read();
+	                            
+	                            if (currentIoxEvent instanceof ch.interlis.iox.ObjectEvent) {
+	                               IomObject objectValue = objectPool.addObject(((ch.interlis.iox.ObjectEvent) currentIoxEvent).getIomObject(), currentBid);
+	                            }else if (currentIoxEvent instanceof ch.interlis.iox.StartBasketEvent) {
+	                                currentBid=((ch.interlis.iox.StartBasketEvent) currentIoxEvent).getBid();
+	                            } else if (currentIoxEvent instanceof ch.interlis.iox.EndTransferEvent) {
+	                                break;
+	                            }
+	                        }
+	                    }
+	                }
+	            } catch (RepositoryAccessException e) {
+	                EhiLogger.logError(e); 
+	            } catch (Ili2cException e) {
+	                EhiLogger.logError(e);   
+	            } catch (IoxException e) {
+	                EhiLogger.logError(e);
+	            } finally {
+	                if (reader != null) {
+	                    try {
+	                        reader.close();
+	                    } catch (IoxException e) {
+	                        EhiLogger.logError(e);
+	                    }
+	                }
+	            }
+	        }
+            return (IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
+    }
+    private void validateReferenceAttrs(String structAttrQName,IomObject iomStruct, Table structure, String bidOfObj){
 		Iterator attrIter=structure.getAttributesAndRoles();
 		while (attrIter.hasNext()){
 			Object refAttrO = attrIter.next();
@@ -2148,6 +2214,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							datatypesOutputReduction.add(attrQName);
 							errs.addEvent(errFact.logInfoMsg("validate reference attr {0}...",attrQName));
 						}
+
 						AbstractClassDef targetClass = refAttrType.getReferred();
 						ArrayList<Viewable> destinationClasses = new ArrayList<Viewable>();
 						destinationClasses.add(targetClass);
@@ -2161,6 +2228,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						IomObject targetObject = null;
 						if(targetOid!=null){
 							targetObject=(IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
+						}
+						if (targetObject == null) {
+                            // Has an Extenal Obj?
+                            // get restriction from reference attribute
+                            String bid = validationConfig.getConfigValue(attrQName, ValidationConfig.REQUIRED_IN);
+                            if (bid == null) {
+                                // get restriction from structure attribute
+                                bid = validationConfig.getConfigValue(structAttrQName, ValidationConfig.REQUIRED_IN);
+                            }
+                            if (bid != null) {
+                                targetObject = findExternalObject(bid, targetOid, destinationClasses, bidOfTargetObj);
+                            }
 						}
 						// EXTERNAL
 						if(!refAttrType.isExternal()){

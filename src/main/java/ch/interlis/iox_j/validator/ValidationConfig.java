@@ -22,6 +22,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	public static final String TYPE="type";
 	public static final String TOPOLOGY="topology";
 	public static final String TARGET="target";
+    public static final String REQUIRED_IN="requiredIn";
 	public static final String MSG="msg";
 	public static final String CHECK = "check";
 	public static final String KEYMSG = "keymsg";
