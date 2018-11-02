@@ -3,6 +3,7 @@ package ch.interlis.iox_j.validator;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ch.ehi.basics.settings.Settings;
@@ -45,9 +46,13 @@ public class ObjectPath23Test {
     private final static String CLASSS = TOPIC + ".ClassS";
     private final static String CLASST = TOPIC + ".ClassT";
     private final static String CLASSU = TOPIC + ".ClassU";
+    private final static String CLASSV = TOPIC + ".ClassV";
+    private final static String CLASSW = TOPIC + ".ClassW";
     private final static String CLASSC1 = TOPIC + ".ClassC1";
     private final static String CLASSS1 = TOPIC_BACKWARD_DIRECTION + ".ClassS";
     private final static String CLASST1 = TOPIC_BACKWARD_DIRECTION + ".ClassT";
+    private final static String CLASSV_BACKWARD = TOPIC_BACKWARD_DIRECTION + ".ClassV";
+    private final static String CLASSW_BACKWARD = TOPIC_BACKWARD_DIRECTION + ".ClassW";
     private final static String CLASSX = TOPIC_FORWARD_WITH_MORETHANONE_LINKOBJ + ".ClassX";
     private final static String CLASSY = TOPIC_FORWARD_WITH_MORETHANONE_LINKOBJ + ".ClassY";
     private final static String CLASSZ = TOPIC_FORWARD_WITH_MORETHANONE_LINKOBJ + ".ClassZ";
@@ -198,6 +203,88 @@ public class ObjectPath23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(0, logger.getErrs().size());
+    }
+    @Test
+    public void embedded_forwardDirection_EmbeddedConstraint_OK() throws Exception {
+        Iom_jObject iomObjV = new Iom_jObject(CLASSV, OID1);
+        Iom_jObject iomObjW = new Iom_jObject(CLASSW, OID2);
+        iomObjW.addattrobj("role_v", "REF").setobjectrefoid(iomObjV.getobjectoid());
+        iomObjV.setattrvalue("v1", "V1");
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(iomObjV));
+        validator.validate(new ObjectEvent(iomObjW));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+    @Test
+    @Ignore("FIXME")
+    public void embedded_forwardDirection_EmbeddedConstraint_Fail() throws Exception {
+        Iom_jObject iomObjV = new Iom_jObject(CLASSV, OID1);
+        Iom_jObject iomObjW = new Iom_jObject(CLASSW, OID2);
+        iomObjW.addattrobj("role_v", "REF").setobjectrefoid(iomObjV.getobjectoid());
+        // iomObjV.setattrvalue("v1", "V1"); should fail because v1 is UNDEFINED
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(iomObjV));
+        validator.validate(new ObjectEvent(iomObjW));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+    }
+    @Test
+    public void embedded_backwardDirection_EmbeddedConstraint_OK() throws Exception {
+        Iom_jObject iomObjV = new Iom_jObject(CLASSV_BACKWARD, OID1);
+        Iom_jObject iomObjW = new Iom_jObject(CLASSW_BACKWARD, OID2);
+        iomObjW.addattrobj("role_v", "REF").setobjectrefoid(iomObjV.getobjectoid());
+        iomObjW.setattrvalue("w1", "W1");
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(iomObjV));
+        validator.validate(new ObjectEvent(iomObjW));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+    @Test
+    @Ignore("FIXME")
+    public void embedded_backwardDirection_EmbeddedConstraint_Fail() throws Exception {
+        Iom_jObject iomObjV = new Iom_jObject(CLASSV_BACKWARD, OID1);
+        Iom_jObject iomObjW = new Iom_jObject(CLASSW_BACKWARD, OID2);
+        iomObjW.addattrobj("role_v", "REF").setobjectrefoid(iomObjV.getobjectoid());
+        //iomObjW.setattrvalue("w1", "W1"); should fail because w1 is UNDEFINED
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(iomObjV));
+        validator.validate(new ObjectEvent(iomObjW));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
     }
     
     @Test

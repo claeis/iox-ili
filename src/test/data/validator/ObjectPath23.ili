@@ -108,6 +108,17 @@ MODEL ObjectPath23
 		CONSTRAINTS OF ClassU =
 			MANDATORY CONSTRAINT INTERLIS.objectCount(role_s3->role_t1)==4;
 		END;
+		
+		CLASS ClassV =
+			v1 : TEXT*10;
+		END ClassV;
+		CLASS ClassW =
+		END ClassW;
+		ASSOCIATION vw =
+			role_v -- {0..1} ClassV;
+			role_w -- {0..2} ClassW;
+			MANDATORY CONSTRAINT DEFINED(role_v->v1);
+		END vw;
 
 	END Topic;
 
@@ -128,6 +139,17 @@ MODEL ObjectPath23
 		CONSTRAINTS OF ClassS =
 			MANDATORY CONSTRAINT role_t2->t1 == "value_t1";
 		END;
+		
+		CLASS ClassV =
+		END ClassV;
+		CLASS ClassW =
+			w1 : TEXT*10;
+		END ClassW;
+		ASSOCIATION vw =
+			role_v -- {0..1} ClassV;
+			role_w -- {0..2} ClassW;
+			MANDATORY CONSTRAINT DEFINED(role_w->w1);
+		END vw;
 		
 	END BackwardDirection;	
 
