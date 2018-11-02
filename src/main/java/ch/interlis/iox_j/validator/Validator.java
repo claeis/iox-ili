@@ -215,7 +215,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(config.getValue(CONFIG_DO_ITF_OIDPERTABLE));
 		allObjectsAccessible=ValidationConfig.TRUE.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE));
 		if(!allObjectsAccessible){
-			errs.addEvent(errFact.logInfoMsg("assume unknown/external objects"));
+			errs.addEvent(errFact.logInfoMsg("assume unknown external objects"));
 		}
         disableRounding=ValidationConfig.TRUE.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_ROUNDING));
         if(disableRounding){
