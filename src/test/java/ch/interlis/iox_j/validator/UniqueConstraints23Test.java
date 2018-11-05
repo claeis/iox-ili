@@ -68,6 +68,8 @@ public class UniqueConstraints23Test {
 	private final static String EMBEDDED_CLASSF=EMBEDDED_TOPIC+".ClassF";
     private final static String EMBEDDED_CLASSG=EMBEDDED_TOPIC+".ClassG";
     private final static String EMBEDDED_CLASSH=EMBEDDED_TOPIC+".ClassH";
+    private final static String EMBEDDED_CLASSI=EMBEDDED_TOPIC+".ClassI";
+    private final static String EMBEDDED_CLASSK=EMBEDDED_TOPIC+".ClassK";
 	private final static String LINKOBJ_CLASSA = LINKOBJ_TOPIC + ".ClassA";
 	private final static String LINKOBJ_CLASSB = LINKOBJ_TOPIC + ".ClassB";
 	// STRUCTURE
@@ -2186,6 +2188,37 @@ public class UniqueConstraints23Test {
         validator.validate(new ObjectEvent(obj_G_2));
         validator.validate(new ObjectEvent(obj_H_3));
         validator.validate(new ObjectEvent(obj_H_4));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // asserts
+        assertTrue(logger.getErrs().size()==1);
+    }
+    @Test
+    @Ignore("FIXME")
+    public void uniqueAttrValuesOfAttrPath_InEmbeddedAssociation_ForwardRef_Fail() {
+        Iom_jObject obj_G_1=new Iom_jObject(EMBEDDED_CLASSI,OID1);
+        obj_G_1.setattrvalue("attrI", "text1");
+
+        Iom_jObject obj_G_2=new Iom_jObject(EMBEDDED_CLASSI,OID2);
+        obj_G_2.setattrvalue("attrI", "text1"); // dupluicate value
+        
+        Iom_jObject obj_H_3=new Iom_jObject(EMBEDDED_CLASSK,OID3);
+        obj_H_3.addattrobj("i1", "REF").setobjectrefoid(obj_G_1.getobjectoid());
+        
+        Iom_jObject obj_H_4=new Iom_jObject(EMBEDDED_CLASSK,OID4);
+        obj_H_4.addattrobj("i1", "REF").setobjectrefoid(obj_G_2.getobjectoid());
+        
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(EMBEDDED_TOPIC,BID));
+        validator.validate(new ObjectEvent(obj_H_3)); // contains a forward reference
+        validator.validate(new ObjectEvent(obj_H_4)); // contains a forward reference
+        validator.validate(new ObjectEvent(obj_G_1));
+        validator.validate(new ObjectEvent(obj_G_2));
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // asserts

@@ -296,6 +296,20 @@ MODEL UniqueConstraints23
 		  UNIQUE g1->attrG, h1->attrH;
 		END assocGH;
 		
+		CLASS ClassI =
+			attrI : TEXT*10;
+		END ClassI;
+		
+		CLASS ClassK =
+			attrK : TEXT*10;
+		END ClassK;
+		
+		ASSOCIATION assocIK =
+		  i1 -- {0..1} ClassI;
+		  k1 -- {0..2} ClassK;
+		  UNIQUE i1->attrI;
+		END assocIK;
+		
 	END EmbeddedUnique;
 
 	TOPIC LinkObjUnique=
