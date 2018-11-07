@@ -34,6 +34,7 @@ import ch.interlis.ili2c.metamodel.Constraint;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Domain;
+import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.EnumTreeValueType;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.Evaluable;
@@ -80,6 +81,7 @@ import ch.interlis.ili2c.metamodel.Topic;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.Type;
 import ch.interlis.ili2c.metamodel.TypeAlias;
+import ch.interlis.ili2c.metamodel.UniqueEl;
 import ch.interlis.ili2c.metamodel.UniquenessConstraint;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
@@ -87,6 +89,7 @@ import ch.interlis.ilirepository.Dataset;
 import ch.interlis.ilirepository.impl.RepositoryAccessException;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.itf.impl.ItfAreaPolygon2Linetable;
 import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
@@ -534,7 +537,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					                if(iomObjOid==null && classOfCurrentObj instanceof AssociationDef) {
 					                    iomObjOid=ObjectPool.getAssociationId(iomObj, (AssociationDef) classOfCurrentObj);
 					                }
-									validateUniquenessConstraint(iomObj, iomObjOid,uniquenessConstraint, null);
+									validateUniquenessConstraint(null,iomObj, iomObjOid,uniquenessConstraint, null);
 								} else if(additionalConstraint instanceof PlausibilityConstraint){
 									PlausibilityConstraint plausibilityConstraint = (PlausibilityConstraint) additionalConstraint;
 									String constraintName = getScopedName(plausibilityConstraint);
@@ -754,7 +757,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 	
-	private void validateUniquenessConstraint(IomObject iomObj, String iomObjOid,UniquenessConstraint uniquenessConstraint, RoleDef role) {
+	private void validateUniquenessConstraint(IomObject parentObject,IomObject iomObj, String iomObjOid,UniquenessConstraint uniquenessConstraint, RoleDef role) {
 		if(!ValidationConfig.OFF.equals(constraintValidation)){
 			String constraintName = getScopedName(uniquenessConstraint);
 			String checkUniqueConstraint=null;
@@ -794,20 +797,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			    }else {
 		            seenValues=seenUniqueConstraintValues;
 			    }
+
 		        if(uniquenessConstraint.getPrefix()!=null){
 		            PathEl[] attrPath = uniquenessConstraint.getPrefix().getPathElements();
-		            visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid,attrPath,0,iomObj, role);
+		            visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid,attrPath,0,parentObject,iomObj, role);
 		        }else {
-	                visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid,null,0,iomObj, role);
+	                visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid,null,0,parentObject,iomObj, role);
 		        }
 			}
 		}
 	}
 	
-	private void visitStructEle(String checkUniqueConstraint,UniquenessConstraint uniquenessConstraint, HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues, String iomObjOid, PathEl[] attrPath, int i, IomObject iomObj, RoleDef role) {
+	private void visitStructEle(String checkUniqueConstraint,UniquenessConstraint uniquenessConstraint, HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues, String iomObjOid, PathEl[] attrPath, int i, IomObject parentObject, IomObject iomObj, RoleDef role) {
 	    if(attrPath==null || i>=attrPath.length) {
 	        OutParam<AttributeArray> values = new OutParam<AttributeArray>();
-            String returnValue = validateUnique(seenValues,iomObjOid,iomObj,uniquenessConstraint, values, role);
+            String returnValue = validateUnique(seenValues,iomObjOid,parentObject,iomObj,uniquenessConstraint, values, role);
             if (returnValue == null){
                 // ok
             } else {
@@ -824,7 +828,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         int structElec=iomObj.getattrvaluecount(attrName);
         for(int structElei=0;structElei<structElec;structElei++) {
             IomObject structEle=iomObj.getattrobj(attrName, structElei);
-            visitStructEle(checkUniqueConstraint,uniquenessConstraint, seenValues, iomObjOid, attrPath,i+1,structEle, role);
+            visitStructEle(checkUniqueConstraint,uniquenessConstraint, seenValues, iomObjOid, attrPath,i+1,parentObject,structEle, role);
         }
     }
     private HashMap<SetConstraint,Collection<String>> setConstraints=new HashMap<SetConstraint,Collection<String>>();
@@ -1494,7 +1498,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			PathEl[] pathElements = objectPathObj.getPathElements();
 			final int lastPathIndex = pathElements.length - 1;
 
-			return getValueFromObjectPath(iomObj, pathElements, lastPathIndex,null);
+			return getValueFromObjectPath(null, iomObj, pathElements, lastPathIndex,null);
 		} else if(expression instanceof Objects) {
 			// objects
 			Iterator<String> objectIterator = allObjIterator;
@@ -1518,7 +1522,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		//TODO instance of ViewableAggregate
 		//TODO instance of ViewableAlias
 	}
-    private Value getValueFromObjectPath(IomObject iomObjStart, PathEl[] pathElements, final int lastPathIndex,RoleDef firstRole) {
+    private Value getValueFromObjectPath(IomObject parentObject,IomObject iomObjStart, PathEl[] pathElements, final int lastPathIndex,RoleDef firstRole) {
         ArrayList<IomObject> currentObjects=new ArrayList<IomObject>();
         ArrayList<IomObject> nextCurrentObjects=new ArrayList<IomObject>();
         RoleDef role = null;
@@ -1539,14 +1543,26 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     if (role == null) {
                         throw new IllegalStateException("Role is not be empty!");
                     } else {
-                        if(k==0 && role==firstRole) {
-                            // special case for embedded association
-                            if (k != lastPathIndex) {
-                                ; // the current object is already the first path element
+                        // IF embedded association and first PathEl of objectpath
+                        if(parentObject!=null && k==0) {
+                            // IF last PathEl of objectpath
+                            if(k==lastPathIndex) {
+                                // THEN return embedded reference object
+                                if(role==firstRole) {
+                                    nextCurrentObjects.add(iomObj);
+                                }else {
+                                    // create/return a reference object to parent object
+                                    Iom_jObject ref = new Iom_jObject("REF", null);
+                                    ref.setobjectrefoid(parentObject.getobjectoid());
+                                    nextCurrentObjects.add(ref);
+                                }
                             }else {
-                                List<IomObject> objects = new ArrayList<IomObject>();
-                                objects.add(iomObj);
-                                nextCurrentObjects.addAll(objects);
+                                if(role==firstRole) {
+                                    IomObject targetObj = getReferencedObject(role, iomObj.getobjectrefoid());
+                                    nextCurrentObjects.add(targetObj);
+                                }else {
+                                    nextCurrentObjects.add(parentObject);
+                                }
                             }
                         }else {
                             String targetOid = null;
@@ -2865,7 +2881,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                     // role is unique?
                                     if(constraintObj instanceof UniquenessConstraint){
                                         UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) constraintObj;
-                                        validateUniquenessConstraint(embeddedLinkObj, iomObjOid,uniquenessConstraint, role);
+                                        validateUniquenessConstraint(iomObj,embeddedLinkObj, iomObjOid,uniquenessConstraint, role);
                                     }
                                 }
                             }
@@ -2949,7 +2965,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	                    Object obj1 = attrI.next();
 	                    if(obj1 instanceof UniquenessConstraint){
 	                        UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) obj1; // uniquenessConstraint not null.
-	                        validateUniquenessConstraint(iomObj, iomObjOid,uniquenessConstraint, null);
+	                        validateUniquenessConstraint(null,iomObj, iomObjOid,uniquenessConstraint, null);
 	                    }
 	                }
 	                aclass2=(Viewable) aclass2.getExtending();
@@ -3093,7 +3109,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return null;
 	}
 	
-	private String validateUnique(HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues,String originObjOid,IomObject currentObject,UniquenessConstraint constraint, OutParam<AttributeArray> valuesRet, RoleDef role) {
+	private String validateUnique(HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues,String originObjOid,IomObject parentObject,IomObject currentObject,UniquenessConstraint constraint, OutParam<AttributeArray> valuesRet, RoleDef role) {
         ArrayList<Object> values = new ArrayList<Object>();
 		Iterator constraintIter = constraint.getElements().iteratorAttribute();
 		while(constraintIter.hasNext()){
@@ -3102,7 +3118,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		    PathEl[] pathElements = objectPathObj.getPathElements();
 		    int lastPathIndex = pathElements.length - 1;
 		    
-		    Value value = getValueFromObjectPath(currentObject, pathElements, lastPathIndex,role);
+		    Value value = getValueFromObjectPath(parentObject, currentObject, pathElements, lastPathIndex,role);
 		    if(value.isUndefined()) {
 		        return null;
 		    }else if(value.skipEvaluation()) {

@@ -2161,7 +2161,7 @@ public class UniqueConstraints23Test {
         assertTrue(logger.getErrs().size()==0);
     }
     @Test
-    @Ignore("FIXME")
+    // @Ignore("GH-52")
     public void uniqueAttrValuesOfAttrPath_InEmbeddedAssociation_Fail() {
         Iom_jObject obj_G_1=new Iom_jObject(EMBEDDED_CLASSG,OID1);
         obj_G_1.setattrvalue("attrG", "text1");
@@ -2191,7 +2191,7 @@ public class UniqueConstraints23Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // asserts
-        assertTrue(logger.getErrs().size()==1);
+        assertEquals(1, logger.getErrs().size());
     }
     @Test
     @Ignore("FIXME")
