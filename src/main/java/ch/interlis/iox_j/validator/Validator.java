@@ -620,6 +620,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						MandatoryConstraint mandatoryConstraint=(MandatoryConstraint) constraintObj;
 						validateMandatoryConstraint(iomObj, mandatoryConstraint);
 					}
+                    // Uniqueness constraint
+                    if (constraintObj instanceof UniquenessConstraint) {
+                        String iomObjOid = iomObj.getobjectoid();
+                        if (iomObjOid == null && classOfIomObj instanceof AssociationDef) {
+                            iomObjOid = ObjectPool.getAssociationId(iomObj, (AssociationDef) classOfIomObj);
+                        }
+                        UniquenessConstraint uniquenessConstraint = (UniquenessConstraint) constraintObj;
+                        validateUniquenessConstraint(null, iomObj, iomObjOid, uniquenessConstraint, null);
+                    }			        
 					// set constraint
 					if(constraintObj instanceof SetConstraint){
 						SetConstraint setConstraint=(SetConstraint) constraintObj;
@@ -657,6 +666,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 				classOfCurrentObj=(Viewable) classOfCurrentObj.getExtending();
 			}
+            
 			Iterator iter = classOfIomObj.getAttributesAndRoles2();
 			while (iter.hasNext()) {
 				ViewableTransferElement obj = (ViewableTransferElement)iter.next();
@@ -681,12 +691,39 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							}
 						}
 					}
+				// unique contraints
+				} else if (obj.obj instanceof RoleDef) {
+                    if (obj.embedded) {
+                        validateConstraintsOfEmbeddedAssociation((RoleDef) obj.obj, iomObj);
+                    }				    
 				}
 			}
 		}
 	}
+	
+    private void validateConstraintsOfEmbeddedAssociation(RoleDef role, IomObject iomObj) {
+        int propc = iomObj.getattrvaluecount(role.getName());
+        if (propc >= 1) {
+            IomObject embeddedLinkObj = iomObj.getattrobj(role.getName(), 0);
+            AssociationDef roleOwner = (AssociationDef) role.getContainer();
 
-	private void fillOfPlausibilityConstraintMap(String validationKind, String usageScope, PlausibilityConstraint constraint, IomObject iomObj){
+            Viewable classOfCurrentObj = roleOwner;
+            if (classOfCurrentObj != null) {
+                String iomObjOid = iomObj.getobjectoid();
+
+                Iterator constraintIterator = classOfCurrentObj.iterator();
+                while (constraintIterator.hasNext()) {
+                    Object constraintObj = constraintIterator.next();
+                    // role is unique?
+                    if (constraintObj instanceof UniquenessConstraint) {
+                        UniquenessConstraint uniquenessConstraint = (UniquenessConstraint) constraintObj;
+                        validateUniquenessConstraint(iomObj, embeddedLinkObj, iomObjOid, uniquenessConstraint, role);
+                    } 
+                }
+            }
+        } 
+    }
+    private void fillOfPlausibilityConstraintMap(String validationKind, String usageScope, PlausibilityConstraint constraint, IomObject iomObj){
 		Evaluable condition = (Evaluable) constraint.getCondition();
 		Value conditionValue = evaluateExpression(validationKind, usageScope, iomObj, condition);
 		if(plausibilityConstraints.containsKey(constraint)){
@@ -1656,6 +1693,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     AttributeRef attrRef = (AttributeRef) currentPathEl;
                     Type type = attrRef.getAttr().getDomain();
                     String currentAttrName = currentPathEl.getName();
+                    if (iomObj == null) {
+                        return Value.createUndefined();
+                    }
                     if (iomObj.getattrvaluecount(currentAttrName) == 0) {
                         return Value.createUndefined(); 
                     } else {
@@ -2869,23 +2909,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             IomObject embeddedLinkObj = iomObj.getattrobj(roleName, 0);
                             AssociationDef roleOwner = (AssociationDef) role.getContainer();
                             
-                            Viewable classOfCurrentObj = roleOwner;
-                            if(classOfCurrentObj!=null) {
-                                String iomObjOid=iomObj.getobjectoid();
-                                if(iomObjOid==null && aclass1 instanceof AssociationDef) {
-                                    iomObjOid=ObjectPool.getAssociationId(iomObj, (AssociationDef) aclass1);
-                                }
-                                Iterator constraintIterator=classOfCurrentObj.iterator();
-                                while (constraintIterator.hasNext()) {
-                                    Object constraintObj = constraintIterator.next();
-                                    // role is unique?
-                                    if(constraintObj instanceof UniquenessConstraint){
-                                        UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) constraintObj;
-                                        validateUniquenessConstraint(iomObj,embeddedLinkObj, iomObjOid,uniquenessConstraint, role);
-                                    }
-                                }
-                            }
-                            
                             if (roleOwner.getDerivedFrom() == null) {
                                 // not just a link?
                                 propNames.add(roleName);
@@ -2949,28 +2972,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     }
 				}
 			 }
-		}
-		
-		// Uniqueness
-		if(isObject){
-		    if(addToPool) {
-	            Viewable aclass2=aclass1;
-	            String iomObjOid=iomObj.getobjectoid();
-	            if(iomObjOid==null && aclass1 instanceof AssociationDef) {
-	                iomObjOid=ObjectPool.getAssociationId(iomObj, (AssociationDef) aclass1);
-	            }
-	            while(aclass2!=null) {
-	                Iterator attrI=aclass2.iterator();
-	                while (attrI.hasNext()) {
-	                    Object obj1 = attrI.next();
-	                    if(obj1 instanceof UniquenessConstraint){
-	                        UniquenessConstraint uniquenessConstraint=(UniquenessConstraint) obj1; // uniquenessConstraint not null.
-	                        validateUniquenessConstraint(null,iomObj, iomObjOid,uniquenessConstraint, null);
-	                    }
-	                }
-	                aclass2=(Viewable) aclass2.getExtending();
-	            }
-		    }
 		}
 		
 		if(isObject){
