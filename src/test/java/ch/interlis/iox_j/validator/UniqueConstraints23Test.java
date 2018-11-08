@@ -1717,7 +1717,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values text already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values text already exist in Object: o1:o2", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// In beiden Objekten wird je ueber eine Structure auf ein attribute einer SURFACE verwiesen, Beide Attribute wurden mit den Selben Values erstellt.
@@ -2194,19 +2194,18 @@ public class UniqueConstraints23Test {
         assertEquals(1, logger.getErrs().size());
     }
     @Test
-    @Ignore("FIXME")
     public void uniqueAttrValuesOfAttrPath_InEmbeddedAssociation_ForwardRef_Fail() {
-        Iom_jObject obj_G_1=new Iom_jObject(EMBEDDED_CLASSI,OID1);
-        obj_G_1.setattrvalue("attrI", "text1");
+        Iom_jObject obj_I_1=new Iom_jObject(EMBEDDED_CLASSI,OID1);
+        obj_I_1.setattrvalue("attrI", "text1");
 
-        Iom_jObject obj_G_2=new Iom_jObject(EMBEDDED_CLASSI,OID2);
-        obj_G_2.setattrvalue("attrI", "text1"); // dupluicate value
+        Iom_jObject obj_I_2=new Iom_jObject(EMBEDDED_CLASSI,OID2);
+        obj_I_2.setattrvalue("attrI", "text1"); // dupluicate value
         
-        Iom_jObject obj_H_3=new Iom_jObject(EMBEDDED_CLASSK,OID3);
-        obj_H_3.addattrobj("i1", "REF").setobjectrefoid(obj_G_1.getobjectoid());
+        Iom_jObject obj_K_3=new Iom_jObject(EMBEDDED_CLASSK,OID3);
+        obj_K_3.addattrobj("i1", "REF").setobjectrefoid(obj_I_1.getobjectoid());
         
-        Iom_jObject obj_H_4=new Iom_jObject(EMBEDDED_CLASSK,OID4);
-        obj_H_4.addattrobj("i1", "REF").setobjectrefoid(obj_G_2.getobjectoid());
+        Iom_jObject obj_K_4=new Iom_jObject(EMBEDDED_CLASSK,OID4);
+        obj_K_4.addattrobj("i1", "REF").setobjectrefoid(obj_I_2.getobjectoid());
         
         ValidationConfig modelConfig=new ValidationConfig();
         LogCollector logger=new LogCollector();
@@ -2215,14 +2214,16 @@ public class UniqueConstraints23Test {
         Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
         validator.validate(new StartTransferEvent());
         validator.validate(new StartBasketEvent(EMBEDDED_TOPIC,BID));
-        validator.validate(new ObjectEvent(obj_H_3)); // contains a forward reference
-        validator.validate(new ObjectEvent(obj_H_4)); // contains a forward reference
-        validator.validate(new ObjectEvent(obj_G_1));
-        validator.validate(new ObjectEvent(obj_G_2));
+        validator.validate(new ObjectEvent(obj_K_3)); // contains a forward reference
+        validator.validate(new ObjectEvent(obj_K_4)); // contains a forward reference
+        validator.validate(new ObjectEvent(obj_I_1));
+        validator.validate(new ObjectEvent(obj_I_2));
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // asserts
-        assertTrue(logger.getErrs().size()==1);
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Unique is violated! Values text1 already exist in Object: o3",
+                logger.getErrs().get(0).getEventMsg());
     }
 	
 	// Prueft, ob das eingebettete Unique-Constraint innerhalb der Association funktioniert.
