@@ -1525,7 +1525,7 @@ public class MandatoryConstraints23 {
         Iom_jObject iomObjW = new Iom_jObject(ILI_CLASSDEFINEDW, OID2);
         IomObject vw=iomObjW.addattrobj("role_v", "REF");
         vw.setobjectrefoid(iomObjV.getobjectoid());
-        vw.setattrvalue("attr", "Attr"); //should fail because v1 is UNDEFINED
+        vw.setattrvalue("attr", "Attr"); 
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
@@ -1540,28 +1540,7 @@ public class MandatoryConstraints23 {
         // Asserts
         assertEquals(0, logger.getErrs().size());
     }
-    @Test
-    @Ignore("FIXME")
-    public void embedded_Defined_Fail() throws Exception {
-        Iom_jObject iomObjV = new Iom_jObject(ILI_CLASSDEFINEDV, OID1);
-        Iom_jObject iomObjW = new Iom_jObject(ILI_CLASSDEFINEDW, OID2);
-        IomObject vw=iomObjW.addattrobj("role_v", "REF");
-        vw.setobjectrefoid(iomObjV.getobjectoid());
-        //vw.setattrvalue("attr", "Attr"); //should fail because attr is UNDEFINED
-        ValidationConfig modelConfig = new ValidationConfig();
-        LogCollector logger = new LogCollector();
-        LogEventFactory errFactory = new LogEventFactory();
-        Settings settings = new Settings();
-        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(TOPIC, BID));
-        validator.validate(new ObjectEvent(iomObjV));
-        validator.validate(new ObjectEvent(iomObjW));
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
-        // Asserts
-        assertEquals(1, logger.getErrs().size());
-    }
+
 
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der formattedType definiert wurde.
 	@Test
@@ -1605,6 +1584,29 @@ public class MandatoryConstraints23 {
 	//#########################################################//
 	//########### FAIL MANDATORY CONSTRAINTS ##################//
 	//#########################################################//
+
+    @Test
+    public void embedded_Defined_Fail() throws Exception {
+        Iom_jObject iomObjV = new Iom_jObject(ILI_CLASSDEFINEDV, OID1);
+        Iom_jObject iomObjW = new Iom_jObject(ILI_CLASSDEFINEDW, OID2);
+        IomObject vw=iomObjW.addattrobj("role_v", "REF");
+        vw.setobjectrefoid(iomObjV.getobjectoid());
+        //vw.setattrvalue("attr", "Attr"); //should fail because attr is UNDEFINED
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(iomObjV));
+        validator.validate(new ObjectEvent(iomObjW));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.DefinedVw.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die boolean nicht uebereinstimmen.	
 	@Test
