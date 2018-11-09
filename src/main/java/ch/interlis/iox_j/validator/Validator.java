@@ -56,6 +56,7 @@ import ch.interlis.ili2c.metamodel.LineForm;
 import ch.interlis.ili2c.metamodel.LineType;
 import ch.interlis.ili2c.metamodel.LocalAttribute;
 import ch.interlis.ili2c.metamodel.MandatoryConstraint;
+import ch.interlis.ili2c.metamodel.Model;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.ObjectPath;
@@ -292,11 +293,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		} else if (event instanceof ch.interlis.iox.StartBasketEvent){
 			StartBasketEvent startBasketEvent = ((ch.interlis.iox.StartBasketEvent) event);
 			currentBasketId = ((ch.interlis.iox.StartBasketEvent) event).getBid();
-			if (isValidId(currentBasketId)) {
-			    validateUniqueBasketId(startBasketEvent);
-			} else {
-                errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid BID", currentBasketId==null?"":currentBasketId));
-			}
+			validateBasketEvent(startBasketEvent);
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=new ch.interlis.iom_j.Iom_jObject(((ch.interlis.iox.ObjectEvent)event).getIomObject());
 			try {
@@ -314,7 +311,27 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 	}
-	private boolean isValidId(String valueStr) {
+	private void validateBasketEvent(ch.interlis.iox.StartBasketEvent event) {
+        boolean hasAFail = false;
+	    if (!isValidTopicName(event.getType())) {
+	        hasAFail = true;
+            errs.addEvent(errFact.logErrorMsg("Invalid basket element name {0}", event.getType()));
+        }
+        if (!isValidId(event.getBid())) {
+            hasAFail = true;
+            errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid BID", event.getBid()==null?"":event.getBid()));
+        }
+        if(!hasAFail) {
+            validateUniqueBasketId(event);
+        }
+    }
+	
+    private boolean isValidTopicName(String topicName) {
+	    Element element = td.getElement(topicName);
+        return element != null && element instanceof Topic ?  true : false;
+    }
+    
+    private boolean isValidId(String valueStr) {
 	    if(valueStr==null) {
 	        return false;
 	    }
@@ -335,12 +352,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
 	private void validateUniqueBasketId(StartBasketEvent startBasketEvent) {
+	    String bid=startBasketEvent.getBid();
 		// check if basket id is unique in transfer file
-		if(currentBasketId != null){
-			if(uniquenessOfBid.containsKey(currentBasketId)){
-				errs.addEvent(errFact.logErrorMsg("BID {0} of {1} already exists in {2}", currentBasketId, startBasketEvent.getType().toString(), uniquenessOfBid.get(currentBasketId)));
+		if(bid != null){
+			if(uniquenessOfBid.containsKey(bid)){
+				errs.addEvent(errFact.logErrorMsg("BID {0} of {1} already exists in {2}", bid, startBasketEvent.getType(), uniquenessOfBid.get(bid)));
 			} else {
-				uniquenessOfBid.put(currentBasketId, startBasketEvent.getType());
+				uniquenessOfBid.put(bid, startBasketEvent.getType());
 			}
 		}
 	}
