@@ -1,0 +1,9 @@
+INTERLIS 2.3;
+
+MODEL Topic23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" =
+	TOPIC Topic =
+		CLASS x=
+                END x;
+	END Topic;
+END Topic23.

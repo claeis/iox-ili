@@ -95,7 +95,7 @@ public class Configuration23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("Configuration23.Topic",BID1));
 		validator.validate(new ObjectEvent(objCondition));
 		validator.validate(new ObjectEvent(objC));
 		validator.validate(new EndBasketEvent());
@@ -273,7 +273,7 @@ public class Configuration23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("Configuration23.Topic",BID1));
 		validator.validate(new ObjectEvent(objCondition));
 		validator.validate(new ObjectEvent(objC));
 		validator.validate(new EndBasketEvent());

@@ -61,7 +61,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new ObjectEvent(objA));
 		validator.validate(new EndBasketEvent());
@@ -87,7 +87,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objConditionX));
 		validator.validate(new ObjectEvent(objAP));
 		validator.validate(new EndBasketEvent());
@@ -111,7 +111,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new ObjectEvent(objA));
 		validator.validate(new EndBasketEvent());
@@ -138,7 +138,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID2));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID2));
 		validator.validate(new ObjectEvent(objB));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -161,7 +161,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objB));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new EndBasketEvent());
@@ -1120,7 +1120,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new ObjectEvent(objA));
 		validator.validate(new EndBasketEvent());
@@ -1147,7 +1147,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objConditionX));
 		validator.validate(new ObjectEvent(objAP));
 		validator.validate(new EndBasketEvent());
@@ -1174,7 +1174,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID2));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID2));
 		validator.validate(new ObjectEvent(objB));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1197,7 +1197,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new ObjectEvent(objA));
 		validator.validate(new EndBasketEvent());
@@ -1221,7 +1221,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new ObjectEvent(objA));
 		validator.validate(new EndBasketEvent());
@@ -2081,7 +2081,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new ObjectEvent(objA));
 		validator.validate(new EndBasketEvent());
@@ -2108,7 +2108,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new ObjectEvent(objA));
 		validator.validate(new EndBasketEvent());
@@ -2135,7 +2135,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new ObjectEvent(objA));
 		validator.validate(new EndBasketEvent());
