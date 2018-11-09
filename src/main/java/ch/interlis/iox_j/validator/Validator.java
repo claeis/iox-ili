@@ -515,7 +515,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									validateExistenceConstraint(iomObj, existenceConstraint);
 								} else if(additionalConstraint instanceof MandatoryConstraint){
 									MandatoryConstraint mandatoryConstraint = (MandatoryConstraint) additionalConstraint;
-									validateMandatoryConstraint(iomObj, mandatoryConstraint);
+									validateMandatoryConstraint(null, iomObj, mandatoryConstraint, null);
 								} else if(additionalConstraint instanceof SetConstraint){
 									SetConstraint setConstraint = (SetConstraint) additionalConstraint;
 									String constraintName = getScopedName(setConstraint);
@@ -618,7 +618,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					// mandatory constraint
 					if(constraintObj instanceof MandatoryConstraint){
 						MandatoryConstraint mandatoryConstraint=(MandatoryConstraint) constraintObj;
-						validateMandatoryConstraint(iomObj, mandatoryConstraint);
+						validateMandatoryConstraint(null, iomObj, mandatoryConstraint, null);
 					}
                     // Uniqueness constraint
                     if (constraintObj instanceof UniquenessConstraint) {
@@ -718,14 +718,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     if (constraintObj instanceof UniquenessConstraint) {
                         UniquenessConstraint uniquenessConstraint = (UniquenessConstraint) constraintObj;
                         validateUniquenessConstraint(iomObj, embeddedLinkObj, iomObjOid, uniquenessConstraint, role);
-                    } 
+                    } else if (constraintObj instanceof MandatoryConstraint) {
+                        MandatoryConstraint mandatoryConstraint=(MandatoryConstraint) constraintObj;
+                        validateMandatoryConstraint(/*ParentObject ->*/iomObj, /*iomObj*/embeddedLinkObj, mandatoryConstraint, role);
+                    }
                 }
             }
         } 
     }
     private void fillOfPlausibilityConstraintMap(String validationKind, String usageScope, PlausibilityConstraint constraint, IomObject iomObj){
 		Evaluable condition = (Evaluable) constraint.getCondition();
-		Value conditionValue = evaluateExpression(validationKind, usageScope, iomObj, condition);
+		Value conditionValue = evaluateExpression(null, validationKind, usageScope, iomObj, condition,null);
 		if(plausibilityConstraints.containsKey(constraint)){
 			PlausibilityPoolValue poolConstraintValues = plausibilityConstraints.get(constraint);
 			double successfulResults = poolConstraintValues.getSuccessfulResults();
@@ -809,7 +812,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}else{
 				// preCondition (UNIQUE WHERE)
 				if(uniquenessConstraint.getPreCondition()!=null){
-					Value preConditionValue = evaluateExpression(checkUniqueConstraint, constraintName, iomObj, uniquenessConstraint.getPreCondition());
+					Value preConditionValue = evaluateExpression(parentObject, checkUniqueConstraint, constraintName, iomObj, uniquenessConstraint.getPreCondition(),role);
 					if (preConditionValue.isNotYetImplemented()){
 						errs.addEvent(errFact.logWarningMsg("Function {0} in uniqueness constraint is not yet implemented.", constraintName));
 						return;
@@ -874,7 +877,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void collectSetConstraintObjs(String validationKind, String constraintName, IomObject iomObj, SetConstraint setConstraintObj) {
 		Evaluable preCondition = (Evaluable) setConstraintObj.getPreCondition();
 		if(preCondition != null){
-			Value preConditionValue = evaluateExpression(validationKind, constraintName, iomObj, preCondition);
+			Value preConditionValue = evaluateExpression(null, validationKind, constraintName, iomObj, preCondition,null);
 			if (preConditionValue.isNotYetImplemented()){
 				errs.addEvent(errFact.logWarningMsg("Function in set constraint {0} is not yet implemented.", getScopedName(setConstraintObj)));
 				return;
@@ -922,7 +925,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						setCurrentMainObj(iomObj);
 						errFact.setDefaultCoord(getDefaultCoord(iomObj));
 						Evaluable condition = (Evaluable) setConstraintObj.getCondition();
-						Value constraintValue = evaluateExpression(checkConstraint, constraintName, iomObj, condition);
+						Value constraintValue = evaluateExpression(null, checkConstraint, constraintName, iomObj, condition,null);
 						if (constraintValue.isNotYetImplemented()){
 							errs.addEvent(errFact.logWarningMsg("Function in set constraint {0} is not yet implemented.", getScopedName(setConstraintObj)));
 							return;
@@ -949,7 +952,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 	
-	private void validateMandatoryConstraint(IomObject iomObj, MandatoryConstraint mandatoryConstraintObj) {
+	private void validateMandatoryConstraint(IomObject parentObject, IomObject iomObj, MandatoryConstraint mandatoryConstraintObj,RoleDef firstRole) {
 		if(!ValidationConfig.OFF.equals(constraintValidation)){
 			String constraintName = getScopedName(mandatoryConstraintObj);
 			String checkConstraint = null;
@@ -967,7 +970,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					errs.addEvent(errFact.logInfoMsg("validate mandatory constraint {0}...",getScopedName(mandatoryConstraintObj)));
 				}
 				Evaluable condition = (Evaluable) mandatoryConstraintObj.getCondition();
-				Value conditionValue = evaluateExpression(checkConstraint, constraintName, iomObj, condition);
+				Value conditionValue = evaluateExpression(parentObject, checkConstraint, constraintName, iomObj, condition,firstRole);
 				if (!conditionValue.isNotYetImplemented()){
 					if (!conditionValue.skipEvaluation()){
 						if (conditionValue.isTrue()){
@@ -996,14 +999,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private Value evaluateExpression(String validationKind, String usageScope, IomObject iomObj, Evaluable expression) {
+	private Value evaluateExpression(IomObject parentObject, String validationKind, String usageScope, IomObject iomObj, Evaluable expression,RoleDef firstRole) {
 		TextType texttype = new TextType();
 		if(expression instanceof Equality){
 			// ==
 			Equality equality = (Equality) expression;
 			Evaluable leftExpression = (Evaluable) equality.getLeft();
 			Evaluable rightExpression = (Evaluable) equality.getRight();
-			Value leftValue=evaluateExpression(validationKind, usageScope, iomObj,leftExpression);
+			Value leftValue=evaluateExpression(parentObject, validationKind, usageScope, iomObj,leftExpression,firstRole);
 			// if isError, return error.
 			if (leftValue.skipEvaluation()){
 				return leftValue;
@@ -1012,7 +1015,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				return Value.createSkipEvaluation();
 			}
 			
-			Value rightValue=evaluateExpression(validationKind, usageScope, iomObj,rightExpression);
+			Value rightValue=evaluateExpression(parentObject, validationKind, usageScope, iomObj,rightExpression,firstRole);
 			// if isError, return error.
 			if (rightValue.skipEvaluation()){
 				return rightValue;
@@ -1032,7 +1035,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			GreaterThan greaterThan = (GreaterThan) expression;
 			Evaluable leftExpression = (Evaluable) greaterThan.getLeft();
 			Evaluable rightExpression = (Evaluable) greaterThan.getRight();
-			Value leftValue=evaluateExpression(validationKind, usageScope, iomObj,leftExpression);
+			Value leftValue=evaluateExpression(parentObject, validationKind, usageScope, iomObj,leftExpression, firstRole);
 			// if isError, return error.
 			if (leftValue.skipEvaluation()){
 				return leftValue;
@@ -1040,7 +1043,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if (leftValue.isUndefined()){
 				return Value.createSkipEvaluation();
 			}
-			Value rightValue=evaluateExpression(validationKind, usageScope, iomObj,rightExpression);
+			Value rightValue=evaluateExpression(parentObject, validationKind, usageScope, iomObj,rightExpression, firstRole);
 			// if isError, return error.
 			if (rightValue.skipEvaluation()){
 				return rightValue;
@@ -1059,7 +1062,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			GreaterThanOrEqual greaterThanOrEqual = (GreaterThanOrEqual) expression;
 			Evaluable leftExpression = (Evaluable) greaterThanOrEqual.getLeft();
 			Evaluable rightExpression = (Evaluable) greaterThanOrEqual.getRight();
-			Value leftValue=evaluateExpression(validationKind, usageScope, iomObj,leftExpression);
+			Value leftValue=evaluateExpression(parentObject, validationKind, usageScope, iomObj,leftExpression, firstRole);
 			// if isError, return error.
 			if (leftValue.skipEvaluation()){
 				return leftValue;
@@ -1067,7 +1070,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if (leftValue.isUndefined()){
 				return Value.createSkipEvaluation();
 			}
-			Value rightValue=evaluateExpression(validationKind, usageScope, iomObj,rightExpression);
+			Value rightValue=evaluateExpression(parentObject, validationKind, usageScope, iomObj,rightExpression, firstRole);
 			// if isError, return error.
 			if (rightValue.skipEvaluation()){
 				return rightValue;
@@ -1086,7 +1089,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Inequality inEquality = (Inequality) expression;
 			Evaluable leftExpression = (Evaluable) inEquality.getLeft();
 			Evaluable rightExpression = (Evaluable) inEquality.getRight();
-			Value leftValue=evaluateExpression(validationKind, usageScope, iomObj,leftExpression);
+			Value leftValue=evaluateExpression(parentObject, validationKind, usageScope, iomObj,leftExpression, firstRole);
 			// if isError, return error.
 			if (leftValue.skipEvaluation()){
 				return leftValue;
@@ -1094,7 +1097,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if (leftValue.isUndefined()){
 				return Value.createSkipEvaluation();
 			}
-			Value rightValue=evaluateExpression(validationKind, usageScope, iomObj,rightExpression);
+			Value rightValue=evaluateExpression(parentObject, validationKind, usageScope, iomObj,rightExpression, firstRole);
 			// if isError, return error.
 			if (rightValue.skipEvaluation()){
 				return rightValue;
@@ -1113,7 +1116,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			LessThan lessThan = (LessThan) expression;
 			Evaluable leftExpression = (Evaluable) lessThan.getLeft();
 			Evaluable rightExpression = (Evaluable) lessThan.getRight();
-			Value leftValue=evaluateExpression(validationKind, usageScope, iomObj,leftExpression);
+			Value leftValue=evaluateExpression(parentObject, validationKind, usageScope, iomObj,leftExpression, firstRole);
 			// if isError, return error.
 			if (leftValue.skipEvaluation()){
 				return leftValue;
@@ -1121,7 +1124,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if (leftValue.isUndefined()){
 				return Value.createSkipEvaluation();
 			}
-			Value rightValue=evaluateExpression(validationKind, usageScope, iomObj,rightExpression);
+			Value rightValue=evaluateExpression(parentObject, validationKind, usageScope, iomObj,rightExpression, firstRole);
 			// if isError, return error.
 			if (rightValue.skipEvaluation()){
 				return rightValue;
@@ -1140,7 +1143,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			LessThanOrEqual lessThanOrEqual = (LessThanOrEqual) expression;
 			Evaluable leftExpression = (Evaluable) lessThanOrEqual.getLeft();
 			Evaluable rightExpression = (Evaluable) lessThanOrEqual.getRight();
-			Value leftValue=evaluateExpression(validationKind, usageScope, iomObj,leftExpression);
+			Value leftValue=evaluateExpression(parentObject, validationKind, usageScope, iomObj,leftExpression, firstRole);
 			// if isError, return error.
 			if (leftValue.skipEvaluation()){
 				return leftValue;
@@ -1148,7 +1151,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if (leftValue.isUndefined()){
 				return Value.createSkipEvaluation();
 			}
-			Value rightValue=evaluateExpression(validationKind, usageScope, iomObj,rightExpression);
+			Value rightValue=evaluateExpression(parentObject, validationKind, usageScope, iomObj,rightExpression, firstRole);
 			// if isError, return error.
 			if (rightValue.skipEvaluation()){
 				return rightValue;
@@ -1165,7 +1168,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		} else if(expression instanceof Negation){
 			// NOT
 			Negation negation = (Negation) expression;				
-			Value arg=evaluateExpression(validationKind, usageScope, iomObj,negation.getNegated());
+			Value arg=evaluateExpression(parentObject, validationKind, usageScope, iomObj,negation.getNegated(), firstRole);
 			if (arg.skipEvaluation()){
 				return arg;
 			}
@@ -1182,7 +1185,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Conjunction conjunction = (Conjunction) expression;
 			Evaluable[] conjunctionArray = (Evaluable[]) conjunction.getConjoined();
 			for (int i=0;i<conjunctionArray.length;i++){
-				Value arg=evaluateExpression(validationKind, usageScope, iomObj,conjunctionArray[i]);
+				Value arg=evaluateExpression(parentObject, validationKind, usageScope, iomObj,conjunctionArray[i], firstRole);
 				if (arg.skipEvaluation()){
 					return arg;
 				}
@@ -1197,7 +1200,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		} else if(expression instanceof DefinedCheck){
 			// DEFINED
 			DefinedCheck defined = (DefinedCheck) expression;
-			Value arg=evaluateExpression(validationKind, usageScope, iomObj,defined.getArgument());
+			Value arg=evaluateExpression(parentObject, validationKind, usageScope, iomObj,defined.getArgument(), firstRole);
 			if(arg.skipEvaluation()){
 				return arg;
 			}
@@ -1211,7 +1214,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Disjunction disjunction = (Disjunction) expression;
 			Evaluable[] disjunctionArray = (Evaluable[]) disjunction.getDisjoined();
 			for (int i=0;i<disjunctionArray.length;i++){
-				Value arg=evaluateExpression(validationKind, usageScope, iomObj,disjunctionArray[i]);
+				Value arg=evaluateExpression(parentObject, validationKind, usageScope, iomObj,disjunctionArray[i], firstRole);
 				if (arg.skipEvaluation()){
 					return arg;
 				}
@@ -1276,7 +1279,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(currentFunction.getScopedName(null).equals("INTERLIS.len") || currentFunction.getScopedName(null).equals("INTERLIS.lenM")){
 				Evaluable[] arguments = functionCallObj.getArguments();
 				for(Evaluable anArgument : arguments){
-					Value arg=evaluateExpression(validationKind, usageScope, iomObj,anArgument);
+					Value arg=evaluateExpression(parentObject, validationKind, usageScope, iomObj,anArgument, firstRole);
 					if (arg.skipEvaluation()){
 						return arg;
 						}
@@ -1292,7 +1295,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			} else if(currentFunction.getScopedName(null).equals("INTERLIS.trim") || currentFunction.getScopedName(null).equals("INTERLIS.trimM")){
 				Evaluable[] arguments = functionCallObj.getArguments();
 				for(Evaluable anArgument : arguments){
-					Value arg=evaluateExpression(validationKind, usageScope, iomObj,anArgument);
+					Value arg=evaluateExpression(parentObject, validationKind, usageScope, iomObj,anArgument, firstRole);
 					if (arg.skipEvaluation()){
 						return arg;
 					}
@@ -1303,14 +1306,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			} else if (currentFunction.getScopedName(null).equals("INTERLIS.isEnumSubVal")){
 				Evaluable[] arguments = functionCallObj.getArguments();
-				Value subEnum=evaluateExpression(validationKind, usageScope, iomObj,arguments[0]);
+				Value subEnum=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[0], firstRole);
 				if (subEnum.skipEvaluation()){
 					return subEnum;
 				}
 				if (subEnum.isUndefined()){
 					return Value.createSkipEvaluation();
 				}
-				Value nodeEnum=evaluateExpression(validationKind, usageScope, iomObj,arguments[1]);
+				Value nodeEnum=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[1], firstRole);
 				if (nodeEnum.skipEvaluation()){
 					return nodeEnum;
 				}
@@ -1324,21 +1327,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			} else if (currentFunction.getScopedName(null).equals("INTERLIS.inEnumRange")){
 				Evaluable[] arguments = functionCallObj.getArguments();
-				Value enumToCompare=evaluateExpression(validationKind, usageScope, iomObj,arguments[0]);
+				Value enumToCompare=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[0], firstRole);
 				if (enumToCompare.skipEvaluation()){
 					return enumToCompare;
 				}
 				if (enumToCompare.isUndefined()){
 					return Value.createSkipEvaluation();
 				}
-				Value minEnum=evaluateExpression(validationKind, usageScope, iomObj,arguments[1]);
+				Value minEnum=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[1], firstRole);
 				if (minEnum.skipEvaluation()){
 					return minEnum;
 				}
 				if (minEnum.isUndefined()){
 					return Value.createSkipEvaluation();
 				}
-				Value maxEnum=evaluateExpression(validationKind, usageScope, iomObj,arguments[2]);
+				Value maxEnum=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[2], firstRole);
 				if (maxEnum.skipEvaluation()){
 					return maxEnum;
 				}
@@ -1365,7 +1368,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			} else if (currentFunction.getScopedName(null).equals("INTERLIS.objectCount")){
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = functionCall.getArguments();
-				Value value=evaluateExpression(validationKind, usageScope, iomObj,arguments[0]);
+				Value value=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[0], firstRole);
 				if (value.skipEvaluation()){
 					return value;
 				}
@@ -1392,7 +1395,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = (Evaluable[]) functionCall.getArguments();
 				Evaluable anArgument = (Evaluable) arguments[0];
-				Value value=evaluateExpression(validationKind, usageScope, iomObj, anArgument);
+				Value value=evaluateExpression(parentObject, validationKind, usageScope, iomObj, anArgument, firstRole);
 				if (value.skipEvaluation()){
 					return value;
 				}
@@ -1403,14 +1406,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			} else if (currentFunction.getScopedName(null).equals("INTERLIS.isOfClass")){
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = functionCall.getArguments();
-				Value paramObject=evaluateExpression(validationKind, usageScope, iomObj,arguments[0]);
+				Value paramObject=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[0], firstRole);
 				if (paramObject.skipEvaluation()){
 					return paramObject;
 				}
 				if (paramObject.isUndefined()){
 					return Value.createSkipEvaluation();
 				}
-				Value paramClass=evaluateExpression(validationKind, usageScope, iomObj,arguments[1]);
+				Value paramClass=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[1], firstRole);
 				if (paramClass.skipEvaluation()){
 					return paramClass;
 				}
@@ -1431,14 +1434,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			} else if (currentFunction.getScopedName(null).equals("INTERLIS.isSubClass")){
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = functionCall.getArguments();
-				Value subViewable=evaluateExpression(validationKind, usageScope, iomObj,arguments[0]);
+				Value subViewable=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[0], firstRole);
 				if (subViewable.skipEvaluation()){
 					return subViewable;
 				}
 				if (subViewable.isUndefined()){
 					return Value.createSkipEvaluation();
 				}
-				Value superViewable=evaluateExpression(validationKind, usageScope, iomObj,arguments[1]);
+				Value superViewable=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[1], firstRole);
 				if (superViewable.skipEvaluation()){
 					return superViewable;
 				}
@@ -1455,7 +1458,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			} else if (currentFunction.getScopedName(null).equals("INTERLIS.myClass")){
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = functionCall.getArguments();
-				Value targetViewable=evaluateExpression(validationKind, usageScope, iomObj,arguments[0]);
+				Value targetViewable=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[0], firstRole);
 				if (targetViewable.skipEvaluation()){
 					return targetViewable;
 				}
@@ -1467,7 +1470,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				FunctionCall functionCall = (FunctionCall) expression;
 				Evaluable[] arguments = functionCall.getArguments();
 				// founded objects (list<IomObjects)
-				Value value=evaluateExpression(validationKind, usageScope, iomObj,arguments[0]);
+				Value value=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[0], firstRole);
 				if (value.skipEvaluation()){
 					return value;
 				}
@@ -1475,12 +1478,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					return Value.createSkipEvaluation();
 				}
 				// count of objects condition returns attrName of BAG / undefined=(numericIsDefined=false)
-				Value surfaceBag=evaluateExpression(validationKind, usageScope, iomObj,arguments[1]);
+				Value surfaceBag=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[1], firstRole);
 				if (surfaceBag.skipEvaluation()){
 					return surfaceBag;
 				}
 				// name of surface (textType)
-				Value surfaceAttr=evaluateExpression(validationKind, usageScope, iomObj,arguments[2]);
+				Value surfaceAttr=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[2], firstRole);
 				if (surfaceAttr.skipEvaluation()){
 					return surfaceAttr;
 				}
@@ -1508,7 +1511,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				int argumentCount = functionCall.getArguments().length;
 				Value[] actualArguments=new Value[argumentCount];
 				for(int i=0; i<argumentCount;i++){
-					Value anObject=evaluateExpression(validationKind, usageScope, iomObj,arguments[i]);
+					Value anObject=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[i], firstRole);
 					if (anObject.skipEvaluation()){
 						return anObject;
 					}
@@ -1533,9 +1536,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			// object path	
 			ObjectPath objectPathObj = (ObjectPath) expression;
 			PathEl[] pathElements = objectPathObj.getPathElements();
-			final int lastPathIndex = pathElements.length - 1;
 
-			return getValueFromObjectPath(null, iomObj, pathElements, lastPathIndex,null);
+			return getValueFromObjectPath(parentObject, iomObj, pathElements, firstRole);
 		} else if(expression instanceof Objects) {
 			// objects
 			Iterator<String> objectIterator = allObjIterator;
@@ -1559,10 +1561,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		//TODO instance of ViewableAggregate
 		//TODO instance of ViewableAlias
 	}
-    private Value getValueFromObjectPath(IomObject parentObject,IomObject iomObjStart, PathEl[] pathElements, final int lastPathIndex,RoleDef firstRole) {
+    private Value getValueFromObjectPath(IomObject parentObject,IomObject iomObjStart, PathEl[] pathElements, RoleDef firstRole) {
         ArrayList<IomObject> currentObjects=new ArrayList<IomObject>();
         ArrayList<IomObject> nextCurrentObjects=new ArrayList<IomObject>();
         RoleDef role = null;
+        final int lastPathIndex = pathElements.length - 1;
         currentObjects.add(iomObjStart);
         for (int k = 0; k < pathElements.length; k++) {
             for (IomObject iomObj:currentObjects) {
@@ -3117,9 +3120,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		    Object next = constraintIter.next();
 		    ObjectPath objectPathObj = (ObjectPath) next;
 		    PathEl[] pathElements = objectPathObj.getPathElements();
-		    int lastPathIndex = pathElements.length - 1;
 		    
-		    Value value = getValueFromObjectPath(parentObject, currentObject, pathElements, lastPathIndex,role);
+		    Value value = getValueFromObjectPath(parentObject, currentObject, pathElements, role);
 		    if(value.isUndefined()) {
 		        return null;
 		    }else if(value.skipEvaluation()) {
