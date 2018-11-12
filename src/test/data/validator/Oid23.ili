@@ -46,5 +46,25 @@ MODEL Oid23
 		   attrB1 : TEXT*10;
 		END ClassB;
 	END Topic2;
+
+	TOPIC Topic3=
+		DOMAIN 
+		TextOid = OID TEXT*34;
+		CLASS ClassA =
+		   TextID : OID TEXT*34; 
+		END ClassA;
+
+		CLASS ClassB3 =
+		   OID AS TextOid;
+		END ClassB3;
+
+		CLASS ClassC =
+		   attrC : INTERLIS.STANDARDOID;
+		END ClassC;
+
+		CLASS ClassD =
+		   OID AS INTERLIS.STANDARDOID;
+		END ClassD;
+	END Topic3;
 	
 END Oid23.
