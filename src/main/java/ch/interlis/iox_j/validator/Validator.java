@@ -2915,8 +2915,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 				} else if(oidType!=null && oidType==td.INTERLIS.I32OID){
 					// valid i32OID.
-				} else if(oidType!=null && oidType==td.INTERLIS.STANDARDOID){
-					// valid Standardoid.
+				} else if(oidType!=null && oidType==td.INTERLIS.STANDARDOID) {
+                    String currentOid = iomObj.getobjectoid();
+                    if (!isValidTextOId(currentOid)) {
+                        errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID", currentOid));
+                    }
 				} else if (oidType!=null && oidType.getType() instanceof TextOIDType) {
 				    String currentOid = iomObj.getobjectoid();
                     if (!isValidTextOId(currentOid)) {

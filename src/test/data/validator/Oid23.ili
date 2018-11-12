@@ -58,13 +58,13 @@ MODEL Oid23
 		   OID AS TextOid;
 		END ClassB3;
 
-		CLASS ClassC =
+		CLASS ClassC3 =
 		   attrC : INTERLIS.STANDARDOID;
-		END ClassC;
+		END ClassC3;
 
-		CLASS ClassD =
+		CLASS ClassD3 =
 		   OID AS INTERLIS.STANDARDOID;
-		END ClassD;
+		END ClassD3;
 	END Topic3;
 	
 END Oid23.
