@@ -188,7 +188,7 @@ public class Datatypes23Test {
 	}
 
     @Test
-    public void dateGregorianValidOk(){
+    public void formattedTypeValidOk(){
         Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
         objGeorgianDatum.setattrvalue("gDatum", "2017:01:03");
         ValidationConfig modelConfig=new ValidationConfig();
@@ -1151,7 +1151,7 @@ public class Datatypes23Test {
 	//////////////////////////////////////////////////////////////////////////////////////
 
     @Test
-    public void dateGregorianValueHasInvalidFormatFail(){
+    public void formattedTypeValueHasInvalidFormatFail(){
         Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
         objGeorgianDatum.setattrvalue("gDatum", "2017-01-01");
         ValidationConfig modelConfig=new ValidationConfig();
@@ -1170,7 +1170,7 @@ public class Datatypes23Test {
     }
 	
     @Test
-    public void dateGregorianValueHasInvalidValueFail(){
+    public void formattedTypeValueHasInvalidValueFail(){
         Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
         objGeorgianDatum.setattrvalue("gDatum", "1");
         ValidationConfig modelConfig=new ValidationConfig();
@@ -1189,7 +1189,7 @@ public class Datatypes23Test {
     }
     
     @Test
-    public void dateGregorianValueIsOutOfRangeMinFail(){
+    public void formattedTypeValueIsOutOfRangeMinFail(){
         Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
         objGeorgianDatum.setattrvalue("gDatum", "2016:01:01");
         ValidationConfig modelConfig=new ValidationConfig();
@@ -1208,7 +1208,7 @@ public class Datatypes23Test {
     }
     
     @Test
-    public void dateGregorianValueIsOutOfRangeMaxFail(){
+    public void formattedTypeValueIsOutOfRangeMaxFail(){
         Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
         objGeorgianDatum.setattrvalue("gDatum", "2018:01:01");
         ValidationConfig modelConfig=new ValidationConfig();
