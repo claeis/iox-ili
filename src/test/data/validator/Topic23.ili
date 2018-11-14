@@ -6,4 +6,18 @@ MODEL Topic23
 		CLASS x=
                 END x;
 	END Topic;
+
+	TOPIC TopicUuidOid = 
+		BASKET OID AS INTERLIS.UUIDOID;
+	END TopicUuidOid;
+
+	TOPIC TopicStandartOID = 
+		BASKET OID AS INTERLIS.STANDARDOID;
+	END TopicStandartOID;
+
+	DOMAIN
+          TextOID = OID TEXT*36;
+	TOPIC TopicTextOID = 
+		BASKET OID AS TextOID;
+	END TopicTextOID;
 END Topic23.

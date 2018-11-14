@@ -320,20 +320,46 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 	private void validateBasketEvent(ch.interlis.iox.StartBasketEvent event) {
-        boolean hasAFail = false;
+        boolean isValid = true;
 	    if (!isValidTopicName(event.getType())) {
-	        hasAFail = true;
+	        isValid = false;
             errs.addEvent(errFact.logErrorMsg("Invalid basket element name {0}", event.getType()));
         }
         if (!isValidId(event.getBid())) {
-            hasAFail = true;
+            isValid = false;
             errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid BID", event.getBid()==null?"":event.getBid()));
         }
-        if(!hasAFail) {
+        if(isValid) {
+            Topic topic = (Topic)td.getElement(event.getType());
+            Domain bidDomain=topic.getBasketOid();
+            if (bidDomain!=null && !isAValidBasketOID(bidDomain, event.getBid())) {
+                isValid = false;
+                errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid BID", event.getBid()==null?"":event.getBid()));
+            }
+        }
+        if(isValid) {
             validateUniqueBasketId(event);
         }
     }
 	
+    private boolean isAValidBasketOID(Domain domain, String bid) {
+
+        Type type = domain.getType();
+        if (domain == td.INTERLIS.UUIDOID) {
+            if (!isValidUuid(bid)) {
+                return false;
+            }
+        } else if (domain == td.INTERLIS.STANDARDOID) {
+            if (!isValidStandartOId(bid)) {
+                return false;
+            }
+        } else if (type instanceof TextOIDType) {
+            if (!isValidTextOId(bid)) {
+                return false;
+            }
+        }
+        return true;
+    }
     private boolean isValidTopicName(String topicName) {
 	    Element element = td.getElement(topicName);
         return element != null && element instanceof Topic ?  true : false;
