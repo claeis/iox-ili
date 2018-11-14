@@ -3572,11 +3572,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     String actualValue = iomObj.getattrvalue(attrName);
                     if (actualValue != null) {
                         if (!actualValue.matches(regExp)) {
-                            errs.addEvent(errFact.logErrorMsg("Attribute <{0}> has a invalid value <{1}>", attrName, actualValue));
+                            errs.addEvent(errFact.logErrorMsg("Attribute <{0}> has a invalid value <{1}>", attrPath, actualValue));
                         } else {
                             boolean hasAValidValue = ((FormattedType) type).isValueInRange(actualValue);
                             if (!hasAValidValue) {
-                                errs.addEvent(errFact.logErrorMsg("Attribute <{0}> is a out of range. Value: <{1}>", attrName, actualValue));
+                                errs.addEvent(errFact.logErrorMsg("Attribute <{0}> is a out of range. Value: <{1}>", attrPath, actualValue));
                             }
                         }
                     }				    
