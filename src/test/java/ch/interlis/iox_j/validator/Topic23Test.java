@@ -48,7 +48,7 @@ public class Topic23Test {
     //#########################################################//
 
     @Test
-    public void basketElementValidateUuidOid_OK() throws Exception {
+    public void bidUuidOid_OK() throws Exception {
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
@@ -63,7 +63,7 @@ public class Topic23Test {
     }
     
     @Test
-    public void basketElementValidateStandartOid_OK() throws Exception {
+    public void bidStandartOid_OK() throws Exception {
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
@@ -78,7 +78,7 @@ public class Topic23Test {
     }
     
     @Test
-    public void basketElementValidateTextOid_OK() throws Exception {
+    public void bidTextOid_OK() throws Exception {
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
@@ -112,7 +112,7 @@ public class Topic23Test {
     //#############################################################//
     
     @Test
-    public void basketElementValidateStandartOidLength16Character_Fail() throws Exception {
+    public void bidStandartOidLength16Character_Fail() throws Exception {
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
@@ -128,7 +128,7 @@ public class Topic23Test {
     }
     
     @Test
-    public void basketElementValidateStandartOidStartWithSpace_Fail() throws Exception {
+    public void bidStandartOidStartWithSpace_Fail() throws Exception {
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
@@ -144,7 +144,7 @@ public class Topic23Test {
     }
     
     @Test
-    public void basketElementValidateStandartOidStartWithNumber_Fail() throws Exception {
+    public void bidStandartOidStartWithNumber_Fail() throws Exception {
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
@@ -160,7 +160,7 @@ public class Topic23Test {
     }
     
     @Test
-    public void basketElementValidateTextOidStartWithNumber_Fail() throws Exception {
+    public void bidTextOidStartWithNumber_Fail() throws Exception {
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
@@ -176,7 +176,7 @@ public class Topic23Test {
     }
     
     @Test
-    public void basketElementValidateTextOidStartWithSpace_Fail() throws Exception {
+    public void bidTextOidStartWithSpace_Fail() throws Exception {
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
@@ -192,7 +192,7 @@ public class Topic23Test {
     }
     
     @Test
-    public void basketElementValidateTextOidStartWithMinus_Fail() throws Exception {
+    public void bidTextOidStartWithMinus_Fail() throws Exception {
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
@@ -208,7 +208,7 @@ public class Topic23Test {
     }
     
     @Test
-    public void basketElementValidateUuidOidLength36Character_Fail() throws Exception {
+    public void bidUuidOidLength36Character_Fail() throws Exception {
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
@@ -224,7 +224,7 @@ public class Topic23Test {
     }    
     
     @Test
-    public void basketElementValidateUuidOidStartWithSpace_Fail() throws Exception {
+    public void bidUuidOidStartWithSpace_Fail() throws Exception {
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
