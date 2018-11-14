@@ -63,11 +63,7 @@ public class Oid23Test {
 
     @Test
     public void standardOid_ClassValue_Ok() throws Exception {
-        Iom_jObject objD1=new Iom_jObject(CLASSD3, "_bcdefghilmno16");
-        Iom_jObject objD2=new Iom_jObject(CLASSD3, "bcdefg_hilmno16");
-        Iom_jObject objD3=new Iom_jObject(CLASSD3, "bcdefg1hilmno16");
-        Iom_jObject objD4=new Iom_jObject(CLASSD3, "bcdefg-hilmno16");
-        Iom_jObject objD5=new Iom_jObject(CLASSD3, "bcdefg.hilmno16");
+        Iom_jObject objD1=new Iom_jObject(CLASSD3, "deg5mQXX2000004a");
         ValidationConfig modelConfig=new ValidationConfig();
         LogCollector logger=new LogCollector();
         LogEventFactory errFactory=new LogEventFactory();
@@ -76,10 +72,6 @@ public class Oid23Test {
         validator.validate(new StartTransferEvent());
         validator.validate(new StartBasketEvent(TOPIC3,BID));
         validator.validate(new ObjectEvent(objD1));
-        validator.validate(new ObjectEvent(objD2));
-        validator.validate(new ObjectEvent(objD3));
-        validator.validate(new ObjectEvent(objD4));
-        validator.validate(new ObjectEvent(objD5));
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
@@ -89,15 +81,7 @@ public class Oid23Test {
     @Test
     public void standardOid_AttrValue_Ok() throws Exception {
         Iom_jObject objC1=new Iom_jObject(CLASSC3, OID1);
-        objC1.setattrvalue("attrC", "_bcdefghilmno16");
-        Iom_jObject objC2=new Iom_jObject(CLASSC3, OID2);
-        objC2.setattrvalue("attrC", "bcdefg_hilmno16");
-        Iom_jObject objC3=new Iom_jObject(CLASSC3, OID3);
-        objC3.setattrvalue("attrC", "bcdefg1hilmno16");
-        Iom_jObject objC4=new Iom_jObject(CLASSC3, OID4);
-        objC4.setattrvalue("attrC", "bcdefg-hilmno16");
-        Iom_jObject objC5=new Iom_jObject(CLASSC3, OID5);
-        objC5.setattrvalue("attrC", "bcdefg.hilmno16");
+        objC1.setattrvalue("attrC", "deg5mQXX2000004a");
         ValidationConfig modelConfig=new ValidationConfig();
         LogCollector logger=new LogCollector();
         LogEventFactory errFactory=new LogEventFactory();
@@ -106,10 +90,6 @@ public class Oid23Test {
         validator.validate(new StartTransferEvent());
         validator.validate(new StartBasketEvent(TOPIC3,BID));
         validator.validate(new ObjectEvent(objC1));
-        validator.validate(new ObjectEvent(objC2));
-        validator.validate(new ObjectEvent(objC3));
-        validator.validate(new ObjectEvent(objC4));
-        validator.validate(new ObjectEvent(objC5));
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
@@ -545,6 +525,9 @@ public class Oid23Test {
         assertEquals("value <abcdefg hilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
     }
     
+ // ----------------------------------------> Text OID <---------------------------------------- //
+ // ------------------------------------------------------------------------------------------- //
+    
     @Test
     public void textOidAttrValueStartWithNumber_Fail() throws Exception {
         Iom_jObject objB1=new Iom_jObject(CLASSA, OID1);
@@ -636,10 +619,13 @@ public class Oid23Test {
         assertTrue(logger.getErrs().size()==1);
         assertEquals("value < bcdefg_hilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
     }
+   
+// ----------------------------------------> STANDART OID <---------------------------------------- //
+ // ---------------------------------------------------------------------------------------------- //
     
     @Test
-    public void standardOid_ClassValueStartWithSpace_Fail() throws Exception {
-        Iom_jObject objD1=new Iom_jObject(CLASSD3, " bcdefghilmno16");
+    public void standardOid_ClassValueLength16Character_Fail() throws Exception {
+        Iom_jObject objD1=new Iom_jObject(CLASSD3, "g5mQXX2000004aa");
         ValidationConfig modelConfig=new ValidationConfig();
         LogCollector logger=new LogCollector();
         LogEventFactory errFactory=new LogEventFactory();
@@ -652,12 +638,30 @@ public class Oid23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("value < bcdefghilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+        assertEquals("value <g5mQXX2000004aa> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void standardOid_ClassValueStartWithSpace_Fail() throws Exception {
+        Iom_jObject objD1=new Iom_jObject(CLASSD3, " eg5mQXX2000004a");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC3,BID));
+        validator.validate(new ObjectEvent(objD1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("value < eg5mQXX2000004a> is not a valid OID", logger.getErrs().get(0).getEventMsg());
     }
     
     @Test
     public void standardOid_ClassValueStartWithNumber_Fail() throws Exception {
-        Iom_jObject objD1=new Iom_jObject(CLASSD3, "1bcdefghilmno16");
+        Iom_jObject objD1=new Iom_jObject(CLASSD3, "1eg5mQXX2000004a");
         ValidationConfig modelConfig=new ValidationConfig();
         LogCollector logger=new LogCollector();
         LogEventFactory errFactory=new LogEventFactory();
@@ -670,13 +674,32 @@ public class Oid23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("value <1bcdefghilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+        assertEquals("value <1eg5mQXX2000004a> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void standardOid_AttrValueLength16Character_Fail() throws Exception {
+        Iom_jObject objC1=new Iom_jObject(CLASSC3, OID1);
+        objC1.setattrvalue("attrC", "g5mQXX2000004aa");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC3,BID));
+        validator.validate(new ObjectEvent(objC1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("value <g5mQXX2000004aa> is not a valid OID", logger.getErrs().get(0).getEventMsg());
     }
     
     @Test
     public void standardOid_AttrValueStartWithSpace_Fail() throws Exception {
         Iom_jObject objC1=new Iom_jObject(CLASSC3, OID1);
-        objC1.setattrvalue("attrC", " bcdefghilmno16");
+        objC1.setattrvalue("attrC", " eg5mQXX2000004a");
         ValidationConfig modelConfig=new ValidationConfig();
         LogCollector logger=new LogCollector();
         LogEventFactory errFactory=new LogEventFactory();
@@ -689,13 +712,13 @@ public class Oid23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("value < bcdefghilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+        assertEquals("value < eg5mQXX2000004a> is not a valid OID", logger.getErrs().get(0).getEventMsg());
     }
     
     @Test
     public void standardOid_AttrValueStartWithNumber_Fail() throws Exception {
         Iom_jObject objC1=new Iom_jObject(CLASSC3, OID1);
-        objC1.setattrvalue("attrC", "1bcdefghilmno16");
+        objC1.setattrvalue("attrC", "1eg5mQXX2000004a");
         ValidationConfig modelConfig=new ValidationConfig();
         LogCollector logger=new LogCollector();
         LogEventFactory errFactory=new LogEventFactory();
@@ -708,7 +731,7 @@ public class Oid23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("value <1bcdefghilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+        assertEquals("value <1eg5mQXX2000004a> is not a valid OID", logger.getErrs().get(0).getEventMsg());
     }
 
 }
