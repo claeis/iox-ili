@@ -186,6 +186,24 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+
+    @Test
+    public void formattedTypeValidOk(){
+        Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objGeorgianDatum.setattrvalue("gDatum", "2017:01:03");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objGeorgianDatum));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
 	
 	// Dies ist ein Muster Datum, welches funktionieren muss.
 	@Test
@@ -1132,8 +1150,81 @@ public class Datatypes23Test {
 	///////////////////////////////// FAILING Tests //////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////
 
+    @Test
+    public void formattedTypeValueHasInvalidFormatFail(){
+        Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objGeorgianDatum.setattrvalue("gDatum", "2017-01-01");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objGeorgianDatum));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Attribute <gDatum> has a invalid value <2017-01-01>", logger.getErrs().get(0).getEventMsg());
+    }
 	
-	
+    @Test
+    public void formattedTypeValueHasInvalidValueFail(){
+        Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objGeorgianDatum.setattrvalue("gDatum", "1");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objGeorgianDatum));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Attribute <gDatum> has a invalid value <1>", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void formattedTypeValueIsOutOfRangeMinFail(){
+        Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objGeorgianDatum.setattrvalue("gDatum", "2016:01:01");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objGeorgianDatum));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Attribute <gDatum> is a out of range. Value: <2016:01:01>", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void formattedTypeValueIsOutOfRangeMaxFail(){
+        Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objGeorgianDatum.setattrvalue("gDatum", "2018:01:01");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objGeorgianDatum));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Attribute <gDatum> is a out of range. Value: <2018:01:01>", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// Es wird getestet, ob true auch gross geschrieben werden kann.
 	@Test

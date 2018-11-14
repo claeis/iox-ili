@@ -5,7 +5,10 @@ MODEL Datatypes23
 	TOPIC Topic=
 		UNIT
 			DEGREE;
-		DOMAIN
+		DOMAIN	
+			!! Datum
+			Datum = FORMAT BASED ON INTERLIS.GregorianDate (Year ":" Month ":" Day);
+
 			!! Enumeration
 			ord = (unten, oben) ORDERED;
 			circu = (Werktage, Sonntag) CIRCULAR;
@@ -76,6 +79,7 @@ MODEL Datatypes23
 		   
 		   !! FormattedType
 		   anInterlisXMLDateFormat : FORMAT INTERLIS.XMLDate "2010-1-1" .. "2110-1-1";
+		   gDatum : FORMAT Datum "2017:01:01" .. "2017:01:31";
 		   !!aDateTimeFormat : FORMAT INTERLIS.XMLDateTime "2000-01-01T00:00:00.000" .. "2005-12-31T23:59:59.999";
 		   !!aXMLTime = FORMAT BASED ON UTC "12:30:35";
 		   !!aXMLDate = FORMAT BASED ON GregorianDate "2010-1-1";

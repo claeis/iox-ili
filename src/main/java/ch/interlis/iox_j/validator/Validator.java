@@ -3567,6 +3567,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID", value));
                         }                        
                     }
+				} else if (type instanceof FormattedType) {
+				    String regExp = ((FormattedType) type).getRegExp();
+                    String actualValue = iomObj.getattrvalue(attrName);
+                    if (actualValue != null) {
+                        if (!actualValue.matches(regExp)) {
+                            errs.addEvent(errFact.logErrorMsg("Attribute <{0}> has a invalid value <{1}>", attrPath, actualValue));
+                        } else {
+                            boolean hasAValidValue = ((FormattedType) type).isValueInRange(actualValue);
+                            if (!hasAValidValue) {
+                                errs.addEvent(errFact.logErrorMsg("Attribute <{0}> is a out of range. Value: <{1}>", attrPath, actualValue));
+                            }
+                        }
+                    }				    
 				}
 			}
 		}
