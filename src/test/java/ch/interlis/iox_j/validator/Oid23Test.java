@@ -20,11 +20,17 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class Oid23Test {
 	// OID
-	private final static String OID1="o1";
-	private final static String OID2="o2";
+    private final static String OID1 = "o1";
+    private final static String OID2 = "o2";
+    private final static String OID3 = "o3";
+    private final static String OID4 = "o4";
+    private final static String OID5 = "o5";
 	// MODEL.TOPIC
 	private final static String TOPIC="Oid23.Topic";
+	private final static String TOPIC3="Oid23.Topic3";
 	// CLASSES
+	private final static String CLASSA=TOPIC3+".ClassA";
+	private final static String CLASSB3=TOPIC3+".ClassB3";
 	private final static String CLASSB=TOPIC+".ClassB";
 	private final static String CLASSC=TOPIC+".ClassC";
 	// ASSOCIATION
@@ -37,7 +43,6 @@ public class Oid23Test {
 	private TransferDescription td=null;
 	// START EVENT BASKET
 	private final static String BID = "b1";
-	private final static String BID2 = " ()";
 		
 	@Before
 	public void setUp() throws Exception {
@@ -52,6 +57,61 @@ public class Oid23Test {
 	//#############################################################//
 	//######################## SUCCESS ############################//
 	//#############################################################//
+		
+    @Test
+    public void textOidAttrValue_Ok() throws Exception {
+        Iom_jObject objA1=new Iom_jObject(CLASSA, OID1);
+        objA1.setattrvalue("TextID", "_bcdefghilmno16");
+        Iom_jObject objA2=new Iom_jObject(CLASSA, OID2);
+        objA2.setattrvalue("TextID", "bcdefg_hilmno16");
+        Iom_jObject objA3=new Iom_jObject(CLASSA, OID3);
+        objA3.setattrvalue("TextID", "bcdefg1hilmno16");
+        Iom_jObject objA4=new Iom_jObject(CLASSA, OID4);
+        objA4.setattrvalue("TextID", "bcdefg-hilmno16");
+        Iom_jObject objA5=new Iom_jObject(CLASSA, OID5);
+        objA5.setattrvalue("TextID", "bcdefg.hilmno16");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC3,BID));
+        validator.validate(new ObjectEvent(objA1));
+        validator.validate(new ObjectEvent(objA2));
+        validator.validate(new ObjectEvent(objA3));
+        validator.validate(new ObjectEvent(objA4));
+        validator.validate(new ObjectEvent(objA5));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+    
+    @Test
+    public void textOidClassValue_Ok() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB3, "_bcdefghilmno16");
+        Iom_jObject objB2=new Iom_jObject(CLASSB3, "bcdefg_hilmno16");
+        Iom_jObject objB3=new Iom_jObject(CLASSB3, "bcdefg1hilmno16");
+        Iom_jObject objB4=new Iom_jObject(CLASSB3, "bcdefg-hilmno16");
+        Iom_jObject objB5=new Iom_jObject(CLASSB3, "bcdefg.hilmno16");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC3,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new ObjectEvent(objB2));
+        validator.validate(new ObjectEvent(objB3));
+        validator.validate(new ObjectEvent(objB4));
+        validator.validate(new ObjectEvent(objB5));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
 	
 	// In diesem Test werden verschiedenen Object ID's getestet.
 	// Es darf keine Fehlermeldung ausgegeben werden.
@@ -390,4 +450,133 @@ public class Oid23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Association Oid23.Topic.bc4 has to have an OID", logger.getErrs().get(0).getEventMsg());
 	}
+    
+    @Test
+    public void validateOidFirstLetterisStartWithNull_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB, " 1abcdefghilmno16");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("value < 1abcdefghilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void validateOidThereisASpaceInSentences_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB, "abcdefg hilmno16");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("value <abcdefg hilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void textOidAttrValueStartWithNumber_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSA, OID1);
+        objB1.setattrvalue("TextID", "1bcdefg_hilmno16");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC3,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("value <1bcdefg_hilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void textOidAttrValueStartWithSpace_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSA, OID1);
+        objB1.setattrvalue("TextID", " bcdefg_hilmno16");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC3,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("value < bcdefg_hilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void textOidClassValueStartWithNumber_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB3, "1bcdefg_hilmno16");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC3,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("value <1bcdefg_hilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void textOidClassValueStartWithMinus_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB3, "-bcdefg_hilmno16");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC3,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("value <-bcdefg_hilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void textOidClassValueStartWithSpace_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB3, " bcdefg_hilmno16");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC3,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("value < bcdefg_hilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+    }
+
 }

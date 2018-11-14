@@ -59,6 +59,7 @@ import ch.interlis.ili2c.metamodel.MandatoryConstraint;
 import ch.interlis.ili2c.metamodel.Model;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
+import ch.interlis.ili2c.metamodel.OIDType;
 import ch.interlis.ili2c.metamodel.ObjectPath;
 import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.Objects;
@@ -77,6 +78,7 @@ import ch.interlis.ili2c.metamodel.StructAttributeRef;
 import ch.interlis.ili2c.metamodel.SurfaceOrAreaType;
 import ch.interlis.ili2c.metamodel.SurfaceType;
 import ch.interlis.ili2c.metamodel.Table;
+import ch.interlis.ili2c.metamodel.TextOIDType;
 import ch.interlis.ili2c.metamodel.TextType;
 import ch.interlis.ili2c.metamodel.Topic;
 import ch.interlis.ili2c.metamodel.TransferDescription;
@@ -112,6 +114,7 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
 	public static final String REGEX_FOR_ID_VALIDATION = "^[0-9a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
+	public static final String REGEX_FOR_TEXTOID_VALIDATION = "^[a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
 	public static final String CONFIG_DO_ITF_LINETABLES="ch.interlis.iox_j.validator.doItfLinetables";
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
@@ -137,6 +140,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String constraintValidation=null;
 	private String defaultGeometryTypeValidation=null;
 	Pattern patternForIdValidation = null;
+	Pattern patternForTextOIdValidation = null;
 	private boolean enforceTypeValidation=false;
 	private boolean enforceConstraintValidation=false;
 	private boolean enforceTargetValidation=false;
@@ -187,6 +191,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 		this.config=config;
 		this.patternForIdValidation = Pattern.compile(REGEX_FOR_ID_VALIDATION);
+		this.patternForTextOIdValidation = Pattern.compile(REGEX_FOR_TEXTOID_VALIDATION);
 		this.config.setTransientObject(InterlisFunction.IOX_DATA_POOL,pipelinePool);
 		this.pipelinePool=pipelinePool;
 		objPoolManager=new ObjectPoolManager();
@@ -342,6 +347,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	    } else {
 	        return false;
 	    }
+    }
+    
+    private boolean isValidTextOId(String valueStr) {
+        if(valueStr==null) {
+            return false;
+        }
+        
+        Matcher matcher = patternForTextOIdValidation.matcher(valueStr);
+        if (matcher.matches()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void doSecondPass() {
@@ -2868,23 +2886,24 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	                }
 				}
 			} else if (aclass1 instanceof Table){
-				Table classValueTable = (Table) aclass1;
-				// class
-				if (classValueTable.isIdentifiable()){
+                Table classValueTable = (Table) aclass1;
+                // class
+                if (classValueTable.isIdentifiable()) {
+                    Domain oidType=((AbstractClassDef) aclass1).getOid();
                     String oid = iomObj.getobjectoid();
-					if (oid == null){
-						errs.addEvent(errFact.logErrorMsg("Class {0} has to have an OID", iomObj.getobjecttag()));
-						addToPool = false;
-					}else if (!isValidId(oid)) {
-                        errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID", oid));                 
+                    if (oid == null) {
+                        errs.addEvent(errFact.logErrorMsg("Class {0} has to have an OID", iomObj.getobjecttag()));
+                        addToPool = false;
+                    } else if (!isValidId(oid) && oidType == null) {
+                        errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID", oid));
                     }
-				// structure	
-				} else {
-					addToPool = false;
-					if (iomObj.getobjectoid() != null){
-						errs.addEvent(errFact.logErrorMsg("Structure {0} has not to have an OID", iomObj.getobjecttag()));
-					}
-				}
+                    // structure
+                } else {
+                    addToPool = false;
+                    if (iomObj.getobjectoid() != null) {
+                        errs.addEvent(errFact.logErrorMsg("Structure {0} has not to have an OID", iomObj.getobjecttag()));
+                    }
+                }
 			}
 			
 			if(aclass1 instanceof AbstractClassDef){
@@ -2898,6 +2917,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					// valid i32OID.
 				} else if(oidType!=null && oidType==td.INTERLIS.STANDARDOID){
 					// valid Standardoid.
+				} else if (oidType!=null && oidType.getType() instanceof TextOIDType) {
+				    String currentOid = iomObj.getobjectoid();
+                    if (!isValidTextOId(currentOid)) {
+                        errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID", currentOid));
+                    }
 				}
 			}
 		}
@@ -3483,6 +3507,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}else if(type instanceof TextType){
 					String value=iomObj.getattrvalue(attrName);
 					validateTextType(iomObj, attrPath, attrName, validateType, type, value);
+                }else if(type instanceof TextOIDType){
+                    String value=iomObj.getattrvalue(attrName);
+                    if (value != null) {
+                        if (!isValidTextOId(value)) {
+                            errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID", value));
+                        }
+                    }
 				}
 			}
 		}
