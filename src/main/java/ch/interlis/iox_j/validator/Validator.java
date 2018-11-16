@@ -2064,6 +2064,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			List<IoxInvalidDataException> intersections=polygonPool.validate();
 			if(intersections!=null){
+			    EhiLogger.traceState(iliClassQName+": INTERLIS.areaAreas() returned false"); 
 				return new Value(false); // not a valid area topology
 			}
 			return new Value(true); // valid areas
