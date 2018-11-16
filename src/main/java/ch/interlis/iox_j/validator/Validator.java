@@ -31,6 +31,7 @@ import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.Constant;
 import ch.interlis.ili2c.metamodel.Constant.Enumeration;
 import ch.interlis.ili2c.metamodel.Constraint;
+import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Domain;
@@ -93,6 +94,7 @@ import ch.interlis.ilirepository.impl.RepositoryAccessException;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iom_j.ViewableProperty;
 import ch.interlis.iom_j.itf.impl.ItfAreaPolygon2Linetable;
 import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
@@ -112,7 +114,8 @@ import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
-	public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
+	private static final String ENUM_TREE_VALUES = "ENUM_TREE_VALUES";
+    public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
 	public static final String REGEX_FOR_ID_VALIDATION = "^[0-9a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
 	public static final String REGEX_FOR_TEXTOID_VALIDATION = "^[a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
 	public static final String REGEX_FOR_STANDARTOID_VALIDATION = "^[a-zA-Z][0-9a-zA-Z]*";
@@ -3536,10 +3539,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 					}
 				}else if(type instanceof EnumerationType){
+				    EnumerationType enumType = (EnumerationType) type;
 					String value=iomObj.getattrvalue(attrName);
 					if(value!=null){
 						if(!((EnumerationType) type).getValues().contains(value)){
-							 logMsg(validateType,"value {0} is not a member of the enumeration in attribute {1}", value, attrName);
+						    logMsg(validateType,"value {0} is not a member of the enumeration in attribute {1}", value, attrName);   
 						}
 					}else{
 						IomObject structValue=iomObj.getattrobj(attrName, 0);
@@ -3548,10 +3552,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 					}
 				}else if(type instanceof EnumTreeValueType){
-					EnumTreeValueType enumTreeValueType = (EnumTreeValueType) type;
-					String attri = iomObj.getattrname(0).toString();
-					String attrv = iomObj.getattrvalue(attri);
-					String value=iomObj.getattrvalue(attrName);
+				    String actualValue=iomObj.getattrvalue(attrName);
+					if (isValidEnumTreeValue(actualValue, attrPath, type)) {
+					    logMsg(validateType,"value {0} is not a member of the enumeration in attribute {1}", actualValue, attrPath);
+					}
 				}else if(type instanceof ReferenceType){
 				}else if(type instanceof TextType){
 					String value=iomObj.getattrvalue(attrName);
@@ -3585,7 +3589,38 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private void validateTextType(IomObject iomObj, String attrPath, String attrName, String validateType, Type type,
+    private boolean isValidEnumTreeValue(String actualValue, String attrPath, Type type) {
+        EnumTreeValueType enumTreeValueType = (EnumTreeValueType) type;
+        if (actualValue != null) {
+            HashMap<String, String> trueValueFormat=(HashMap<String, String>) enumTreeValueType.getTransientMetaValue(ENUM_TREE_VALUES);
+            if(trueValueFormat==null) {
+                trueValueFormat = new HashMap<String, String>();
+                Domain enumType = enumTreeValueType.getEnumType();
+                EnumerationType enumerationType = (EnumerationType) enumType.getType();
+                List<String> values = enumerationType.getValues();
+                for (String value : values) {
+                    String[] tmpValues = value.split("\\.");
+                    String tmpValue = "";
+                    for (int i = 0; i < tmpValues.length; i++) {
+                        if (i == 0) {
+                            trueValueFormat.put(tmpValues[i], tmpValues[i]);
+                            tmpValue = tmpValues[i];
+                        } else {
+                            tmpValue = tmpValue + "." + tmpValues[i];
+                            trueValueFormat.put(tmpValue, tmpValue);
+                        }
+                    }
+                }
+                enumTreeValueType.setTransientMetaValue(ENUM_TREE_VALUES,trueValueFormat);
+            }
+            if (trueValueFormat != null && !trueValueFormat.containsKey(actualValue)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void validateTextType(IomObject iomObj, String attrPath, String attrName, String validateType, Type type,
 			String value) {
 		if(value!=null){
 			int maxLength=((TextType) type).getMaxLength();
