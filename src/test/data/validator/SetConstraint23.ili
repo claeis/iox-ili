@@ -29,7 +29,11 @@ MODEL SetConstraint23
 		CONSTRAINTS OF Class3 =
 			SET CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie3);
 		END;
-
+		CLASS Class4 =
+			attr4: (a, b, c);
+			Geometrie3 : MANDATORY SURFACE WITH (STRAIGHTS, ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.050;
+			SET CONSTRAINT WHERE attr4==#a : INTERLIS.areAreas(ALL, UNDEFINED, >> Geometrie3);
+		END Class4;
 	END TopicA;
 	
 	TOPIC TopicB=
