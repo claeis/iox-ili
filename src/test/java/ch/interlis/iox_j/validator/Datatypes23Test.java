@@ -376,6 +376,42 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+    @Test
+    public void enumerationTypeAllOffTest_OnlyNodeWihtoutSubEnumerationOk(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Werktage");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+    
+    @Test
+    public void enumerationTypeAllOffTest_SubSubSubEnumerationOK(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Werktage.Montag.Busy.FullDay");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+	
 	// Die kleinste Minuten Zeit Angabe wird getestet.
 	@Test
 	public void timeMinMinutesOk(){
@@ -604,6 +640,24 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+    @Test
+    public void enumerationTypeAllOffTest_SubSubEnumerationOK(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Werktage.Montag.Frei");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+	
 	// Die hoechste Minuten Angabe von Datum und Zeit wird getestet.
 	@Test
 	public void dateTimeMaxMinuteOk(){
@@ -755,7 +809,7 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
+		
 	// Eine geordnete Aufzaehlung wird getestet.
 	@Test
 	public void enumerationTypeCircularOk(){
@@ -781,8 +835,6 @@ public class Datatypes23Test {
 	@Test
 	public void enumerationTypeOrderedOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objMaxLength.setattrvalue("aufzaehlungCircular", "Sonntag");
-		objMaxLength.setattrvalue("aufzaehlungCircular", "Werktage");
 		objMaxLength.setattrvalue("aufzaehlungCircular", "Sonntag");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -873,6 +925,24 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+    @Test
+    public void enumerationTypeAllOffTest_SubEnumerationOK(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Werktage.Montag");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
 	
 	// Die vertikale Ausrichtung Cap wird getestet.
 	@Test
@@ -2435,5 +2505,100 @@ public class Datatypes23Test {
         // Asserts
         assertTrue(logger.getErrs().size()==1);
         assertEquals("invalid format of INTERLIS.URI value <> in attribute uritext", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void enumerationTypeOnlyMehrFail(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlung", "mehr");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("value mehr is not a member of the enumeration in attribute aufzaehlung", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void enumerationTypeOnlyZehnFail(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlung", "zehn");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("value zehn is not a member of the enumeration in attribute aufzaehlung", logger.getErrs().get(0).getEventMsg());
+    }
+        
+    @Test
+    public void enumerationTypeAllOffTest_SubSubSubEnumerationFail(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Montag.Busy.FullDay");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("value Montag.Busy.FullDay is not a member of the enumeration in attribute aufzaehlungAll", logger.getErrs().get(0).getEventMsg());
+    }
+        
+    @Test
+    public void enumerationTypeAllOffTest_SubSubEnumerationFail(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Frei");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("value Frei is not a member of the enumeration in attribute aufzaehlungAll", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void enumerationTypeAllOffTest_SubEnumerationFail(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Montag");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("value Montag is not a member of the enumeration in attribute aufzaehlungAll", logger.getErrs().get(0).getEventMsg());
     }
 }
