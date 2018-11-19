@@ -544,7 +544,7 @@ public class Oid23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertTrue(logger.getErrs().size()==1);
-        assertEquals("value <1bcdefg_hilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+        assertEquals("value <1bcdefg_hilmno16> is not a valid OID in attribute TextID", logger.getErrs().get(0).getEventMsg());
     }
     
     @Test
@@ -563,7 +563,7 @@ public class Oid23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertTrue(logger.getErrs().size()==1);
-        assertEquals("value < bcdefg_hilmno16> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+        assertEquals("value < bcdefg_hilmno16> is not a valid OID in attribute TextID", logger.getErrs().get(0).getEventMsg());
     }
     
     @Test
@@ -693,7 +693,7 @@ public class Oid23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("value <g5mQXX2000004aa> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+        assertEquals("value <g5mQXX2000004aa> is not a valid OID in attribute attrC", logger.getErrs().get(0).getEventMsg());
     }
     
     @Test
@@ -712,7 +712,7 @@ public class Oid23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("value < eg5mQXX2000004a> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+        assertEquals("value < eg5mQXX2000004a> is not a valid OID in attribute attrC", logger.getErrs().get(0).getEventMsg());
     }
     
     @Test
@@ -731,7 +731,7 @@ public class Oid23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("value <1eg5mQXX2000004a> is not a valid OID", logger.getErrs().get(0).getEventMsg());
+        assertEquals("value <1eg5mQXX2000004a> is not a valid OID in attribute attrC", logger.getErrs().get(0).getEventMsg());
     }
 
 }
