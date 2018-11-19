@@ -117,6 +117,6 @@ public class StructAttr23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("it has wrong number of values in attribute attrB2",logger.getErrs().get(0).getEventMsg());
+		assertEquals("Attribute attrB2 has wrong number of values",logger.getErrs().get(0).getEventMsg());
 	}
 }

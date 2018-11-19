@@ -1236,7 +1236,7 @@ public class Datatypes23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("It has a invalid value <2017-01-01> in attribute <gDatum>", logger.getErrs().get(0).getEventMsg());
+        assertEquals("Attribute <gDatum> has a invalid value <2017-01-01>", logger.getErrs().get(0).getEventMsg());
     }
 	
     @Test
@@ -1255,7 +1255,7 @@ public class Datatypes23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("It has a invalid value <1> in attribute <gDatum>", logger.getErrs().get(0).getEventMsg());
+        assertEquals("Attribute <gDatum> has a invalid value <1>", logger.getErrs().get(0).getEventMsg());
     }
     
     @Test

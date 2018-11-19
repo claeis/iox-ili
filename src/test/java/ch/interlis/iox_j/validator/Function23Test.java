@@ -1670,7 +1670,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("it has wrong number of values in attribute Numbers", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Attribute Numbers has wrong number of values", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Warnungsmeldung ausgegeben wird, wenn die Funktion noch nicht implementiert wurde.

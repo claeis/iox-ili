@@ -3288,7 +3288,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}else{
 					 Cardinality card = ((CompositionType)type).getCardinality();
 					 if(structc<card.getMinimum() || structc>card.getMaximum()){
-						logMsg(validateMultiplicity,"it has wrong number of values in attribute {0}", attrPath);
+						logMsg(validateMultiplicity,"Attribute {0} has wrong number of values", attrPath);
 					 }
 				}
 			 for(int structi=0;structi<structc;structi++){
@@ -3536,7 +3536,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}else{
 						IomObject structValue=iomObj.getattrobj(attrName, 0);
 						if(structValue!=null){
-							logMsg(validateType, "It has an unexpected type {0} in attribute {1}",structValue.getobjecttag(), attrPath);
+							logMsg(validateType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
 						}
 					}
 				}else if(type instanceof EnumerationType){
@@ -3549,7 +3549,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}else{
 						IomObject structValue=iomObj.getattrobj(attrName, 0);
 						if(structValue!=null){
-							logMsg(validateType, "It has an unexpected type {0} in attribute {1}",structValue.getobjecttag(), attrPath);
+							logMsg(validateType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
 						}
 					}
 				}else if(type instanceof EnumTreeValueType){
@@ -3577,7 +3577,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     String actualValue = iomObj.getattrvalue(attrName);
                     if (actualValue != null) {
                         if (!actualValue.matches(regExp)) {
-                            errs.addEvent(errFact.logErrorMsg("It has a invalid value <{0}> in attribute <{1}>", actualValue, attrPath));
+                            errs.addEvent(errFact.logErrorMsg("Attribute <{0}> has a invalid value <{1}>", attrPath, actualValue));
                         } else {
                             boolean hasAValidValue = ((FormattedType) type).isValueInRange(actualValue);
                             if (!hasAValidValue) {
