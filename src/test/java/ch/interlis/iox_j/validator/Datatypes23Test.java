@@ -1236,7 +1236,7 @@ public class Datatypes23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("Attribute <gDatum> has a invalid value <2017-01-01>", logger.getErrs().get(0).getEventMsg());
+        assertEquals("It has a invalid value <2017-01-01> in attribute <gDatum>", logger.getErrs().get(0).getEventMsg());
     }
 	
     @Test
@@ -1255,7 +1255,7 @@ public class Datatypes23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("Attribute <gDatum> has a invalid value <1>", logger.getErrs().get(0).getEventMsg());
+        assertEquals("It has a invalid value <1> in attribute <gDatum>", logger.getErrs().get(0).getEventMsg());
     }
     
     @Test
@@ -1274,7 +1274,7 @@ public class Datatypes23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("Attribute <gDatum> is a out of range. Value: <2016:01:01>", logger.getErrs().get(0).getEventMsg());
+        assertEquals("Value <2016:01:01> is a out of range in attribute <gDatum>", logger.getErrs().get(0).getEventMsg());
     }
     
     @Test
@@ -1293,7 +1293,7 @@ public class Datatypes23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("Attribute <gDatum> is a out of range. Value: <2018:01:01>", logger.getErrs().get(0).getEventMsg());
+        assertEquals("Value <2018:01:01> is a out of range in attribute <gDatum>", logger.getErrs().get(0).getEventMsg());
     }
 	
 	// Es wird getestet, ob true auch gross geschrieben werden kann.
