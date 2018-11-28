@@ -221,7 +221,7 @@ public class CompoundCurveRing extends LinearRing {
 		    			}
 		    			seg0=segs.get(seg0Idx);
 		    			seg0Idx--;
-	    			}while(seg0.getStartPoint().y==topEnv.getMaxY()); // falls seg0 eine horizontale Gerade naechstes davor liegendes Segment
+	    			}while(seg0.getStartPoint().y==topEnv.getMaxY() && seg0 instanceof StraightSegment); // falls seg0 eine horizontale Gerade naechstes davor liegendes Segment
 	    			seg1=top;
 	    		}else {
 	    			// segmment danach relevant
@@ -232,7 +232,7 @@ public class CompoundCurveRing extends LinearRing {
 		    			}
 		    			seg1=segs.get(seg1Idx);
 		    			seg1Idx++;
-	    			}while(seg1.getEndPoint().y==topEnv.getMaxY()); // falls seg1 eine horizontale Gerade naechstes danach liegendes Segment
+	    			}while(seg1.getEndPoint().y==topEnv.getMaxY() && seg1 instanceof StraightSegment); // falls seg1 eine horizontale Gerade naechstes danach liegendes Segment
 	    			seg0=top;
 	    		}
 	    		Coordinate[] coords=null;
