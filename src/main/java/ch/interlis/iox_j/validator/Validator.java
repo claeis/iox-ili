@@ -90,6 +90,7 @@ import ch.interlis.ili2c.metamodel.UniqueEl;
 import ch.interlis.ili2c.metamodel.UniquenessConstraint;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
+import ch.interlis.ili2c.parser.Ili23Parser;
 import ch.interlis.ilirepository.Dataset;
 import ch.interlis.ilirepository.impl.RepositoryAccessException;
 import ch.interlis.iom.IomConstants;
@@ -1643,7 +1644,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 PathEl surfaceBagPath[] = null;
                 Viewable viewable = null;
                 try {
-                    surfaceBagObjPath = ch.interlis.ili2c.Main.parseObjectOrAttributePath(currentClass, surfaceBag.getValue());
+                    surfaceBagObjPath = parseObjectOrAttributePath(currentClass, surfaceBag.getValue());
                     if (surfaceBagObjPath.getPathElements() != null) {
                         PathEl surfaceBagPathEl[] = surfaceBagObjPath.getPathElements();
                         surfaceBagPath = surfaceBagPathEl;              
@@ -1671,8 +1672,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 PathEl surfaceAttrPath[] = null;
                 ObjectPath surfaceAttrObjPath = null;
                 try {
-                    surfaceAttrObjPath = ch.interlis.ili2c.Main.parseObjectOrAttributePath(attrObjClass,
-                            surfaceAttr.getValue());
+                    surfaceAttrObjPath = parseObjectOrAttributePath(attrObjClass, surfaceAttr.getValue());
                     if (surfaceAttrObjPath.getPathElements() != null) {
                         PathEl surfaceAttrPathEl[] = surfaceAttrObjPath.getPathElements();
                         surfaceAttrPath = surfaceAttrPathEl;
@@ -1751,6 +1751,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		//TODO instance of ParameterValue
 		//TODO instance of ViewableAggregate
 		//TODO instance of ViewableAlias
+	}
+	
+	private ObjectPath parseObjectOrAttributePath(Viewable viewable, String objectPath) throws Ili2cException {
+        return Ili23Parser.parseObjectOrAttributePath(td,viewable, objectPath);
 	}
 	
     private Value getValueFromObjectPath(IomObject parentObject,IomObject iomObjStart, PathEl[] pathElements, RoleDef firstRole) {
