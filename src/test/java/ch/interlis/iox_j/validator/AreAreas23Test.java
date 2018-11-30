@@ -184,42 +184,6 @@ public class AreAreas23Test {
     }
 
     @Test
-    @Ignore("Ich weiss nicht ob die Test stimmt oder Falsch ist?")
-    public void perStructure_OneClassDHasTwoSubStructureB_BHasTwoSubStrAOverlap_Ok() {
-
-        Iom_jObject structA1 = createStructureWithSurface("486000.000", "75000.000", "490000.000", "80000.000");
-
-        Iom_jObject structA2 = createStructureWithSurface("488000.000", "75000.000", "494000.000", "80000.000");
-
-        Iom_jObject structB2_1 = new Iom_jObject(STRUCTB, null);
-        structB2_1.addattrobj("attr2", structA1);
-
-        Iom_jObject structB2_2 = new Iom_jObject(STRUCTB, null);
-        structB2_2.addattrobj("attr2", structA2);
-        
-        Iom_jObject structC1 = new Iom_jObject(STRUCTC, null);
-        structC1.addattrobj("attr3", structB2_1);       
-        structC1.addattrobj("attr3", structB2_2);
-
-        Iom_jObject classD2 = new Iom_jObject(CLASSD2, OID2);
-        classD2.addattrobj("attr4", structC1);
-
-        // Create and run validator.
-        ValidationConfig modelConfig = new ValidationConfig();
-        LogCollector logger = new LogCollector();
-        LogEventFactory errFactory = new LogEventFactory();
-        Settings settings = new Settings();
-        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(TOPIC, BID));
-        validator.validate(new ObjectEvent(classD2));
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
-        // Asserts.
-        assertEquals(0, logger.getErrs().size());
-    }
-
-    @Test
     public void areaPerAllObject_TwoClassDTheyAreNotOverlapping_Ok() {
 
         Iom_jObject structA = createStructureWithSurface("486000.000", "75000.000", "490000.000", "80000.000");
@@ -264,6 +228,43 @@ public class AreAreas23Test {
     // ######################### FAIL ##############################//
     // #############################################################//
 
+    @Test
+    public void perStructure_OneClassDHasTwoSubStructureB_BHasTwoSubStrAOverlap_Fail() {
+
+        Iom_jObject structA1 = createStructureWithSurface("486000.000", "75000.000", "490000.000", "80000.000");
+
+        Iom_jObject structA2 = createStructureWithSurface("488000.000", "75000.000", "494000.000", "80000.000");
+
+        Iom_jObject structB2_1 = new Iom_jObject(STRUCTB, null);
+        structB2_1.addattrobj("attr2", structA1);
+
+        Iom_jObject structB2_2 = new Iom_jObject(STRUCTB, null);
+        structB2_2.addattrobj("attr2", structA2);
+        
+        Iom_jObject structC1 = new Iom_jObject(STRUCTC, null);
+        structC1.addattrobj("attr3", structB2_1);       
+        structC1.addattrobj("attr3", structB2_2);
+
+        Iom_jObject classD2 = new Iom_jObject(CLASSD2, OID2);
+        classD2.addattrobj("attr4", structC1);
+
+        // Create and run validator.
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(classD2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts.
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Mandatory Constraint AreAreas23.Topic.ClassD2.Constraint1 is not true.",
+                logger.getErrs().get(0).getEventMsg());
+    }
+    
     @Test
     public void perObject_OneClassDHasTwiceSubElementStructAOverlap_Fail() {
 
