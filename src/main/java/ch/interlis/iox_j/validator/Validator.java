@@ -68,6 +68,7 @@ import ch.interlis.ili2c.metamodel.PathEl;
 import ch.interlis.ili2c.metamodel.PathElAbstractClassRole;
 import ch.interlis.ili2c.metamodel.PathElAssocRole;
 import ch.interlis.ili2c.metamodel.PathElRefAttr;
+import ch.interlis.ili2c.metamodel.PathElThis;
 import ch.interlis.ili2c.metamodel.PlausibilityConstraint;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
@@ -89,6 +90,7 @@ import ch.interlis.ili2c.metamodel.UniqueEl;
 import ch.interlis.ili2c.metamodel.UniquenessConstraint;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
+import ch.interlis.ili2c.parser.Ili23Parser;
 import ch.interlis.ilirepository.Dataset;
 import ch.interlis.ilirepository.impl.RepositoryAccessException;
 import ch.interlis.iom.IomConstants;
@@ -161,6 +163,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private HashSet<String> configOffOufputReduction =new HashSet<String>();
 	private HashSet<String> setConstraintOufputReduction =new HashSet<String>();
 	private HashSet<String> constraintOutputReduction=new HashSet<String>();
+    private HashSet<String> seenModels=new HashSet<String>();
 	private HashSet<String> datatypesOutputReduction=new HashSet<String>();
 	private Map<String, String> uniquenessOfBid = new HashMap<String, String>();
 	private String globalMultiplicity=null;
@@ -259,11 +262,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		defaultGeometryTypeValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION);
 		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class,objPoolManager);
 		linkPool=new LinkPool();
-		String additionalModels=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS);
-		if(additionalModels!=null){
-			String[] additionalModelv = additionalModels.split(";");
-			iterateThroughAdditionalModels(additionalModelv);
-	}
 	}
 	/** mappings from xml-tags to Viewable|AttributeDef
 	 */
@@ -317,11 +315,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
+	        String additionalModels=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS);
+	        if(additionalModels!=null){
+	            String[] additionalModelv = additionalModels.split(";");
+	            iterateThroughAdditionalModels(additionalModelv);
+	        }
 			if(autoSecondPass){
 				doSecondPass();
 			}
 		}
 	}
+    
 	private void validateBasketEvent(ch.interlis.iox.StartBasketEvent event) {
         boolean isValid = true;
 	    if (!isValidTopicName(event.getType())) {
@@ -334,6 +338,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
         if(isValid) {
             Topic topic = (Topic)td.getElement(event.getType());
+            Model model=(Model) topic.getContainer();
+            seenModels.add(model.getName());
             Domain bidDomain=topic.getBasketOid();
             if (bidDomain!=null && !isAValidBasketOID(bidDomain, event.getBid())) {
                 isValid = false;
@@ -439,7 +445,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(additionalModel==null){
 				continue;
 			}
+			if(seenModels.contains(additionalModel)) {
+			    continue;
+			}
 			errs.addEvent(errFact.logInfoMsg("additional model {0}", additionalModel));
+			seenModels.add(additionalModel);
 			// models
 			Iterator tdIterator = td.iterator();
 			boolean modelExists=false;
@@ -936,15 +946,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void visitStructEle(String checkUniqueConstraint,UniquenessConstraint uniquenessConstraint, HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues, String iomObjOid, PathEl[] attrPath, int i, IomObject parentObject, IomObject iomObj, RoleDef role) {
 	    if(attrPath==null || i>=attrPath.length) {
 	        OutParam<AttributeArray> values = new OutParam<AttributeArray>();
-            String returnValue = validateUnique(seenValues,iomObjOid,parentObject,iomObj,uniquenessConstraint, values, role);
-            if (returnValue == null){
+            String oidOfObjectWithDuplicateValue = validateUnique(seenValues,iomObjOid,parentObject,iomObj,uniquenessConstraint, values, role);
+            if (oidOfObjectWithDuplicateValue == null){
                 // ok
             } else {
                 String msg=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.MSG);
                 if(msg!=null && msg.length()>0){
                     logMsg(checkUniqueConstraint,msg);
                 } else {
-                    logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), returnValue);
+                    logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), formatObjectId(oidOfObjectWithDuplicateValue));
                 }
             }
 	        return;
@@ -956,6 +966,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             visitStructEle(checkUniqueConstraint,uniquenessConstraint, seenValues, iomObjOid, attrPath,i+1,parentObject,structEle, role);
         }
     }
+    private String formatObjectId(String oidOfObjectWithDuplicateValue) {
+        IomObject iomObj=objectPool.getObject(oidOfObjectWithDuplicateValue, null, null);
+        String keymsg = validationConfig.getConfigValue(iomObj.getobjecttag(), ValidationConfig.KEYMSG);
+        if (keymsg != null) {
+            return keymsg;
+        }
+        return oidOfObjectWithDuplicateValue;
+    }
+
     private HashMap<SetConstraint,Collection<String>> setConstraints=new HashMap<SetConstraint,Collection<String>>();
 	private Iterator<String> allObjIterator=null;
 	
@@ -1567,6 +1586,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if (surfaceBag.skipEvaluation()){
 					return surfaceBag;
 				}
+                Viewable currentClass=(Viewable) td.getElement(iomObj.getobjecttag());
+                //PathEl surfaceBagPath[]=parseObjectPath(currentClass, surfaceBag.getValue());
+                ObjectPath surfaceBagObjPath = null;
+                PathEl surfaceBagPath[] = null;
+                Viewable viewable = null;
+                try {
+                    surfaceBagObjPath = parseObjectOrAttributePath(currentClass, surfaceBag.getValue());
+                    if (surfaceBagObjPath.getPathElements() != null) {
+                        PathEl surfaceBagPathEl[] = surfaceBagObjPath.getPathElements();
+                        surfaceBagPath = surfaceBagPathEl;          
+                        viewable = surfaceBagObjPath.getViewable();
+                    }
+                } catch (Ili2cException e) {
+                    EhiLogger.logError(e);
+                }
 				// name of surface (textType)
 				Value surfaceAttr=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[2], firstRole);
 				if (surfaceAttr.skipEvaluation()){
@@ -1575,16 +1609,105 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if (surfaceAttr.isUndefined()){
 					return Value.createSkipEvaluation();
 				}
+				
+                Viewable attrObjClass = null;
+                if (viewable != null) {
+                    attrObjClass = viewable;
+                } else {
+                    attrObjClass = currentClass;
+                }				
+				
+                ObjectPath surfaceAttrObjPath;
+                PathEl surfaceAttrPath[] = null;
+                try {
+                    surfaceAttrObjPath = parseObjectOrAttributePath(attrObjClass, surfaceAttr.getValue());
+                    if (surfaceAttrObjPath.getPathElements() != null) {
+                        PathEl surfaceAttrPathEl[] = surfaceAttrObjPath.getPathElements(); 
+                        surfaceAttrPath = surfaceAttrPathEl;                        
+                    }
+                } catch (Ili2cException e) {
+                    EhiLogger.logError(e);
+                }
+				//parsePath(surfaceAttr.getValue())
 				for(Function aFunction:functions.keySet()) {
 					if(aFunction==currentFunction) {
 						Value isArea=functions.get(currentFunction);
 						return isArea;
 					}
 				}
-				Value isArea = evaluateAreArea(iomObj, value, surfaceBag, surfaceAttr);
+				Value isArea = evaluateAreArea(iomObj, value, surfaceBagPath, surfaceAttrPath, currentFunction);
 				functions.put(currentFunction, isArea);
 				return isArea;
-			} else {
+            } else if (currentFunction.getScopedName(null).equals("INTERLIS_ext.areAreas2") || 
+                    currentFunction.getScopedName(null).equals("INTERLIS_ext.areAreas3")){
+                FunctionCall functionCall = (FunctionCall) expression;
+                Evaluable[] arguments = functionCall.getArguments();
+                // founded objects (list<IomObjects)
+                Value value=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[0], firstRole);
+                if (value.skipEvaluation()){
+                    return value;
+                }
+                if (value.isUndefined()){
+                    return Value.createSkipEvaluation();
+                }
+                // count of objects condition returns attrName of BAG / undefined=(numericIsDefined=false)
+                Value surfaceBag=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[1], firstRole);
+                if (surfaceBag.skipEvaluation()){
+                    return surfaceBag;
+                }
+                Viewable currentClass=(Viewable) td.getElement(iomObj.getobjecttag());
+//                PathEl surfaceBagPath[]=parseObjectPath(currentClass, surfaceBag.getValue());
+                ObjectPath surfaceBagObjPath = null;
+                PathEl surfaceBagPath[] = null;
+                Viewable viewable = null;
+                try {
+                    surfaceBagObjPath = parseObjectOrAttributePath(currentClass, surfaceBag.getValue());
+                    if (surfaceBagObjPath.getPathElements() != null) {
+                        PathEl surfaceBagPathEl[] = surfaceBagObjPath.getPathElements();
+                        surfaceBagPath = surfaceBagPathEl;              
+                        viewable = surfaceBagObjPath.getViewable();
+                    }
+                } catch (Ili2cException e) {
+                    EhiLogger.logError(e);
+                }
+                // name of surface (textType)
+                Value surfaceAttr=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[2], firstRole);
+                if (surfaceAttr.skipEvaluation()){
+                    return surfaceAttr;
+                }
+                if (surfaceAttr.isUndefined()){
+                    return Value.createSkipEvaluation();
+                }
+                
+                Viewable attrObjClass = null;
+                if (viewable != null) {
+                    attrObjClass = viewable;
+                } else {
+                    attrObjClass = currentClass;
+                }
+                
+                PathEl surfaceAttrPath[] = null;
+                ObjectPath surfaceAttrObjPath = null;
+                try {
+                    surfaceAttrObjPath = parseObjectOrAttributePath(attrObjClass, surfaceAttr.getValue());
+                    if (surfaceAttrObjPath.getPathElements() != null) {
+                        PathEl surfaceAttrPathEl[] = surfaceAttrObjPath.getPathElements();
+                        surfaceAttrPath = surfaceAttrPathEl;
+                    }
+                } catch (Ili2cException e) {
+                    EhiLogger.logError(e);
+                }                    
+
+                for(Function aFunction:functions.keySet()) {
+                    if(aFunction==currentFunction) {
+                        Value isArea=functions.get(currentFunction);
+                        return isArea;
+                    }
+                }
+                Value isArea = evaluateAreArea(iomObj, value, surfaceBagPath, surfaceAttrPath, currentFunction);
+                functions.put(currentFunction, isArea);
+                return isArea;
+            } else {
 				String functionQname=currentFunction.getScopedName(null);
 				Class functionTargetClass=customFunctions.get(functionQname);
 				if(functionTargetClass==null){
@@ -1646,6 +1769,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		//TODO instance of ViewableAggregate
 		//TODO instance of ViewableAlias
 	}
+	
+	private ObjectPath parseObjectOrAttributePath(Viewable viewable, String objectPath) throws Ili2cException {
+        return Ili23Parser.parseObjectOrAttributePath(td,viewable, objectPath);
+	}
+	
     private Value getValueFromObjectPath(IomObject parentObject,IomObject iomObjStart, PathEl[] pathElements, RoleDef firstRole) {
         ArrayList<IomObject> currentObjects=new ArrayList<IomObject>();
         ArrayList<IomObject> nextCurrentObjects=new ArrayList<IomObject>();
@@ -1858,6 +1986,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             }                        
                         }                        
                     }
+                } else if (currentPathEl instanceof PathElThis) {
+                    nextCurrentObjects.addAll(currentObjects);
                 }
                 
             }
@@ -2020,7 +2150,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return new Value(counter);
 	}
 	
-	private Value evaluateAreArea(IomObject iomObj, Value value, Value surfaceBag, Value surfaceAttr) {
+	private Value evaluateAreArea(IomObject iomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction) {
 		// if surfaceBag is undefined
 		String objTag=null;
 		if(iomObj!=null){
@@ -2029,103 +2159,138 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		Object aModelele=tag2class.get(objTag);
 		Viewable eleClass=(Viewable) aModelele;
 		String iliClassQName=getScopedName(eleClass);
-		if(surfaceBag.isUndefined()){
+		if(pathToStructEle == null){
 			ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(iliClassQName, objPoolManager); // create new pool of polygons
 			if(value.getViewable()!=null){
 				Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
+				ArrayList<IomObject> listOfPolygons = new ArrayList<IomObject>();
 				while(objectIterator.hasNext()){
 					IomObject aIomObj = (IomObject) objectIterator.next();
 					if(aIomObj!=null){
 						Object modelElement=tag2class.get(aIomObj.getobjecttag());
 						Viewable anObjectClass = (Viewable) modelElement;
 						if(value.getViewable().equals(anObjectClass)){
-							IomObject polygon = aIomObj.getattrobj(surfaceAttr.getValue(), 0); // get polygon of current object
-							if(polygon!=null){ // if value of Argument[2] equals object attribute
-								try { // add polylines to polygonPool.
-									polygonPool.addLines(aIomObj.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
-								} catch (IoxException e) {
-									throw new IllegalStateException(e);
-								}
-							}
+                            findPolygonIomObject(pathToSurfaceAttr, listOfPolygons, aIomObj, 0);
 						}
 					}
 				}
+                for (IomObject polygon : listOfPolygons) {
+                    try {
+                        polygonPool.addLines(null, null, polygonPool.getLinesFromPolygon(polygon));
+                    } catch (IoxException e) {
+                        EhiLogger.logError(e);  
+                    }
+                }
 				// if objects.equals(anObjectClass) never equal, handling.
 			} else {
-				Iterator iterIomObjects = value.getComplexObjects().iterator(); // iterate through all objects of Argument[0] 
+			    ArrayList<IomObject> listOfPolygons = new ArrayList<IomObject>();
+				Iterator iterIomObjects = value.getComplexObjects().iterator(); 
 				while(iterIomObjects.hasNext()){
-					IomObject anObject = (IomObject) iterIomObjects.next();
-					IomObject polygon = anObject.getattrobj(surfaceAttr.getValue(), 0); // get polygon of current object
-					if(polygon!=null){ // if value of Argument[2] equals object attribute
-						try { // add polylines to polygonPool.
-							polygonPool.addLines(anObject.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
-						} catch (IoxException e) {
-							throw new IllegalStateException(e);
-						}
-					}
+					IomObject structEle = (IomObject) iterIomObjects.next();
+                    findPolygonIomObject(pathToSurfaceAttr, listOfPolygons, structEle, 0);
+				}
+				for (IomObject polygon : listOfPolygons) {
+				    try {
+				        polygonPool.addLines(null, null, polygonPool.getLinesFromPolygon(polygon));
+				    } catch (IoxException e) {
+				        EhiLogger.logError(e);  
+				    }
+				    
 				}
 			}
 			List<IoxInvalidDataException> intersections=polygonPool.validate();
 			if(intersections!=null){
-			    EhiLogger.traceState(iliClassQName+": INTERLIS.areaAreas() returned false"); 
-				return new Value(false); // not a valid area topology
+			    EhiLogger.traceState(iliClassQName+ ":" + currentFunction.getScopedName(null) + " returned false"); 
+			    // not a valid area topology
+			    return new Value(false); 
 			}
-			return new Value(true); // valid areas
+			// valid areas
+			return new Value(true); 
 		} else {
-			// if surfaceBag is defined
-			ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(iliClassQName, objPoolManager);
-			if(value.getViewable()!=null){
-				Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
-				while(objectIterator.hasNext()){
-					IomObject aIomObj = (IomObject) objectIterator.next();
-					if(aIomObj!=null){
-						Object modelElement=tag2class.get(aIomObj.getobjecttag());
-						Viewable anObjectClass = (Viewable) modelElement;
-						if(value.getViewable().equals(anObjectClass)){
-							int countOfSurfaceBagValues = aIomObj.getattrvaluecount(surfaceBag.getValue());
-							for(int i=0; i<countOfSurfaceBagValues; i++){
-								IomObject surfaceBagObj = aIomObj.getattrobj(surfaceBag.getValue(), i);
-								IomObject polygon = surfaceBagObj.getattrobj(surfaceAttr.getValue(), 0);
-								if(polygon!=null){ // if value of Argument[2] equals object attribute
-									try { // add polylines to polygonPool.
-										polygonPool.addLines(aIomObj.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
-									} catch (IoxException e) {
-										throw new IllegalStateException(e);
-									}
-								}
-							}
-						}
-					}
-				}
-			} else {
-				Iterator iterIomObjects = value.getComplexObjects().iterator();
-				while(iterIomObjects.hasNext()){
-					IomObject anObject = (IomObject) iterIomObjects.next();
-					int countOfSurfaceBagValues = anObject.getattrvaluecount(surfaceBag.getValue());
-					for(int i=0; i<countOfSurfaceBagValues; i++){
-						IomObject surfaceBagObj = anObject.getattrobj(surfaceBag.getValue(), i);
-						IomObject polygon = surfaceBagObj.getattrobj(surfaceAttr.getValue(), 0);
-						if(polygon!=null){
-							try {
-								polygonPool.addLines(anObject.getobjectoid(), null, polygonPool.getLinesFromPolygon(polygon));
-							} catch (IoxException e) {
-								throw new IllegalStateException(e);
-							}
-						} else {
-							// there is no area to compare. --> area not false and not true.
-						}
-					}
-				}
-			}
-			List<IoxInvalidDataException> intersections=polygonPool.validate();
-			if(intersections!=null) {
-				return new Value(false);
-			}
+		      for (PathEl surface : pathToStructEle) {
+		            // if surfaceBag is defined
+		            ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(iliClassQName, objPoolManager);
+		            if(value.getViewable()!=null){
+		                Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
+		                ArrayList<IomObject> listOfPolygons = new ArrayList<IomObject>();
+		                while(objectIterator.hasNext()){
+		                    IomObject aIomObj = (IomObject) objectIterator.next();
+		                    if(aIomObj!=null){
+		                        Object modelElement=tag2class.get(aIomObj.getobjecttag());
+		                        Viewable anObjectClass = (Viewable) modelElement;
+		                        if(value.getViewable().equals(anObjectClass)){
+		                            findPolygonIomObject(pathToStructEle, listOfPolygons, aIomObj, 0);
+		                        }
+		                    }
+		                }
+                        for (IomObject polygon : listOfPolygons) {
+                            try {
+                                polygonPool.addLines(null, null, polygonPool.getLinesFromPolygon(polygon));
+                            } catch (IoxException e) {
+                                EhiLogger.logError(e);  
+                            }
+                            
+                        }
+		            } else {
+		                Iterator iterIomObjects = value.getComplexObjects().iterator();
+		                ArrayList<IomObject> listOfPolygons = new ArrayList<IomObject>();
+		                Value currentValue = null;
+		                while(iterIomObjects.hasNext()){		                    
+		                    IomObject anObject = (IomObject) iterIomObjects.next();
+		                    currentValue = getValueFromObjectPath(null, anObject, pathToStructEle, null);
+		                    if (currentValue.isUndefined()) {
+		                        currentValue = getValueFromObjectPath(null, anObject, pathToSurfaceAttr, null);
+		                        System.out.println("Stop!");
+		                    } else {
+	                            Collection<IomObject> complexObjects = currentValue.getComplexObjects();
+	                            Iterator<IomObject> iterator = complexObjects.iterator();
+	                            while (iterator.hasNext()) {
+	                                findPolygonIomObject(pathToSurfaceAttr, listOfPolygons, iterator.next(), 0);
+	                            }		                        
+		                    }
+		                }
+                        for (IomObject polygon : listOfPolygons) {
+                            try {
+                                polygonPool.addLines(null, null, polygonPool.getLinesFromPolygon(polygon));
+                            } catch (IoxException e) {
+                                EhiLogger.logError(e);  
+                            }
+                            
+                        }
+		            }
+		            List<IoxInvalidDataException> intersections=polygonPool.validate();
+		            if(intersections!=null) {
+		                return new Value(false);
+		            }		            
+		      }
 			return new Value(true);
 		}
 	}
 	
-	private String getEnumerationConstantXtfValue(Constant.Enumeration enumValue)
+	private void findPolygonIomObject(PathEl[] pathEl, ArrayList<IomObject> listOfPolygons, IomObject structEle, int startIndex) {
+        if (pathEl != null) {
+            int lengthOfSurfaceAttr = pathEl.length - 1;
+            //
+            for (; startIndex < pathEl.length; startIndex++) {
+               PathEl pathElLine = pathEl[startIndex];
+               int attrCount = structEle.getattrvaluecount(pathElLine.getName());
+               for (int i = 0; i < attrCount; i++) {
+                   
+                   if (startIndex == lengthOfSurfaceAttr) {
+                       // surface attr found, add polylines to polygonPool.
+                       IomObject polygon = structEle.getattrobj(pathElLine.getName(), 0);
+                       listOfPolygons.add(polygon);
+                   } else {
+                       IomObject polygon = structEle.getattrobj(pathElLine.getName(), i);
+                       findPolygonIomObject(pathEl, listOfPolygons, polygon, startIndex);
+                   }
+               }
+
+           }            
+        }
+    }
+	
+    private String getEnumerationConstantXtfValue(Constant.Enumeration enumValue)
 	{
 		String value[] = enumValue.getValue();
 		StringBuilder buf = new StringBuilder(100);

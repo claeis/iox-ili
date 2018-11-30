@@ -1,0 +1,42 @@
+INTERLIS 2.3;
+CONTRACTED MODEL AreAreas23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
+  	IMPORTS INTERLIS_ext;
+  	
+	TOPIC Topic=
+		DOMAIN
+			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+						   70000.000 .. 310000.000 [INTERLIS.m],
+						ROTATION 2 -> 1;
+
+		STRUCTURE StructA =
+			flaeche : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END StructA;
+
+		STRUCTURE StructB =
+			attr2 : BAG OF StructA;
+		END StructB;
+
+		STRUCTURE StructC =
+			attr3 : BAG OF StructB;
+		END StructC;
+
+		CLASS ClassD =
+			attr4 : BAG OF StructC;
+		END ClassD;
+    	
+		CLASS ClassD1 EXTENDS ClassD =
+			MANDATORY CONSTRAINT INTERLIS_ext.areAreas2(THIS,UNDEFINED,"attr4->attr3->attr2->flaeche");
+		END ClassD1;
+    	
+		CLASS ClassD2 EXTENDS ClassD =
+			MANDATORY CONSTRAINT INTERLIS_ext.areAreas2(THIS,"attr4->attr3","attr2->flaeche");
+		END ClassD2;
+
+		CLASS ClassD3 EXTENDS ClassD =
+			SET CONSTRAINT INTERLIS_ext.areAreas3(ALL,UNDEFINED,"attr4->attr3->attr2->flaeche");
+		END ClassD3;
+		
+	END Topic;
+	
+END AreAreas23.

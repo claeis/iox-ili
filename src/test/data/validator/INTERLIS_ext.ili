@@ -1,0 +1,19 @@
+!! Extension of the internal INTERLIS-data model
+
+INTERLIS 2.3;
+
+CONTRACTED TYPE MODEL INTERLIS_ext (en) AT "http://www.interlis.ch/models"
+  VERSION "2016-05-30" =
+
+  FUNCTION areAreas2(
+    Object: OBJECT OF ANYCLASS;
+    SurfaceBag: TEXT;
+    SurfaceAttr: TEXT): BOOLEAN;
+
+  FUNCTION areAreas3(
+    Objects: OBJECTS OF ANYCLASS;
+    SurfaceBag: TEXT;
+    SurfaceAttr: TEXT): BOOLEAN;
+
+END INTERLIS_ext.
+

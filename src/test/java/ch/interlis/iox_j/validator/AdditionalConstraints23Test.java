@@ -284,6 +284,26 @@ public class AdditionalConstraints23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Mandatory Constraint AdditionalModelC.AdditionalTopicC.AdditionalClassC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
+    @Test
+    public void mandatoryConstraint_NotEqual_DuplicateModel_Fail(){
+        Iom_jObject obj1=new Iom_jObject(CLASSB, OID1);
+        obj1.setattrvalue("attr1", "5");
+        obj1.setattrvalue("attr2", "10");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelC;AdditionalConstraints23");
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID1));
+        validator.validate(new ObjectEvent(obj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Mandatory Constraint AdditionalModelC.AdditionalTopicC.AdditionalClassC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+    }
 	
 
 	
