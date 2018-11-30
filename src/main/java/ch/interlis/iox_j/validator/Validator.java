@@ -1575,7 +1575,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 PathEl surfaceBagPath[] = null;
                 Viewable viewable = null;
                 try {
-                    surfaceBagObjPath = ch.interlis.ili2c.Main.parseObjectOrAttributePath(currentClass, surfaceBag.getValue());
+                    surfaceBagObjPath = parseObjectOrAttributePath(currentClass, surfaceBag.getValue());
                     if (surfaceBagObjPath.getPathElements() != null) {
                         PathEl surfaceBagPathEl[] = surfaceBagObjPath.getPathElements();
                         surfaceBagPath = surfaceBagPathEl;          
@@ -1603,7 +1603,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 ObjectPath surfaceAttrObjPath;
                 PathEl surfaceAttrPath[] = null;
                 try {
-                    surfaceAttrObjPath = ch.interlis.ili2c.Main.parseObjectOrAttributePath(attrObjClass, surfaceAttr.getValue());
+                    surfaceAttrObjPath = parseObjectOrAttributePath(attrObjClass, surfaceAttr.getValue());
                     if (surfaceAttrObjPath.getPathElements() != null) {
                         PathEl surfaceAttrPathEl[] = surfaceAttrObjPath.getPathElements(); 
                         surfaceAttrPath = surfaceAttrPathEl;                        
