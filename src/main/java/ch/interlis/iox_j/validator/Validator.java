@@ -162,6 +162,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private HashSet<String> configOffOufputReduction =new HashSet<String>();
 	private HashSet<String> setConstraintOufputReduction =new HashSet<String>();
 	private HashSet<String> constraintOutputReduction=new HashSet<String>();
+    private HashSet<String> seenModels=new HashSet<String>();
 	private HashSet<String> datatypesOutputReduction=new HashSet<String>();
 	private Map<String, String> uniquenessOfBid = new HashMap<String, String>();
 	private String globalMultiplicity=null;
@@ -260,11 +261,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		defaultGeometryTypeValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION);
 		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class,objPoolManager);
 		linkPool=new LinkPool();
-		String additionalModels=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS);
-		if(additionalModels!=null){
-			String[] additionalModelv = additionalModels.split(";");
-			iterateThroughAdditionalModels(additionalModelv);
-	}
 	}
 	/** mappings from xml-tags to Viewable|AttributeDef
 	 */
@@ -318,11 +314,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
+	        String additionalModels=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS);
+	        if(additionalModels!=null){
+	            String[] additionalModelv = additionalModels.split(";");
+	            iterateThroughAdditionalModels(additionalModelv);
+	        }
 			if(autoSecondPass){
 				doSecondPass();
 			}
 		}
 	}
+    
 	private void validateBasketEvent(ch.interlis.iox.StartBasketEvent event) {
         boolean isValid = true;
 	    if (!isValidTopicName(event.getType())) {
@@ -335,6 +337,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
         if(isValid) {
             Topic topic = (Topic)td.getElement(event.getType());
+            Model model=(Model) topic.getContainer();
+            seenModels.add(model.getName());
             Domain bidDomain=topic.getBasketOid();
             if (bidDomain!=null && !isAValidBasketOID(bidDomain, event.getBid())) {
                 isValid = false;
@@ -440,7 +444,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(additionalModel==null){
 				continue;
 			}
+			if(seenModels.contains(additionalModel)) {
+			    continue;
+			}
 			errs.addEvent(errFact.logInfoMsg("additional model {0}", additionalModel));
+			seenModels.add(additionalModel);
 			// models
 			Iterator tdIterator = td.iterator();
 			boolean modelExists=false;
