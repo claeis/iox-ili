@@ -946,15 +946,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void visitStructEle(String checkUniqueConstraint,UniquenessConstraint uniquenessConstraint, HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues, String iomObjOid, PathEl[] attrPath, int i, IomObject parentObject, IomObject iomObj, RoleDef role) {
 	    if(attrPath==null || i>=attrPath.length) {
 	        OutParam<AttributeArray> values = new OutParam<AttributeArray>();
-            String returnValue = validateUnique(seenValues,iomObjOid,parentObject,iomObj,uniquenessConstraint, values, role);
-            if (returnValue == null){
+            String oidOfObjectWithDuplicateValue = validateUnique(seenValues,iomObjOid,parentObject,iomObj,uniquenessConstraint, values, role);
+            if (oidOfObjectWithDuplicateValue == null){
                 // ok
             } else {
                 String msg=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.MSG);
                 if(msg!=null && msg.length()>0){
                     logMsg(checkUniqueConstraint,msg);
                 } else {
-                    logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), returnValue);
+                    logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), formatObjectId(oidOfObjectWithDuplicateValue));
                 }
             }
 	        return;
@@ -966,6 +966,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             visitStructEle(checkUniqueConstraint,uniquenessConstraint, seenValues, iomObjOid, attrPath,i+1,parentObject,structEle, role);
         }
     }
+    private String formatObjectId(String oidOfObjectWithDuplicateValue) {
+        IomObject iomObj=objectPool.getObject(oidOfObjectWithDuplicateValue, null, null);
+        String keymsg = validationConfig.getConfigValue(iomObj.getobjecttag(), ValidationConfig.KEYMSG);
+        if (keymsg != null) {
+            return keymsg;
+        }
+        return oidOfObjectWithDuplicateValue;
+    }
+
     private HashMap<SetConstraint,Collection<String>> setConstraints=new HashMap<SetConstraint,Collection<String>>();
 	private Iterator<String> allObjIterator=null;
 	
