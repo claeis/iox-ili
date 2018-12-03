@@ -180,15 +180,15 @@ public class Xtf23ReaderDataTest {
 	
 	// Es wird getestet ob Black Box Typen ohne Fehler erstellt werden koennen.
 	@Test
-	@Ignore("GH-43")
 	public void testBlackBoxType_Ok()  throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"BlackBoxTypes.xtf"));
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
 		IoxEvent event = reader.read();
 		assertTrue(event instanceof  ObjectEvent);
-		assertEquals("AAAA",((ObjectEvent) event).getIomObject().getattrvalue("attrBin")); // fails
-        assertEquals("<anyXml/>",((ObjectEvent) event).getIomObject().getattrvalue("attrXml")); // fails
+		IomObject iomObject = ((ObjectEvent) event).getIomObject();
+        assertEquals("AAAA",iomObject.getattrvalue("attrBin"));
+        assertEquals("<anyXml xmlns=\"http://www.interlis.ch/INTERLIS2.3\"></anyXml>",iomObject.getattrvalue("attrXml"));
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();

@@ -756,7 +756,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
         xmloutputf.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES,true);
         XMLEventFactory xmlef = XMLEventFactory.newInstance();
         XMLEventWriter xmlw = xmloutputf.createXMLEventWriter(strw); 
-        xmlw.add(xmlef.createStartDocument());
+        //xmlw.add(xmlef.createStartDocument());
         xmlw.add(event);
         int inHeader = 1;
         while(reader.hasNext()){
@@ -777,7 +777,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                 throw new IllegalStateException("inHeader < 0");
             }
         } // end while
-        xmlw.add(xmlef.createEndDocument());
+        //xmlw.add(xmlef.createEndDocument());
         xmlw.flush();
         xmlw.close();
         return event;
