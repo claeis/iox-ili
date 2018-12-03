@@ -164,7 +164,7 @@ public class LogEventFactory {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	private String formatMessage(String rawMsg, IomObject iomObj,String...args) {
+	public static String formatMessage(String rawMsg, IomObject iomObj,String...args) {
 		// TODO resolve placeholders
 		int startPos=rawMsg.indexOf('{');
 		if(startPos==-1){

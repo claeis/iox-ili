@@ -975,55 +975,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             visitStructEle(checkUniqueConstraint,uniquenessConstraint, seenValues, iomObjOid, attrPath,i+1,parentObject,structEle, role);
         }
     }
-    private String formatObjectId(String oidOfObjectWithDuplicateValue) {
+    private String formatObjectId(String oid) {
         String actualLanguage = Locale.getDefault().getLanguage();
-        IomObject iomObj=objectPool.getObject(oidOfObjectWithDuplicateValue, null, null);
+        IomObject iomObj=objectPool.getObject(oid, null, null);
         String keymsg = validationConfig.getConfigValue(iomObj.getobjecttag(), ValidationConfig.KEYMSG+"_"+actualLanguage);
         if (keymsg != null) {
-            return formatMessage(keymsg, iomObj);
+            return LogEventFactory.formatMessage(keymsg, iomObj);
         } else {
             keymsg = validationConfig.getConfigValue(iomObj.getobjecttag(), ValidationConfig.KEYMSG);
-            return keymsg != null ? formatMessage(keymsg, iomObj) : oidOfObjectWithDuplicateValue;
+            return keymsg != null ? LogEventFactory.formatMessage(keymsg, iomObj) : oid;
         }
     }
 
-    private String formatMessage(String rawMsg, IomObject iomObj,String...args) {
-        int startPos=rawMsg.indexOf('{');
-        if(startPos==-1){
-            return rawMsg;
-        }
-        StringBuffer msg=new StringBuffer();
-        StringBuffer param=null;
-        for(int idx=0;idx<rawMsg.length();idx++){
-            char c=rawMsg.charAt(idx);
-            if(param==null){
-                if(c=='{'){
-                    param=new StringBuffer();
-                }else{
-                    msg.append(c);
-                }
-            }else{
-                if(c=='}'){
-                    // resolve param
-                    try{
-                        int argi=Integer.parseInt(param.toString());
-                        if(args!=null && argi<args.length){
-                            msg.append(args[argi]);
-                        }
-                    }catch(NumberFormatException e){
-                        String value=iomObj.getattrvalue(param.toString());
-                        if(value!=null){
-                            msg.append(value);
-                        }
-                    }
-                    param=null;
-                }else{
-                    param.append(c);
-                }
-            }
-        }
-        return msg.toString();
-    }
     private HashMap<SetConstraint,Collection<String>> setConstraints=new HashMap<SetConstraint,Collection<String>>();
 	private Iterator<String> allObjIterator=null;
 	
