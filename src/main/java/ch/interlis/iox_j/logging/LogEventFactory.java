@@ -1,6 +1,7 @@
 package ch.interlis.iox_j.logging;
 
 import java.util.Date;
+import java.util.Locale;
 
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxLogEvent;
@@ -147,8 +148,12 @@ public class LogEventFactory {
 	}
 	private String getObjectUsrId(IomObject iomObj) {
 		String keymsg=null;
+		String keyMsgWithLang = ValidationConfig.KEYMSG+"_" + Locale.getDefault().getLanguage();
 		if(validConfig!=null){
-			keymsg=validConfig.getConfigValue(iomObj.getobjecttag(), ValidationConfig.KEYMSG);
+		    keymsg=validConfig.getConfigValue(iomObj.getobjecttag(), keyMsgWithLang);
+		    if (keymsg == null) {
+		        keymsg=validConfig.getConfigValue(iomObj.getobjecttag(), ValidationConfig.KEYMSG);
+		    }
 		}
 		if(keymsg!=null){
 			return formatMessage(keymsg, iomObj);
