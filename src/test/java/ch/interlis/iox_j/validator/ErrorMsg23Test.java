@@ -3,6 +3,7 @@ package ch.interlis.iox_j.validator;
 import static org.junit.Assert.*;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.junit.Before;
@@ -285,6 +286,33 @@ public class ErrorMsg23Test {
 		IoxLogEvent err = logger.getErrs().get(0);
 		assertEquals("Msg TestKey",err.getEventMsg());
 	}
+	
+    @Test
+    public void msg_de_Param_Fail(){
+        Iom_jObject iomObj=new Iom_jObject(ILI_CLASSD, OID);
+        iomObj.setattrvalue(ILI_CLASSD_ATTRA, "0");
+        iomObj.setattrvalue(ILI_CLASSD_ATTRA2, "TestKey");
+        ValidationConfig modelConfig=new ValidationConfig();
+        String actualLanguage = Locale.getDefault().getLanguage();
+        // default message
+        modelConfig.setConfigValue(ILI_CLASSD_CONSTRA, ValidationConfig.MSG, "Msg {"+ILI_CLASSD_ATTRA2+"}");
+        // de spezifische message
+        modelConfig.setConfigValue(ILI_CLASSD_CONSTRA, ValidationConfig.MSG+"_"+actualLanguage, "Msg_lang {"+ILI_CLASSD_ATTRA2+"}");
+        
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+        validator.validate(new ObjectEvent(iomObj));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        IoxLogEvent err = logger.getErrs().get(0);
+        assertEquals("Msg_lang TestKey",err.getEventMsg());
+    }
 
 	// die Geometry Error Message muss die unten genannten Inhalte der Koordinaten: C1 und C2 enthalten.
 	@Test

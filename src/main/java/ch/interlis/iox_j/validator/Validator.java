@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -865,7 +866,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						constraintOutputReduction.add(constraint+":"+constraintName);
 						errs.addEvent(errFact.logInfoMsg("validate plausibility constraint {0}...",getScopedName(constraintEntry.getKey())));
 					}
-					String msg=validationConfig.getConfigValue(getScopedName(constraintEntry.getKey()), ValidationConfig.MSG);
+                    String actualLanguage = Locale.getDefault().getLanguage();
+                    String msg = validationConfig.getConfigValue(getScopedName(constraintEntry.getKey()), ValidationConfig.MSG+"_"+actualLanguage);
+                    if (msg == null) {
+                        msg=validationConfig.getConfigValue(getScopedName(constraintEntry.getKey()), ValidationConfig.MSG);
+                    }
 					if(constraintEntry.getKey().getDirection()==0){ // >=
 						if(((constraintEntry.getValue().getSuccessfulResults()/constraintEntry.getValue().getTotalSumOfConstraints())*100) >= constraintEntry.getKey().getPercentage()){
 							// ok
@@ -950,7 +955,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             if (oidOfObjectWithDuplicateValue == null){
                 // ok
             } else {
-                String msg=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.MSG);
+                String actualLanguage = Locale.getDefault().getLanguage();
+                String msg = validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.MSG+"_"+actualLanguage);
+                if (msg == null) {
+                    msg=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.MSG);
+                }
                 if(msg!=null && msg.length()>0){
                     logMsg(checkUniqueConstraint,msg);
                 } else {
@@ -966,13 +975,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             visitStructEle(checkUniqueConstraint,uniquenessConstraint, seenValues, iomObjOid, attrPath,i+1,parentObject,structEle, role);
         }
     }
-    private String formatObjectId(String oidOfObjectWithDuplicateValue) {
-        IomObject iomObj=objectPool.getObject(oidOfObjectWithDuplicateValue, null, null);
-        String keymsg = validationConfig.getConfigValue(iomObj.getobjecttag(), ValidationConfig.KEYMSG);
+    private String formatObjectId(String oid) {
+        String actualLanguage = Locale.getDefault().getLanguage();
+        IomObject iomObj=objectPool.getObject(oid, null, null);
+        String keymsg = validationConfig.getConfigValue(iomObj.getobjecttag(), ValidationConfig.KEYMSG+"_"+actualLanguage);
         if (keymsg != null) {
-            return keymsg;
+            return LogEventFactory.formatMessage(keymsg, iomObj);
+        } else {
+            keymsg = validationConfig.getConfigValue(iomObj.getobjecttag(), ValidationConfig.KEYMSG);
+            return keymsg != null ? LogEventFactory.formatMessage(keymsg, iomObj) : oid;
         }
-        return oidOfObjectWithDuplicateValue;
     }
 
     private HashMap<SetConstraint,Collection<String>> setConstraints=new HashMap<SetConstraint,Collection<String>>();
@@ -1040,7 +1052,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						if (constraintValue.isTrue()){
 							// ok
 						} else {
-							String msg=validationConfig.getConfigValue(getScopedName(setConstraintObj), ValidationConfig.MSG);
+			                String actualLanguage = Locale.getDefault().getLanguage();
+			                String msg = validationConfig.getConfigValue(getScopedName(setConstraintObj), ValidationConfig.MSG+"_"+actualLanguage);
+			                if (msg == null) {
+			                    msg=validationConfig.getConfigValue(getScopedName(setConstraintObj), ValidationConfig.MSG);
+			                }
 							if(msg!=null && msg.length()>0){
 								logMsg(checkConstraint,msg);
 							} else {
@@ -1080,7 +1096,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						if (conditionValue.isTrue()){
 							// ok
 						} else {
-							String msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
+						    String actualLanguage = Locale.getDefault().getLanguage();
+						    String msg = validationConfig.getConfigValue(constraintName, ValidationConfig.MSG+"_"+actualLanguage);
+						    if (msg == null) {
+						        msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
+						    }
 							if(msg!=null && msg.length()>0){
 								logMsg(checkConstraint,msg);
 							} else {
@@ -2716,7 +2736,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 				}
 				if (!valueExists){
-					String msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
+                    String actualLanguage = Locale.getDefault().getLanguage();
+                    String msg = validationConfig.getConfigValue(constraintName, ValidationConfig.MSG+"_"+actualLanguage);
+                    if (msg == null) {
+                        msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
+                    }
 					if(msg!=null && msg.length()>0){
 						logMsg(checkConstraint,msg);
 					} else {
