@@ -1,0 +1,110 @@
+INTERLIS 2.3;
+MODEL TextFunction23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
+	IMPORTS Text;
+
+	TOPIC Topic=
+
+		CLASS ClassA1 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Text.compareToIgnoreCase(attr1, attr2)==0;
+		END ClassA1;	
+
+		CLASS ClassA2 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Text.concat(attr1, attr2)=="concatCONCAT";
+		END ClassA2;
+
+		CLASS ClassA3 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Text.endsWith(attr1, attr2);
+		END ClassA3;
+
+		CLASS ClassA4 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Text.equalsIgnoreCase(attr1, attr2);
+		END ClassA4;
+		
+		CLASS ClassA5 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Text.indexOf(attr1,attr2,UNDEFINED) == 1;
+		END ClassA5;
+
+		CLASS ClassA5_2 =
+			attr1: TEXT;
+			attr2: TEXT;
+			attr3: TEXT;
+			MANDATORY CONSTRAINT
+				Text.indexOf(attr1,attr2,attr3) == 4;
+		END ClassA5_2;
+
+		CLASS ClassA6 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Text.lastIndexOf(attr1,attr2,UNDEFINED) == 4;
+		END ClassA6;
+
+		CLASS ClassA7 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Text.matches(attr1,attr2);
+		END ClassA7;
+
+		CLASS ClassA8 =
+			attr1: TEXT;
+			attr2: TEXT;
+			attr3: TEXT;
+			MANDATORY CONSTRAINT
+				Text.replace(attr1,attr2, attr3) == "abbde";
+		END ClassA8;
+
+		CLASS ClassA9 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Text.startsWith(attr1,attr2);
+		END ClassA9;
+
+		CLASS ClassA10 =
+			attr1: TEXT;
+			attr2: TEXT;
+			attr3: TEXT;
+			MANDATORY CONSTRAINT
+				Text.substring(attr1, attr2, UNDEFINED) == "ist ein Text";
+		END ClassA10;
+
+
+		CLASS ClassA11 =
+			attr1: TEXT;
+			attr2: TEXT;
+			attr3: TEXT;
+			MANDATORY CONSTRAINT
+				Text.substring(attr1, attr2, attr3) == "ist";
+		END ClassA11;
+
+		CLASS ClassA12 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Text.toLowerCase(attr1) == "abc is not equal to xyz";
+		END ClassA12;
+
+		CLASS ClassA13 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Text.toUpperCase(attr1) == "THIS IS A TEST STRING";
+		END ClassA13;
+	END Topic;
+	
+END TextFunction23.
