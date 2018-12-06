@@ -115,6 +115,7 @@ import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.PipelinePool;
 import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.logging.LogEventFactory;
+import ch.interlis.iox_j.utility.ReaderFactory;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
 	private static final String ENUM_TREE_VALUES = "ENUM_TREE_VALUES";
@@ -2761,7 +2762,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	                if (datasetFiles != null) {
 	                    File[] files = datasetFiles.clone();
 	                    for (File file : files) {
-	                        reader = new XtfReader(file);
+	                        reader = new ReaderFactory().createReader(file,errFact);
 	                        String currentBid=null;
 	                        while(true) {
 	                            IoxEvent currentIoxEvent = reader.read();
