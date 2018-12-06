@@ -1092,15 +1092,15 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 
 	private IomObject readReference(IomObject iomObj, StartElement element, String attrName, AssociationDef association) throws IoxException{
 		String refOid=element.getAttributeByName(QNAME_XML_REF).getValue();
-		if(refOid.length()<=1){
+		if(refOid.length()==0){
 			throw new IoxException("unexpected reference value <"+refOid+">");
 		}
 		Attribute attrRefBid=element.getAttributeByName(QNAME_XML_TOPIC_BID);
 		String refBid=null;
 		if(attrRefBid!=null) {
 			refBid=attrRefBid.getValue();
-			if(refBid.length()<=1){
-				throw new IoxException("unexpected reference value <"+refBid+">");
+			if(refBid.length()==0){
+				throw new IoxException("unexpected reference BID value <"+refBid+">");
 			}
 		}
 		Long orderPos=null;
