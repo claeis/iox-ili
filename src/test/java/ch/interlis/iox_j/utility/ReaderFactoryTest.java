@@ -78,7 +78,7 @@ public class ReaderFactoryTest {
 		IoxReader reader=null;
 		new ReaderFactory();
 		reader=new ReaderFactory().createReader(new File("src/test/data/Xtf23Reader/dataSection/SimpleCoord23a.xtf"),null);
-		assertTrue(reader instanceof Xtf23Reader);
+		assertTrue(reader instanceof XtfReader);
 	}
 	
 	// Es wird getestet ob der passende Reader: XtfReader zurueckgegeben wird.
@@ -88,7 +88,7 @@ public class ReaderFactoryTest {
 		IoxReader reader=null;
 		new ReaderFactory();
 		reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/SimpleCoord23a.txt"),null);
-		assertTrue(reader instanceof Xtf23Reader);
+		assertTrue(reader instanceof XtfReader);
 	}
 	
 	// Es wird getestet ob der passende Reader: Xtf24Reader zurueckgegeben wird.

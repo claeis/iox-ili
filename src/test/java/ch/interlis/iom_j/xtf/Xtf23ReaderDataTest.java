@@ -109,6 +109,7 @@ public class Xtf23ReaderDataTest {
 	
 	// Es wird getestet ob Texte ohne Fehler gelesen werden koennen.
 	@Test
+	@Ignore
 	public void testTextType_Ok()  throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"TextTypes.xtf"));
 		assertTrue(reader.read() instanceof  StartTransferEvent);

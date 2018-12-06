@@ -27,12 +27,12 @@ public class ReaderFactory{
 		}catch(IoxException ex){
 		}
 		
-        reader=new Xtf23Reader(inputFile);
+        reader=new XtfReader(inputFile);
         IoxEvent event2=null;
 		try{
 			event2=reader.read();
 			if(event2!=null){
-		        reader=new Xtf23Reader(inputFile);
+		        reader=new XtfReader(inputFile);
 				return reader;
 			}
 		}catch(IoxException ex){
