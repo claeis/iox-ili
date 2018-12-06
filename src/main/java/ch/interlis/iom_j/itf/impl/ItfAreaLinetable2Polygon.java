@@ -16,6 +16,7 @@ import com.vividsolutions.jts.geom.TopologyException;
 import com.vividsolutions.jts.index.strtree.STRtree;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.ehi.iox.objpool.impl.IomObjectSerializer;
 import ch.ehi.iox.objpool.impl.JavaSerializer;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.AreaType;
@@ -121,7 +122,7 @@ public class ItfAreaLinetable2Polygon {
 	public void addItfLinetableObject(IomObject iomObj)
 	{
 		if(lines==null){
-			lines=objPool.newObjectPoolImpl2(new JavaSerializer());
+			lines=objPool.newObjectPoolImpl2(new IomObjectSerializer());
 		}
 		IomObject polyline=iomObj.getattrobj(helperTableGeomAttrName, 0);
 		if(polyline==null){

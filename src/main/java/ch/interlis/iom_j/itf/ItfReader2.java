@@ -25,6 +25,7 @@ package ch.interlis.iom_j.itf;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.ehi.iox.objpool.impl.IomObjectSerializer;
 import ch.ehi.iox.objpool.impl.JavaSerializer;
 import ch.interlis.iox_j.*;
 import ch.interlis.iox_j.logging.Log2EhiLogger;
@@ -271,7 +272,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 			// maintable
 			surfaceOrAreaAttr=null;
 			//mainObjs=new HashMap<String,IomObject>();
-			currentMainObjs=objPool.newObjectPoolImpl2(new JavaSerializer());
+			currentMainObjs=objPool.newObjectPoolImpl2(new IomObjectSerializer());
 			iliQName=aclass.getScopedName(null);
 			while(true){
 				  // collect objects
