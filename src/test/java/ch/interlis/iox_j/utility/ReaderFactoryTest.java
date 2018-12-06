@@ -8,6 +8,7 @@ import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.csv.CsvReader;
 import ch.interlis.iom_j.iligml.Iligml20Reader;
 import ch.interlis.iom_j.itf.ItfReader2;
+import ch.interlis.iom_j.xtf.Xtf23Reader;
 import ch.interlis.iom_j.xtf.Xtf24Reader;
 import ch.interlis.iom_j.xtf.XtfReader;
 import ch.interlis.iox.EndBasketEvent;
@@ -77,7 +78,7 @@ public class ReaderFactoryTest {
 		IoxReader reader=null;
 		new ReaderFactory();
 		reader=new ReaderFactory().createReader(new File("src/test/data/Xtf23Reader/dataSection/SimpleCoord23a.xtf"),null);
-		assertTrue(reader instanceof XtfReader);
+		assertTrue(reader instanceof Xtf23Reader);
 	}
 	
 	// Es wird getestet ob der passende Reader: XtfReader zurueckgegeben wird.
@@ -87,7 +88,7 @@ public class ReaderFactoryTest {
 		IoxReader reader=null;
 		new ReaderFactory();
 		reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/SimpleCoord23a.txt"),null);
-		assertTrue(reader instanceof XtfReader);
+		assertTrue(reader instanceof Xtf23Reader);
 	}
 	
 	// Es wird getestet ob der passende Reader: Xtf24Reader zurueckgegeben wird.

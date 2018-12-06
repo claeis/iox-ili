@@ -4,6 +4,7 @@ import java.io.File;
 import ch.interlis.iom_j.csv.CsvReader;
 import ch.interlis.iom_j.iligml.Iligml20Reader;
 import ch.interlis.iom_j.itf.ItfReader2;
+import ch.interlis.iom_j.xtf.Xtf23Reader;
 import ch.interlis.iom_j.xtf.Xtf24Reader;
 import ch.interlis.iom_j.xtf.XtfReader;
 import ch.interlis.iox.IoxEvent;
@@ -26,12 +27,12 @@ public class ReaderFactory{
 		}catch(IoxException ex){
 		}
 		
-        reader=new XtfReader(inputFile);
+        reader=new Xtf23Reader(inputFile);
         IoxEvent event2=null;
 		try{
 			event2=reader.read();
 			if(event2!=null){
-		        reader=new XtfReader(inputFile);
+		        reader=new Xtf23Reader(inputFile);
 				return reader;
 			}
 		}catch(IoxException ex){
