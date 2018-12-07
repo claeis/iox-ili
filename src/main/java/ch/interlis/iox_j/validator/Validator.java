@@ -316,6 +316,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				throw e;
 			}
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
+		    clearCurrentBid();
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
 	        String additionalModels=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS);
 	        if(additionalModels!=null){
@@ -328,14 +329,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
     
-	private void validateBasketEvent(ch.interlis.iox.StartBasketEvent event) {
+    private void clearCurrentBid() {
+        currentMainOid = null;
+        errFact.setDataObj(null);
+    }
+    private void validateBasketEvent(ch.interlis.iox.StartBasketEvent event) {
         boolean isValid = true;
+        errFact.setTid(event.getBid());
+        errFact.setIliqname(event.getType());
 	    if (!isValidTopicName(event.getType())) {
 	        isValid = false;
             errs.addEvent(errFact.logErrorMsg("Invalid basket element name {0}", event.getType()));
         }
         if (!isValidId(event.getBid())) {
             isValid = false;
+            LogEventFactory factory = new LogEventFactory();
             errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid BID", event.getBid()==null?"":event.getBid()));
         }
         if(isValid) {

@@ -112,6 +112,29 @@ public class Bid23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+    @Test
+    public void errorMsgAddressedWrongBid_Ok() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
+        Iom_jObject objB2=new Iom_jObject(CLASSB, OID2);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID2+" "));
+        validator.validate(new ObjectEvent(objB2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals(BID2+" ", logger.getErrs().get(0).getSourceObjectXtfId());
+        assertEquals(TOPIC, logger.getErrs().get(0).getSourceObjectTag());
+    }
+	
 	// Es werden die selben BID's innerhalb verschiedener TransferEvents erstellt.
 	// Beim Start eines TransferEvents wird die Map geloescht.
 	// Somit soll keine Fehlermeldung ausgegeben werden.
