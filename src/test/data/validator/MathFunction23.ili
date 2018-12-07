@@ -1,0 +1,199 @@
+INTERLIS 2.3;
+MODEL MathFunction23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
+	IMPORTS Math;
+
+	TOPIC Topic=
+
+		CLASS ClassA1 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Math.add(attr1, attr2)==5;
+		END ClassA1;
+
+		CLASS ClassA2 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Math.sub(attr1, attr2)==5;
+		END ClassA2;
+
+		CLASS ClassA3 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Math.mul(attr1, attr2)==5;
+		END ClassA3;
+
+		CLASS ClassA4 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Math.div(attr1, attr2)==5;
+		END ClassA4;
+
+		CLASS ClassA5 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.abs(attr1)==5;
+		END ClassA5;
+
+		CLASS ClassA6 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.acos(attr1)==1.5433773235341761;
+		END ClassA6;
+
+		CLASS ClassA7 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.asin(attr1)==0.02741900326072046;
+		END ClassA7;
+
+		CLASS ClassA8 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.atan(attr1)==0.0274087022410345;
+		END ClassA8;
+
+		CLASS ClassA9 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Math.atan2(attr1, attr2)==0.9827937232473292;
+		END ClassA9;
+
+		CLASS ClassA10 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.cbrt(attr1)==5;
+		END ClassA10;
+
+		CLASS ClassA11 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.cos(attr1)==0.7071067811865476;
+		END ClassA11;
+
+		CLASS ClassA12 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.cosh(attr1)==1.3246090892520057;
+		END ClassA12;
+
+		CLASS ClassA13 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.exp(attr1)==148.4131591025766;
+		END ClassA13;
+
+		CLASS ClassA14 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Math.hypot(attr1, attr2)==60986.133234122164;
+		END ClassA14;
+
+		CLASS ClassA15 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.log(attr1)==11.018368453441132;
+		END ClassA15;
+
+		CLASS ClassA16 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.log10(attr1)==4.78521661890635;
+		END ClassA16;
+
+		CLASS ClassA17 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Math.pow(attr1,attr2)==42.22425314473263;
+		END ClassA17;
+
+		CLASS ClassA18 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.round(attr1)==101;
+		END ClassA18;
+
+		CLASS ClassA19 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.signum(attr1)==1;
+		END ClassA19;
+
+		CLASS ClassA20 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.sin(attr1)==0.7071067811865475;
+		END ClassA20;
+
+		CLASS ClassA21 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.sinh(attr1)==0.8686709614860095;
+		END ClassA21;
+
+		CLASS ClassA22 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.sqrt(attr1)==5;
+		END ClassA22;	
+
+		CLASS ClassA23 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.tan(attr1)==0.9999999999999999;
+		END ClassA23;
+
+		CLASS ClassA24 =
+			attr1: TEXT;
+			MANDATORY CONSTRAINT
+				Math.tanh(attr1)==0.6557942026326724;
+		END ClassA24;
+
+		CLASS ClassA25 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Math.max(attr1, attr2)==5;
+		END ClassA25;
+
+		CLASS ClassA26 =
+			attr1: TEXT;
+			attr2: TEXT;
+			MANDATORY CONSTRAINT
+				Math.min(attr1, attr2)==3;
+		END ClassA26;
+
+		STRUCTURE StructA =
+			attrA : 1..20;
+		END StructA;
+
+		CLASS ClassB =
+			attrb : BAG OF StructA;
+			MANDATORY CONSTRAINT Math.avg("THIS->attrb->attrA")<5.0;
+		END ClassB;
+
+		CLASS ClassC =
+			attrc : BAG OF StructA;
+			MANDATORY CONSTRAINT Math.max2("THIS->attrc->attrA")==12;
+		END ClassC;
+
+		CLASS ClassD =
+			attrd : BAG OF StructA;
+			MANDATORY CONSTRAINT Math.min2("THIS->attrd->attrA")==3;
+		END ClassD;
+
+		CLASS ClassE =
+			attre : BAG OF StructA;
+			MANDATORY CONSTRAINT Math.sum("THIS->attre->attrA")==20;
+		END ClassE;
+
+	END Topic;
+	
+END MathFunction23.

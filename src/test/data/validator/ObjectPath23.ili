@@ -88,13 +88,13 @@ MODEL ObjectPath23
 		  st_1 : TEXT*10;
 		END st1;
 
-		CONSTRAINTS OF ClassS =
-			MANDATORY CONSTRAINT role_t1->t1 == "value_t1";
-		END;
+		!!CONSTRAINTS OF ClassS =
+		!!	MANDATORY CONSTRAINT \role_t1->st_1 == "value_st1"; 
+		!!END;
 
-		CONSTRAINTS OF ClassS =
-			MANDATORY CONSTRAINT \role_t1->st_1 == "value_st1"; 
-		END;
+		!! CONSTRAINTS OF ClassS =
+		!!	MANDATORY CONSTRAINT role_t1->t1 == "value_t1";
+		!! END;
 
 		CLASS ClassU =
 		  u1 : TEXT*10; 
@@ -122,6 +122,37 @@ MODEL ObjectPath23
 
 	END Topic;
 
+	TOPIC ExpressionSingleValue = 
+
+		CLASS ClassS =
+		  s1 : TEXT*10;
+		END ClassS;
+		
+		CLASS ClassT =
+		  t1 : TEXT*10; 
+		END ClassT;
+
+		CLASS ClassU =
+		  u1 : TEXT*10; 
+		END ClassU;
+
+		ASSOCIATION st1 =
+		  role_s1 -- {0..*} ClassS;
+		  role_t1 -- {0..*} ClassT;
+		  st_1 : TEXT*10;
+		END st1;
+
+		ASSOCIATION tu =
+			role_s3 -- {0..*} ClassS;
+			role_u3 -- {0..1} ClassU;
+		END tu;
+
+		CONSTRAINTS OF ClassS =
+			MANDATORY CONSTRAINT role_t1->t1 == "value_t1";
+		END;
+
+	END ExpressionSingleValue;
+
 	TOPIC BackwardDirection =
 
 		CLASS ClassS =
@@ -132,10 +163,21 @@ MODEL ObjectPath23
 		  t1 : TEXT*10; 
 		END ClassT;
 
+		ASSOCIATION st1 =
+		  role_s1 -- {0..*} ClassS;
+		  role_t1 -- {0..*} ClassT;
+		  st_1 : TEXT*10;
+		END st1;
+
 		ASSOCIATION st2 =
 			role_s2 -- {0..1} ClassS;
 			role_t2 -- {0..*} ClassT;
 		END st2;
+
+		CONSTRAINTS OF ClassS =
+			MANDATORY CONSTRAINT \role_t1->st_1 == "value_st1"; 
+		END;
+
 		CONSTRAINTS OF ClassS =
 			MANDATORY CONSTRAINT role_t2->t1 == "value_t1";
 		END;

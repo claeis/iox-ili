@@ -35,7 +35,8 @@ public class ObjectPath23Test {
     private final static String TOPIC_BACKWARD_DIRECTION = "ObjectPath23.BackwardDirection";
     private final static String TOPIC_RECURSIVELY = "ObjectPath23.RekursivelyObject";
     private final static String TOPIC_FORWARD_WITH_MORETHANONE_LINKOBJ = "ObjectPath23.ForwardDirectionWithMoreThanOnelinkObj";
-
+    private final static String TOPIC_EXPRESSION_SINGLE_VALUE = "ObjectPath23.ExpressionSingleValue";
+    
     // CLASSES
     private final static String CLASSA = TOPIC_RECURSIVELY + ".ClassA";
     private final static String CLASSB = TOPIC + ".ClassB";
@@ -57,10 +58,15 @@ public class ObjectPath23Test {
     private final static String CLASSY = TOPIC_FORWARD_WITH_MORETHANONE_LINKOBJ + ".ClassY";
     private final static String CLASSZ = TOPIC_FORWARD_WITH_MORETHANONE_LINKOBJ + ".ClassZ";
     private final static String CLASSY1 = TOPIC_FORWARD_WITH_MORETHANONE_LINKOBJ + ".ClassY1";
+    private final static String CLASSU2 = TOPIC_EXPRESSION_SINGLE_VALUE + ".ClassU";
+    private final static String CLASSS2 = TOPIC_EXPRESSION_SINGLE_VALUE + ".ClassS";
+    private final static String CLASST2 = TOPIC_EXPRESSION_SINGLE_VALUE + ".ClassT";
     
     // ASSOCIATION
     private static final String ASSOC_MANY2MANY = TOPIC + ".many2many";
-    private static final String ASSOC_ST1 = TOPIC + ".st1";
+    private static final String ASSOC_ST1_TOPIC = TOPIC + ".st1";
+    private static final String ASSOC_ST1 = TOPIC_BACKWARD_DIRECTION + ".st1";
+    private static final String ASSOC_ST1_V2 = TOPIC_EXPRESSION_SINGLE_VALUE + ".st1";
     private static final String ASSOC_XY = TOPIC_FORWARD_WITH_MORETHANONE_LINKOBJ + ".x2y";
     private static final String ASSOC_YZ = TOPIC_FORWARD_WITH_MORETHANONE_LINKOBJ + ".y2z";
     private static final String ASSOC_A2A = TOPIC_RECURSIVELY + ".a2a";
@@ -343,8 +349,8 @@ public class ObjectPath23Test {
     
     @Test
     public void linkObj_backwardDirection_toLinkObj_OK() throws Exception {
-        Iom_jObject iomObjS = new Iom_jObject(CLASSS, OID1);
-        Iom_jObject iomObjT = new Iom_jObject(CLASST, OID2);
+        Iom_jObject iomObjS = new Iom_jObject(CLASSS1, OID1);
+        Iom_jObject iomObjT = new Iom_jObject(CLASST1, OID2);
         iomObjT.setattrvalue("t1", "value_t1");
         Iom_jObject iomObjST1 = new Iom_jObject(ASSOC_ST1, null);
         iomObjST1.addattrobj("role_s1", "REF").setobjectrefoid(iomObjS.getobjectoid());
@@ -364,65 +370,6 @@ public class ObjectPath23Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(0, logger.getErrs().size());
-    }
-    
-    
-    @Test
-    public void embedded_backwardAnd_forwardDirectionWithMoreThanOne_linkObj_OK() throws Exception {
-        Iom_jObject iomObjU = new Iom_jObject(CLASSU, OID1);
-        
-        Iom_jObject iomObjS = new Iom_jObject(CLASSS, OID2);
-        iomObjS.addattrobj("role_u3", "REF").setobjectrefoid(iomObjU.getobjectoid());
-
-        Iom_jObject iomObjS7 = new Iom_jObject(CLASSS, OID7);
-        iomObjS7.addattrobj("role_u3", "REF").setobjectrefoid(iomObjU.getobjectoid());
-
-        Iom_jObject iomObjT = new Iom_jObject(CLASST, OID3);
-        iomObjT.setattrvalue("t1", "value_t1");
-        Iom_jObject iomObjST1 = new Iom_jObject(ASSOC_ST1, null);
-        iomObjST1.addattrobj("role_s1", "REF").setobjectrefoid(iomObjS.getobjectoid());
-        iomObjST1.addattrobj("role_t1", "REF").setobjectrefoid(iomObjT.getobjectoid());
-        
-        Iom_jObject iomObjT4=new Iom_jObject(CLASST, OID4);
-        iomObjT4.setattrvalue("t1", "value_t1");
-        Iom_jObject iomObjST3=new Iom_jObject(ASSOC_ST1, null);
-        iomObjST3.addattrobj("role_s1", "REF").setobjectrefoid(iomObjS.getobjectoid());
-        iomObjST3.addattrobj("role_t1", "REF").setobjectrefoid(iomObjT4.getobjectoid());
-        
-        Iom_jObject iomObjT5=new Iom_jObject(CLASST, OID5);
-        iomObjT5.setattrvalue("t1", "value_t1");
-        Iom_jObject iomObjST4=new Iom_jObject(ASSOC_ST1, null);
-        iomObjST4.addattrobj("role_s1", "REF").setobjectrefoid(iomObjS7.getobjectoid());
-        iomObjST4.addattrobj("role_t1", "REF").setobjectrefoid(iomObjT5.getobjectoid());
-        
-        Iom_jObject iomObjT6=new Iom_jObject(CLASST, OID6);
-        iomObjT6.setattrvalue("t1", "value_t1");
-        Iom_jObject iomObjST5=new Iom_jObject(ASSOC_ST1, null);
-        iomObjST5.addattrobj("role_s1", "REF").setobjectrefoid(iomObjS7.getobjectoid());
-        iomObjST5.addattrobj("role_t1", "REF").setobjectrefoid(iomObjT6.getobjectoid());
-
-        ValidationConfig modelConfig = new ValidationConfig();
-        LogCollector logger = new LogCollector();
-        LogEventFactory errFactory = new LogEventFactory();
-        Settings settings = new Settings();
-        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(TOPIC, BID));
-        validator.validate(new ObjectEvent(iomObjS));
-        validator.validate(new ObjectEvent(iomObjU));
-        validator.validate(new ObjectEvent(iomObjT));
-        validator.validate(new ObjectEvent(iomObjS7));
-        validator.validate(new ObjectEvent(iomObjT4));
-        validator.validate(new ObjectEvent(iomObjT5));
-        validator.validate(new ObjectEvent(iomObjT6));
-        validator.validate(new ObjectEvent(iomObjST1));
-        validator.validate(new ObjectEvent(iomObjST3));
-        validator.validate(new ObjectEvent(iomObjST4));
-        validator.validate(new ObjectEvent(iomObjST5));
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
-        // Asserts 
         assertEquals(0, logger.getErrs().size());
     }
     
@@ -528,6 +475,46 @@ public class ObjectPath23Test {
     //############################################################/
     //########## FAILING TESTS ###################################/
     //############################################################/    
+    
+    @Test
+    public void embedded_backwardAnd_forwardDirectionExpressionSigleValue_Fail() throws Exception {
+
+        Iom_jObject iomObjU = new Iom_jObject(CLASSU2, OID1);
+
+        Iom_jObject iomObjS = new Iom_jObject(CLASSS2, OID2);
+        iomObjS.addattrobj("role_u3", "REF").setobjectrefoid(iomObjU.getobjectoid());
+
+        Iom_jObject iomObjT = new Iom_jObject(CLASST2, OID3);
+        iomObjT.setattrvalue("t1", "value_t1");
+        Iom_jObject iomObjST1 = new Iom_jObject(ASSOC_ST1_V2, null);
+        iomObjST1.addattrobj("role_s1", "REF").setobjectrefoid(iomObjS.getobjectoid());
+        iomObjST1.addattrobj("role_t1", "REF").setobjectrefoid(iomObjT.getobjectoid());
+
+        Iom_jObject iomObjT4 = new Iom_jObject(CLASST2, OID4);
+        iomObjT4.setattrvalue("t1", "value_t1");
+        Iom_jObject iomObjST3 = new Iom_jObject(ASSOC_ST1_V2, null);
+        iomObjST3.addattrobj("role_s1", "REF").setobjectrefoid(iomObjS.getobjectoid());
+        iomObjST3.addattrobj("role_t1", "REF").setobjectrefoid(iomObjT4.getobjectoid());
+
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC_EXPRESSION_SINGLE_VALUE, BID));
+        validator.validate(new ObjectEvent(iomObjS));
+        validator.validate(new ObjectEvent(iomObjU));
+        validator.validate(new ObjectEvent(iomObjT));
+        validator.validate(new ObjectEvent(iomObjT4));
+        validator.validate(new ObjectEvent(iomObjST1));
+        validator.validate(new ObjectEvent(iomObjST3));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts 
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("expression role_t1->t1 must evaluate to a single value.", logger.getErrs().get(0).getEventMsg());
+    }
     
     @Test
     public void embedded_backwardDirection_EmbeddedConstraint_Fail() throws Exception {
@@ -783,8 +770,8 @@ public class ObjectPath23Test {
     
     @Test
     public void linkObj_backwardDirection_toLinkObj_Fail() throws Exception {
-        Iom_jObject iomObjS = new Iom_jObject(CLASSS, OID1);
-        Iom_jObject iomObjT = new Iom_jObject(CLASST, OID2);
+        Iom_jObject iomObjS = new Iom_jObject(CLASSS1, OID1);
+        Iom_jObject iomObjT = new Iom_jObject(CLASST1, OID2);
         iomObjT.setattrvalue("t1", "value_t1");
         Iom_jObject iomObjST1 = new Iom_jObject(ASSOC_ST1, null);
         iomObjST1.addattrobj("role_s1", "REF").setobjectrefoid(iomObjS.getobjectoid());
@@ -797,7 +784,7 @@ public class ObjectPath23Test {
         Settings settings = new Settings();
         Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
         validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new StartBasketEvent(TOPIC_BACKWARD_DIRECTION, BID));
         validator.validate(new ObjectEvent(iomObjS));
         validator.validate(new ObjectEvent(iomObjT));
         validator.validate(new ObjectEvent(iomObjST1));
@@ -805,7 +792,7 @@ public class ObjectPath23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint ObjectPath23.Topic.ClassS.Constraint2 is not true.",
+        assertEquals("Mandatory Constraint ObjectPath23.BackwardDirection.ClassS.Constraint1 is not true.",
                 logger.getErrs().get(0).getEventMsg());
     }
     
@@ -828,12 +815,13 @@ public class ObjectPath23Test {
         validator.validate(new EndTransferEvent());
         // Asserts 
         assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint ObjectPath23.BackwardDirection.ClassS.Constraint1 is not true.",
+        assertEquals("Mandatory Constraint ObjectPath23.BackwardDirection.ClassS.Constraint2 is not true.",
                 logger.getErrs().get(0).getEventMsg());
     }
     
     @Test
     public void embedded_backwardAnd_forwardDirectionWithMoreThanOne_linkObj_Fail() throws Exception {
+        // U<-S<->T
         Iom_jObject iomObjU = new Iom_jObject(CLASSU, OID1);
         
         Iom_jObject iomObjS = new Iom_jObject(CLASSS, OID2);
@@ -844,18 +832,18 @@ public class ObjectPath23Test {
 
         Iom_jObject iomObjT = new Iom_jObject(CLASST, OID3);
         iomObjT.setattrvalue("t1", "value_t1");
-        Iom_jObject iomObjST1 = new Iom_jObject(ASSOC_ST1, null);
+        Iom_jObject iomObjST1 = new Iom_jObject(ASSOC_ST1_TOPIC, null);
         iomObjST1.addattrobj("role_s1", "REF").setobjectrefoid(iomObjS.getobjectoid());
         iomObjST1.addattrobj("role_t1", "REF").setobjectrefoid(iomObjT.getobjectoid());
         
         Iom_jObject iomObjT4=new Iom_jObject(CLASST, OID4);
         iomObjT4.setattrvalue("t1", "value_t1");
-        Iom_jObject iomObjST3=new Iom_jObject(ASSOC_ST1, null);
+        Iom_jObject iomObjST3=new Iom_jObject(ASSOC_ST1_TOPIC, null);
         iomObjST3.addattrobj("role_s1", "REF").setobjectrefoid(iomObjS.getobjectoid());
         iomObjST3.addattrobj("role_t1", "REF").setobjectrefoid(iomObjT4.getobjectoid());
         
         Iom_jObject iomObjT5=new Iom_jObject(CLASST, OID5);
-        Iom_jObject iomObjST4=new Iom_jObject(ASSOC_ST1, null);
+        Iom_jObject iomObjST4=new Iom_jObject(ASSOC_ST1_TOPIC, null);
         iomObjST4.addattrobj("role_s1", "REF").setobjectrefoid(iomObjS7.getobjectoid());
         iomObjST4.addattrobj("role_t1", "REF").setobjectrefoid(iomObjT5.getobjectoid());
         

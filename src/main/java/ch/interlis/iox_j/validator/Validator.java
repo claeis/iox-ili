@@ -1123,6 +1123,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
+    private Value evaluateExpressionToSingleValue(IomObject parentObject, String validationKind, String usageScope, IomObject iomObj, Evaluable expression,RoleDef firstRole) {
+        Value value=evaluateExpression(parentObject, validationKind, usageScope, iomObj, expression,firstRole);
+        if(!value.skipEvaluation()) {
+            if( value.getValues()!=null && value.getValues().length>1) {
+                errs.addEvent(errFact.logErrorMsg("expression {0} must evaluate to a single value.", expression.toString()));
+                return Value.createSkipEvaluation();
+            }
+        }
+        return value;
+    }
 	private Value evaluateExpression(IomObject parentObject, String validationKind, String usageScope, IomObject iomObj, Evaluable expression,RoleDef firstRole) {
 		TextType texttype = new TextType();
 		if(expression instanceof Equality){
@@ -1130,7 +1140,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Equality equality = (Equality) expression;
 			Evaluable leftExpression = (Evaluable) equality.getLeft();
 			Evaluable rightExpression = (Evaluable) equality.getRight();
-			Value leftValue=evaluateExpression(parentObject, validationKind, usageScope, iomObj,leftExpression,firstRole);
+			Value leftValue=evaluateExpressionToSingleValue(parentObject, validationKind, usageScope, iomObj,leftExpression,firstRole);
 			// if isError, return error.
 			if (leftValue.skipEvaluation()){
 				return leftValue;
@@ -1139,7 +1149,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				return Value.createSkipEvaluation();
 			}
 			
-			Value rightValue=evaluateExpression(parentObject, validationKind, usageScope, iomObj,rightExpression,firstRole);
+			Value rightValue=evaluateExpressionToSingleValue(parentObject, validationKind, usageScope, iomObj,rightExpression,firstRole);
 			// if isError, return error.
 			if (rightValue.skipEvaluation()){
 				return rightValue;
@@ -1708,6 +1718,680 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 					return new Value(texttype, arg.getValue().trim());
 				}
+			} else if (currentFunction.getScopedName(null).equals("Math.add")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    Value secondValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[1], firstRole);
+                    if (secondValue.skipEvaluation()) {
+                        return secondValue;
+                    }
+                    if (secondValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    if (firstValue.getValue() != null && secondValue.getValue() != null) {
+                        Integer value1 = Integer.parseInt(firstValue.getValue());
+                        Integer value2 = Integer.parseInt(secondValue.getValue());
+                        return new Value(value1 + value2);
+                    }
+
+                }
+                return new Value(false);
+			} else if (currentFunction.getScopedName(null).equals("Math.sub")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    Value secondValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[1], firstRole);
+                    if (secondValue.skipEvaluation()) {
+                        return secondValue;
+                    }
+                    if (secondValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    if (firstValue.getValue() != null && secondValue.getValue() != null) {
+                        Integer value1 = Integer.parseInt(firstValue.getValue());
+                        Integer value2 = Integer.parseInt(secondValue.getValue());
+                        return new Value(value1 - value2);
+                    }
+
+                }
+                return new Value(false);
+			} else if (currentFunction.getScopedName(null).equals("Math.mul")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    Value secondValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[1], firstRole);
+                    if (secondValue.skipEvaluation()) {
+                        return secondValue;
+                    }
+                    if (secondValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    if (firstValue.getValue() != null && secondValue.getValue() != null) {
+                        Integer value1 = Integer.parseInt(firstValue.getValue());
+                        Integer value2 = Integer.parseInt(secondValue.getValue());
+                        return new Value(value1 * value2);
+                    }
+
+                }
+                return new Value(false); 
+			} else if (currentFunction.getScopedName(null).equals("Math.div")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    Value secondValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[1], firstRole);
+                    if (secondValue.skipEvaluation()) {
+                        return secondValue;
+                    }
+                    if (secondValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    if (firstValue.getValue() != null && secondValue.getValue() != null) {
+                        Integer value1 = Integer.parseInt(firstValue.getValue());
+                        Integer value2 = Integer.parseInt(secondValue.getValue());
+                        return new Value(value1 / value2);
+                    }
+
+                }
+                return new Value(false);
+			} else if (currentFunction.getScopedName(null).equals("Math.abs")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    if (firstValue.getValue() != null) {
+                        Integer value1 = Integer.parseInt(firstValue.getValue());
+                        return new Value(Math.abs(value1));
+                    }
+                }
+                return new Value(false); 
+			} else if (currentFunction.getScopedName(null).equals("Math.acos")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    if (firstValue.getValue() != null) {
+                        double value1 = Double.parseDouble(firstValue.getValue());
+                        
+                        // convert x to radians
+                        value1 = Math.toRadians(value1);
+                        return new Value(Math.acos(value1));
+                    }
+                }
+                return new Value(false);
+			} else if (currentFunction.getScopedName(null).equals("Math.asin")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    if (firstValue.getValue() != null) {
+                        double value1 = Double.parseDouble(firstValue.getValue());
+                        
+                        // convert x to radians
+                        value1 = Math.toRadians(value1);
+                        return new Value(Math.asin(value1));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.atan")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    if (firstValue.getValue() != null) {
+                        double value1 = Double.parseDouble(firstValue.getValue());
+                        
+                        // convert x to radians
+                        value1 = Math.toRadians(value1);
+                        return new Value(Math.atan(value1));
+                    }
+                }
+                return new Value(false);
+			} else if (currentFunction.getScopedName(null).equals("Math.atan2")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    Value secondValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[1], firstRole);
+                    if (secondValue.skipEvaluation()) {
+                        return secondValue;
+                    }
+                    if (secondValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    
+                    if (firstValue.getValue() != null && secondValue.getValue() != null) {
+                        double value1 = Double.parseDouble(firstValue.getValue());
+                        double value2 = Double.parseDouble(secondValue.getValue());
+                        
+                        // convert x and y to degrees
+                        value1 = Math.toDegrees(value1);
+                        value2 = Math.toDegrees(value2);
+
+                        return new Value(Math.atan2(value1, value2));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.cbrt")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    if (firstValue.getValue() != null) {
+                        int value1 = Integer.parseInt(firstValue.getValue());
+                        Double cbrt = Math.cbrt(value1);
+                        return new Value(cbrt.intValue());
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.cos")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    if (firstValue.getValue() != null) {
+                        double cos = Double.parseDouble(firstValue.getValue());
+                        cos = Math.toRadians(cos);
+                        return new Value(Math.cos(cos));
+                    }
+                }
+                return new Value(false);
+			} else if (currentFunction.getScopedName(null).equals("Math.cosh")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    if (firstValue.getValue() != null) {
+                        double cosh = Double.parseDouble(firstValue.getValue());
+                        cosh = Math.toRadians(cosh);
+                        return new Value(Math.cosh(cosh));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.exp")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    if (firstValue.getValue() != null) {
+                        double exp = Double.parseDouble(firstValue.getValue());
+                        return new Value(Math.exp(exp));
+                    }
+                }
+                return new Value(false);
+			} else if (currentFunction.getScopedName(null).equals("Math.hypot")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    Value secondValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[1], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    if (firstValue.getValue() != null && secondValue != null) {
+                        double hypot1 = Double.parseDouble(firstValue.getValue());
+                        double hypot2 = Double.parseDouble(secondValue.getValue());
+                        return new Value(Math.hypot(hypot1, hypot2));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.log")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+
+                    if (firstValue.getValue() != null) {
+                        double attrValue = Double.parseDouble(firstValue.getValue());
+                        return new Value(Math.log(attrValue));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.log10")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+
+                    if (firstValue.getValue() != null) {
+                        double attrValue = Double.parseDouble(firstValue.getValue());
+                        return new Value(Math.log10(attrValue));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.pow")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    Value secondValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[1], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+
+                    if (firstValue.getValue() != null && secondValue != null) {
+                        double firstAttrValue = Double.parseDouble(firstValue.getValue());
+                        double secondAttrValue = Double.parseDouble(secondValue.getValue());
+                        return new Value(Math.pow(firstAttrValue, secondAttrValue));
+                    }
+                }
+                return new Value(false);
+			} else if (currentFunction.getScopedName(null).equals("Math.round")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+
+                    if (firstValue.getValue() != null) {
+                        double attrValue = Double.parseDouble(firstValue.getValue());
+                        return new Value(Math.round(attrValue));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.signum")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+
+                    if (firstValue.getValue() != null) {
+                        double attrValue = Double.parseDouble(firstValue.getValue());
+                        return new Value(Math.signum(attrValue));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.sin")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+
+                    if (firstValue.getValue() != null) {
+                        double attrValue = Double.parseDouble(firstValue.getValue());
+                        
+                        // convert them to radians
+                        attrValue = Math.toRadians(attrValue);
+                        return new Value(Math.sin(attrValue));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.sinh")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+
+                    if (firstValue.getValue() != null) {
+                        double attrValue = Double.parseDouble(firstValue.getValue());
+                        
+                        // convert them to radians
+                        attrValue = Math.toRadians(attrValue);
+                        return new Value(Math.sinh(attrValue));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.sqrt")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+
+                    if (firstValue.getValue() != null) {
+                        double attrValue = Double.parseDouble(firstValue.getValue());
+                        return new Value(Math.sqrt(attrValue));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.tan")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+
+                    if (firstValue.getValue() != null) {
+                        double attrValue = Double.parseDouble(firstValue.getValue());
+                        
+                        // convert them in radians
+                        attrValue = Math.toRadians(attrValue);
+                        return new Value(Math.tan(attrValue));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.tanh")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+
+                    if (firstValue.getValue() != null) {
+                        double attrValue = Double.parseDouble(firstValue.getValue());
+                        
+                        // convert them in radians
+                        attrValue = Math.toRadians(attrValue);
+                        return new Value(Math.tanh(attrValue));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.max")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    Value secondValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[1], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    
+                    if (firstValue.getValue() != null && secondValue != null) {
+                        double firstattrValue = Double.parseDouble(firstValue.getValue());
+                        double secondAttrValue = Double.parseDouble(secondValue.getValue());                        
+                        return new Value(Math.max(firstattrValue, secondAttrValue));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.min")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value firstValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    Value secondValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[1], firstRole);
+                    if (firstValue.skipEvaluation()) {
+                        return firstValue;
+                    }
+                    if (firstValue.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    
+                    if (firstValue.getValue() != null && secondValue != null) {
+                        double firstattrValue = Double.parseDouble(firstValue.getValue());
+                        double secondAttrValue = Double.parseDouble(secondValue.getValue());                        
+                        return new Value(Math.min(firstattrValue, secondAttrValue));
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.avg")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value surfaceAttr = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (surfaceAttr.skipEvaluation()) {
+                        return surfaceAttr;
+                    }
+                    if (surfaceAttr.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    
+                    if (surfaceAttr.getValue() != null ) {
+                        Viewable currentClass=(Viewable) td.getElement(iomObj.getobjecttag());
+                        ObjectPath attributePath = null;
+                        try {
+                            attributePath = parseObjectOrAttributePath(currentClass, surfaceAttr.getValue());
+                        } catch (Ili2cException e) {
+                            EhiLogger.logError(e);
+                        }
+                        Value valueOfObjectPath=getValueFromObjectPath(parentObject, iomObj, attributePath.getPathElements(), firstRole);
+                        if (valueOfObjectPath.getValues() != null) {
+                            String[] values = valueOfObjectPath.getValues();
+                            double sum = 0;
+                            for (String value : values) {
+                                double tmpValue = Double.parseDouble(value);
+                                sum += tmpValue;
+                            }
+                            return new Value(sum / values.length);
+                        }
+                    }
+                }
+                return new Value(false);
+			} else if (currentFunction.getScopedName(null).equals("Math.max2")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value surfaceAttr = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (surfaceAttr.skipEvaluation()) {
+                        return surfaceAttr;
+                    }
+                    if (surfaceAttr.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    
+                    if (surfaceAttr.getValue() != null ) {
+                        Viewable currentClass=(Viewable) td.getElement(iomObj.getobjecttag());
+                        ObjectPath attributePath = null;
+                        try {
+                            attributePath = parseObjectOrAttributePath(currentClass, surfaceAttr.getValue());
+                        } catch (Ili2cException e) {
+                            EhiLogger.logError(e);
+                        }
+                        Value valueOfObjectPath=getValueFromObjectPath(parentObject, iomObj, attributePath.getPathElements(), firstRole);
+                        if (valueOfObjectPath.getValues() != null) {
+                            String[] values = valueOfObjectPath.getValues();
+                            double maxValue = 0;
+                            int index = 0;
+                            for (String value : values) {
+                                double tmpValue = Double.parseDouble(value);
+                                if (index == 0) {
+                                    maxValue = tmpValue;
+                                } else {
+                                    maxValue = Math.max(maxValue, tmpValue);
+                                }
+                                index++;
+                            }
+                            return new Value(maxValue);
+                        }
+                    }
+                }
+                return new Value(false); 
+			} else if (currentFunction.getScopedName(null).equals("Math.min2")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value surfaceAttr = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (surfaceAttr.skipEvaluation()) {
+                        return surfaceAttr;
+                    }
+                    if (surfaceAttr.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    
+                    if (surfaceAttr.getValue() != null ) {
+                        Viewable currentClass=(Viewable) td.getElement(iomObj.getobjecttag());
+                        ObjectPath attributePath = null;
+                        try {
+                            attributePath = parseObjectOrAttributePath(currentClass, surfaceAttr.getValue());
+                        } catch (Ili2cException e) {
+                            EhiLogger.logError(e);
+                        }
+                        Value valueOfObjectPath=getValueFromObjectPath(parentObject, iomObj, attributePath.getPathElements(), firstRole);
+                        if (valueOfObjectPath.getValues() != null) {
+                            String[] values = valueOfObjectPath.getValues();
+                            double minValue = 0;
+                            int index = 0;
+                            for (String value : values) {
+                                double tmpValue = Double.parseDouble(value);
+                                if (index == 0) {
+                                    minValue = tmpValue;
+                                } else {
+                                    minValue = Math.min(minValue, tmpValue);
+                                }
+                                index++;
+                            }
+                            return new Value(minValue);
+                        }
+                    }
+                }
+                return new Value(false);			    
+			} else if (currentFunction.getScopedName(null).equals("Math.sum")) {
+                Evaluable[] arguments = functionCallObj.getArguments();
+                if (arguments != null) {
+                    Value surfaceAttr = evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                    if (surfaceAttr.skipEvaluation()) {
+                        return surfaceAttr;
+                    }
+                    if (surfaceAttr.isUndefined()) {
+                        return Value.createSkipEvaluation();
+                    }
+                    
+                    if (surfaceAttr.getValue() != null ) {
+                        Viewable currentClass=(Viewable) td.getElement(iomObj.getobjecttag());
+                        ObjectPath attributePath = null;
+                        try {
+                            attributePath = parseObjectOrAttributePath(currentClass, surfaceAttr.getValue());
+                        } catch (Ili2cException e) {
+                            EhiLogger.logError(e);
+                        }
+                        Value valueOfObjectPath=getValueFromObjectPath(parentObject, iomObj, attributePath.getPathElements(), firstRole);
+                        if (valueOfObjectPath.getValues() != null) {
+                            String[] values = valueOfObjectPath.getValues();
+                            double sum = 0;
+                            for (String value : values) {
+                                double tmpValue = Double.parseDouble(value);
+                                sum += tmpValue;
+                            }
+                            return new Value(sum);
+                        }
+                    }
+                }
+                return new Value(false);			    
 			} else if (currentFunction.getScopedName(null).equals("INTERLIS.isEnumSubVal")){
 				Evaluable[] arguments = functionCallObj.getArguments();
 				Value subEnum=evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[0], firstRole);
@@ -2212,13 +2896,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     if (iomObj == null) {
                         return Value.createUndefined();
                     }
-                    if (iomObj.getattrvaluecount(currentAttrName) == 0) {
+                    int attrCount = iomObj.getattrvaluecount(currentAttrName);
+                    if (attrCount == 0) {
                         return Value.createUndefined(); 
                     } else {
                         // not the last pathEl?
                         if (k!=lastPathIndex) {
-                            iomObj = iomObj.getattrobj(currentAttrName,0); 
-                            nextCurrentObjects.add(iomObj);
+                            for (int i = 0; i < attrCount; i++) {
+                                IomObject iomObjTmp = iomObj.getattrobj(currentAttrName,i);
+                                nextCurrentObjects.add(iomObjTmp);                                
+                            }
                         }else {
                             String attrValue = iomObj.getattrvalue(currentAttrName);
                             if (attrValue != null) {
@@ -2242,7 +2929,23 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                         return new Value(type, attrValue);
                                     }
                                 }
-                                return new Value(type, attrValue);
+                                if (currentObjects.size() == 1) {
+                                    return new Value(type, attrValue);
+                                } else {
+                                    String[] attrValues = new String[currentObjects.size()];
+                                    int counter = 0;
+                                    for (IomObject value : currentObjects) {
+                                        attrValue = value.getattrvalue(currentAttrName);
+                                        if (attrValue != null) {
+                                            attrValues[counter] = attrValue;
+                                            counter++;
+                                        }
+                                    }
+                                    if (attrValues != null) {
+                                        return new Value(type, attrValues);
+                                    }
+                                }
+                                
                             } else {
                                 List<IomObject> objects = new ArrayList<IomObject>();
                                 int attrValueCount = iomObj.getattrvaluecount(currentAttrName);
