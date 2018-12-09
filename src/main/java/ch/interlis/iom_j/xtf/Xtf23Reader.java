@@ -44,7 +44,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 	private static final int AFTER_ENDTRANSFER=5;
 	
 	// namespace
-	private static final String NAMESPACE_ILIXMLBASE="http://www.interlis.ch/INTERLIS2.3";
+	public static final String NAMESPACE_ILIXMLBASE="http://www.interlis.ch/INTERLIS2.3";
     
     // segmentType
     private enum SegmentType {C1,C2,C3,A1,A2,R}
@@ -894,7 +894,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
         xmloutputf.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES,true);
         XMLEventFactory xmlef = XMLEventFactory.newInstance();
         XMLEventWriter xmlw = xmloutputf.createXMLEventWriter(strw); 
-        xmlw.add(xmlef.createStartDocument());
+        //xmlw.add(xmlef.createStartDocument());
         xmlw.add(event);
         int inHeader = 1;
         while(xmlReader.hasNext()){
@@ -915,7 +915,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
                 throw new IllegalStateException("inHeader < 0");
             }
         } // end while
-        xmlw.add(xmlef.createEndDocument());
+        //xmlw.add(xmlef.createEndDocument());
         xmlw.flush();
         xmlw.close();
         return event;
@@ -1046,7 +1046,9 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 	                		throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
 	                	}
 	                	iomObj.addattrobj(attrName, multiSurface);
-	                }else if(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_XML_BINBLBOX) || event.asStartElement().getName().equals(QNAME_XML_XMLBLBOX))){
+	                }else if(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_XML_XMLBLBOX))){
+                        event=reader.nextEvent(); // skip XMLBLBOX
+                        event=skipSpacesAndGetNextEvent(event);
 	                    // BLACKBOX (binary and/or xml)
 	                	java.io.StringWriter strw=new java.io.StringWriter();
 	                	event=collectXMLElement(reader,event, strw); // start BLACKBOX
@@ -1054,6 +1056,16 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 	                    if(!event.isEndElement()){
 	                    	throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
 	                    }
+                        event=reader.nextEvent(); // skip end of XMLBLBOX
+                        event=skipSpacesAndGetNextEvent(event);
+                    }else if(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_XML_BINBLBOX)) ){
+                        event=reader.nextEvent(); // skip BLBOX
+                        StringBuffer value=new StringBuffer();
+                        event=readSimpleContent(event,value);
+                        iomObj.setattrvalue(attrName, value.toString());
+                        if(!event.isEndElement()){
+                            throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
+                        }
 	                }else{
 	    				// structure
 	                	IomObject structObj=createIomObject(event.asStartElement().getName().getLocalPart(), null);
@@ -1080,15 +1092,15 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 
 	private IomObject readReference(IomObject iomObj, StartElement element, String attrName, AssociationDef association) throws IoxException{
 		String refOid=element.getAttributeByName(QNAME_XML_REF).getValue();
-		if(refOid.length()<=1){
+		if(refOid.length()==0){
 			throw new IoxException("unexpected reference value <"+refOid+">");
 		}
 		Attribute attrRefBid=element.getAttributeByName(QNAME_XML_TOPIC_BID);
 		String refBid=null;
 		if(attrRefBid!=null) {
 			refBid=attrRefBid.getValue();
-			if(refBid.length()<=1){
-				throw new IoxException("unexpected reference value <"+refBid+">");
+			if(refBid.length()==0){
+				throw new IoxException("unexpected reference BID value <"+refBid+">");
 			}
 		}
 		Long orderPos=null;

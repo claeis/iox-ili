@@ -122,6 +122,39 @@ public class CompoundCurveRingIsCCWTest {
         CompoundCurveRing ring=fact.createCompoundCurveRing(line);
         assertEquals(false,CompoundCurveRing.isCCW(ring));
     }
+    @Test
+    public void isCCWerstesSegmentIstHoechsteGeradeZwischeZweiHalbkreisboegen() {
+        JtsextGeometryFactory fact=new JtsextGeometryFactory();
+        ArrayList<CurveSegment> segs=new ArrayList<CurveSegment>();
+
+        addCoord(segs, 120.0, 100.0); // oben rechts, aeusserer Bogen
+        addCoord(segs, 118.0, 100.0); // oben rechts, innerer Bogen
+        addArc(segs,   110.0, 92.0, 102.0, 100.0); // oben links, innerer Bogen
+        addCoord(segs, 100.0, 100.0);  // oben links, aeusserer Bogen
+        addArc(segs,   110.0, 90.0, 120.0, 100.0); // oben rechts, aeusserer Bogen
+        
+        CompoundCurve line=new CompoundCurve(segs,fact);
+        CompoundCurveRing ring=fact.createCompoundCurveRing(line);
+        assertEquals(true,CompoundCurveRing.isCCW(ring));
+    }
+    @Test
+    public void isCWerstesSegmentIstHoechsteGeradeZwischeZweiHalbkreisboegen() {
+        JtsextGeometryFactory fact=new JtsextGeometryFactory();
+        ArrayList<CurveSegment> segs=new ArrayList<CurveSegment>();
+
+        addCoord(segs, 120.0, 100.0); // oben rechts, aeusserer Bogen
+        addArc(segs,   110.0, 90.0, 100.0, 100.0); // oben links, aeusserer Bogen
+        addCoord(segs, 102.0, 100.0);  // oben links, innerer Bogen
+        addArc(segs,   110.0, 92.0, 118.0, 100.0); // oben rechts, innerer Bogen
+        addCoord(segs, 120.0, 100.0); // oben rechts, innerer Bogen
+        
+        
+        CompoundCurve line=new CompoundCurve(segs,fact);
+        CompoundCurveRing ring=fact.createCompoundCurveRing(line);
+        assertEquals(false,CompoundCurveRing.isCCW(ring));
+    }
+    
+    
 	@Test
 	public void isCCW() {
 		JtsextGeometryFactory fact=new JtsextGeometryFactory();

@@ -93,6 +93,24 @@ public class Area23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    @Ignore("GH-64")
+    public void notApolygon_Fail(){
+        Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
+        objSurfaceSuccess.setattrvalue("area2d", "3");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+        validator.validate(new ObjectEvent(objSurfaceSuccess));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+    }
 	
 	// prueft ob ein Polygon erstellt werden kann, wenn sie sich selber an 1 Punkt beruehrt.
 	@Test
@@ -2645,9 +2663,9 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==6);
-		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
-		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
-		assertEquals("value 10000.000 is out of range", logger.getErrs().get(2).getEventMsg());
+		assertEquals("value 4800000.000 is out of range in attribute area3d", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 700000.000 is out of range in attribute area3d", logger.getErrs().get(1).getEventMsg());
+		assertEquals("value 10000.000 is out of range in attribute area3d", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn die Polygon mit einem ungueltigen Kreisbogen erstellt wird.
@@ -2704,8 +2722,8 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("value 4800000.000 is out of range", logger.getErrs().get(0).getEventMsg());
-		assertEquals("value 700000.000 is out of range", logger.getErrs().get(1).getEventMsg());
+		assertEquals("value 4800000.000 is out of range in attribute area3d", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 700000.000 is out of range in attribute area3d", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn der Type area nicht vom Type Multisurface ist.

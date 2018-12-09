@@ -21,6 +21,7 @@ public class Value {
 	// type & value
 	private Type type=null;
 	private String value=null;
+	private String[] values=null;
 	private String refTypeName;
 	private List<IomObject> complexObjects;
 	private RoleDef role=null;
@@ -49,6 +50,15 @@ public class Value {
 		this.value = valueStr;
 		this.type=type;
 	}
+	
+    public Value(Type type,String[] valueStr){
+        if(valueStr.length==1) {
+            this.value=valueStr[0];
+        }else {
+            this.values = valueStr;
+        }
+        this.type=type;
+    }
 	
 	public Value(List<IomObject> complexObjects){
 		this.complexObjects = complexObjects;
@@ -102,6 +112,13 @@ public class Value {
 		return value;
 	}
 	
+    public String[] getValues(){
+        if(skipEvaluation()){
+            throw new IllegalArgumentException();
+        }
+        return values;
+    }
+	
 	public double getNumeric(){
 		if(skipEvaluation()){
 			throw new IllegalArgumentException();
@@ -133,7 +150,8 @@ public class Value {
 						booleanIsDefined ||
 						getRole() != null ||
 						numericIsDefined ||
-						getViewable() != null);
+						getViewable() != null || 
+						getValues() != null);
 	}
 	
 	public static Value createSkipEvaluation(){
@@ -182,17 +200,32 @@ public class Value {
 					// compare surfaces and areas
 					if(iomObj.getobjecttag().equals("MULTISURFACE") && iomObjOther.getobjecttag().equals("MULTISURFACE")){
 						return compareSurfaceOrAreaTo(iomObj, iomObjOther);
+					} else {
+					    return compareIomObjTo(iomObj, iomObjOther);
 					}
 				}
 			}
 		}
+
+		if (this.values != null && other.values != null) {
+		    if (this.values.length != other.values.length) {
+		        return -1;
+		    } 
+            for (int i=0;i<values.length;i++) {
+                int result = compareSimpleValue(this.values[i], other.values[i]);
+                if (result != 0) {
+                    return result;
+                }
+            }
+            return 0;               
+		} 
 		// compare simple value
 		if(this.value!=null && other.value!=null){
 			if(type instanceof NumericType){
 				return Double.valueOf(value).compareTo(Double.valueOf(other.value));
 			// compare text
 			} else if(type instanceof TextType){
-				return value.compareTo(other.value);
+			    return value.compareTo(other.value);
 			// compare formatted type
 			} else if(type instanceof FormattedType){
 				return value.compareTo(other.value);
@@ -224,8 +257,86 @@ public class Value {
 		// incompatible type
 		throw new IllegalArgumentException("incompatible values");
 	}
-	
-	private int compareViewable(Viewable viewable2, Viewable viewable3) {
+
+    private double compareIomObjTo(IomObject iomObj, IomObject iomObjOther) {
+        if (iomObj.getattrcount() != iomObjOther.getattrcount()) {
+            return -1;
+        }
+        
+        if (iomObj.getobjectrefbid() != null && iomObjOther.getobjectrefbid() != null) {
+            if (!iomObj.getobjectrefbid().equals(iomObjOther.getobjectrefbid())) {
+                return -1;
+            }
+        } else if ((iomObj.getobjectrefbid() != null && iomObjOther.getobjectrefbid() == null) ) {
+            return 1;
+        } else if ((iomObj.getobjectrefbid() == null && iomObjOther.getobjectrefbid() != null)) {
+            return -1;
+        }
+        
+        if (iomObj.getobjectoid() != null && iomObjOther.getobjectoid() != null) {
+            if (!iomObj.getobjectoid().equals(iomObjOther.getobjectoid())) {
+                return -1;
+            }
+        } else if (iomObj.getobjectoid() != null && iomObjOther.getobjectoid() == null) {
+            return 1;
+        } else if (iomObj.getobjectoid() == null && iomObjOther.getobjectoid() != null) {
+            return -1;
+        }
+        
+        if (iomObj.getobjecttag() != null && iomObjOther.getobjecttag() != null) {
+            if (!iomObj.getobjecttag().equals(iomObjOther.getobjecttag())) {
+                return -1;
+            }            
+        } else if (iomObj.getobjecttag() != null && iomObjOther.getobjecttag() == null) {
+            return 1;
+        } else if (iomObj.getobjecttag() == null && iomObjOther.getobjecttag() != null) {
+            return -1;
+        }
+
+        for (int i = 0; i < iomObj.getattrcount(); i++) {
+            String attrNameIomObj = iomObj.getattrname(i);
+            
+            //Has it the same values in two elements?
+            int actualCount = iomObj.getattrvaluecount(attrNameIomObj);
+            int otherCount = iomObjOther.getattrvaluecount(attrNameIomObj);
+            if (actualCount != otherCount) {
+                return -1;
+            }
+            for (int j = 0; j < actualCount; j++) {
+                IomObject iomStructActual = iomObj.getattrobj(attrNameIomObj,j);
+                IomObject iomStructOther = iomObjOther.getattrobj(attrNameIomObj,j);
+                //Simple Value
+                if (iomStructActual == null && iomStructOther == null) {
+                    String attrNameValue = iomObj.getattrvalue(attrNameIomObj);
+                    String attrNameValueOther = iomObjOther.getattrvalue(attrNameIomObj);
+                    if (!attrNameValue.equals(attrNameValueOther)) {
+                        return -1;
+                    }
+                } else {
+                    //Complex Value
+                    double returnValue = compareIomObjTo(iomStructActual, iomStructOther);
+                    if (returnValue != 0) {
+                        return returnValue;
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    private int compareSimpleValue(String thisValue, String otherValue) {
+        if ((thisValue != null && otherValue != null) || (!thisValue.isEmpty() && !otherValue.isEmpty())) {
+            if (!thisValue.equals(otherValue)) {
+                return -1;
+            }                
+        } else if ((thisValue != null && otherValue == null) || (!thisValue.isEmpty() && otherValue.isEmpty())) {
+            return 1;
+        } else if (thisValue == null && otherValue != null || (thisValue.isEmpty() && !otherValue.isEmpty())) {
+            return -1;
+        }
+        return 0;
+    }
+    private int compareViewable(Viewable viewable2, Viewable viewable3) {
 		return (viewable3.equals(viewable2) ? 0 : (!viewable3.equals(viewable2) ? 1 : -1));
 	}
 

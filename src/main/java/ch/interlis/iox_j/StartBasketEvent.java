@@ -45,6 +45,11 @@ public class StartBasketEvent implements ch.interlis.iox.StartBasketEvent {
 		this.type=type;
 		this.bid=bid;
 	}
+    public StartBasketEvent(String type,String bid,java.util.Map<String,String> genericDomains){
+        this.type=type;
+        this.bid=bid;
+        this.domains=new java.util.HashMap<String,String>(genericDomains);
+    }
 	public String getBid() {
 		return bid;
 	}

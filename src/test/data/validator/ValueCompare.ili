@@ -1,0 +1,80 @@
+INTERLIS 2.3;
+
+MODEL ValueCompareTo
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-16" =
+	
+	TOPIC Topic=
+
+		DOMAIN
+			Coord = COORD 1..10,1..10;
+
+		CLASS ClassC1 =
+			attrC1 : TEXT*10;
+		END ClassC1;
+		
+		STRUCTURE SubSubStruct =
+			attrS8 : TEXT*10;
+			attrS9 : TEXT*10;
+		END SubSubStruct;
+		STRUCTURE StructS =
+			attrS1 : TEXT*10;
+			attrS2 : TEXT*10;
+			attrS3 : SubSubStruct;
+		END StructS;
+		STRUCTURE StructD1 =
+			attrD1 : TEXT*10;
+			attrD2 : REFERENCE TO ClassC1;
+			attrD3 : StructS;
+			attrD4 : StructS;
+			attrD5 : Coord;
+			attrD6 : Coord;
+		END StructD1;
+
+		CLASS ClassB =
+		   attrB1 : TEXT*10;
+		   attrB2 : StructD1;
+		   attrB3 : LIST {0..*} OF StructD1;
+		   MANDATORY CONSTRAINT attrB2->attrD1 == "REF";
+		   MANDATORY CONSTRAINT attrB3[FIRST]->attrD1 == "REF";
+		END ClassB;
+
+		CLASS ClassE =
+		   attrE1 : TEXT*10;
+		   attrE2 : StructD1;
+		   MANDATORY CONSTRAINT attrE2->attrD3 == attrE2->attrD4;
+		END ClassE;
+
+		CLASS ClassF =
+		   attrF1 : TEXT*10;
+		   attrF2 : StructD1;
+		   MANDATORY CONSTRAINT attrF2->attrD5 == attrF2->attrD6;
+		END ClassF;
+		
+		CLASS ClassG =
+		   attrB1 : TEXT*10;
+		   attrB2 : StructD1;
+		   MANDATORY CONSTRAINT attrB2->attrD2->attrC1 == "REF";
+		END ClassG;
+
+		CLASS ClassH =
+			attrH1 : TEXT*10;
+		END ClassH;
+
+		ASSOCIATION one2many =
+			roleH_1 -- {0..1} ClassH;
+			roleC_1 -- {0..*} ClassC1;
+		END one2many;
+		CONSTRAINTS OF ClassC1 =
+			MANDATORY CONSTRAINT roleH_1->attrH1 == "H1";
+		END;
+
+		ASSOCIATION many2many =
+			roleH_2 -- {0..*} ClassH;
+			roleC_2 -- {0..*} ClassC1;
+			MANDATORY CONSTRAINT roleH_2->attrH1 == "H1";
+		END many2many;
+
+
+	END Topic;
+	
+END ValueCompareTo.

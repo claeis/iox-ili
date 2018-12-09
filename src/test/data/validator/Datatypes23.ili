@@ -5,16 +5,19 @@ MODEL Datatypes23
 	TOPIC Topic=
 		UNIT
 			DEGREE;
-		DOMAIN
+		DOMAIN	
+			!! Datum
+			Datum = FORMAT BASED ON INTERLIS.GregorianDate (Year ":" Month ":" Day);
+
 			!! Enumeration
 			ord = (unten, oben) ORDERED;
-			circu = (Werktage, Sonntag) CIRCULAR;
+			circu = (Werktage (Montag (Frei, Busy (FullDay, HalfDay)), Dienstag), Sonntag) CIRCULAR;
 			allauf = ALL OF circu;
 			circuEx EXTENDS circu = (Sonntag (Morgen, Nachmittag));
 			ordEx EXTENDS ord = (unten (mitte));
 			ordFinal = (eins : FINAL);
-			ordFinalEx EXTENDS ordFinal = (eins (zwei));
-			
+			ordFinalEx EXTENDS ordFinal = (eins (zwei));	  
+		
 			!! Numeric
 			numerictype = 0.0 .. 9.9 CIRCULAR;
 			!!numericCounterClockwise = MANDATORY 0.0 .. 359.9 CIRCULAR [DEGREE] COUNTERCLOCKWISE;
@@ -76,6 +79,7 @@ MODEL Datatypes23
 		   
 		   !! FormattedType
 		   anInterlisXMLDateFormat : FORMAT INTERLIS.XMLDate "2010-1-1" .. "2110-1-1";
+		   gDatum : FORMAT Datum "2017:01:01" .. "2017:01:31";
 		   !!aDateTimeFormat : FORMAT INTERLIS.XMLDateTime "2000-01-01T00:00:00.000" .. "2005-12-31T23:59:59.999";
 		   !!aXMLTime = FORMAT BASED ON UTC "12:30:35";
 		   !!aXMLDate = FORMAT BASED ON GregorianDate "2010-1-1";

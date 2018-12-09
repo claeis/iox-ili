@@ -10,11 +10,13 @@ import ch.interlis.ili2c.config.FileEntryKind;
 import static org.junit.Assert.*;
 
 import java.util.Iterator;
+import java.util.Locale;
 
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox.IoxEvent;
+import ch.interlis.iox.IoxLogEvent;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
@@ -95,7 +97,7 @@ public class Configuration23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("Configuration23.Topic",BID1));
 		validator.validate(new ObjectEvent(objCondition));
 		validator.validate(new ObjectEvent(objC));
 		validator.validate(new EndBasketEvent());
@@ -273,7 +275,7 @@ public class Configuration23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("Configuration23.Topic",BID1));
 		validator.validate(new ObjectEvent(objCondition));
 		validator.validate(new ObjectEvent(objC));
 		validator.validate(new EndBasketEvent());
@@ -839,6 +841,67 @@ public class Configuration23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("My own Set Constraint.", logger.getErrs().get(0).getEventMsg());
 	}
+	
+    @Test
+    public void keymsgParam_Fail(){
+        Iom_jObject objClassH1=new Iom_jObject(CLASSH, OID1);
+        objClassH1.setattrvalue("attr1", "Key");
+        objClassH1.setattrvalue("attr2", "20");
+        
+        Iom_jObject objClassH2=new Iom_jObject(CLASSH, OID2);
+        objClassH2.setattrvalue("attr1", "Key");
+        objClassH2.setattrvalue("attr2", "20");
+        
+        ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(CLASSH, ValidationConfig.KEYMSG, "Key {attr2}");
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID1));
+        validator.validate(new ObjectEvent(objClassH1));
+        validator.validate(new ObjectEvent(objClassH2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        IoxLogEvent err = logger.getErrs().get(0);
+        assertEquals("Key 20",err.getSourceObjectUsrId());
+    }
+    
+    @Test
+    public void keymsg_withLanguage_Param_Fail(){
+        Iom_jObject objClassH1=new Iom_jObject(CLASSH, OID1);
+        objClassH1.setattrvalue("attr1", "Key");
+        objClassH1.setattrvalue("attr2", "20");
+        
+        Iom_jObject objClassH2=new Iom_jObject(CLASSH, OID2);
+        objClassH2.setattrvalue("attr1", "Key");
+        objClassH2.setattrvalue("attr2", "20");
+        
+        ValidationConfig modelConfig=new ValidationConfig();
+        String actualLanguage = Locale.getDefault().getLanguage();
+        // default message
+        modelConfig.setConfigValue(CLASSH, ValidationConfig.KEYMSG, "KEYMsg {attr2}");
+        // de spezifische message
+        modelConfig.setConfigValue(CLASSH, ValidationConfig.KEYMSG+"_"+actualLanguage, "KEYMsg_lang {attr2}");
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID1));
+        validator.validate(new ObjectEvent(objClassH1));
+        validator.validate(new ObjectEvent(objClassH2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        IoxLogEvent err = logger.getErrs().get(0);
+        assertEquals("Unique is violated! Values Key, 20 already exist in Object: KEYMsg_lang 20",err.getEventMsg());
+        assertEquals("KEYMsg_lang 20",err.getSourceObjectUsrId());
+    }
 	
 	// Es wird getestet ob die eigens erstellte Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist, wenn validationConfig msg leer ist.
 	@Test
@@ -1524,7 +1587,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("value <undecided> is not a BOOLEAN", logger.getWarn().get(0).getEventMsg());
+		assertEquals("value <undecided> is not a BOOLEAN in attribute aBoolean", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// parameter=default=off
@@ -1569,7 +1632,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("value 10000.000 is out of range",logger.getWarn().get(0).getEventMsg());
+		assertEquals("value 10000.000 is out of range in attribute lcoord",logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// target=on. Erwarte den Fehler:

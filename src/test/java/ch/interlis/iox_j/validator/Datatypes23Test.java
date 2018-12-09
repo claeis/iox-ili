@@ -2,6 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
@@ -186,6 +187,24 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+
+    @Test
+    public void formattedTypeValidOk(){
+        Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objGeorgianDatum.setattrvalue("gDatum", "2017:01:03");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objGeorgianDatum));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
 	
 	// Dies ist ein Muster Datum, welches funktionieren muss.
 	@Test
@@ -357,6 +376,42 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+    @Test
+    public void enumerationTypeAllOffTest_OnlyNodeWihtoutSubEnumerationOk(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Werktage");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+    
+    @Test
+    public void enumerationTypeAllOffTest_SubSubSubEnumerationOK(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Werktage.Montag.Busy.FullDay");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
 	
 	// Die kleinste Minuten Zeit Angabe wird getestet.
 	@Test
@@ -586,6 +641,24 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+    @Test
+    public void enumerationTypeAllOffTest_SubSubEnumerationOK(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Werktage.Montag.Frei");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+	
 	// Die hoechste Minuten Angabe von Datum und Zeit wird getestet.
 	@Test
 	public void dateTimeMaxMinuteOk(){
@@ -737,7 +810,7 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
+		
 	// Eine geordnete Aufzaehlung wird getestet.
 	@Test
 	public void enumerationTypeCircularOk(){
@@ -763,8 +836,6 @@ public class Datatypes23Test {
 	@Test
 	public void enumerationTypeOrderedOk(){
 		Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objMaxLength.setattrvalue("aufzaehlungCircular", "Sonntag");
-		objMaxLength.setattrvalue("aufzaehlungCircular", "Werktage");
 		objMaxLength.setattrvalue("aufzaehlungCircular", "Sonntag");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -855,6 +926,24 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+    @Test
+    public void enumerationTypeAllOffTest_SubEnumerationOK(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Werktage.Montag");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
 	
 	// Die vertikale Ausrichtung Cap wird getestet.
 	@Test
@@ -1105,6 +1194,24 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    @Ignore("GH-64")
+    public void coordType_notAcoord_Fail(){
+        Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objSuccessFormat.setattrvalue("lcoord", "5");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objSuccessFormat));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+    }
 	
 	// Die dreidimensionale Koordinate wird getestet.
 	@Test
@@ -1132,8 +1239,81 @@ public class Datatypes23Test {
 	///////////////////////////////// FAILING Tests //////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////
 
+    @Test
+    public void formattedTypeValueHasInvalidFormatFail(){
+        Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objGeorgianDatum.setattrvalue("gDatum", "2017-01-01");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objGeorgianDatum));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Attribute <gDatum> has a invalid value <2017-01-01>", logger.getErrs().get(0).getEventMsg());
+    }
 	
-	
+    @Test
+    public void formattedTypeValueHasInvalidValueFail(){
+        Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objGeorgianDatum.setattrvalue("gDatum", "1");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objGeorgianDatum));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Attribute <gDatum> has a invalid value <1>", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void formattedTypeValueIsOutOfRangeMinFail(){
+        Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objGeorgianDatum.setattrvalue("gDatum", "2016:01:01");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objGeorgianDatum));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Value <2016:01:01> is a out of range in attribute <gDatum>", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void formattedTypeValueIsOutOfRangeMaxFail(){
+        Iom_jObject objGeorgianDatum=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objGeorgianDatum.setattrvalue("gDatum", "2018:01:01");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objGeorgianDatum));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Value <2018:01:01> is a out of range in attribute <gDatum>", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// Es wird getestet, ob true auch gross geschrieben werden kann.
 	@Test
@@ -1152,7 +1332,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <TRUE> is not a BOOLEAN", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <TRUE> is not a BOOLEAN in attribute aBoolean", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Wenn Value kein Booean ist, wird eine Fehlermeldung ausgegeben.
@@ -1172,7 +1352,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <8> is not a BOOLEAN", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <8> is not a BOOLEAN in attribute aBoolean", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es wird getestet ob die horizontale Ansicht: top beinhaltet.
@@ -1192,7 +1372,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value Top is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value Top is not a member of the enumeration in attribute horizAlignment", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob left bei einer vertikalen Ansicht eingegeben werden kann.
@@ -1212,7 +1392,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value Left is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value Left is not a member of the enumeration in attribute vertAlignment", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es wird getestet ob die ungueltige Eingabe einer uuid mit der richtigen Laenge eingegeben werden kann.
@@ -1232,7 +1412,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <123e4567-e89b-12d3-z456-426655440000> is not a valid UUID", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <123e4567-e89b-12d3-z456-426655440000> is not a valid UUID in attribute aUuid", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine uuid welche zu kurz ist, einen Fehler ausgibt.
@@ -1252,7 +1432,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <123e4567-e89b-12d3-b456-42665544000> is not a valid UUID", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <123e4567-e89b-12d3-b456-42665544000> is not a valid UUID in attribute aUuid", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine zu lange Eingabe einer uuid zu einem Fehler fuehrt.
@@ -1273,7 +1453,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <123e4567-e89b-12d3-b456-4266554400000> is not a valid UUID", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <123e4567-e89b-12d3-b456-4266554400000> is not a valid UUID in attribute aUuid", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es wird getestet ob das Datum im gueltigen Bereich ist. Minimum Test.
@@ -1293,7 +1473,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <1580-2-15> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <1580-2-15> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die Eingabe des Jahres in einem gueltigen Bereich ist. Maximaler Test.
@@ -1313,7 +1493,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <3000-2-15> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <3000-2-15> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Monat von Datum zu klein.
@@ -1333,7 +1513,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <2016-0-15> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <2016-0-15> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Monat von Datum zu gross.
@@ -1353,7 +1533,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <2016-13-15> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <2016-13-15> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Tag von Datum zu klein.
@@ -1373,7 +1553,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <2016-2-0> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <2016-2-0> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Tag von Datum zu gross.
@@ -1393,7 +1573,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <2016-2-32> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <2016-2-32> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Datenformat mit Punkten unzulaessig.
@@ -1413,7 +1593,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of date value <2016.2.15>", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of date value <2016.2.15> in attribue aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Datenformat mit Slash unzulaessig.
@@ -1433,7 +1613,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of date value <2016/2/15>", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of date value <2016/2/15> in attribue aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Eingabe des Datum mit zu kleinem Jahresdatum (jjjj) unzulaessig.
@@ -1453,7 +1633,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <216-2-2> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <216-2-2> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Eingabe des Datum Jahres zu lang (jjjj). Eingabe unzulaessig.
@@ -1474,7 +1654,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <20016-12-15> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <20016-12-15> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Zeitangabe Stunde zu lang. unzulaessig.
@@ -1494,7 +1674,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("time value <24:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("time value <24:59:59.999> is not in range in attribute aTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Zeitangabe Minute zu gross. Fehler.
@@ -1514,7 +1694,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("time value <23:60:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("time value <23:60:59.999> is not in range in attribute aTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Zeitangabe Sekunde zu gross. Fehler.
@@ -1534,7 +1714,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("time value <23:59:60.000> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("time value <23:59:60.000> is not in range in attribute aTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Zeitangabe allgemein zu kurz. Fehler.
@@ -1554,7 +1734,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of time value <5:5:5.55>", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of time value <5:5:5.55> in attribute aTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Zeitangabe zu lang. Fehler.
@@ -1574,7 +1754,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of time value <23:59:59.9990>", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of time value <23:59:59.9990> in attribute aTime", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Dieses Datum wird ueber Interlis.xmlDate ausgefuehrt und ist kleiner als der definierte Bereich.
@@ -1594,7 +1774,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <2000-06-15> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <2000-06-15> is not in range in attribute anInterlisXMLDateFormat", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Jahr Format bei DatumZeit zu kurz. Fehler.
@@ -1614,7 +1794,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("datetime value <1581-2-29T12:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <1581-2-29T12:59:59.999> is not in range in attribute aDateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Jahr Format bie DatumZeit zu lang. Fehler.
@@ -1634,7 +1814,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("datetime value <3000-2-29T12:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <3000-2-29T12:59:59.999> is not in range in attribute aDateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Monat bei DatumZeit zu kurz.
@@ -1654,7 +1834,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("datetime value <2016-0-29T12:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <2016-0-29T12:59:59.999> is not in range in attribute aDateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Monats Angabe zu gross.
@@ -1674,7 +1854,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("datetime value <2016-13-29T12:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <2016-13-29T12:59:59.999> is not in range in attribute aDateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Tages Angabe zu klein.
@@ -1694,7 +1874,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("datetime value <2016-2-0T12:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <2016-2-0T12:59:59.999> is not in range in attribute aDateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Tages Angabe zu gross.
@@ -1714,7 +1894,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("datetime value <2016-2-32T12:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <2016-2-32T12:59:59.999> is not in range in attribute aDateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Stunde zu gross.
@@ -1734,7 +1914,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("datetime value <2016-2-29T24:59:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <2016-2-29T24:59:59.999> is not in range in attribute aDateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Minute zu gross.
@@ -1754,7 +1934,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("datetime value <2016-2-29T12:60:59.999> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <2016-2-29T12:60:59.999> is not in range in attribute aDateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Sekunden Angabe zu gross.
@@ -1774,7 +1954,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("datetime value <2016-2-29T12:59:60.000> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("datetime value <2016-2-29T12:59:60.000> is not in range in attribute aDateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Laenge zu kurz.
@@ -1794,7 +1974,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of datetime value <2016-2-2T2:2:2.99>", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of datetime value <2016-2-2T2:2:2.99> in attribute aDateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Laenge zu gross.
@@ -1814,7 +1994,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of datetime value <2016-12-29T12:59:59.9999>", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of datetime value <2016-12-29T12:59:59.9999> in attribute aDateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit Format mit Punkten unzulaessig.
@@ -1834,7 +2014,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of datetime value <2016.2.29T12:59:59.999>", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of datetime value <2016.2.29T12:59:59.999> in attribute aDateTime", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// DatumZeit ohne T unzulaessig.
@@ -1855,7 +2035,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of datetime value <2016-2-29V12:59:59.999>", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of datetime value <2016-2-29V12:59:59.999> in attribute aDateTime", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es wird die Eingabe einer ungueltigen Sub Value getestet.
@@ -1875,7 +2055,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value mehr.elf is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value mehr.elf is not a member of the enumeration in attribute aufzaehlung", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Ungueltige Eingabe einer Aufzaehlung.
@@ -1895,7 +2075,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 5 is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 5 is not a member of the enumeration in attribute aufzaehlung", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Test ob die Laenge des Texted bei textLimited begraenzt ist und einen Fehler ausgibt.
@@ -2036,7 +2216,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10000.000 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10000.000 is out of range in attribute lcoord", logger.getErrs().get(0).getEventMsg());
 	}
 	// Es wird ein Fehler ausgegeben, weil die Koordinate nicht 4 Dimensional sein darf.
 	@Test
@@ -2101,7 +2281,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <undecided> is not a BOOLEAN", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <undecided> is not a BOOLEAN in attribute aBoolean", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// eine Fehlermeldung wird erwartet, da 9(4) auf 90 abgerundet werden soll,
@@ -2124,7 +2304,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 479999.999 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 479999.999 is out of range in attribute lcoord", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob 9(5) erfolgreich auf 100 aufgerundet wird.
@@ -2205,7 +2385,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of INTERLIS.NAME value <>", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of INTERLIS.NAME value <> in attribute nametext", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Das erste Zeichen der Value ist kein Buchstabe. Somit soll eine Fehlermeldung ausgegeben werden.
@@ -2225,7 +2405,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of INTERLIS.NAME value <5NameText>", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of INTERLIS.NAME value <5NameText> in attribute nametext", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Der Wert beinhaltet das gueltige Zeichen underline '_'.
@@ -2264,7 +2444,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of INTERLIS.NAME value <Name-Text>", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of INTERLIS.NAME value <Name-Text> in attribute nametext", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Der Wert ist ein KeyWord. Somit soll eine Fehlermeldung ausgegeben werden.
@@ -2284,7 +2464,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <ANYSTRUCTURE> is a keyword", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <ANYSTRUCTURE> is a keyword in attribute nametext", logger.getErrs().get(0).getEventMsg());
 	}
 	
     // Eine gueltige URI wird erstellt.
@@ -2323,7 +2503,7 @@ public class Datatypes23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertTrue(logger.getErrs().size()==1);
-        assertEquals("invalid format of INTERLIS.URI value <ce@localhost>", logger.getErrs().get(0).getEventMsg());
+        assertEquals("invalid format of INTERLIS.URI value <ce@localhost> in attribute uritext", logger.getErrs().get(0).getEventMsg());
     }
     
     // Die Gueltigkeit einer URI wird auf einen leeren Wert getestet.
@@ -2343,6 +2523,101 @@ public class Datatypes23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertTrue(logger.getErrs().size()==1);
-        assertEquals("invalid format of INTERLIS.URI value <>", logger.getErrs().get(0).getEventMsg());
+        assertEquals("invalid format of INTERLIS.URI value <> in attribute uritext", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void enumerationTypeOnlyMehrFail(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlung", "mehr");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("value mehr is not a member of the enumeration in attribute aufzaehlung", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void enumerationTypeOnlyZehnFail(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlung", "zehn");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("value zehn is not a member of the enumeration in attribute aufzaehlung", logger.getErrs().get(0).getEventMsg());
+    }
+        
+    @Test
+    public void enumerationTypeAllOffTest_SubSubSubEnumerationFail(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Montag.Busy.FullDay");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("value Montag.Busy.FullDay is not a member of the enumeration in attribute aufzaehlungAll", logger.getErrs().get(0).getEventMsg());
+    }
+        
+    @Test
+    public void enumerationTypeAllOffTest_SubSubEnumerationFail(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Frei");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("value Frei is not a member of the enumeration in attribute aufzaehlungAll", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void enumerationTypeAllOffTest_SubEnumerationFail(){
+        Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Montag");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objMaxLength));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("value Montag is not a member of the enumeration in attribute aufzaehlungAll", logger.getErrs().get(0).getEventMsg());
     }
 }

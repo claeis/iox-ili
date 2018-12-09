@@ -74,7 +74,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value -11 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value -11 is out of range in attribute numericInt", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Die groesste Numnern Angabe wird getestet.
@@ -113,7 +113,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 11 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 11 is out of range in attribute numericInt", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Die kleinste Dezimale Angabe wird getestet.
@@ -152,7 +152,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value -10.1 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value -10.1 is out of range in attribute numericDec", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Die groesste Dezimale Zahl wird getestet.
@@ -191,7 +191,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.1 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.1 is out of range in attribute numericDec", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird eine Fehlermeldung erwartet, da der eingegebene Wert nicht dem Format entspricht.
@@ -252,7 +252,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.1 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.1 is out of range in attribute numericDec", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob 4(5) erfolgreich auf 50 aufrundet
@@ -273,7 +273,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.1 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.1 is out of range in attribute numericDec", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob 4(4) erfolgreich auf 40 abrundet
@@ -314,7 +314,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 200000 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 200000 is out of range in attribute numericInt3", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob die erste Zahl: (minus) -1, erfolgreich durch das Runden der Zahlen: 9, zu (minus) -2 abgerundet wird
@@ -335,7 +335,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value -200000 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value -200000 is out of range in attribute numericInt3", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob die Zahl erfolgreich durch das Aufrunden der Zahlen: 9, den Amount um 1 Zahl erweitert
@@ -356,7 +356,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10 is out of range in attribute numericInt2", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob die (minus) Zahl erfolgreich durch das Abrunden der Zahlen: 9, den Amount um 1 Zahl erweitert
@@ -377,7 +377,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value -10 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value -10 is out of range in attribute numericInt2", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob 0.6 erfolgreich auf 1.0 aufrundet
@@ -398,7 +398,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 11 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 11 is out of range in attribute numericInt", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob 0.4 erfolgreich auf 0.0 abrundet
@@ -439,7 +439,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 11 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 11 is out of range in attribute numericInt", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob 0.0016 erfolgreich auf 0.002 aufrundet
@@ -460,7 +460,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 0.002 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 0.002 is out of range in attribute numericDec2", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob 0.0014 erfolgreich auf 0.001 abrundet
@@ -501,7 +501,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 0.002 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 0.002 is out of range in attribute numericDec2", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob (minus) -0.6 erfolgreich auf (minus) -1.0 abrundet
@@ -522,7 +522,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value -11 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value -11 is out of range in attribute numericInt", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob (minus) -0.4 erfolgreich auf (minus) -0.0 aufrundet
@@ -583,7 +583,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value -0.002 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value -0.002 is out of range in attribute numericDec2", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob (minus) -0.0014 erfolgreich auf (minus) -0.001 aufrundet

@@ -15,6 +15,7 @@ import ch.ehi.basics.types.OutParam;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.CompoundCurveSerializer;
 import ch.ehi.iox.objpool.impl.FileBasedCollection;
+import ch.ehi.iox.objpool.impl.IomObjectSerializer;
 import ch.ehi.iox.objpool.impl.JavaSerializer;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
@@ -195,7 +196,7 @@ public class ItfAreaPolygon2Linetable {
 			//dissolver.dissolve(lines);
 			//lines=dissolver.getDissolved();
 			//ioxlines=new ArrayList<IomObject>();
-			ioxlines=new FileBasedCollection<IomObject>(recman,new JavaSerializer());
+			ioxlines=new FileBasedCollection<IomObject>(recman,new IomObjectSerializer());
 			for(CompoundCurve line:lines){
 				IomObject ioxline;
 				try {

@@ -6,6 +6,34 @@ ideas/open issues
 LATEST
 -----------------------------
 
+iox-ili 1.20.10 (2018-12-09)
+-----------------------------
+- Validator: Error message addressed wrong basket
+- Validator: implement Math funcitons
+- Validator: fixed msg_(language) support
+- Validator: use keymsg in UNIQUE constraint
+- Validator: use model names from GUI
+- Validator: implement INTERLIS_ext functions
+- Validator: fixed CCW calculation if two half circles with horizontal straights
+- Validator: use attrPath in all validateAttribute messages
+- Validator: validate ALL OF enumerations
+- Validator: validate formatted type
+- Validator: validate UUID if used as BID
+- Validator: validate STANDRADOID
+- Validator: validate TEXT OID
+- Validator: validate basket element name
+- Validator: validate Contsraints in embedded associations
+- Validator: validate UNIQUE with forward references
+- Validator: support remote data/catalogue files
+- Validator: evaluate object paths with forward references
+- Validator: fix == with structures
+- Validator: report superflous attributes in embedded associations
+- Validator: validate that a BID is different from TIDs
+- xtf24: read/write ili:domains
+- switch config file reader to pure ini file syntax
+- improve temporary file size
+- ili2c-4.7.10
+
 iox-ili 1.20.9 (2018-09-07)
 -----------------------------
 - add PipelinePool to Settings so that custom functions can use it

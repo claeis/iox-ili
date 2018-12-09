@@ -8,6 +8,7 @@ import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.csv.CsvReader;
 import ch.interlis.iom_j.iligml.Iligml20Reader;
 import ch.interlis.iom_j.itf.ItfReader2;
+import ch.interlis.iom_j.xtf.Xtf23Reader;
 import ch.interlis.iom_j.xtf.Xtf24Reader;
 import ch.interlis.iom_j.xtf.XtfReader;
 import ch.interlis.iox.EndBasketEvent;

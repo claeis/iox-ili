@@ -281,7 +281,51 @@ MODEL UniqueConstraints23
 		  attrEF : TEXT*10;
 		  UNIQUE e1, attrEF;
 		END assocEF;
+
+		CLASS ClassG =
+			attrG : TEXT*10;
+		END ClassG;
+		
+		CLASS ClassH =
+			attrH : TEXT*10;
+		END ClassH;
+		
+		ASSOCIATION assocGH =
+		  g1 -- {0..1} ClassG;
+		  h1 -- {0..2} ClassH;
+		  UNIQUE g1->attrG, h1->attrH;
+		END assocGH;
+		
+		CLASS ClassI =
+			attrI : TEXT*10;
+		END ClassI;
+		
+		CLASS ClassK =
+			attrK : TEXT*10;
+		END ClassK;
+		
+		ASSOCIATION assocIK =
+		  i1 -- {0..1} ClassI;
+		  k1 -- {0..2} ClassK;
+		  UNIQUE i1->attrI;
+		END assocIK;
 		
 	END EmbeddedUnique;
+
+	TOPIC LinkObjUnique=
+ 		CLASS ClassA =
+			attrA : TEXT*10;
+		END ClassA;
+		
+		CLASS ClassB =
+			attrB : TEXT*10;
+		END ClassB;
+
+ 		ASSOCIATION assocAB =
+		  a1 -- {0..*} ClassA;
+		  b1 -- {0..*} ClassB;
+		  UNIQUE a1->attrA,b1->attrB;
+		END assocAB;
+	END LinkObjUnique;
 	
 END UniqueConstraints23.

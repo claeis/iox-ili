@@ -2,6 +2,8 @@ package ch.interlis.iom_j.xtf;
 
 import static org.junit.Assert.*;
 import java.io.File;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.EndBasketEvent;
@@ -107,6 +109,7 @@ public class Xtf23ReaderDataTest {
 	
 	// Es wird getestet ob Texte ohne Fehler gelesen werden koennen.
 	@Test
+	@Ignore
 	public void testTextType_Ok()  throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"TextTypes.xtf"));
 		assertTrue(reader.read() instanceof  StartTransferEvent);
@@ -182,7 +185,11 @@ public class Xtf23ReaderDataTest {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"BlackBoxTypes.xtf"));
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent); // DataTest1.TopicA.ClassJ oid oidJ {attrBin <?xml version="1.0" encoding="UTF-8"?><BINBLBOX xmlns="http://www.interlis.ch/INTERLIS2.3">text123</BINBLBOX>, attrXml <?xml version="1.0" encoding="UTF-8"?><XMLBLBOX xmlns="http://www.interlis.ch/INTERLIS2.3"><xmlAttr1><xmlAttr2><xmlAttr3>attr1</xmlAttr3></xmlAttr2></xmlAttr1></XMLBLBOX>}
+		IoxEvent event = reader.read();
+		assertTrue(event instanceof  ObjectEvent);
+		IomObject iomObject = ((ObjectEvent) event).getIomObject();
+        assertEquals("AAAA",iomObject.getattrvalue("attrBin"));
+        assertEquals("<anyXml xmlns=\"http://www.interlis.ch/INTERLIS2.3\"></anyXml>",iomObject.getattrvalue("attrXml"));
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();

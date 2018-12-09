@@ -2,6 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
@@ -29,13 +30,15 @@ public class UniqueConstraints23Test {
 	private final static String BID = "b1";
 	// TOPIC
 	private final static String TOPIC="UniqueConstraints23.Topic";
-	private final static String EMBEDDED_UNIQUE_TOPIC="UniqueConstraints23.EmbeddedUnique";
+	private final static String LINKOBJ_TOPIC = "UniqueConstraints23.LinkObjUnique";
+	private final static String EMBEDDED_TOPIC="UniqueConstraints23.EmbeddedUnique";
 	// ASSOCIATION
 	private final static String ASSOCA=TOPIC+".assoA";
 	private final static String ASSOCB=TOPIC+".assoB";
-	private final static String EMBEDDED_UNIQUE_ASSOCAB=EMBEDDED_UNIQUE_TOPIC+".assocAB";
-	private final static String EMBEDDED_UNIQUE_ASSOCCD=EMBEDDED_UNIQUE_TOPIC+".assocCD";
-	private final static String EMBEDDED_UNIQUE_ASSOCEF=EMBEDDED_UNIQUE_TOPIC+".assocEF";
+	private final static String EMBEDDED_ASSOCAB=EMBEDDED_TOPIC+".assocAB";
+	private final static String EMBEDDED_ASSOCCD=EMBEDDED_TOPIC+".assocCD";
+	private final static String EMBEDDED_ASSOCEF=EMBEDDED_TOPIC+".assocEF";
+	private final static String LINKOBJ_ASSOCAB=LINKOBJ_TOPIC+".assocAB";
 	// CLASS
 	private final static String CLASSA=TOPIC+".ClassA";
 	private final static String CLASSB=TOPIC+".ClassB";
@@ -57,12 +60,18 @@ public class UniqueConstraints23Test {
 	private final static String CLASSB1=TOPIC+".ClassB1";
 	private final static String CLASSC1=TOPIC+".ClassC1";
 	private final static String CLASSD1=TOPIC+".ClassD1";
-	private final static String EMBEDDED_UNIQUE_CLASSA=EMBEDDED_UNIQUE_TOPIC+".ClassA";
-	private final static String EMBEDDED_UNIQUE_CLASSB=EMBEDDED_UNIQUE_TOPIC+".ClassB";
-	private final static String EMBEDDED_UNIQUE_CLASSC=EMBEDDED_UNIQUE_TOPIC+".ClassC";
-	private final static String EMBEDDED_UNIQUE_CLASSD=EMBEDDED_UNIQUE_TOPIC+".ClassD";
-	private final static String EMBEDDED_UNIQUE_CLASSE=EMBEDDED_UNIQUE_TOPIC+".ClassE";
-	private final static String EMBEDDED_UNIQUE_CLASSF=EMBEDDED_UNIQUE_TOPIC+".ClassF";
+	private final static String EMBEDDED_CLASSA=EMBEDDED_TOPIC+".ClassA";
+	private final static String EMBEDDED_CLASSB=EMBEDDED_TOPIC+".ClassB";
+	private final static String EMBEDDED_CLASSC=EMBEDDED_TOPIC+".ClassC";
+	private final static String EMBEDDED_CLASSD=EMBEDDED_TOPIC+".ClassD";
+	private final static String EMBEDDED_CLASSE=EMBEDDED_TOPIC+".ClassE";
+	private final static String EMBEDDED_CLASSF=EMBEDDED_TOPIC+".ClassF";
+    private final static String EMBEDDED_CLASSG=EMBEDDED_TOPIC+".ClassG";
+    private final static String EMBEDDED_CLASSH=EMBEDDED_TOPIC+".ClassH";
+    private final static String EMBEDDED_CLASSI=EMBEDDED_TOPIC+".ClassI";
+    private final static String EMBEDDED_CLASSK=EMBEDDED_TOPIC+".ClassK";
+	private final static String LINKOBJ_CLASSA = LINKOBJ_TOPIC + ".ClassA";
+	private final static String LINKOBJ_CLASSB = LINKOBJ_TOPIC + ".ClassB";
 	// STRUCTURE
 	private final static String STRUCTA=TOPIC+".StructA";
 	private final static String STRUCTE=TOPIC+".StructE";
@@ -1164,7 +1173,46 @@ public class UniqueConstraints23Test {
 	//############################################################/
 	//########## FAILING TESTS ###################################/
 	//############################################################/
-
+	
+    @Test
+    public void objectPathInUnique_Fail() throws Exception {
+        Iom_jObject iomObjA1 = new Iom_jObject(LINKOBJ_CLASSA, OID1);
+        Iom_jObject iomObjB1 = new Iom_jObject(LINKOBJ_CLASSB, OID2);
+        iomObjA1.setattrvalue("attrA", "ValueA1");
+        iomObjB1.setattrvalue("attrB", "ValueB1");
+        Iom_jObject iomObjassocab1 = new Iom_jObject(LINKOBJ_ASSOCAB, null);
+        iomObjassocab1.addattrobj("a1", "REF").setobjectrefoid(iomObjA1.getobjectoid());
+        iomObjassocab1.addattrobj("b1", "REF").setobjectrefoid(iomObjB1.getobjectoid());
+        
+        Iom_jObject iomObjA2 = new Iom_jObject(LINKOBJ_CLASSA, OID3);
+        Iom_jObject iomObjB2 = new Iom_jObject(LINKOBJ_CLASSB, OID4);
+        iomObjA2.setattrvalue("attrA", "ValueA1");
+        iomObjB2.setattrvalue("attrB", "ValueB1");
+        Iom_jObject iomObjassocab2 = new Iom_jObject(LINKOBJ_ASSOCAB, null);
+        iomObjassocab2.addattrobj("a1", "REF").setobjectrefoid(iomObjA2.getobjectoid());
+        iomObjassocab2.addattrobj("b1", "REF").setobjectrefoid(iomObjB2.getobjectoid());
+        
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(LINKOBJ_TOPIC, BID));
+        validator.validate(new ObjectEvent(iomObjA1));
+        validator.validate(new ObjectEvent(iomObjB1));
+        validator.validate(new ObjectEvent(iomObjassocab1));
+        validator.validate(new ObjectEvent(iomObjA2));
+        validator.validate(new ObjectEvent(iomObjB2));
+        validator.validate(new ObjectEvent(iomObjassocab2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Unique is violated! Values ValueA1, ValueB1 already exist in Object: o1:o2",
+                logger.getErrs().get(0).getEventMsg());
+    }
+	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn (attr1, attr2) Unique definiert sind und beide Werte gleich sind.
 	// Die Klasse: ClassB wird von der Klasse: ClassBP erweitert.
 	@Test
@@ -1669,7 +1717,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values text already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values text already exist in Object: o1:o2", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// In beiden Objekten wird je ueber eine Structure auf ein attribute einer SURFACE verwiesen, Beide Attribute wurden mit den Selben Values erstellt.
@@ -1916,19 +1964,17 @@ public class UniqueConstraints23Test {
 	// wird erwartet, dass dieser Test funktioniert.
 	@Test
 	public void uniqueAttrValuesOfRole_InEmbeddedAssociation_Ok() {
-		String attrAB="attrAB";
-		Iom_jObject obj_A_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSA,OID1);
-		Iom_jObject obj_A_2=new Iom_jObject(EMBEDDED_UNIQUE_CLASSA,OID2);
+		String attrAB="attrB";
+		Iom_jObject obj_A_1=new Iom_jObject(EMBEDDED_CLASSA,OID1);
+		Iom_jObject obj_A_2=new Iom_jObject(EMBEDDED_CLASSA,OID2);
 		
-		Iom_jObject obj_B_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSB,OID3);
-		IomObject attrObj_AB=obj_B_3.addattrobj("a1", EMBEDDED_UNIQUE_ASSOCAB);
-		attrObj_AB.setobjectrefoid(OID1);
-		attrObj_AB.setattrvalue(attrAB, "text1");
+		Iom_jObject obj_B_3=new Iom_jObject(EMBEDDED_CLASSB,OID3);
+		IomObject attrObj_AB=obj_B_3.addattrobj("a1", EMBEDDED_ASSOCAB);
+		attrObj_AB.setobjectrefoid(obj_A_1.getobjectoid());
 		
-		Iom_jObject obj_B_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSB,OID4);
-		IomObject attrObj2_AB=obj_B_4.addattrobj("a1", EMBEDDED_UNIQUE_ASSOCAB);
-		attrObj2_AB.setobjectrefoid(OID2);
-		attrObj2_AB.setattrvalue(attrAB, "text1");
+		Iom_jObject obj_B_4=new Iom_jObject(EMBEDDED_CLASSB,OID4);
+		IomObject attrObj2_AB=obj_B_4.addattrobj("a1", EMBEDDED_ASSOCAB);
+		attrObj2_AB.setobjectrefoid(obj_A_2.getobjectoid());
 		
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1936,7 +1982,7 @@ public class UniqueConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new StartBasketEvent(EMBEDDED_TOPIC,BID));
 		validator.validate(new ObjectEvent(obj_A_1));
 		validator.validate(new ObjectEvent(obj_A_2));
 		validator.validate(new ObjectEvent(obj_B_3));
@@ -1951,18 +1997,15 @@ public class UniqueConstraints23Test {
 	// wird erwartet, dass dieser Test eine Fehlermeldung ausgibt.
 	@Test
 	public void uniqueAttrValuesOfRole_InEmbeddedAssociation_False() {
-		String attrAB="attrAB";
-		Iom_jObject obj_A_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSA,OID1);
+		Iom_jObject obj_A_1=new Iom_jObject(EMBEDDED_CLASSA,OID1);
 		
-		Iom_jObject obj_B_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSB,OID3);
-		IomObject attrObj_AB=obj_B_3.addattrobj("a1", EMBEDDED_UNIQUE_ASSOCAB);
-		attrObj_AB.setobjectrefoid(OID1);
-		attrObj_AB.setattrvalue(attrAB, "text1");
+		Iom_jObject obj_B_3=new Iom_jObject(EMBEDDED_CLASSB,OID3);
+		IomObject attrObj_AB=obj_B_3.addattrobj("a1", EMBEDDED_ASSOCAB);
+		attrObj_AB.setobjectrefoid(obj_A_1.getobjectoid());
 		
-		Iom_jObject obj_B_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSB,OID4);
-		IomObject attrObj2_AB=obj_B_4.addattrobj("a1", EMBEDDED_UNIQUE_ASSOCAB);
-		attrObj2_AB.setobjectrefoid(OID1);
-		attrObj2_AB.setattrvalue(attrAB, "text1");
+		Iom_jObject obj_B_4=new Iom_jObject(EMBEDDED_CLASSB,OID4);
+		IomObject attrObj2_AB=obj_B_4.addattrobj("a1", EMBEDDED_ASSOCAB);
+		attrObj2_AB.setobjectrefoid(obj_A_1.getobjectoid());
 		
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1970,14 +2013,14 @@ public class UniqueConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new StartBasketEvent(EMBEDDED_TOPIC,BID));
 		validator.validate(new ObjectEvent(obj_A_1));
 		validator.validate(new ObjectEvent(obj_B_3));
 		validator.validate(new ObjectEvent(obj_B_4));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// asserts
-		assertTrue(logger.getErrs().size()==1);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("Unique is violated! Values o1 already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
 	
 	}
@@ -1988,15 +2031,15 @@ public class UniqueConstraints23Test {
 	@Test
 	public void uniqueAttrValuesOfAttr_InEmbeddedAssociation_Ok() {
 		String attrCD="attrCD";
-		Iom_jObject obj_C_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSC,OID1);
+		Iom_jObject obj_C_1=new Iom_jObject(EMBEDDED_CLASSC,OID1);
 		
-		Iom_jObject obj_D_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSD,OID3);
-		IomObject attrObj_CD=obj_D_3.addattrobj("c1", EMBEDDED_UNIQUE_ASSOCCD);
+		Iom_jObject obj_D_3=new Iom_jObject(EMBEDDED_CLASSD,OID3);
+		IomObject attrObj_CD=obj_D_3.addattrobj("c1", EMBEDDED_ASSOCCD);
 		attrObj_CD.setobjectrefoid(OID1);
 		attrObj_CD.setattrvalue(attrCD, "text1");
 		
-		Iom_jObject obj_D_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSD,OID4);
-		IomObject attrObj2_CD=obj_D_4.addattrobj("c1", EMBEDDED_UNIQUE_ASSOCCD);
+		Iom_jObject obj_D_4=new Iom_jObject(EMBEDDED_CLASSD,OID4);
+		IomObject attrObj2_CD=obj_D_4.addattrobj("c1", EMBEDDED_ASSOCCD);
 		attrObj2_CD.setobjectrefoid(OID1);
 		attrObj2_CD.setattrvalue(attrCD, "text2");
 		
@@ -2006,7 +2049,7 @@ public class UniqueConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new StartBasketEvent(EMBEDDED_TOPIC,BID));
 		validator.validate(new ObjectEvent(obj_C_1));
 		validator.validate(new ObjectEvent(obj_D_3));
 		validator.validate(new ObjectEvent(obj_D_4));
@@ -2021,16 +2064,16 @@ public class UniqueConstraints23Test {
 	@Test
 	public void uniqueAttrValuesOfAttr_InEmbeddedAssociation_False() {
 		String attrCD="attrCD";
-		Iom_jObject obj_C_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSC,OID1);
+		Iom_jObject obj_C_1=new Iom_jObject(EMBEDDED_CLASSC,OID1);
 		
-		Iom_jObject obj_D_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSD,OID3);
-		IomObject attrObj_CD=obj_D_3.addattrobj("c1", EMBEDDED_UNIQUE_ASSOCCD);
-		attrObj_CD.setobjectrefoid(OID1);
+		Iom_jObject obj_D_3=new Iom_jObject(EMBEDDED_CLASSD,OID3);
+		IomObject attrObj_CD=obj_D_3.addattrobj("c1", EMBEDDED_ASSOCCD);
+		attrObj_CD.setobjectrefoid(obj_C_1.getobjectoid());
 		attrObj_CD.setattrvalue(attrCD, "text1");
 		
-		Iom_jObject obj_D_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSD,OID4);
-		IomObject attrObj2_CD=obj_D_4.addattrobj("c1", EMBEDDED_UNIQUE_ASSOCCD);
-		attrObj2_CD.setobjectrefoid(OID1);
+		Iom_jObject obj_D_4=new Iom_jObject(EMBEDDED_CLASSD,OID4);
+		IomObject attrObj2_CD=obj_D_4.addattrobj("c1", EMBEDDED_ASSOCCD);
+		attrObj2_CD.setobjectrefoid(obj_C_1.getobjectoid());
 		attrObj2_CD.setattrvalue(attrCD, "text1");
 		
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2039,14 +2082,14 @@ public class UniqueConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new StartBasketEvent(EMBEDDED_TOPIC,BID));
 		validator.validate(new ObjectEvent(obj_C_1));
 		validator.validate(new ObjectEvent(obj_D_3));
 		validator.validate(new ObjectEvent(obj_D_4));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// asserts
-		assertTrue(logger.getErrs().size()==1);
+		assertEquals(1, logger.getErrs().size());
 		assertEquals("Unique is violated! Values text1 already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
 	}
 	
@@ -2056,16 +2099,16 @@ public class UniqueConstraints23Test {
 	@Test
 	public void uniqueAttrValuesOfRoleAndAttr_InEmbeddedAssociation_AttrSame_Ok() {
 		String attrEF="attrEF";
-		Iom_jObject obj_E_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSE,OID1);
-		Iom_jObject obj_E_2=new Iom_jObject(EMBEDDED_UNIQUE_CLASSE,OID2);
+		Iom_jObject obj_E_1=new Iom_jObject(EMBEDDED_CLASSE,OID1);
+		Iom_jObject obj_E_2=new Iom_jObject(EMBEDDED_CLASSE,OID2);
 		
-		Iom_jObject obj_F_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID3);
-		IomObject attrObj_EF=obj_F_3.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
+		Iom_jObject obj_F_3=new Iom_jObject(EMBEDDED_CLASSF,OID3);
+		IomObject attrObj_EF=obj_F_3.addattrobj("e1", EMBEDDED_ASSOCEF);
 		attrObj_EF.setobjectrefoid(OID1);
 		attrObj_EF.setattrvalue(attrEF, "text1");
 		
-		Iom_jObject obj_F_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID4);
-		IomObject attrObj2_EF=obj_F_4.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
+		Iom_jObject obj_F_4=new Iom_jObject(EMBEDDED_CLASSF,OID4);
+		IomObject attrObj2_EF=obj_F_4.addattrobj("e1", EMBEDDED_ASSOCEF);
 		attrObj2_EF.setobjectrefoid(OID2);
 		attrObj2_EF.setattrvalue(attrEF, "text1");
 		
@@ -2075,7 +2118,7 @@ public class UniqueConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new StartBasketEvent(EMBEDDED_TOPIC,BID));
 		validator.validate(new ObjectEvent(obj_E_1));
 		validator.validate(new ObjectEvent(obj_E_2));
 		validator.validate(new ObjectEvent(obj_F_3));
@@ -2085,6 +2128,103 @@ public class UniqueConstraints23Test {
 		// asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    public void uniqueAttrValuesOfAttrPath_InEmbeddedAssociation_Ok() {
+        Iom_jObject obj_G_1=new Iom_jObject(EMBEDDED_CLASSG,OID1);
+        obj_G_1.setattrvalue("attrG", "text1");
+
+        Iom_jObject obj_G_2=new Iom_jObject(EMBEDDED_CLASSG,OID2);
+        obj_G_2.setattrvalue("attrG", "text1");
+        
+        Iom_jObject obj_H_3=new Iom_jObject(EMBEDDED_CLASSH,OID3);
+        obj_H_3.addattrobj("g1", "REF").setobjectrefoid(obj_G_1.getobjectoid());
+        obj_H_3.setattrvalue("attrH", "text1");
+        
+        Iom_jObject obj_H_4=new Iom_jObject(EMBEDDED_CLASSH,OID4);
+        obj_H_4.addattrobj("g1", "REF").setobjectrefoid(obj_G_2.getobjectoid());
+        obj_H_4.setattrvalue("attrH", "text2");
+        
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(EMBEDDED_TOPIC,BID));
+        validator.validate(new ObjectEvent(obj_G_1));
+        validator.validate(new ObjectEvent(obj_G_2));
+        validator.validate(new ObjectEvent(obj_H_3));
+        validator.validate(new ObjectEvent(obj_H_4));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
+    // @Ignore("GH-52")
+    public void uniqueAttrValuesOfAttrPath_InEmbeddedAssociation_Fail() {
+        Iom_jObject obj_G_1=new Iom_jObject(EMBEDDED_CLASSG,OID1);
+        obj_G_1.setattrvalue("attrG", "text1");
+
+        Iom_jObject obj_G_2=new Iom_jObject(EMBEDDED_CLASSG,OID2);
+        obj_G_2.setattrvalue("attrG", "text1");
+        
+        Iom_jObject obj_H_3=new Iom_jObject(EMBEDDED_CLASSH,OID3);
+        obj_H_3.addattrobj("g1", "REF").setobjectrefoid(obj_G_1.getobjectoid());
+        obj_H_3.setattrvalue("attrH", "text1");
+        
+        Iom_jObject obj_H_4=new Iom_jObject(EMBEDDED_CLASSH,OID4);
+        obj_H_4.addattrobj("g1", "REF").setobjectrefoid(obj_G_2.getobjectoid());
+        obj_H_4.setattrvalue("attrH", "text1");
+        
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(EMBEDDED_TOPIC,BID));
+        validator.validate(new ObjectEvent(obj_G_1));
+        validator.validate(new ObjectEvent(obj_G_2));
+        validator.validate(new ObjectEvent(obj_H_3));
+        validator.validate(new ObjectEvent(obj_H_4));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // asserts
+        assertEquals(1, logger.getErrs().size());
+    }
+    @Test
+    public void uniqueAttrValuesOfAttrPath_InEmbeddedAssociation_ForwardRef_Fail() {
+        Iom_jObject obj_I_1=new Iom_jObject(EMBEDDED_CLASSI,OID1);
+        obj_I_1.setattrvalue("attrI", "text1");
+
+        Iom_jObject obj_I_2=new Iom_jObject(EMBEDDED_CLASSI,OID2);
+        obj_I_2.setattrvalue("attrI", "text1"); // dupluicate value
+        
+        Iom_jObject obj_K_3=new Iom_jObject(EMBEDDED_CLASSK,OID3);
+        obj_K_3.addattrobj("i1", "REF").setobjectrefoid(obj_I_1.getobjectoid());
+        
+        Iom_jObject obj_K_4=new Iom_jObject(EMBEDDED_CLASSK,OID4);
+        obj_K_4.addattrobj("i1", "REF").setobjectrefoid(obj_I_2.getobjectoid());
+        
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(EMBEDDED_TOPIC,BID));
+        validator.validate(new ObjectEvent(obj_K_3)); // contains a forward reference
+        validator.validate(new ObjectEvent(obj_K_4)); // contains a forward reference
+        validator.validate(new ObjectEvent(obj_I_1));
+        validator.validate(new ObjectEvent(obj_I_2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Unique is violated! Values text1 already exist in Object: o3",
+                logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// Prueft, ob das eingebettete Unique-Constraint innerhalb der Association funktioniert.
 	// Da das Attribute: attrEF und die Rolle: e1 als UNIQUE definiert sind und die Rolle mehr als 1 Mal angesprochen wird,
@@ -2092,15 +2232,15 @@ public class UniqueConstraints23Test {
 	@Test
 	public void uniqueAttrValuesOfRoleAndAttr_InEmbeddedAssociation_RoleSame_Ok() {
 		String attrEF="attrEF";
-		Iom_jObject obj_E_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSE,OID1);
+		Iom_jObject obj_E_1=new Iom_jObject(EMBEDDED_CLASSE,OID1);
 		
-		Iom_jObject obj_F_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID3);
-		IomObject attrObj_EF=obj_F_3.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
+		Iom_jObject obj_F_3=new Iom_jObject(EMBEDDED_CLASSF,OID3);
+		IomObject attrObj_EF=obj_F_3.addattrobj("e1", EMBEDDED_ASSOCEF);
 		attrObj_EF.setobjectrefoid(OID1);
 		attrObj_EF.setattrvalue(attrEF, "text1");
 		
-		Iom_jObject obj_F_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID4);
-		IomObject attrObj2_EF=obj_F_4.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
+		Iom_jObject obj_F_4=new Iom_jObject(EMBEDDED_CLASSF,OID4);
+		IomObject attrObj2_EF=obj_F_4.addattrobj("e1", EMBEDDED_ASSOCEF);
 		attrObj2_EF.setobjectrefoid(OID1);
 		attrObj2_EF.setattrvalue(attrEF, "text2");
 		
@@ -2110,7 +2250,7 @@ public class UniqueConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new StartBasketEvent(EMBEDDED_TOPIC,BID));
 		validator.validate(new ObjectEvent(obj_E_1));
 		validator.validate(new ObjectEvent(obj_F_3));
 		validator.validate(new ObjectEvent(obj_F_4));
@@ -2126,16 +2266,16 @@ public class UniqueConstraints23Test {
 	@Test
 	public void uniqueAttrValuesOfRoleAndAttr_InEmbeddedAssociation_BothDifferent_Ok() {
 		String attrEF="attrEF";
-		Iom_jObject obj_E_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSE,OID1);
-		Iom_jObject obj_E_2=new Iom_jObject(EMBEDDED_UNIQUE_CLASSE,OID2);
+		Iom_jObject obj_E_1=new Iom_jObject(EMBEDDED_CLASSE,OID1);
+		Iom_jObject obj_E_2=new Iom_jObject(EMBEDDED_CLASSE,OID2);
 		
-		Iom_jObject obj_F_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID3);
-		IomObject attrObj_EF=obj_F_3.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
+		Iom_jObject obj_F_3=new Iom_jObject(EMBEDDED_CLASSF,OID3);
+		IomObject attrObj_EF=obj_F_3.addattrobj("e1", EMBEDDED_ASSOCEF);
 		attrObj_EF.setobjectrefoid(OID1);
 		attrObj_EF.setattrvalue(attrEF, "text1");
 		
-		Iom_jObject obj_F_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID4);
-		IomObject attrObj2_EF=obj_F_4.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
+		Iom_jObject obj_F_4=new Iom_jObject(EMBEDDED_CLASSF,OID4);
+		IomObject attrObj2_EF=obj_F_4.addattrobj("e1", EMBEDDED_ASSOCEF);
 		attrObj2_EF.setobjectrefoid(OID2);
 		attrObj2_EF.setattrvalue(attrEF, "text2");
 		
@@ -2145,7 +2285,7 @@ public class UniqueConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new StartBasketEvent(EMBEDDED_TOPIC,BID));
 		validator.validate(new ObjectEvent(obj_E_1));
 		validator.validate(new ObjectEvent(obj_E_2));
 		validator.validate(new ObjectEvent(obj_F_3));
@@ -2162,16 +2302,16 @@ public class UniqueConstraints23Test {
 	@Test
 	public void uniqueAttrValuesOfRoleAndAttr_InEmbeddedAssociation_False() {
 		String attrEF="attrEF";
-		Iom_jObject obj_E_1=new Iom_jObject(EMBEDDED_UNIQUE_CLASSE,OID1);
+		Iom_jObject obj_E_1=new Iom_jObject(EMBEDDED_CLASSE,OID1);
 		
-		Iom_jObject obj_F_3=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID3);
-		IomObject attrObj_EF=obj_F_3.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
-		attrObj_EF.setobjectrefoid(OID1);
+		Iom_jObject obj_F_3=new Iom_jObject(EMBEDDED_CLASSF,OID3);
+		IomObject attrObj_EF=obj_F_3.addattrobj("e1", EMBEDDED_ASSOCEF);
+		attrObj_EF.setobjectrefoid(obj_E_1.getobjectoid());
 		attrObj_EF.setattrvalue(attrEF, "text1");
 		
-		Iom_jObject obj_F_4=new Iom_jObject(EMBEDDED_UNIQUE_CLASSF,OID4);
-		IomObject attrObj2_EF=obj_F_4.addattrobj("e1", EMBEDDED_UNIQUE_ASSOCEF);
-		attrObj2_EF.setobjectrefoid(OID1);
+		Iom_jObject obj_F_4=new Iom_jObject(EMBEDDED_CLASSF,OID4);
+		IomObject attrObj2_EF=obj_F_4.addattrobj("e1", EMBEDDED_ASSOCEF);
+		attrObj2_EF.setobjectrefoid(obj_E_1.getobjectoid());
 		attrObj2_EF.setattrvalue(attrEF, "text1");
 		
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2180,14 +2320,14 @@ public class UniqueConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(EMBEDDED_UNIQUE_TOPIC,BID));
+		validator.validate(new StartBasketEvent(EMBEDDED_TOPIC,BID));
 		validator.validate(new ObjectEvent(obj_E_1));
 		validator.validate(new ObjectEvent(obj_F_3));
 		validator.validate(new ObjectEvent(obj_F_4));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// asserts
-		assertTrue(logger.getErrs().size()==1);
+		assertEquals(1, logger.getErrs().size());
 		assertEquals("Unique is violated! Values o1, text1 already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
 	}
 	

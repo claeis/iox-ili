@@ -1,0 +1,23 @@
+INTERLIS 2.3;
+
+MODEL Topic23
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" =
+	TOPIC Topic =
+		CLASS x=
+                END x;
+	END Topic;
+
+	TOPIC TopicUuidOid = 
+		BASKET OID AS INTERLIS.UUIDOID;
+	END TopicUuidOid;
+
+	TOPIC TopicStandartOID = 
+		BASKET OID AS INTERLIS.STANDARDOID;
+	END TopicStandartOID;
+
+	DOMAIN
+          TextOID = OID TEXT*36;
+	TOPIC TopicTextOID = 
+		BASKET OID AS TextOID;
+	END TopicTextOID;
+END Topic23.

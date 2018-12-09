@@ -272,7 +272,11 @@ public class Xtf24ReaderDataTest {
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent); // return DataTest1.TopicA.ClassJ oid oidJ {attrBin text123, attrXml <?xml version="1.0" encoding="UTF-8"?><xmlAttr1 xmlns="http://www.interlis.ch/xtf/2.4/DataTest1"><xmlAttr2><xmlAttr3>attr1</xmlAttr3></xmlAttr2></xmlAttr1>}
+		IoxEvent event = reader.read();
+		assertTrue(event instanceof  ObjectEvent); // return DataTest1.TopicA.ClassJ oid oidJ {attrBin text123, attrXml <?xml version="1.0" encoding="UTF-8"?><xmlAttr1 xmlns="http://www.interlis.ch/xtf/2.4/DataTest1"><xmlAttr2><xmlAttr3>attr1</xmlAttr3></xmlAttr2></xmlAttr1>}
+		IomObject iomObj=((ObjectEvent) event).getIomObject();
+		assertEquals("FFFF",iomObj.getattrvalue("attrBin"));
+        assertEquals("<xmlAttr1 xmlns=\"http://www.interlis.ch/xtf/2.4/DataTest1\"><xmlAttr2><xmlAttr3>attr1</xmlAttr3></xmlAttr2></xmlAttr1>",iomObj.getattrvalue("attrXml"));
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();

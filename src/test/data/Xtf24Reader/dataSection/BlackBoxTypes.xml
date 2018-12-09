@@ -8,7 +8,7 @@
 	<ili:datasection>
 		<TopicA ili:bid="bidA">
 			<ClassJ ili:tid="oidJ">
-				<attrBin>text123</attrBin>
+				<attrBin>FFFF</attrBin>
 				<attrXml>
 					<xmlAttr1><xmlAttr2><xmlAttr3>attr1</xmlAttr3></xmlAttr2></xmlAttr1>
 				</attrXml>

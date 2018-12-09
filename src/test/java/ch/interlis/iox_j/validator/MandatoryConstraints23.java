@@ -2,6 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
@@ -20,7 +21,8 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 public class MandatoryConstraints23 {
 	private TransferDescription td=null;
 	// OID
-	private final static String OID ="o1";
+	private final static String OID1 ="o1";
+    private final static String OID2 ="o2";
 	// MODEL.TOPIC
 	private final static String TOPIC="MandatoryConstraints23.Topic";
 	// CONSTANT SUCCESS
@@ -75,6 +77,8 @@ public class MandatoryConstraints23 {
 	// ATTRIBUTES GREATER OR EQUAL THAN (<=) SUCCESS AND FAIL
 	private final static String ILI_CLASSDEFINEDA=TOPIC+".ClassDefinedA";
 	private final static String ILI_CLASSDEFINEDB=TOPIC+".ClassDefinedB";
+    private final static String ILI_CLASSDEFINEDV=TOPIC+".ClassDefinedV";
+    private final static String ILI_CLASSDEFINEDW=TOPIC+".ClassDefinedW";
 	// ATTRIBUTES FORMATTED TYPE EQUAL (==) SUCCESS AND FAIL
 	private final static String ILI_CLASSFORMATTEDTYPEA=TOPIC+".ClassFormattedTypeA";
 	// START BASKET EVENT
@@ -97,7 +101,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn eine Konstante auf true gesetzt wird.
 	@Test
 	public void constantTrue_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTA, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -115,7 +119,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die aufzaehlung1 auf mehr.vier gesetzt wird.
 	@Test
 	public void constantEnumeration_Ok(){
-		Iom_jObject objClassConstantJ=new Iom_jObject(ILI_CLASSCONSTANTJ, OID);
+		Iom_jObject objClassConstantJ=new Iom_jObject(ILI_CLASSCONSTANTJ, OID1);
 		objClassConstantJ.setattrvalue("aufzaehlung1", "mehr.vier");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -135,7 +139,7 @@ public class MandatoryConstraints23 {
 	// und die Klasse: ClassConstantJP die Klasse: ClassConstant erweitert.
 	@Test
 	public void constantEnumerationSub_Ok(){
-		Iom_jObject objClassConstantJP=new Iom_jObject(ILI_CLASSCONSTANTJP, OID);
+		Iom_jObject objClassConstantJP=new Iom_jObject(ILI_CLASSCONSTANTJP, OID1);
 		objClassConstantJP.setattrvalue("aufzaehlung1", "mehr.vier");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -155,7 +159,7 @@ public class MandatoryConstraints23 {
 	// und die Klasse: ClassConstant ueber die Klassen: ClassConstantJP3 --> ClassConstantJP2 --> ClassConstantJP erweitert wird.
 	@Test
 	public void multipleSubClassesEnumeration_Ok(){
-		Iom_jObject objClassConstantJP3=new Iom_jObject(ILI_CLASSCONSTANTJP3, OID);
+		Iom_jObject objClassConstantJP3=new Iom_jObject(ILI_CLASSCONSTANTJP3, OID1);
 		objClassConstantJP3.setattrvalue("aufzaehlung1", "mehr.vier");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -174,7 +178,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn eine Konstante true ergibt oder not false ist.
 	@Test
 	public void constantNegation_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTB, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTB, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -192,7 +196,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn eine Konstante definiert ist.
 	@Test
 	public void constantDefined_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTD, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTD, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -210,7 +214,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn alle Konstanten die mit AND verbunden sind, true ergeben.
 	@Test
 	public void constantAND_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTE, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTE, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -228,7 +232,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn alle Konstanten welche mit OR verbunden sind, true ergeben.
 	@Test
 	public void constantOR_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTF, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTF, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -246,7 +250,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Konstante in einem Vergleich zu einer anderen Konstante true ergibt.
 	@Test
 	public void constantEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTG, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSCONSTANTG, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -264,7 +268,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2 Attribute von boolean in einem Vergleich true sind.
 	@Test
 	public void booleanEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID1);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "true");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -284,7 +288,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn diese 2 Strings in einem Vergleich uebereinstimmen.
 	@Test
 	public void textEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONG, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONG, OID1);
 		iomObjA.setattrvalue("attr1", "Bernhard");
 		iomObjA.setattrvalue("attr2", "Bernhard");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -304,7 +308,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2 Numerischen Werte uebereinstimmen.
 	@Test
 	public void numericEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID1);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -324,7 +328,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2 Numerischen Werte uebereinstimmen.
 	@Test
 	public void decEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID1);
 		iomObjA.setattrvalue("attr1", "5.0");
 		iomObjA.setattrvalue("attr2", "5.0");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -343,7 +347,7 @@ public class MandatoryConstraints23 {
 	
 	@Test
 	public void decEqualConstant_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF2, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF2, OID1);
 		iomObjA.setattrvalue("attr1", "2.0");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -360,7 +364,7 @@ public class MandatoryConstraints23 {
 	}	
 	@Test
 	public void decDomainEqualConstant_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF3, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF3, OID1);
 		iomObjA.setattrvalue("attr1", "2.0");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -379,7 +383,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlungen mit der Unter-Hierarchie uebereinstimmen.
 	@Test
 	public void subEnumerationEqual_Ok(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSEQUALATIONH, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSEQUALATIONH, OID1);
 		objValue.setattrvalue("aufzaehlung1", "mehr.vier");
 		objValue.setattrvalue("aufzaehlung2", "mehr.vier");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -399,7 +403,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Koordinaten uebereinstimmen.
 	@Test
 	public void coordsEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONE, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONE, OID1);
 		IomObject coordValue=iomObjA.addattrobj("attr1", "COORD");
 		coordValue.setattrvalue("C1", "480000.000");
 		coordValue.setattrvalue("C2", "70000.000");
@@ -429,7 +433,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polylines nur aus Geraden uebereinstimmen.
 	@Test
 	public void polylines2dStrainghtsEqual_Ok(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIOND, OID);
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIOND, OID1);
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
 		IomObject coordStart=segments.addattrobj("segment", "COORD");
@@ -463,7 +467,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2 3d Polylines aus Geraden und Kurven uebereinstimmen.
 	@Test
 	public void polylines3dStraightsArcs_Ok(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIONA, OID);
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIONA, OID1);
 		// line 1
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -515,7 +519,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Oberflaechen uebereinstimmen.
 	@Test
 	public void surface2dEqual_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONB, OID);
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONB, OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -599,7 +603,7 @@ public class MandatoryConstraints23 {
 	// test in equal (==)
 	@Test
 	public void mandatoryConstraintEqualityAreaTwice2DOk(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONC, OID);
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONC, OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -683,7 +687,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Texte ungleich sind.
 	@Test
 	public void textUnEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONA, OID1);
 		iomObjA.setattrvalue("attr1", "Bernhard");
 		iomObjA.setattrvalue("attr2", "Hannes");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -703,7 +707,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummern ungleich sind.
 	@Test
 	public void numericUnEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OID1);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "10");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -723,7 +727,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummern ungleich sind.
 	@Test
 	public void decimalUnEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OID1);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "10.1958764");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -743,7 +747,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzaehlungen ungleich sind.
 	@Test
 	public void enumerationUnEqual_Ok(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID1);
 		objValue.setattrvalue("aufzaehlung1", "null");
 		objValue.setattrvalue("aufzaehlung2", "eins");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -763,7 +767,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlungen mit der Unter-Hierarchy ungleich sind.
 	@Test
 	public void enumerationSubUnEqual_Ok(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID1);
 		objValue.setattrvalue("aufzaehlung1", "mehr.vier");
 		objValue.setattrvalue("aufzaehlung2", "drei");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -783,7 +787,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Coords ungleich sind.
 	@Test
 	public void coordsUnEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIOND, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIOND, OID1);
 		IomObject coordValue=iomObjA.addattrobj("attr1", "COORD");
 		coordValue.setattrvalue("C1", "480000.000");
 		coordValue.setattrvalue("C2", "70000.000");
@@ -813,7 +817,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polylines aus Geraden ungleich zu einander sind.
 	@Test
 	public void polylines2dStraights_Ok(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONE, OID);
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONE, OID1);
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
 		IomObject coordStart=segments.addattrobj("segment", "COORD");
@@ -847,7 +851,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Polylines 3d mit Geraden und Kurven ungleich sind.
 	@Test
 	public void polylines3dStraightsArcsUnEqual_Ok(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONF, OID);
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONF, OID1);
 		// line 1
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -899,7 +903,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Oberflaechen in 2d ungleich zu einander stehen.
 	@Test
 	public void surface2dUnEqual_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONG, OID);
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONG, OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -979,7 +983,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Areas in 2d ungleich sind.
 	@Test
 	public void area2dUnEqual_Ok(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONH, OID);
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONH, OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -1059,7 +1063,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Booleans ungleich sind.
 	@Test
 	public void booleanUnEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONI, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONI, OID1);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1079,7 +1083,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummer aus attr1 groesser als die Nummer aus attr2 ist.
 	@Test
 	public void numericGreaterThan_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID1);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1099,7 +1103,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummer aus attr1 groesser als die Nummer aus attr2 ist.
 	@Test
 	public void decimalGreaterThan_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID1);
 		iomObjA.setattrvalue("attr1", "5.9");
 		iomObjA.setattrvalue("attr2", "5.4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1119,7 +1123,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung groesser als die zweite Aufzaehlung ist.
 	@Test
 	public void enumerationGreaterThan_Ok(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OID1);
 		objValue.setattrvalue("aufzaehlung1", "eins");
 		objValue.setattrvalue("aufzaehlung2", "null");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1139,7 +1143,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 groesser als attr2 ist.
 	@Test
 	public void textGreaterThan_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OID1);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaaa");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1159,7 +1163,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 kleiner als attr2 in Numerischen Zahlen ist.
 	@Test
 	public void numericLessThan_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OID1);
 		iomObjA.setattrvalue("attr1", "4");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1179,7 +1183,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 kleiner als die Aufzaehlung2 ist.
 	@Test
 	public void enumerationLessThan_Ok(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OID1);
 		objValue.setattrvalue("aufzaehlung1", "eins");
 		objValue.setattrvalue("aufzaehlung2", "drei");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1199,7 +1203,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 kleiner als attr2 ist.
 	@Test
 	public void textLessTahn_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANC, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANC, OID1);
 		iomObjA.setattrvalue("attr1", "Aaaaa");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1219,7 +1223,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 groesser oder gleich attr2 ist.
 	@Test
 	public void numericGreaterThanOrEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID1);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1239,7 +1243,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 groesser oder gleich wie attr2 ist.
 	@Test
 	public void numericGreaterOrEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID1);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1259,7 +1263,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 groesser oder gleich attr2 ist.
 	@Test
 	public void decimalGreaterThanOrEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID1);
 		iomObjA.setattrvalue("attr1", "6.9");
 		iomObjA.setattrvalue("attr2", "5.8");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1279,7 +1283,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 groesser oder gleich wie attr2 ist.
 	@Test
 	public void decimalGreaterOrEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID1);
 		iomObjA.setattrvalue("attr1", "6.001");
 		iomObjA.setattrvalue("attr2", "6.001");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1299,7 +1303,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 groesser oder gleich der Aufzaehlung2 ist.
 	@Test
 	public void enumerationGreaterOrEqual_Ok(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OID1);
 		objValue.setattrvalue("aufzaehlung1", "eins");
 		objValue.setattrvalue("aufzaehlung2", "null");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1319,7 +1323,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 groesser oder gleich der Aufzaehlung2 ist. 
 	@Test
 	public void enumerationGreaterOrEqual2_Ok(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OID1);
 		objValue.setattrvalue("aufzaehlung1", "null");
 		objValue.setattrvalue("aufzaehlung2", "null");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1339,7 +1343,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 groesser oder gleich dem Text aus attr2 ist.
 	@Test
 	public void textGreaterOrEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OID1);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaaa");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1359,7 +1363,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 groesser oder gleich dem Text aus attr2 ist
 	@Test
 	public void textGreaterOrEqual2_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OID1);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1379,7 +1383,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 kleiner oder gleich dem Text aus attr2 ist.
 	@Test
 	public void textLessThanOrEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALA, OID1);
 		iomObjA.setattrvalue("attr1", "4");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1399,7 +1403,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 kleiner oder gleich dem Text aus attr2 ist
 	@Test
 	public void numericLessThanOrEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALA, OID1);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1419,7 +1423,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 kleiner oder gleich gross der Aufzaehlung2 ist.
 	@Test
 	public void enumerationLessThanOrEqual_Ok(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OID1);
 		objValue.setattrvalue("aufzaehlung1", "eins");
 		objValue.setattrvalue("aufzaehlung2", "drei");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1439,7 +1443,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 kleiner oder gleich der Aufzaehlung2 ist.
 	@Test
 	public void enumerationLessThanOrEqual2_Ok(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OID1);
 		objValue.setattrvalue("aufzaehlung1", "drei");
 		objValue.setattrvalue("aufzaehlung2", "drei");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1459,7 +1463,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der erste Text kleiner oder gleich dem zweiten Text ist.
 	@Test
 	public void textLessThanOrEqual2_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALC, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALC, OID1);
 		iomObjA.setattrvalue("attr1", "Aaaaa");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1479,7 +1483,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der erste Text kleiner oder gleich dem zweiten Text ist.
 	@Test
 	public void textLessTahnOrEqual_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALC, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALC, OID1);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1499,7 +1503,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2d Polyline nur mit Geraden definiert wurde.
 	@Test
 	public void polyline2dStraightsDefined_Ok(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSDEFINEDA, OID);
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSDEFINEDA, OID1);
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs1", "POLYLINE");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1515,10 +1519,33 @@ public class MandatoryConstraints23 {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+    @Test
+    public void embedded_Defined_Ok() throws Exception {
+        Iom_jObject iomObjV = new Iom_jObject(ILI_CLASSDEFINEDV, OID1);
+        Iom_jObject iomObjW = new Iom_jObject(ILI_CLASSDEFINEDW, OID2);
+        IomObject vw=iomObjW.addattrobj("role_v", "REF");
+        vw.setobjectrefoid(iomObjV.getobjectoid());
+        vw.setattrvalue("attr", "Attr"); 
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(iomObjV));
+        validator.validate(new ObjectEvent(iomObjW));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+
+
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der formattedType definiert wurde.
 	@Test
 	public void formattedTypeDefined_Ok(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSFORMATTEDTYPEA, OID);
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSFORMATTEDTYPEA, OID1);
 		objStraightsSuccess.setattrvalue("attr1", "2005-12-31T23:59:59.999");
 		objStraightsSuccess.setattrvalue("attr2", "2005-12-31T23:59:59.999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1538,7 +1565,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die verschiedenen Expressions alle stimmen.
 	@Test
 	public void differentExpressions_Ok(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(TOPIC+".ClassDiffExpressions", OID);
+		Iom_jObject objStraightsSuccess=new Iom_jObject(TOPIC+".ClassDiffExpressions", OID1);
 		objStraightsSuccess.setattrvalue("Geometrie_Polygon", "true");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1557,11 +1584,34 @@ public class MandatoryConstraints23 {
 	//#########################################################//
 	//########### FAIL MANDATORY CONSTRAINTS ##################//
 	//#########################################################//
+
+    @Test
+    public void embedded_Defined_Fail() throws Exception {
+        Iom_jObject iomObjV = new Iom_jObject(ILI_CLASSDEFINEDV, OID1);
+        Iom_jObject iomObjW = new Iom_jObject(ILI_CLASSDEFINEDW, OID2);
+        IomObject vw=iomObjW.addattrobj("role_v", "REF");
+        vw.setobjectrefoid(iomObjV.getobjectoid());
+        //vw.setattrvalue("attr", "Attr"); //should fail because attr is UNDEFINED
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(iomObjV));
+        validator.validate(new ObjectEvent(iomObjW));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Mandatory Constraint MandatoryConstraints23.Topic.DefinedVw.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die boolean nicht uebereinstimmen.	
 	@Test
 	public void booleanEqual_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID1);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1583,7 +1633,7 @@ public class MandatoryConstraints23 {
 	// und die Klasse: ClassConstant ueber die Klassen: ClassConstantJP3 --> ClassConstantJP2 --> ClassConstantJP erweitert wird.
 	@Test
 	public void multipleSubClassesEnumeration_Fail(){
-		Iom_jObject objClassConstantJP3=new Iom_jObject(ILI_CLASSCONSTANTJP3, OID);
+		Iom_jObject objClassConstantJP3=new Iom_jObject(ILI_CLASSCONSTANTJP3, OID1);
 		objClassConstantJP3.setattrvalue("aufzaehlung1", "eins");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1604,7 +1654,7 @@ public class MandatoryConstraints23 {
 	// die Klasse: ClassConstantJP die Klasse: ClassConstant erweitert und der constraint false ist.
 	@Test
 	public void constantEnumerationSub_Fail(){
-		Iom_jObject objClassConstantJP=new Iom_jObject(ILI_CLASSCONSTANTJP, OID);
+		Iom_jObject objClassConstantJP=new Iom_jObject(ILI_CLASSCONSTANTJP, OID1);
 		objClassConstantJP.setattrvalue("aufzaehlung1", "eins");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1624,7 +1674,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die boolean nicht uebereinstimmen.	
 	@Test
 	public void subClassBooleanEqual_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONIP, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONIP, OID1);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1645,7 +1695,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Texte nicht uebereinstimmen.
 	@Test
 	public void textNotEqual_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONG, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONG, OID1);
 		iomObjA.setattrvalue("attr1", "Bernhard");
 		iomObjA.setattrvalue("attr2", "Albert");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1666,7 +1716,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummern nicht uebereinstimmen.
 	@Test
 	public void numericNotEqual_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID1);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1687,7 +1737,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummern nicht uebereinstimmen.
 	@Test
 	public void decimalNotEqual_Fail(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF, OID1);
 		iomObjA.setattrvalue("attr1", "4.444444");
 		iomObjA.setattrvalue("attr2", "4.999999");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -1708,7 +1758,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Coords nicht uebereinstimmen.
 	@Test
 	public void coordsNotEqual_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONE, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONE, OID1);
 		IomObject coordValue=iomObjA.addattrobj("attr1", "COORD");
 		coordValue.setattrvalue("C1", "480000.000");
 		coordValue.setattrvalue("C2", "70000.000");
@@ -1739,7 +1789,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2d Polylines nicht uebereinstimmen.
 	@Test
 	public void polylines2dNotEqual_False(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIOND, OID);
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIOND, OID1);
 		// polyline 1
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -1798,7 +1848,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 3d Polylines nich uebereinstimmen.
 	@Test
 	public void polyline3dNotEqual_False(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIONA, OID);
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSEQUALATIONA, OID1);
 		// line 1
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -1851,7 +1901,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2d Oberflaechen nicht uebereinstimmen.
 	@Test
 	public void polyline2dNotEqual_False(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONB, OID);
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONB, OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -1932,7 +1982,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 2d Areas nicht uebereinstimmen.
 	@Test
 	public void area2dNotEqual_False(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONC, OID);
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSEQUALATIONC, OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -2017,7 +2067,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Texte uebereinstimmen.
 	@Test
 	public void textIsEqual_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONA, OID1);
 		iomObjA.setattrvalue("attr1", "Bernhard");
 		iomObjA.setattrvalue("attr2", "Bernhard");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2038,7 +2088,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Texte uebereinstimmen.
 	@Test
 	public void numberUnEqual_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OID1);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2059,7 +2109,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Texte uebereinstimmen.
 	@Test
 	public void decimalUnEqual_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONB, OID1);
 		iomObjA.setattrvalue("attr1", "5.222");
 		iomObjA.setattrvalue("attr2", "5.222");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2080,7 +2130,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzaehlungen nicht ungleich sind.
 	@Test
 	public void enumerationUnEqual_False(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID1);
 		objValue.setattrvalue("aufzaehlung1", "null");
 		objValue.setattrvalue("aufzaehlung2", "null");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2101,7 +2151,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzaehlungen mit ihrer Sub-Hierarchie nicht uebereinstimmen.
 	@Test
 	public void subEnumerationUnEqual_False(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSINEQUALATIONC, OID1);
 		objValue.setattrvalue("aufzaehlung1", "mehr.vier");
 		objValue.setattrvalue("aufzaehlung2", "mehr.vier");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2122,7 +2172,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Coords nicht uebereinstimmen.
 	@Test
 	public void coordsUnEqual_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIOND, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIOND, OID1);
 		IomObject coordValue=iomObjA.addattrobj("attr1", "COORD");
 		coordValue.setattrvalue("C1", "480000.000");
 		coordValue.setattrvalue("C2", "70000.000");
@@ -2153,7 +2203,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polylines nur aus Geraden, nicht uebereinstimmen.
 	@Test
 	public void polyline2dStraightsUnEqual_False(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONE, OID);
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONE, OID1);
 		// polyline 1
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -2190,7 +2240,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die 3d Polylines aus Geraden und Kurven nicht uebereinstimmen.
 	@Test
 	public void polyline3dStraightsArcsUnEqual_False(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONF, OID);
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONF, OID1);
 		// line 1
 		IomObject polylineValue=objStraightsSuccess.addattrobj("straightsarcs1", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
@@ -2243,7 +2293,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Oberflaechen nicht ungleich zueinander sind.
 	@Test
 	public void surface2dUnEqual_False(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONG, OID);
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONG, OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("surface1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -2328,7 +2378,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polygone nicht ungleich sind.
 	@Test
 	public void area2DUnEqual_False(){
-		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONH, OID);
+		Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSINEQUALATIONH, OID1);
 		// surface 1
 		IomObject multisurfaceValue=objSurfaceSuccess.addattrobj("area1", "MULTISURFACE");
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
@@ -2413,7 +2463,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Booleans nicht ungleich sind.
 	@Test
 	public void booleanNotUnEqual_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONI, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSINEQUALATIONI, OID1);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "true");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2434,7 +2484,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn das erste Attribute nicht groesser als das Zweite Attribute ist.
 	@Test
 	public void numericGreaterThan_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID1);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2455,7 +2505,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die attr1 nicht groesser als attr2 ist. 
 	@Test
 	public void numericNotGreaterThan_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID1);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2476,7 +2526,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn das erste Attribute nicht groesser als das Zweite Attribute ist.
 	@Test
 	public void decimalGreaterThan_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID1);
 		iomObjA.setattrvalue("attr1", "5.8");
 		iomObjA.setattrvalue("attr2", "5.9");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2497,7 +2547,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die attr1 nicht groesser als attr2 ist. 
 	@Test
 	public void decimalNotGreaterThan_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANA, OID1);
 		iomObjA.setattrvalue("attr1", "6.0");
 		iomObjA.setattrvalue("attr2", "6.0");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2518,7 +2568,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 nicht groesser als die Aufzaehlung2 ist.
 	@Test
 	public void enumerationNotGreaterThan_False(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OID1);
 		objValue.setattrvalue("aufzaehlung1", "null");
 		objValue.setattrvalue("aufzaehlung2", "eins");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2539,7 +2589,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die beiden Aufzaehlungen nicht ungleich sind.
 	@Test
 	public void enumerationUnEqual2_False(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANB, OID1);
 		objValue.setattrvalue("aufzaehlung1", "null");
 		objValue.setattrvalue("aufzaehlung2", "null");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2560,7 +2610,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht groesser als attr2 ist.
 	@Test
 	public void textNotGreaterThan_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OID1);
 		iomObjA.setattrvalue("attr1", "Aaaaa");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2581,7 +2631,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht groesser als attr2 ist.
 	@Test
 	public void textNotGreaterThan2_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANC, OID1);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2602,7 +2652,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn  die attr1 Nummer nicht kleiner als die attr2 Nummer ist.
 	@Test
 	public void numericNotLessThan_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OID1);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2623,7 +2673,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht kleiner als attr2 ist.
 	@Test
 	public void numericNotLess_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OID1);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2644,7 +2694,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn  die attr1 Nummer nicht kleiner als die attr2 Nummer ist.
 	@Test
 	public void decimalNotLessThan_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OID1);
 		iomObjA.setattrvalue("attr1", "4.301");
 		iomObjA.setattrvalue("attr2", "4.202");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2665,7 +2715,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht kleiner als attr2 ist.
 	@Test
 	public void decimalNotLess_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANA, OID1);
 		iomObjA.setattrvalue("attr1", "6.0");
 		iomObjA.setattrvalue("attr2", "6.0");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2686,7 +2736,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 nicht kleiner als Aufzaehlung2 ist.
 	@Test
 	public void enumerationNotLessThan_False(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OID1);
 		objValue.setattrvalue("aufzaehlung1", "drei");
 		objValue.setattrvalue("aufzaehlung2", "eins");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2707,7 +2757,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 nicht kleiner als die Aufzaehlung ist.
 	@Test
 	public void enumeriationsNotLessThan_False(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANB, OID1);
 		objValue.setattrvalue("aufzaehlung1", "drei");
 		objValue.setattrvalue("aufzaehlung2", "drei");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2728,7 +2778,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 nicht kleiner als attr2 ist.
 	@Test
 	public void textNotLessThan_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANC, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANC, OID1);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaaa");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2749,7 +2799,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht kleiner als attr2 ist.
 	@Test
 	public void textLessThan_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANC, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANC, OID1);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2770,7 +2820,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht groesser oder gleich attr2 ist.
 	@Test
 	public void numericNotGreaterThanOrEqual_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID1);
 		iomObjA.setattrvalue("attr1", "5");
 		iomObjA.setattrvalue("attr2", "6");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2791,7 +2841,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn attr1 nicht groesser oder gleich attr2 ist.
 	@Test
 	public void decimalNotGreaterThanOrEqual_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALA, OID1);
 		iomObjA.setattrvalue("attr1", "6.0124");
 		iomObjA.setattrvalue("attr2", "6.0125");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2812,7 +2862,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 nicht groesser oder gleich die Aufzaehlung2 ist.
 	@Test
 	public void enumeriationNotGreaterThanOrEqual_False(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALB, OID1);
 		objValue.setattrvalue("aufzaehlung1", "null");
 		objValue.setattrvalue("aufzaehlung2", "eins");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2833,7 +2883,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1 nicht groesser oder gleich dem Text aus attr2 ist.
 	@Test
 	public void textNotGreaterThanOrEqual_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSGREATERTHANOREQUALC, OID1);
 		iomObjA.setattrvalue("attr1", "Aaaaa");
 		iomObjA.setattrvalue("attr2", "Aaaab");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2854,7 +2904,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummer aus attr1 nicht kleiner der Nummer aus attr2 ist.
 	@Test
 	public void numericNotLessThan2_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALA, OID1);
 		iomObjA.setattrvalue("attr1", "6");
 		iomObjA.setattrvalue("attr2", "4");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2875,7 +2925,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Nummer aus attr1 nicht kleiner der Nummer aus attr2 ist.
 	@Test
 	public void decimalNotLessThan2_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALA, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALA, OID1);
 		iomObjA.setattrvalue("attr1", "6.4");
 		iomObjA.setattrvalue("attr2", "4.5");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2896,7 +2946,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn die Aufzaehlung1 nicht kleiner oder gleich der Aufzaehlung2 ist.
 	@Test
 	public void enumerationNotLessThanOrEqual_False(){
-		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OID);
+		Iom_jObject objValue=new Iom_jObject(ILI_CLASSLESSTHANOREQUALB, OID1);
 		objValue.setattrvalue("aufzaehlung1", "drei");
 		objValue.setattrvalue("aufzaehlung2", "eins");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2917,7 +2967,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der Text aus attr1, nicht kleiner oder gleich dem Text aus attr2 ist.
 	@Test
 	public void textNotLessThanOrEqual_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALC, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSLESSTHANOREQUALC, OID1);
 		iomObjA.setattrvalue("attr1", "Aaaab");
 		iomObjA.setattrvalue("attr2", "Aaaaa");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2938,7 +2988,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der FormattedType aus attr1, dem FormattedType aus attr2 entspricht.
 	@Test
 	public void formattedTypeUnEqual_Fail(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSFORMATTEDTYPEA, OID);
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSFORMATTEDTYPEA, OID1);
 		objStraightsSuccess.setattrvalue("attr1", "2005-12-31T23:59:59.999");
 		objStraightsSuccess.setattrvalue("attr2", "2005-12-31T23:59:59.888");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -2959,7 +3009,7 @@ public class MandatoryConstraints23 {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn alle 3 Constraints definierte Attribute enthalten.
 	@Test
 	public void unDefinedAttrs_Fail(){
-		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSDEFINEDB, OID);
+		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSDEFINEDB, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -2982,7 +3032,7 @@ public class MandatoryConstraints23 {
 	// Es wird eine Fehlermeldung erwartet.
 	@Test
 	public void valuesNotEqual_ConstraintDisableSet_NotSet_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID1);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -3005,7 +3055,7 @@ public class MandatoryConstraints23 {
 	// Es wird eine Fehlermeldung erwartet.
 	@Test
 	public void valuesNotEqual_ConstraintDisableSet_ON_False(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID1);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -3029,7 +3079,7 @@ public class MandatoryConstraints23 {
 	// Es wird erwartet dass keine Fehlermeldung ausgegeben wird.
 	@Test
 	public void valuesNotEqual_ConstraintDisableSet_OFF_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID);
+		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONI, OID1);
 		iomObjA.setattrvalue("attr1", "true");
 		iomObjA.setattrvalue("attr2", "false");
 		ValidationConfig modelConfig=new ValidationConfig();

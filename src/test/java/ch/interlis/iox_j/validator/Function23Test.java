@@ -2,6 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
@@ -61,7 +62,6 @@ public class Function23Test {
 	private final static String ILI_CLASSWB=ILI_TOPIC+".ClassWB";
 	private final static String ILI_CLASSX=ILI_TOPIC+".ClassX";
 	private final static String ILI_CLASSY=ILI_TOPIC+".ClassY";
-	private final static String ILI_CLASSZ=ILI_TOPIC+".ClassZ";
 	private final static String ILI_CLASSZA=ILI_TOPIC+".ClassZA";
 	private final static String ILI_CLASSZB=ILI_TOPIC+".ClassZB";
 	private final static String ILI_CLASSZD=ILI_TOPIC+".ClassZD";
@@ -79,6 +79,7 @@ public class Function23Test {
 	private final static String ILI_STRUCTF=ILI_TOPIC+".StructF";
 	private final static String ILI_STRUCTAP=ILI_TOPIC+".StructAp";
 	private final static String ILI_STRUCTBP=ILI_TOPIC+".StructBp";
+    private final static String ILI_STRUCTBPP=ILI_TOPIC+".StructBpp";
 	// ASSOCIATION
 	private final static String ILI_ASSOC_QR1_Q1="q1";
 	private final static String ILI_ASSOC_QR1_R1="r1";
@@ -606,12 +607,11 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: myClass, die KlasseY mit der Gesuchten Klasse uebereinstimmt.
 	@Test
 	public void myClass_Ok(){
-		Iom_jObject iomObjS1=new Iom_jObject(ILI_STRUCTB, null);
-		Iom_jObject iomObjU=new Iom_jObject(ILI_CLASSY, OBJ_OID1);
-		iomObjU.addattrobj("attrY1", iomObjS1);
+		Iom_jObject iomStructBP=new Iom_jObject(ILI_STRUCTBP, null);
+		Iom_jObject iomObjY=new Iom_jObject(ILI_CLASSY, OBJ_OID1);
+		iomObjY.addattrobj("attrY1", iomStructBP);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -619,13 +619,32 @@ public class Function23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjU));
-		validator.validate(new ObjectEvent(iomObjS1));
+		validator.validate(new ObjectEvent(iomObjY));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertEquals(0,logger.getErrs().size());
 	}
+
+    @Test
+    public void myClass_WrongClass_Fail(){
+        Iom_jObject iomStructB=new Iom_jObject(ILI_STRUCTB, null);
+        Iom_jObject iomObjY=new Iom_jObject(ILI_CLASSY, OBJ_OID1);
+        iomObjY.addattrobj("attrY1", iomStructB);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObjY));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1,logger.getErrs().size());
+        assertEquals("Mandatory Constraint Function23.Topic.ClassY.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isSubClass die referenzierte Klasse mit der Klasse der Funktion: myClass uebereinstimmt.
 	@Test
@@ -659,14 +678,13 @@ public class Function23Test {
 		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
 		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, OBJ_OID3);
 		Iom_jObject iomObjST1=new Iom_jObject(ILI_ASSOC_ST1, null);
-		iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID1);
-		iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID3);
+		iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(iomObjS1.getobjectoid());
+		iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(iomObjT1.getobjectoid());
 		// zweites S->T
-		Iom_jObject iomObjS2=new Iom_jObject(ILI_CLASSS, OBJ_OID2);
 		Iom_jObject iomObjT2=new Iom_jObject(ILI_CLASST, OBJ_OID4);
 		Iom_jObject iomObjST2=new Iom_jObject(ILI_ASSOC_ST1, null);
-		iomObjST2.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID2);
-		iomObjST2.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID4);
+		iomObjST2.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(iomObjS1.getobjectoid());
+		iomObjST2.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(iomObjT2.getobjectoid());
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -675,7 +693,6 @@ public class Function23Test {
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjS1));
-		validator.validate(new ObjectEvent(iomObjS2));
 		validator.validate(new ObjectEvent(iomObjT1));
 		validator.validate(new ObjectEvent(iomObjT2));
 		validator.validate(new ObjectEvent(iomObjST1));
@@ -936,39 +953,6 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Rolle t1, 2 mal aufgerufen wird.
-	@Test
-	public void objectCountRole_RoleCountEqual_Ok(){
-		// erstes S->T
-		// zweites S->T
-		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
-		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, OBJ_OID3);
-		Iom_jObject iomObjS2=new Iom_jObject(ILI_CLASSS, OBJ_OID2);
-		Iom_jObject iomObjT2=new Iom_jObject(ILI_CLASST, OBJ_OID4);
-		Iom_jObject iomObjST1=new Iom_jObject(ILI_ASSOC_ST1, null);
-		iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID1);
-		iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID3);
-		Iom_jObject iomObjST2=new Iom_jObject(ILI_ASSOC_ST1, null);
-		iomObjST2.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(OBJ_OID2);
-		iomObjST2.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(OBJ_OID4);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjS1));
-		validator.validate(new ObjectEvent(iomObjT1));
-		validator.validate(new ObjectEvent(iomObjST1));
-		validator.validate(new ObjectEvent(iomObjS2));
-		validator.validate(new ObjectEvent(iomObjT2));
-		validator.validate(new ObjectEvent(iomObjST2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
 	//#########################################################//
 	//######## FAIL FUNCTIONS #################################//
 	//#########################################################//
@@ -1423,7 +1407,8 @@ public class Function23Test {
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: objectCount(Role), die Anzahl der Rollen von KlasseS nach KlasseT nicht stimmt.
 	@Test
-	public void objectCountRole_RoleCountNotEqual_Fail(){
+	//@Ignore("review model")
+	public void objectCountRole_Fail(){
 		// erstes S->T
 		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
 		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, OBJ_OID3);
@@ -1447,42 +1432,48 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassS.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass, die Klasse nicht von der Eltern-Klasse stammt.
-	@Test
-	public void isOfClass_ParentClassNotValid_Fail(){
-		String objTargetId=OBJ_OID1;
-		Iom_jObject iomObjB=new Iom_jObject(ILI_STRUCTB, null);
-		Iom_jObject iomObjBP=new Iom_jObject(ILI_STRUCTBP, objTargetId);
-		Iom_jObject o1Ref=new Iom_jObject("REF", null);
-		o1Ref.setobjectrefoid(objTargetId);
-		Iom_jObject iomObjV=new Iom_jObject(ILI_CLASSV, OBJ_OID1);
-		iomObjV.addattrobj("attrV1", iomObjBP);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjV));
-		validator.validate(new ObjectEvent(iomObjB));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Function23.Topic.ClassV.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass die referenzierte Klasse, keine gueltige Klasse der Eltern-Klasse ist.
+    @Test
+    public void isOfClass_Ok(){
+        Iom_jObject iomStructBP=new Iom_jObject(ILI_STRUCTBP, null);
+        Iom_jObject iomObjV=new Iom_jObject(ILI_CLASSV, OBJ_OID1);
+        iomObjV.addattrobj("attrV1", iomStructBP);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObjV));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0,logger.getErrs().size());
+    }
+    @Test
+    public void isOfClass_subClassOk(){
+        Iom_jObject iomStructBPP=new Iom_jObject(ILI_STRUCTBPP, null);
+        Iom_jObject iomObjV=new Iom_jObject(ILI_CLASSV, OBJ_OID1);
+        iomObjV.addattrobj("attrV1", iomStructBPP);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObjV));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0,logger.getErrs().size());
+    }
 	@Test
-	public void isOfClass_ChildClassNotValid_Fail(){
-		String objTargetId=OBJ_OID1;
-		Iom_jObject iomObjB=new Iom_jObject(ILI_STRUCTB, null);
-		Iom_jObject iomObjBP=new Iom_jObject(ILI_STRUCTAP, objTargetId);
-		Iom_jObject o1Ref=new Iom_jObject("REF", null);
-		o1Ref.setobjectrefoid(objTargetId);
+	public void isOfClass_Object_Fail(){
+		Iom_jObject iomStructB=new Iom_jObject(ILI_STRUCTB, null);
 		Iom_jObject iomObjV=new Iom_jObject(ILI_CLASSV, OBJ_OID1);
-		iomObjV.addattrobj("attrV1", iomObjBP);
+		iomObjV.addattrobj("attrV1", iomStructB);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1491,13 +1482,11 @@ public class Function23Test {
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjV));
-		validator.validate(new ObjectEvent(iomObjB));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("Attribute attrV1 requires a structure Function23.Topic.StructB", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Mandatory Constraint Function23.Topic.ClassV.Constraint1 is not true.", logger.getErrs().get(1).getEventMsg());
+		assertEquals(1,logger.getErrs().size());
+		assertEquals("Mandatory Constraint Function23.Topic.ClassV.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isSubClass, die beiden Konstanten Klassen nicht uebereinstimmen.
@@ -1519,27 +1508,6 @@ public class Function23Test {
 		assertEquals("Mandatory Constraint Function23.Topic.ClassX.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: myClass, die myClass auf eine falsche Klasse verweist.
-	@Test
-	public void myClass_WrongClass_Fail(){
-		Iom_jObject iomObjS1=new Iom_jObject(ILI_STRUCTB, null);
-		Iom_jObject iomObjU=new Iom_jObject(ILI_CLASSZ, OBJ_OID1);
-		iomObjU.addattrobj("attrZ1", iomObjS1);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjU));
-		validator.validate(new ObjectEvent(iomObjS1));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Function23.Topic.ClassZ.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
-	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass die MyClass ueber eine falsche Referenz fuehrt.
 	@Test

@@ -326,6 +326,18 @@ MODEL MandatoryConstraints23
 			DEFINED(attr1);
 		END ClassDefinedB;
 		
+		CLASS ClassDefinedV =
+		END ClassDefinedV;
+		CLASS ClassDefinedW =
+		END ClassDefinedW;
+		ASSOCIATION DefinedVw =
+			role_v -- {0..1} ClassDefinedV;
+			role_w -- {0..2} ClassDefinedW;
+			attr : TEXT*10;
+			MANDATORY CONSTRAINT DEFINED(attr);
+		END DefinedVw;
+		
+		
 		CLASS ClassFormattedTypeA =
 			attr1: FORMAT INTERLIS.XMLDateTime "2000-01-01T00:00:00.000" ..	"2005-12-31T23:59:59.999";
 			attr2: FORMAT INTERLIS.XMLDateTime "2000-01-01T00:00:00.000" ..	"2005-12-31T23:59:59.999";
