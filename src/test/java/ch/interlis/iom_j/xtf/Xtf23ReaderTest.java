@@ -169,11 +169,28 @@ public class Xtf23ReaderTest {
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		// b1
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent); // DataTest1.TopicA.ClassA oid oidA {}
+		
+        IoxEvent event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        IomObject iomObject = ((ObjectEvent) event).getIomObject();
+        
+        // DataTest1.TopicA.ClassA oid oidA {}
+        assertEquals("DataTest1.TopicA.ClassA", iomObject.getobjecttag());
+        assertEquals("oidA", iomObject.getobjectoid());
+		
+		//assertTrue(reader.read() instanceof  ObjectEvent); 
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		// b2
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent); // DataTest1.TopicC.ClassC oid oidC {}
+
+        event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        iomObject = ((ObjectEvent) event).getIomObject();
+        
+        // DataTest1.TopicA.ClassA oid oidA {}
+        assertEquals("DataTest1.TopicC.ClassC", iomObject.getobjecttag());
+        assertEquals("oidC", iomObject.getobjectoid());
+		
 		assertTrue(reader.read() instanceof  ObjectEvent);
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
@@ -187,10 +204,42 @@ public class Xtf23ReaderTest {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"ObjectConsistencyMode.xtf"));
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent); // DataTest1.TopicA.ClassA oid oid1 {}
-		assertTrue(reader.read() instanceof  ObjectEvent); // DataTest1.TopicA.ClassA oid oid2 {}
-		assertTrue(reader.read() instanceof  ObjectEvent); // DataTest1.TopicA.ClassA oid oid3 {}
-		assertTrue(reader.read() instanceof  ObjectEvent); // DataTest1.TopicA.ClassA oid oid4 {}
+		
+        IoxEvent event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        IomObject iomObject = ((ObjectEvent) event).getIomObject();
+        
+        // DataTest1.TopicA.ClassA oid oid1 {}
+        assertEquals("DataTest1.TopicA.ClassA", iomObject.getobjecttag());
+        assertEquals("oid1", iomObject.getobjectoid());
+        
+
+        event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        iomObject = ((ObjectEvent) event).getIomObject();
+        
+        // DataTest1.TopicA.ClassA oid oid2 {}
+        assertEquals("DataTest1.TopicA.ClassA", iomObject.getobjecttag());
+        assertEquals("oid2", iomObject.getobjectoid());
+        
+        
+        event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        iomObject = ((ObjectEvent) event).getIomObject();
+        
+        // DataTest1.TopicA.ClassA oid oid3 {}
+        assertEquals("DataTest1.TopicA.ClassA", iomObject.getobjecttag());
+        assertEquals("oid3", iomObject.getobjectoid());
+        
+        
+        event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        iomObject = ((ObjectEvent) event).getIomObject();
+        
+        // DataTest1.TopicA.ClassA oid oid4 {}
+        assertEquals("DataTest1.TopicA.ClassA", iomObject.getobjecttag());
+        assertEquals("oid4", iomObject.getobjectoid());
+
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
