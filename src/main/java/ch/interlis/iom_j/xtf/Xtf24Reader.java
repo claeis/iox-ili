@@ -1341,7 +1341,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 						break;
 					case MULTICOORD: segment.setattrvalue("multicoord", event.asCharacters().getData());
 						break;
-					case R: // ignore
+					case R: segment.setattrvalue("R", event.asCharacters().getData());
 						break;
 					default: throw new IoxSyntaxException(event2msgtext(event));
 				}
