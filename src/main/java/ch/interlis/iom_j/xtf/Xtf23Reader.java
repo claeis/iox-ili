@@ -941,7 +941,17 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
         	if(event.isCharacters()) {
 	            Characters characters = (Characters) event;
 	            if(!characters.isWhiteSpace()){
-					throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
+	                String data = characters.getData();
+	                if (data.length() == 1) {
+	                    char c = data.charAt(0);
+	                    if (Character.isLetter(c) || Character.isDigit(c)) {
+	                        throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
+	                    } else {
+	                        return event;
+	                    }
+	                } else {
+	                    throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
+	                }
 	            }
         	}
             event=reader.nextEvent();
@@ -984,8 +994,9 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
         			return iomObj;
         		}
             }else if(element.getAttributeByName(QNAME_XML_OID)!=null) {
-            	Attribute attr=element.getAttributeByName(QNAME_XML_OID);
-            	iomObj.setattrvalue(attrName, attr.getValue());
+            	Attribute oidAttr=element.getAttributeByName(QNAME_XML_OID);
+            	attrName=element.getName().getLocalPart();
+            	iomObj.setattrvalue(attrName, oidAttr.getValue());
             	event=reader.nextEvent();
             	event=skipCommentary(event);
         		if(event.isCharacters()){ // are characters
@@ -1002,7 +1013,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 		    	event=reader.nextEvent(); // start attribute
 		    	event=skipCommentary(event);
 		    	if(!reader.peek().isEndElement()) {
-		    		event=skipSpacesAndGetNextEvent(event);
+		    	    event=skipSpacesAndGetNextEvent(event);
 		    	}
 		    	// characters
 	            if(event.isCharacters()){ 

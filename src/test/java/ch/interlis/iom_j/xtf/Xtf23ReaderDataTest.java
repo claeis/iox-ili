@@ -129,7 +129,7 @@ public class Xtf23ReaderDataTest {
 	
 	// Es wird getestet ob Texte ohne Fehler gelesen werden koennen.
 	@Test
-	@Ignore
+	//@Ignore
 	public void testTextType_Ok()  throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"TextTypes.xtf"));
 		assertTrue(reader.read() instanceof  StartTransferEvent);
@@ -142,7 +142,12 @@ public class Xtf23ReaderDataTest {
         assertEquals("DataTest1.TopicA.ClassA", iomObject.getobjecttag());
         assertEquals("oidA", iomObject.getobjectoid());		
         
-	    assertTrue(reader.read() instanceof  ObjectEvent);
+        assertEquals("m text", iomObject.getattrvalue("attrMText"));
+        assertEquals("Randomname", iomObject.getattrvalue("attrName"));
+        assertEquals("\"normal text\"", iomObject.getattrvalue("attrText"));
+        assertEquals("http://www.interlis.ch", iomObject.getattrvalue("attrUri"));
+        
+	    //assertTrue(reader.read() instanceof  ObjectEvent);
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
@@ -196,7 +201,6 @@ public class Xtf23ReaderDataTest {
 	
 	// Es wird getestet ob Oid's ohne Fehler erstellt werden koennen.
 	@Test
-	@Ignore("Es funktioniert nicht richtig! Value attrH5 kommt null")
 	public void testOidType_Ok()  throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"OidTypes.xtf"));
 		assertTrue(reader.read() instanceof  StartTransferEvent);
@@ -213,8 +217,6 @@ public class Xtf23ReaderDataTest {
 		assertEquals("Interlis12345", iomObject.getattrvalue("attrH4"));
 		assertEquals("123e4567-e89b-12d3-a456-426655440000", iomObject.getattrvalue("attrH5"));
 		
-		// DataTest1.TopicA.ClassH oid oidH {attrH1 5kidok-_, attrH2 igjH-m_, attrH3 1234, attrH4 Interlis12345, attrH5 123e4567-e89b-12d3-a456-426655440000}
-		// assertTrue(reader.read() instanceof ObjectEvent); 
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
