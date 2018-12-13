@@ -28,7 +28,7 @@ import ch.interlis.iox_j.IoxIliReader;
 import ch.interlis.iox_j.IoxSyntaxException;
 
 public class Xtf23Reader implements IoxReader ,IoxIliReader{
-	private XMLEventReader reader=null;
+    private XMLEventReader reader=null;
 	private IoxFactoryCollection factory=new  ch.interlis.iox_j.DefaultIoxFactoryCollection();
 	private java.io.InputStream inputFile=null;
 	private int oidSpaceSize=0;
@@ -941,17 +941,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
         	if(event.isCharacters()) {
 	            Characters characters = (Characters) event;
 	            if(!characters.isWhiteSpace()){
-	                String data = characters.getData();
-	                if (data.length() == 1) {
-	                    char c = data.charAt(0);
-	                    if (Character.isLetter(c) || Character.isDigit(c)) {
-	                        throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
-	                    } else {
-	                        return event;
-	                    }
-	                } else {
-	                    throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
-	                }
+	                throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
 	            }
         	}
             event=reader.nextEvent();
@@ -1012,9 +1002,14 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 		    	}
 		    	event=reader.nextEvent(); // start attribute
 		    	event=skipCommentary(event);
-		    	if(!reader.peek().isEndElement()) {
-		    	    event=skipSpacesAndGetNextEvent(event);
+		    	if (event.isCharacters()) {
+		    	    Characters characters = (Characters) event;
+		    	    // Check has character a new line or tab..
+	                if(!reader.peek().isEndElement() && characters.isWhiteSpace()) {
+	                    event=skipSpacesAndGetNextEvent(event);
+	                }
 		    	}
+
 		    	// characters
 	            if(event.isCharacters()){ 
 	            	StringBuffer value=new StringBuffer();

@@ -8,7 +8,7 @@
 	<DATASECTION>
 		<DataTest1.TopicA BID="bidA">
 			<DataTest1.TopicA.ClassA TID="oidA">
-				<attrText>&quot;normal text&quot;</attrText>
+				<attrText>&quot;normal text</attrText>
 				<attrMText>m text</attrMText>
 				<attrUri>http://www.interlis.ch</attrUri>
 				<attrName>Randomname</attrName>
