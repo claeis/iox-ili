@@ -2,18 +2,20 @@
 <ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" xmlns="http://www.interlis.ch/xtf/2.4/Association" xmlns:geom="http://www.interlis.ch/geometry/1.0">
 	<ili:headersection>
 		<ili:models>
-			<ili:model>Association</ili:model>
+			<ili:model>Model</ili:model>
 		</ili:models>
 	</ili:headersection>
 	<ili:datasection>
-		<Baum ili:bid="bid">
-			<Ast ili:tid="oid1">
-			</Ast>
-			<Blatt ili:tid="oid2">
-			</Blatt>
-			<Beziehung>
-				<bezAst ili:ref="oid1"/>
-			</Beziehung>
-		</Baum>
+		<TopicEmbeddedAssWithAttr ili:bid="bid">
+			<ClassA ili:tid="oid1">
+			</ClassA>
+			<ClassB ili:tid="oid2">
+				<rolle_A ili:ref="oid1">
+					<assocAB>
+						<attr_Assoc>12</attr_Assoc>
+					</assocAB>
+				</rolle_A>
+			</ClassB>
+		</TopicEmbeddedAssWithAttr>
 	</ili:datasection>
 </ili:transfer>

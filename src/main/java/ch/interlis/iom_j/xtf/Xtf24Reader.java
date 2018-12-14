@@ -298,12 +298,9 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 					iomObj=readObject(event, iomObj); // read object
 					setOperation(event.asStartElement(), iomObj);
 					setConsistency(event.asStartElement(), iomObj);
-					if(viewable instanceof AssociationDef){
-						associationIsValid(iomObj);
-					}
                 	return new ch.interlis.iox_j.ObjectEvent(iomObj); // return object
                 }else if(event.isEndElement()) { // end basket
-					state=AFTER_ENDBASKET;
+                	state=AFTER_ENDBASKET;
 		        	return new ch.interlis.iox_j.EndBasketEvent(); // return end basket
                 }
 			}
@@ -316,9 +313,6 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 					iomObj=readObject(event, iomObj); // read object
 					setOperation(event.asStartElement(), iomObj);
 					setConsistency(event.asStartElement(), iomObj);
-					if(viewable instanceof AssociationDef){
-						associationIsValid(iomObj);
-					}
                 	return new ch.interlis.iox_j.ObjectEvent(iomObj); // return object
 		        }else if(event.isEndElement()){
 					state=AFTER_ENDBASKET; // close basket
@@ -633,20 +627,6 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
         return event;
     }
 	
-	private void associationIsValid(IomObject iomObj) throws IoxException {
-		int count=0;
-		for(int i=0;i<iomObj.getattrcount();i++){
-			String key=iomObj.getattrname(i);
-			IomObject attrValue=iomObj.getattrobj(key,0);
-			if(attrValue!=null && attrValue.getobjecttag().equals("REF")){
-				count+=1;
-			}
-		}
-		if(count<2){
-			throw new IoxException("expected at least 2 roles in ASSOCIATION "+iomObj.getobjecttag());
-		}
-	}
-
 	private IomObject setOperation(StartElement element, IomObject iomObj) throws IoxException {
 		Attribute operation = element.getAttributeByName(QNAME_ILI_OPERATION);
         if(operation!=null){
@@ -967,6 +947,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
         						}
         						iomObj=readReference(viewable,iomObj, element, role,association);
         						event=reader.nextEvent(); // after role
+        						event=skipSpacesAndGetNextEvent(event);
         						attrName=null;
         					}
             			}
@@ -1137,7 +1118,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
         return iomObj;
     }
 
-	private IomObject readReference(Viewable aclass,IomObject iomObj, StartElement element, RoleDef role, AssociationDef association) throws IoxException{
+	private IomObject readReference(Viewable aclass,IomObject iomObj, StartElement element, RoleDef role, AssociationDef association) throws IoxException, XMLStreamException{
 		String refOid=element.getAttributeByName(QNAME_ILI_REF).getValue();
 		if(refOid.length()<=1){
 			throw new IoxException("unexpected reference value <"+refOid+">");
@@ -1177,14 +1158,28 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 			}
 		}else{
 			// embedded role
-			iomObj.addattrobj(role.getName(),"REF").setobjectrefoid(refOid);
-			IomObject aObject=iomObj.getattrobj(role.getName(), 0);
-			if(orderPos!=null){
-				aObject.setobjectreforderpos(orderPos);
-			}
-			if(refBid!=null) {
-				aObject.setobjectrefbid(refBid);
-			}
+	        XMLEvent peek = reader.peek();
+	        XMLEvent event = null;
+	        if (peek.isCharacters()) {
+	            event = reader.nextEvent();
+	            event = skipSpacesAndGetNextEvent(event);
+	        } else if (peek.isStartElement()) {
+	            event = reader.nextEvent();
+	        }
+	        
+	        if (event != null && event.isStartElement()) {
+	            element = (StartElement) event;
+	            iomObj.addattrobj(role.getName(), readObject(event, iomObj));
+	        } else {
+	            iomObj.addattrobj(role.getName(),"REF").setobjectrefoid(refOid);
+	            IomObject aObject=iomObj.getattrobj(role.getName(), 0);
+	            if(orderPos!=null){
+	                aObject.setobjectreforderpos(orderPos);
+	            }
+	            if(refBid!=null) {
+	                aObject.setobjectrefbid(refBid);
+	            }	            
+	        }
 		}
 		return iomObj;
 	}

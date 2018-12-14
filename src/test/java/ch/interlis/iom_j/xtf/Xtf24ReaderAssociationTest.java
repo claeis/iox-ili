@@ -35,6 +35,38 @@ public class Xtf24ReaderAssociationTest {
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
 	}
+	
+    @Test
+    public void embeddedAssociationWithAttributes_Ok() throws Iox2jtsException, IoxException {
+        Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"EmbeddedAssociationWithAttributes.xml"));
+        reader.setModel(td);
+        assertTrue(reader.read() instanceof  StartTransferEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        
+        IoxEvent event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        IomObject iomObject = ((ObjectEvent) event).getIomObject();
+        
+        assertEquals("Association.TopicEmbeddedAssWithAttr.ClassA", iomObject.getobjecttag());
+        assertEquals("oid1", iomObject.getobjectoid());
+        
+        
+        event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        iomObject = ((ObjectEvent) event).getIomObject();
+        
+        assertEquals("Association.TopicEmbeddedAssWithAttr.ClassB", iomObject.getobjecttag());
+        assertEquals("oid2", iomObject.getobjectoid());     
+        
+        IomObject association = iomObject.getattrobj("rolle_A", 0);
+        assertNotNull(association);
+        assertEquals("12", association.getattrvalue("attr_Assoc"));
+        
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
 
 	@Test
 	public void embedded_0to1_Ok() throws Iox2jtsException, IoxException {
@@ -735,26 +767,6 @@ public class Xtf24ReaderAssociationTest {
 			fail();
 		}catch(IoxException ioxEx){
 			assertTrue((ioxEx).getMessage().contains("class or association Beziehung2 not found"));
-	        assertTrue(ioxEx instanceof IoxException);
-		}
-		reader.close();
-		reader=null;
-	}
-	
-	// Die Beziehungsklasse hat nur eine Rolle.
-	@Test
-	public void associationWithOneRole_Fail() throws Iox2jtsException, IoxException {
-		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"AssociationWithOneRole.xml"));
-		reader.setModel(td);
-		assertTrue(reader.read() instanceof  StartTransferEvent);
-		assertTrue(reader.read() instanceof  StartBasketEvent);
-		assertTrue(reader.read() instanceof  ObjectEvent); // Association.Baum.Ast oid oid1 {}
-		assertTrue(reader.read() instanceof  ObjectEvent); // Association.Baum.Blatt oid oid2 {}
-		try{
-			reader.read(); // Association.Baum.Beziehung {bezAst -> oid1 REF {}}
-			fail();
-		}catch(IoxException ioxEx){
-			assertTrue((ioxEx).getMessage().contains("expected at least 2 roles in ASSOCIATION Association.Baum.Beziehung"));
 	        assertTrue(ioxEx instanceof IoxException);
 		}
 		reader.close();
