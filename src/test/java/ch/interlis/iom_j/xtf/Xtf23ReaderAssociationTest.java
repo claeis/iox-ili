@@ -53,6 +53,38 @@ public class Xtf23ReaderAssociationTest {
 		reader=null;
 	}
 	
+    @Test
+    public void embeddedAssociationWithAttributes_Ok() throws Iox2jtsException, IoxException {
+        Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"EmbeddedAssociationWithAttributes.xtf"));
+        assertTrue(reader.read() instanceof  StartTransferEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        
+        IoxEvent event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        IomObject iomObject = ((ObjectEvent) event).getIomObject();
+        
+        //Association.Mensch.Mann oid oid1 {}
+        assertEquals("Model.Topic.ClassA", iomObject.getobjecttag());
+        assertEquals("oid1", iomObject.getobjectoid());
+        
+        
+        event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        iomObject = ((ObjectEvent) event).getIomObject();
+        
+        assertEquals("Model.Topic.ClassB", iomObject.getobjecttag());
+        assertEquals("oid2", iomObject.getobjectoid());     
+        
+        IomObject association = iomObject.getattrobj("rolle_A", 0);
+        assertNotNull(association);
+        assertEquals("12", association.getattrvalue("attr_Assoc"));
+        
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
+	
 	// prueft, ob eine eingebettete Referenz mit einer REF (oid, bid) gelesen werden kann.
 	@Test
 	public void embedded_ClassPathRef_Ok() throws Iox2jtsException, IoxException {

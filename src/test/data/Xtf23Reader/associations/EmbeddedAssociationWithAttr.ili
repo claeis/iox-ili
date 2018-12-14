@@ -1,0 +1,23 @@
+INTERLIS 2.3;
+
+MODEL Model (de) AT "mailto:ceis@localhost" VERSION "2016-07-08" =
+
+	TOPIC Topic =
+
+		CLASS ClassA =
+		   attrA1 : TEXT*10;
+		END ClassA;
+		
+		CLASS ClassB =
+		   attrB1 : TEXT*10;
+		END ClassB;
+
+		ASSOCIATION assocAB =
+		  rolle_A -- {0..1} ClassA;
+		  rolle_B -- {0..1} ClassB;
+		  attr_Assoc : 1..20;
+		END assocAB;
+
+	END Topic;
+	
+END Model.

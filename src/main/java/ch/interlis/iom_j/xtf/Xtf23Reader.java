@@ -1096,11 +1096,15 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
     	return iomObj;
     }
 
-	private IomObject readReference(IomObject iomObj, StartElement element, String attrName, AssociationDef association) throws IoxException{
-		String refOid=element.getAttributeByName(QNAME_XML_REF).getValue();
-		if(refOid.length()==0){
-			throw new IoxException("unexpected reference value <"+refOid+">");
+	private IomObject readReference(IomObject iomObj, StartElement element, String attrName, AssociationDef association) throws IoxException, XMLStreamException{
+	    String refOid=null;
+	    if (element.getAttributeByName(QNAME_XML_REF) != null) {
+	        refOid=element.getAttributeByName(QNAME_XML_REF).getValue();
+	        if(refOid.length()==0){
+	            throw new IoxException("unexpected reference value <"+refOid+">");
+	        }		    
 		}
+
 		Attribute attrRefBid=element.getAttributeByName(QNAME_XML_TOPIC_BID);
 		String refBid=null;
 		if(attrRefBid!=null) {
@@ -1121,14 +1125,28 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 				}
         	}
         }
-		iomObj.addattrobj(attrName,QNAME_XML_REF.getLocalPart()).setobjectrefoid(refOid); // set reference
-		IomObject aObject=iomObj.getattrobj(attrName, 0);
-		if(orderPos!=null){
-			aObject.setobjectreforderpos(orderPos);
-		}
-		if(refBid!=null) {
-			aObject.setobjectrefbid(refBid);
-		}
+        XMLEvent peek = reader.peek();
+        XMLEvent event = null;
+        if (peek.isCharacters()) {
+            event = reader.nextEvent();
+            event = skipSpacesAndGetNextEvent(event);
+        } else if (peek.isStartElement()) {
+            event = reader.nextEvent();
+        }
+        if (event != null && event.isStartElement()) {
+            element = (StartElement) event;
+            iomObj.addattrobj(attrName, readObject(event, iomObj));
+        } else {
+            IomObject aObject=iomObj.addattrobj(attrName,QNAME_XML_REF.getLocalPart());
+            aObject.setobjectrefoid(refOid); // set reference
+            if(orderPos!=null){
+                aObject.setobjectreforderpos(orderPos);
+            }
+            if(refBid!=null) {
+                aObject.setobjectrefbid(refBid);
+            }            
+        }
+
 		return iomObj;
 	}
     
