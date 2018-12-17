@@ -93,24 +93,6 @@ public class Area23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-    @Test
-    @Ignore("GH-64")
-    public void notApolygon_Fail(){
-        Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
-        objSurfaceSuccess.setattrvalue("area2d", "3");
-        ValidationConfig modelConfig=new ValidationConfig();
-        LogCollector logger=new LogCollector();
-        LogEventFactory errFactory=new LogEventFactory();
-        Settings settings=new Settings();
-        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-        validator.validate(new ObjectEvent(objSurfaceSuccess));
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
-        // Asserts
-        assertTrue(logger.getErrs().size()==1);
-    }
 	
 	// prueft ob ein Polygon erstellt werden kann, wenn sie sich selber an 1 Punkt beruehrt.
 	@Test
@@ -4413,4 +4395,23 @@ public class Area23Test {
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
+	
+    @Test
+    public void notApolygon_Fail(){
+        Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
+        objSurfaceSuccess.setattrvalue("area2d", "3");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+        validator.validate(new ObjectEvent(objSurfaceSuccess));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("The value <3> is not a Polygon in attribute area2d", logger.getErrs().get(0).getEventMsg());
+    }
 }

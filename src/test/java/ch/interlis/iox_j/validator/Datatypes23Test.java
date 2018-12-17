@@ -1194,24 +1194,6 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-    @Test
-    @Ignore("GH-64")
-    public void coordType_notAcoord_Fail(){
-        Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-        objSuccessFormat.setattrvalue("lcoord", "5");
-        ValidationConfig modelConfig=new ValidationConfig();
-        LogCollector logger=new LogCollector();
-        LogEventFactory errFactory=new LogEventFactory();
-        Settings settings=new Settings();
-        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
-        validator.validate(new ObjectEvent(objSuccessFormat));
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
-        // Asserts
-        assertTrue(logger.getErrs().size()==1);
-    }
 	
 	// Die dreidimensionale Koordinate wird getestet.
 	@Test
@@ -2619,5 +2601,24 @@ public class Datatypes23Test {
         // Asserts
         assertEquals(1, logger.getErrs().size());
         assertEquals("value Montag is not a member of the enumeration in attribute aufzaehlungAll", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void coordType_notAcoord_Fail(){
+        Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objSuccessFormat.setattrvalue("lcoord", "5");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objSuccessFormat));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("The value <5> is not a Coord in attribute lcoord", logger.getErrs().get(0).getEventMsg());
     }
 }

@@ -71,24 +71,6 @@ public class Polyline23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-    @Test
-    @Ignore("GH-64")
-    public void notApolyline_Fail(){
-        Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
-        objStraightsSuccess.setattrvalue("straights2d", "5");
-        ValidationConfig modelConfig=new ValidationConfig();
-        LogCollector logger=new LogCollector();
-        LogEventFactory errFactory=new LogEventFactory();
-        Settings settings=new Settings();
-        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-        validator.validate(new ObjectEvent(objStraightsSuccess));
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
-        // Asserts
-        assertTrue(logger.getErrs().size()==1);
-    }
 	
 	// Es wird getestet ob eine 3d Linie erstellt werden kann.
 	@Test
@@ -523,6 +505,25 @@ public class Polyline23Test {
 		assertEquals(1,logger.getErrs().size());
 		assertEquals("Attribute straights2dWithoutOverlaps has an invalid self-intersection at (480005.0, 70000.0)", logger.getErrs().get(0).getEventMsg());
 	}
+	
+    @Test
+    public void notApolyline_Fail(){
+        Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
+        objStraightsSuccess.setattrvalue("straights2d", "5");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+        validator.validate(new ObjectEvent(objStraightsSuccess));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("The value <5> is not a Polyline in attribute straights2d", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// Es wird getestet ob bei 3d Polylines, Fehler bei ueberschneidungen ausgegeben werden.
 //	@Test

@@ -113,6 +113,47 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
+    @Test
+    public void koord2OK(){
+        Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+        IomObject coordValue=objSuccessFormat.addattrobj("koord2", "COORD");
+        coordValue.setattrvalue("C1", "1.00");
+        coordValue.setattrvalue("C2", "100.0");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+        validator.validate(new ObjectEvent(objSuccessFormat));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+    
+    @Test
+    public void koord3OK(){
+        Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+        IomObject coordValue=objHighestDay.addattrobj("koord3", "COORD");
+        coordValue.setattrvalue("C1", "5.55");
+        coordValue.setattrvalue("C2", "200.6");
+        coordValue.setattrvalue("C3", "9999");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+        validator.validate(new ObjectEvent(objHighestDay));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+	
 	// Es wird getestet ob diese Befehl Woerter Auswirkungen auf die Eingabe haben.
 	@Test
 	public void text2ValOk(){
@@ -821,30 +862,10 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die Eingabe von 2d Koordinaten wird getestet.
-	@Test
-	public void koord2Ok(){
-		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objHighestDay.setattrvalue("koord2", "5.55 200.6");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objHighestDay));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
 	// Die Koordinate als undefiniert markiert wird getestet.
 	@Test
 	public void koord2UndefinedOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objHighestDay.setattrvalue("koord2", "@");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -853,25 +874,6 @@ public class Datatypes10Test {
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
 		validator.validate(new ObjectEvent(objHighestDay));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	// Die Koordinate als 3d Eingabe wird getestet.
-	@Test
-	public void koord3Ok(){
-		Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objSuccessFormat.setattrvalue("koord3", "5.55, 200.6 9999");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSuccessFormat));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
@@ -882,7 +884,6 @@ public class Datatypes10Test {
 	@Test
 	public void koord3UndefinedOk(){
 		Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objSuccessFormat.setattrvalue("koord3", "@");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1760,7 +1761,8 @@ public class Datatypes10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertEquals(1, logger.getErrs().size());
+		assertEquals("The value <5.55 200.6 9999> is not a Coord in attribute koord2", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es wird ein Fehler ausgegeben, wenn dei Koordinate auf 2d geschrieben wird, obwohl sie eine 3d Definition hat.
@@ -1849,4 +1851,62 @@ public class Datatypes10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+    @Test
+    public void koord2wrongValueFail(){
+        Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+        objHighestDay.setattrvalue("koord2", "@");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+        validator.validate(new ObjectEvent(objHighestDay));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("The value <@> is not a Coord in attribute koord2", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    // Die Koordinate als 3d Eingabe wird getestet.
+    @Test
+    public void koord3Fail(){
+        Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+        objSuccessFormat.setattrvalue("koord3", "5.55, 200.6 9999");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+        validator.validate(new ObjectEvent(objSuccessFormat));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("The value <5.55, 200.6 9999> is not a Coord in attribute koord3", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void koord2Fail(){
+        Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+        objHighestDay.setattrvalue("koord2", "5.55 200.6");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+        validator.validate(new ObjectEvent(objHighestDay));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("The value <5.55 200.6> is not a Coord in attribute koord2", logger.getErrs().get(0).getEventMsg());
+    }
 }

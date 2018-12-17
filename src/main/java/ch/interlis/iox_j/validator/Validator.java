@@ -4656,6 +4656,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						if(isValid){
 							validatePolylineTopology(attrPath,validateGeometryType, polylineType, polylineValue);
 						}
+					} else {
+                        String attrValue = iomObj.getattrvalue(attrName);
+                        if (attrValue != null) {
+                            logMsg(validateType,"The value <{0}> is not a Polyline in attribute {1}", attrValue, attrPath);
+                        }					    
 					}
 				}else if(type instanceof SurfaceOrAreaType){
 					 if(doItfLineTables){
@@ -4700,12 +4705,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									}
 								}
 							}
+						} else {
+						    String attrValue = iomObj.getattrvalue(attrName);
+						    if (attrValue != null) {
+						        logMsg(validateType,"The value <{0}> is not a Polygon in attribute {1}", attrValue, attrPath);
+						    }
 						}
 					 }
 				}else if(type instanceof CoordType){
 					IomObject coord=iomObj.getattrobj(attrName, 0);
 					if (coord!=null){
 						validateCoordType(validateGeometryType, (CoordType)type, coord, attrName);
+					} else {
+					    String attrValue = iomObj.getattrvalue(attrName);
+					    if (attrValue != null) {
+					        logMsg(validateType,"The value <{0}> is not a Coord in attribute {1}", attrValue, attrPath);
+					    }
 					}
 				}else if(type instanceof NumericType){
 					String valueStr=iomObj.getattrvalue(attrName);
