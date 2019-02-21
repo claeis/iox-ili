@@ -325,6 +325,24 @@ MODEL MandatoryConstraints23
 			MANDATORY CONSTRAINT
 			DEFINED(attr1);
 		END ClassDefinedB;
+
+		CLASS ClassUrsprung =
+		   attrA1 : TEXT*10;
+		END ClassUrsprung;
+		
+		CLASS ClassHinweis =
+		   attrB1 : TEXT*10;
+		END ClassHinweis;
+		ASSOCIATION HinweisWeitereDokumente =
+			Ursprung -- {0..*} ClassUrsprung;
+			Hinweis -- {0..*} ClassHinweis;
+			MANDATORY CONSTRAINT Ursprung <> Hinweis;
+		END HinweisWeitereDokumente;
+		!!ASSOCIATION HinweisWeitereDokumente =
+		!!	Ursprung -- {0..*} ClassUrsprung;
+		!!	Hinweis -- {0..*} ClassHinweis;
+		!!	MANDATORY CONSTRAINT Ursprung -> attrA1 <> Hinweis -> attrB1;
+		!!END HinweisWeitereDokumente;
 		
 		CLASS ClassDefinedV =
 		END ClassDefinedV;

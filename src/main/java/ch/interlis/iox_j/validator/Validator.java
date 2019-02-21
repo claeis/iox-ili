@@ -2858,11 +2858,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                 }
                             }else {
                                 List<IomObject> objects = new ArrayList<IomObject>();
-                                if (roleDefValue != null) {
+                                IomObject targetRefObj = getReferencedObject(role, targetOid);
+                                if (targetRefObj != null) {
+                                    if (role instanceof RoleDef) {
+                                        return Value.createOidValue(targetRefObj.getobjectoid());
+                                    } else {
+                                        objects.add(targetRefObj);
+                                        nextCurrentObjects.addAll(objects);                                        
+                                    }
+  
+                                } else if (roleDefValue != null) {
                                     objects.add(roleDefValue);
-                                    nextCurrentObjects.addAll(objects);                                    
+                                    nextCurrentObjects.addAll(objects);
                                 }
-
                             }
                         }
                     }
@@ -3252,7 +3260,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		                    currentValue = getValueFromObjectPath(null, anObject, pathToStructEle, null);
 		                    if (currentValue.isUndefined()) {
 		                        currentValue = getValueFromObjectPath(null, anObject, pathToSurfaceAttr, null);
-		                        System.out.println("Stop!");
 		                    } else {
 	                            Collection<IomObject> complexObjects = currentValue.getComplexObjects();
 	                            Iterator<IomObject> iterator = complexObjects.iterator();
@@ -4404,7 +4411,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		        return null;
 		    }else if(value.getValue() != null) {
 			    values.add(value.getValue());
-			} else if (value.getComplexObjects() != null) {
+			} else if (value.getOid() != null) { 
+			    values.add(value.getOid());
+			}else if (value.getComplexObjects() != null) {
 			    IomObject complexValue = value.getComplexObjects().iterator().next();
 			    if(complexValue.getobjectrefoid() != null) {
 			        values.add(complexValue.getobjectrefoid());
@@ -4434,7 +4443,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return null;
 	}
 
-	private void validateAttrValue(Viewable eleClass,IomObject iomObj, AttributeDef attr,String attrPath) throws IoxException {
+    private void validateAttrValue(Viewable eleClass,IomObject iomObj, AttributeDef attr,String attrPath) throws IoxException {
 		 String attrName = attr.getName();
 		 String attrQName = getScopedName(attr);
 		 String iliClassQName=getScopedName(eleClass);

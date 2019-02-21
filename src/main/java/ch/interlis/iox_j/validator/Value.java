@@ -25,6 +25,7 @@ public class Value {
 	private String refTypeName;
 	private List<IomObject> complexObjects;
 	private RoleDef role=null;
+	private String oid=null;
 	private Viewable viewable=null;
 	
 	// not yet implemented
@@ -46,6 +47,11 @@ public class Value {
 		this.viewable = viewable;
 	}
 	
+    public static Value createOidValue(String oid){
+        Value ret=new Value();
+        ret.oid=oid;
+        return ret;
+    }
 	public Value(Type type,String valueStr){
 		this.value = valueStr;
 		this.type=type;
@@ -105,6 +111,13 @@ public class Value {
 		return type;
 	}
 	
+    public String getOid(){
+        if(skipEvaluation()){
+            throw new IllegalArgumentException();
+        }
+        return oid;
+    }
+	
 	public String getValue(){
 		if(skipEvaluation()){
 			throw new IllegalArgumentException();
@@ -149,6 +162,7 @@ public class Value {
 						getComplexObjects() != null ||
 						booleanIsDefined ||
 						getRole() != null ||
+						oid != null ||
 						numericIsDefined ||
 						getViewable() != null || 
 						getValues() != null);
@@ -249,6 +263,8 @@ public class Value {
 			return compareDouble(numeric, Double.valueOf(other.value));
 		} else if(this.value!=null && other.numericIsDefined){
 			return compareDouble(Double.valueOf(this.value), other.numeric);
+		} else if (this.oid!=null && other.oid!=null) {
+		    return compareOid(this.oid, other.oid);
 		} else if(this.viewable!=null && other.viewable!=null){
 			return compareViewable(this.viewable, other.viewable);
 		}else if(this.value==null && other.value==null){
@@ -346,6 +362,10 @@ public class Value {
 
 	private double compareDouble(double thisVal, double anotherVal) {
 		return (thisVal<anotherVal ? -1 : (thisVal==anotherVal ? 0 : 1));
+	}
+	
+	private int compareOid(String oid1, String oid2) {
+	    return oid1.equals(oid2) ? 0 : -1;
 	}
 
 	private int compareSurfaceOrAreaTo(IomObject complexValue2, IomObject iomObjOther2) {
