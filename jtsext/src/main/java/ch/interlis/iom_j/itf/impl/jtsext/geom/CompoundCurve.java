@@ -171,9 +171,15 @@ public class CompoundCurve extends LineString {
 				if(!atStartOfLine){
 					// modify end of segment
 					newSegment=new ArcSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),newVertexPt,newArcMidPt,thisSegment.getEndPoint());
+					if(((ArcSegment)newSegment).isStraight()) {
+	                    newSegment=new StraightSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),newVertexPt,thisSegment.getEndPoint());
+					}
 				}else{
 					// modify start of segment
 					newSegment=new ArcSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),thisSegment.getStartPoint(),newArcMidPt,newVertexPt);
+                    if(((ArcSegment)newSegment).isStraight()) {
+                        newSegment=new StraightSegment(OVERLAP_TID_TAG+thisSegment.getUserData(),thisSegment.getStartPoint(),newVertexPt);
+                    }
 				}
 			}
 		}else{

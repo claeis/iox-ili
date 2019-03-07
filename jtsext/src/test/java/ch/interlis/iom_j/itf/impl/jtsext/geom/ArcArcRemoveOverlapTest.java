@@ -9,6 +9,7 @@ import org.junit.Test;
 import ch.interlis.iox.IoxException;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class ArcArcRemoveOverlapTest {
 	static final double EPSILON=0.00000001;
@@ -342,4 +343,47 @@ public class ArcArcRemoveOverlapTest {
 		assertEquals(10.0,newseg.getRadius(),EPSILON);
 	}
 	
+    @Test
+    public void overlapReplacedByStraight() throws IoxException {
+        Coordinate startCoord = new Coordinate(2759364.607, 1221799.353);
+        Coordinate middleCoord = new Coordinate(2759364.449, 1221799.343);
+        Coordinate endCoord = new Coordinate(2759364.345, 1221799.224);
+        
+        ArcSegment thisSegment = new ArcSegment(startCoord, middleCoord, endCoord);
+        ArcSegment otherSegment = new ArcSegment(new Coordinate(2759364.948, 1221801.003),new Coordinate(2759364.647, 1221800.113),new Coordinate(2759364.345, 1221799.224));
+        
+        ArrayList<CurveSegment> segments = new ArrayList<CurveSegment>();
+        segments.add(thisSegment);
+
+        CompoundCurve compCurve = new CompoundCurve(segments, new GeometryFactory());
+        double newVertexOffset = 0.002;
+        boolean removeOverlap = compCurve.removeOverlap(thisSegment, otherSegment, newVertexOffset);
+        assertTrue(removeOverlap);
+        
+        if (!(compCurve.getSegments().get(0) instanceof ArcSegment)) {
+            fail("First Segment in Segments must be instance of ArcSegment sein.");
+        }
+        ArcSegment modseg=(ArcSegment) compCurve.getSegments().get(0);
+        System.out.println("modseg r " + modseg.getRadius() + "; center "+modseg.getCenterPoint()+"; sign "+modseg.sign);
+        if (!(compCurve.getSegments().get(1) instanceof StraightSegment)) {
+            fail("Second Segment in Segments must be instance of Straight Segment sein.");
+        }
+        StraightSegment newseg=(StraightSegment) compCurve.getSegments().get(1);
+        System.out.println("newseg startPoint" + newseg.getStartPoint()+"; endPoint "+ newseg.getEndPoint());
+        System.out.println("modseg startPoint" + modseg.getStartPoint()+"; endPoint "+ modseg.getEndPoint());
+        System.out.println("modseg middlePoint" + modseg.getMidPoint());
+        
+        assertEquals(modseg.getEndPoint().x, newseg.getStartPoint().x, EPSILON);
+        assertEquals(modseg.getEndPoint().y, newseg.getStartPoint().y, EPSILON);
+        
+        assertEquals(endCoord.x, newseg.getEndPoint().x, EPSILON);
+        assertEquals(endCoord.y, newseg.getEndPoint().y, EPSILON);
+        
+        assertEquals(startCoord.x, modseg.getStartPoint().x, EPSILON);
+        assertEquals(startCoord.y, modseg.getStartPoint().y, EPSILON);
+        
+        assertEquals(middleCoord.x, modseg.getMidPoint().x, EPSILON);
+        assertEquals(middleCoord.y, modseg.getMidPoint().y, EPSILON);
+     
+    }
 }
