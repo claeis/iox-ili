@@ -176,10 +176,13 @@ public class UniqueConstraints10Test {
 	public void ref_Fail(){
 		Iom_jObject objA1=new Iom_jObject(TABLEA, OID1);
 		Iom_jObject objA2=new Iom_jObject(TABLEA, OID2);
+		
 		Iom_jObject objB1=new Iom_jObject(TABLEB, OID3);
 		objB1.addattrobj("b2", "REF").setobjectrefoid(OID1);
+		
 		Iom_jObject objB2=new Iom_jObject(TABLEB, OID4);
 		objB2.addattrobj("b2", "REF").setobjectrefoid(OID1);
+		
 		// Create and run validator.
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();

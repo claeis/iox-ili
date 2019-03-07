@@ -79,6 +79,10 @@ public class MandatoryConstraints23 {
 	private final static String ILI_CLASSDEFINEDB=TOPIC+".ClassDefinedB";
     private final static String ILI_CLASSDEFINEDV=TOPIC+".ClassDefinedV";
     private final static String ILI_CLASSDEFINEDW=TOPIC+".ClassDefinedW";
+    private final static String ILI_CLASS_URSPRUNG=TOPIC+".ClassUrsprung";
+    private final static String ILI_CLASS_HINWEIS=TOPIC+".ClassHinweis";
+    // ASSOCIATION CLASS
+    private final static String ILI_ASSOC_AB=TOPIC+".HinweisWeitereDokumente";
 	// ATTRIBUTES FORMATTED TYPE EQUAL (==) SUCCESS AND FAIL
 	private final static String ILI_CLASSFORMATTEDTYPEA=TOPIC+".ClassFormattedTypeA";
 	// START BASKET EVENT
@@ -1517,6 +1521,32 @@ public class MandatoryConstraints23 {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	@Test
+	public void assoc_UnEquals_OK() throws Exception {
+        Iom_jObject iomObj_Ursprung = new Iom_jObject(ILI_CLASS_URSPRUNG, OID1);
+        iomObj_Ursprung.setattrvalue("attrA1", "Attr1"); 
+        Iom_jObject iomObj_Hinweis = new Iom_jObject(ILI_CLASS_HINWEIS, OID2);
+        iomObj_Hinweis.setattrvalue("attrB1", "Attr2");
+        Iom_jObject iomObj_Assoc=new Iom_jObject(ILI_ASSOC_AB, null);
+        iomObj_Assoc.addattrobj("Ursprung", "REF").setobjectrefoid(iomObj_Ursprung.getobjectoid());
+        iomObj_Assoc.addattrobj("Hinweis", "REF").setobjectrefoid(iomObj_Hinweis.getobjectoid());
+        
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(iomObj_Ursprung));
+        validator.validate(new ObjectEvent(iomObj_Hinweis));
+        validator.validate(new ObjectEvent(iomObj_Assoc));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());	    
 	}
 	
     @Test
