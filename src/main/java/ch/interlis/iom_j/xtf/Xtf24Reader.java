@@ -33,6 +33,7 @@ import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.xtf.impl.XtfWriterAlt;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
@@ -176,6 +177,8 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
             if(ns.equals(NAMESPACE_ILIXMLBASE_INTERLIS)) {
                 return new Xtf24Reader(xtffile);
             }else if(ns.equals(Xtf23Reader.NAMESPACE_ILIXMLBASE)) {
+                return new XtfReader(xtffile);
+            }else if(ns.equals(XtfWriterAlt.ili22Ns)) {
                 return new XtfReader(xtffile);
             }else {
                 throw new IoxException("unexpected namesapce "+ns);
