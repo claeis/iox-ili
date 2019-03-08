@@ -364,14 +364,10 @@ public class ArcArcRemoveOverlapTest {
             fail("First Segment in Segments must be instance of ArcSegment sein.");
         }
         ArcSegment modseg=(ArcSegment) compCurve.getSegments().get(0);
-        System.out.println("modseg r " + modseg.getRadius() + "; center "+modseg.getCenterPoint()+"; sign "+modseg.sign);
         if (!(compCurve.getSegments().get(1) instanceof StraightSegment)) {
             fail("Second Segment in Segments must be instance of Straight Segment sein.");
         }
         StraightSegment newseg=(StraightSegment) compCurve.getSegments().get(1);
-        System.out.println("newseg startPoint" + newseg.getStartPoint()+"; endPoint "+ newseg.getEndPoint());
-        System.out.println("modseg startPoint" + modseg.getStartPoint()+"; endPoint "+ modseg.getEndPoint());
-        System.out.println("modseg middlePoint" + modseg.getMidPoint());
         
         assertEquals(modseg.getEndPoint().x, newseg.getStartPoint().x, EPSILON);
         assertEquals(modseg.getEndPoint().y, newseg.getStartPoint().y, EPSILON);

@@ -385,30 +385,6 @@ public class CurveSegmentIntersectorTest {
 		assertEquals(70.0,is2.y,EPS);
 	}
 	
-    // two arcs. ArcPoint is equal. different angle.
-    // startPoints are same. endPoints are same.
-    @Test
-    public void overlayTwoARCS_DifferentStartEndPoints_OtherDirection_DifferentLength_Test2() {
-        CurveSegmentIntersector li=new CurveSegmentIntersector();
-        // CIRCULARSTRING (2759364.356398068 1221799.2512748044, 2759364.350699179 1221799.2376373415, 2759364.345 1221799.224)
-        ArcSegment s0=new ArcSegment(new Coordinate(2759364.948, 1221801.003),new Coordinate(2759364.647,1221800.113),new Coordinate(2759364.345, 1221799.224));
-        ArcSegment s1=new ArcSegment(new Coordinate(2759364.607, 1221799.353),new Coordinate(2759364.449,1221799.343),new Coordinate(2759364.345, 1221799.224));
-        li.computeIntersection(s0, s1);
-        /*
-        assertTrue(li.isOverlay());
-        assertTrue(li.hasIntersection());
-        assertTrue(li.getIntersectionNum()==2);
-        // intSeg1
-        Coordinate is=li.getIntersection(0);
-        assertEquals(60,is.x,EPS);
-        assertEquals(130,is.y,EPS);
-        // intSeg2
-        Coordinate is2=li.getIntersection(1);
-        assertEquals(70,is2.x,EPS);
-        assertEquals(60,is2.y,EPS);
-        */
-    }
-	
 	// two arcs. ArcPoint is equal. different angle.
 	// startPoints and endPoints are different.
 	@Test
