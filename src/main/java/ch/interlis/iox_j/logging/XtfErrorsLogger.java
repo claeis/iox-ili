@@ -26,7 +26,8 @@ import ch.interlis.iox_j.StartTransferEvent;
 import ch.interlis.models.ILISMETA07;
 
 public class XtfErrorsLogger implements LogListener {
-	IoxWriter out=null;
+	private static final String UNDEFINED_MESSAGE = "UNDEFINED MESSAGE";
+    IoxWriter out=null;
 	private int objc=1;
 	public XtfErrorsLogger(File logFile,String sender)
 	{
@@ -45,7 +46,27 @@ public class XtfErrorsLogger implements LogListener {
 	@Override
 	public void logEvent(LogEvent event) {
 		org.interlis2.validator.models.IliVErrors.ErrorLog.Error iomObj=new org.interlis2.validator.models.IliVErrors.ErrorLog.Error("o"+objc++);
-		iomObj.setMessage(event.getEventMsg());
+		String msg = event.getEventMsg();
+        if (msg == null) {
+            Throwable ex = event.getException();
+            if (ex != null) {
+                msg = ex.getLocalizedMessage();
+                if (msg != null) {
+                    msg = msg.trim();
+                    if (msg.length() == 0) {
+                        msg = null;
+                    }
+                }
+                if (msg == null) {
+                    msg = ex.getClass().getName();
+                }
+            }
+        }
+        if (msg != null) {
+            iomObj.setMessage(msg);
+        } else {
+            iomObj.setMessage(UNDEFINED_MESSAGE);
+        }
 		switch(event.getEventKind()){
 		case LogEvent.ERROR: 
 				iomObj.setType(Error_Type.Error);
