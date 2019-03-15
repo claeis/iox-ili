@@ -6,6 +6,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import com.vividsolutions.jts.geom.Coordinate;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
 import ch.interlis.iox.IoxException;
 
@@ -460,4 +461,89 @@ public class CurveSegmentIntersectorTest {
         assertFalse(li.isOverlay());
         assertFalse(li.hasIntersection());
     }
+    
+
+    private Coordinate calcCircle(double x1,double y1, double x2, double y2, double x3, double y3)
+    {
+        double dx=x1;
+        double dy=y1;
+        Coordinate c=calcCircle_(x1-dx, y1-dy, x2-dx, y2-dy, x3-dx, y3-dy);
+        c.x+=dx;
+        c.y+=dy;
+        return c;
+    }
+    private Coordinate calcCircle_(double x1,double y1, double x2, double y2, double x3, double y3)
+    {
+        double A=x1*(y2-y3)-y1*(x2-x3)+x2*y3-x3*y2;
+        double B=(x1*x1+y1*y1)*(y3-y2)+(x2*x2+y2*y2)*(y1-y3)+(x3*x3+y3*y3)*(y2-y1);
+        double C=(x1*x1+y1*y1)*(x2-x3)+(x2*x2+y2*y2)*(x3-x1)+(x3*x3+y3*y3)*(x1-x2);
+        double D=(x1*x1+y1*y1)*(x3*y2-x2*y3)+(x2*x2+y2*y2)*(x1*y3-x3*y1)+(x3*x3+y3*y3)*(x2*y1-x1*y2);
+        double x=-B/2.0/A;
+        double y=-C/2.0/A;
+        //double r=Math.sqrt((B*B+C*C-4.0*A*D)/(4.0*A*A));
+        double r=Math.hypot(x-x1, y-y1);
+        return new Coordinate(x,y);
+    }
+    
+    @Test
+    @Ignore("ilivalidator#186")
+    public void twoARCS_intersect0() {
+        // compile group: 'org.apfloat', name: 'apfloat', version: '1.8.3'
+        CurveSegmentIntersector li=new CurveSegmentIntersector();
+        ArcSegment s0=new ArcSegment(new Coordinate(2658317.225,1250832.586),new Coordinate(2658262.543,1250774.465),new Coordinate(2658210.528,1250713.944));
+        // center (2659581.37 , 1249587.16)
+        // radius 1774.43
+        System.out.println(s0.getCenterPoint()+" r "+s0.getRadius()+" "+s0.getSign()+" theta "+s0.getTheta());
+        System.out.println("s0 dist "+CurveSegment.dist(s0.getStartPoint(),s0.getEndPoint()));
+        //Coordinate c0=calcCircle(s0.getStartPoint().x,s0.getStartPoint().y,s0.getMidPoint().x,s0.getMidPoint().y,s0.getEndPoint().x,s0.getEndPoint().y);
+        //System.out.println(c0);
+        //System.out.println("start r "+CurveSegment.dist(c0, s0.getStartPoint()));
+        //System.out.println("mid   r "+CurveSegment.dist(c0, s0.getMidPoint()));
+        //System.out.println("end   r "+CurveSegment.dist(c0, s0.getEndPoint()));
+        //calcCircle(s0.getStartPoint().x,s0.getStartPoint().y,s0.getMidPoint().x,s0.getMidPoint().y,s0.getEndPoint().x,s0.getEndPoint().y);
+        ArcSegment s1=new ArcSegment(new Coordinate(2658211.456,1250715.072),new Coordinate(2658161.386,1250651.279),new Coordinate(2658114.283,1250585.266));
+        System.out.println(s1.getCenterPoint()+" r "+s1.getRadius()+" "+s1.getSign()+" theta "+s1.getTheta());
+        System.out.println("s1 dist "+CurveSegment.dist(s1.getStartPoint(),s1.getEndPoint()));
+        Coordinate c1=new Coordinate(2659582.4124795417,1249587.8392729152);
+        
+        //calcCircle(s1.getStartPoint().x,s1.getStartPoint().y,s1.getMidPoint().x,s1.getMidPoint().y,s1.getEndPoint().x,s1.getEndPoint().y);
+        li.computeIntersection(s0, s1);
+        assertFalse(li.isOverlay());
+        assertTrue(li.hasIntersection());
+        assertTrue(li.getIntersectionNum()==1);
+    }
+    @Test
+    @Ignore("ilivalidator#186")
+    public void twoARCS_intersect() {
+        final double RDIFF=0.197;
+        final double R0=1800.0;
+        final double R1=R0+RDIFF;
+        final double DVW=0.196;
+        final double C_X=0.0;
+        final double C_Y=0.0;
+        final double THETA=0.048;
+        
+        CurveSegmentIntersector li=new CurveSegmentIntersector();
+        final Coordinate startPoint0 = new Coordinate(C_X,C_Y+R0);
+        ArcSegment s0=new ArcSegment(startPoint0,
+                new Coordinate(startPoint0.x-R0*Math.sin(THETA),startPoint0.y-R0+R0*Math.cos(THETA)),
+                new Coordinate(startPoint0.x-R0*Math.sin(2*THETA),startPoint0.y-R0+R0*Math.cos(2*THETA)));
+        // center (2659581.37 , 1249587.16)
+        // radius 1774.43
+        System.out.println("s0 "+s0.getStartPoint()+" "+s0.getMidPoint()+" "+s0.getEndPoint());
+        System.out.println("s0 "+s0.getCenterPoint()+" r "+s0.getRadius()+" "+s0.getSign()+" theta "+s0.getTheta());
+        System.out.println("s0 dist "+CurveSegment.dist(s0.getStartPoint(),s0.getEndPoint()));
+        final Coordinate startPoint1 = new Coordinate(C_X-DVW,C_Y+R0);
+        ArcSegment s1=new ArcSegment(startPoint1,
+                new Coordinate(startPoint1.x+R1*Math.sin(THETA),startPoint1.y-R1+R1*Math.cos(THETA)),
+                new Coordinate(startPoint1.x+R1*Math.sin(2*THETA),startPoint1.y-R1+R1*Math.cos(2*THETA)));
+        System.out.println("s1 "+s1.getStartPoint()+" "+s1.getMidPoint()+" "+s1.getEndPoint());
+        System.out.println("s1 "+s1.getCenterPoint()+" r "+s1.getRadius()+" "+s1.getSign()+" theta "+s1.getTheta());
+        System.out.println("s1 dist "+CurveSegment.dist(s1.getStartPoint(),s1.getEndPoint()));
+        li.computeIntersection(s0, s1);
+        assertFalse(li.isOverlay());
+        assertTrue(li.hasIntersection());
+        assertEquals(1,li.getIntersectionNum());
+    }
+    
 }
