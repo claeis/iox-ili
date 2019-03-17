@@ -3628,7 +3628,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, errFact,validateType);
 		} catch (IoxException e) {
 			surfaceTopologyValid=false;
-			errs.addEvent(errFact.logErrorMsg(e,"failed to validate polygon"));
+			errs.addEvent(errFact.logErrorMsg(e.getMessage()));
 		}
 		return surfaceTopologyValid;
 	}

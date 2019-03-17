@@ -275,6 +275,9 @@ public class ItfSurfaceLinetable2Polygon {
 		ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
 		try {
 	        createPolygon(mainTid, segv,maxOverlaps,newVertexOffset,dataerrs,linetableIliqname,ignorePolygonBuildingErrors,null,poly);
+		} catch (IllegalArgumentException e) {
+			polygonValid=false;
+			throw new IoxException ("Failed to validate geometry. Low level routine says: " + e.getMessage());
 		}finally {
 			if(dataerrs.size()>0) {
 				polygonValid=false;
