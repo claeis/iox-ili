@@ -1,0 +1,24 @@
+INTERLIS 2.4;
+
+MODEL model4 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
+	TOPIC Topic12 =
+		CLASS Class1 =
+			attr1 : TEXT*40;
+			attr2 : TEXT*40;
+			attr3 : TEXT*40;
+			attr4 : TEXT*40;
+		END Class1;
+		CLASS Class2 =
+			attr1 : TEXT*40;
+			attr2 : TEXT*40;
+			attr3 : TEXT*40;
+			attr4 : TEXT*40;
+		END Class2;
+		CLASS Class3 =
+			attr1 : TEXT*40;
+			attr2 : TEXT*40;
+			attr3 : TEXT*40;
+			attr4 : TEXT*40;
+		END Class3;
+	END Topic12;
+END model4.

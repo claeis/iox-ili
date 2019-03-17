@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.ehi.basics.logging.EhiLogger;
@@ -22,8 +23,13 @@ import ch.interlis.iox_j.jts.Iox2jtsException;
 
 public class IligmlWriterTest {
 
-	private static String TEST_OUT="test-out";
+	private static String TEST_OUT="build";
 	private TransferDescription td=null;
+	@BeforeClass
+	public static void setupEnv()
+	{
+		new File(TEST_OUT).mkdir();
+	}
 	private void addArc(IomObject polyline,double xa, double ya,double x, double y){
 		IomObject sequence=polyline.getattrobj("sequence",0);
 		IomObject ret=new ch.interlis.iom_j.Iom_jObject("ARC",null);

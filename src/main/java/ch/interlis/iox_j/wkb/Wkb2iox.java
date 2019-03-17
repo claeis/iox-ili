@@ -46,6 +46,12 @@ import com.vividsolutions.jts.io.ByteOrderValues;
 
 public class Wkb2iox
 {
+	static final public String ATTR_POLYLINE="polyline";
+	static final public String ATTR_COORD="coord";
+	static final public String OBJ_MULTIPOLYLINE="MULTIPOLYLINE";
+	static final public String OBJ_MULTIPOINT="MULTIPOINT";
+	static final public String OBJ_MULTICOORD="MULTICOORD";
+	
   /**
    * Converts a hexadecimal string to a byte array.
    *
@@ -155,10 +161,16 @@ public class Wkb2iox
     switch (geometryType) {
       case WKBConstants.wkbPoint :
         return readPoint();
+      case WKBConstants.wkbMultiPoint :
+          return readMultiPoint();
       case WKBConstants.wkbLineString :
         return readLineString();
       case WKBConstants.wkbCompoundCurve :
           return readCompoundCurve();
+      case WKBConstants.wkbMultiLineString :
+          return readMultiCurve(false);
+        case WKBConstants.wkbMultiCurve :
+            return readMultiCurve(true);
       case WKBConstants.wkbPolygon :
         return readPolygon();
       case WKBConstants.wkbCurvePolygon :
@@ -196,6 +208,24 @@ public class Wkb2iox
 		ret.setattrvalue("C3", Double.toString(ordValues[2]));
 	}
 	return ret;
+  }
+  private IomObject readMultiPoint() throws IOException
+  {
+		IomObject ret=new ch.interlis.iom_j.Iom_jObject(OBJ_MULTICOORD,null);
+	    int coordc = dis.readInt();
+	    for(int coordi=0;coordi<coordc;coordi++){
+	        byte byteOrder = dis.readByte();
+	        int typeInt = dis.readInt();
+	        int geometryType = typeInt & 0xff;
+	        if(geometryType==WKBConstants.wkbPoint){
+	        }else{
+	    	    throw new IllegalStateException("Unexpected WKB type " + geometryType);
+	        }
+        	IomObject coord=null;
+        	coord=readPoint();
+	    	ret.addattrobj(ATTR_COORD,coord);
+	    }
+	    return ret;
   }
 
   private IomObject readLineString() throws IOException
@@ -386,6 +416,41 @@ public class Wkb2iox
 	        	IomObject surface=poly.getattrobj("surface", 0);
 		    	ret.addattrobj("surface",surface);
 	        }
+	    }
+	    return ret;
+  }
+  private IomObject readMultiCurve(boolean allowCurve) throws IOException, ParseException
+  {
+/*
+<multicurve binary representation> ::=
+<byte order> <wkbmulticurve> 
+     [ <num> <curve binary representation>... ]
+| <multilinestring binary representation>
+
+
+<multilinestring binary representation> ::=
+<byte order> <wkbmultilinestring>
+[ <num> <linestring binary representation>... ]
+
+*/
+		IomObject ret=new ch.interlis.iom_j.Iom_jObject(OBJ_MULTIPOLYLINE,null);
+	    int curvec = dis.readInt();
+	    for(int curvei=0;curvei<curvec;curvei++){
+	        byte byteOrder = dis.readByte();
+	        int typeInt = dis.readInt();
+	        int geometryType = typeInt & 0xff;
+	        if(geometryType==WKBConstants.wkbLineString){
+	        }else if(allowCurve && geometryType==WKBConstants.wkbCompoundCurve){
+	        }else{
+	    	    throw new IllegalStateException("Unexpected WKB type " + geometryType);
+	        }
+        	IomObject polyline=null;
+	        if(geometryType==WKBConstants.wkbLineString){
+	        	polyline=readLineString();
+	        }else{
+	        	polyline=readCompoundCurve();
+	        }
+	    	ret.addattrobj(ATTR_POLYLINE,polyline);
 	    }
 	    return ret;
   }

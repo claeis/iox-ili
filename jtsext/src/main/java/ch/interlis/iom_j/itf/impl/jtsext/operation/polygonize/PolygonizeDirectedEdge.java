@@ -37,6 +37,14 @@ class PolygonizeDirectedEdge
   {
     super(from, to, directionPt, edgeDirection);
   }
+  @Override
+    public double getAngle() {
+        double ret=super.getAngle();
+        if(Double.isNaN(ret)) {
+            throw new IllegalStateException("angle is NaN");
+        }
+        return ret;
+    }
   protected void adjustDirectionPt(double dist)
   {
 		Coordinate directionPt = null;

@@ -178,29 +178,37 @@ public class MyHandler
     		return;
     	}
     	String name=event.getName().getLocalPart();
-    	if(state==BEFORE_TRANSFER && name.equals("TRANSFER")){
-    		state=BEFORE_HEADERSECTION;
-    		isIli22=event.getName().getNamespaceURI().equals(XtfWriterAlt.ili22Ns);
-    		returnObject=new XtfStartTransferEvent();
-    		if(isIli22){
-    			((StartTransferEvent)returnObject).setVersion("2.2");
-    		}else{
-    			((StartTransferEvent)returnObject).setVersion("2.3");
+    	if(state==BEFORE_TRANSFER) {
+    		if(name.equals("TRANSFER")){
+	    		state=BEFORE_HEADERSECTION;
+	    		isIli22=event.getName().getNamespaceURI().equals(XtfWriterAlt.ili22Ns);
+	    		returnObject=new XtfStartTransferEvent();
+	    		if(isIli22){
+	    			((StartTransferEvent)returnObject).setVersion("2.2");
+	    		}else{
+	    			((StartTransferEvent)returnObject).setVersion("2.3");
+	    		}
+	    		return;
+    		}else {
+    			throw new IoxException("Expected TRANSFER, but "+name+" found.");
     		}
-    		return;
     	}
-		if(state==BEFORE_HEADERSECTION && name.equals("HEADERSECTION")){
-			state=HS_HEADERSECTION;
-			// SENDER
-			Attribute sender = event.getAttributeByName(new QName("SENDER"));
-			if (sender == null){
-				// SENDER is mandatory
-			  throw new IllegalArgumentException ("Attribute SENDER missing in HEADERSECTION");
+		if(state==BEFORE_HEADERSECTION) {
+			if(name.equals("HEADERSECTION")){
+				state=HS_HEADERSECTION;
+				// SENDER
+				Attribute sender = event.getAttributeByName(new QName("SENDER"));
+				if (sender == null){
+					// SENDER is mandatory
+				  throw new IllegalArgumentException ("Attribute SENDER missing in HEADERSECTION");
+				}
+				((StartTransferEvent)returnObject).setSender(sender.getValue());
+				header=new java.util.HashMap();
+				((XtfStartTransferEvent)returnObject).setHeaderObjects(header);
+				return;
+			}else {
+				throw new IoxException("Expected HEADERSECTION, but "+name+" found.");
 			}
-			((StartTransferEvent)returnObject).setSender(sender.getValue());
-			header=new java.util.HashMap();
-			((XtfStartTransferEvent)returnObject).setHeaderObjects(header);
-			return;
 		}
     	if(state==BEFORE_DATASECTION && name.equals("DATASECTION")){
     		state=BEFORE_BASKET;

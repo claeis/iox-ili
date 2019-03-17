@@ -37,7 +37,7 @@ public class Datatypes10Test {
 	//########## SUCCESSFUL TESTS ################################/
 	//############################################################/
 	
-	// Die maximale Länge des Textes wird getestet.
+	// Die maximale Laenge des Textes wird getestet.
 	@Test
 	public void textMaximum_Ok(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -56,7 +56,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird die minimale Länge des Textes getestet.
+	// Es wird die minimale Laenge des Textes getestet.
 	@Test
 	public void textMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -94,7 +94,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob die Zahlen 0-9 in dieser Numeric vorkommen können.
+	// Es wird getestet ob die Zahlen 0-9 in dieser Numeric vorkommen koennen.
 	@Test
 	public void text2Numeric0_9Ok(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -113,7 +113,48 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob diese Befehl Wörter Auswirkungen auf die Eingabe haben.
+    @Test
+    public void koord2OK(){
+        Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+        IomObject coordValue=objSuccessFormat.addattrobj("koord2", "COORD");
+        coordValue.setattrvalue("C1", "1.00");
+        coordValue.setattrvalue("C2", "100.0");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+        validator.validate(new ObjectEvent(objSuccessFormat));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+    
+    @Test
+    public void koord3OK(){
+        Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+        IomObject coordValue=objHighestDay.addattrobj("koord3", "COORD");
+        coordValue.setattrvalue("C1", "5.55");
+        coordValue.setattrvalue("C2", "200.6");
+        coordValue.setattrvalue("C3", "9999");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+        validator.validate(new ObjectEvent(objHighestDay));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+	
+	// Es wird getestet ob diese Befehl Woerter Auswirkungen auf die Eingabe haben.
 	@Test
 	public void text2ValOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -132,7 +173,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob diese Zeichen im Text vorkommen können.
+	// Es wird getestet ob diese Zeichen im Text vorkommen koennen.
 	@Test
 	public void text2SignsOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -151,7 +192,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob es möglich ist, 2 Wörter zu schreiben.
+	// Es wird getestet ob es moeglich ist, 2 Woerter zu schreiben.
 	@Test
 	public void text2WordSeparationOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -174,7 +215,7 @@ public class Datatypes10Test {
 	@Test
 	public void text2ZeichensatzContentOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("text2", "ÄâäàáæÇçÉêëèéîïìíÑñÖôöòóÜûüùú");
+		objTest.setattrvalue("text2", "\u00c4\u00e2\u00e4\u00e0\u00e1\u00e6\u00c7\u00e7\u00c9\u00ea\u00eb\u00e8\u00e9\u00ee\u00ef\u00ec\u00ed\u00d1\u00f1\u00d6\u00f4\u00f6\u00f2\u00f3\u00dc\u00fb\u00fc\u00f9\u00fa");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -195,7 +236,7 @@ public class Datatypes10Test {
 	@Test
 	public void bereichMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("bereich", "10.4");
+		objTest.setattrvalue("bereich", "9.94");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -210,13 +251,14 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Dezimal 0.0 wird gerundet auf (0).
-	// -0.4 gerundet =  0. valid.
-	// -0.5 gerundet = -1. unvalid.
+	// Dezimal -0.05 wird gerundet auf (0).
+	// -0.04 gerundet =  0. valid.
+	// -0.05 gerundet =  0. valid.
+	// -0.06 gerundet = -1. unvalid.
 	@Test
 	public void bereichMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("bereich", "-0.4");
+		objTest.setattrvalue("bereich", "-0.05");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -235,7 +277,7 @@ public class Datatypes10Test {
 	@Test
 	public void bereich2MaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("bereich2", "10.499");
+		objTest.setattrvalue("bereich2", "9.999");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -254,7 +296,7 @@ public class Datatypes10Test {
 	@Test
 	public void bereich2MinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("bereich2", "-0.499");
+		objTest.setattrvalue("bereich2", "0.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -269,7 +311,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die maximale Aufzählung wird hier getestet.
+	// Die maximale Aufzaehlung wird hier getestet.
 	@Test
 	public void aufzaehlungMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -288,7 +330,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die minimale Aufzählung wird getestet.
+	// Die minimale Aufzaehlung wird getestet.
 	@Test
 	public void aufzaehlungMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -307,7 +349,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob diese Aufzählung in einer Verschachtelung funktioniert.
+	// Es wird getestet ob diese Aufzaehlung in einer Verschachtelung funktioniert.
 	@Test
 	public void aufzaehlungVerschachtelungOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -326,11 +368,11 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die maximale Länge dieser Numeric wird getetstet.
+	// Die maximale Laenge dieser Numeric wird getetstet.
 	@Test
 	public void laengeMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("laenge", "10.4");
+		objTest.setattrvalue("laenge", "9.94");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -345,11 +387,11 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die minimale Länge der Numeric wird getestet
+	// Die minimale Laenge der Numeric wird getestet
 	@Test
 	public void laengeMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("laenge", "0.5");
+		objTest.setattrvalue("laenge", "0.95");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -364,7 +406,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// 3 Stellen nach dem Komma werden getestet auf die Zulässigkeit.
+	// 3 Stellen nach dem Komma werden getestet auf die Zulaessigkeit.
 	@Test
 	public void laenge2ThirdPositionAfterDotOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -383,11 +425,11 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Das Maximum der Fläche wird getestet
+	// Das Maximum der Flaeche wird getestet
 	@Test
 	public void flaecheMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("flaeche", "10.4");
+		objTest.setattrvalue("flaeche", "9.94");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -402,11 +444,11 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Das Minimum der Fläche wird getestet.
+	// Das Minimum der Flaeche wird getestet.
 	@Test
 	public void flaecheMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("flaeche", "0.5");
+		objTest.setattrvalue("flaeche", "0.95");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -421,11 +463,11 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// 3 Stellen nach dem Komma werden getestet auf die Fläche.
+	// 3 Stellen nach dem Komma werden getestet auf die Flaeche.
 	@Test
 	public void flaeche2ThirdPositionAfterDotOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("flaeche2", "99.000");
+		objTest.setattrvalue("flaeche2", "98.999");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -444,7 +486,7 @@ public class Datatypes10Test {
 	@Test
 	public void winkelRadianMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("radians", "10.4");
+		objTest.setattrvalue("radians", "10.0");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -463,7 +505,7 @@ public class Datatypes10Test {
 	@Test
 	public void winkelRadianMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("radians", "0.5");
+		objTest.setattrvalue("radians", "1.0");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -482,7 +524,7 @@ public class Datatypes10Test {
 	@Test
 	public void winkelGradsMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("grads", "10.4");
+		objTest.setattrvalue("grads", "10.04");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -501,7 +543,7 @@ public class Datatypes10Test {
 	@Test
 	public void winkelGradsMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("grads", "0.5");
+		objTest.setattrvalue("grads", "0.95");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -520,7 +562,7 @@ public class Datatypes10Test {
 	@Test
 	public void winkelDegreesMaximumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("degrees", "10.4");
+		objTest.setattrvalue("degrees", "10.04");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -539,7 +581,7 @@ public class Datatypes10Test {
 	@Test
 	public void winkelDegreesMinimumOk(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objTest.setattrvalue("degrees", "0.5");
+		objTest.setattrvalue("degrees", "0.95");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -554,7 +596,7 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Das minimale Datum, welches möglich ist, wird getestet.
+	// Das minimale Datum, welches moeglich ist, wird getestet.
 	@Test
 	public void datumLowestYearOk(){
 		Iom_jObject objLowestYear=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -820,30 +862,10 @@ public class Datatypes10Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Die Eingabe von 2d Koordinaten wird getestet.
-	@Test
-	public void koord2Ok(){
-		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objHighestDay.setattrvalue("koord2", "5.55 200.6");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objHighestDay));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
 	// Die Koordinate als undefiniert markiert wird getestet.
 	@Test
 	public void koord2UndefinedOk(){
 		Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objHighestDay.setattrvalue("koord2", "@");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -852,25 +874,6 @@ public class Datatypes10Test {
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
 		validator.validate(new ObjectEvent(objHighestDay));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
-	
-	// Die Koordinate als 3d Eingabe wird getestet.
-	@Test
-	public void koord3Ok(){
-		Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objSuccessFormat.setattrvalue("koord3", "5.55, 200.6 9999");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
-		validator.validate(new ObjectEvent(objSuccessFormat));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
@@ -881,7 +884,6 @@ public class Datatypes10Test {
 	@Test
 	public void koord3UndefinedOk(){
 		Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes10.Topic.Table", "o1");
-		objSuccessFormat.setattrvalue("koord3", "@");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -900,7 +902,7 @@ public class Datatypes10Test {
 	//########## FAILING TESTS ###################################/
 	//############################################################/
 	
-	// Testet die Fehlerausgabe, wenn der Text grösser ist, als zulässig.
+	// Testet die Fehlerausgabe, wenn der Text groesser ist, als zulaessig.
 	@Test
 	public void textGreaterThanMaximumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -940,7 +942,7 @@ public class Datatypes10Test {
 		assertEquals("unknown property <Ztext>", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// testet, die Eingabe von nicht gültigen Zeichen.
+	// testet, die Eingabe von nicht gueltigen Zeichen.
 	@Test
 	public void textContainUnvalidCharactersFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -960,7 +962,7 @@ public class Datatypes10Test {
 		assertEquals("Attribute text must not contain control characters", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Testet die Eingabe von Buchstaben in einem Bereich für Zahlen.
+	// Testet die Eingabe von Buchstaben in einem Bereich fuer Zahlen.
 	@Test
 	public void bereichContainLettersFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -980,7 +982,7 @@ public class Datatypes10Test {
 		assertEquals("value <test> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn die Zahleneingabe grösser ist, als erlaubt.
+	// Gibt einen Fehler aus, wenn die Zahleneingabe groesser ist, als erlaubt.
 	@Test
 	public void bereichGreaterThanMaximumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -997,7 +999,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.5 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.5 is out of range in attribute bereich", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn die Zahleneingabe kleiner ist, als definiert wurde.
@@ -1017,10 +1019,10 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value -0.5 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value -0.5 is out of range in attribute bereich", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn der Bereich (auf 3 Kommastellen gerundet) grösser ist als definiert.
+	// Gibt einen Fehler aus, wenn der Bereich (auf 3 Kommastellen gerundet) groesser ist als definiert.
 	@Test
 	public void bereich2GreaterThanMaximumFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1037,7 +1039,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.500 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.500 is out of range in attribute bereich2", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt eine Fehlermeldung aus, wenn der Bereich kleiner ist (auf 3 Stellen gerundet), als definiert.
@@ -1057,7 +1059,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value -0.500 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value -0.500 is out of range in attribute bereich2", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Gibt einen Fehler aus, wenn die Hierarchie nicht richtig eingegeben wurde.
@@ -1077,7 +1079,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value mehr.mehr.vier is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value mehr.mehr.vier is not a member of the enumeration in attribute aufzaehlung", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn der Typ afuzaelung nicht richtig geschrieben wurde.
@@ -1100,7 +1102,7 @@ public class Datatypes10Test {
 		assertEquals("unknown property <aufzaelung>", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn die Aufzählung nicht in der gleichen Enumeration sich befindet.
+	// Gibt einen Fehler aus, wenn die Aufzaehlung nicht in der gleichen Enumeration sich befindet.
 	@Test
 	public void aufzaehlungNotInSameEnumerationFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1117,10 +1119,10 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value meter.ml is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value meter.ml is not a member of the enumeration in attribute aufzaehlung2Oberauszaehlungen", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn  die Aufzählung nicht in der selber Enumeratiobn sich befindet. Test 2.
+	// Gibt einen Fehler aus, wenn  die Aufzaehlung nicht in der selber Enumeratiobn sich befindet. Test 2.
 	@Test
 	public void aufzaehlungNotInSameEnumeration2Fail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1137,10 +1139,10 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value liter.mm is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value liter.mm is not a member of the enumeration in attribute aufzaehlung2Oberauszaehlungen", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Gibt einen Fehler aus, wenn die Länge zu hoch ist.
+	// Gibt einen Fehler aus, wenn die Laenge zu hoch ist.
 	@Test
 	public void laengeToHighFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1157,10 +1159,10 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.5 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.5 is out of range in attribute laenge", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn die Länge zu kurz ist.
+	// Gibt einen Fehler aus, wenn die Laenge zu kurz ist.
 	@Test
 	public void laengeToLowFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1177,10 +1179,10 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 0.4 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 0.4 is out of range in attribute laenge", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn die Länge nicht numerisch ist.
+	// Gibt einen Fehler aus, wenn die Laenge nicht numerisch ist.
 	@Test
 	public void laengeNotValidFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1220,7 +1222,7 @@ public class Datatypes10Test {
 		assertEquals("value <2.0 5.2> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Gibt einen Fehler aus, wenn die Flächendefinition zu gross ist.
+	// Gibt einen Fehler aus, wenn die Flaechendefinition zu gross ist.
 	@Test
 	public void flaecheToHighFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1237,10 +1239,10 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.5 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.5 is out of range in attribute flaeche", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn die Flächendefinition zu klein ist.
+	// Gibt einen Fehler aus, wenn die Flaechendefinition zu klein ist.
 	@Test
 	public void flaecheToLowFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1257,10 +1259,10 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 0.4 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 0.4 is out of range in attribute flaeche", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn die Fläche nicht numerisch, sondern aus Buchstaben besteht.
+	// Gibt einen Fehler aus, wenn die Flaeche nicht numerisch, sondern aus Buchstaben besteht.
 	@Test
 	public void flaecheNotValidFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1280,7 +1282,7 @@ public class Datatypes10Test {
 		assertEquals("value <abc> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn die Fläche nicht numerisch, sondern aus koordinaten besteht aus.
+	// Gibt einen Fehler aus, wenn die Flaeche nicht numerisch, sondern aus koordinaten besteht aus.
 	@Test
 	public void FlaecheWith2DezFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1300,7 +1302,7 @@ public class Datatypes10Test {
 		assertEquals("value <2.0 5.2> is not a number", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn der Radian grösser ist, als die Definition des Maximums.
+	// Gibt einen Fehler aus, wenn der Radian groesser ist, als die Definition des Maximums.
 	@Test
 	public void radiansGreaterThanMaxFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1317,7 +1319,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.5 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.5 is out of range in attribute radians", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn der Radian kleiner ist, als erlaubt.
@@ -1337,10 +1339,10 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 0.4 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 0.4 is out of range in attribute radians", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn grads grösser definiert wurde, als erlaubt.
+	// Gibt einen Fehler aus, wenn grads groesser definiert wurde, als erlaubt.
 	@Test
 	public void gradsGreaterThanMaxFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1357,7 +1359,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.5 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.5 is out of range in attribute grads", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn grads kleiner definiert wurde, als erlaubt.
@@ -1377,10 +1379,10 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 0.4 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 0.4 is out of range in attribute grads", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn degrees grösser ist, als erlaubt.
+	// Gibt einen Fehler aus, wenn degrees groesser ist, als erlaubt.
 	@Test
 	public void degreesGreaterThanMaxFail(){
 		Iom_jObject objTest=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1397,7 +1399,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 10.5 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 10.5 is out of range in attribute degrees", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn degrees kleiner ist, als erlaubt.
@@ -1417,7 +1419,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value 0.4 is out of range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value 0.4 is out of range in attribute degrees", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn radian Type: abc keine Nummer ist.
@@ -1517,10 +1519,10 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <15801225> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <15801225> is not in range in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Gibt einen Fehler aus, wenn das Datum die maximale Definition übersteigt.
+	// Gibt einen Fehler aus, wenn das Datum die maximale Definition uebersteigt.
 	@Test
 	public void datumYearToHighFail(){
 		Iom_jObject objYearToHigh=new Iom_jObject("Datatypes10.Topic.Table", "o1");
@@ -1537,7 +1539,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 				assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <30001225> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <30001225> is not in range in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn das Datum des Monats zu tief ist.
@@ -1557,7 +1559,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <20160025> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <20160025> is not in range in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn das Datum des Monats zu hoch ist.
@@ -1577,7 +1579,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <20161325> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <20161325> is not in range in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn das Datum des Tages zu tief ist.
@@ -1597,7 +1599,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <20161200> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <20161200> is not in range in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn das Datum des Tages zu hoch ist.
@@ -1617,7 +1619,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <20161232> is not in range", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <20161232> is not in range in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Datum darf nicht mit Dots getrennt werden, sonst wird ein Fehler ausgegeben.
@@ -1637,7 +1639,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016.12.25> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <2016.12.25> is not a valid Date in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird ein Fehler ausgegeben, wenn das Datum zu kurz geschrieben wird.
@@ -1657,7 +1659,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2016125> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <2016125> is not a valid Date in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird ein Fehler ausgegeben, wenn das Datum zu lang geschrieben wurde.
@@ -1677,7 +1679,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <201612251> is not a valid Date", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <201612251> is not a valid Date in attribute datum", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es wird ein Fehler ausgegeben, wenn die Horizontale nicht existiert.
@@ -1697,7 +1699,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value Top is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value Top is not a member of the enumeration in attribute horizAlignment", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird ein Fehler ausgegeben, wenn die Vertikale nicht existiert.
@@ -1717,7 +1719,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value Left is not a member of the enumeration", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value Left is not a member of the enumeration in attribute vertAlignment", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird ein Fehler ausgegeben, wenn die Koordinate eine falsche dimension aufweist.
@@ -1759,7 +1761,8 @@ public class Datatypes10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertEquals(1, logger.getErrs().size());
+		assertEquals("The value <5.55 200.6 9999> is not a Coord in attribute koord2", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es wird ein Fehler ausgegeben, wenn dei Koordinate auf 2d geschrieben wird, obwohl sie eine 3d Definition hat.
@@ -1784,5 +1787,126 @@ public class Datatypes10Test {
 		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
 	}
 
-
+	// eine Fehlermeldung wird erwartet, da 9(4) auf 90 abgerundet werden soll,
+	// und somit der gueltige Bereich unterschritten wird.
+	@Test
+	public void coordType_Rounding_Down_Fail(){
+		Iom_jObject obj=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+		IomObject coordValue=obj.addattrobj("koord2", "COORD");
+		coordValue.setattrvalue("C1", "5.55");
+		coordValue.setattrvalue("C2", "99.94");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+		validator.validate(new ObjectEvent(obj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("value 99.9 is out of range in attribute koord2", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// prueft, ob 9(5) erfolgreich auf 100 aufgerundet wird.
+	@Test
+	public void coordType_Rounding_UpFrom5_Ok(){
+		Iom_jObject obj=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+		IomObject coordValue=obj.addattrobj("koord2", "COORD");
+		coordValue.setattrvalue("C1", "5.55");
+		coordValue.setattrvalue("C2", "99.95");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+		validator.validate(new ObjectEvent(obj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// prueft, ob 9(6) erfolgreich auf 100 aufgerundet wird.
+	@Test
+	public void coordType_Rounding_Up_Ok(){
+		Iom_jObject obj=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+		IomObject coordValue=obj.addattrobj("koord2", "COORD");
+		coordValue.setattrvalue("C1", "5.55");
+		coordValue.setattrvalue("C2", "99.96");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+		validator.validate(new ObjectEvent(obj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+    @Test
+    public void koord2wrongValueFail(){
+        Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+        objHighestDay.setattrvalue("koord2", "@");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+        validator.validate(new ObjectEvent(objHighestDay));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("The value <@> is not a Coord in attribute koord2", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    // Die Koordinate als 3d Eingabe wird getestet.
+    @Test
+    public void koord3Fail(){
+        Iom_jObject objSuccessFormat=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+        objSuccessFormat.setattrvalue("koord3", "5.55, 200.6 9999");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+        validator.validate(new ObjectEvent(objSuccessFormat));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("The value <5.55, 200.6 9999> is not a Coord in attribute koord3", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
+    public void koord2Fail(){
+        Iom_jObject objHighestDay=new Iom_jObject("Datatypes10.Topic.Table", "o1");
+        objHighestDay.setattrvalue("koord2", "5.55 200.6");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes10.Topic","b1"));
+        validator.validate(new ObjectEvent(objHighestDay));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("The value <5.55 200.6> is not a Coord in attribute koord2", logger.getErrs().get(0).getEventMsg());
+    }
 }

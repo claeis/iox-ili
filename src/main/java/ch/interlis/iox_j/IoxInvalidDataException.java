@@ -1,9 +1,12 @@
 package ch.interlis.iox_j;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iox.IoxException;
 
 public class IoxInvalidDataException extends IoxException {
@@ -71,21 +74,43 @@ public class IoxInvalidDataException extends IoxException {
 	}
 	public static String formatTids(String tids[]) {
 		StringBuilder ret=new StringBuilder();
-		if(tids!=null && tids.length>0){
-			if(tids.length>1){
-				ret.append("tids ");
-			}else{
-				ret.append("tid ");
-			}
-			String sep="";
-			for(String tid:tids){
-				ret.append(sep);
-				ret.append(tid);
-				sep=", ";
-			}
+		if(tids!=null){
+	        List<String> tidv=new ArrayList<String>();
+	        for(String tid:tids) {
+	            if(tid!=null && tid.length()>0) {
+	                tidv.add(tid);
+	            }
+	        }
+	        if(tidv.size()>0){
+	            if(tidv.size()>1){
+	                ret.append("tids ");
+	            }else{
+	                ret.append("tid ");
+	            }
+	            Collections.sort(tidv);
+	            String sep="";
+	            for(String tid:tidv){
+	                ret.append(sep);
+	                ret.append(tid);
+	                sep=", ";
+	            }
+	        }
 		}
 		return ret.toString();
 	}
+    public static String formatTids(CompoundCurve curve) {
+        String tids[]=curve.getSegmentTids();
+        if(tids==null || tids.length==0) {
+            StringBuilder ret=new StringBuilder();
+            Object tid=curve.getUserData();
+            if(tid!=null) {
+                ret.append("tid ");
+                ret.append(tid);
+            }
+            return ret.toString();
+        }
+        return formatTids(tids);
+    }
 
 	public IomObject getGeom() {
 		return geom;

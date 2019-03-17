@@ -26,6 +26,7 @@ import com.vividsolutions.jts.planargraph.*;
 class PolygonizeGraph
     extends PlanarGraph
 {
+	  final boolean doDetailTrace=false;
 
   private static int getDegreeNonDeleted(Node node)
   {
@@ -119,6 +120,11 @@ class PolygonizeGraph
     for (Iterator iNode = nodeIterator(); iNode.hasNext(); ) {
       Node node = (Node) iNode.next();
       computeNextCWEdges(node);
+      if(doDetailTrace) {
+          DirectedEdgeStar deStar = node.getOutEdges();
+          List<PolygonizeDirectedEdge> edges = getActiveOutgoingEdges(deStar);
+          printEdges("computeNextCWEdges "+node.getCoordinate()+": ",edges);
+      }
     }
   }
 
@@ -173,76 +179,79 @@ class PolygonizeGraph
 
   public void removeOverlaps(double newVertexOffset)
   {
-	  final boolean doDetailTrace=false;
 		CurveSegmentIntersector li = new CurveSegmentIntersector();
 	    for (Iterator iNode = nodeIterator(); iNode.hasNext(); ) {
 	        Node node = (Node) iNode.next();
 	        //computeNextCWEdges(node);
-	        boolean overlapRemoved=false;
             DirectedEdgeStar deStar = node.getOutEdges();
-            PolygonizeDirectedEdge startDE = null;
-            PolygonizeDirectedEdge prevDE = null;
-            // the edges are stored in CCW order around the star
-            List<PolygonizeDirectedEdge> edges = getActiveOutgoingEdges(deStar);
-            if(doDetailTrace)printEdges(node.getCoordinate()+": ",edges);
-            int edgec=edges.size();
-            double maxDist=0.0;
-            for(int i=0;i<edgec;i++){
-                PolygonizeDirectedEdge currentDE = edges.get(i);
-                for(int j=i+1;j<edgec;j++){
-                    PolygonizeDirectedEdge nextDE = edges.get(j);
-                    if((currentDE.isArc() || nextDE.isArc()) && Math.abs(currentDE.getAngle()-nextDE.getAngle())<0.0001){
-                    	maxDist=2*newVertexOffset;
-                    	if(doDetailTrace)System.out.println("  angleDiff "+(currentDE.getAngle()-nextDE.getAngle()));
-                    }
-                    Coordinate is=getIntersection(li,node.getCoordinate(),currentDE, nextDE);
-                    if(is!=null){
-                    	double dist=CurveSegment.dist(node.getCoordinate(),is);
-                    	if(dist>maxDist){
-                    		maxDist=dist;
-                    	}
-                    }
-                }
-            }
-            if(maxDist>0){
-            	maxDist=maxDist*1.1;
-            	if(doDetailTrace)System.out.println("  maxDist "+maxDist);
+	        boolean overlapRemoved=false;
+            do{
+    	        overlapRemoved=false;
+                PolygonizeDirectedEdge startDE = null;
+                PolygonizeDirectedEdge prevDE = null;
+                List<PolygonizeDirectedEdge> edges = getActiveOutgoingEdges(deStar);
+                if(doDetailTrace)printEdges("removeOverlaps "+node.getCoordinate()+": ",edges);
+                int edgec=edges.size();
+                double maxDist=0.0;
+                // calculate distance for evaluation of curve direction
                 for(int i=0;i<edgec;i++){
                     PolygonizeDirectedEdge currentDE = edges.get(i);
-                    currentDE.adjustDirectionPt(maxDist);
+                    for(int j=i+1;j<edgec;j++){
+                        PolygonizeDirectedEdge nextDE = edges.get(j);
+                        if((currentDE.isArc() || nextDE.isArc()) && Math.abs(currentDE.getAngle()-nextDE.getAngle())<0.0001){
+                        	maxDist=2*newVertexOffset;
+                        	if(doDetailTrace)System.out.println("  angleDiff "+(currentDE.getAngle()-nextDE.getAngle()));
+                        }
+                        Coordinate is=getIntersection(li,node.getCoordinate(),currentDE, nextDE);
+                        if(is!=null){
+                        	double dist=CurveSegment.dist(node.getCoordinate(),is);
+                        	if(dist>maxDist){
+                        		maxDist=dist;
+                        	}
+                        }
+                    }
                 }
-    		    Collections.sort(deStar.getEdges());
-                edges = getActiveOutgoingEdges(deStar);
-                if(doDetailTrace)printEdges("   reordered ",edges);
-            }
-            
-            // the edges are stored in CCW order around the star
-            for (Iterator i = deStar.getEdges().iterator(); i.hasNext(); ) {
-              PolygonizeDirectedEdge currentDE = (PolygonizeDirectedEdge) i.next();
-              if (currentDE.isMarked()) continue;
-              if (startDE == null){
-                startDE = currentDE;
-              }
-              if (prevDE != null) {
-            	  // check outDE,prevDE
-            	  boolean removed=removeOverlap(li,node.getCoordinate(),prevDE, currentDE,newVertexOffset);
-            	  overlapRemoved=overlapRemoved || removed;
-              }
-              prevDE = currentDE;
-            }
-            if (prevDE != null) {
-            	  // check prevDE,startDE
-            	boolean removed=removeOverlap(li,node.getCoordinate(),prevDE, startDE,newVertexOffset);
-            	overlapRemoved=overlapRemoved || removed;
-            }
-            if(overlapRemoved){
-            	if(doDetailTrace)printEdges("   overlapRemoved ",edges);
-            }
+                // reorder edges based on curve direction at given distance to node 
+                if(maxDist>0){
+                	maxDist=maxDist*1.1;
+                	if(doDetailTrace)System.out.println("  maxDist "+maxDist);
+                    for(int i=0;i<edgec;i++){
+                        PolygonizeDirectedEdge currentDE = edges.get(i);
+                        currentDE.adjustDirectionPt(maxDist);
+                    }
+        		    Collections.sort(deStar.getEdges());
+                    edges = getActiveOutgoingEdges(deStar);
+                    if(doDetailTrace)printEdges("   reordered ",edges);
+                }
+                
+                // the edges are stored in CCW order around the star
+                for (Iterator i = deStar.getEdges().iterator(); i.hasNext(); ) {
+                  PolygonizeDirectedEdge currentDE = (PolygonizeDirectedEdge) i.next();
+                  if (currentDE.isMarked()) continue;
+                  if (startDE == null){
+                    startDE = currentDE;
+                  }
+                  if (prevDE != null) {
+                	  // check outDE,prevDE
+                	  boolean removed=removeOverlap(li,node.getCoordinate(),prevDE, currentDE,newVertexOffset);
+                	  overlapRemoved=overlapRemoved || removed;
+                  }
+                  prevDE = currentDE;
+                }
+                if (prevDE != null) {
+                	  // check prevDE,startDE
+                	boolean removed=removeOverlap(li,node.getCoordinate(),prevDE, startDE,newVertexOffset);
+                	overlapRemoved=overlapRemoved || removed;
+                }
+                if(overlapRemoved){
+                	if(doDetailTrace)printEdges("   overlapRemoved ",edges);
+                }
+            }while(overlapRemoved);
 	      }
 	  
   }
 
-private void printEdges(String tag,List<PolygonizeDirectedEdge> edges) {
+void printEdges(String tag,List<PolygonizeDirectedEdge> edges) {
 		System.out.print(tag);
 		int edgec=edges.size();
 		for(int i=0;i<edgec;i++){
@@ -312,6 +321,7 @@ private boolean removeOverlap(CurveSegmentIntersector li,Coordinate node,
 						  throw new IllegalStateException("unexpected overlap tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
 					  }
 				  }else{
+					  li.isOverlay(); // TODO ceis 20180501 is overlay a special case here?
 					  Coordinate is0=li.getIntersection(0);
 					  Coordinate is1=li.getIntersection(1);
 					  if(is0.equals2D(node)){
@@ -393,6 +403,7 @@ private Coordinate getIntersection(CurveSegmentIntersector li,Coordinate node,
 						  throw new IllegalStateException("unexpected overlap");
 					  }
 				  }else{
+					  li.isOverlay(); // TODO ceis 20180501 is overlay a special case here?
 					  Coordinate is0=li.getIntersection(0);
 					  Coordinate is1=li.getIntersection(1);
 					  if(is0.equals2D(node)){
@@ -432,6 +443,9 @@ private Coordinate getIntersection(CurveSegmentIntersector li,Coordinate node,
       if (de.isInRing()) continue;
 
       EdgeRing er = findEdgeRing(de);
+      if(doDetailTrace) {
+    	  printEdges("getEdgeRings:", (List<PolygonizeDirectedEdge>)er.getEdges());
+      }
       edgeRingList.add(er);
     }
     return edgeRingList;
@@ -445,7 +459,7 @@ private Coordinate getIntersection(CurveSegmentIntersector li,Coordinate node,
    * @param dirEdges a List of the DirectedEdges in the graph
    * @return a List of DirectedEdges, one for each edge ring found
    */
-  private static List findLabeledEdgeRings(Collection dirEdges)
+  private List findLabeledEdgeRings(Collection dirEdges)
   {
     List edgeRingStarts = new ArrayList();
     // label the edge rings formed
@@ -457,7 +471,9 @@ private Coordinate getIntersection(CurveSegmentIntersector li,Coordinate node,
 
       edgeRingStarts.add(de);
       List edges = findDirEdgesInRing(de);
-
+      if(doDetailTrace) {
+    	  printEdges("findLabeledEdgeRings:",edges);
+      }
       label(edges, currLabel);
       currLabel++;
     }

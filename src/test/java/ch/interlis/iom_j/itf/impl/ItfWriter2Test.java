@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ch.interlis.ili2c.Ili2cFailure;
@@ -22,6 +23,7 @@ import ch.interlis.iox_j.*;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 
 public class ItfWriter2Test {
+	private final static String TEST_OUT="build";
 
 	private TransferDescription td=null;
 	private void addArc(IomObject polyline,double xa, double ya,double x, double y){
@@ -47,15 +49,18 @@ public class ItfWriter2Test {
 		ret.addattrobj("sequence",sequence);
 		return ret;
 	}
-	private IomObject createPolgon(IomObject polyline) {
+	private IomObject newPolygon() {
 		// MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline
 		IomObject ret=new ch.interlis.iom_j.Iom_jObject("MULTISURFACE",null);
 		IomObject surface=new ch.interlis.iom_j.Iom_jObject("SURFACE",null);
-		IomObject boundary=new ch.interlis.iom_j.Iom_jObject("BOUNDARY",null);
-		boundary.addattrobj("polyline", polyline);
-		surface.addattrobj("boundary",boundary);
 		ret.addattrobj("surface",surface);
 		return ret;
+	}
+	private void addBoundary(IomObject polygon,IomObject polyline){
+		IomObject boundary=new ch.interlis.iom_j.Iom_jObject("BOUNDARY",null);
+		boundary.addattrobj("polyline", polyline);
+		IomObject surface=polygon.getattrobj("surface",0);
+		surface.addattrobj("boundary",boundary);
 	}
 	@Before
 	public void setup() throws Ili2cFailure
@@ -70,7 +75,7 @@ public class ItfWriter2Test {
 	
 	@Test
 	public void testF1() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File("test-out/TestF1.itf"),td);
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestF1.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new EndTransferEvent());
 		writer.close();
@@ -78,7 +83,7 @@ public class ItfWriter2Test {
 	}
 	@Test
 	public void testF3() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File("test-out/TestF3.itf"),td);
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestF3.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicF","bid1"));
 		writer.write(new EndBasketEvent());
@@ -88,7 +93,7 @@ public class ItfWriter2Test {
 	}
 	@Test
 	public void testF4() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File("test-out/TestF4.itf"),td);
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestF4.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicF","bid1"));
 		writer.write(new ObjectEvent(new Iom_jObject("Test1.TopicF.TableF0","10")));
@@ -101,8 +106,8 @@ public class ItfWriter2Test {
 		writer=null;
 	}
 	@Test
-	public void testA1() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File("test-out/TestA1.itf"),td);
+	public void testSurfaceNull() throws Iox2jtsException, IoxException {
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestSurfaceNull.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicA","bid1"));
 		writer.write(new ObjectEvent(new Iom_jObject("Test1.TopicA.TableA","10")));
@@ -113,8 +118,8 @@ public class ItfWriter2Test {
 		writer=null;
 	}
 	@Test
-	public void testA2() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File("test-out/TestA2.itf"),td);
+	public void testSurface() throws Iox2jtsException, IoxException {
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestSurfaceWithArc.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicA","bid1"));
 		IomObject iomObj=new Iom_jObject("Test1.TopicA.TableA","10");
@@ -124,7 +129,8 @@ public class ItfWriter2Test {
 		addCoord(polyline,120.0,  140.0); 
 		addCoord(polyline,110.0,  140.0); 
 		addCoord(polyline,110.0,  110.0);
-		IomObject polygon=createPolgon(polyline);
+		IomObject polygon=newPolygon();
+		addBoundary(polygon,polyline);
 		iomObj.addattrobj("Form", polygon);
 		writer.write(new ObjectEvent(iomObj));
 		iomObj=new Iom_jObject("Test1.TopicA.TableA","11");
@@ -134,7 +140,8 @@ public class ItfWriter2Test {
 		addCoord(polyline,115.0,  120.0); 
 		addCoord(polyline,112.0,  120.0); 
 		addCoord(polyline,110.0,  110.0);
-		polygon=createPolgon(polyline);
+		polygon=newPolygon();
+		addBoundary(polygon,polyline);
 		iomObj.addattrobj("Form", polygon);
 		writer.write(new ObjectEvent(iomObj));
 		writer.write(new EndBasketEvent());
@@ -143,8 +150,8 @@ public class ItfWriter2Test {
 		writer=null;
 	}
 	@Test
-	public void testB1() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File("test-out/TestB1.itf"),td);
+	public void testAreaEmpty() throws Iox2jtsException, IoxException {
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestAreaEmpty.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicB","bid1"));
 		writer.write(new ObjectEvent(new Iom_jObject("Test1.TopicB.TableB","10")));
@@ -155,8 +162,29 @@ public class ItfWriter2Test {
 		writer=null;
 	}
 	@Test
-	public void testB2() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File("test-out/TestB2.itf"),td);
+	public void testAreaSimple() throws Iox2jtsException, IoxException {
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestAreaSimple.itf"),td);
+		writer.write(new StartTransferEvent());
+		writer.write(new StartBasketEvent("Test1.TopicB","bid1"));
+		IomObject iomObj=new Iom_jObject("Test1.TopicB.TableB","10");
+		IomObject polygon=newPolygon();
+		IomObject polyline=newPolyline();
+		addCoord(polyline,110,110);
+		addCoord(polyline,120.0,  110.0); 
+		addCoord(polyline,120.0,  140.0); 
+		addCoord(polyline,110.0,  140.0); 
+		addCoord(polyline,110.0,  110.0);
+		addBoundary(polygon, polyline);
+		iomObj.addattrobj("Form", polygon);
+		writer.write(new ObjectEvent(iomObj));
+		writer.write(new EndBasketEvent());
+		writer.write(new EndTransferEvent());
+		writer.close();
+		writer=null;
+	}
+	@Test
+	public void testAreaWithArc() throws Iox2jtsException, IoxException {
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestAreaWithArc.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicB","bid1"));
 		IomObject iomObj=new Iom_jObject("Test1.TopicB.TableB","10");
@@ -166,17 +194,42 @@ public class ItfWriter2Test {
 		addCoord(polyline,120.0,  140.0); 
 		addCoord(polyline,110.0,  140.0); 
 		addCoord(polyline,110.0,  110.0);
-		IomObject polygon=createPolgon(polyline);
+		IomObject polygon=newPolygon();
+		addBoundary(polygon,polyline);
 		iomObj.addattrobj("Form", polygon);
 		writer.write(new ObjectEvent(iomObj));
-		iomObj=new Iom_jObject("Test1.TopicB.TableB","11");
+		writer.write(new EndBasketEvent());
+		writer.write(new EndTransferEvent());
+		writer.close();
+		writer=null;
+	}
+	@Ignore("Area overlay of lines not yet implemented.")
+	@Test
+	public void testAreaWithHole() throws Iox2jtsException, IoxException {
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestAreaWithHole.itf"),td);
+		writer.write(new StartTransferEvent());
+		writer.write(new StartBasketEvent("Test1.TopicB","bid1"));
+		IomObject iomObj=new Iom_jObject("Test1.TopicB.TableB","10");
+		IomObject polyline=newPolyline();
+		addCoord(polyline,110.0,  110.0);
+		addCoord(polyline,120.0,  110.0); 
+		addCoord(polyline,120.0,  140.0); 
+		addCoord(polyline,110.0,  140.0); 
+		addCoord(polyline,110.0,  110.0);
+		IomObject polygon=newPolygon();
+		addBoundary(polygon,polyline);
 		polyline=newPolyline();
 		addCoord(polyline,110.0,  110.0);
 		addCoord(polyline,115.0,  115.0); 
 		addCoord(polyline,115.0,  120.0); 
 		addCoord(polyline,112.0,  120.0); 
 		addCoord(polyline,110.0,  110.0);
-		polygon=createPolgon(polyline);
+		addBoundary(polygon,polyline);
+		iomObj.addattrobj("Form", polygon);
+		writer.write(new ObjectEvent(iomObj));
+		iomObj=new Iom_jObject("Test1.TopicB.TableB","11");
+		polygon=newPolygon();
+		addBoundary(polygon,polyline);
 		iomObj.addattrobj("Form", polygon);
 		writer.write(new ObjectEvent(iomObj));
 		writer.write(new EndBasketEvent());

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" xmlns="http://www.interlis.ch/xtf/2.4/DataTest1" xmlns:geom="http://www.interlis.ch/geometry/1.0">
+	<ili:headersection>
+		<ili:models>
+			<ili:model>DataTest1</ili:model>
+		</ili:models>
+	</ili:headersection>
+	<ili:datasection>
+		<TopicB ili:bid="bidB">
+			<Coord1D ili:tid="oid1D">
+				<attr1>
+					<geom:coord>
+						<geom:c1>480000.000</geom:c1>
+					</geom:coord>
+				</attr1>
+			</Coord1D>
+			<Coord2D ili:tid="oid2D">
+				<attr2>
+					<geom:coord>
+						<geom:c1>480000.000</geom:c1>
+						<geom:c2>70000.000</geom:c2>
+					</geom:coord>
+				</attr2>
+			</Coord2D>
+			<Coord3D ili:tid="oid3D">
+				<attr3>
+					<geom:coord>
+						<geom:c1>480000.000</geom:c1>
+						<geom:c2>70000.000</geom:c2>
+						<geom:c3>5000.000</geom:c3>
+					</geom:coord>
+				</attr3>
+			</Coord3D>
+			<MultiCoord ili:tid="mOid">
+				<attr4>
+					<geom:multicoord>
+						<geom:coord>
+							<geom:c1>480000.111</geom:c1>
+							<geom:c2>70000.111</geom:c2>
+							<geom:c3>5000.111</geom:c3>
+						</geom:coord>
+						<geom:coord>
+							<geom:c1>480000.222</geom:c1>
+							<geom:c2>70000.222</geom:c2>
+							<geom:c3>5000.222</geom:c3>
+						</geom:coord>
+						<geom:coord>
+							<geom:c1>480000.333</geom:c1>
+							<geom:c2>70000.333</geom:c2>
+							<geom:c3>5000.333</geom:c3>
+						</geom:coord>
+						<geom:coord>
+							<geom:c1>480000.444</geom:c1>
+							<geom:c2>70000.444</geom:c2>
+							<geom:c3>5000.444</geom:c3>
+						</geom:coord>
+						<geom:coord>
+							<geom:c1>480000.555</geom:c1>
+							<geom:c2>70000.555</geom:c2>
+							<geom:c3>5000.555</geom:c3>
+						</geom:coord>
+					</geom:multicoord>
+				</attr4>
+			</MultiCoord>
+		</TopicB>
+	</ili:datasection>
+</ili:transfer>

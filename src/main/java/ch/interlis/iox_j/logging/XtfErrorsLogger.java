@@ -26,7 +26,8 @@ import ch.interlis.iox_j.StartTransferEvent;
 import ch.interlis.models.ILISMETA07;
 
 public class XtfErrorsLogger implements LogListener {
-	IoxWriter out=null;
+	private static final String UNDEFINED_MESSAGE = "UNDEFINED MESSAGE";
+    IoxWriter out=null;
 	private int objc=1;
 	public XtfErrorsLogger(File logFile,String sender)
 	{
@@ -45,7 +46,27 @@ public class XtfErrorsLogger implements LogListener {
 	@Override
 	public void logEvent(LogEvent event) {
 		org.interlis2.validator.models.IliVErrors.ErrorLog.Error iomObj=new org.interlis2.validator.models.IliVErrors.ErrorLog.Error("o"+objc++);
-		iomObj.setMessage(event.getEventMsg());
+		String msg = event.getEventMsg();
+        if (msg == null) {
+            Throwable ex = event.getException();
+            if (ex != null) {
+                msg = ex.getLocalizedMessage();
+                if (msg != null) {
+                    msg = msg.trim();
+                    if (msg.length() == 0) {
+                        msg = null;
+                    }
+                }
+                if (msg == null) {
+                    msg = ex.getClass().getName();
+                }
+            }
+        }
+        if (msg != null) {
+            iomObj.setMessage(msg);
+        } else {
+            iomObj.setMessage(UNDEFINED_MESSAGE);
+        }
 		switch(event.getEventKind()){
 		case LogEvent.ERROR: 
 				iomObj.setType(Error_Type.Error);
@@ -62,14 +83,33 @@ public class XtfErrorsLogger implements LogListener {
 		}
 		if(event instanceof IoxLogEvent){
 			IoxLogEvent ioxEvent=(IoxLogEvent)event;
-			iomObj.setObjTag(ioxEvent.getSourceObjectTag());
-			iomObj.setTid(ioxEvent.getSourceObjectXtfId());
-			iomObj.setTechId(ioxEvent.getSourceObjectTechId());
-			iomObj.setUserId(ioxEvent.getSourceObjectUsrId()); 
-			iomObj.setIliQName(ioxEvent.getModelEleQName());
-			iomObj.setDataSource(ioxEvent.getDataSource());
-			if(ioxEvent.getSourceLineNr()!=null){
-				iomObj.setLine(ioxEvent.getSourceLineNr());
+			String sourceObjectTag = ioxEvent.getSourceObjectTag();
+			if(sourceObjectTag!=null) {
+	            iomObj.setObjTag(sourceObjectTag);
+			}
+			String sourceObjectXtfId = ioxEvent.getSourceObjectXtfId();
+			if(sourceObjectXtfId!=null) {
+	            iomObj.setTid(sourceObjectXtfId);
+			}
+			String sourceObjectTechId = ioxEvent.getSourceObjectTechId();
+			if(sourceObjectTechId!=null) {
+	            iomObj.setTechId(sourceObjectTechId);
+			}
+			String sourceObjectUsrId = ioxEvent.getSourceObjectUsrId();
+			if(sourceObjectUsrId!=null) {
+	            iomObj.setUserId(sourceObjectUsrId); 
+			}
+			String modelEleQName = ioxEvent.getModelEleQName();
+			if(modelEleQName!=null) {
+	            iomObj.setIliQName(modelEleQName);
+			}
+			String dataSource = ioxEvent.getDataSource();
+			if(dataSource!=null) {
+	            iomObj.setDataSource(dataSource);
+			}
+			Integer sourceLineNr = ioxEvent.getSourceLineNr();
+            if(sourceLineNr!=null){
+				iomObj.setLine(sourceLineNr);
 			}
 			if(ioxEvent.getGeomC1()!=null && ioxEvent.getGeomC2()!=null){
 				Iom_jObject iomCoord=new Iom_jObject("COORD",null);

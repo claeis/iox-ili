@@ -76,7 +76,11 @@ public class Ili2cUtility {
 					}
 					
 				}
-				mapping.defineClass(tag, (ViewableProperty[])propv.toArray(new ViewableProperty[propv.size()]));
+				// is an object possible in the transfer file?
+				if(propv!=null) {
+				    // define the "class" of that object
+	                mapping.defineClass(tag, (ViewableProperty[])propv.toArray(new ViewableProperty[propv.size()]));
+				}
 				
 			}
 		}else{
@@ -183,15 +187,6 @@ public class Ili2cUtility {
 		if(obj.obj instanceof RoleDef){
 			RoleDef role = (RoleDef) obj.obj;
 			
-			// not an embedded role and roledef not defined in a lightweight association?
-			if (!obj.embedded && !((AssociationDef)v).isLightweight()){
-				prop=new ViewableProperty(role.getName());
-				RoleDef baseRole=role.getRootExtending();
-				if(baseRole==null)baseRole=role;
-				if(baseRole.getContainer()!=v){
-					prop.setBaseDefInClass(baseRole.getContainer().getScopedName(null));
-				}
-			}
 			// a role of an embedded association?
 			if(obj.embedded){
 				AssociationDef roleOwner = (AssociationDef) role.getContainer();
@@ -204,6 +199,13 @@ public class Ili2cUtility {
 						prop.setBaseDefInClass(baseOppRole.getDestination().getScopedName(null));
 					}
 				}
+			}else {
+                prop=new ViewableProperty(role.getName());
+                RoleDef baseRole=role.getRootExtending();
+                if(baseRole==null)baseRole=role;
+                if(baseRole.getContainer()!=v){
+                    prop.setBaseDefInClass(baseRole.getContainer().getScopedName(null));
+                }
 			}
 		}
 		return prop;

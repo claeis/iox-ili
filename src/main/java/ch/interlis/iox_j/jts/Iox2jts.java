@@ -22,15 +22,19 @@
  */
 package ch.interlis.iox_j.jts;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateList;
+import com.vividsolutions.jts.geom.PrecisionModel;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iox_j.wkb.Wkb2iox;
 
 /** Utility to convert from INTERLIS to JTS geometry types.
  * @author ceis
  */
 public class Iox2jts {
 	// utility, no instances
-	private Iox2jts(){}
+	Iox2jts(){}
 	private static double dist(double re1,double ho1,double re2,double ho2)
 	{
 		double ret;
@@ -121,6 +125,25 @@ public class Iox2jts {
 			coord=new com.vividsolutions.jts.geom.Coordinate(xCoord, yCoord,zCoord);
 		}
 		return coord;
+	}
+	/** Converts a MULTICOORD to a JTS MultiPoint.
+	 * @param obj INTERLIS MULTICOORD structure.
+	 * @return JTS MultiPoint.
+	 * @throws Iox2jtsException
+	 */
+	public static com.vividsolutions.jts.geom.MultiPoint multicoord2JTS(IomObject obj)
+	throws Iox2jtsException 
+	{
+		int segmentCount=obj.getattrvaluecount(Wkb2iox.ATTR_COORD);
+		com.vividsolutions.jts.geom.Point[] jtsPointArray=new com.vividsolutions.jts.geom.Point[segmentCount];
+		for(int i=0;i<segmentCount;i++) {
+			IomObject segment=obj.getattrobj(Wkb2iox.ATTR_COORD, i);
+			Coordinate jtsCoordinate=coord2JTS(segment);
+			com.vividsolutions.jts.geom.Point jtsPoint=new com.vividsolutions.jts.geom.Point(jtsCoordinate, new PrecisionModel(), 0);
+			jtsPointArray[i]=jtsPoint;
+		}
+		com.vividsolutions.jts.geom.MultiPoint ret=new com.vividsolutions.jts.geom.MultiPoint(jtsPointArray, new PrecisionModel(), 0);
+		return ret;
 	}
 	private static void arc2JTS(com.vividsolutions.jts.geom.CoordinateList ret,IomObject value,double p)
 	throws Iox2jtsException
@@ -300,6 +323,26 @@ public class Iox2jts {
 		}
 		return ret;
 	}
+	/** Converts a MULTIPOLYLINE to a JTS MultiLineString.
+	 * @param obj INTERLIS MULTIPOLYLINE structure
+	 * @param strokeP maximum stroke to use when removing ARCs
+	 * @return JTS MultiLineString
+	 * @throws Iox2jtsException
+	 */
+	public static com.vividsolutions.jts.geom.MultiLineString multipolyline2JTS(IomObject obj,double strokeP)
+	throws Iox2jtsException
+	{
+		int polylineCount=obj.getattrvaluecount("polyline");
+		com.vividsolutions.jts.geom.LineString[] jtsLineStringArray=new com.vividsolutions.jts.geom.LineString[polylineCount];
+		for(int polylinei=0;polylinei<polylineCount;polylinei++) {
+			IomObject polyline=obj.getattrobj("polyline", polylinei);
+			CoordinateList jtsCoordinateList=polyline2JTS(polyline, false, strokeP);
+			com.vividsolutions.jts.geom.LineString jtsLineString=new com.vividsolutions.jts.geom.LineString(jtsCoordinateList.toCoordinateArray(), new PrecisionModel(), 0);
+			jtsLineStringArray[polylinei]=jtsLineString;
+		}
+		com.vividsolutions.jts.geom.MultiLineString ret=new com.vividsolutions.jts.geom.MultiLineString(jtsLineStringArray, new PrecisionModel(), 0);
+		return ret;
+	}
 	/** Converts a SURFACE to a JTS Polygon.
 	 * @param obj INTERLIS SURFACE structure
 	 * @param strokeP maximum stroke to use when removing ARCs
@@ -357,5 +400,45 @@ public class Iox2jts {
 		}
 		return ret;
 	}
-
+	/** Converts a MULTISURFACE to a JTS MultiPolygon.
+	 * @param obj INTERLIS MULTISURFACE structure
+	 * @param strokeP maximum stroke to use when removing ARCs
+	 * @return JTS MultiPolygon
+	 * @throws Iox2jtsException
+	 */
+	public static com.vividsolutions.jts.geom.MultiPolygon multisurface2JTS(IomObject obj,double strokeP,int srid) //SurfaceOrAreaType type)
+	throws Iox2jtsException
+	{
+		com.vividsolutions.jts.geom.Polygon[] jtsPolygons=null;
+		com.vividsolutions.jts.geom.Polygon jtsPolygon=null;
+		int surfaceCount=obj.getattrvaluecount("surface");
+		jtsPolygons=new com.vividsolutions.jts.geom.Polygon[surfaceCount];
+		for(int surfacei=0;surfacei<surfaceCount;surfacei++){
+			IomObject surface=obj.getattrobj("surface",surfacei);
+			com.vividsolutions.jts.geom.LinearRing jtsShell=null;
+			com.vividsolutions.jts.geom.LinearRing jtsHoles[]=null;
+			int boundarycount=surface.getattrvaluecount("boundary");
+			if(boundarycount>1){
+				jtsHoles=new com.vividsolutions.jts.geom.LinearRing[boundarycount-1];				
+			}
+			for(int boundaryi=0;boundaryi<boundarycount;boundaryi++){
+				IomObject boundary=surface.getattrobj("boundary",boundaryi);
+				com.vividsolutions.jts.geom.CoordinateList jtsLine=new com.vividsolutions.jts.geom.CoordinateList();
+				for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
+					IomObject polyline=boundary.getattrobj("polyline",polylinei);
+					jtsLine.addAll(polyline2JTS(polyline,true,strokeP));
+				}
+				jtsLine.closeRing();
+				if(boundaryi==0){
+					jtsShell=new com.vividsolutions.jts.geom.GeometryFactory().createLinearRing(jtsLine.toCoordinateArray());
+				}else{
+					jtsHoles[boundaryi-1]=new com.vividsolutions.jts.geom.GeometryFactory().createLinearRing(jtsLine.toCoordinateArray());
+				}
+			}
+			jtsPolygon=new com.vividsolutions.jts.geom.GeometryFactory().createPolygon(jtsShell,jtsHoles);
+			jtsPolygons[surfacei]=jtsPolygon;
+		}
+		com.vividsolutions.jts.geom.MultiPolygon ret=new com.vividsolutions.jts.geom.MultiPolygon(jtsPolygons, new PrecisionModel(), srid);
+		return ret;
+	}
 }

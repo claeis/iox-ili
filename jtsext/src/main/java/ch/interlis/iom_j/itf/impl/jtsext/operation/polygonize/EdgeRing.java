@@ -133,7 +133,7 @@ class EdgeRing {
   private GeometryFactory factory;
 
 
-  private List deList = new ArrayList();
+  private List<DirectedEdge> deList = new ArrayList<DirectedEdge>();
 
   // cache the following data for efficiency
   private LinearRing ring = null;
@@ -165,10 +165,10 @@ class EdgeRing {
   public boolean isHole()
   {
     LinearRing ring = getRing();
-    return CGAlgorithms.isCCW(ring.getCoordinates());
+	return CompoundCurveRing.isCCW(ring);
   }
 
-  /**
+/**
    * Adds a hole to the polygon formed by this ring.
    * @param hole the {@link LinearRing} forming the hole.
    */
@@ -326,4 +326,8 @@ class EdgeRing {
 			
 		}
   }
+
+public List<? extends DirectedEdge> getEdges() {
+	return deList;
+}
 }

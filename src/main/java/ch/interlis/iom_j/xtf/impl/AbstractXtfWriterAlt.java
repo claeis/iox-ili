@@ -19,7 +19,7 @@ public abstract class AbstractXtfWriterAlt {
 	public abstract void writeEndBasket() throws IoxException;
 
 	public abstract void writeStartBasket(String type, String bid,
-			int consistency, int kind, String startstate, String endstate, String[] topicv)
+			int consistency, int kind, String startstate, String endstate, String[] topicv,String domains)
 			throws IoxException;
 
 	public abstract void writeStartBasket(String type, String bid)

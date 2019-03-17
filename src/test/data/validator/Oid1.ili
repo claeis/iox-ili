@@ -16,6 +16,15 @@ MODEL Oid1
 		
 	END Topic.
 	
+	TOPIC Topic2=
+	
+		TABLE ClassB =
+		   attrB1 : OPTIONAL TEXT*10;
+		   NO IDENT
+		END ClassB;
+		
+	END Topic2.
+	
 END Oid1.
 
 FORMAT FREE;

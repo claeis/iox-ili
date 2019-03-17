@@ -99,4 +99,8 @@ public class CurvePolygon extends Polygon {
 			EhiLogger.debug("CompoundCurve line=new CompoundCurve(segs);");
 			EhiLogger.debug(ring+"=new CompoundCurveRing(line);");
 		}
+
+		public static boolean polygonOverlays(Polygon e0, Polygon e1) {
+			return e0.equals(e1) || e0.overlaps(e1);
+		}
 }

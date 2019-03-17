@@ -284,6 +284,26 @@ public class AdditionalConstraints23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Mandatory Constraint AdditionalModelC.AdditionalTopicC.AdditionalClassC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
+    @Test
+    public void mandatoryConstraint_NotEqual_DuplicateModel_Fail(){
+        Iom_jObject obj1=new Iom_jObject(CLASSB, OID1);
+        obj1.setattrvalue("attr1", "5");
+        obj1.setattrvalue("attr2", "10");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelC;AdditionalConstraints23");
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID1));
+        validator.validate(new ObjectEvent(obj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Mandatory Constraint AdditionalModelC.AdditionalTopicC.AdditionalClassC.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+    }
 	
 
 	
@@ -448,11 +468,11 @@ public class AdditionalConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei die Funktion: areArea,
-	// über eine additional constraint via set constraint ausgeführt werden kann.
+	// ueber eine additional constraint via set constraint ausgefuehrt werden kann.
 	// 1 object. Objects=ALL, SurfaceBAG=UNDEFINED, SurfaceAttr=Geometrie.
 	@Test
 	public void mandatoryConstraint_FunctionAreArea_Ok(){
@@ -504,7 +524,7 @@ public class AdditionalConstraints23Test {
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei die Funktion: areArea,
-	// über eine additional constraint via set constraint ausgeführt werden kann und die Objekte verschiedene Values enthalten.
+	// ueber eine additional constraint via set constraint ausgefuehrt werden kann und die Objekte verschiedene Values enthalten.
 	// 1 object. Objects=ALL, SurfaceBAG=>> Numbers, SurfaceAttr=>> AdditionalConstraints23.Topic.StructD->Surface.
 	@Test
 	public void mandatoryConstraint_FunctionAreArea_Fail(){
@@ -594,6 +614,8 @@ public class AdditionalConstraints23Test {
 		assertEquals("Set Constraint AdditionalModelI.AdditionalTopicI.AdditionalClassI.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
+	// Es wird getestet ob eine Intersection Fehlermeldung ausgegeben wird,
+	// wenn sich die Boundaries der Surface selbst ueberschneiden.
 	@Test
 	public void mandatoryConstraint_OverlappedSurface_False(){
 		Iom_jObject function1=new Iom_jObject(CLASSI, OID1);
@@ -609,23 +631,23 @@ public class AdditionalConstraints23Test {
 		startSegment.setattrvalue("C1", "480000.000");
 		startSegment.setattrvalue("C2", "70000.000");
 		IomObject endSegment=segments.addattrobj("segment", "COORD");
-		endSegment.setattrvalue("C1", "500000.000");
-		endSegment.setattrvalue("C2", "80000.000");
+		endSegment.setattrvalue("C1", "480000.000");
+		endSegment.setattrvalue("C2", "250000.000");
 		// polyline 2
 		IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments2=polylineValue2.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment2=segments2.addattrobj("segment", "COORD");
-		startSegment2.setattrvalue("C1", "500000.000");
-		startSegment2.setattrvalue("C2", "80000.000");
+		startSegment2.setattrvalue("C1", "480000.000");
+		startSegment2.setattrvalue("C2", "250000.000");
 		IomObject endSegment2=segments2.addattrobj("segment", "COORD");
-		endSegment2.setattrvalue("C1", "550000.000");
-		endSegment2.setattrvalue("C2", "90000.000");
+		endSegment2.setattrvalue("C1", "600000.000");
+		endSegment2.setattrvalue("C2", "250000.000");
 		// polyline 3
 		IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3=polylineValue3.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3=segments3.addattrobj("segment", "COORD");
-		startSegment3.setattrvalue("C1", "550000.000");
-		startSegment3.setattrvalue("C2", "90000.000");
+		startSegment3.setattrvalue("C1", "600000.000");
+		startSegment3.setattrvalue("C2", "250000.000");
 		IomObject endSegment3=segments3.addattrobj("segment", "COORD");
 		endSegment3.setattrvalue("C1", "480000.000");
 		endSegment3.setattrvalue("C2", "70000.000");
@@ -635,29 +657,29 @@ public class AdditionalConstraints23Test {
 		IomObject polylineValueInner = innerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segmentsInner=polylineValueInner.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegmentInner=segmentsInner.addattrobj("segment", "COORD");
-		startSegmentInner.setattrvalue("C1", "480000.000");
-		startSegmentInner.setattrvalue("C2", "70000.000");
+		startSegmentInner.setattrvalue("C1", "500000.000");
+		startSegmentInner.setattrvalue("C2", "150000.000");
 		IomObject endSegmentInner=segmentsInner.addattrobj("segment", "COORD");
 		endSegmentInner.setattrvalue("C1", "500000.000");
-		endSegmentInner.setattrvalue("C2", "80000.000");
+		endSegmentInner.setattrvalue("C2", "230000.000");
 		// polyline 2
 		IomObject polylineValue2Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments2Inner=polylineValue2Inner.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
 		startSegment2Inner.setattrvalue("C1", "500000.000");
-		startSegment2Inner.setattrvalue("C2", "78000.000");
+		startSegment2Inner.setattrvalue("C2", "230000.000");
 		IomObject endSegment2Inner=segments2Inner.addattrobj("segment", "COORD");
-		endSegment2Inner.setattrvalue("C1", "505000.000");
-		endSegment2Inner.setattrvalue("C2", "78000.000");
+		endSegment2Inner.setattrvalue("C1", "600000.000");
+		endSegment2Inner.setattrvalue("C2", "230000.000");
 		// polyline 3
 		IomObject polylineValue3Inner = innerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments3Inner=polylineValue3Inner.addattrobj("sequence", "SEGMENTS");
 		IomObject startSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
-		startSegment3Inner.setattrvalue("C1", "505000.000");
-		startSegment3Inner.setattrvalue("C2", "78000.000");
+		startSegment3Inner.setattrvalue("C1", "600000.000");
+		startSegment3Inner.setattrvalue("C2", "230000.000");
 		IomObject endSegment3Inner=segments3Inner.addattrobj("segment", "COORD");
-		endSegment3Inner.setattrvalue("C1", "480000.000");
-		endSegment3Inner.setattrvalue("C2", "70000.000");
+		endSegment3Inner.setattrvalue("C1", "500000.000");
+		endSegment3Inner.setattrvalue("C2", "150000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelH");
 		LogCollector logger=new LogCollector();
@@ -670,7 +692,83 @@ public class AdditionalConstraints23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
+		assertTrue(logger.getErrs().size()==4);
+		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
+		assertEquals("Set Constraint AdditionalModelH.AdditionalTopicH.AdditionalClassH.Constraint1 is not true.", logger.getErrs().get(3).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist nicht gesetzt.
+	// Es wird eine Fehlermeldung erwartet.
+	@Test
+	public void plausibilityConstraintFail_ConstraintDisableSet_NotSet_False(){
+		Iom_jObject obj1=new Iom_jObject(CLASSF, OID1);
+		obj1.setattrvalue("attr1", "5");
+		obj1.setattrvalue("attr2", "7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelG;");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("failed to validate polygon", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Plausibility Constraint AdditionalModelG.AdditionalTopicG.AdditionalClassG.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist Eingeschaltet.
+	// Es wird eine Fehlermeldung erwartet.
+	@Test
+	public void plausibilityConstraintFail_ConstraintDisableSet_ON_False(){
+		Iom_jObject obj1=new Iom_jObject(CLASSF, OID1);
+		obj1.setattrvalue("attr1", "5");
+		obj1.setattrvalue("attr2", "7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.ON);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelG;");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Plausibility Constraint AdditionalModelG.AdditionalTopicG.AdditionalClassG.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist Ausgeschaltet.
+	// Es wird erwartet dass keine Fehlermeldung ausgegeben wird.
+	@Test
+	public void plausibilityConstraintFail_ConstraintDisableSet_OFF_Ok(){
+		Iom_jObject obj1=new Iom_jObject(CLASSF, OID1);
+		obj1.setattrvalue("attr1", "5");
+		obj1.setattrvalue("attr2", "7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelG;");
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID1));
+		validator.validate(new ObjectEvent(obj1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
 	}
 }

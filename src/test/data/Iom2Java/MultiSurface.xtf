@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+	<HEADERSECTION SENDER="ili2pg-3.6.0-20161230" VERSION="2.3">
+		<MODELS>
+			<MODEL NAME="Model" VERSION="2016-07-08" URI="mailto:ceis@localhost"></MODEL>
+		</MODELS>
+	</HEADERSECTION>
+	<DATASECTION>
+		<Model.Topic BID="ab.cd">
+		</Model.Topic>
+		<Model.Topic BID="ef.gh">
+			<Model.Topic.Surface TID="oid.1">
+			    <attr1>xy</attr1>
+				<attr2>
+					<SURFACE>
+						<BOUNDARY>
+							<POLYLINE>
+								<COORD>
+									<C1>2600000.000</C1>
+									<C2>1050000.000</C2>
+								</COORD>
+								<COORD>
+									<C1>2600000.000</C1>
+									<C2>1050025.000</C2>
+								</COORD>
+								<ARC>
+									<C1>2600024.98</C1>
+									<C2>1050014.367861</C2>
+									<A1>2600000.030</A1>
+									<A2>1050024.367861</A2>
+								</ARC>
+								<COORD>
+									<C1>2600024.98</C1>
+									<C2>1050000.000</C2>
+								</COORD>
+								<COORD>
+									<C1>2600000.000</C1>
+									<C2>1050000.000</C2>
+								</COORD>
+							</POLYLINE>
+						</BOUNDARY>
+					</SURFACE>
+				</attr2>
+			</Model.Topic.Surface>
+			<Model.Topic.Area TID="oid.2">
+			    <attr1>wk</attr1>
+				<attr3>
+					<SURFACE>
+						<BOUNDARY>
+							<POLYLINE>
+								<COORD>
+									<C1>2600000.000</C1>
+									<C2>1050000.000</C2>
+								</COORD>
+								<COORD>
+									<C1>2600000.000</C1>
+									<C2>1050025.000</C2>
+								</COORD>
+								<ARC>
+									<C1>2600024.98</C1>
+									<C2>1050014.367861</C2>
+									<A1>2600000.030</A1>
+									<A2>1050024.367861</A2>
+								</ARC>
+								<COORD>
+									<C1>2600024.98</C1>
+									<C2>1050000.000</C2>
+								</COORD>
+								<COORD>
+									<C1>2600000.000</C1>
+									<C2>1050000.000</C2>
+								</COORD>
+							</POLYLINE>
+						</BOUNDARY>
+					</SURFACE>
+				</attr3>
+			</Model.Topic.Area>
+		</Model.Topic>
+	</DATASECTION>
+</TRANSFER>

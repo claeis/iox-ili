@@ -46,7 +46,7 @@ public class ExistenceConstraints23Test {
 	//########## SUCCESSFUL TESTS ################################/
 	//############################################################/
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr5 der KlasseA über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr5 der KlasseA ueber die
 	// Existence Constraint auf das Attr1 der Klasse ConditionClass verweist und dieselbe Value hat.
 	@Test
 	public void existenceConstraintToClass_Ok() throws Exception{
@@ -61,7 +61,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new ObjectEvent(objA));
 		validator.validate(new EndBasketEvent());
@@ -70,7 +70,33 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr5 der KlasseA über die
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn das Attr5 der KlasseA ueber die
+	// Existence Constraint auf das Attr1 der Klasse ConditionClass verweist und dieselbe Value hat.
+	// Die Klasse: ClassA wird von der Klasse: Class AP erweitert.
+	// Die Klasse: ConditionClass wird von der Klasse: ConditionClassX erweitert.
+	@Test
+	public void subClassExistenceConstraintToClass_Ok() throws Exception{
+		Iom_jObject objConditionX=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClassX", OID1);
+		objConditionX.setattrvalue("attr1", "lars");
+		Iom_jObject objAP=new Iom_jObject("ExistenceConstraints23.Topic.ClassAp", OID2);
+		objAP.setattrvalue("attr5", "lars");
+		objAP.setattrvalue("attr2", "20");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
+		validator.validate(new ObjectEvent(objConditionX));
+		validator.validate(new ObjectEvent(objAP));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr5 der KlasseA ueber die
 	// Existence Constraint auf das Attr1 der Klasse ConditionClass verweist, welche von der Klasse ConditionClassX extended wird und dieselbe Value hat.
 	@Test
 	public void existenceConstraintViaExtendedClass_Ok() throws Exception{
@@ -85,7 +111,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new ObjectEvent(objA));
 		validator.validate(new EndBasketEvent());
@@ -94,7 +120,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der KlasseB über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der KlasseB ueber die
 	// Existence Constraint auf das Attr1 der Klasse ConditionClass verweist, welche sich in einer anderen Basket befindet und dieselbe Value hat.
 	@Test
 	public void existenceConstraintViaDiffModelDiffBasket_Ok() throws Exception {
@@ -112,7 +138,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID2));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID2));
 		validator.validate(new ObjectEvent(objB));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -120,7 +146,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der KlasseB über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der KlasseB ueber die
 	// Existence Constraint auf das Attr1 der Klasse ConditionClass eines anderen Models verweist und dieselbe Value hat.
 	@Test
 	public void existenceConstraintViaDiffModel_Ok() throws Exception {
@@ -135,7 +161,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objB));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new EndBasketEvent());
@@ -144,38 +170,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	//	@Test
-//	public void existenceConstraintStructureOk() throws Exception {
-//		Iom_jObject structureValueBedingung=new Iom_jObject("ExistenceConstraints23Condition.structure", null);
-//		structureValueBedingung.setattrvalue("attr1", "lars");
-//		//structureValueBedingung.setattrvalue("attr2", "andre");
-//		//structureValueBedingung.setattrvalue("attr3", "james");
-//		Iom_jObject objB=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassStructure", "o1");
-//		objB.addattrobj("attr1", structureValueBedingung);
-//		Iom_jObject structureValueBedingung2=new Iom_jObject("ExistenceConstraints23.Topic.ClassStructureOtherModel", null);
-//		structureValueBedingung2.setattrvalue("attr1", "lars");
-//		//structureValueBedingung2.setattrvalue("attr2", "andre");
-//		//structureValueBedingung2.setattrvalue("attr3", "james");
-//		Iom_jObject objC=new Iom_jObject("ExistenceConstraints23.Topic.ClassStructureOtherModel", "o2");
-//		objC.addattrobj("attr1", structureValueBedingung2);
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b1"));
-//		validator.validate(new ObjectEvent(objB));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic","b2"));
-//		validator.validate(new ObjectEvent(objC));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==0);
-//	}
-
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der ClassCoord1d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der ClassCoord1d ueber die
 	// Existence Constraint auf das Attr0 der Klasse ConditionClassCoord verweist und dieselbe Value hat.
 	@Test
 	public void existenceConstraintViaDiffModel1dCoord_Ok(){
@@ -202,7 +197,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der ClassCoord2d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der ClassCoord2d ueber die
 	// Existence Constraint auf das Attr1 der Klasse ConditionClassCoord verweist und dieselben Values hat.
 	@Test
 	public void existenceConstraintViaDiffModel2dCoords_Ok(){
@@ -231,7 +226,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der ClassCoord3d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der ClassCoord3d ueber die
 	// Existence Constraint auf das Attr2 der Klasse ConditionClassCoord verweist und dieselben Values hat.
 	@Test
 	public void existenceConstraintDiffModel3dCoords_Ok(){
@@ -262,7 +257,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn straights2d der Klasse ClassLine2d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn straights2d der Klasse ClassLine2d ueber die
 	// Existence Constraint auf das straights2d der Klasse ConditionClassLine verweist und dieselbe Value hat.
 	@Test
 	public void diffModel2dpolylineStraights_Ok(){
@@ -303,7 +298,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das straights3d der ClassLine3d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das straights3d der ClassLine3d ueber die
 	// Existence Constraint auf das straights3d der Klasse ConditionClassLine verweist und dieselbe Value hat.
 	@Test
 	public void diffModel3dPolylineStraights_Ok(){
@@ -348,7 +343,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcs2d der ClassLine2dArcs über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcs2d der ClassLine2dArcs ueber die
 	// Existence Constraint auf das arcs2d der Klasse ConditionClassLine verweist und dieselbe Value hat.
 	@Test
 	public void diffModel2dPolylineArcs_Ok(){
@@ -391,7 +386,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcs3d der ClassLine3dArcs über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcs3d der ClassLine3dArcs ueber die
 	// Existence Constraint auf das arcs3d der Klasse ConditionClassLine verweist und dieselbe Value hat.
 	@Test
 	public void diffModel3dPolylineArcs_Ok(){
@@ -438,7 +433,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcsstraights3d der ClassLine3dArcsStraights über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcsstraights3d der ClassLine3dArcsStraights ueber die
 	// Existence Constraint auf das arcsstraights3d der Klasse ConditionClassLine verweist und dieselbe Value hat.
 	@Test
 	public void diffModel3dPolylineStraightsArcs_Ok(){
@@ -493,7 +488,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcsstraights2d der ClassLine2dArcsStraights über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das arcsstraights2d der ClassLine2dArcsStraights ueber die
 	// Existence Constraint auf das arcsstraights2d der Klasse ConditionClassLine verweist und dieselbe Value hat.
 	@Test
 	public void diffModel2dPolylineStraightsArcs_Ok(){
@@ -542,7 +537,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das surface2d der ClassSurface2d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das surface2d der ClassSurface2d ueber die
 	// Existence Constraint auf das surface2d der Klasse ConditionClassSurface verweist und dieselbe Value hat.
 	@Test
 	public void diffModel2dSurface_Ok(){
@@ -629,7 +624,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das surface3d der ClassSurface3d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das surface3d der ClassSurface3d ueber die
 	// Existence Constraint auf das surface3d der Klasse ConditionClassSurface verweist und dieselbe Value hat.
 	@Test
 	public void diffModel3dSurface_Ok(){
@@ -728,7 +723,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das area2d der ClassArea2d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das area2d der ClassArea2d ueber die
 	// Existence Constraint auf das area2d der Klasse ConditionClassArea verweist und dieselbe Value hat.
 	@Test
 	public void diffModel2dArea_Ok(){
@@ -815,7 +810,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das area3d der ClassArea3d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das area3d der ClassArea3d ueber die
 	// Existence Constraint auf das area3d der Klasse ConditionClassArea verweist und dieselbe Value hat.
 	@Test
 	public void diffModel3dSurfaceArea_Ok(){
@@ -914,7 +909,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn 2 Objekte erstellt werden, wenn eines der Objekte das Attr1 der ClassCooord2d über die
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn 2 Objekte erstellt werden, wenn eines der Objekte das Attr1 der ClassCooord2d ueber die
 	// Existence Constraint auf das Attr1 der ConditionClassCoord verweist und dieselbe Value hat.
 	@Test
 	public void diffModel2ObjsOneContainsConditionAttrs_Ok(){
@@ -973,7 +968,7 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn beide Objekte keine Attribute für den Constraint definiert haben.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn beide Objekte keine Attribute fuer den Constraint definiert haben.
 	@Test
 	public void diffModelBothObjectsWithoutConditionValues_Ok(){
 		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", OID1);
@@ -996,12 +991,122 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-
+	// Es wird getestet, ob innerhalb einer Struktur eine Existence Constraint geprueft wird.
+	// Es darf keine Fehlermeldung ausgegeben werden, da die Attributewerte miteinander uebereinstimmen.
+	@Test
+	public void existenceConstraintInStructure_Ok() throws Exception {
+		Iom_jObject conditionClass=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", OID1);
+		conditionClass.setattrvalue("attr1", "lars");
+		Iom_jObject baseClassStruct=new Iom_jObject("ExistenceConstraints23.Topic.structureBase", null);
+		baseClassStruct.setattrvalue("attr1", "lars");
+		Iom_jObject baseClassD=new Iom_jObject("ExistenceConstraints23.Topic.ClassD", OID2);
+		baseClassD.addattrobj("attr1", baseClassStruct);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
+		validator.validate(new ObjectEvent(conditionClass));
+		validator.validate(new ObjectEvent(baseClassD));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	// Es wird getestet, dass das Constraint innerhlab einer Struktur ueberlesen wird, falls faelschlicherweise kein Strukturelement vorhanden ist
+	@Test
+	public void existenceConstraintInStructureButPrimitiveValue_Fail() throws Exception {
+		Iom_jObject conditionClass=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", OID1);
+		conditionClass.setattrvalue("attr1", "lars");
+		Iom_jObject baseClassD=new Iom_jObject("ExistenceConstraints23.Topic.ClassD", OID2);
+		baseClassD.setattrvalue("attr1", "lars"); // sollte eigentlich ein Strukturelement sein, darf nicht zum Absturz fuehren
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
+		validator.validate(new ObjectEvent(conditionClass));
+		validator.validate(new ObjectEvent(baseClassD));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn
+	// - innerhalb einer Klasse, auf eine Struktur in einem anderen Model verwiesen wird.
+	// - Die Existence-Constraint auf eine Klasse in einem anderen Model verweist.
+	// - Die Attribute-Werte stimmen uebereinstimmen.
+	@Test
+	public void existenceConstraint_structuredValue_Ok() throws Exception {
+		Iom_jObject conditionStruct=new Iom_jObject("ExistenceConstraints23Condition.structure", null);
+		conditionStruct.setattrvalue("attr1", "lars");
+		Iom_jObject conditionClass=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassStructure", OID1);
+		conditionClass.addattrobj("attr1", conditionStruct);
+		Iom_jObject objC=new Iom_jObject("ExistenceConstraints23.Topic.ClassStructureOtherModel", OID2);
+		// base class references to condition struct.
+		objC.addattrobj("attr1", conditionStruct);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic",BID1));
+		validator.validate(new ObjectEvent(conditionClass));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID2));
+		validator.validate(new ObjectEvent(objC));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn
+	// - innerhalb einer Klasse, ueber mehrere Strukturen in einem anderen Model verwiesen wird.
+	// - Die Existence-Constraint auf eine Klasse in einem anderen Model verweist.
+	// - Die Attribute-Werte stimmen uebereinstimmen.
+	@Test
+	public void existenceConstraint_nestedStructures_Ok() throws Exception {
+		Iom_jObject conditionStruct=new Iom_jObject("ExistenceConstraints23Condition.structure", null);
+		conditionStruct.setattrvalue("attr1", "lars");
+		Iom_jObject conditionStruct2=new Iom_jObject("ExistenceConstraints23Condition.structure2", null);
+		IomObject conditionCoordValue=conditionStruct2.addattrobj("coord", "COORD");
+		conditionCoordValue.setattrvalue("C1", "480000.000");
+		conditionCoordValue.setattrvalue("C2", "70000.000");
+		conditionStruct2.addattrobj("attr1", conditionStruct);
+		Iom_jObject conditionClass=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassStructure2", OID1);
+		conditionClass.addattrobj("attr1", conditionStruct2);
+		Iom_jObject objC=new Iom_jObject("ExistenceConstraints23.Topic.ClassStructureOtherModel2", OID2);
+		// base class references to condition struct.
+		objC.addattrobj("attr1", conditionStruct2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic",BID1));
+		validator.validate(new ObjectEvent(conditionClass));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID2));
+		validator.validate(new ObjectEvent(objC));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
 	//############################################################
 	//################ FAIL TESTS ################################
 	//############################################################
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void sameModelDifferentAttrs_Fail() throws Exception{
 		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", OID1);
@@ -1015,7 +1120,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new ObjectEvent(objA));
 		validator.validate(new EndBasketEvent());
@@ -1025,7 +1130,34 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute, welche in 2 unterschiedlichen Model sich befinden nicht übereinstimmen.
+	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn das Attr5 der KlasseA ueber die
+	// Existence Constraint auf das Attr1 der Klasse ConditionClass verweist und beide unterschiedliche Values enthalten.
+	// Die Klasse: ClassA wird von der Klasse: Class AP erweitert.
+	// Die Klasse: ConditionClass wird von der Klasse: ConditionClassX erweitert.
+	@Test
+	public void subClassSameModelDifferentAttrs_Fail() throws Exception{
+		Iom_jObject objConditionX=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClassX", OID1);
+		objConditionX.setattrvalue("attr1", "other");
+		Iom_jObject objAP=new Iom_jObject("ExistenceConstraints23.Topic.ClassAp", OID2);
+		objAP.setattrvalue("attr5", "lars");
+		objAP.setattrvalue("attr2", "20");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
+		validator.validate(new ObjectEvent(objConditionX));
+		validator.validate(new ObjectEvent(objAP));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassAp was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute, welche in 2 unterschiedlichen Model sich befinden nicht uebereinstimmen.
 	@Test
 	public void diffModelConstraintValuesDifferent_Fail() throws Exception {
 		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClass", OID1);
@@ -1042,7 +1174,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID2));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID2));
 		validator.validate(new ObjectEvent(objB));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1051,7 +1183,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void sameModelConstraintAttrsDifferent_Fail() throws Exception{
 		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass2", OID1);
@@ -1065,7 +1197,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new ObjectEvent(objA));
 		validator.validate(new EndBasketEvent());
@@ -1075,7 +1207,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Condition Attributes welche über eine weitere Klasse extended wird, mit dem Attribute in ClassA übereinstimmt.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Condition Attributes welche ueber eine weitere Klasse extended wird, mit dem Attribute in ClassA uebereinstimmt.
 	@Test
 	public void sameModelOverExtendedClass_Fail() throws Exception{
 		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClassX", OID1);
@@ -1089,7 +1221,7 @@ public class ExistenceConstraints23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic",BID1));
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
 		validator.validate(new ObjectEvent(objBedingung));
 		validator.validate(new ObjectEvent(objA));
 		validator.validate(new EndBasketEvent());
@@ -1099,39 +1231,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 
-//	@Test
-//	public void existenceConstraintStructureFail() throws Exception {
-//		Iom_jObject structureValueBedingung=new Iom_jObject("ExistenceConstraints23Condition.structure", null);
-//		structureValueBedingung.setattrvalue("attr1", "lars");
-//		structureValueBedingung.setattrvalue("attr2", "andre");
-//		structureValueBedingung.setattrvalue("attr3", "james");
-//		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassStructure", "o1");
-//		objBedingung.addattrobj("attr1", structureValueBedingung);
-//		Iom_jObject structureValueB=new Iom_jObject("ExistenceConstraints23Condition.structure", null);
-//		structureValueB.setattrvalue("attr1", "lars");
-//		structureValueB.setattrvalue("attr2", "andre");
-//		structureValueB.setattrvalue("attr3", "ben");
-//		Iom_jObject objB=new Iom_jObject("ExistenceConstraints23.Topic.ClassStructureOtherModel", "o2");
-//		objB.addattrobj("attr1", structureValueB);
-//		ValidationConfig modelConfig=new ValidationConfig();
-//		LogCollector logger=new LogCollector();
-//		LogEventFactory errFactory=new LogEventFactory();
-//		Settings settings=new Settings();
-//		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-//		validator.validate(new StartTransferEvent());
-//		validator.validate(new StartBasketEvent("ExistenceContraints23.Topic","b1"));
-//		validator.validate(new ObjectEvent(objB));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic","b2"));
-//		validator.validate(new ObjectEvent(objBedingung));
-//		validator.validate(new EndBasketEvent());
-//		validator.validate(new EndTransferEvent());
-//		// Asserts
-//		assertTrue(logger.getErrs().size()==1);
-//		assertEquals("The value of the attribute attr5 of CLASS ExistenceConstraints23.Topic.ClassA was not found in the conditional CLASS ExistenceConstraints23.Topic.ConditionClass2.", logger.getErrs().get(0).getEventMsg());
-//	}
-
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 1d Coord constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 1d Coord constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void diffModelDiff1dCoords_Fail(){
 		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", OID1);
@@ -1158,7 +1258,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord1d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Coords constraint Attribute nicht übereinstimmen. 
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Coords constraint Attribute nicht uebereinstimmen. 
 	@Test
 	public void diffModel2dCoordDifferent_Fail(){
 		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", OID1);
@@ -1187,7 +1287,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Coord constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Coord constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void diffModel3dCoordsDiff_Fail(){
 		Iom_jObject conditionObj=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassCoord", OID1);
@@ -1218,7 +1318,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void diffModel2dPolylineStraights_Fail(){
 		// Polyline in Condition Class
@@ -1259,7 +1359,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute straights2d of ExistenceConstraints23Coords.Topic.ClassLine2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void diffModels3dPolylineStraights_Fail(){
 		// Polyline in Condition Class
@@ -1304,7 +1404,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute straights3d of ExistenceConstraints23Coords.Topic.ClassLine3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline mit Arcs constraint Attributes nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline mit Arcs constraint Attributes nicht uebereinstimmen.
 	@Test
 	public void diffModels2dPolylineArcs_Fail(){
 		Iom_jObject objStraightsCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassLine", OID1);
@@ -1347,7 +1447,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute arcs2d of ExistenceConstraints23Coords.Topic.ClassLine2dArcs was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline mit Arcs constraint Attributes nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline mit Arcs constraint Attributes nicht uebereinstimmen.
 	@Test
 	public void diffModels3dPolylineArcs_Fail(){
 		Iom_jObject objStraightsCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassLine", OID1);
@@ -1394,7 +1494,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute arcs3d of ExistenceConstraints23Coords.Topic.ClassLine3dArcs was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline mit Straights und Arcs constraint Attributes nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline mit Straights und Arcs constraint Attributes nicht uebereinstimmen.
 	@Test
 	public void diffModels3dPolylineStraightsArcs_Fail(){
 		Iom_jObject objStraightsCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassLine", OID1);
@@ -1449,7 +1549,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute arcsstraights3d of ExistenceConstraints23Coords.Topic.ClassLine3dArcsStraights was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline mit Straights und Arcs constraint Attributes nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline mit Straights und Arcs constraint Attributes nicht uebereinstimmen.
 	@Test
 	public void diffModels2dPolylineStraightsArcs_Fail(){
 		Iom_jObject objStraightsCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassLine", OID1);
@@ -1498,7 +1598,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute arcsstraights2d of ExistenceConstraints23Coords.Topic.ClassLine2dArcsStraights was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Oberflächen constraint Attributes nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Oberflaechen constraint Attributes nicht uebereinstimmen.
 	@Test
 	public void diffModels2dSurface_Fail(){
 		Iom_jObject objSurfaceSuccessCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassSurface", OID1);
@@ -1585,7 +1685,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute surface2d of ExistenceConstraints23Coords.Topic.ClassSurface2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Oberflächen constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Oberflaechen constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void diffModels3dSurface_Fail(){
 		Iom_jObject objSurfaceSuccessCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassSurface", OID1);
@@ -1684,7 +1784,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute surface3d of ExistenceConstraints23Coords.Topic.ClassSurface3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polygone constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polygone constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void diffModels2dArea_Fail(){
 		Iom_jObject objSurfaceSuccessCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassArea", OID1);
@@ -1771,7 +1871,7 @@ public class ExistenceConstraints23Test {
 		assertEquals("The value of the attribute area2d of ExistenceConstraints23Coords.Topic.ClassArea2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Area constraint Attribute nicht übereinstimmen.
+	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Area constraint Attribute nicht uebereinstimmen.
 	@Test
 	public void diffModels3dArea_Fail(){
 		Iom_jObject objSurfaceSuccessCondition=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassArea", OID1);
@@ -1868,5 +1968,179 @@ public class ExistenceConstraints23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("The value of the attribute area3d of ExistenceConstraints23Coords.Topic.ClassArea3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet, ob innerhalb einer Struktur eine Existence Constraint erstellt werden kann.
+	// Es muss eine Fehlermeldung ausgegeben werden, da die Attributewerte nicht uebereinstimmen.
+	@Test
+	public void existenceConstraintInStructure_Fail() throws Exception {
+		Iom_jObject conditionClass=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", OID1);
+		conditionClass.setattrvalue("attr1", "lars");
+		Iom_jObject baseClassStruct=new Iom_jObject("ExistenceConstraints23.Topic.structureBase", null);
+		baseClassStruct.setattrvalue("attr1", "urs");
+		Iom_jObject baseClassD=new Iom_jObject("ExistenceConstraints23.Topic.ClassD", OID2);
+		baseClassD.addattrobj("attr1", baseClassStruct);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
+		validator.validate(new ObjectEvent(conditionClass));
+		validator.validate(new ObjectEvent(baseClassD));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(1,logger.getErrs().size());
+		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.structureBase was not found in the condition class.",logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn
+	// - innerhalb einer Klasse, auf eine Struktur in einem anderen Model verwiesen wird.
+	// - Die Existence-Constraint auf eine Klasse in einem anderen Model verweist.
+	// - Die Attribute-Werte nicht miteinander uebereinstimmen.
+	@Test
+	public void existenceConstraint_structuredValue_Fail() throws Exception {
+		Iom_jObject structureValueBedingung=new Iom_jObject("ExistenceConstraints23Condition.structure", null);
+		structureValueBedingung.setattrvalue("attr1", "lars");
+		Iom_jObject objB=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassStructure", OID1);
+		objB.addattrobj("attr1", structureValueBedingung);
+		Iom_jObject structureValueBedingung2=new Iom_jObject("ExistenceConstraints23Condition.structure", null);
+		structureValueBedingung2.setattrvalue("attr1", "urs");
+		Iom_jObject objC=new Iom_jObject("ExistenceConstraints23.Topic.ClassStructureOtherModel", OID2);
+		objC.addattrobj("attr1", structureValueBedingung2);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic",BID1));
+		validator.validate(new ObjectEvent(objB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID2));
+		validator.validate(new ObjectEvent(objC));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassStructureOtherModel was not found in the condition class.",logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn
+	// - innerhalb einer Klasse, ueber mehrere Strukturen in einem anderen Model verwiesen wird.
+	// - Die Existence-Constraint auf eine Klasse in einem anderen Model verweist.
+	// - Die Attribute-Werte nicht miteinander uebereinstimmen.
+	@Test
+	public void existenceConstraint_nestedStructures_Fail() throws Exception {
+		Iom_jObject conditionStruct=new Iom_jObject("ExistenceConstraints23Condition.structure", null);
+		conditionStruct.setattrvalue("attr1", "lars");
+		Iom_jObject conditionStruct3=new Iom_jObject("ExistenceConstraints23Condition.structure", null);
+		conditionStruct3.setattrvalue("attr1", "urs");
+		Iom_jObject conditionStruct4=new Iom_jObject("ExistenceConstraints23Condition.structure2", null);
+		conditionStruct4.addattrobj("attr1", conditionStruct3);
+		Iom_jObject conditionStruct2=new Iom_jObject("ExistenceConstraints23Condition.structure2", null);
+		conditionStruct2.addattrobj("attr1", conditionStruct);
+		Iom_jObject conditionClass=new Iom_jObject("ExistenceConstraints23Condition.Topic.ConditionClassStructure2", OID1);
+		conditionClass.addattrobj("attr1", conditionStruct2);
+		Iom_jObject objC=new Iom_jObject("ExistenceConstraints23.Topic.ClassStructureOtherModel2", OID2);
+		// base class references to condition struct.
+		objC.addattrobj("attr1", conditionStruct4);
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23Condition.Topic",BID1));
+		validator.validate(new ObjectEvent(conditionClass));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID2));
+		validator.validate(new ObjectEvent(objC));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassStructureOtherModel2 was not found in the condition class.",logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist nicht gesetzt.
+	// Es wird eine Fehlermeldung erwartet.
+	@Test
+	public void sameModelDifferentAttrs_ConstraintDisableSet_NotSet_Fail() throws Exception {
+		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", OID1);
+		objBedingung.setattrvalue("attr1", "other");
+		Iom_jObject objA=new Iom_jObject("ExistenceConstraints23.Topic.ClassA", OID2);
+		objA.setattrvalue("attr5", "lars");
+		objA.setattrvalue("attr2", "20");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
+		validator.validate(new ObjectEvent(objBedingung));
+		validator.validate(new ObjectEvent(objA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist Eingeschaltet.
+	// Es wird eine Fehlermeldung erwartet.
+	@Test
+	public void sameModelDifferentAttrs_ConstraintDisableSet_ON_Fail() throws Exception {
+		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", OID1);
+		objBedingung.setattrvalue("attr1", "other");
+		Iom_jObject objA=new Iom_jObject("ExistenceConstraints23.Topic.ClassA", OID2);
+		objA.setattrvalue("attr5", "lars");
+		objA.setattrvalue("attr2", "20");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.ON);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
+		validator.validate(new ObjectEvent(objBedingung));
+		validator.validate(new ObjectEvent(objA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+	}
+	
+	// Prueft die Konfiguration: constraint validation.
+	// Die Konfiguration ist Ausgeschaltet.
+	// Es wird erwartet dass keine Fehlermeldung ausgegeben wird.
+	@Test
+	public void sameModelDifferentAttrs_ConstraintDisableSet_OFF_Ok() throws Exception {
+		Iom_jObject objBedingung=new Iom_jObject("ExistenceConstraints23.Topic.ConditionClass", OID1);
+		objBedingung.setattrvalue("attr1", "other");
+		Iom_jObject objA=new Iom_jObject("ExistenceConstraints23.Topic.ClassA", OID2);
+		objA.setattrvalue("attr5", "lars");
+		objA.setattrvalue("attr2", "20");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.OFF);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("ExistenceConstraints23.Topic",BID1));
+		validator.validate(new ObjectEvent(objBedingung));
+		validator.validate(new ObjectEvent(objA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
 	}
 }

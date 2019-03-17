@@ -252,7 +252,7 @@ public class Polyline10Test {
 	//############## FAILING TESTS ###########################
 	//########################################################
 	
-	// Es muss ein Fehler ausgegeben werden, wenn die 2d Linie von Ihren eigenen Linienpunkten überschnitten wird.
+	// Es muss ein Fehler ausgegeben werden, wenn die 2d Linie von Ihren eigenen Linienpunkten ueberschnitten wird.
 	@Test
 	public void straight2dPolyline_WithOverlappedLines_Fail(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSLINETABLE, OBJ_OID1);
@@ -286,7 +286,7 @@ public class Polyline10Test {
 		assertEquals("Attribute lineWithoutOverlaps2d has an invalid self-intersection at (480005.0, 70000.0)", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es muss ein Fehler ausgegeben werden, wenn die 3d Linie von Ihren eigenen Linienpunkten überschnitten wird.
+	// Es muss ein Fehler ausgegeben werden, wenn die 3d Linie von Ihren eigenen Linienpunkten ueberschnitten wird.
 	@Test
 	public void straight3dPolyline_WithOverlappedLines_Fail(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSLINETABLE, OBJ_OID1);
@@ -324,7 +324,7 @@ public class Polyline10Test {
 		assertEquals("Attribute lineWithoutOverlaps3d has an invalid self-intersection at (480005.0, 70000.0)", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es muss ein Fehler ausgegeben werden, wenn der 2d Arc sich selber überschneidet.
+	// Es muss ein Fehler ausgegeben werden, wenn der 2d Arc sich selber ueberschneidet.
 	@Test
 	public void arc2dPolyline_WithOverlappedLines_Fail(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSLINETABLE, OBJ_OID1);
@@ -359,7 +359,7 @@ public class Polyline10Test {
 		assertEquals("Attribute lineWithoutOverlaps2dArc has an invalid self-intersection at (480000.0, 73000.0), coord2 (481484.5360824742, 70340.20618556702)", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es muss ein Fehler ausgegeben werden, wenn der 3d Arc sich selber überschneidet.
+	// Es muss ein Fehler ausgegeben werden, wenn der 3d Arc sich selber ueberschneidet.
 	@Test
 	public void arc3dPolyline_WithOverlappedLines_Fail(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSLINETABLE, OBJ_OID1);
@@ -397,7 +397,7 @@ public class Polyline10Test {
 		assertEquals("Attribute lineWithoutOverlaps3dArc has an invalid self-intersection at (480000.0, 73000.0), coord2 (481484.5360824742, 70340.20618556702)", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es müssen zwei Fehler ausgegeben werden, wenn ein 2d Bogen und eine 2d Linie sich selber überschneiden.
+	// Es muessen zwei Fehler ausgegeben werden, wenn ein 2d Bogen und eine 2d Linie sich selber ueberschneiden.
 	@Test
 	public void arcAndStraght2dPolyline_WithOverlappingLines_Fail(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSLINETABLE, OBJ_OID1);
@@ -434,7 +434,7 @@ public class Polyline10Test {
 		assertEquals("Attribute lineWithoutOverlaps2dArcStraights has an invalid self-intersection at (482500.0, 71500.0), coord2 (484670.0, 71810.0)", logger.getErrs().get(1).getEventMsg());
 	}
 	
-	// Es müssen zwei Fehler ausgegeben werden, wenn ein 3d Bogen und eine 3d Linie sich selber überschneiden.
+	// Es muessen zwei Fehler ausgegeben werden, wenn ein 3d Bogen und eine 3d Linie sich selber ueberschneiden.
 	@Test
 	public void arcAndStraights3dPolylines_WithOverlappingLines_Fail(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSLINETABLE, OBJ_OID1);

@@ -1,0 +1,17 @@
+INTERLIS 2.4;
+
+MODEL BundesModel (de) AT "mailto:ceis@localhost" VERSION "20170703" =
+	
+	TOPIC Topic=
+	
+		CLASS Class1 =
+			attr1 : TEXT*40;
+			attr2 : TEXT*40;
+			attr4 : TEXT*40;
+			attr5 : TEXT*40;
+			attr6 : TEXT*40;
+			attr7 : TEXT*40;
+		END Class1;
+		
+	END Topic;
+END BundesModel.

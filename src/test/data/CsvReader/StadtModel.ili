@@ -1,0 +1,11 @@
+INTERLIS 2.4;
+
+MODEL StadtModel (de) AT "mailto:ceis@localhost" VERSION "20170703" =
+	TOPIC Topic =
+		CLASS Class1 =
+			id : TEXT*40;
+			abbreviation : TEXT*40;
+			state : TEXT*40;
+		END Class1;
+	END Topic;
+END StadtModel.

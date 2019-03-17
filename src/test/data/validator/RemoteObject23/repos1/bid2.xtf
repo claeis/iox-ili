@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+  <HEADERSECTION SENDER="ceis" VERSION="2.3">
+    <MODELS>
+      <MODEL NAME="RemoteObject23" VERSION="2018-10-19" URI="mailto:ce@eisenhutinformatik.ch"/>
+    </MODELS>
+  </HEADERSECTION>
+  <DATASECTION>
+    <RemoteObject23.Topic BID="b2">
+		<RemoteObject23.Topic.ClassA TID="o1">
+		</RemoteObject23.Topic.ClassA>
+    </RemoteObject23.Topic>
+  </DATASECTION>
+</TRANSFER>

@@ -1,9 +1,6 @@
 package ch.interlis.iox_j.validator;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -16,8 +13,7 @@ import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.TransferDescription;
-
-import com.moandjiezana.toml.Toml;
+import ch.interlis.iox_j.inifile.IniFileReader;
 
 public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	private HashMap<String,HashMap<String,String>> data=new HashMap<String,HashMap<String,String>>();
@@ -26,6 +22,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	public static final String TYPE="type";
 	public static final String TOPOLOGY="topology";
 	public static final String TARGET="target";
+    public static final String REQUIRED_IN="requiredIn";
 	public static final String MSG="msg";
 	public static final String CHECK = "check";
 	public static final String KEYMSG = "keymsg";
@@ -34,13 +31,18 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	public static final String WARNING="warning";
 	public static final String OFF="off";
 	public static final String ON="on";
+	public static final String TRUE="true";
+	public static final String FALSE="false";
 	// PARAMETER
 	public static final String PARAMETER = "PARAMETER";
 	public static final String VALIDATION = "validation";
 	public static final String AREA_OVERLAP_VALIDATION = "areaOverlapValidation";
+	public static final String CONSTRAINT_VALIDATION = "constraintValidation";
 	public static final String DEFAULT_GEOMETRY_TYPE_VALIDATION = "defaultGeometryTypeValidation";
 	public static final String ADDITIONAL_MODELS="additionalModels";
 	public static final String ALLOW_ONLY_MULTIPLICITY_REDUCTION="allowOnlyMultiplicityReduction";
+	public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
+    public static final String DISABLE_ROUNDING="disableRounding";
 	// PipelinePool
 	public static final String TOPOLOGY_VALIDATION_OK="topologyValidationOk";
 	public void mergeIliMetaAttrs(TransferDescription td){
@@ -97,40 +99,13 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 		}
 		return null;
 	}
-	public void mergeConfigFile(java.io.File file) throws FileNotFoundException
+	public void mergeConfigFile(java.io.File file) throws IOException
 	{
-		InputStream in=null;
-		try {
-			in = new FileInputStream(file);
-			Toml toml = new Toml().read(in);
-			for (java.util.Map.Entry<String, Object> entry : toml.entrySet()) {
-				  Object entryO=entry.getValue();
-				  if(entryO instanceof Toml){
-					  String iliQName=stripQuotes(entry.getKey());
-					  Toml config=(Toml)entryO;
-						for (java.util.Map.Entry<String, Object> configEntry : config.entrySet()) {
-							String paramName=configEntry.getKey();
-							if(configEntry.getValue() instanceof String){
-								String paramValue=(String) configEntry.getValue();
-								setConfigValue(iliQName,paramName,paramValue);
-							}
-						}
-				  }
-			}
-		}finally{
-			if(in!=null){
-				try {
-					in.close();
-				} catch (IOException e) {
-				}
-				in=null;
-			}
-		}
+	    IniFileReader.mergeIniFile(this, file);
 	}
-	static public ValidationConfig readFromConfigFile(java.io.File file) throws FileNotFoundException
+	static public ValidationConfig readFromConfigFile(java.io.File file) throws IOException
 	{
-		ValidationConfig ret=new ValidationConfig();
-		ret.mergeConfigFile(file);
+		ValidationConfig ret=IniFileReader.readFile(file);
 		return ret;
 	}
 	private static String stripQuotes(String key) {

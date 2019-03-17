@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" xmlns="http://www.interlis.ch/xtf/2.4/DataTest1">
+	<ili:headersection>
+		<ili:models>
+			<ili:model>DataTest1</ili:model>
+		</ili:models>
+	</ili:headersection>
+	<ili:datasection>
+		<TopicA ili:bid="bidA">
+			<ClassJ ili:tid="oidJ">
+				<attrBin>FFFF</attrBin>
+				<attrXml>
+					<xmlAttr1><xmlAttr2><xmlAttr3>attr1</xmlAttr3></xmlAttr2></xmlAttr1>
+				</attrXml>
+			</ClassJ>
+		</TopicA>
+	</ili:datasection>
+</ili:transfer>

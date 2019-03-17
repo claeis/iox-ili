@@ -96,4 +96,12 @@ public class JtsextGeometryFactory extends GeometryFactory {
 		}
 		return super.createPolygon(shell);
 	}
+
+	public LinearRing createRing(LineString line) {
+		if(line instanceof CompoundCurve){
+			return new CompoundCurveRing((CompoundCurve)line, this);
+			
+		}
+		return createLinearRing(line.getCoordinates());
+	}
 }

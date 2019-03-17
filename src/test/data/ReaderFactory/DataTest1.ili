@@ -1,0 +1,271 @@
+INTERLIS 2.4;
+
+MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
+
+	UNIT
+		Minute [min] = 60 [INTERLIS.s];
+		Hour [h] = 60 [min];
+		Day [d] = 24 [h];
+		Month [M] EXTENDS INTERLIS.TIME;
+		Year [Y] EXTENDS INTERLIS.TIME;
+
+	DOMAIN
+		abstractNr (ABSTRACT) = NUMERIC;
+		normal = 0.00 .. 7.99;
+		exactly EXTENDS normal = 0.0000 .. 7.9949;
+		
+		uri (FINAL) = TEXT*1023;
+		name (FINAL) = TEXT*255;
+		
+		attrBool (FINAL) = (false, true) ORDERED;
+		
+		halignment (FINAL) = (Left, Center, Right) ORDERED;
+		valignment (FINAL) = (Top, Cap, Half, Base, Bottom) ORDERED;
+		
+		InterlisAttributeRef = ATTRIBUTE;
+	
+		buchungsDatum = FORMAT INTERLIS.XMLDate "2002-01-01" .. "2007-12-31";
+		startZeit = FORMAT INTERLIS.XMLTime "00:00:00.000" .. "23:59:59.999";
+		messZeitpunkt = FORMAT INTERLIS.XMLDateTime "2002-01-01T00:00:00.000" .. "2007-12-31T23:59:59.999";
+		
+		farben = (rot (dunkelrot, orange, karmin), gelb, gruen (hellgruen, dunkelgruen));
+		
+		lage = (unten, mitte, oben) ORDERED;
+		wochentage = (Werktage (Montag, Dienstag, Mittwoch,Donnerstag, Freitag, Samstag),Sonntag) CIRCULAR;
+		wochentagsWerte = ALL OF wochentage;
+		
+		farbe = (rot,gelb,gruen);
+		farbePlus EXTENDS farbe = (rot (dunkelrot, orange, karmin),gruen (hellgruen, dunkelgruen: FINAL),blau);
+		farbePlusPlus EXTENDS farbePlus = (rot (FINAL),blau (hellblau, dunkelblau));
+		
+		NOOID = OID ANY;
+		ANYOID EXTENDS NOOID = OID ANY;
+		I32OID EXTENDS ANYOID = OID 0 .. 2147483647;
+		STANDARDOID EXTENDS ANYOID = OID TEXT*16;
+		UUIDOID EXTENDS ANYOID = OID TEXT*36;
+		
+		Mkoord = MULTICOORD 480000.000 .. 850000.000 [INTERLIS.m];
+		Skoord = COORD 480000.000 .. 850000.000 [INTERLIS.m];
+		Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+				        70000.000 .. 310000.000 [INTERLIS.m],
+					   ROTATION 2 -> 1;
+		Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+				        70000.000 .. 310000.000 [INTERLIS.m],
+				              0.000 .. 5000.000 [INTERLIS.m];
+	
+	TOPIC TopicA =
+		
+		CLASS ClassA =
+			attrText : TEXT*10;
+			attrMText : MTEXT*10;
+			attrUri : uri;
+			attrName : name;
+		END ClassA;
+		
+		CLASS ClassB =
+			attrNrDec : 0.00 .. 10.00;
+			attrWertNormal : normal;
+			attrWertExakt : exactly;
+		END ClassB;
+		
+		CLASS ClassC =
+			attrBoolean1 : BOOLEAN;
+			attrBoolean2 : attrBool;
+		END ClassC;
+		
+		CLASS ClassD =
+			attrH : halignment;
+			attrV : valignment;
+		END ClassD;
+		
+		CLASS ClassOthers =
+			attrO : farbe;
+		END ClassOthers;
+		
+		CLASS ClassE =
+			attrDate : buchungsDatum;
+			attrTime : startZeit;
+			attrDateTime : messZeitpunkt;
+		END ClassE;
+		
+		CLASS ClassF =
+			attrF1 : farben;
+			attrF2 : lage;
+			attrF3 : wochentage;
+			attrF4 : wochentagsWerte;
+		END ClassF;
+		
+		CLASS ClassG =
+			attrG1 : farbe;
+			attrG2 : farbePlus;
+			attrG3 : farbePlusPlus;
+		END ClassG;
+		
+		CLASS ClassH =
+			attrH1 : NOOID;
+			attrH2 : ANYOID;
+			attrH3 : I32OID;
+			attrH4 : STANDARDOID;
+			attrH5 : UUIDOID;
+		END ClassH;
+		
+		CLASS ClassI =
+			attrI1: FORMAT INTERLIS.XMLDateTime "2000-01-01T00:00:00.000" .. "2005-12-31T23:59:59.999";
+			attrI2: FORMAT INTERLIS.XMLDateTime "2002-01-01T00:00:00.000" .. "2007-12-31T23:59:59.999";
+			attrI3: FORMAT INTERLIS.XMLDate "2002-01-01" .. "2007-12-31";
+			attrI4: FORMAT INTERLIS.XMLTime "00:00:00.000" .. "23:59:59.999";
+		END ClassI;
+		
+		CLASS ClassJ =
+			attrBin : BLACKBOX BINARY;
+			attrXml : BLACKBOX XML;
+		END ClassJ;
+		
+		STRUCTURE GregorianDate =
+			Year: 1582 .. 2999;
+			SUBDIVISION Month: 1 .. 12;
+			SUBDIVISION Day: 1 .. 31;
+		END GregorianDate;
+		
+		CLASS ClassK =
+			attrK1 : FORMAT BASED ON GregorianDate ( Year/4 "-" Month/2 "-" Day/2 );
+		END ClassK;
+	
+		STRUCTURE StructA =
+			attrS1 : TEXT*30;
+		END StructA;
+		
+		CLASS ClassL =
+			attrL1 : BAG {1..*} OF StructA;
+		END ClassL;
+	
+	END TopicA;
+	
+	TOPIC TopicB =
+				
+		CLASS Coord1D =
+			attr1 : Skoord;
+		END Coord1D;
+		
+		CLASS Coord2D =
+			attr2 : Lkoord;
+		END Coord2D;
+		
+		CLASS Coord3D =
+			attr3 : Hkoord;
+		END Coord3D;
+		
+		CLASS MultiCoord =
+			attr4 : Mkoord;
+		END MultiCoord;
+		
+		CLASS ClassN =
+			attrN1 : POLYLINE WITH (STRAIGHTS) VERTEX Hkoord;
+		END ClassN;
+		
+		CLASS ClassO =
+			attrO1 : POLYLINE WITH (ARCS) VERTEX Hkoord;
+		END ClassO;
+		
+		CLASS ClassP =
+			attrP1 : POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Hkoord;
+		END ClassP;
+		
+		CLASS ClassPM =
+			attrPM : MULTIPOLYLINE WITH (STRAIGHTS,ARCS) VERTEX Hkoord;
+		END ClassPM;
+		
+		CLASS ClassQ =
+			formQ : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		END ClassQ;
+		
+		CLASS ClassQM =
+			formQM : MULTISURFACE WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		END ClassQM;
+		
+		CLASS ClassR =
+			formR : AREA WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		END ClassR;
+		
+		CLASS ClassRM =
+			formRM : MULTIAREA WITH (STRAIGHTS,ARCS) VERTEX Hkoord WITHOUT OVERLAPS > 0.001;
+		END ClassRM;
+		
+		CLASS ClassS =
+			attrS : POLYLINE WITH (STRAIGHTS) VERTEX Hkoord;
+		END ClassS;
+		
+		CLASS ClassAP1 =
+			attr1 : InterlisAttributeRef;
+		END ClassAP1;
+		
+		CLASS ClassA =
+		  attr1 : TEXT*10;
+		END ClassA;
+		
+		VIEW View1
+			PROJECTION OF DataTest1.TopicB.ClassA;
+			=
+			ALL OF ClassA;
+			attr2 : TEXT*10 := "fail";
+		END View1;
+	END TopicB;
+	
+	TOPIC TopicC =
+		CLASS ClassA =
+			attrA : TEXT*10;
+		END ClassA;
+		
+		CLASS ClassB =
+			attrA : TEXT*10;
+		END ClassB;
+		
+		CLASS ClassC =
+			attrA : TEXT*10;
+		END ClassC;
+	END TopicC;
+	
+	TOPIC TopicD1 =
+		CLASS ClassA =
+		END ClassA;
+	END TopicD1;
+	TOPIC TopicD2 =
+		CLASS ClassA =
+		END ClassA;
+	END TopicD2;
+	TOPIC TopicD3 =
+		CLASS ClassA =
+		END ClassA;
+	END TopicD3;
+	
+	TOPIC TopicE =
+		CLASS TopicE =
+		END TopicE;
+	END TopicE;
+	
+	TOPIC TopicF =
+		CLASS TopicF =
+			TopicF : TEXT*10;
+		END TopicF;
+	END TopicF;
+	
+	VIEW TOPIC AdditionalTopicA =
+		DEPENDS ON DataTest1.TopicB;
+		VIEW AdditionalClassA
+			PROJECTION OF DataTest1.TopicB.ClassA;
+			=
+			ALL OF ClassA;
+			attr2 : TEXT*10 := "te";
+		END AdditionalClassA;
+	END AdditionalTopicA;
+	
+	VIEW TOPIC AdditionalTopicC =
+		DEPENDS ON DataTest1.TopicB;
+		VIEW AdditionalClassC (TRANSIENT)
+			PROJECTION OF DataTest1.TopicB.ClassA;
+			=
+			ALL OF ClassA;
+			attr3 : TEXT*10 := "te3";
+		END AdditionalClassC;
+	END AdditionalTopicC;
+END DataTest1.

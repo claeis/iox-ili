@@ -3,10 +3,20 @@ package ch.interlis.iom_j.iligml;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+import org.xmlunit.xpath.JAXPXPathEngine;
+import org.xmlunit.xpath.XPathEngine;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.ili2c.Ili2cFailure;
@@ -22,8 +32,14 @@ import ch.interlis.iox_j.jts.Iox2jtsException;
 
 public class Iligml20WriterTest {
 
-	private final static String TEST_OUT="support/test-out";
+	private final static String TEST_OUT="build";
+	private final static String TEST_IN="src/test/data/Iligml20Writer";
 	private TransferDescription td=null;
+	@BeforeClass
+	public static void setupEnv()
+	{
+		new File(TEST_OUT).mkdir();
+	}
 	private void addArc(IomObject polyline,double xa, double ya,double x, double y){
 		IomObject sequence=polyline.getattrobj("sequence",0);
 		IomObject ret=new ch.interlis.iom_j.Iom_jObject("ARC",null);
@@ -197,15 +213,19 @@ public class Iligml20WriterTest {
 		writer=null;
 	}
 	@Test
-	public void testReference() throws Iox2jtsException, IoxException {
-		Iligml20Writer writer=new Iligml20Writer(new File(TEST_OUT,"Reference-out.gml"),td);
+	public void testReference() throws Iox2jtsException, IoxException, ParserConfigurationException, SAXException, IOException {
+		File destFile = new File(TEST_OUT,"Reference-out.gml");
+		Iligml20Writer writer=new Iligml20Writer(destFile,td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicG","bid1"));
 		writer.write(new ObjectEvent(new Iom_jObject("Test1.TopicG.ClassG1","10")));
 		writer.write(new ObjectEvent(new Iom_jObject("Test1.TopicG.ClassG1","11")));
-		Iom_jObject objG2=new Iom_jObject("Test1.TopicG.ClassG2","20");
-		objG2.addattrobj("attrRefG1", "REF").setobjectrefoid("10");
-		writer.write(new ObjectEvent(objG2));
+		Iom_jObject objG2_20=new Iom_jObject("Test1.TopicG.ClassG2","20");
+		objG2_20.addattrobj("attrRefG1", "REF").setobjectrefoid("10");
+		writer.write(new ObjectEvent(objG2_20));
+		Iom_jObject objG2_21=new Iom_jObject("Test1.TopicG.ClassG2","21");
+		objG2_21.addattrobj("attrRefG1", "REF").setobjectrefoid("10");
+		writer.write(new ObjectEvent(objG2_21));
 		Iom_jObject objG3=new Iom_jObject("Test1.TopicG.ClassG3","30");
 		objG3.addattrobj("attrRefG1", "REF").setobjectrefoid("10");
 		writer.write(new ObjectEvent(objG3));
@@ -213,6 +233,24 @@ public class Iligml20WriterTest {
 		writer.write(new EndTransferEvent());
 		writer.close();
 		writer=null;
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+	    DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+	    Document doc = docBuilder.parse(destFile);
+	    doc.normalizeDocument();
+	    File controlFile=new File(TEST_IN,"Reference.gml");
+	    Document controlDoc = docBuilder.parse(controlFile);
+	    controlDoc.normalizeDocument();
+	    XPathEngine xpath = new JAXPXPathEngine();
+	    java.util.HashMap<String,String> nsMap=new java.util.HashMap<String,String>();
+	    nsMap.put("gml", "http://www.opengis.net/gml/3.2");
+	    nsMap.put("xtf", "http://www.interlis.ch/ILIGML-2.0/Test1");
+	    xpath.setNamespaceContext(nsMap);
+	    assertThat(xpath.selectNodes("//*[@gml:id='x10']", doc).iterator().next(),org.xmlunit.matchers.CompareMatcher.isSimilarTo(xpath.selectNodes("//*[@gml:id='x10']", controlDoc).iterator().next()).ignoreWhitespace().ignoreComments().throwComparisonFailure());
+	    assertThat(xpath.selectNodes("//*[@gml:id='x11']", doc).iterator().next(),org.xmlunit.matchers.CompareMatcher.isSimilarTo(xpath.selectNodes("//*[@gml:id='x11']", controlDoc).iterator().next()).ignoreWhitespace().ignoreComments().throwComparisonFailure());
+	    assertThat(xpath.selectNodes("//*[@gml:id='x20']", doc).iterator().next(),org.xmlunit.matchers.CompareMatcher.isSimilarTo(xpath.selectNodes("//*[@gml:id='x20']", controlDoc).iterator().next()).ignoreWhitespace().ignoreComments().throwComparisonFailure());
+	    assertThat(xpath.selectNodes("//*[@gml:id='x21']", doc).iterator().next(),org.xmlunit.matchers.CompareMatcher.isSimilarTo(xpath.selectNodes("//*[@gml:id='x21']", controlDoc).iterator().next()).ignoreWhitespace().ignoreComments().throwComparisonFailure());
+	    assertThat(xpath.selectNodes("//*[@gml:id='x30']", doc).iterator().next(),org.xmlunit.matchers.CompareMatcher.isSimilarTo(xpath.selectNodes("//*[@gml:id='x30']", controlDoc).iterator().next()).ignoreWhitespace().ignoreComments().throwComparisonFailure());
 	}
 
 	

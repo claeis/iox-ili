@@ -1,11 +1,163 @@
 ideas/open issues
 ----------------------------
 - add xml validation
+- add Xtf23Reader
 
-iox-ili 1.19.0 (2017-xx-xx)
+LATEST
 -----------------------------
+- XtfWriter: fixed writing of embedded associations
+
+iox-ili 1.20.10 (2018-12-09)
+-----------------------------
+- Validator: Error message addressed wrong basket
+- Validator: implement Math funcitons
+- Validator: fixed msg_(language) support
+- Validator: use keymsg in UNIQUE constraint
+- Validator: use model names from GUI
+- Validator: implement INTERLIS_ext functions
+- Validator: fixed CCW calculation if two half circles with horizontal straights
+- Validator: use attrPath in all validateAttribute messages
+- Validator: validate ALL OF enumerations
+- Validator: validate formatted type
+- Validator: validate UUID if used as BID
+- Validator: validate STANDRADOID
+- Validator: validate TEXT OID
+- Validator: validate basket element name
+- Validator: validate Contsraints in embedded associations
+- Validator: validate UNIQUE with forward references
+- Validator: support remote data/catalogue files
+- Validator: evaluate object paths with forward references
+- Validator: fix == with structures
+- Validator: report superflous attributes in embedded associations
+- Validator: validate that a BID is different from TIDs
+- xtf24: read/write ili:domains
+- switch config file reader to pure ini file syntax
+- improve temporary file size
+- ili2c-4.7.10
+
+iox-ili 1.20.9 (2018-09-07)
+-----------------------------
+- add PipelinePool to Settings so that custom functions can use it
+- Validator: fixed validation of number of reference properties  
+- Validator: disableRounding=true/false
+- Validator: validate URI values
+- Validator: validate TID/BID values
+- fix quoted parameter names read from TOML file
+- ItfReader: fixed wrong line number of first object in a table
+- ItfReader: fixed strange error message if surface line table without reference
+
+iox-ili 1.20.8 (2018-08-13)
+-----------------------------
+- removed "illegal value null for ObjTag" log messages
+- fixed Arc/Arc overlay detection if two halves of a circle
+
+iox-ili 1.20.7 (2018-07-05)
+-----------------------------
+- Validator: fixed validation of extended association/roledef
+- ItfReader2: catch/report line building errors
+- ili2c-4.7.9
+
+iox-ili 1.20.6 (2018-06-22)
+-----------------------------
+- Validator: clone IomObject to keep modifications (rounding) local
+
+iox-ili 1.20.5 (2018-06-22)
+-----------------------------
+- Validator xtf: include TIDs in AREA intersection error message
+- changed/improved overlay handling
+- CsvReader: fixed UTF-8 BOM handling
+- API: throw exception if one sets a IomObject attribute to null
+- Validator: allow to disable constraint validation
+- ehibasics-1.2.0
+- replaced javax.xml.ws.Holder by ch.ehi.basics.types.OutParam
+
+iox-ili 1.20.4 (2018-03-02)
+-----------------------------
+- Validator: improved performance
+- Validator: validate UNIQUE (LOCAL) against current object (and not all)
+- ItfReader2: show line tids in "no area-ref to polygon" error message
+
+iox-ili 1.20.2 (2018-02-08)
+-----------------------------
+- Validator: fix cut edge issue if small radius
+- Validator: fix cut edge issue if short arcs
+- ItfReader2: fix multiple area-refs to polygon issue
+- CsvReader: skip optional BOM in UTF-8 encoded file
+- Iox2wkb: fix conversion of surface with multiple polylines
+- Iox2wkb: fix segmentation of ARCs
+
+iox-ili 1.20.1 (2017-12-29)
+-----------------------------
+- Validator: improve UNIQUE validation performance 
+- Validator: fix cardinality validation of cross topic roles
+- Validator: fix NPE if primitive value instead of struct value
+- Iligml20Writer: fixed "max one reference value allowed"
+- added IoxStatistics
+- CsvReader: support character encoding
+- CsvWriter: support character encoding
+- CsvWriter: support defined attribute ordering
+- CsvReader: support query of attribute names
+- CsvReader: set line number in returned objects
+- CsvReader: ignore case of attribute names
+
+iox-ili 1.20.0 (2017-11-23)
+-----------------------------
+- implement MultiPoint wkb conversion
+- fix itf AREA building when a top horizontal straight line
+- keep objects ordered, so that reruns of tests give the same ordering of messages
+- fixed ItfReader2 if no main table obj for AREA/SURFACE attrs 
+
+iox-ili 1.19.8 (2017-10-20)
+-----------------------------
+- Xtf24Reader: fixed xmlns setup
+- Xtf24Reader: added models to StartTransferEvent
+- ItfReader2: enable AREAs with holes
+- added CSVWriter
+- CSVReader: fixed warn message unclosed reader
+- fixed ReaderFactory to return a Reader state before first event
+- fixed GetModels()
+- fixed coordinates calculation in ArcSegment+Iox2wkb if full circle
+- fixed polygon building if arcs overhang
+- added IoxIliReader to make generic clients aware of setModel()
+
+iox-ili 1.19.6 (2017-08-24)
+-----------------------------
+- fixed TranslateToOrigin: failed if dest attribute name equals source attrname
+- fixed TranslateToTranslation: failed if dest attribute name equals source attrname
+- added CsvReader
+- added addGenericReader
+
+iox-ili 1.19.5 (2017-08-12)
+-----------------------------
+- refactored arcpt calculation
+- added Xtf24Reader
+- added Iligml20Reader
+- validator: fixed UUID validation to accept also uppercase A-F
+- validator: new option to assume all objects are known to the validator
+
+iox-ili 1.19.4 (2017-06-27)
+-----------------------------
+- fixed wkb2iox "Unexpected WKB type 2" if MULTILINESTRING 
+
+iox-ili 1.19.3 (2017-06-22)
+-----------------------------
+- added ModelUtilities.buildEnumElementList() to get list of enum eles (not only names)
+
+iox-ili 1.19.1 (2017-06-19)
+-----------------------------
+- added iox2wkb/wkb2iox MultiLine support 
+
+iox-ili 1.19.0 (2017-06-17)
+-----------------------------
+- iox-ili: implement a GML reader
 - validator: fixed Missing coordinate in xtflog for errors detected by a custom function
 - validator: fixed INTERLIS.areAreas() not working in views
+- validator: fixed Check FORMAT INTERLIS.XMLDate
+- validator: fixed failed to validate uniqueness of BID
+- validator: fixed comparison of attributes with DomainRef as datatype 
+- validator: enable multi file validation
+- validator: enable to set a "multiplicity" default
+- ili2c-4.7.3
 
 iox-ili 1.18.1 (2017-04-20)
 -----------------------------

@@ -43,7 +43,7 @@ import java.util.Iterator;
  * @author ce
  * @version $Revision: 1.0 $ $Date: 23.06.2006 $
  */
-public class ItfReader implements ch.interlis.iox.IoxReader{
+public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 	private ItfScanner scanner=null;
 	private ItfLineCursor itfLine=null;
 	private int state=0;
@@ -298,9 +298,12 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 									// attr is a SURFACE
 									// add REF to main table
 									String maintableref=ModelUtilities.getHelperTableMainTableRef(surfaceOrAreaAttr);
-									IomObject structvalue = createIomObject("REF", null);
-									String ref=propv[1];
-
+									String ref=null;
+									if(propv.length<2) {
+                                        throw new IoxInvalidDataException(itfLine.getLineNumber(),"missing reference to maintable "+aclass.getScopedName());
+									}else {
+									    ref=propv[1];
+									}
 									if(tid2tid!=null){
 										String oldRef=aclass.getName()+":"+ref;
 										if(!tid2tid.containsKey(oldRef)){
@@ -308,8 +311,11 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 										}
 										ref=(String)tid2tid.get(oldRef);
 									}
-									structvalue.setobjectrefoid(ref);
-                                                                        iomObj.addattrobj(maintableref,structvalue); // This line moved
+									if(ref!=null) {
+	                                    IomObject structvalue = createIomObject("REF", null);
+	                                    structvalue.setobjectrefoid(ref);
+	                                    iomObj.addattrobj(maintableref,structvalue);
+									}
 									// start with prop[2], prop[0] is TID, prop[1] is REF to main table
 									startLineAttr=2;
 								}else{
@@ -638,6 +644,7 @@ public class ItfReader implements ch.interlis.iox.IoxReader{
 	/** Sets the model of the the data to be read.
 	 * @param td model as read by the compiler
 	 */
+	@Override
 	public void setModel(TransferDescription td)
 	{
 		this.td=td;

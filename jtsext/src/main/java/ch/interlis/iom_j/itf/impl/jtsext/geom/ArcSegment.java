@@ -62,42 +62,19 @@ public class ArcSegment extends CurveSegment {
 
 			double pt2_re=endPoint.x;
 			double pt2_ho=endPoint.y;
-			
-			//EhiLogger.debug("pt1 "+pt1_re+", "+pt1_ho);
-			//EhiLogger.debug("arc "+arcPt_re+", "+arcPt_ho);
-			//EhiLogger.debug("pt2 "+pt2_re+", "+pt2_ho);
-			/*
-			if(c3==null){
-				ret.setDimension(IFMEFeature.FME_TWO_D);
-				ret.add2DCoordinate(p2_x, p2_y);
-			}else{
-				double zCoord = Double.parseDouble(c3);
-				ret.setDimension(IFMEFeature.FME_THREE_D);
-				ret.add3DCoordinate(p2_x, p2_y, zCoord);
-			}
-			*/
-			// letzter Punkt ein Bogenzwischenpunkt?
-		
-			// Zwischenpunkte erzeugen
 
 			// Distanz zwischen Bogenanfanspunkt und Zwischenpunkt
 			double a=CurveSegment.dist(pt1_re,pt1_ho,arcPt_re,arcPt_ho);
 			// Distanz zwischen Zwischenpunkt und Bogenendpunkt 
 			double b=CurveSegment.dist(arcPt_re,arcPt_ho,pt2_re,pt2_ho);
+			
+			getCenterPoint();
 
-			// Zwischenpunkte erzeugen, so dass maximale Pfeilhoehe nicht 
-			// ueberschritten wird
-			// Distanz zwischen Bogenanfanspunkt und Bogenendpunkt 
-			double c=CurveSegment.dist(pt1_re,pt1_ho,pt2_re,pt2_ho);
-			// Radius bestimmen
-			double s=(a+b+c)/2.0;
-			double ds=Math.atan2(pt2_re-arcPt_re,pt2_ho-arcPt_ho)-Math.atan2(pt1_re-arcPt_re,pt1_ho-arcPt_ho);
-			double rSign=(Math.sin(ds)>0.0)?-1.0:1.0;
-			double r=a*b*c/4.0/Math.sqrt(s*(s-a)*(s-b)*(s-c))*rSign;
+			double r=radius;
 			// Kreismittelpunkt
-			double thetaM=Math.atan2(arcPt_re-pt1_re,arcPt_ho-pt1_ho)+Math.acos(a/2.0/r);
-			double reM=pt1_re+r*Math.sin(thetaM);
-			double hoM=pt1_ho+r*Math.cos(thetaM);
+			double thetaM=deta;
+			double reM=centerPoint.x;
+			double hoM=centerPoint.y;
 
 			// mindest Winkelschrittweite
 			double theta=2*Math.acos(1-p/Math.abs(r));
@@ -110,7 +87,7 @@ public class ArcSegment extends CurveSegment {
 				// anzahl Schritte
 				int alphan=(int)Math.ceil(alpha/theta);
 				// Winkelschrittweite
-				double alphai=alpha/(alphan*(r>0.0?1:-1));
+				double alphai=alpha/(alphan*(sign));
 				double ri=Math.atan2(pt1_re-reM,pt1_ho-hoM);
 				for(int i=1;i<alphan;i++){
 					ri += alphai;
@@ -128,7 +105,7 @@ public class ArcSegment extends CurveSegment {
 				// anzahl Schritte
 				int betan=(int)Math.ceil((beta/theta));
 				// Winkelschrittweite
-				double betai=beta/(betan*(r>0.0?1:-1));
+				double betai=beta/(betan*(sign));
 				double ri=Math.atan2(arcPt_re-reM,arcPt_ho-hoM);
 				for(int i=1;i<betan;i++){
 					ri += betai;
@@ -252,11 +229,20 @@ public class ArcSegment extends CurveSegment {
 		}
 		return sign;
 	}
+	public double getTheta() {
+		if(centerPoint==null){
+			getCenterPoint();
+		}
+		return deta;
+	}
 	public Coordinate getDirectionPt(boolean atStart,double dist) {
 		if(dist>0){
 			double radius=getRadius();
 			Coordinate center=getCenterPoint();
 			if(atStart){
+	            if(dist/2.0>Math.abs(radius) || dist>CurveSegment.dist(startPoint.x,startPoint.y,endPoint.x,endPoint.y)) {
+	                return endPoint;
+	            }
 				// Zentriwinkel zwischen start und directionPt
 				double alpha=2.0*Math.asin(dist/2.0/Math.abs(radius));
 				double ri=Math.atan2(startPoint.x-center.x,startPoint.y-center.y);
@@ -266,6 +252,9 @@ public class ArcSegment extends CurveSegment {
 				Coordinate directionPt=new Coordinate(pti_re,pti_ho);
 				return directionPt;
 			}else{
+                if(dist/2.0>Math.abs(radius) || dist>CurveSegment.dist(endPoint.x,endPoint.y,startPoint.x,startPoint.y)) {
+                    return startPoint;
+                }
 				// Zentriwinkel zwischen end und directionPt
 				double alpha=2.0*Math.asin(dist/2.0/Math.abs(radius));
 				double ri=Math.atan2(endPoint.x-center.x,endPoint.y-center.y)-alpha*sign;
@@ -283,5 +272,18 @@ public class ArcSegment extends CurveSegment {
 			Coordinate directionPt=CompoundCurve.calcKleinp(getCenterPoint(), endPoint, radius, -1.0*-sign);
 			return directionPt;
 		}
+	}
+	public static Coordinate calcArcPt(Coordinate start, Coordinate end,
+			Coordinate center, double radius, double sign) {
+		Coordinate midPt;
+		// calulate new mid pt
+		// Zentriwinkel zwischen start und end
+		double a=CurveSegment.dist(start.x,start.y,end.x,end.y);
+		// Richtung des Punktes auf dem halben Bogen 
+		double alpha=Math.atan2(start.x-center.x,start.y-center.y)+sign*Math.asin(a/2.0/radius);
+		midPt=new Coordinate();
+		midPt.x=center.x + radius * Math.sin(alpha);
+		midPt.y=center.y + radius * Math.cos(alpha);
+		return midPt;
 	}
 }

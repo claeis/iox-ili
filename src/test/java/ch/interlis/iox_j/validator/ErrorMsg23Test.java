@@ -3,6 +3,7 @@ package ch.interlis.iox_j.validator;
 import static org.junit.Assert.*;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.junit.Before;
@@ -87,7 +88,7 @@ public class ErrorMsg23Test {
 	}
 	
 	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
-	// wenn die beiden Koordinaten die vordefinierte maximale Zahl des Punktes überschreiten.
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl des Punktes ueberschreiten.
 	@Test
 	public void coordFromPoint_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -113,7 +114,7 @@ public class ErrorMsg23Test {
 	}
 	
 	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
-	// wenn die beiden Koordinaten die vordefinierte maximale Zahl der Linie überschreiten.
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl der Linie ueberschreiten.
 	@Test
 	public void coordFromLine_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -148,7 +149,7 @@ public class ErrorMsg23Test {
 	}
 	
 	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
-	// wenn die beiden Koordinaten die vordefinierte maximale Zahl der Oberfläche überschreiten.
+	// wenn die beiden Koordinaten die vordefinierte maximale Zahl der Oberflaeche ueberschreiten.
 	@Test
 	public void coordFromSurface_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
@@ -192,8 +193,7 @@ public class ErrorMsg23Test {
 		assertEquals(new Double(70001.000),logger.getErrs().get(0).getGeomC2());
 	}
 	
-	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
-	// wenn die beiden Koordinaten die vordefinierte maximale Zahl des Punktes innerhalb der Struktur überschreiten.
+	// Hier wird getestet ob die Koordinate aus einem Strukturattribut in der Fehlermeldung vorkommt
 	@Test
 	public void coordFromStructAttrPoint_Fail(){
 		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTB, null);
@@ -218,6 +218,25 @@ public class ErrorMsg23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals(new Double(480001.000),logger.getErrs().get(0).getGeomC1());
 		assertEquals(new Double(70001.000),logger.getErrs().get(0).getGeomC2());
+	}
+	// Hier wird getestet, dass bei fehlerhaftem Strukturattribut keine Koordinate gesucht wird
+	@Test
+	public void noCoordFromStructAttrPoint_Fail(){
+		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSC, OID);
+		iomObj.setattrvalue(ILI_CLASSC_ATTRC1, "true");
+		iomObj.setattrvalue(ILI_CLASSC_ATTRC2, "true"); // waere eigentlich ein Strukturattribut
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==2);
 	}
 	
 	// Es wird getestet ob der erstellte Key, mit dem Attribute Wert: TestKey in der Fehlermeldung ausgegeben wird.
@@ -267,6 +286,33 @@ public class ErrorMsg23Test {
 		IoxLogEvent err = logger.getErrs().get(0);
 		assertEquals("Msg TestKey",err.getEventMsg());
 	}
+	
+    @Test
+    public void msg_de_Param_Fail(){
+        Iom_jObject iomObj=new Iom_jObject(ILI_CLASSD, OID);
+        iomObj.setattrvalue(ILI_CLASSD_ATTRA, "0");
+        iomObj.setattrvalue(ILI_CLASSD_ATTRA2, "TestKey");
+        ValidationConfig modelConfig=new ValidationConfig();
+        String actualLanguage = Locale.getDefault().getLanguage();
+        // default message
+        modelConfig.setConfigValue(ILI_CLASSD_CONSTRA, ValidationConfig.MSG, "Msg {"+ILI_CLASSD_ATTRA2+"}");
+        // de spezifische message
+        modelConfig.setConfigValue(ILI_CLASSD_CONSTRA, ValidationConfig.MSG+"_"+actualLanguage, "Msg_lang {"+ILI_CLASSD_ATTRA2+"}");
+        
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+        validator.validate(new ObjectEvent(iomObj));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        IoxLogEvent err = logger.getErrs().get(0);
+        assertEquals("Msg_lang TestKey",err.getEventMsg());
+    }
 
 	// die Geometry Error Message muss die unten genannten Inhalte der Koordinaten: C1 und C2 enthalten.
 	@Test

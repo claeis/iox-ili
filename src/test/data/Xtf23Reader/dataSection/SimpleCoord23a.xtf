@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+	<HEADERSECTION SENDER="ili2c-4.5.22-20160520" VERSION="2.3">
+		<MODELS>
+			<MODEL NAME="SimpleCoord23" VERSION="2011-12-22" URI="http://interlis.ch"></MODEL>
+		</MODELS>
+	</HEADERSECTION>
+	<DATASECTION>
+		<SimpleCoord23.TestA BID="b1">
+			<SimpleCoord23.TestA.ClassA1 TID="o1">
+				<attr1>gugus1</attr1>
+				<attr2>
+					<COORD>
+					<C1>2460001.000</C1>
+					<C2>1045001.000</C2>
+					</COORD>
+				</attr2>
+			</SimpleCoord23.TestA.ClassA1>
+			<SimpleCoord23.TestA.ClassA1 TID="o2">
+				<attr1>gugus2</attr1>
+				<attr2>
+					<COORD>
+					<C1>2460002.000</C1>
+					<C2>1045002.000</C2>
+					</COORD>
+				</attr2>
+			</SimpleCoord23.TestA.ClassA1>
+		</SimpleCoord23.TestA>
+	</DATASECTION>
+</TRANSFER>

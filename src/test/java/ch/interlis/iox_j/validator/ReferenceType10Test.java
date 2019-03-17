@@ -187,7 +187,7 @@ public class ReferenceType10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("attrC1 should associate 1 to 1 target objects (instead of 3)",logger.getErrs().get(0).getEventMsg());
+		assertEquals("Role ReferenceType10.TopicA.ClassCattrC1.attrC1 requires only one reference property",logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn config target auf ON steht und die eigene oid als Klassenreferenz angegeben wird.
@@ -234,7 +234,7 @@ public class ReferenceType10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(2, logger.getErrs().size());
-		assertEquals("The OID o2 of object 'ReferenceType10.TopicA.ClassC oid o2 {attrC1 -> o1 REF {}}' already exists in CLASS ReferenceType10.TopicA.ClassC.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("OID o2 of object ReferenceType10.TopicA.ClassC already exists in CLASS ReferenceType10.TopicA.ClassC.", logger.getErrs().get(0).getEventMsg());
 		assertEquals("attrC1 should associate 1 to 1 target objects (instead of 2)", logger.getErrs().get(1).getEventMsg());
 	}
 	
@@ -261,7 +261,7 @@ public class ReferenceType10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(3, logger.getErrs().size());
-		assertEquals("The OID o2 of object 'ReferenceType10.TopicA.ClassC oid o2 {attrC1 -> o1 REF {}}' already exists in CLASS ReferenceType10.TopicA.ClassC.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("OID o2 of object ReferenceType10.TopicA.ClassC already exists in CLASS ReferenceType10.TopicA.ClassC.", logger.getErrs().get(0).getEventMsg());
 		assertEquals("No object found with OID o1 in basket b1.", logger.getErrs().get(1).getEventMsg());
 		assertEquals("attrC1 should associate 1 to 1 target objects (instead of 2)", logger.getErrs().get(2).getEventMsg());
 	}

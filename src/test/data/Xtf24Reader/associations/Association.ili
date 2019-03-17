@@ -1,0 +1,171 @@
+INTERLIS 2.4;
+
+MODEL Association (de) AT "mailto:ceis@localhost" VERSION "20170703" =
+
+	TOPIC Mensch =
+		CLASS Mann =
+		END Mann;
+		
+		CLASS Frau =
+		END Frau;
+		
+		ASSOCIATION Beziehung =
+			bezMann -- {0..1} Mann;
+			bezFrau -- {1..1} Frau;
+		END Beziehung;
+	END Mensch;
+	
+	TOPIC Autos =
+		CLASS Auto =
+		END Auto;
+		
+		CLASS Garage =
+		END Garage;
+		
+		ASSOCIATION Beziehung =
+			bezAuto -- {1..1} Auto;
+			bezGarage -- {1..1} Garage;
+		END Beziehung;
+	END Autos;
+	
+	TOPIC Schule =
+		CLASS Kinder =
+		END Kinder;
+		
+		CLASS Lehrer =
+		END Lehrer;
+		
+		ASSOCIATION Beziehung =
+			bezKinder -- {1..1} Kinder;
+			bezLehrer -- {1..*} Lehrer;
+		END Beziehung;
+	END Schule;
+	
+	TOPIC Firma =
+		CLASS Admin =
+		END Admin;
+		
+		CLASS User =
+		END User;
+		
+		ASSOCIATION Beziehung =
+			bezAdmin -- {1..*} Admin;
+			bezUser -- {1..1} User;
+		END Beziehung;
+	END Firma;
+	
+	TOPIC Atom =
+		CLASS Proton =
+		END Proton;
+		
+		CLASS Neutron =
+		END Neutron;
+		
+		ASSOCIATION NucleusAB =
+			electronA -- {1..1} Proton;
+			electronB -- {1..1} Neutron;
+		END NucleusAB;
+		
+		ASSOCIATION NucleusCD =
+			electronD -- {1..1} Neutron;
+			electronC -- {1..1} Proton;
+		END NucleusCD;
+	END Atom;
+	
+	TOPIC Transport =
+		CLASS Schiff =
+		END Schiff;
+		
+		CLASS Hafen =
+		END Hafen;
+		
+		ASSOCIATION Beziehung =
+			bezSchiff (ORDERED) -- {1..1} Schiff;
+			bezHafen (ORDERED) -- {1..1} Hafen;
+		END Beziehung;
+	END Transport;
+	
+	TOPIC Baum =
+		CLASS Ast =
+		END Ast;
+		
+		CLASS Blatt =
+		END Blatt;
+		
+		ASSOCIATION Beziehung =
+			bezAst -- {1..*} Ast;
+			bezBlatt -- {1..*} Blatt;
+		END Beziehung;
+	END Baum;
+	
+	TOPIC Baum2 =
+		CLASS Ast =
+		END Ast;
+		
+		CLASS Blatt =
+		END Blatt;
+		
+		ASSOCIATION Beziehung =
+			bezAst -- {1..*} Ast;
+			bezBlatt -- {1..*} Blatt;
+			attr1 : 0..10;
+			attr2 : 0..10;
+			attr3 : 0..10;
+		END Beziehung;
+	END Baum2;
+	
+	TOPIC Fail1 =
+		CLASS ClassA =
+		END ClassA;
+		
+		CLASS ClassB =
+		END ClassB;
+		
+		ASSOCIATION Beziehung =
+			roleA -- {1..*} ClassA;
+			roleB -- {1..*} ClassB;
+		END Beziehung;
+	END Fail1;
+	
+	TOPIC Fail2 =
+		CLASS ClassA =
+		END ClassA;
+		
+		CLASS ClassB =
+		END ClassB;
+		
+		ASSOCIATION Beziehung =
+			roleA -- {0..0} ClassA;
+			roleB -- {0..0} ClassB;
+		END Beziehung;
+	END Fail2;
+	
+	TOPIC Fail3 =
+		CLASS Ast =
+		END Ast;
+		
+		CLASS Blatt =
+		END Blatt;
+		
+		ASSOCIATION =
+			bezAst -- {1..*} Ast;
+			bezBlatt -- {1..*} Blatt;
+		END;
+	END Fail3;
+
+	TOPIC TopicEmbeddedAssWithAttr =
+		CLASS ClassA =
+		   attrA1 : TEXT*10;
+		END ClassA;
+		
+		CLASS ClassB =
+		   attrB1 : TEXT*10;
+		END ClassB;
+
+		ASSOCIATION assocAB =
+		  rolle_A -- {0..1} ClassA;
+		  rolle_B -- {0..1} ClassB;
+		  attr_Assoc : 1..20;
+		END assocAB; 
+	END TopicEmbeddedAssWithAttr;
+END Association.

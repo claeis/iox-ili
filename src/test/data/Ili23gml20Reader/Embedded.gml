@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ili:TRANSFER xmlns:ili="http://www.interlis.ch/ILIGML-2.0/INTERLIS" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.interlis.ch/ILIGML-2.0/Ili23" gml:id="iox1">
+	<ili:baskets>
+		<Mensch gml:id="oidMensch">
+			<member>
+				<Mann gml:id="oidM">
+					<bezFrau xlink:href="#oidF"/>
+				</Mann>
+			</member>
+			<member>
+				<Frau gml:id="oidF">
+					<bezMann xlink:href="#oidM"/>
+				</Frau>
+			</member>
+		</Mensch>
+	</ili:baskets>
+</ili:TRANSFER>

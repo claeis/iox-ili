@@ -24,11 +24,9 @@ package ch.interlis.iox_j.jts;
 
 import java.util.ArrayList;
 
-import javax.xml.ws.Holder;
-
 import com.vividsolutions.jts.geom.Coordinate;
 
-import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.basics.types.OutParam;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
@@ -160,7 +158,7 @@ public class Iox2jtsext {
 	/** Converts a POLYLINE to a JTS CoordinateList.
 	 * @param polylineObj INTERLIS POLYLINE structure
 	 * @param isSurfaceOrArea true if called as part of a SURFACE conversion.
-	 * @param p maximum stroke to use when removing ARCs
+	 * @param p not used anymore
 	 * @return JTS CoordinateList
 	 * @throws Iox2jtsException
 	 */
@@ -173,10 +171,10 @@ public class Iox2jtsext {
 		Log2EhiLogger logger=new Log2EhiLogger();
 		LogEventFactory errs=new LogEventFactory();
 		errs.setLogger(logger);
-		Holder<Boolean> foundErrs=new Holder<Boolean>();
+		OutParam<Boolean> foundErrs=new OutParam<Boolean>();
 		return polyline2JTS(polylineObj, isSurfaceOrArea, p,foundErrs,errs,0.0,ValidationConfig.WARNING,ValidationConfig.WARNING);
 	}
-	public static CompoundCurve polyline2JTS(IomObject polylineObj,boolean isSurfaceOrArea,double p,Holder<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType,String degeneratedArcValidationType)
+	public static CompoundCurve polyline2JTS(IomObject polylineObj,boolean isSurfaceOrArea,double p,OutParam<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType,String degeneratedArcValidationType)
 	throws IoxException
 	{
 		foundErrs.value=false;
@@ -281,7 +279,7 @@ public class Iox2jtsext {
 	}
 	/** Converts a SURFACE to a JTS Polygon.
 	 * @param obj INTERLIS SURFACE structure
-	 * @param strokeP maximum stroke to use when removing ARCs
+	 * @param strokeP not used any more
 	 * @return JTS Polygon
 	 * @throws Iox2jtsException
 	 */
@@ -291,10 +289,10 @@ public class Iox2jtsext {
 		Log2EhiLogger logger=new Log2EhiLogger();
 		LogEventFactory errs=new LogEventFactory();
 		errs.setLogger(logger);
-		Holder<Boolean> foundErrs=new Holder<Boolean>();
+		OutParam<Boolean> foundErrs=new OutParam<Boolean>();
 		return surface2JTS(obj,strokeP,foundErrs,errs,0.0,ValidationConfig.WARNING);
 	}
-	public static com.vividsolutions.jts.geom.Polygon surface2JTS(IomObject obj,double strokeP, Holder<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType) //SurfaceOrAreaType type)
+	public static com.vividsolutions.jts.geom.Polygon surface2JTS(IomObject obj,double strokeP, OutParam<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType) //SurfaceOrAreaType type)
 	throws IoxException
 	{
 		foundErrs.value=false;
@@ -336,7 +334,7 @@ public class Iox2jtsext {
 				ArrayList<CompoundCurve> jtsLines=new ArrayList<CompoundCurve>();
 				for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
 					IomObject polyline=boundary.getattrobj("polyline",polylinei);
-					Holder<Boolean> lineErrs=new Holder<Boolean>();
+					OutParam<Boolean> lineErrs=new OutParam<Boolean>();
 					CompoundCurve jtsLine=polyline2JTS(polyline,true,strokeP,lineErrs,errs,tolerance,validationType,ValidationConfig.WARNING);
 					if(lineErrs.value){
 						foundErrs.value=foundErrs.value || lineErrs.value;
@@ -357,5 +355,43 @@ public class Iox2jtsext {
 		}
 		return ret;
 	}
-
+	
+	public static ArrayList<CompoundCurve> surface2JTSCompoundCurves(IomObject obj,String validationType,double tolerance,LogEventFactory errFact) throws IoxException {
+		if(obj==null){
+			return null;
+		}
+		boolean clipped=obj.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
+		if(clipped){
+			throw new IoxException("clipped surface not supported");
+		}
+		String tag=obj.getobjecttag();
+		if(!"MULTISURFACE".equals(tag)){
+			throw new IoxException("unexpected Type "+tag+"; MULTISURFACE expected");
+		}
+		int surfacec=obj.getattrvaluecount("surface");
+		if(surfacec==0){
+			throw new IoxException("at least one element surface expected");
+		}
+		ArrayList<CompoundCurve> jtsLines=new ArrayList<CompoundCurve>();
+		for(int surfacei=0;surfacei<surfacec;surfacei++){
+			if(clipped){
+				//out.startElement("CLIPPED",0,0);
+			}else{
+				// an unclipped surface should have only one surface element
+				if(surfacei>0){
+					throw new IoxException("unclipped surface with multi 'surface' elements");
+				}
+			}
+			IomObject surface=obj.getattrobj("surface",surfacei);
+			for(int boundaryi=0;boundaryi<surface.getattrvaluecount("boundary");boundaryi++){
+				IomObject boundary=surface.getattrobj("boundary",boundaryi);
+				for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
+					IomObject polyline=boundary.getattrobj("polyline",polylinei);
+					CompoundCurve jtsLine=Iox2jtsext.polyline2JTS(polyline, false, 0.0,new OutParam<Boolean>(),errFact,tolerance,validationType, ValidationConfig.WARNING);
+					jtsLines.add(jtsLine);
+				}
+			}
+		}
+		return jtsLines;
+	}
 }

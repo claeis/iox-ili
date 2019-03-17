@@ -1,0 +1,10 @@
+INTERLIS 2.3;
+
+MODEL KantonsModel2 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
+	TOPIC Topic2 =
+		CLASS Class2 =
+			id2 : TEXT*40;
+			stadt2 : TEXT*40;
+		END Class2;
+	END Topic2;
+END KantonsModel2.

@@ -49,7 +49,7 @@ public class ItfAreaLinetable2PolygonIli2cTest {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
-		ItfReader reader=new ItfReader(new File("src/test/data/TestArea1.itf"));
+		ItfReader reader=new ItfReader(new File("src/test/data/Itf/TestArea1.itf"));
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{
@@ -79,7 +79,7 @@ public class ItfAreaLinetable2PolygonIli2cTest {
 		String tableBName=tableB.getScopedName(null);
 		String formAttrTableName=tableB.getContainer().getScopedName(null)+"."+tableB.getName()+"_"+formAttr.getName();
 		ItfAreaLinetable2Polygon builder=new ItfAreaLinetable2Polygon(formAttr,false);
-		ItfReader reader=new ItfReader(new File("src/test/data/TestArea1b.itf"));
+		ItfReader reader=new ItfReader(new File("src/test/data/Itf/TestArea1b.itf"));
 		reader.setModel(td);
 		IoxEvent event=null;
 		 do{
@@ -101,7 +101,7 @@ public class ItfAreaLinetable2PolygonIli2cTest {
 		builder.buildSurfaces();
 		IomObject polygon=builder.getSurfaceObject("10");
 		//System.out.println(polygon.toString());
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, ARC {A2 108.0, A1 115.0, C1 110.0, C2 110.0}]}}}}}"
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, ARC {A1 115.0, A2 108.0, C1 110.0, C2 110.0}]}}}}}"
 				,polygon.toString());
 	}
 

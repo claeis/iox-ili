@@ -36,6 +36,7 @@ public class StartBasketEvent implements ch.interlis.iox.StartBasketEvent {
 	private String startstate=null;
 	private String endstate=null; 
 	private String[] topicv=null;
+	private java.util.Map<String,String> domains=new java.util.HashMap<String,String>();
 	/** Creates a new start basket event.
 	 * @param type Type of basket
 	 * @param bid Identifier of basket
@@ -44,6 +45,11 @@ public class StartBasketEvent implements ch.interlis.iox.StartBasketEvent {
 		this.type=type;
 		this.bid=bid;
 	}
+    public StartBasketEvent(String type,String bid,java.util.Map<String,String> genericDomains){
+        this.type=type;
+        this.bid=bid;
+        this.domains=new java.util.HashMap<String,String>(genericDomains);
+    }
 	public String getBid() {
 		return bid;
 	}
@@ -100,5 +106,14 @@ public class StartBasketEvent implements ch.interlis.iox.StartBasketEvent {
 	 */
 	public void setType(String string) {
 		type = string;
+	}
+	public java.util.Map<String,String> getDomains() {
+		return domains;
+	}
+	public void addDomain(String genericDomain,String concreteDomain) {
+		domains.put(genericDomain, concreteDomain);
+	}
+	public String getDomain(String genericDomain) {
+		return domains.get(genericDomain);
 	}
 }

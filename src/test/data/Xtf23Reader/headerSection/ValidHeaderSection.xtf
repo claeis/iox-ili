@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+	<HEADERSECTION SENDER="ili2c-4.5.22-20160520" VERSION="2.3">
+		<MODELS>
+			<MODEL NAME="Test1" VERSION="2011-12-22" URI="http://interlis.ch"></MODEL>
+			<MODEL NAME="Test2" VERSION="2011-12-22" URI="http://interlis.ch"></MODEL>
+		</MODELS>
+		<ALIAS>
+			<ENTRIES FOR="1">
+				<TAGENTRY FROM="2" TO="3"></TAGENTRY>
+				<TAGENTRY FROM="4" TO="5"></TAGENTRY>
+			</ENTRIES>
+			<ENTRIES FOR="6">
+				<VALENTRY TAG="7" ATTR="8" FROM="9" TO="10"></VALENTRY>
+				<VALENTRY TAG="11" ATTR="12" FROM="13" TO="14"></VALENTRY>
+			</ENTRIES>
+			<ENTRIES FOR="15">
+				<DELENTRY TAG="16"></DELENTRY>
+				<DELENTRY TAG="17" ATTR="18"></DELENTRY>
+			</ENTRIES>
+		</ALIAS>
+		<OIDSPACES>
+			<OIDSPACE NAME="19" OIDDOMAIN="20"></OIDSPACE>
+			<OIDSPACE NAME="21" OIDDOMAIN="22"></OIDSPACE>
+		</OIDSPACES>
+		<COMMENT>
+			beliebiger Text ohne Tags (inkl. carriage return
+			(Wagenruecklauf) (#xD), line feed (Zeilenvorschub) (#xA)
+			und Tabulatorzeichen (#x9)).
+		</COMMENT>
+	</HEADERSECTION>
+	<DATASECTION>
+	</DATASECTION>
+</TRANSFER>

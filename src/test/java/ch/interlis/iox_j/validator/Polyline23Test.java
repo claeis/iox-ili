@@ -2,6 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
@@ -222,7 +223,7 @@ public class Polyline23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob die Linienpunkte aneinander gehängt werden können.
+	// Es wird getestet ob die Linienpunkte aneinander gehaengt werden koennen.
 	@Test
 	public void createASeriesOf2dStraightLines_Ok(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
@@ -255,7 +256,7 @@ public class Polyline23Test {
 		assertEquals(0,logger.getErrs().size());
 	}
 	
-	// Es wird getestet ob die Linienpunkte aneinander gehängt werden können.
+	// Es wird getestet ob die Linienpunkte aneinander gehaengt werden koennen.
 //	@Test
 //	public void createASeriesOf3dStraightLines_Ok(){
 //		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
@@ -378,7 +379,7 @@ public class Polyline23Test {
 		assertEquals("unexpected Type POLYLINE", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet, ob bei einem Kompletten Polsline Type, zwei Sequenzen erstellt werden können.
+	// Es wird getestet, ob bei einem Kompletten Polsline Type, zwei Sequenzen erstellt werden koennen.
 	@Test
 	public void completeBy2Sequences_Fail(){
 		Iom_jObject objStraightsFail=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
@@ -471,7 +472,7 @@ public class Polyline23Test {
 		assertEquals("unexpected COORD", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob Linienüberschneidungen zu einem Fehler führen. Ja.
+	// Es wird getestet ob Linienueberschneidungen zu einem Fehler fuehren. Ja.
 	@Test
 	public void intersectionBy2dPolylines_Fail(){
 		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
@@ -505,7 +506,26 @@ public class Polyline23Test {
 		assertEquals("Attribute straights2dWithoutOverlaps has an invalid self-intersection at (480005.0, 70000.0)", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob bei 3d Polylines, Fehler bei überschneidungen ausgegeben werden.
+    @Test
+    public void notApolyline_Fail(){
+        Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
+        objStraightsSuccess.setattrvalue("straights2d", "5");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+        validator.validate(new ObjectEvent(objStraightsSuccess));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("The value <5> is not a Polyline in attribute straights2d", logger.getErrs().get(0).getEventMsg());
+    }
+	
+	// Es wird getestet ob bei 3d Polylines, Fehler bei ueberschneidungen ausgegeben werden.
 //	@Test
 //	public void intersectionBy3dPolylines_Fail(){
 //		Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);

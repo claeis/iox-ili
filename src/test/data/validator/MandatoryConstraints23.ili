@@ -15,6 +15,7 @@ MODEL MandatoryConstraints23
 			enumeration = (null, eins, zwei, drei, mehr (vier));
 			enumerationOrdered = (null, eins, zwei, drei, mehr (vier)) ORDERED;
 			attrRef1 = TEXT*12;	
+			NumType  = 1..10;
 		
 		CLASS ClassConstantA =
 			MANDATORY CONSTRAINT
@@ -61,6 +62,15 @@ MODEL MandatoryConstraints23
 			MANDATORY CONSTRAINT
 			aufzaehlung1 == #mehr.vier;
 		END ClassConstantJ;
+		
+		CLASS ClassConstantJp EXTENDS ClassConstantJ=
+		END ClassConstantJp;
+		
+		CLASS ClassConstantJp2 EXTENDS ClassConstantJp=
+		END ClassConstantJp2;
+		
+		CLASS ClassConstantJp3 EXTENDS ClassConstantJp2=
+		END ClassConstantJp3;
 		
 		CLASS ClassEqualA =
 			straightsarcs1 : POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Hkoord;
@@ -114,6 +124,12 @@ MODEL MandatoryConstraints23
 			attr1 == 2.0;
 		END ClassEqualF2;
 		
+		CLASS ClassEqualF3 =
+			attr1 : NumType;
+			MANDATORY CONSTRAINT
+			attr1 == 2.0;
+		END ClassEqualF3;
+		
 		CLASS ClassEqualNot =
 			attr1 : 0..10;
 			attr2 : 0..10;
@@ -141,6 +157,9 @@ MODEL MandatoryConstraints23
 			MANDATORY CONSTRAINT
 			attr1 == attr2;
 		END ClassEqualI;
+		
+		CLASS ClassEqualIp EXTENDS ClassEqualI =
+		END ClassEqualIp;
 		
 		CLASS ClassUnEqualA =
 			attr1 : TEXT*10;
@@ -250,8 +269,8 @@ MODEL MandatoryConstraints23
 		END ClassLessThanC;
 		
 		CLASS ClassGreaterThanOrEqualA =
-			attr1 : 0..10;
-			attr2 : 0..10;
+			attr1 : 0.000 .. 10.000;
+			attr2 : 0.000 .. 10.000;
 			MANDATORY CONSTRAINT
 			attr1 >= attr2;
 		END ClassGreaterThanOrEqualA;
@@ -306,6 +325,36 @@ MODEL MandatoryConstraints23
 			MANDATORY CONSTRAINT
 			DEFINED(attr1);
 		END ClassDefinedB;
+
+		CLASS ClassUrsprung =
+		   attrA1 : TEXT*10;
+		END ClassUrsprung;
+		
+		CLASS ClassHinweis =
+		   attrB1 : TEXT*10;
+		END ClassHinweis;
+		ASSOCIATION HinweisWeitereDokumente =
+			Ursprung -- {0..*} ClassUrsprung;
+			Hinweis -- {0..*} ClassHinweis;
+			MANDATORY CONSTRAINT Ursprung <> Hinweis;
+		END HinweisWeitereDokumente;
+		!!ASSOCIATION HinweisWeitereDokumente =
+		!!	Ursprung -- {0..*} ClassUrsprung;
+		!!	Hinweis -- {0..*} ClassHinweis;
+		!!	MANDATORY CONSTRAINT Ursprung -> attrA1 <> Hinweis -> attrB1;
+		!!END HinweisWeitereDokumente;
+		
+		CLASS ClassDefinedV =
+		END ClassDefinedV;
+		CLASS ClassDefinedW =
+		END ClassDefinedW;
+		ASSOCIATION DefinedVw =
+			role_v -- {0..1} ClassDefinedV;
+			role_w -- {0..2} ClassDefinedW;
+			attr : TEXT*10;
+			MANDATORY CONSTRAINT DEFINED(attr);
+		END DefinedVw;
+		
 		
 		CLASS ClassFormattedTypeA =
 			attr1: FORMAT INTERLIS.XMLDateTime "2000-01-01T00:00:00.000" ..	"2005-12-31T23:59:59.999";

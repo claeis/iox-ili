@@ -20,6 +20,9 @@ MODEL UniqueConstraints23
 		  UNIQUE attr1, attr2;
 		END ClassB;
 		
+		CLASS ClassBp EXTENDS ClassB =
+		END ClassBp;
+		
 		CLASS ClassB0 =
 		  attr1 : TEXT*10;
 		  attr2 : 0 .. 100;
@@ -104,28 +107,12 @@ MODEL UniqueConstraints23
 		  UNIQUE (LOCAL) attr2 : attr1, attr2;
 		END ClassH;
 		
-		CLASS ClassI =
-		  attr1 : BAG {1..*} OF StructA;
-		  UNIQUE (LOCAL) attr1 : attr1;
-		END ClassI;
-		
-		CLASS ClassJ =
-		  attr2 : BAG {1..*} OF StructA;
-		  UNIQUE (LOCAL) attr2 : attr1, attr2;
-		  UNIQUE (LOCAL) attr2 : attr1;
-		END ClassJ;
-		
 		CLASS ClassK =
-		  attr1 : LIST {1..*} OF StructE;
+		  attr1 : LIST {0..*} OF StructE;
 		  attr2 : 0..10;
 		  UNIQUE (LOCAL) attr1 : attr1;
 		  UNIQUE attr2;
 		END ClassK;
-		
-		CLASS ClassL =
-		  attr1 : BAG {1..*} OF StructF;
-		  UNIQUE (LOCAL) attr1 -> attr1f: attr1g;
-		END ClassL;
 		
 		CLASS ClassM =
 		  attr1 : BAG {1..*} OF StructH;
@@ -145,15 +132,6 @@ MODEL UniqueConstraints23
 		  attro2 : BAG {1..*} OF StructO;
 		  UNIQUE (LOCAL) attro2 : surface2d;
 		END ClassO2;
-		
-		STRUCTURE StructP =
-			area2d : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
-		END StructP;
-		
-		CLASS ClassP2 =
-		  attr1 : BAG {1..*} OF StructP;
-		  UNIQUE (LOCAL) attr1 : area2d;
-		END ClassP2;
 		
 		CLASS ClassP =
 		  area2d : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
@@ -189,11 +167,11 @@ MODEL UniqueConstraints23
 		
 		STRUCTURE StructC1 =
 			attr1 : REFERENCE TO ClassC1;
-			!!UNIQUE attr1;
 		END StructC1;
 		
 		CLASS ClassEE =
 			attr1 : BAG {0..*} OF StructC1;
+			!!UNIQUE attr1->attr1;
 		END ClassEE;
 		
 		ASSOCIATION assoB =
@@ -257,4 +235,97 @@ MODEL UniqueConstraints23
 		END ClassN3;
 		
 	END Topic;
+
+	TOPIC EmbeddedUnique=
+
+		CLASS ClassA =
+			attrA : TEXT*10;
+		END ClassA;
+		
+		CLASS ClassB =
+			attrB : TEXT*10;
+		END ClassB;
+
+		ASSOCIATION assocAB =
+		  a1 -- {0..1} ClassA;
+		  b1 -- {0..2} ClassB;
+		  UNIQUE a1;
+		END assocAB;
+
+		CLASS ClassC =
+			attrC : TEXT*10;
+		END ClassC;
+		
+		CLASS ClassD =
+			attrD : TEXT*10;
+		END ClassD;
+		
+		ASSOCIATION assocCD =
+		  c1 -- {0..1} ClassC;
+		  d1 -- {0..2} ClassD;
+		  attrCD : TEXT*10;
+		  UNIQUE attrCD;
+		END assocCD;
+		
+		CLASS ClassE =
+			attrE : TEXT*10;
+		END ClassE;
+		
+		CLASS ClassF =
+			attrF : TEXT*10;
+		END ClassF;
+		
+		ASSOCIATION assocEF =
+		  e1 -- {0..1} ClassE;
+		  f1 -- {0..2} ClassF;
+		  attrEF : TEXT*10;
+		  UNIQUE e1, attrEF;
+		END assocEF;
+
+		CLASS ClassG =
+			attrG : TEXT*10;
+		END ClassG;
+		
+		CLASS ClassH =
+			attrH : TEXT*10;
+		END ClassH;
+		
+		ASSOCIATION assocGH =
+		  g1 -- {0..1} ClassG;
+		  h1 -- {0..2} ClassH;
+		  UNIQUE g1->attrG, h1->attrH;
+		END assocGH;
+		
+		CLASS ClassI =
+			attrI : TEXT*10;
+		END ClassI;
+		
+		CLASS ClassK =
+			attrK : TEXT*10;
+		END ClassK;
+		
+		ASSOCIATION assocIK =
+		  i1 -- {0..1} ClassI;
+		  k1 -- {0..2} ClassK;
+		  UNIQUE i1->attrI;
+		END assocIK;
+		
+	END EmbeddedUnique;
+
+	TOPIC LinkObjUnique=
+ 		CLASS ClassA =
+			attrA : TEXT*10;
+		END ClassA;
+		
+		CLASS ClassB =
+			attrB : TEXT*10;
+		END ClassB;
+
+ 		ASSOCIATION assocAB =
+		  a1 -- {0..*} ClassA;
+		  b1 -- {0..*} ClassB;
+		  UNIQUE a1->attrA,b1->attrB;
+		END assocAB;
+	END LinkObjUnique;
+	
 END UniqueConstraints23.

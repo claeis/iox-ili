@@ -70,7 +70,7 @@ public class ItfSurfaceLinetable2PolygonOverlapsTest {
 		builder.buildSurfaces();
 		IomObject polygon=builder.getSurfaceObject(mainObjectTid);
 		System.out.println(polygon);
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 130.0}, ARC {A2 133.0, A1 121.0, C1 125.0, C2 135.0}, COORD {C1 125.0, C2 115.0}, ARC {A2 117.0, A1 121.0, C1 120.0, C2 120.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}",polygon.toString());
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 130.0}, ARC {A1 121.0, A2 133.0, C1 125.0, C2 135.0}, COORD {C1 125.0, C2 115.0}, ARC {A1 121.0, A2 117.0, C1 120.0, C2 120.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}",polygon.toString());
 		
 	}
 	@Test
@@ -98,7 +98,7 @@ public class ItfSurfaceLinetable2PolygonOverlapsTest {
 		builder.buildSurfaces();
 		IomObject polygon=builder.getSurfaceObject(mainObjectTid);
 		System.out.println(polygon);
-		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 119.99, C2 131.0}, COORD {C1 121.98958463592862, C2 134.76494889987706}, ARC {A2 135.19450319710128, A1 123.47042933431564, C1 125.0, C2 135.0}, COORD {C1 124.99, C2 114.0}, ARC {A2 114.26933535900471, A1 123.41282964438186, C1 121.99540012764511, C2 115.01156270378142}, COORD {C1 120.0, C2 120.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}",polygon.toString());
+		assertEquals("MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 119.99, C2 131.0}, COORD {C1 121.98958463592862, C2 134.76494889987706}, ARC {A1 123.47042933431564, A2 135.19450319710128, C1 125.0, C2 135.0}, COORD {C1 124.99, C2 114.0}, ARC {A1 123.41282964438186, A2 114.26933535900471, C1 121.99540012764511, C2 115.01156270378142}, COORD {C1 120.0, C2 120.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}",polygon.toString());
 		
 	}
 

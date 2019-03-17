@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+	<HEADERSECTION SENDER="ili2pg-3.6.0-20161230" VERSION="2.3">
+		<MODELS>
+			<MODEL NAME="Overlap23" VERSION="2016-07-08" URI="mailto:ceis@localhost"></MODEL>
+		</MODELS>
+	</HEADERSECTION>
+	<DATASECTION>
+		<Overlap23.Topic BID="Overlap23.Topic">
+			<Overlap23.Topic.Area TID="1">
+				<area>
+					<SURFACE>
+						<BOUNDARY>
+							<POLYLINE>
+								<COORD>
+									<C1>2600000.020</C1>
+									<C2>1049995.000</C2>
+								</COORD>
+								<COORD>
+									<C1>2600000.020</C1>
+									<C2>1050015.000</C2>
+								</COORD>
+								<COORD>
+									<C1>2600020.000</C1>
+									<C2>1050015.000</C2>
+								</COORD>
+								<COORD>
+									<C1>2600020.000</C1>
+									<C2>1049995.000</C2>
+								</COORD>
+								<COORD>
+									<C1>2600000.020</C1>
+									<C2>1049995.000</C2>
+								</COORD>
+							</POLYLINE>
+						</BOUNDARY>
+						<BOUNDARY>
+							<POLYLINE>
+								<COORD>
+									<C1>2600000.020</C1>
+									<C2>1050010.632</C2>
+								</COORD>
+								<ARC>
+									<A1>2600000.000</A1><!-- Dieser Bogen hat einen Winkel von 90 grad -->
+									<A2>1050010.000</A2>
+									<C1>2600010.000</C1>
+									<C2>1050000.000</C2>
+								</ARC>
+								<COORD>
+									<C1>2600010.000</C1>
+									<C2>1050010.632</C2>
+								</COORD>
+								<COORD>
+									<C1>2600000.020</C1>
+									<C2>1050010.632</C2>
+								</COORD>
+							</POLYLINE>
+						</BOUNDARY>
+					</SURFACE>
+				</area>
+			</Overlap23.Topic.Area>
+		</Overlap23.Topic>
+	</DATASECTION>
+</TRANSFER>
