@@ -104,6 +104,7 @@ import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 import ch.interlis.iom_j.xtf.XtfReader;
+import ch.interlis.iom_j.xtf.XtfStartTransferEvent;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxLogging;
@@ -131,6 +132,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE_DO="doItfOidPerTable";
+	public static final String CONFIG_DO_XTF_VERSIONCONTROL="ch.interlis.iox_j.validator.doXtfVersionControl";
+	public static final String CONFIG_DO_XTF_VERSIONCONTROL_DO="doXtfVersionControl";
 	public static final String CONFIG_CUSTOM_FUNCTIONS="ch.interlis.iox_j.validator.customFunctions";
 	public static final String CONFIG_OBJECT_RESOLVERS="ch.interlis.iox_j.validator.objectResolvers";
 	// the object count result as value in map with the appropriate function as key.
@@ -305,6 +308,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		if (event instanceof ch.interlis.iox.StartTransferEvent){
 			errs.addEvent(errFact.logInfoMsg("first validation pass..."));
+			validateInconsistentIliAndXMLVersion(event);
 			uniquenessOfBid.clear();
 		} else if (event instanceof ch.interlis.iox.StartBasketEvent){
 			StartBasketEvent startBasketEvent = ((ch.interlis.iox.StartBasketEvent) event);
@@ -333,6 +337,40 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 	}
+    private void validateInconsistentIliAndXMLVersion(ch.interlis.iox.IoxEvent event) {
+        String versionControl = config.getValue(CONFIG_DO_XTF_VERSIONCONTROL);
+        if (versionControl != null && event instanceof XtfStartTransferEvent) {
+            Model model = getModelFromTransferDesc();
+            String iliVersion = model.getModelVersion();
+            String modelName = model.getName();
+            XtfStartTransferEvent startTransferEvent = (XtfStartTransferEvent) event;
+            Collection<IomObject> headerObjValues = startTransferEvent.getHeaderObjects().values();
+            List<IomObject> headerObjects = new ArrayList<IomObject>(headerObjValues);
+            for(IomObject currentObj : headerObjects) {
+                String currentVersion = currentObj.getattrvalue("version");
+                if (!(currentVersion.equals(iliVersion))) {
+                    String versionInfoMessage = "The Iliversion (" + iliVersion + ") in a Model (" + modelName
+                    + ") and the XML Model version (" + currentVersion + ") in a model (" + currentObj.getattrvalue("model") + ") do not match.";
+                    errs.addEvent(errFact.logInfoMsg(versionInfoMessage));
+                }
+            }
+        }
+    }
+    
+    private Model getModelFromTransferDesc() {
+        Iterator<Model> modeli = td.iterator();
+        
+        List<Model> list = new ArrayList<Model>();
+        while (modeli.hasNext()) {
+            list.add(0, modeli.next());
+        }
+        modeli = list.iterator();
+        while (modeli.hasNext()) {
+            Model model = modeli.next();
+            return model;
+        }
+        return null;
+    }
     
     private void clearCurrentBid() {
         currentMainOid = null;
