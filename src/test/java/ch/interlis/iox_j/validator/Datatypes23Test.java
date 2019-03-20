@@ -1575,7 +1575,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of date value <2016.2.15> in attribue aDate", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of date value <2016.2.15> in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Datenformat mit Slash unzulaessig.
@@ -1595,7 +1595,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of date value <2016/2/15> in attribue aDate", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of date value <2016/2/15> in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Eingabe des Datum mit zu kleinem Jahresdatum (jjjj) unzulaessig.
