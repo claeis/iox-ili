@@ -105,6 +105,7 @@ import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 import ch.interlis.iom_j.xtf.XtfReader;
 import ch.interlis.iom_j.xtf.XtfStartTransferEvent;
+import ch.interlis.iom_j.xtf.impl.MyHandler;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxLogging;
@@ -348,9 +349,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             List<IomObject> headerObjects = new ArrayList<IomObject>(headerObjValues);
             for(IomObject currentObj : headerObjects) {
                 String currentVersion = currentObj.getattrvalue("version");
-                if (!(currentVersion.equals(iliVersion))) {
-                    String versionInfoMessage = "The Iliversion (" + iliVersion + ") in a Model (" + modelName
-                    + ") and the XML Model version (" + currentVersion + ") in a model (" + currentObj.getattrvalue("model") + ") do not match.";
+                if (currentObj.getobjecttag().equals(MyHandler.HEADER_OBJECT_MODELENTRY) 
+                        && !(currentVersion.equals(iliVersion))) {
+                    String versionInfoMessage = "The Iliversion in model (" + modelName + ") and transferfile do not match (" 
+                                + iliVersion + "!=" + currentVersion + ")";
                     errs.addEvent(errFact.logInfoMsg(versionInfoMessage));
                 }
             }
