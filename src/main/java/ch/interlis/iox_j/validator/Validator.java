@@ -182,7 +182,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private Map<String, String> uniquenessOfBid = new HashMap<String, String>();
 	private String globalMultiplicity=null;
 	private ch.interlis.ilirepository.ReposManager repositoryManager = null;
-	private static java.util.ResourceBundle rsrc=java.util.ResourceBundle.getBundle("ch.interlis.iox_j.validator.ValidatorMessages");
+	private java.util.ResourceBundle rsrc=java.util.ResourceBundle.getBundle("ch.interlis.iox_j.validator.ValidatorMessages");
 	
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -3661,7 +3661,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				Evaluable[] ev = (((LocalAttribute)attr).getBasePaths());
 				attrType=((ObjectPath)ev[0]).getType();
 			}else {
-				throw new IllegalArgumentException(rsrc.getString("isAttributeMandatory.unexpectedAttributeType") +attr.getScopedName());
+				throw new IllegalArgumentException("unexpected attribute type " + attr.getScopedName());
 			}
 		}
 		return attrType.isMandatoryConsideringAliases();
