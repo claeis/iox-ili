@@ -2,8 +2,11 @@ package ch.interlis.iox_j.validator;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -73,6 +76,7 @@ import ch.interlis.ili2c.metamodel.PathElThis;
 import ch.interlis.ili2c.metamodel.PlausibilityConstraint;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
+import ch.interlis.ili2c.metamodel.PredefinedModel;
 import ch.interlis.ili2c.metamodel.Projection;
 import ch.interlis.ili2c.metamodel.ReferenceType;
 import ch.interlis.ili2c.metamodel.RoleDef;
@@ -105,6 +109,7 @@ import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 import ch.interlis.iom_j.xtf.XtfReader;
 import ch.interlis.iom_j.xtf.XtfStartTransferEvent;
+import ch.interlis.iom_j.xtf.impl.MyHandler;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxLogging;
@@ -132,8 +137,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE_DO="doItfOidPerTable";
-	public static final String CONFIG_DO_XTF_VERSIONCONTROL="ch.interlis.iox_j.validator.doXtfVersionControl";
-	public static final String CONFIG_DO_XTF_VERSIONCONTROL_DO="doXtfVersionControl";
+	public static final String CONFIG_DO_XTF_VERIFYMODEL="ch.interlis.iox_j.validator.doXtfVersionControl";
+	public static final String CONFIG_DO_XTF_VERIFYMODEL_DO="doXtfVersionControl";
 	public static final String CONFIG_CUSTOM_FUNCTIONS="ch.interlis.iox_j.validator.customFunctions";
 	public static final String CONFIG_OBJECT_RESOLVERS="ch.interlis.iox_j.validator.objectResolvers";
 	// the object count result as value in map with the appropriate function as key.
@@ -339,26 +344,30 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
     private void validateInconsistentIliAndXMLVersion(ch.interlis.iox.IoxEvent event) {
-        String versionControl = config.getValue(CONFIG_DO_XTF_VERSIONCONTROL);
-        if (versionControl != null && event instanceof XtfStartTransferEvent) {
-            Model model = getModelFromTransferDesc();
-            String iliVersion = model.getModelVersion();
-            String modelName = model.getName();
+        String versionControl = config.getValue(CONFIG_DO_XTF_VERIFYMODEL);
+        if (versionControl != null && versionControl.equals(CONFIG_DO_XTF_VERIFYMODEL_DO) && event instanceof XtfStartTransferEvent) {            
             XtfStartTransferEvent startTransferEvent = (XtfStartTransferEvent) event;
             Collection<IomObject> headerObjValues = startTransferEvent.getHeaderObjects().values();
             List<IomObject> headerObjects = new ArrayList<IomObject>(headerObjValues);
+
             for(IomObject currentObj : headerObjects) {
-                String currentVersion = currentObj.getattrvalue("version");
-                if (!(currentVersion.equals(iliVersion))) {
-                    String versionInfoMessage = "The Iliversion (" + iliVersion + ") in a Model (" + modelName
-                    + ") and the XML Model version (" + currentVersion + ") in a model (" + currentObj.getattrvalue("model") + ") do not match.";
-                    errs.addEvent(errFact.logInfoMsg(versionInfoMessage));
+                if (currentObj.getobjecttag().equals(MyHandler.HEADER_OBJECT_MODELENTRY) && 
+                        currentObj.getattrvaluecount(MyHandler.HEADER_OBJECT_MODELENTRY_VERSION) > 0) {
+                    String currentVersion = currentObj.getattrvalue(MyHandler.HEADER_OBJECT_MODELENTRY_VERSION);
+                    String currentModelName = currentObj.getattrvalue("model");
+                    Model model = getModelFromTransferDesc(currentModelName);
+                    String iliVersion = model.getModelVersion();
+                    if (!(currentVersion.equals(iliVersion))) {
+                        String versionInfoMessage = "The VERSION in model (" + currentModelName + ") and transferfile do not match (" 
+                                    + iliVersion + "!=" + currentVersion + ")";
+                        errs.addEvent(errFact.logInfoMsg(versionInfoMessage));
+                    }                    
                 }
             }
         }
     }
     
-    private Model getModelFromTransferDesc() {
+    private Model getModelFromTransferDesc(String modelName) {
         Iterator<Model> modeli = td.iterator();
         
         List<Model> list = new ArrayList<Model>();
@@ -368,7 +377,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         modeli = list.iterator();
         while (modeli.hasNext()) {
             Model model = modeli.next();
-            return model;
+            if (model.getName().equals(modelName)) {
+                return model;
+            }
         }
         return null;
     }
