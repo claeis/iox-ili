@@ -182,6 +182,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private Map<String, String> uniquenessOfBid = new HashMap<String, String>();
 	private String globalMultiplicity=null;
 	private ch.interlis.ilirepository.ReposManager repositoryManager = null;
+	private java.util.ResourceBundle rsrc=java.util.ResourceBundle.getBundle("ch.interlis.iox_j.validator.ValidatorMessages");
 	
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -312,7 +313,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			return;
 		}
 		if (event instanceof ch.interlis.iox.StartTransferEvent){
-			errs.addEvent(errFact.logInfoMsg("first validation pass..."));
+			errs.addEvent(errFact.logInfoMsg(rsrc.getString("validate.firstValidationPass")));
 			validateInconsistentIliAndXMLVersion(event);
 			uniquenessOfBid.clear();
 		} else if (event instanceof ch.interlis.iox.StartBasketEvent){
@@ -324,9 +325,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			try {
                 validateObject(iomObj,null,null);
 			} catch (IoxException e) {
-				errs.addEvent(errFact.logInfoMsg("failed to validate object {0}", iomObj.toString()));
+				errs.addEvent(errFact.logInfoMsg(rsrc.getString("validate.failedToValidateObject"), iomObj.toString()));
 			}catch(RuntimeException e) {
-				EhiLogger.traceState("failing object: "+iomObj.toString());
+				EhiLogger.traceState(rsrc.getString("validate.failingObject") + iomObj.toString());
 				throw e;
 			}
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
@@ -393,12 +394,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         errFact.setIliqname(event.getType());
 	    if (!isValidTopicName(event.getType())) {
 	        isValid = false;
-            errs.addEvent(errFact.logErrorMsg("Invalid basket element name {0}", event.getType()));
+            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.invalidBasketElementName"), event.getType()));
         }
         if (!isValidId(event.getBid())) {
             isValid = false;
             LogEventFactory factory = new LogEventFactory();
-            errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid BID", event.getBid()==null?"":event.getBid()));
+            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.valueIsNotAValidBID"), event.getBid()==null?"":event.getBid()));
         }
         if(isValid) {
             Topic topic = (Topic)td.getElement(event.getType());
@@ -407,7 +408,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             Domain bidDomain=topic.getBasketOid();
             if (bidDomain!=null && !isAValidBasketOID(bidDomain, event.getBid())) {
                 isValid = false;
-                errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid BID", event.getBid()==null?"":event.getBid()));
+                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.valueIsNotAValidBID"), event.getBid()==null?"":event.getBid()));
             }
         }
         if(isValid) {
@@ -482,7 +483,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     }
 
     public void doSecondPass() {
-		errs.addEvent(errFact.logInfoMsg("second validation pass..."));
+		errs.addEvent(errFact.logInfoMsg(rsrc.getString("doSecondPass.secondValidationPass")));
 		iterateThroughAllObjects();
 		validateAllAreas();
 		validatePlausibilityConstraints();
@@ -493,7 +494,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		// check if basket id is unique in transfer file
 		if(bid != null){
 			if(uniquenessOfBid.containsKey(bid)){
-				errs.addEvent(errFact.logErrorMsg("BID {0} of {1} already exists in {2}", bid, startBasketEvent.getType(), uniquenessOfBid.get(bid)));
+				errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateUniqueBasketId.bidOfAlreadyExistIn"), bid, startBasketEvent.getType(), uniquenessOfBid.get(bid)));
 			} else {
 				uniquenessOfBid.put(bid, startBasketEvent.getType());
 			}
@@ -512,7 +513,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(seenModels.contains(additionalModel)) {
 			    continue;
 			}
-			errs.addEvent(errFact.logInfoMsg("additional model {0}", additionalModel));
+			errs.addEvent(errFact.logInfoMsg(rsrc.getString("iterateThroughAdditionalModels.additionalModel"), additionalModel));
 			seenModels.add(additionalModel);
 			// models
 			Iterator tdIterator = td.iterator();
@@ -530,7 +531,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 			if(!modelExists){
-				logMsg(additionalModel, "required additional model {0} not found", additionalModel);
+				logMsg(additionalModel, rsrc.getString("iterateThroughAdditionalModels.requiredAdditionalModelNotFound"), additionalModel);
 			}
 		}
 	}
@@ -579,7 +580,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(ValidationConfig.OFF.equals(checkConstraint)){
 						if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
 							configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check= off", constraintName));
+							errs.addEvent(errFact.logInfoMsg(rsrc.getString("collectAdditionalConstraints.validationConfigurationCheckOff"), constraintName));
 						}
 					}else{
 						additionalConstraints.put(constraint, classValue);
@@ -592,7 +593,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void validateAllAreas() {
 		setCurrentMainObj(null);
 		for(AttributeDef attr:areaAttrs.keySet()){
-			errs.addEvent(errFact.logInfoMsg("validate AREA {0}...", getScopedName(attr)));
+			errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAllAreas.validateAREA"), getScopedName(attr)));
 			ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
 			List<IoxInvalidDataException> intersections=allLines.validate();
 			if(intersections!=null && intersections.size()>0){
@@ -610,7 +611,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 				}
 				setCurrentMainObj(null);
-				logMsg(areaOverlapValidation,"failed to validate AREA {0}", getScopedName(attr));
+				logMsg(areaOverlapValidation,rsrc.getString("validateAllAreas.failedToValidateAREA"), getScopedName(attr));
 			}
 		}
 	}
@@ -685,7 +686,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									if(ValidationConfig.OFF.equals(checkAdditionalConstraint)){
 										if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
 											configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-											errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
+											errs.addEvent(errFact.logInfoMsg(rsrc.getString("iterateThroughAllObjects.validationConfigurationCheckOff"), constraintName, iomObj.getobjectoid()));
 										}
 									} else {
 										collectSetConstraintObjs(checkAdditionalConstraint, constraintName, iomObj, setConstraint);
@@ -707,7 +708,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									if(ValidationConfig.OFF.equals(checkPlausibilityConstraint)){
 										if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
 											configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-											errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
+											errs.addEvent(errFact.logInfoMsg(rsrc.getString("iterateThroughAllObjects.validationConfigurationCheckOff"), constraintName, iomObj.getobjectoid()));
 										}
 									} else {
 										fillOfPlausibilityConstraintMap(checkPlausibilityConstraint, constraintName, plausibilityConstraint, iomObj);
@@ -799,7 +800,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						if(ValidationConfig.OFF.equals(checkSetConstraint)){
 							if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
 								configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-								errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
+								errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateConstraints.validationConfigurationCheckOff"), constraintName, iomObj.getobjectoid()));
 							}
 						} else {
 							collectSetConstraintObjs(checkSetConstraint, constraintName, iomObj, setConstraint);
@@ -816,7 +817,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						if(ValidationConfig.OFF.equals(checkPlausibilityConstraint)){
 							if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
 								configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-								errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
+								errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateConstraints.validationConfigurationCheckOff"), constraintName, iomObj.getobjectoid()));
 							}
 						} else {
 							fillOfPlausibilityConstraintMap(checkPlausibilityConstraint, constraintName, plausibilityConstraint, iomObj);
@@ -922,12 +923,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(ValidationConfig.OFF.equals(checkConstraint)){
 					if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
 						configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-						errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName));
+						errs.addEvent(errFact.logInfoMsg(rsrc.getString("validatePlausibilityConstraints.validationConfigurationCheckOff"), constraintName));
 					}
 				}else{
 					if(!constraintOutputReduction.contains(constraint+":"+constraintName)){
 						constraintOutputReduction.add(constraint+":"+constraintName);
-						errs.addEvent(errFact.logInfoMsg("validate plausibility constraint {0}...",getScopedName(constraintEntry.getKey())));
+						errs.addEvent(errFact.logInfoMsg(rsrc.getString("validatePlausibilityConstraints.validatePlausibilityConstraint"),getScopedName(constraintEntry.getKey())));
 					}
                     String actualLanguage = Locale.getDefault().getLanguage();
                     String msg = validationConfig.getConfigValue(getScopedName(constraintEntry.getKey()), ValidationConfig.MSG+"_"+actualLanguage);
@@ -941,7 +942,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							if(msg!=null && msg.length()>0){
 								logMsg(checkConstraint,msg);
 							} else {
-								logMsg(checkConstraint,"Plausibility Constraint {0} is not true.", getScopedName(constraintEntry.getKey()));
+								logMsg(checkConstraint, rsrc.getString("validatePlausibilityConstraints.plausibilityConstraintIsNotTrue"), getScopedName(constraintEntry.getKey()));
 							}
 						}
 					} else if(constraintEntry.getKey().getDirection()==1){ // <=
@@ -951,7 +952,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							if(msg!=null && msg.length()>0){
 								logMsg(checkConstraint,msg);
 							} else {
-								logMsg(checkConstraint,"Plausibility Constraint {0} is not true.", getScopedName(constraintEntry.getKey()));
+								logMsg(checkConstraint,rsrc.getString("validatePlausibilityConstraints.plausibilityConstraintIsNotTrue"), getScopedName(constraintEntry.getKey()));
 							}
 						}
 					}
@@ -970,14 +971,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(ValidationConfig.OFF.equals(checkUniqueConstraint)){
 				if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
 					configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName, iomObj.getobjectoid()));
+					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateUniquenessConstraint.validationConfigurationCheckOff"), constraintName, iomObj.getobjectoid()));
 				}
 			}else{
 				// preCondition (UNIQUE WHERE)
 				if(uniquenessConstraint.getPreCondition()!=null){
 					Value preConditionValue = evaluateExpression(parentObject, checkUniqueConstraint, constraintName, iomObj, uniquenessConstraint.getPreCondition(),role);
 					if (preConditionValue.isNotYetImplemented()){
-						errs.addEvent(errFact.logWarningMsg("Function {0} in uniqueness constraint is not yet implemented.", constraintName));
+						errs.addEvent(errFact.logWarningMsg(rsrc.getString("validateUniquenessConstraint.functionInUniquenessConstraintIsNotYetImplemented"), constraintName));
 						return;
 					}
 					if (preConditionValue.skipEvaluation()){
@@ -992,7 +993,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				Viewable aClass1= (Viewable) modelElement;
 				if(!loggedObjects.contains(uniquenessConstraint)){
 					loggedObjects.add(uniquenessConstraint);
-					errs.addEvent(errFact.logInfoMsg("validate unique constraint {0}...",getScopedName(uniquenessConstraint)));
+					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateUniquenessConstraint.validateUniqeConstraint"),getScopedName(uniquenessConstraint)));
 				}
 			    HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues = null;
 			    if(uniquenessConstraint.getLocal()) {
@@ -1026,7 +1027,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 if(msg!=null && msg.length()>0){
                     logMsg(checkUniqueConstraint,msg);
                 } else {
-                    logMsg(checkUniqueConstraint,"Unique is violated! Values {0} already exist in Object: {1}", values.value.valuesAsString(), formatObjectId(oidOfObjectWithDuplicateValue));
+                    logMsg(checkUniqueConstraint,rsrc.getString("visitStructEle.uniqueIsViolatedValuesAlreadyExistInObject"), values.value.valuesAsString(), formatObjectId(oidOfObjectWithDuplicateValue));
                 }
             }
 	        return;
@@ -1058,7 +1059,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(preCondition != null){
 			Value preConditionValue = evaluateExpression(null, validationKind, constraintName, iomObj, preCondition,null);
 			if (preConditionValue.isNotYetImplemented()){
-				errs.addEvent(errFact.logWarningMsg("Function in set constraint {0} is not yet implemented.", getScopedName(setConstraintObj)));
+				errs.addEvent(errFact.logWarningMsg(rsrc.getString("collectSetConstraintObjs.functionInSetConstraintIsNotYetImplemented"), getScopedName(setConstraintObj)));
 				return;
 			}
 			if (preConditionValue.skipEvaluation()){
@@ -1090,12 +1091,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(ValidationConfig.OFF.equals(checkConstraint)){
 				if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+getScopedName(setConstraintObj))){
 					configOffOufputReduction.add(ValidationConfig.CHECK+":"+getScopedName(setConstraintObj));
-					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", getScopedName(setConstraintObj)));
+					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateSetConstraint.validationConfigurationCheckOff"), getScopedName(setConstraintObj)));
 				}
 			}else{
 				if(!constraintOutputReduction.contains(setConstraintObj+":"+constraintName)){
 					constraintOutputReduction.add(setConstraintObj+":"+constraintName);
-					errs.addEvent(errFact.logInfoMsg("validate set constraint {0}...",getScopedName(setConstraintObj)));
+					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateSetConstraint.validateSetConstraint"),getScopedName(setConstraintObj)));
 				}
 				if(objs!=null && objs.size()>0){
 					for(String oid:objs){
@@ -1106,7 +1107,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						Evaluable condition = (Evaluable) setConstraintObj.getCondition();
 						Value constraintValue = evaluateExpression(null, checkConstraint, constraintName, iomObj, condition,null);
 						if (constraintValue.isNotYetImplemented()){
-							errs.addEvent(errFact.logWarningMsg("Function in set constraint {0} is not yet implemented.", getScopedName(setConstraintObj)));
+							errs.addEvent(errFact.logWarningMsg(rsrc.getString("validateSetConstraint.functionInSetConstraintIsNotYetImplemented"), getScopedName(setConstraintObj)));
 							return;
 						}
 						if (constraintValue.skipEvaluation()){
@@ -1125,7 +1126,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							} else {
 								if(!setConstraintOufputReduction.contains(setConstraintObj+":"+constraintName)){
 									setConstraintOufputReduction.add(setConstraintObj+":"+constraintName);
-									logMsg(checkConstraint,"Set Constraint {0} is not true.", constraintName);
+									logMsg(checkConstraint,rsrc.getString("validateSetConstraint.setConstraintIsNotTrue"), constraintName);
 								}
 							}
 						}
@@ -1145,12 +1146,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(ValidationConfig.OFF.equals(checkConstraint)){
 				if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
 					configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName));
+					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateMandatoryConstraint.validationConfigurationCheckOff"), constraintName));
 				}
 			} else {
 				if(!constraintOutputReduction.contains(mandatoryConstraintObj+":"+constraintName)){
 					constraintOutputReduction.add(mandatoryConstraintObj+":"+constraintName);
-					errs.addEvent(errFact.logInfoMsg("validate mandatory constraint {0}...",getScopedName(mandatoryConstraintObj)));
+					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateMandatoryConstraint.validateMandatoryConstraint"),getScopedName(mandatoryConstraintObj)));
 				}
 				Evaluable condition = (Evaluable) mandatoryConstraintObj.getCondition();
 				Value conditionValue = evaluateExpression(parentObject, checkConstraint, constraintName, iomObj, condition,firstRole);
@@ -1167,7 +1168,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							if(msg!=null && msg.length()>0){
 								logMsg(checkConstraint,msg);
 							} else {
-								logMsg(checkConstraint,"Mandatory Constraint {0} is not true.", constraintName);
+								logMsg(checkConstraint,rsrc.getString("validateMandatoryConstraint.mandatoryConstraintIsNotTrue"), constraintName);
 							}
 						}
 					}
@@ -1175,10 +1176,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(condition instanceof FunctionCall){
 						FunctionCall functionCallObj = (FunctionCall) condition;
 						Function function = functionCallObj.getFunction();
-						errs.addEvent(errFact.logWarningMsg("Function {0} is not yet implemented.", function.getScopedName(null)));
+						errs.addEvent(errFact.logWarningMsg(rsrc.getString("validateMandatoryConstraint.functionIsNotYetImplemented"), function.getScopedName(null)));
 						Value.createNotYetImplemented();
 					} else {
-						errs.addEvent(errFact.logWarningMsg("MandatoryConstraint {0} of {1} is not yet implemented.", mandatoryConstraintObj.getScopedName(null), iomObj.getobjecttag()));
+						errs.addEvent(errFact.logWarningMsg(rsrc.getString("validateMandatoryConstraint.mandatoryConstraintIsNotYetImplemented"), mandatoryConstraintObj.getScopedName(null), iomObj.getobjecttag()));
 						Value.createNotYetImplemented();
 					}
 				}
@@ -1190,7 +1191,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         Value value=evaluateExpression(parentObject, validationKind, usageScope, iomObj, expression,firstRole);
         if(!value.skipEvaluation()) {
             if( value.getValues()!=null && value.getValues().length>1) {
-                errs.addEvent(errFact.logErrorMsg("expression {0} must evaluate to a single value.", expression.toString()));
+                errs.addEvent(errFact.logErrorMsg(rsrc.getString("evaluateExpressionToSingleValue.expressionMustEvaluateToASingleValue"), expression.toString()));
                 return Value.createSkipEvaluation();
             }
         }
@@ -1544,7 +1545,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Iterator<String> objectIterator = allObjIterator;
 			List<IomObject> listOfIomObjects = new ArrayList<IomObject>();
 			if(allObjIterator==null){
-				 throw new IllegalStateException("argument ALL requires a SET CONSTRAINT.");
+				 throw new IllegalStateException(rsrc.getString("evaluateExpression.argumentAllRequiresASetConstraint"));
 			}
 			while(objectIterator.hasNext()){
 				String oid=objectIterator.next();
@@ -1555,7 +1556,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			return new Value(listOfIomObjects);
 		} else {
-			errs.addEvent(errFact.logWarningMsg("expression {0} is not yet implemented.", expression.toString()));
+			errs.addEvent(errFact.logWarningMsg(rsrc.getString("evaluateExpression.ExpressionIsNotYetImplemented"), expression.toString()));
 		}
 		return Value.createSkipEvaluation(); // skip further evaluation
 		//TODO instance of ParameterValue
@@ -1587,7 +1588,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     }
                     
                     if (role == null) {
-                        throw new IllegalStateException("Role is not be empty!");
+                        throw new IllegalStateException(rsrc.getString("getValueFromObjectPath.roleIsNotBeEmpty"));
                     } else {
                         // IF embedded association and first PathEl of objectpath
                         if(parentObject!=null && k==0) {
@@ -1940,10 +1941,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             if (expectedIndex <= attrValueCount && expectedIndex > 0) {
                 iomObj = iomObj.getattrobj(currentAttrName, expectedIndex - 1);
                 if (iomObj == null) {
-                    throw new IllegalStateException("There is no record found for this index!");
+                    throw new IllegalStateException(rsrc.getString("getIomObjWithIndex.thereIsNoRecordFoundForThisIndex"));
                 }
             } else {
-                throw new IllegalStateException("There is no record found for this index!");
+                throw new IllegalStateException(rsrc.getString("getIomObjWithIndex.thereIsNoRecordFoundForThisIndex"));
             }
         }
         return iomObj;
@@ -2132,12 +2133,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(multiplicity != null && ValidationConfig.OFF.equals(multiplicity)){
 			if(!configOffOufputReduction.contains(ValidationConfig.MULTIPLICITY+":"+roleQName)){
 				configOffOufputReduction.add(ValidationConfig.MULTIPLICITY+":"+roleQName);
-				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration multiplicity=off", roleQName));
+				errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateRoleCardinality.validationConfigurationMultiplicityOff"), roleQName));
 			}
 		}else{
 			if(!configOffOufputReduction.contains(ValidationConfig.MULTIPLICITY+":"+roleQName)){
 				configOffOufputReduction.add(ValidationConfig.MULTIPLICITY+":"+roleQName);
-				errs.addEvent(errFact.logInfoMsg("validate multiplicity of role {0}...",roleQName));
+				errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateRoleCardinality.validateMultiplicityOfRole"),roleQName));
 			}
 			int nrOfTargetObjs=linkPool.getTargetObjectCount(iomObj,role,doItfOidPerTable);
 			long cardMin=role.getCardinality().getMinimum();
@@ -2147,9 +2148,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			} else {
 				if(role.getCardinality().getMaximum() == Cardinality.UNBOUND){
 					String cardMaxStr = "*";
-					logMsg(multiplicity,"{0} should associate {1} to {2} target objects (instead of {3})", role.getName(), String.valueOf(cardMin), cardMaxStr, String.valueOf(nrOfTargetObjs));
+					logMsg(multiplicity, rsrc.getString("validateRoleCardinality.shouldAssociateToTargetObject"), role.getName(), String.valueOf(cardMin), cardMaxStr, String.valueOf(nrOfTargetObjs));
 				} else {
-					logMsg(multiplicity,"{0} should associate {1} to {2} target objects (instead of {3})", role.getName(), String.valueOf(cardMin), String.valueOf(cardMax), String.valueOf(nrOfTargetObjs));
+					logMsg(multiplicity, rsrc.getString("validateRoleCardinality.shouldAssociateToTargetObject"), role.getName(), String.valueOf(cardMin), String.valueOf(cardMax), String.valueOf(nrOfTargetObjs));
 				}
 			}
 		}
@@ -2166,12 +2167,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(ValidationConfig.OFF.equals(validateTarget)){
 			if(!configOffOufputReduction.contains(ValidationConfig.TARGET+":"+roleQName)){
 				configOffOufputReduction.add(ValidationConfig.TARGET+":"+roleQName);
-				errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration target=off", roleQName));
+				errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateRoleReference.validationConfigurationTargetOff"), roleQName));
 			}
 		}else{
 			if(!datatypesOutputReduction.contains(roleQName)){
 				datatypesOutputReduction.add(roleQName);
-				errs.addEvent(errFact.logInfoMsg("validate target of role {0}...",roleQName));
+				errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateRoleReference.validateTargetOfRole"),roleQName));
 			}
 			String targetOid = null;
 			// role of iomObj
@@ -2217,12 +2218,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							// target object exists.
 						} else {
 							// no object with this oid found
-							logMsg(validateTarget,"No object found with OID {0}.", targetOid);
+							logMsg(validateTarget, rsrc.getString("validateRoleReference.noObjectFoundWithOid"), targetOid);
 							return;
 						}
 					} else {
 						// no object with this oid found
-						logMsg(validateTarget,"No object found with OID {0} in basket {1}.", targetOid,bidOfObj);
+						logMsg(validateTarget, rsrc.getString("validateRoleReference.noObjectFoundWithOidInBasket"), targetOid,bidOfObj);
 						return;
 					}
 				}
@@ -2242,7 +2243,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 					}
 					if(allObjectsAccessible && !extObjFound){
-						logMsg(validateTarget,"No object found with OID {0}.", targetOid);
+						logMsg(validateTarget, rsrc.getString("validateRoleReference.noObjectFoundWithOid"), targetOid);
 					}
 				}
 			}
@@ -2261,7 +2262,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 				}
 				//wrong class of target object (typ false)
-				logMsg(validateTarget,"wrong class {0} of target object {1} for role {2}.", getScopedName(targetObjClass),targetOid, getScopedName(role));
+				logMsg(validateTarget, rsrc.getString("validateRoleReference.wrongClassOfTargetObjectForRole"), getScopedName(targetObjClass),targetOid, getScopedName(role));
 				return;
 			}
 		}
@@ -2330,12 +2331,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(ValidationConfig.OFF.equals(validateTarget)){
 						if(!configOffOufputReduction.contains(ValidationConfig.TARGET+":"+attrQName)){
 							configOffOufputReduction.add(ValidationConfig.TARGET+":"+attrQName);
-							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration target=off", attrQName));
+							errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateReferenceAttrs.validationConfigurationTargetOff"), attrQName));
 						}
 					}else{
 						if(!datatypesOutputReduction.contains(attrQName)){
 							datatypesOutputReduction.add(attrQName);
-							errs.addEvent(errFact.logInfoMsg("validate reference attr {0}...",attrQName));
+							errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateReferenceAttrs.validateReferenceAttr"),attrQName));
 						}
 
 						AbstractClassDef targetClass = refAttrType.getReferred();
@@ -2372,12 +2373,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 										// target object exists in correct basket
 									} else {
 										// no object with this oid found
-										logMsg(validateTarget,"No object found with OID {0} in basket {1}.", targetOid,bidOfObj);
+										logMsg(validateTarget, rsrc.getString("validateReferenceAttrs.noObjectFoundWithOidInBasket"), targetOid,bidOfObj);
 										return;
 									}
 								}else{
 									// no object with this oid found
-									logMsg(validateTarget,"No object found with OID {0}.", targetOid);
+									logMsg(validateTarget, rsrc.getString("validateReferenceAttrs.noObjectFoundWithOid"), targetOid);
 									return;
 								}
 							}
@@ -2391,13 +2392,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									// call custom function to verify in external data pools
 									for(ExternalObjectResolver extObjResolver:extObjResolvers){
 										if(extObjResolver.objectExists(targetOid, destinationClasses)){
-												extObjFound=true;
-												break;
+                                            extObjFound = true;
+                                            break;
 										}
 									}
 								}
 								if(allObjectsAccessible && !extObjFound){
-									logMsg(validateTarget,"No object found with OID {0}.", targetOid);
+									logMsg(validateTarget,rsrc.getString("validateReferenceAttrs.noObjectFoundWithOid"), targetOid);
 								}
 							}
 						}
@@ -2428,7 +2429,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							if (targetObjClass.isExtending(targetClass) || targetObjClass.equals(targetClass)){
 								// ok
 							} else {
-								logMsg(validateTarget,"wrong class {0} of target object {1} for reference attr {2}.", getScopedName(targetObjClass),targetOid, getScopedName(refAttr));
+								logMsg(validateTarget, rsrc.getString("validateReferenceAttrs.wrongClassOfTargetObjectForReferenceAttr"), getScopedName(targetObjClass),targetOid, getScopedName(refAttr));
 							}
 						}
 					}
@@ -2447,7 +2448,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(ValidationConfig.OFF.equals(checkConstraint)){
 				if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
 					configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration check=off", constraintName));
+					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateExistenceConstraint.validationConfigurationCheckOff"), constraintName));
 				}
 			} else {
 				if (iomObj.getattrcount() == 0){
@@ -2455,7 +2456,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 				if(!constraintOutputReduction.contains(existenceConstraint+":"+constraintName)){
 					constraintOutputReduction.add(existenceConstraint+":"+constraintName);
-					errs.addEvent(errFact.logInfoMsg("validate existence constraint {0}...",getScopedName(existenceConstraint)));
+					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateExistenceConstraint.validateExistenceConstraint"), getScopedName(existenceConstraint)));
 				}
 				String restrictedAttrName = existenceConstraint.getRestrictedAttribute().getLastPathEl().getName();
 				if(iomObj.getattrvaluecount(restrictedAttrName)==0){
@@ -2543,7 +2544,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(msg!=null && msg.length()>0){
 						logMsg(checkConstraint,msg);
 					} else {
-						logMsg(checkConstraint,"The value of the attribute {0} of {1} was not found in the condition class.", restrictedAttrName.toString(), iomObj.getobjecttag().toString());
+						logMsg(checkConstraint, rsrc.getString("validateExistenceConstraint.valueOfTheAttributeWasNotFoundInTheConditionClass"), restrictedAttrName.toString(), iomObj.getobjecttag().toString());
 					}
 				}
 			}
@@ -2879,7 +2880,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		String objectoid = iomObj.getobjectoid();
 		if (objectoid != null && !objectoid.equals("")) {
 	        if (uniquenessOfBid.containsKey(objectoid)) {
-	            errs.addEvent(errFact.logErrorMsg("OID <{0}> is equal to a BID", objectoid));
+	            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.oidIsEqualToABid"), objectoid));
 	        }		    
 		}
 
@@ -2892,7 +2893,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		if(modelele==null){
 			if(!unknownTypev.contains(tag)){
-				errs.addEvent(errFact.logErrorMsg("unknown class <{0}>",tag));
+				errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.unknownClass"),tag));
 			}
 			return;
 		}
@@ -2911,7 +2912,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			errFact.setDefaultCoord(getDefaultCoord(iomObj));
 			// validate that object is instance of a concrete class
 			if(aclass1.isAbstract()){
-				errs.addEvent(errFact.logErrorMsg("Object must be a non-abstract class"));
+				errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.objectMustBeANonAbstractClass")));
 			}
 			
 			// association
@@ -2921,10 +2922,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if (modelAssociationDef.isIdentifiable() || oidType!=null){
                     String oid = iomObj.getobjectoid();
 					if (oid == null){
-						errs.addEvent(errFact.logErrorMsg("Association {0} has to have an OID", iomObj.getobjecttag()));
+						errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.AssociationHasToHaveAnOid"), iomObj.getobjecttag()));
 						addToPool = false;
 					}else if (!isValidId(oid)) {
-	                    errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID", oid));                 
+	                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.valueIsNotAValidOid"), oid));                 
 	                }
 				}
 			} else if (aclass1 instanceof Table){
@@ -2934,16 +2935,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     Domain oidType=((AbstractClassDef) aclass1).getOid();
                     String oid = iomObj.getobjectoid();
                     if (oid == null) {
-                        errs.addEvent(errFact.logErrorMsg("Class {0} has to have an OID", iomObj.getobjecttag()));
+                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.classHasToHaveAnOid"), iomObj.getobjecttag()));
                         addToPool = false;
                     } else if (!isValidId(oid) && oidType == null) {
-                        errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID", oid));
+                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.valueIsNotAValidOid"), oid));
                     }
                     // structure
                 } else {
                     addToPool = false;
                     if (iomObj.getobjectoid() != null) {
-                        errs.addEvent(errFact.logErrorMsg("Structure {0} has not to have an OID", iomObj.getobjecttag()));
+                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.structureHasNotToHaveAnOid"), iomObj.getobjecttag()));
                     }
                 }
 			}
@@ -2953,19 +2954,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(oidType!=null && oidType==td.INTERLIS.UUIDOID){
 					String oid=iomObj.getobjectoid();
 					if(oid != null && !isValidUuid(oid)){
-						errs.addEvent(errFact.logErrorMsg("TID <{0}> is not a valid UUID", oid));
+						errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.tidIsNotAValidUuid"), oid));
 					}
 				} else if(oidType!=null && oidType==td.INTERLIS.I32OID){
 					// valid i32OID.
 				} else if(oidType!=null && oidType==td.INTERLIS.STANDARDOID) {
                     String currentOid = iomObj.getobjectoid();
                     if (!isValidStandartOId(currentOid)) {
-                        errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID", currentOid));
+                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.valueIsNotAValidOid"), currentOid));
                     }
 				} else if (oidType!=null && oidType.getType() instanceof TextOIDType) {
 				    String currentOid = iomObj.getobjectoid();
                     if (!isValidTextOId(currentOid)) {
-                        errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID", currentOid));
+                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.valueIsNotAValidOid"), currentOid));
                     }
 				}
 			}
@@ -3028,10 +3029,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                 }
                             }
                             if(propc>1) {
-                                errs.addEvent(errFact.logErrorMsg("Role {0} requires only one reference property",role.getScopedName()));
+                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresOnlyOneReferenceProperty"),role.getScopedName()));
                             }
                             if(refoid==null) {
-                                errs.addEvent(errFact.logErrorMsg("Role {0} requires a reference to another object",role.getScopedName()));
+                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresAReferenceToAnotherObject"),role.getScopedName()));
                             }
                         }
                     } else {
@@ -3054,7 +3055,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         }
                         if(refoid==null) {
                             addToPool = false;
-                            errs.addEvent(errFact.logErrorMsg("Role {0} requires a reference to another object",role.getScopedName()));
+                            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresAReferenceToAnotherObject"),role.getScopedName()));
                         }
                     }
                     if (refoid != null) {
@@ -3072,7 +3073,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(objectValue!=null){
 						Object modelElement=tag2class.get(objectValue.getobjecttag());
 						Viewable classValueOfKey= (Viewable) modelElement;
-						errs.addEvent(errFact.logErrorMsg("OID {0} of object {1} already exists in {2}.", objectValue.getobjectoid(), iomObj.getobjecttag(), classValueOfKey.toString()));
+						errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.oidXOfObjectYAlreadyExistsInZ"), objectValue.getobjectoid(), iomObj.getobjecttag(), classValueOfKey.toString()));
 					}
 				}
 			}
@@ -3086,7 +3087,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				// ok, software internal properties start with a '_'
 			}else{
 				if(!propNames.contains(propName)){
-					errs.addEvent(errFact.logErrorMsg("unknown property <{0}>",propName));
+					errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.unknownPropertyX"),propName));
 				}
 			}
 		}
@@ -3225,7 +3226,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			        values.add(complexValue);
 			    }
 			}else {
-			    throw new IllegalStateException("unexpected value in unique");
+			    throw new IllegalStateException(rsrc.getString("validateUnique.unexpectedValueInUnique"));
 			}
 		}
 		valuesRet.value=new AttributeArray(values);
@@ -3277,12 +3278,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(ValidationConfig.OFF.equals(validateMultiplicity)){
 					if(!configOffOufputReduction.contains(ValidationConfig.MULTIPLICITY+":"+attrQName)){
 						configOffOufputReduction.add(ValidationConfig.MULTIPLICITY+":"+attrQName);
-						errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration multiplicity=off in attribute {1}", attrQName, attrPath, iomObj.getobjecttag(), iomObj.getobjectoid()));
+						errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAttrValue.XNotValidatedValidationConfigurationMultiplicityOffInAttributeY"), attrQName, attrPath, iomObj.getobjecttag(), iomObj.getobjectoid()));
 					}
 				}else{
 					 Cardinality card = ((CompositionType)type).getCardinality();
 					 if(structc<card.getMinimum() || structc>card.getMaximum()){
-						logMsg(validateMultiplicity,"Attribute {0} has wrong number of values", attrPath);
+						logMsg(validateMultiplicity, rsrc.getString("validateAttrValue.attributeXHasWrongNumberOfValues"), attrPath);
 					 }
 				}
 			 for(int structi=0;structi<structc;structi++){
@@ -3290,26 +3291,26 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(ValidationConfig.OFF.equals(validateType)){
 						if(!configOffOufputReduction.contains(ValidationConfig.TYPE+":"+attrQName)){
 							configOffOufputReduction.add(ValidationConfig.TYPE+":"+attrQName);
-							errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration type=off in attribute {1}", attrQName, attrPath, iomObj.getobjecttag(), iomObj.getobjectoid()));
+							errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAttrValue.XNotValidatedValidationConfigurationTypeOffInAttributeY"), attrQName, attrPath, iomObj.getobjecttag(), iomObj.getobjectoid()));
 						}
 					}else if(structEle==null) {
-							 logMsg(validateType,"Attribute {0} requires a structure {1}", attrPath,((CompositionType)type).getComponentType().getScopedName(null));
+							 logMsg(validateType, rsrc.getString("validateAttrValue.attributeXRequiresAStructureY"), attrPath,((CompositionType)type).getComponentType().getScopedName(null));
 					}else {
 						String tag=structEle.getobjecttag();
 						Object modelele=tag2class.get(tag);
 						if(modelele==null){
 							if(!unknownTypev.contains(tag)){
-								errs.addEvent(errFact.logErrorMsg("unknown class <{0}> in attribute {1}",tag, attrPath));
+								errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.unknownClassXInAttributeY"),tag, attrPath));
 							}
 						}else{
 							Viewable structEleClass=(Viewable) modelele;
 							Table requiredClass=((CompositionType)type).getComponentType();
 							if(!structEleClass.isExtending(requiredClass)){
-								 logMsg(validateType,"Attribute {0} requires a structure {1}", attrPath,requiredClass.getScopedName(null));
+								 logMsg(validateType, rsrc.getString("validateAttrValue.attributeXRequiresAStructureY"), attrPath,requiredClass.getScopedName(null));
 							}
 							if(structEleClass.isAbstract()){
 								// validate that object is instance of concrete class
-								 logMsg(validateType,"Attribute {0} requires a non-abstract structure", attrPath);
+								 logMsg(validateType, rsrc.getString("validateAttrValue.attributeXRequiresANonAbstractStructure"), attrPath);
 							}
 						}
 						validateObject(structEle, attrPath+"["+structi+"]",null);
@@ -3319,7 +3320,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(ValidationConfig.OFF.equals(validateMultiplicity)){
 				if(!configOffOufputReduction.contains(ValidationConfig.MULTIPLICITY+":"+attrQName)){
 					configOffOufputReduction.add(ValidationConfig.MULTIPLICITY+":"+attrQName);
-					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration multiplicity=off in attribute {1}", attrQName, attrPath, iomObj.getobjecttag(), iomObj.getobjectoid()));
+					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAttrValue.XNotValidatedValidationConfigurationMultiplicityOffInAttributeY"), attrQName, attrPath, iomObj.getobjecttag(), iomObj.getobjectoid()));
 				}
 			}else{
 				Object topologyDone=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
@@ -3332,7 +3333,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						 if(doItfLineTables && type instanceof SurfaceType){
 							 // SURFACE; no attrValue in maintable
 						 }else{
-							 logMsg(validateMultiplicity,"Attribute {0} requires a value", attrPath);
+							 logMsg(validateMultiplicity, rsrc.getString("validateAttrValue.attributeXRequiresAValue"), attrPath);
 						 }
 					 }
 				}else{
@@ -3340,7 +3341,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(topologyValidationOk==null || topologyValidationOk){
 						 int structc=iomObj.getattrvaluecount(attrName);
 						 if(structc==0 && isAttributeMandatory(attr)) {
-							 logMsg(validateMultiplicity,"Attribute {0} requires a value", attrPath);
+							 logMsg(validateMultiplicity,rsrc.getString("validateAttrValue.attributeXRequiresAValue"), attrPath);
 						 }
 					}else{
 						// topology validation failed
@@ -3351,7 +3352,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(ValidationConfig.OFF.equals(validateType)){
 				if(!configOffOufputReduction.contains(ValidationConfig.TYPE+":"+attrQName)){
 					configOffOufputReduction.add(ValidationConfig.TYPE+":"+attrQName);
-					errs.addEvent(errFact.logInfoMsg("{0} not validated, validation configuration type=off in attribute {1}", attrQName, attrPath, iomObj.getobjecttag(), iomObj.getobjectoid()));
+					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAttrValue.XNotValidatedValidationConfigurationTypeOffInAttributeY"), attrQName, attrPath, iomObj.getobjecttag(), iomObj.getobjectoid()));
 				}
 			}else{
 				if (attr.isDomainIli1Date()) {
@@ -3369,13 +3370,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							if (year >= 1582 && year <= 2999 && month >= 01 && month <= 12
 									&& day >= 01 && day <= 31) {
 							} else {
-								logMsg(validateType, "value <{0}> is not in range in attribute {1}", valueStr, attrPath);
+								logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotInRangeInAttributeY"), valueStr, attrPath);
 							}
 						} catch (NumberFormatException numberformatexception) {
-							logMsg(validateType, "value <{0}> is not a valid Date in attribute {1}", valueStr, attrPath);
+							logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotAValidDateInAttributeY"), valueStr, attrPath);
 						}
 					} else {
-						logMsg(validateType, "value <{0}> is not a valid Date in attribute {1}", valueStr, attrPath);
+						logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotAValidDateInAttributeY"), valueStr, attrPath);
 					}
 				} else if (attr.isDomainBoolean()) {
 					// Value has to be not null and ("true" or "false")
@@ -3383,7 +3384,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if (valueStr == null || valueStr.equals("true") || valueStr.equals("false")){
 						// Value okay, skip it
 					} else {
-						logMsg(validateType, "value <{0}> is not a BOOLEAN in attribute {1}", valueStr, attrPath);
+						logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotABooleanInAttributeY"), valueStr, attrPath);
 					}
 				} else if (attr.isDomainIliUuid()) {
 					// Value is exactly 36 chars long and matches the regex
@@ -3391,7 +3392,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if (valueStr == null || isValidUuid(valueStr)) {
 							// Value ok, Skip it
 					} else {
-						logMsg(validateType, "value <{0}> is not a valid UUID in attribute {1}", valueStr, attrPath);
+						logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotAValidUUIDInAttributeY"), valueStr, attrPath);
 					}
 				} else if (attr.isDomainIli2Date()) {
 					// Value matches regex and is not null and is in range of type.
@@ -3399,9 +3400,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					FormattedType subType = (FormattedType) type;
 					if (valueStr != null){
 						if (!valueStr.matches(subType.getRegExp())) {
-							logMsg(validateType, "invalid format of date value <{0}> in attribue {1}", valueStr, attrPath);
+							logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfDateValueXInAttributeY"), valueStr, attrPath);
 						} else if(!subType.isValueInRange(valueStr)){
-							logMsg(validateType, "date value <{0}> is not in range in attribute {1}", valueStr, attrPath);
+							logMsg(validateType, rsrc.getString("validateAttrValue.dateValueXIsNotInRangeInAttributeY"), valueStr, attrPath);
 						}
 					}
 				} else if (attr.isDomainIli2Time()) {
@@ -3411,9 +3412,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
 					if (valueStr != null){
 						if (!valueStr.matches(subType.getRegExp()) || valueStr.length() < 9 || valueStr.length() > 12){
-							logMsg(validateType, "invalid format of time value <{0}> in attribute {1}", valueStr, attrPath);
+							logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfTimeValueXInAttributeY"), valueStr, attrPath);
 						} else if(!subType.isValueInRange(valueStr)){
-							logMsg(validateType, "time value <{0}> is not in range in attribute {1}", valueStr, attrPath);
+							logMsg(validateType, rsrc.getString("validateAttrValue.timeValueXIsNotInRangeInAttributeY"), valueStr, attrPath);
 						}
 					}
 				} else if (attr.isDomainIli2DateTime()) {
@@ -3423,9 +3424,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
 					if (valueStr != null){
 						if (!valueStr.matches(subType.getRegExp()) || valueStr.length() < 18 || valueStr.length() > 23) {
-							logMsg(validateType, "invalid format of datetime value <{0}> in attribute {1}", valueStr, attrPath);
+							logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfDatetimeValueXInAttributeY"), valueStr, attrPath);
 						} else if(!subType.isValueInRange(valueStr)){
-							logMsg(validateType, "datetime value <{0}> is not in range in attribute {1}", valueStr, attrPath);
+							logMsg(validateType, rsrc.getString("validateAttrValue.datetimeValueXIsNotInRangeInAttributeY"), valueStr, attrPath);
 						}
 					}
 				} else if(isDomainName(attr)) {
@@ -3434,7 +3435,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if (valueStr!=null) {
 						validateTextType(iomObj, attrPath, attrName, validateType, type, valueStr);
 						if (isAKeyword(valueStr)) {
-							logMsg(validateType,"value <{0}> is a keyword in attribute {1}", valueStr, attrPath);
+							logMsg(validateType,rsrc.getString("validateAttrValue.valueXIsAKeywordInAttributeY"), valueStr, attrPath);
 						}else{
 							// value is not a keyword
 						}
@@ -3443,7 +3444,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						if(matcher!=null && matcher.matches()){
 							// value matched pattern
 						}else {
-							logMsg(validateType,"invalid format of INTERLIS.NAME value <{0}> in attribute {1}", valueStr, attrPath);
+							logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfInterlisNameValueXInAttributeY"), valueStr, attrPath);
 						}
 					}
 				}else if (isDomainUri(attr)) { 
@@ -3458,7 +3459,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         if(matcher!=null && matcher.matches()){
                          // value matched pattern
                         }else {
-                            logMsg(validateType,"invalid format of INTERLIS.URI value <{0}> in attribute {1}", valueStr, attrPath);
+                            logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfInterlisUriValueXInAttributeY"), valueStr, attrPath);
                         }
                     }
 				} else if (type instanceof PolylineType){
@@ -3472,7 +3473,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					} else {
                         String attrValue = iomObj.getattrvalue(attrName);
                         if (attrValue != null) {
-                            logMsg(validateType,"The value <{0}> is not a Polyline in attribute {1}", attrValue, attrPath);
+                            logMsg(validateType, rsrc.getString("validateAttrValue.theValueXIsNotAPolylineInAttributeY"), attrValue, attrPath);
                         }					    
 					}
 				}else if(type instanceof SurfaceOrAreaType){
@@ -3512,7 +3513,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 												validateAreaTopology(validateGeometryType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
 											}else {
 												// surface topology not valid
-												errs.addEvent(errFact.logInfoMsg("AREA topology not validated, validation of SURFACE topology failed in attribute {0}", attrPath));
+												errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAttrValue.areaTopologyNoValidatedValidationOfSurfaceTopologyFailedInAttributeY"), attrPath));
 											}
 										}
 									}
@@ -3521,7 +3522,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						} else {
 						    String attrValue = iomObj.getattrvalue(attrName);
 						    if (attrValue != null) {
-						        logMsg(validateType,"The value <{0}> is not a Polygon in attribute {1}", attrValue, attrPath);
+						        logMsg(validateType,rsrc.getString("validateAttrValue.theValueXIsNotAPolygonInAttributeY"), attrValue, attrPath);
 						    }
 						}
 					 }
@@ -3532,7 +3533,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					} else {
 					    String attrValue = iomObj.getattrvalue(attrName);
 					    if (attrValue != null) {
-					        logMsg(validateType,"The value <{0}> is not a Coord in attribute {1}", attrValue, attrPath);
+					        logMsg(validateType, rsrc.getString("validateAttrValue.theValueXIsNotCoordInAttributeY"), attrValue, attrPath);
 					    }
 					}
 				}else if(type instanceof NumericType){
@@ -3545,7 +3546,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}else{
 						IomObject structValue=iomObj.getattrobj(attrName, 0);
 						if(structValue!=null){
-							logMsg(validateType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
+							logMsg(validateType, rsrc.getString("validateAttrValue.attributeXHasAnUnexpectedTypeY"),attrPath,structValue.getobjecttag());
 						}
 					}
 				}else if(type instanceof EnumerationType){
@@ -3553,18 +3554,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					String value=iomObj.getattrvalue(attrName);
 					if(value!=null){
 						if(!((EnumerationType) type).getValues().contains(value)){
-						    logMsg(validateType,"value {0} is not a member of the enumeration in attribute {1}", value, attrPath);   
+						    logMsg(validateType,rsrc.getString("validateAttrValue.valueXIsNotAMemberOfTheEnumerationInAttributeY"), value, attrPath);   
 						}
 					}else{
 						IomObject structValue=iomObj.getattrobj(attrName, 0);
 						if(structValue!=null){
-							logMsg(validateType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
+							logMsg(validateType, rsrc.getString("validateAttrValue.attributeXHasAnUnexpectedTypeY"),attrPath,structValue.getobjecttag());
 						}
 					}
 				}else if(type instanceof EnumTreeValueType){
 				    String actualValue=iomObj.getattrvalue(attrName);
 					if (isValidEnumTreeValue(actualValue, attrPath, type)) {
-					    logMsg(validateType,"value {0} is not a member of the enumeration in attribute {1}", actualValue, attrPath);
+					    logMsg(validateType,rsrc.getString("validateAttrValue.valueXIsNotAMemberOfTheEnumerationInAttributeY"), actualValue, attrPath);
 					}
 				}else if(type instanceof ReferenceType){
 				}else if(type instanceof TextType){
@@ -3574,11 +3575,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     String value=iomObj.getattrvalue(attrName);
                     if (value != null && isDomainStandardOid(attr)) {
                         if (!isValidStandartOId(value)) {
-                            errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID in attribute {1}", value, attrPath));
+                            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.valueXIsNotAValidOidInAttributeY"), value, attrPath));
                         }                        
                     } else if (value != null && isDomainTextOid(attr)) {
                         if (!isValidTextOId(value)) {
-                            errs.addEvent(errFact.logErrorMsg("value <{0}> is not a valid OID in attribute {1}", value, attrPath));
+                            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.valueXIsNotAValidOidInAttributeY"), value, attrPath));
                         }                        
                     }
 				} else if (type instanceof FormattedType) {
@@ -3586,11 +3587,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     String actualValue = iomObj.getattrvalue(attrName);
                     if (actualValue != null) {
                         if (!actualValue.matches(regExp)) {
-                            errs.addEvent(errFact.logErrorMsg("Attribute <{0}> has a invalid value <{1}>", attrPath, actualValue));
+                            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.attributeXHasAInvalidValueY"), attrPath, actualValue));
                         } else {
                             boolean hasAValidValue = ((FormattedType) type).isValueInRange(actualValue);
                             if (!hasAValidValue) {
-                                errs.addEvent(errFact.logErrorMsg("Value <{0}> is a out of range in attribute <{1}>", actualValue, attrPath));
+                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.valueXIsAOutOfRangeInAttributeY"), actualValue, attrPath));
                             }
                         }
                     }				    
@@ -3637,18 +3638,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			TextType textType = (TextType) type;
 			if(maxLength!=-1){
 				if(value.length()>maxLength){
-					 logMsg(validateType,"Attribute {0} is length restricted to {1}", attrPath,Integer.toString(maxLength));
+					 logMsg(validateType,rsrc.getString("validateTextType.attributeXIsLengthRestrictedToY"), attrPath,Integer.toString(maxLength));
 				}
 			}
 			if(((TextType) type).isNormalized()){
 				if(value.indexOf('\n')>=0 || value.indexOf('\r')>=0 || value.indexOf('\t')>=0){
-					 logMsg(validateType,"Attribute {0} must not contain control characters", attrPath);
+					 logMsg(validateType,rsrc.getString("validateTextType.attributeXMustNotContainControlCharacters"), attrPath);
 				}
 			}
 		}else{
 			IomObject structValue=iomObj.getattrobj(attrName, 0);
 			if(structValue!=null){
-				logMsg(validateType, "Attribute {0} has an unexpected type {1}",attrPath,structValue.getobjecttag());
+				logMsg(validateType, rsrc.getString("validateTextType.attributeXHasAnUnexpectedTypeY"),attrPath,structValue.getobjecttag());
 			}
 		}
 	}
@@ -3660,7 +3661,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				Evaluable[] ev = (((LocalAttribute)attr).getBasePaths());
 				attrType=((ObjectPath)ev[0]).getType();
 			}else {
-				throw new IllegalArgumentException("unexpected attribute type "+attr.getScopedName());
+				throw new IllegalArgumentException("unexpected attribute type " + attr.getScopedName());
 			}
 		}
 		return attrType.isMandatoryConsideringAliases();
@@ -3677,7 +3678,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, errFact,validateType);
 		} catch (IoxException e) {
 			surfaceTopologyValid=false;
-			errs.addEvent(errFact.logErrorMsg(e,"failed to validate polygon"));
+			errs.addEvent(errFact.logErrorMsg(e, rsrc.getString("validateSurfaceTopology.failedToValidatePolygon")));
 		}
 		return surfaceTopologyValid;
 	}
@@ -3731,7 +3732,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			for(int surfacei=0;surfacei< surfaceValue.getattrvaluecount("surface");surfacei++){
 				if(!clipped && surfacei>0){
 					// unclipped surface with multi 'surface' elements
-					logMsg(validateType,"invalid number of surfaces in COMPLETE basket");
+					logMsg(validateType, rsrc.getString("validatePolygon.invalidNumberOfSurfaceInCompleteBasket"));
 					return false;
 				}
 				IomObject surface= surfaceValue.getattrobj("surface",surfacei);
@@ -3742,7 +3743,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(objectIdentification==null){
 						objectIdentification = currentIomObj.getobjecttag();
 					}
-					logMsg(validateType,"missing outerboundary in {0} of object {1}.", attrName, objectIdentification);
+					logMsg(validateType, rsrc.getString("validatePolygon.missingOuterboundaryInXOfObjectY"), attrName, objectIdentification);
 					return false;
 				} else {
 					for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
@@ -3776,7 +3777,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			for(int sequencei=0;sequencei<polylineValue.getattrvaluecount("sequence");sequencei++){
 				if(!clipped && sequencei>0){
 					// an unclipped polyline should have only one sequence element
-					logMsg(validateType,"invalid number of sequences in COMPLETE basket");
+					logMsg(validateType, rsrc.getString("validatePolyline.invalidNumberOfSequenceInCompleteBasket"));
 					foundErrs = foundErrs || true;
 				}
 				IomObject sequence=polylineValue.getattrobj("sequence",sequencei);
@@ -3825,30 +3826,30 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if (coordValue.getattrvalue("C1") != null){
 				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"), attrName));
 			} else if (coordValue.getattrvalue("A1") != null) {
-				logMsg(validateType, "Not a type of COORD");
+				logMsg(validateType, rsrc.getString("validateCoordType.notATypeOfCoord"));
 			} else {
-				logMsg(validateType, "Wrong COORD structure, C1 expected");
+				logMsg(validateType, rsrc.getString("validateCoordType.wrongCoordStructureC1Expected"));
 			}
 		}
 		if (coordType.getDimensions().length == 2){
 			if (coordValue.getattrvalue("C3") != null){
-				logMsg(validateType, "Wrong COORD structure, C3 not expected");
+				logMsg(validateType, rsrc.getString("validateCoordType.wrongCoordStructureC3NotExpected"));
 			}
 		}
 		if (coordType.getDimensions().length >= 2){
 			if (coordValue.getattrvalue("C2") != null){
 				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"), attrName));
 			} else if (coordValue.getattrvalue("A2") != null) {
-				logMsg(validateType, "Not a type of COORD");
+				logMsg(validateType, rsrc.getString("validateCoordType.notATypeOfCoord"));
 			} else {
-				logMsg(validateType, "Wrong COORD structure, C2 expected");
+				logMsg(validateType, rsrc.getString("validateCoordType.wrongCoordStructureC2Expected"));
 			}
 		}
 		if (coordType.getDimensions().length == 3){
 			if (coordValue.getattrvalue("C3") != null){
 				coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"), attrName));
 			} else {
-				logMsg(validateType, "Wrong COORD structure, C3 expected");
+				logMsg(validateType, rsrc.getString("validateCoordType.wrongCoordStructureC3Expected"));
 			}
 		}
 		// validate if no superfluous properties
@@ -3859,7 +3860,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				// ok, software internal properties start with a '_'
 			}else{
 				if(!propName.equals("C1") && !propName.equals("C2") && !propName.equals("C3")){
-					errs.addEvent(errFact.logErrorMsg("Wrong COORD structure, unknown property <{0}>",propName));
+					errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateCoordType.wrongCoordStructureUnknownPropertyX"),propName));
 				}
 			}
 		}
@@ -3883,13 +3884,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], c2, attrName));
 				if(dimLength==2) {
 					if(c3!=null) {
-						logMsg(validateType, "Wrong ARC structure, C3 not expected");
+						logMsg(validateType, rsrc.getString("validateARCSType.wrongArcStructureC3NotExpected"));
 					}
 				}else if(dimLength==3) {
 					if(c3!=null) {
 						coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], c3, attrName));
 					}else {
-						logMsg(validateType, "Wrong ARC structure, C3 expected");
+						logMsg(validateType, rsrc.getString("validateARCSType.wrongArcStructureC3Expected"));
 					}
 				}
 			}else {
@@ -3899,7 +3900,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			wrongArcStructure=true;
 		}
 		if(wrongArcStructure) {
-			logMsg(validateType, "Wrong ARC structure");
+			logMsg(validateType, rsrc.getString("validateARCSType.wrongArcStructure"));
 		}
 		
 		// validate if no superfluous properties
@@ -3912,7 +3913,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(!propName.equals("A1") || !propName.equals("A2") || !propName.equals("C1") || !propName.equals("C2") || !propName.equals("C3")){
 					// ok.
 				} else {
-					errs.addEvent(errFact.logErrorMsg("Wrong ARC structure, unknown property <{0}>",propName));
+					errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateARCSType.wrongArcStructureUnknownPropertyX"),propName));
 				}
 			}
 		}
@@ -3923,7 +3924,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		try {
 			value=new PrecisionDecimal(valueStr);
 		} catch (NumberFormatException e) {
-			 logMsg(validateType,"value <{0}> is not a number", valueStr);
+			 logMsg(validateType, rsrc.getString("validateNumericType.valueXIsNotANumber"), valueStr);
 		}
 		BigDecimal rounded=null;
 		if(value!=null){
@@ -3939,7 +3940,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	            rounded=roundNumeric(precision,valueBigDec);
 			}
 			if (rounded!=null && (rounded.compareTo(min_general)==-1 || rounded.compareTo(max_general)==+1)){
-				logMsg(validateType,"value {0} is out of range in attribute {1}", rounded.toString(), attrName);
+				logMsg(validateType, rsrc.getString("validateNumericType.valueXIsOutOfRangeInAttributeY"), rounded.toString(), attrName);
 			}
 		}
 		if(rounded==null) {
