@@ -27,7 +27,7 @@ public class VerifyModelTest {
     // Config File
     private static final String CONFIG_FILE = "test/data/inconsistentModelVersion/ConfigFile.toml";
     public static final String SETTING_CONFIGFILE = "org.interlis2.validator.configfile";
-    public static final String TEST_IN = "C:/projects/ilivalidator/test/data/inconsistentModelVersion";
+    public static final String TEST_IN = "src/test/data/validator/inconsistentModelVersion";
     
     // TD
     private TransferDescription td=null;
