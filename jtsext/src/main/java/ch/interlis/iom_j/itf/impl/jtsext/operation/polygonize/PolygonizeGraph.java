@@ -6,6 +6,7 @@ import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.iom_j.itf.impl.jtsext.algorithm.CurveSegmentIntersector;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CurvePolygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
@@ -26,7 +27,7 @@ import com.vividsolutions.jts.planargraph.*;
 class PolygonizeGraph
     extends PlanarGraph
 {
-	  final boolean doDetailTrace=false;
+	final boolean doDetailTrace=false;
 
   private static int getDegreeNonDeleted(Node node)
   {
@@ -332,7 +333,7 @@ private boolean removeOverlap(CurveSegmentIntersector li,Coordinate node,
 						  throw new IllegalStateException("unexpected overlap "+is.toString());
 					  }
 					  if(is!=null){
-							EhiLogger.traceState("valoverlap "+is.toString());
+							EhiLogger.traceState(CurvePolygon.VALID_OVERLAP+" "+is.toString());
 					  }
 		    		  if(s0 instanceof StraightSegment){
 		    			  if(line1.removeOverlap((ArcSegment) s1,s0,newVertexOffset)){

@@ -16,7 +16,9 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class CurvePolygon extends Polygon {
 
-	public CurvePolygon(LinearRing shell, LinearRing[] holes,
+	public static final String VALID_OVERLAP = "valoverlap";
+
+    public CurvePolygon(LinearRing shell, LinearRing[] holes,
 			GeometryFactory factory) {
 		super(shell, holes, factory);
 	}

@@ -28,6 +28,7 @@ import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.jtsext.algorithm.CurveSegmentIntersector;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CurvePolygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
@@ -467,7 +468,7 @@ public class ItfSurfaceLinetable2Polygon {
 						Intersection is = new Intersection(
 								li.getIntersection(0), li.getIntersection(1),
 								seg, seg, seg0, seg1, li.getOverlap(),false);
-						EhiLogger.traceState("valoverlap " + is.toString());
+						EhiLogger.traceState(CurvePolygon.VALID_OVERLAP +" "+ is.toString());
 						
 						  // overlap entfernen
 						  if(seg0 instanceof StraightSegment){
