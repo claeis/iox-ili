@@ -492,11 +492,11 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==4);
+		assertEquals(4,logger.getErrs().size());
 		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("dangle tid o1", logger.getErrs().get(1).getEventMsg());
 		assertEquals("dangle tid o1", logger.getErrs().get(2).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(3).getEventMsg());
+        assertEquals("no polygon", logger.getErrs().get(3).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
@@ -558,7 +558,7 @@ public class Surface23Test {
 		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("dangle tid o1", logger.getErrs().get(1).getEventMsg());
 		assertEquals("dangle tid o1", logger.getErrs().get(2).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(3).getEventMsg());
+		assertEquals("no polygon", logger.getErrs().get(3).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -662,9 +662,8 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 300000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft ob eine Overlay Fehlermeldung ausgegeben wird,
@@ -768,9 +767,8 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 300000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn
@@ -864,10 +862,9 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
+		assertEquals(2,logger.getErrs().size());
 		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 290000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn
@@ -972,10 +969,9 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
+		assertEquals(2,logger.getErrs().size());
 		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 300000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
@@ -1069,9 +1065,8 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 300000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird,
@@ -1151,9 +1146,8 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
@@ -1261,10 +1255,9 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
+		assertEquals(2,logger.getErrs().size());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
 	}	
 	
 	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
@@ -1343,9 +1336,8 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft, ob eine Surface erstellt werden kann, wenn

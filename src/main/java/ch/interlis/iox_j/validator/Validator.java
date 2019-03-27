@@ -3448,7 +3448,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								}
 								if(attrValidator==this){
 									if(surfaceOrAreaType instanceof SurfaceType){
-										validateSurfaceTopology(validateGeometryType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
+									    boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
 									}else{
 										boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
 										if(!ValidationConfig.OFF.equals(areaOverlapValidation)){

@@ -104,6 +104,37 @@ public class ItfReader2Test {
 		 assertEquals("Test1.TopicA.TableA oid 10 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}}", 
 				 objs.get("10").toString());
 	}
+    @Test
+    public void testSURFACEintersection() throws Iox2jtsException, IoxException {
+        EhiLogger.getInstance().setTraceFilter(false);
+        ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceIntersection.itf"),false);
+        reader.setModel(td);
+        IoxEvent event=null;
+        HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
+         try {
+             do{
+                 event=reader.read();
+                 if(event instanceof StartTransferEvent){
+                 }else if(event instanceof StartBasketEvent){
+                 }else if(event instanceof ObjectEvent){
+                     IomObject iomObj=((ObjectEvent)event).getIomObject();
+                     //System.out.println(iomObj);
+                     assertNotNull(iomObj.getobjectoid());
+                     objs.put(iomObj.getobjectoid(), iomObj);
+                 }else if(event instanceof EndBasketEvent){
+                 }else if(event instanceof EndTransferEvent){
+                 }
+             }while(!(event instanceof EndTransferEvent));
+             fail();
+        }catch(IoxInvalidDataException ex){
+            assertError("intersection tids 3218, 3218");
+            // assertError("failed to build polygons of Test1.TopicA.TableA.Form");
+             // verify that the valid geometry value is read
+             assertEquals("Test1.TopicA.TableA oid VeritiID34395 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 687644.618, C2 154306.589}, COORD {C1 687656.999, C2 154312.905}, COORD {C1 687662.675, C2 154315.8}, COORD {C1 687669.036, C2 154306.543}, COORD {C1 687659.196, C2 154301.648}, COORD {C1 687647.743, C2 154295.95}, COORD {C1 687644.618, C2 154306.589}]}}}}}}", 
+                     objs.get("VeritiID34395").toString());
+        }
+         // Test1.TopicA.TableA oid VeritiID34395 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 687644.618, C2 154306.589}, COORD {C1 687656.999, C2 154312.905}, COORD {C1 687662.675, C2 154315.8}, COORD {C1 687669.036, C2 154306.543}, COORD {C1 687659.196, C2 154301.648}, COORD {C1 687647.743, C2 154295.95}, COORD {C1 687644.618, C2 154306.589}]}}}}}}
+    }
 	@Test
 	public void testSURFACEundefined() throws Iox2jtsException, IoxException {
 		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceUndefined.itf"),false);
