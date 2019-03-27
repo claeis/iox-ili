@@ -248,15 +248,17 @@ public class Interlis {
             ObjectPath surfaceBagObjPath = null;
             PathEl surfaceBagPath[] = null;
             Viewable viewable = null;
-            try {
-                surfaceBagObjPath = validator.parseObjectOrAttributePath(currentClass, surfaceBag.getValue());
-                if (surfaceBagObjPath.getPathElements() != null) {
-                    PathEl surfaceBagPathEl[] = surfaceBagObjPath.getPathElements();
-                    surfaceBagPath = surfaceBagPathEl;          
-                    viewable = surfaceBagObjPath.getViewable();
+            if(!surfaceBag.isUndefined()) {
+                try {
+                    surfaceBagObjPath = validator.parseObjectOrAttributePath(currentClass, surfaceBag.getValue());
+                    if (surfaceBagObjPath.getPathElements() != null) {
+                        PathEl surfaceBagPathEl[] = surfaceBagObjPath.getPathElements();
+                        surfaceBagPath = surfaceBagPathEl;          
+                        viewable = surfaceBagObjPath.getViewable();
+                    }
+                } catch (Ili2cException e) {
+                    EhiLogger.logError(e);
                 }
-            } catch (Ili2cException e) {
-                EhiLogger.logError(e);
             }
             // name of surface (textType)
             Value surfaceAttr=validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[2], firstRole);
