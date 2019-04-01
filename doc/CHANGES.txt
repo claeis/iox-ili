@@ -5,6 +5,20 @@ ideas/open issues
 
 LATEST
 -----------------------------
+
+iox-ili 1.20.11 (2019-04-01)
+-----------------------------
+- XTF23/24Reader: support embedded association with attributes
+- Validator: Failed to detect wrong type in COORD/POLYLINE/SURFACE attr
+- Validator: factor interlis functions out of class validator
+- Validator: Constraints in association: compare objects not possible
+- ItfReader: invalid Ring lines Error - failed to build polygons
+- Validator: Xtflog contains not all messages
+- ReaderFactory: fixed unexpected namesapce http://www.interlis.ch/INTERLIS2.2 
+- Validator: optionally report inconsistent model version
+- Validator: localize validation messages
+- ItfReader: keep reading valid polygons from itf SURFACE if there are some invalid polygons
+- Validator: incomplete attribute path in error message 
 - XtfWriter: fixed writing of embedded associations
 - Validator: fixed INTERLIS.areAreas(...,UNDEFINED,...) evaluation
 
