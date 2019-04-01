@@ -278,7 +278,7 @@ public class Surface10Test {
 		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("dangle tid o1", logger.getErrs().get(1).getEventMsg());
 		assertEquals("dangle tid o1", logger.getErrs().get(2).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(3).getEventMsg());
+		assertEquals("no polygon", logger.getErrs().get(3).getEventMsg());
 	}
 	
 	// prueft, ob eine dangles Fehlermeldung ausgegeben wird, wenn
@@ -339,7 +339,7 @@ public class Surface10Test {
 		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("dangle tid o1", logger.getErrs().get(1).getEventMsg());
 		assertEquals("dangle tid o1", logger.getErrs().get(2).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(3).getEventMsg());
+		assertEquals("no polygon", logger.getErrs().get(3).getEventMsg());
 	}
 	
 	// pfueft, ob eine Surface mit 1 Outerboundary und 1 Innerboundary erstellt werden kann.

@@ -371,6 +371,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 					ArrayList<IoxInvalidDataException> dataerrs2 = polygonizer.getDataerrs();
 					dataerrs.addAll(dataerrs2);
 					if(dataerrs2.size()>0){
+	                    dataerrs.add(new IoxInvalidDataException("failed to build polygons of "+aclass.getScopedName(null)+"."+areaAttrName));
 						setTopologyValidationFailed(areaAttr);
 					}
 				} catch (Exception e) {
@@ -392,6 +393,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 					dataerrs.addAll(dataerrs2);
 					if(dataerrs2.size()>0){
 						setTopologyValidationFailed(surfaceAttr);
+	                    dataerrs.add( new IoxInvalidDataException("failed to build polygons of "+aclass.getScopedName(null)+"."+surfaceAttrName));
 					}
 				} catch (Exception e) {
 					ArrayList<IoxInvalidDataException> dataerrs2 = polygonizer.getDataerrs();

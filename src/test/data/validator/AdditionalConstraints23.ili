@@ -63,6 +63,20 @@ CONTRACTED MODEL AdditionalConstraints23 AT "mailto:ceis@localhost" VERSION "201
 		CLASS ClassJ =
 			Geometrie : MANDATORY AREA WITH (STRAIGHTS, ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.050;
 		END ClassJ;
+		
+		CLASS ClassK =
+			attrK : TEXT*10;
+		END ClassK;
+		
+		CLASS ClassL =
+			attrL : TEXT*10;
+		END ClassL;
+		
+		ASSOCIATION k2l =
+		  roleK -- {0..*} ClassK;
+		  roleL -- {0..*} ClassL;
+		END k2l;
+		
 	END Topic;
 END AdditionalConstraints23.
 
@@ -193,3 +207,18 @@ CONTRACTED MODEL AdditionalModelI AT "mailto:ceis@localhost" VERSION "2016-03-29
     END AdditionalClassI;
   END AdditionalTopicI;
 END AdditionalModelI.
+
+CONTRACTED MODEL AdditionalModelK AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+  IMPORTS AdditionalConstraints23;
+  VIEW TOPIC AdditionalTopicK =
+  	DEPENDS ON AdditionalConstraints23.Topic;
+    
+  	VIEW AdditionalAssocK2L
+   	PROJECTION OF AdditionalConstraints23.Topic.k2l;
+    	=
+       ALL OF k2l;
+       !!MANDATORY CONSTRAINT roleK->attrK<>roleL->attrL; !! requires fix in ili2c
+    END AdditionalAssocK2L;
+    
+  END AdditionalTopicK;
+END AdditionalModelK.

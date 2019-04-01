@@ -51,6 +51,7 @@ public class MyHandler
 	public static final String HEADER_OBJECT_MODELENTRY="iom04.metamodel.ModelEntry";
 	public static final String HEADER_OBJECT_MODELENTRY_NAME="model";
 	public static final String HEADER_OBJECT_MODELENTRY_URI="uri";
+    public static final String HEADER_OBJECT_MODELENTRY_VERSION="version";
 	
 	private java.util.HashMap<String, IomObject> header=null;
 	private boolean isIli22=false;
@@ -235,11 +236,15 @@ public class MyHandler
 			}
 			// [URI]
 			Attribute modelUri = event.getAttributeByName(new QName("URI"));
+            Attribute modelVersion = event.getAttributeByName(new QName("VERSION"));
 			IomObject model=newIomObject(HEADER_OBJECT_MODELENTRY,hsNextOid());
 			parser_addAttrValue(model,HEADER_OBJECT_MODELENTRY_NAME,modelName.getValue());
 			if(modelUri!=null){
 				parser_addAttrValue(model,HEADER_OBJECT_MODELENTRY_URI,modelUri.getValue());
 			}
+            if(modelVersion!=null){
+                parser_addAttrValue(model,HEADER_OBJECT_MODELENTRY_VERSION,modelVersion.getValue());
+            }
 			header.put(model.getobjectoid(),model);
 			return;
 		}

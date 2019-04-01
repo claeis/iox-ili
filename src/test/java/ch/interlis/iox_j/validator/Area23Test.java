@@ -93,24 +93,6 @@ public class Area23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-    @Test
-    @Ignore("GH-64")
-    public void notApolygon_Fail(){
-        Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
-        objSurfaceSuccess.setattrvalue("area2d", "3");
-        ValidationConfig modelConfig=new ValidationConfig();
-        LogCollector logger=new LogCollector();
-        LogEventFactory errFactory=new LogEventFactory();
-        Settings settings=new Settings();
-        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-        validator.validate(new ObjectEvent(objSurfaceSuccess));
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
-        // Asserts
-        assertTrue(logger.getErrs().size()==1);
-    }
 	
 	// prueft ob ein Polygon erstellt werden kann, wenn sie sich selber an 1 Punkt beruehrt.
 	@Test
@@ -569,10 +551,9 @@ public class Area23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
+		assertEquals(2,logger.getErrs().size());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	// prueft, ob 2 Polygone die sich ueberlappen mit ausgeschalteter
@@ -970,9 +951,10 @@ public class Area23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
+		assertTrue(logger.getErrs().size()==3);
 		assertEquals("superfluous outerboundary tid o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("superfluous outerboundary tid o1", logger.getErrs().get(1).getEventMsg());
+        assertEquals("multipolygon detected", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn 2 Polygone exakt
@@ -1804,9 +1786,8 @@ public class Area23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (600000.0, 100000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -1896,9 +1877,8 @@ public class Area23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (600000.0, 100000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -1994,9 +1974,8 @@ public class Area23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 200000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -2100,10 +2079,9 @@ public class Area23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
+		assertEquals(2,logger.getErrs().size());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("Overlay coord1 (500000.0, 200000.0, NaN), coord2 (550000.0, 200000.0, NaN), tids o1, o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -2219,11 +2197,10 @@ public class Area23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==4);
+		assertEquals(3,logger.getErrs().size());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("Overlay coord1 (500000.0, 200000.0, NaN), coord2 (550000.0, 200000.0, NaN), tids o1, o1", logger.getErrs().get(1).getEventMsg());
 		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 200000.0, NaN), tids o1, o1", logger.getErrs().get(2).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(3).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn Dangles erstellt wurden.
@@ -2299,9 +2276,8 @@ public class Area23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird,
@@ -2418,10 +2394,9 @@ public class Area23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
+		assertEquals(2,logger.getErrs().size());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
 	}	
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -2500,9 +2475,8 @@ public class Area23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn diese aus 3d Koordinaten besteht,
@@ -3075,10 +3049,9 @@ public class Area23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
+		assertEquals(2,logger.getErrs().size());
 		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 290000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn
@@ -4409,8 +4382,26 @@ public class Area23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
+		assertEquals(1,logger.getErrs().size());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
 	}
+	
+    @Test
+    public void notApolygon_Fail(){
+        Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSD, OID1);
+        objSurfaceSuccess.setattrvalue("area2d", "3");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+        validator.validate(new ObjectEvent(objSurfaceSuccess));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("The value <3> is not a Polygon in attribute area2d", logger.getErrs().get(0).getEventMsg());
+    }
 }

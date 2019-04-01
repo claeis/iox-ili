@@ -28,7 +28,7 @@ import ch.interlis.iox_j.IoxIliReader;
 import ch.interlis.iox_j.IoxSyntaxException;
 
 public class Xtf23Reader implements IoxReader ,IoxIliReader{
-	private XMLEventReader reader=null;
+    private XMLEventReader reader=null;
 	private IoxFactoryCollection factory=new  ch.interlis.iox_j.DefaultIoxFactoryCollection();
 	private java.io.InputStream inputFile=null;
 	private int oidSpaceSize=0;
@@ -941,7 +941,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
         	if(event.isCharacters()) {
 	            Characters characters = (Characters) event;
 	            if(!characters.isWhiteSpace()){
-					throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
+	                throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
 	            }
         	}
             event=reader.nextEvent();
@@ -984,8 +984,9 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
         			return iomObj;
         		}
             }else if(element.getAttributeByName(QNAME_XML_OID)!=null) {
-            	Attribute attr=element.getAttributeByName(QNAME_XML_OID);
-            	iomObj.setattrvalue(attrName, attr.getValue());
+            	Attribute oidAttr=element.getAttributeByName(QNAME_XML_OID);
+            	attrName=element.getName().getLocalPart();
+            	iomObj.setattrvalue(attrName, oidAttr.getValue());
             	event=reader.nextEvent();
             	event=skipCommentary(event);
         		if(event.isCharacters()){ // are characters
@@ -1001,9 +1002,14 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 		    	}
 		    	event=reader.nextEvent(); // start attribute
 		    	event=skipCommentary(event);
-		    	if(!reader.peek().isEndElement()) {
-		    		event=skipSpacesAndGetNextEvent(event);
+		    	if (event.isCharacters()) {
+		    	    Characters characters = (Characters) event;
+		    	    // Check has character a new line or tab..
+	                if(!reader.peek().isEndElement() && characters.isWhiteSpace()) {
+	                    event=skipSpacesAndGetNextEvent(event);
+	                }
 		    	}
+
 		    	// characters
 	            if(event.isCharacters()){ 
 	            	StringBuffer value=new StringBuffer();
@@ -1090,11 +1096,15 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
     	return iomObj;
     }
 
-	private IomObject readReference(IomObject iomObj, StartElement element, String attrName, AssociationDef association) throws IoxException{
-		String refOid=element.getAttributeByName(QNAME_XML_REF).getValue();
-		if(refOid.length()==0){
-			throw new IoxException("unexpected reference value <"+refOid+">");
+	private IomObject readReference(IomObject iomObj, StartElement element, String attrName, AssociationDef association) throws IoxException, XMLStreamException{
+	    String refOid=null;
+	    if (element.getAttributeByName(QNAME_XML_REF) != null) {
+	        refOid=element.getAttributeByName(QNAME_XML_REF).getValue();
+	        if(refOid.length()==0){
+	            throw new IoxException("unexpected reference value <"+refOid+">");
+	        }		    
 		}
+
 		Attribute attrRefBid=element.getAttributeByName(QNAME_XML_TOPIC_BID);
 		String refBid=null;
 		if(attrRefBid!=null) {
@@ -1115,14 +1125,28 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 				}
         	}
         }
-		iomObj.addattrobj(attrName,QNAME_XML_REF.getLocalPart()).setobjectrefoid(refOid); // set reference
-		IomObject aObject=iomObj.getattrobj(attrName, 0);
-		if(orderPos!=null){
-			aObject.setobjectreforderpos(orderPos);
-		}
-		if(refBid!=null) {
-			aObject.setobjectrefbid(refBid);
-		}
+        XMLEvent peek = reader.peek();
+        XMLEvent event = null;
+        if (peek.isCharacters()) {
+            event = reader.nextEvent();
+            event = skipSpacesAndGetNextEvent(event);
+        } else if (peek.isStartElement()) {
+            event = reader.nextEvent();
+        }
+        if (event != null && event.isStartElement()) {
+            element = (StartElement) event;
+            iomObj.addattrobj(attrName, readObject(event, iomObj));
+        } else {
+            IomObject aObject=iomObj.addattrobj(attrName,QNAME_XML_REF.getLocalPart());
+            aObject.setobjectrefoid(refOid); // set reference
+            if(orderPos!=null){
+                aObject.setobjectreforderpos(orderPos);
+            }
+            if(refBid!=null) {
+                aObject.setobjectrefbid(refBid);
+            }            
+        }
+
 		return iomObj;
 	}
     

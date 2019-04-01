@@ -40,6 +40,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	public static final String CONSTRAINT_VALIDATION = "constraintValidation";
 	public static final String DEFAULT_GEOMETRY_TYPE_VALIDATION = "defaultGeometryTypeValidation";
 	public static final String ADDITIONAL_MODELS="additionalModels";
+	public static final String VERIFY_MODEL_VERSION = "verifyModelVersion";
 	public static final String ALLOW_ONLY_MULTIPLICITY_REDUCTION="allowOnlyMultiplicityReduction";
 	public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
     public static final String DISABLE_ROUNDING="disableRounding";

@@ -1,0 +1,7 @@
+INTERLIS 2.3;
+
+MODEL Beispiel2
+  AT "mailto:ceis@localhost"
+  VERSION "2016-07-08" =
+
+END Beispiel2.

@@ -3,6 +3,8 @@ package ch.interlis.iox_j.validator;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -618,6 +620,7 @@ public class AdditionalConstraints23Test {
 	// wenn sich die Boundaries der Surface selbst ueberschneiden.
 	@Test
 	public void mandatoryConstraint_OverlappedSurface_False(){
+	    EhiLogger.getInstance().setTraceFilter(false);
 		Iom_jObject function1=new Iom_jObject(CLASSI, OID1);
 		// Geometrie 1
 		IomObject multisurfaceValue=function1.addattrobj("Geometrie", "MULTISURFACE");
@@ -692,11 +695,10 @@ public class AdditionalConstraints23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==4);
+		assertEquals(3,logger.getErrs().size());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
 		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(2).getEventMsg());
-		assertEquals("Set Constraint AdditionalModelH.AdditionalTopicH.AdditionalClassH.Constraint1 is not true.", logger.getErrs().get(3).getEventMsg());
+		assertEquals("Set Constraint AdditionalModelH.AdditionalTopicH.AdditionalClassH.Constraint1 is not true.", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	// Prueft die Konfiguration: constraint validation.
