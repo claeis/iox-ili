@@ -405,7 +405,7 @@ public class ReferenceType23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Attribute attrE2 requires a value", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Attribute attrF2[0]/attrE2 requires a value", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Rolle nicht External ist und die Klasse sich in einer anderen Bid befindet.

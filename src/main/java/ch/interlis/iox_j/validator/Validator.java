@@ -2984,7 +2984,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						// skip implicit particles (base-viewables) of views
 					}else{
 						propNames.add(attr.getName());
-						validateAttrValue(aclass1,iomObj,attr,null);
+						validateAttrValue(aclass1,iomObj,attr,attrPath);
 					}
 				}
 			}
