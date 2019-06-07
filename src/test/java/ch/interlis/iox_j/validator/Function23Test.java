@@ -546,7 +546,7 @@ public class Function23Test {
 	public void isOfClassWithRef_Ok(){
 		String objTargetId=OBJ_OID1;
 		Iom_jObject iomObjS1=new Iom_jObject(ILI_STRUCTA, null);
-		Iom_jObject iomObjAP=new Iom_jObject(ILI_STRUCTAP, objTargetId);
+		Iom_jObject iomObjAP=new Iom_jObject(ILI_STRUCTAP, null);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
 		o1Ref.setobjectrefoid(objTargetId);
 		Iom_jObject iomObjU=new Iom_jObject(ILI_CLASSU, OBJ_OID1);
@@ -570,7 +570,7 @@ public class Function23Test {
 	@Test
 	public void isOfClassWithRefEqualToMyClass_Ok(){
 		String objTargetId=OBJ_OID1;
-		Iom_jObject iomObjAP=new Iom_jObject(ILI_STRUCTAP, objTargetId);
+		Iom_jObject iomObjAP=new Iom_jObject(ILI_STRUCTAP, null);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
 		o1Ref.setobjectrefoid(objTargetId);
 		Iom_jObject iomObjU=new Iom_jObject(ILI_CLASSUA, OBJ_OID1);
@@ -651,7 +651,7 @@ public class Function23Test {
 	public void isSubClassWithRefAndMyClass_Ok(){
 		String objTargetId=OBJ_OID1;
 		Iom_jObject iomObjS1=new Iom_jObject(ILI_STRUCTB, null);
-		Iom_jObject iomObjAP=new Iom_jObject(ILI_STRUCTBP, objTargetId);
+		Iom_jObject iomObjAP=new Iom_jObject(ILI_STRUCTBP, null);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
 		o1Ref.setobjectrefoid(objTargetId);
 		Iom_jObject iomObjU=new Iom_jObject(ILI_CLASSWA, OBJ_OID1);
@@ -1514,7 +1514,7 @@ public class Function23Test {
 	public void isOfClass_MyClassNotValid_Fail(){
 		String objTargetId=OBJ_OID1;
 		Iom_jObject iomObjS1=new Iom_jObject(ILI_STRUCTA, null);
-		Iom_jObject iomObjAP=new Iom_jObject(ILI_STRUCTAP, objTargetId);
+		Iom_jObject iomObjAP=new Iom_jObject(ILI_STRUCTAP, null);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
 		o1Ref.setobjectrefoid(objTargetId);
 		Iom_jObject iomObjU=new Iom_jObject(ILI_CLASSWB, OBJ_OID1);

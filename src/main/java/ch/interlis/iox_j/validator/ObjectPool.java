@@ -47,6 +47,7 @@ public class ObjectPool {
 		Iterator<ViewableTransferElement> rolei=assocDef.getAttributesAndRoles2();
 		String sep="";
 		tid="";
+		boolean missingRef=false;
 		while(rolei.hasNext()){
 			ViewableTransferElement prop=rolei.next();
 			if(prop.obj instanceof RoleDef && !prop.embedded){
@@ -60,9 +61,13 @@ public class ObjectPool {
 					tid=tid+sep+ref;
 					sep=":";
 				}else{
-			 		throw new IllegalStateException("REF required ("+tag+"/"+roleName+")");
+			 		//throw new IllegalStateException("REF required ("+tag+"/"+roleName+")");
+			 		missingRef=true;
 				}
 			}
+		}
+		if(missingRef) {
+		    return null;
 		}
 		return tid;
 	}
@@ -72,6 +77,9 @@ public class ObjectPool {
 		Object modelEle = tag2class.get(iomObj.getobjecttag());
 		if(oid==null){
 			oid=getAssociationId(iomObj, (AssociationDef)modelEle);
+			if(oid==null) {
+			    throw new IllegalStateException("Association with missin REF "+iomObj.getobjecttag());
+			}
 		}
 		Viewable classValue = (Viewable) modelEle;
 		ObjectPoolKey key = null;

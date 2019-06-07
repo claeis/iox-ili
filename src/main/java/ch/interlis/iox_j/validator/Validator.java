@@ -2877,11 +2877,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		
 		// validate that OID is not a BID
-		String objectoid = iomObj.getobjectoid();
-		if (objectoid != null && !objectoid.equals("")) {
-	        if (uniquenessOfBid.containsKey(objectoid)) {
-	            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.oidIsEqualToABid"), objectoid));
-	        }		    
+		if(isObject) {
+	        String objectoid=iomObj.getobjectoid();
+	        if (objectoid != null && !objectoid.equals("")) {
+	            if (uniquenessOfBid.containsKey(objectoid)) {
+	                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.oidIsEqualToABid"), objectoid));
+	            }           
+	        }
 		}
 
 		String tag=iomObj.getobjecttag();
@@ -2908,65 +2910,82 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		Viewable aclass1=(Viewable)modelele;
 		
 		boolean addToPool = true;
+		
 		if(isObject){
 			errFact.setDefaultCoord(getDefaultCoord(iomObj));
-			// validate that object is instance of a concrete class
-			if(aclass1.isAbstract()){
-				errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.objectMustBeANonAbstractClass")));
-			}
-			
-			// association
-			if (aclass1 instanceof AssociationDef){
-				AssociationDef modelAssociationDef = (AssociationDef) aclass1;
-				Domain oidType=((AbstractClassDef) modelAssociationDef).getOid();
-				if (modelAssociationDef.isIdentifiable() || oidType!=null){
-                    String oid = iomObj.getobjectoid();
-					if (oid == null){
-						errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.AssociationHasToHaveAnOid"), iomObj.getobjecttag()));
-						addToPool = false;
-					}else if (!isValidId(oid)) {
-	                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.valueIsNotAValidOid"), oid));                 
-	                }
-				}
-			} else if (aclass1 instanceof Table){
-                Table classValueTable = (Table) aclass1;
-                // class
-                if (classValueTable.isIdentifiable()) {
-                    Domain oidType=((AbstractClassDef) aclass1).getOid();
-                    String oid = iomObj.getobjectoid();
-                    if (oid == null) {
-                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.classHasToHaveAnOid"), iomObj.getobjecttag()));
-                        addToPool = false;
-                    } else if (!isValidId(oid) && oidType == null) {
-                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.valueIsNotAValidOid"), oid));
-                    }
-                    // structure
-                } else {
+		}
+        // validate that object is instance of a concrete class
+        if(aclass1.isAbstract()){
+            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.objectMustBeANonAbstractClass")));
+        }
+
+        // association
+        if (aclass1 instanceof AssociationDef){
+            AssociationDef modelAssociationDef = (AssociationDef) aclass1;
+            Domain oidType=((AbstractClassDef) modelAssociationDef).getOid();
+            String oid = iomObj.getobjectoid();
+            if (modelAssociationDef.isIdentifiable() || oidType!=null){
+                if (oid == null){
+                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.AssociationHasToHaveAnOid"), iomObj.getobjecttag()));
                     addToPool = false;
-                    if (iomObj.getobjectoid() != null) {
-                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.structureHasNotToHaveAnOid"), iomObj.getobjecttag()));
+                }else if (!isValidId(oid)) {
+                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.valueIsNotAValidOid"), oid));                 
+                }
+            }else {
+                if(oid!=null) {
+                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.associationHasNotToHaveAnOid"), iomObj.getobjecttag(),oid));
+                }else {
+                    if(isObject) {
+                        // fix current oid
+                        currentMainOid=ObjectPool.getAssociationId(iomObj, (AssociationDef)modelAssociationDef);
                     }
                 }
-			}
+            }
+        } else if (aclass1 instanceof Table){
+            Table classValueTable = (Table) aclass1;
+            if (classValueTable.isIdentifiable()) {
+                // class
+                Domain oidType=((AbstractClassDef) aclass1).getOid();
+                String oid = iomObj.getobjectoid();
+                if (oid == null) {
+                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.classHasToHaveAnOid"), iomObj.getobjecttag()));
+                    addToPool = false;
+                } else if (!isValidId(oid) && oidType == null) {
+                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.valueIsNotAValidOid"), oid));
+                }
+            } else {
+                // structure
+                addToPool = false;
+                String structId=iomObj.getobjectoid();
+                if(structId!=null){
+                    if(isObject) {
+                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.structureHasNotToHaveAnOid"), iomObj.getobjecttag()));
+                    }else {
+                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.structAttrMustNotHaveAnOid"),attrPath,tag,structId));
+                    }
+                }
+            }
+        }
+        
+        
+        if(isObject){
 			
 			if(aclass1 instanceof AbstractClassDef){
 				Domain oidType=((AbstractClassDef) aclass1).getOid();
+                String oid=iomObj.getobjectoid();
 				if(oidType!=null && oidType==td.INTERLIS.UUIDOID){
-					String oid=iomObj.getobjectoid();
 					if(oid != null && !isValidUuid(oid)){
 						errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.tidIsNotAValidUuid"), oid));
 					}
 				} else if(oidType!=null && oidType==td.INTERLIS.I32OID){
 					// valid i32OID.
 				} else if(oidType!=null && oidType==td.INTERLIS.STANDARDOID) {
-                    String currentOid = iomObj.getobjectoid();
-                    if (!isValidStandartOId(currentOid)) {
-                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.valueIsNotAValidOid"), currentOid));
+                    if (!isValidStandartOId(oid)) {
+                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.valueIsNotAValidOid"), oid));
                     }
 				} else if (oidType!=null && oidType.getType() instanceof TextOIDType) {
-				    String currentOid = iomObj.getobjectoid();
-                    if (!isValidTextOId(currentOid)) {
-                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.valueIsNotAValidOid"), currentOid));
+                    if (!isValidTextOId(oid)) {
+                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.valueIsNotAValidOid"), oid));
                     }
 				}
 			}
@@ -3073,7 +3092,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					if(objectValue!=null){
 						Object modelElement=tag2class.get(objectValue.getobjecttag());
 						Viewable classValueOfKey= (Viewable) modelElement;
-						errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.oidXOfObjectYAlreadyExistsInZ"), objectValue.getobjectoid(), iomObj.getobjecttag(), classValueOfKey.toString()));
+						errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.oidXOfObjectYAlreadyExistsInZ"), currentMainOid, iomObj.getobjecttag(), classValueOfKey.toString()));
 					}
 				}
 			}
