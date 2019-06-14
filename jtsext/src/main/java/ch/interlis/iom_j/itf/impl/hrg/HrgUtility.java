@@ -80,6 +80,7 @@ public static void CTRC3P_(double P1I,double P2I,double  S1I,double S2I,double Q
 		//of the 2 possibilities 
 		//to calculate
 		//point z
+	    // lambda1 und lambda2 (=Radius minus Pfeilhoehe auf die beiden Sehnen))
 		L1 = (G1*A22 - A12*G2)/ DETAO[0];
 		L2 = (A11*G2 - G1*A21)/ DETAO[0];
 		Z1O[0] =   (X1 + L1*N1 + Y1 + L2*M1)/ 2.00;
