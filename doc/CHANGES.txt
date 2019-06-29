@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- remove reference to javax.xml.bind.DatatypeConverter (because of removal in jdk11) 
 
 iox-ili 1.20.11 (2019-04-01)
 -----------------------------
