@@ -1104,7 +1104,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			objs=new HashSet<String>();
 			setConstraints.put(setConstraintObj,objs);
 		}
-		objs.add(iomObj.getobjectoid());
+		String oid=iomObj.getobjectoid();
+		if(oid==null) {
+	        oid=ObjectPool.getAssociationId(iomObj, (AssociationDef)td.getElement(iomObj.getobjecttag()));
+		}
+		objs.add(oid);
 	}
 	
 	private void validateSetConstraint(SetConstraint setConstraintObj) {
