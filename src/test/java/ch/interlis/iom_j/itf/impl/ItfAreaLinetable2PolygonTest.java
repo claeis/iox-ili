@@ -318,7 +318,7 @@ public class ItfAreaLinetable2PolygonTest {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("overlay 1", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 400.000), tids 1, 2", errs.get(0).getLocalizedMessage());
 			assertEquals(1, errs.size());
 		}
 	}
@@ -361,8 +361,8 @@ public class ItfAreaLinetable2PolygonTest {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("intersection tids 1, 2", errs.get(0).getLocalizedMessage());
-			assertEquals("intersection tids 1, 2", errs.get(1).getLocalizedMessage());
+			assertEquals("Intersection coord1 (340.000, 400.000), tids 1, 2", errs.get(0).getLocalizedMessage());
+			assertEquals("Intersection coord1 (160.000, 400.000), tids 1, 2", errs.get(1).getLocalizedMessage());
 			assertEquals(2, errs.size());
 		}
 	}
@@ -405,7 +405,7 @@ public class ItfAreaLinetable2PolygonTest {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("overlay 1", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 300.000), tids 1, 2", errs.get(0).getLocalizedMessage());
 			assertEquals(1, errs.size());
 		}
 	}
@@ -446,7 +446,7 @@ public class ItfAreaLinetable2PolygonTest {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("overlay 1", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 300.000), tids 1, 2", errs.get(0).getLocalizedMessage());
 			assertEquals(1, errs.size());
 		}
 	}
@@ -488,7 +488,7 @@ public class ItfAreaLinetable2PolygonTest {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("overlay 1", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 400.000), tids 1, 2", errs.get(0).getLocalizedMessage());
 			assertEquals(1, errs.size());
 		}
 	}
@@ -534,8 +534,8 @@ public class ItfAreaLinetable2PolygonTest {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("intersection tids 1, 2", errs.get(0).getLocalizedMessage());
-			assertEquals("overlay 2", errs.get(1).getLocalizedMessage());
+			assertEquals("Intersection coord1 (260.000, 400.000), tids 1, 2", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (260.000, 360.000), coord2 (260.000, 400.000), tids 2, 2", errs.get(1).getLocalizedMessage());
 			assertEquals(2, errs.size());
 		}
 	}
@@ -645,7 +645,7 @@ public class ItfAreaLinetable2PolygonTest {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("intersection tids 1, 2", errs.get(0).getLocalizedMessage());
+			assertEquals("Intersection coord1 (260.000, 80.000), tids 1, 2", errs.get(0).getLocalizedMessage());
 			assertEquals(1, errs.size());
 		}
 	}
@@ -696,7 +696,7 @@ public class ItfAreaLinetable2PolygonTest {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("overlay 2", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (200.000, 240.000), coord2 (240.000, 240.000), tids 2, 3", errs.get(0).getLocalizedMessage());
 			assertEquals(1, errs.size());
 		}
 	}
@@ -747,8 +747,8 @@ public class ItfAreaLinetable2PolygonTest {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("intersection tids 2, 3", errs.get(0).getLocalizedMessage());
-			assertEquals("intersection tids 2, 3", errs.get(1).getLocalizedMessage());
+			assertEquals("Intersection coord1 (225.000, 240.000), tids 2, 3", errs.get(0).getLocalizedMessage());
+			assertEquals("Intersection coord1 (215.000, 240.000), tids 2, 3", errs.get(1).getLocalizedMessage());
 			assertEquals(2, errs.size());
 		}
 	}
@@ -947,9 +947,9 @@ MULTISURFACE {surface SURFACE {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("overlay 1", errs.get(0).getLocalizedMessage());
-			assertEquals("overlay 1", errs.get(1).getLocalizedMessage());
-			assertEquals("overlay 1", errs.get(2).getLocalizedMessage());
+			assertEquals("Overlay coord1 (100.000, 100.000), coord2 (400.000, 100.000), tids 1, 2", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (400.000, 100.000), coord2 (400.000, 400.000), tids 1, 2", errs.get(1).getLocalizedMessage());
+			assertEquals("Overlay coord1 (100.000, 400.000), coord2 (400.000, 400.000), tids 1, 2", errs.get(2).getLocalizedMessage());
 			assertEquals(3, errs.size());
 		}
 	}
@@ -994,12 +994,12 @@ MULTISURFACE {surface SURFACE {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("overlay 1", errs.get(0).getLocalizedMessage());
-			assertEquals("overlay 1", errs.get(1).getLocalizedMessage());
-			assertEquals("overlay 1", errs.get(2).getLocalizedMessage());
-			assertEquals("overlay 1", errs.get(3).getLocalizedMessage());
-			assertEquals("overlay 1", errs.get(4).getLocalizedMessage());
-			assertEquals("overlay 1", errs.get(5).getLocalizedMessage());
+			assertEquals("Overlay coord1 (100.000, 100.000), coord2 (260.000, 100.000), tids 1, 2", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (260.000, 100.000), coord2 (400.000, 100.000), tids 1, 2", errs.get(1).getLocalizedMessage());
+			assertEquals("Overlay coord1 (400.000, 100.000), coord2 (400.000, 260.000), tids 1, 2", errs.get(2).getLocalizedMessage());
+			assertEquals("Overlay coord1 (400.000, 260.000), coord2 (400.000, 400.000), tids 1, 2", errs.get(3).getLocalizedMessage());
+			assertEquals("Overlay coord1 (260.000, 400.000), coord2 (400.000, 400.000), tids 1, 2", errs.get(4).getLocalizedMessage());
+			assertEquals("Overlay coord1 (100.000, 400.000), coord2 (260.000, 400.000), tids 1, 2", errs.get(5).getLocalizedMessage());
 			assertEquals(6, errs.size());
 		}
 	}
@@ -1040,9 +1040,9 @@ MULTISURFACE {surface SURFACE {
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
 			assertEquals(3, errs.size());
-			assertEquals("overlay 1", errs.get(0).getLocalizedMessage());
-			assertEquals("overlay 1", errs.get(1).getLocalizedMessage());
-			assertEquals("overlay 1", errs.get(2).getLocalizedMessage());
+			assertEquals("Overlay coord1 (20.000, 160.000), coord2 (240.000, 160.000), tids 1, 2", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (240.000, 160.000), coord2 (240.000, 360.000), tids 1, 2", errs.get(1).getLocalizedMessage());
+			assertEquals("Overlay coord1 (20.000, 360.000), coord2 (240.000, 360.000), tids 1, 2", errs.get(2).getLocalizedMessage());
 		}
 	}
 	
@@ -1082,8 +1082,8 @@ MULTISURFACE {surface SURFACE {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("overlay 1", errs.get(0).getLocalizedMessage());
-			assertEquals("overlay 1", errs.get(1).getLocalizedMessage());
+			assertEquals("Overlay coord1 (20.000, 160.000), coord2 (240.000, 160.000), tids 1, 2", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (20.000, 360.000), coord2 (240.000, 360.000), tids 1, 2", errs.get(1).getLocalizedMessage());
 			assertEquals(2, errs.size());
 		}
 	}
@@ -1125,8 +1125,8 @@ MULTISURFACE {surface SURFACE {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("overlay 1", errs.get(0).getLocalizedMessage());
-			assertEquals("overlay 1", errs.get(1).getLocalizedMessage());
+			assertEquals("Overlay coord1 (10.000, 26.000), coord2 (10.000, 40.000), tids 1, 2", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (10.000, 8.000), coord2 (10.000, 26.000), tids 1, 2", errs.get(1).getLocalizedMessage());
 			assertEquals(2, errs.size());
 		}
 	}
@@ -1167,7 +1167,7 @@ MULTISURFACE {surface SURFACE {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("overlay 1", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (120.000, 110.000), coord2 (120.000, 140.000), tids 1, 2", errs.get(0).getLocalizedMessage());
 			assertEquals(1, errs.size());
 		}
 	}
@@ -1208,8 +1208,8 @@ MULTISURFACE {surface SURFACE {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("intersection tids 1, 2", errs.get(0).getLocalizedMessage());
-			assertEquals("overlay 1", errs.get(1).getLocalizedMessage());
+			assertEquals("Intersection coord1 (120.000, 111.000), tids 1, 2", errs.get(0).getLocalizedMessage());
+			assertEquals("Overlay coord1 (120.000, 111.000), coord2 (120.000, 139.000), tids 1, 2", errs.get(1).getLocalizedMessage());
 			assertEquals(2, errs.size());
 		}
 	}
@@ -1261,10 +1261,10 @@ MULTISURFACE {surface SURFACE {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("intersection tids 1, 2", errs.get(0).getLocalizedMessage());
-			assertEquals("intersection tids 1, 2", errs.get(1).getLocalizedMessage());
-			assertEquals("intersection tids 1, 3", errs.get(2).getLocalizedMessage());
-			assertEquals("intersection tids 1, 3", errs.get(3).getLocalizedMessage());
+			assertEquals("Intersection coord1 (340.000, 400.000), tids 1, 2", errs.get(0).getLocalizedMessage());
+			assertEquals("Intersection coord1 (160.000, 400.000), tids 1, 2", errs.get(1).getLocalizedMessage());
+			assertEquals("Intersection coord1 (300.000, 300.000), tids 1, 3", errs.get(2).getLocalizedMessage());
+			assertEquals("Intersection coord1 (200.000, 300.000), tids 1, 3", errs.get(3).getLocalizedMessage());
 			assertEquals(4, errs.size());
 		}
 	}
@@ -1304,7 +1304,7 @@ MULTISURFACE {surface SURFACE {
 		}catch(IoxException ex){
 			IoxAssert.assertStartsWith("intersections",ex.getMessage());
 			ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-			assertEquals("intersection tids 1, 2", errs.get(0).getLocalizedMessage());
+			assertEquals("Intersection coord1 (120.000, 115.000), tids 1, 2", errs.get(0).getLocalizedMessage());
 			assertEquals(1, errs.size());
 		}
 	}

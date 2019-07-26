@@ -200,7 +200,7 @@ public class ItfAreaLinetable2Polygon {
 						p10 = e1.getSegments().get(segIndex1).getStartPoint();
 						p11 = e1.getSegments().get(segIndex1).getEndPoint();
 						if(is.isOverlay()) {
-							dataerrs.add(new IoxInvalidDataException("overlay "+is.getCurve1().getUserData(),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
+							dataerrs.add(new IoxInvalidDataException(is.toShortString(),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
 							hasIntersections=true;
 						}else if(e0!=e1 && 
 								(segIndex0==0 || segIndex0==e0.getSegments().size()-1) 
@@ -217,13 +217,7 @@ public class ItfAreaLinetable2Polygon {
 							// aufeinanderfolgende Segmente der selben Linie
 							throw new IllegalStateException("unexpected overlap; should have been removed before; "+is);
 						}else{
-							String []tids=new String[2];
-							tids[0]=(String) is.getCurve1().getUserData();
-							tids[1]=(String) is.getCurve2().getUserData();
-							dataerrs.add(new IoxInvalidDataException("intersection "+IoxInvalidDataException.formatTids(tids),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
-							if(is.getPt().length==2){
-								dataerrs.add(new IoxInvalidDataException("intersection "+IoxInvalidDataException.formatTids(tids),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[1])));
-							}
+							dataerrs.add(new IoxInvalidDataException(is.toShortString(),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
 							hasIntersections=true;
 						}
 					}
