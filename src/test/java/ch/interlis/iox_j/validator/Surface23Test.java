@@ -663,7 +663,7 @@ public class Surface23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 300000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft ob eine Overlay Fehlermeldung ausgegeben wird,
@@ -768,7 +768,7 @@ public class Surface23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 300000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn
@@ -863,8 +863,8 @@ public class Surface23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(2,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 290000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 290000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (500000.000, 290000.000), tids o1, o1", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn
@@ -970,8 +970,8 @@ public class Surface23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(2,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 300000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (510000.000, 300000.000), tids o1, o1", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
@@ -1066,7 +1066,7 @@ public class Surface23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 300000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird,
@@ -1256,8 +1256,8 @@ public class Surface23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(2,logger.getErrs().size());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Intersection coord1 (581818.182, 155454.545), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (581818.182, 180909.091), tids o1, o1", logger.getErrs().get(1).getEventMsg());
 	}	
 	
 	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
@@ -1337,7 +1337,7 @@ public class Surface23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (491666.667, 73333.333), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob eine Surface erstellt werden kann, wenn

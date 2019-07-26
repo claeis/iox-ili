@@ -127,8 +127,9 @@ public class ItfReader2Test {
              }while(!(event instanceof EndTransferEvent));
              fail();
         }catch(IoxInvalidDataException ex){
-            assertError("intersection tids 3218, 3218");
-            // assertError("failed to build polygons of Test1.TopicA.TableA.Form");
+            assertEquals("failed to build polygons",ex.getLocalizedMessage());
+            assertError("failed to build polygons of Test1.TopicA.TableA.Form");
+            assertError("Intersection coord1 (686638.497, 152674.248), tids 3218, 3218");
              // verify that the valid geometry value is read
              assertEquals("Test1.TopicA.TableA oid VeritiID34395 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 687644.618, C2 154306.589}, COORD {C1 687656.999, C2 154312.905}, COORD {C1 687662.675, C2 154315.8}, COORD {C1 687669.036, C2 154306.543}, COORD {C1 687659.196, C2 154301.648}, COORD {C1 687647.743, C2 154295.95}, COORD {C1 687644.618, C2 154306.589}]}}}}}}", 
                      objs.get("VeritiID34395").toString());

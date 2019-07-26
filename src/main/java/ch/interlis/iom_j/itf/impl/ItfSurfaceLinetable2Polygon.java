@@ -350,10 +350,7 @@ public class ItfSurfaceLinetable2Polygon {
 					tids[0]=(String) is.getCurve1().getUserData();
 					tids[1]=(String) is.getCurve2().getUserData();
 					
-					dataerrs.add(new IoxInvalidDataException("intersection "+IoxInvalidDataException.formatTids(tids),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
-					if(is.getPt().length==2){
-						dataerrs.add(new IoxInvalidDataException("intersection "+IoxInvalidDataException.formatTids(tids),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[1])));
-					}
+                    dataerrs.add(new IoxInvalidDataException(is.toShortString(),linetableIliqname,null,Jtsext2iox.JTS2coord(is.getPt()[0])));
 					hasIntersections=true;
 				}
 			}

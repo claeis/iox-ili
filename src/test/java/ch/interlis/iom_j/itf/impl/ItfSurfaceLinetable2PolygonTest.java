@@ -282,7 +282,7 @@ public class ItfSurfaceLinetable2PolygonTest {
 		builder.addItfLinetableObject(linetableObj);
         builder.buildSurfaces();
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-        assertEquals("Overlay coord1 (100.0, 100.0, NaN), coord2 (100.0, 400.0, NaN), tids 1, 2", errs.get(0).getLocalizedMessage());
+        assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 400.000), tids 1, 2", errs.get(0).getLocalizedMessage());
         assertEquals(1, errs.size());
 	}
 	
@@ -320,8 +320,8 @@ public class ItfSurfaceLinetable2PolygonTest {
 		builder.addItfLinetableObject(linetableObj);
         builder.buildSurfaces();
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-        assertEquals("intersection tids 1, 2", errs.get(0).getLocalizedMessage());
-        assertEquals("intersection tids 1, 2", errs.get(1).getLocalizedMessage());
+        assertEquals("Intersection coord1 (340.000, 400.000), tids 1, 2", errs.get(0).getLocalizedMessage());
+        assertEquals("Intersection coord1 (160.000, 400.000), tids 1, 2", errs.get(1).getLocalizedMessage());
         assertEquals(2, errs.size());
 	}
 	
@@ -361,7 +361,7 @@ public class ItfSurfaceLinetable2PolygonTest {
         builder.buildSurfaces();
         // muss fehler overlay liefern.
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-        assertEquals("Overlay coord1 (100.0, 100.0, NaN), coord2 (100.0, 300.0, NaN), tids 1, 2", errs.get(0).getLocalizedMessage());
+        assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 300.000), tids 1, 2", errs.get(0).getLocalizedMessage());
         assertEquals(1, errs.size());
 	}
 	
@@ -399,7 +399,7 @@ public class ItfSurfaceLinetable2PolygonTest {
         builder.buildSurfaces();
         // muss fehler: overlay liefern und nicht dangles.
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-        assertEquals("Overlay coord1 (100.0, 100.0, NaN), coord2 (100.0, 300.0, NaN), tids 1, 2", errs.get(0).getLocalizedMessage());
+        assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 300.000), tids 1, 2", errs.get(0).getLocalizedMessage());
         assertEquals(1, errs.size());
 	}
 	
@@ -438,7 +438,7 @@ public class ItfSurfaceLinetable2PolygonTest {
         builder.buildSurfaces();
         // muss fehler: overlay liefern und keine dangles.
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-        assertEquals("Overlay coord1 (100.0, 100.0, NaN), coord2 (100.0, 400.0, NaN), tids 1, 2", errs.get(0).getLocalizedMessage());
+        assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 400.000), tids 1, 2", errs.get(0).getLocalizedMessage());
         assertEquals(1, errs.size());
 	}
 	
@@ -479,8 +479,8 @@ public class ItfSurfaceLinetable2PolygonTest {
         builder.buildSurfaces();
         // muss fehler: overlay und intersections liefern
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-        assertEquals("intersection tids 1, 2", errs.get(0).getLocalizedMessage());
-        assertEquals("Overlay coord1 (260.0, 360.0, NaN), coord2 (260.0, 400.0, NaN), tids 2, 2", errs.get(1).getLocalizedMessage());
+        assertEquals("Intersection coord1 (260.000, 400.000), tids 1, 2", errs.get(0).getLocalizedMessage());
+        assertEquals("Overlay coord1 (260.000, 360.000), coord2 (260.000, 400.000), tids 2, 2", errs.get(1).getLocalizedMessage());
         assertEquals(2, errs.size());
 	}
 	
@@ -649,7 +649,7 @@ public class ItfSurfaceLinetable2PolygonTest {
 		}
         builder.buildSurfaces();
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-        assertEquals("Overlay coord1 (200.0, 240.0, NaN), coord2 (240.0, 240.0, NaN), tids 2, 3", errs.get(0).getLocalizedMessage());
+        assertEquals("Overlay coord1 (200.000, 240.000), coord2 (240.000, 240.000), tids 2, 3", errs.get(0).getLocalizedMessage());
         assertEquals(1, errs.size());
 	}
 	
@@ -696,8 +696,8 @@ public class ItfSurfaceLinetable2PolygonTest {
 		}
         builder.buildSurfaces();
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-        assertEquals("intersection tids 2, 3", errs.get(0).getLocalizedMessage());
-        assertEquals("intersection tids 2, 3", errs.get(1).getLocalizedMessage());
+        assertEquals("Intersection coord1 (552.500, 150.000), tids 2, 3", errs.get(0).getLocalizedMessage());
+        assertEquals("Intersection coord1 (547.500, 150.000), tids 2, 3", errs.get(1).getLocalizedMessage());
         assertEquals(2, errs.size());
 	}
 	

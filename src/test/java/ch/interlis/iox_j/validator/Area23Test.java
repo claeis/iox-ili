@@ -13,6 +13,8 @@ import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iom_j.xtf.XtfWriter;
+import ch.interlis.iox.IoxException;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
@@ -552,8 +554,8 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(2,logger.getErrs().size());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Intersection coord1 (550000.000, 100000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (550000.000, 100000.000), tids o1, o1", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft, ob 2 Polygone die sich ueberlappen mit ausgeschalteter
@@ -674,10 +676,10 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==5);
-		assertEquals("Intersection coord1 (500000.0, 77000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection coord1 (503500.0, 77000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(1).getEventMsg());
-		assertEquals("Intersection coord1 (500000.0, 77285.71428571429, NaN), tid1 o1, tid2 o2", logger.getErrs().get(2).getEventMsg());
-		assertEquals("Intersection coord1 (503669.06474820146, 77338.12949640288, NaN), tid1 o1, tid2 o2", logger.getErrs().get(3).getEventMsg());
+		assertEquals("Intersection coord1 (500000.000, 77000.000), tids o1, o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (503500.000, 77000.000), tids o1, o2", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Intersection coord1 (500000.000, 77285.714), tids o1, o2", logger.getErrs().get(2).getEventMsg());
+		assertEquals("Intersection coord1 (503669.065, 77338.129), tids o1, o2", logger.getErrs().get(3).getEventMsg());
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(4).getEventMsg());
 	}
 	
@@ -841,10 +843,10 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==5);
-		assertEquals("Intersection coord1 (545000.0, 200000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection coord1 (555000.0, 200000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(1).getEventMsg());
-		assertEquals("Intersection coord1 (547000.0, 180000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(2).getEventMsg());
-		assertEquals("Intersection coord1 (553000.0, 180000.0, NaN), tid1 o1, tid2 o2", logger.getErrs().get(3).getEventMsg());
+		assertEquals("Intersection coord1 (545000.000, 200000.000), tids o1, o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (555000.000, 200000.000), tids o1, o2", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Intersection coord1 (547000.000, 180000.000), tids o1, o2", logger.getErrs().get(2).getEventMsg());
+		assertEquals("Intersection coord1 (553000.000, 180000.000), tids o1, o2", logger.getErrs().get(3).getEventMsg());
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(4).getEventMsg());
 	}
 	
@@ -1463,8 +1465,8 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==3);
-		assertEquals("Overlay coord1 (540000.0, 150000.0, NaN), coord2 (540000.0, 160000.0, NaN), tids o1, o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Overlay coord1 (540000.0, 160000.0, NaN), coord2 (540000.0, 200000.0, NaN), tids o1, o2", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Overlay coord1 (540000.000, 150000.000), coord2 (540000.000, 160000.000), tids o1, o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (540000.000, 160000.000), coord2 (540000.000, 200000.000), tids o1, o2", logger.getErrs().get(1).getEventMsg());
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(2).getEventMsg());
 	}
 	
@@ -1787,7 +1789,7 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (600000.0, 100000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (600000.000, 100000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -1878,7 +1880,7 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (600000.0, 100000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (600000.000, 100000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -1975,7 +1977,7 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 200000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 200000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -2080,8 +2082,8 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(2,logger.getErrs().size());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Overlay coord1 (500000.0, 200000.0, NaN), coord2 (550000.0, 200000.0, NaN), tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Intersection coord1 (550000.000, 200000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (500000.000, 200000.000), coord2 (550000.000, 200000.000), tids o1, o1", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -2198,9 +2200,9 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(3,logger.getErrs().size());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Overlay coord1 (500000.0, 200000.0, NaN), coord2 (550000.0, 200000.0, NaN), tids o1, o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 200000.0, NaN), tids o1, o1", logger.getErrs().get(2).getEventMsg());
+		assertEquals("Intersection coord1 (550000.000, 200000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (500000.000, 200000.000), coord2 (550000.000, 200000.000), tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 200000.000), tids o1, o1", logger.getErrs().get(2).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn Dangles erstellt wurden.
@@ -2395,8 +2397,8 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(2,logger.getErrs().size());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Intersection coord1 (581818.182, 155454.545), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (581818.182, 180909.091), tids o1, o1", logger.getErrs().get(1).getEventMsg());
 	}	
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -2476,7 +2478,7 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (491666.667, 73333.333), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn diese aus 3d Koordinaten besteht,
@@ -2890,8 +2892,8 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==3);
-		assertEquals("Overlay coord1 (540000.0, 100000.0, NaN), coord2 (540000.0, 150000.0, NaN), tids o1, o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Overlay coord1 (540000.0, 150000.0, NaN), coord2 (540000.0, 200000.0, NaN), tids o1, o2", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Overlay coord1 (540000.000, 100000.000), coord2 (540000.000, 150000.000), tids o1, o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Overlay coord1 (540000.000, 150000.000), coord2 (540000.000, 200000.000), tids o1, o2", logger.getErrs().get(1).getEventMsg());
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(2).getEventMsg());
 	}
 	
@@ -3050,8 +3052,8 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(2,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.0, 100000.0, NaN), coord2 (500000.0, 290000.0, NaN), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 290000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (500000.000, 290000.000), tids o1, o1", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn
@@ -4074,6 +4076,130 @@ public class Area23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    // prueft, ob die Validierung die ueberdeckung feststellt, wenn ein Polygon,
+    // genau ueber einem InnerBoundary einer anderen Polygon liegt.
+    @Test
+    public void twoPolygonWithArc_Polygon2ExactlyOverInnerBoundaryOfPolygon1_Ok() throws Exception{
+        IomObject innerBoundary = null;
+        Iom_jObject obj1=new Iom_jObject(ILI_CLASSD, OID1);
+        IomObject multisurface=obj1.addattrobj("area2d", "MULTISURFACE");
+        IomObject surfaceValue = multisurface.addattrobj("surface", "SURFACE");
+        {
+            IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+            {
+                // polyline 1
+                IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+                IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+                IomObject startSegment=segments.addattrobj("segment", "COORD");
+                startSegment.setattrvalue("C1", "500000.000");
+                startSegment.setattrvalue("C2", "100000.000");
+                IomObject endSegment=segments.addattrobj("segment", "COORD");
+                endSegment.setattrvalue("C1", "600000.000");
+                endSegment.setattrvalue("C2", "100000.000");
+            }
+            {
+                // polyline 2
+                IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+                IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+                IomObject startSegment=segments.addattrobj("segment", "COORD");
+                startSegment.setattrvalue("C1", "600000.000");
+                startSegment.setattrvalue("C2", "100000.000");
+                IomObject endSegment=segments.addattrobj("segment", "COORD");
+                endSegment.setattrvalue("C1", "600000.000");
+                endSegment.setattrvalue("C2", "200000.000");
+            }
+            {
+                // polyline 3
+                IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+                IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+                IomObject startSegment=segments.addattrobj("segment", "COORD");
+                startSegment.setattrvalue("C1", "600000.000");
+                startSegment.setattrvalue("C2", "200000.000");
+                IomObject endSegment=segments.addattrobj("segment", "COORD");
+                endSegment.setattrvalue("C1", "500000.000");
+                endSegment.setattrvalue("C2", "200000.000");
+            }
+            {
+                // polyline 4
+                IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+                IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+                IomObject startSegment=segments.addattrobj("segment", "COORD");
+                startSegment.setattrvalue("C1", "500000.000");
+                startSegment.setattrvalue("C2", "200000.000");
+                IomObject endSegment=segments.addattrobj("segment", "COORD");
+                endSegment.setattrvalue("C1", "500000.000");
+                endSegment.setattrvalue("C2", "100000.000");
+            }
+            innerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+            {
+                // polyline 1
+                IomObject polyline = innerBoundary.addattrobj("polyline", "POLYLINE");
+                IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+                IomObject startSegment=segments.addattrobj("segment", "COORD");
+                startSegment.setattrvalue("C1", "540000.000");
+                startSegment.setattrvalue("C2", "140000.000");
+                IomObject endSegment=segments.addattrobj("segment", "ARC");
+                endSegment.setattrvalue("A1", "555000.000");
+                //endSegment.setattrvalue("A2", "139800.000");
+                endSegment.setattrvalue("A2", "140100.000");
+                endSegment.setattrvalue("C1", "560000.000");
+                endSegment.setattrvalue("C2", "140000.000");
+            }
+            {
+                // polyline 2
+                IomObject polyline = innerBoundary.addattrobj("polyline", "POLYLINE");
+                IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+                IomObject startSegment=segments.addattrobj("segment", "COORD");
+                startSegment.setattrvalue("C1", "560000.000");
+                startSegment.setattrvalue("C2", "140000.000");
+                IomObject endSegment=segments.addattrobj("segment", "COORD");
+                endSegment.setattrvalue("C1", "560000.000");
+                endSegment.setattrvalue("C2", "160000.000");
+            }
+            {
+                // polyline 3
+                IomObject polyline = innerBoundary.addattrobj("polyline", "POLYLINE");
+                IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+                IomObject startSegment=segments.addattrobj("segment", "COORD");
+                startSegment.setattrvalue("C1", "560000.000");
+                startSegment.setattrvalue("C2", "160000.000");
+                IomObject endSegment=segments.addattrobj("segment", "COORD");
+                endSegment.setattrvalue("C1", "540000.000");
+                endSegment.setattrvalue("C2", "160000.000");
+            }
+            {
+                // polyline 4
+                IomObject polyline = innerBoundary.addattrobj("polyline", "POLYLINE");
+                IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+                IomObject startSegment=segments.addattrobj("segment", "COORD");
+                startSegment.setattrvalue("C1", "540000.000");
+                startSegment.setattrvalue("C2", "160000.000");
+                IomObject endSegment=segments.addattrobj("segment", "COORD");
+                endSegment.setattrvalue("C1", "540000.000");
+                endSegment.setattrvalue("C2", "140000.000");
+            }
+        }
+        Iom_jObject obj2=new Iom_jObject(ILI_CLASSD, OID2);
+        IomObject multisurface2=obj2.addattrobj("area2d", "MULTISURFACE");
+        IomObject surfaceValue2 = multisurface2.addattrobj("surface", "SURFACE");
+        {
+            surfaceValue2.addattrobj("boundary", innerBoundary);
+        }
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        //settings.setValue(Validator.CONFIG_DEBUG_XTFOUT, "src/test/data/validator/out.xtf");
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+        validator.validate(new ObjectEvent(obj1));
+        validator.validate(new ObjectEvent(obj2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);        
+    }
 	
 	// es wird eine Fehlermeldung erwartet, da ein Polygon, nicht genau ueber einem InnerBoundary einer anderen Polygon liegt.
 	@Test
@@ -4383,7 +4509,7 @@ public class Area23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (480000.003, 70000.002), tids o1, o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
     @Test
