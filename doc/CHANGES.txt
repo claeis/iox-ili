@@ -6,7 +6,8 @@ ideas/open issues
 LATEST
 -----------------------------
 - remove reference to javax.xml.bind.DatatypeConverter (because of removal in jdk11) 
-- show coord in XTF interscetion errormessage
+- Validator: show coord in XTF interscetion errormessage
+- Validator: fixed NPE: if structAttributeName element without a nested structure element
 
 iox-ili 1.20.11 (2019-04-01)
 -----------------------------

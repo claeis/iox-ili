@@ -762,7 +762,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								int structc=iomObj.getattrvaluecount(attrName);
 								 for(int structi=0;structi<structc;structi++){
 									IomObject structValue=iomObj.getattrobj(attrName, structi);
-									validateReferenceAttrs(attr.getScopedName(),structValue, structure, objectBid);
+									if(structValue==null) {
+									    // invalid: structAttributeName element without a nested structure element
+									    // but already reported in validateAttrValue()
+									}else {
+	                                    validateReferenceAttrs(attr.getScopedName(),structValue, structure, objectBid);
+									}
 								}
 							}
 						}else if(objA.obj instanceof RoleDef){
