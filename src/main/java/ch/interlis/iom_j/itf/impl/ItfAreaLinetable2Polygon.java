@@ -25,6 +25,7 @@ import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.itf.ModelUtilities;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurveRing;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurvePolygon;
@@ -58,7 +59,7 @@ use STRTree and PreparedPolygon to implement Point-In-Polygon test
 
 */	
 
-public class ItfAreaLinetable2Polygon {
+public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 	private Map<String,Polygon> polygons=new HashMap<String,Polygon>();
 	private Map<String,IomObject> mainTids=new HashMap<String,IomObject>();
 	private Map<String,IomObject> lines=null; 
@@ -74,6 +75,9 @@ public class ItfAreaLinetable2Polygon {
 	private String linetableIliqname=null;
 	private String geomattrIliqname=null;
 	private boolean allowItfAreaHoles=true; // default is like Interlis2 (not exactly according to Interlis1 spec)
+    private boolean keepLinetables=false;
+    private String mainTableRef1=null;
+    private String mainTableRef2=null;
 
 	public ItfAreaLinetable2Polygon(AttributeDef surfaceAttr,boolean ignorePolygonBuildingErrors1)
 	{
@@ -110,15 +114,17 @@ public class ItfAreaLinetable2Polygon {
 		}
 		
 	}
+	@Override
 	public void close()
 	{
+        lines=null;
+        mainTids=null;
 		if(objPool!=null){
-			lines=null;
-			mainTids=null;
 			objPool.close();
 			objPool=null;
 		}
 	}
+	@Override
 	public void addItfLinetableObject(IomObject iomObj)
 	{
 		if(lines==null){
@@ -135,10 +141,20 @@ public class ItfAreaLinetable2Polygon {
 	{
 		mainTids.put(tid, iomCoord);
 	}
+	@Override
 	public Iterator<String> mainTableTidIterator()
 	{
 		return mainTids.keySet().iterator();
 	}
+	@Override
+    public Iterator<String> lineTableTidIterator()
+    {
+        if(!keepLinetables || lines==null) {
+            throw new IllegalStateException("no linetable kept");
+        }
+        return lines.keySet().iterator();
+    }
+	@Override
 	public IomObject getSurfaceObject(String mainObjectTid) throws IoxException
 	{
 		if(!surfacesBuilt){
@@ -160,6 +176,7 @@ public class ItfAreaLinetable2Polygon {
 	      System.gc();
 	      return Runtime.getRuntime().totalMemory()- Runtime.getRuntime().freeMemory();
 	  }  
+	@Override
 	public void buildSurfaces() throws IoxException
 	{
 			surfacesBuilt=true;
@@ -172,9 +189,11 @@ public class ItfAreaLinetable2Polygon {
 
 			ArrayList<CompoundCurve> segv=lineset.buildBoundaries(lines,jtsFact);
 			lineset=null;
-			lines=null;		
-			objPool.close();
-			objPool=null;
+			if(!keepLinetables) {
+	            lines=null;     
+	            objPool.close();
+	            objPool=null;
+			}
 
 			EhiLogger.traceState("validate noding..."+helperTableGeomAttrName+", maxOverlaps "+maxOverlaps+", offset "+newVertexOffset);
 			for(CompoundCurve seg : segv){
@@ -361,6 +380,22 @@ public class ItfAreaLinetable2Polygon {
 					}
 				}
 			}
+			if(keepLinetables) {
+	            for(String tid:mainTids.keySet()){
+	                Polygon poly=polygons.get(tid);
+	                for(String lineTid:getTidAsArray(poly)){
+	                    IomObject line=getLineObject(lineTid);
+	                    if(line.getattrvaluecount(mainTableRef1)==0) {
+	                        line.setattrvalue(mainTableRef1, tid);
+	                    }else if(line.getattrvaluecount(mainTableRef2)==0) {
+	                        line.setattrvalue(mainTableRef2, tid);
+	                    }else {
+	                        throw new IllegalStateException("more than two refs in line");
+	                    }
+	                    lines.put(lineTid, line); // keep file up-to-date
+	                }
+	            }
+			}
 		}
 	public String getTids(Polygon hit) {
 		StringBuilder hitTids=new StringBuilder();
@@ -391,6 +426,34 @@ public class ItfAreaLinetable2Polygon {
 		}
 		return hitTids.toString();
 	}
+    public String[] getTidAsArray(Polygon hit) {
+        ArrayList<String> hitTids=new ArrayList<String>();
+        if(hit instanceof CurvePolygon){
+            CurvePolygon cp=(CurvePolygon) hit;
+            String sep="";
+            ArrayList<CurveSegment> segs=new ArrayList<CurveSegment>();
+            CompoundCurveRing c=(CompoundCurveRing) cp.getExteriorRing();
+            for(CompoundCurve cv:c.getLines()){
+                segs.addAll(cv.getSegments());
+            }
+            for(int ri=0;ri<cp.getNumInteriorRing();ri++){
+                c=(CompoundCurveRing) cp.getInteriorRingN(ri);
+                for(CompoundCurve cv:c.getLines()){
+                    segs.addAll(cv.getSegments());
+                }
+            }
+            java.util.HashSet<String> uniqueTids=new java.util.HashSet<String>();
+            for(CurveSegment seg:segs){
+                String tidx=seg.getUserData().toString();
+                if(!uniqueTids.contains(tidx)){
+                    hitTids.add(tidx);
+                    uniqueTids.add(tidx);
+                }
+            }
+        }
+        return hitTids.toArray(new String[hitTids.size()]);
+    }
+    @Override
 	public ArrayList<IoxInvalidDataException> getDataerrs() {
 		return dataerrs;
 	}
@@ -400,4 +463,21 @@ public class ItfAreaLinetable2Polygon {
 	public void setAllowItfAreaHoles(boolean allowItfAreaHoles) {
 		this.allowItfAreaHoles = allowItfAreaHoles;
 	}
+	@Override
+    public boolean isKeepLinetables() {
+        return keepLinetables;
+    }
+	@Override
+    public void setKeepLinetables(boolean keepLinetables,String ref1,String ref2) {
+        this.keepLinetables = keepLinetables;
+        this.mainTableRef1=ref1;
+        this.mainTableRef2=ref2;
+    }
+    @Override
+    public IomObject getLineObject(String lineTid) {
+        if(!keepLinetables || lines==null) {
+            throw new IllegalStateException("no linetable kept");
+        }
+        return lines.get(lineTid);
+    }
 }

@@ -105,6 +105,33 @@ public class ItfReader2Test {
 				 objs.get("10").toString());
 	}
     @Test
+    public void testSURFACEwithLinetables() throws Iox2jtsException, IoxException {
+        ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceBasic.itf"),false);
+        reader.setModel(td);
+        reader.setReadLinetables(true);
+        IoxEvent event=null;
+        HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
+         do{
+                event=reader.read();
+                if(event instanceof StartTransferEvent){
+                }else if(event instanceof StartBasketEvent){
+                }else if(event instanceof ObjectEvent){
+                    IomObject iomObj=((ObjectEvent)event).getIomObject();
+                    assertNotNull(iomObj.getobjectoid());
+                    objs.put(iomObj.getobjectoid(), iomObj);
+                }else if(event instanceof EndBasketEvent){
+                }else if(event instanceof EndTransferEvent){
+                }
+         }while(!(event instanceof EndTransferEvent));
+         assertEquals(3,objs.size());
+         assertEquals("Test1.TopicA.TableA oid 10 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}}", 
+                 objs.get("10").toString());
+         assertEquals("Test1.TopicA.TableA_Form oid 1 {_itf_geom_TableA POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 120.0, C2 140.0}]}}, _itf_ref_TableA -> 10 REF {}}", 
+                 objs.get("1").toString());
+         assertEquals("Test1.TopicA.TableA_Form oid 2 {_itf_geom_TableA POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 140.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 110.0, C2 110.0}]}}, _itf_ref_TableA -> 10 REF {}}", 
+                 objs.get("2").toString());
+    }
+    @Test
     public void testSURFACEintersection() throws Iox2jtsException, IoxException {
         EhiLogger.getInstance().setTraceFilter(false);
         ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceIntersection.itf"),false);
@@ -281,6 +308,42 @@ public class ItfReader2Test {
 		 assertEquals("Test1.TopicB.TableB oid 10 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}, _itf_Form COORD {C1 115.0, C2 115.0}}", 
 				 objs.get("10").toString());
 	}
+    @Test
+    public void testAREAwithLinetables() throws Iox2jtsException, IoxException {
+        ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/AreaTwoPolygons.itf"),false);
+        reader.setModel(td);
+        reader.setReadLinetables(true);
+        IoxEvent event=null;
+        HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
+         do{
+                event=reader.read();
+                if(event instanceof StartTransferEvent){
+                }else if(event instanceof StartBasketEvent){
+                }else if(event instanceof ObjectEvent){
+                    IomObject iomObj=((ObjectEvent)event).getIomObject();
+                    assertNotNull(iomObj.getobjectoid());
+                    objs.put(iomObj.getobjectoid(), iomObj);
+                }else if(event instanceof EndBasketEvent){
+                }else if(event instanceof EndTransferEvent){
+                }
+         }while(!(event instanceof EndTransferEvent));   
+         assertEquals(5,objs.size());
+         assertNotNull(objs.get("1"));
+         assertNotNull(objs.get("2"));
+         assertNotNull(objs.get("3"));
+         assertNotNull(objs.get("10"));
+         assertNotNull(objs.get("11"));
+         assertEquals("Test1.TopicB.TableB_Form oid 1 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 140.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 110.0, C2 110.0}, COORD {C1 120.0, C2 110.0}]}}, _itf_ref_TableB 10}", 
+                 objs.get("1").toString());
+         assertEquals("Test1.TopicB.TableB_Form oid 2 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 110.0}, COORD {C1 120.0, C2 140.0}]}}, _itf_ref2_TableB 11, _itf_ref_TableB 10}", 
+                 objs.get("2").toString());
+         assertEquals("Test1.TopicB.TableB_Form oid 3 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 110.0}, COORD {C1 130.0, C2 110.0}, COORD {C1 130.0, C2 140.0}, COORD {C1 120.0, C2 140.0}]}}, _itf_ref_TableB 11}", 
+                 objs.get("3").toString());
+         assertEquals("Test1.TopicB.TableB oid 10 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}, _itf_Form COORD {C1 115.0, C2 115.0}}", 
+                 objs.get("10").toString());
+         assertEquals("Test1.TopicB.TableB oid 11 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 110.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 130.0, C2 140.0}, COORD {C1 130.0, C2 110.0}, COORD {C1 120.0, C2 110.0}]}}}}}, _itf_Form COORD {C1 125.0, C2 115.0}}", 
+                 objs.get("11").toString());
+    }
 	@Test
 	public void testAREAundefined() throws Iox2jtsException, IoxException {
 		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/AreaUndefined.itf"),false);

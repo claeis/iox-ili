@@ -99,9 +99,10 @@ THEN: Fehler; Abbruch
 Polygon aus Raendern zusammensetzen   
 */	
 
-public class ItfSurfaceLinetable2Polygon {
+public class ItfSurfaceLinetable2Polygon implements Linetable2Polygon {
 	private Map<String,Polygon> polygons=null;
 	private Set<String> mainTids=new java.util.HashSet<String>();
+    private Map<String,String> lineTid2mainTid=new java.util.HashMap<String,String>();
 	private Map<String,java.util.List<IomObject>> linepool=null;
 	private boolean surfacesBuilt=false;
 	private String helperTableMainTableRef=null;
@@ -111,6 +112,7 @@ public class ItfSurfaceLinetable2Polygon {
 	private double maxOverlaps=0.0;
 	private double newVertexOffset=0.0;
 	private ObjectPoolManager objPool=null;
+    private boolean keepLinetables=false;
 	private boolean ignorePolygonBuildingErrors=false;
 	ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
 	private String linetableIliqname=null;
@@ -156,6 +158,7 @@ public class ItfSurfaceLinetable2Polygon {
 		}
 		
 	}
+	@Override
 	public void close()
 	{
 		if(objPool!=null){
@@ -166,36 +169,41 @@ public class ItfSurfaceLinetable2Polygon {
 			objPool=null;
 		}
 	}
+	@Override
 	public void addItfLinetableObject(IomObject iomObj)
 	{
 		if(linepool==null){
 			linepool=objPool.newObjectPoolImpl2(new IomObjectArraySerializer());
 		}
 		IomObject structvalue=iomObj.getattrobj(helperTableMainTableRef,0);
-		String refoid=structvalue.getobjectrefoid();
-		if(refoid==null) {
+		String mainTid=structvalue.getobjectrefoid();
+		if(mainTid==null) {
 			dataerrs.add(new IoxInvalidDataException("boundary line without reference to main table",linetableIliqname,iomObj.getobjectoid(),iomObj));
 			return;
 		}
 		java.util.List<IomObject> lines=null;
-		if(linepool.containsKey(refoid)){
-            lines=new java.util.ArrayList<IomObject>(linepool.get(refoid));
+		if(linepool.containsKey(mainTid)){
+            lines=new java.util.ArrayList<IomObject>(linepool.get(mainTid));
 			lines.add(iomObj);
-			linepool.put(refoid,lines);
+			linepool.put(mainTid,lines);
 		}else{
 			lines=new java.util.ArrayList<IomObject>();
 			lines.add(iomObj);
-			linepool.put(refoid,lines);
+			linepool.put(mainTid,lines);
 		}
+        String lineTid=iomObj.getobjectoid();
+        lineTid2mainTid.put(lineTid, mainTid);
 	}
 	public void addMainObjectTid(String tid)
 	{
 		mainTids.add(tid);
 	}
+	@Override
 	public Iterator<String> mainTableTidIterator()
 	{
 		return mainTids.iterator();
 	}
+	@Override
 	public IomObject getSurfaceObject(String mainObjectTid) throws IoxException
 	{
 		if(!surfacesBuilt){
@@ -210,6 +218,7 @@ public class ItfSurfaceLinetable2Polygon {
 		}
 		return null;
 	}
+	@Override
 	public void buildSurfaces() throws IoxException
 	{
 		surfacesBuilt=true;
@@ -490,8 +499,32 @@ public class ItfSurfaceLinetable2Polygon {
 		}
 		
 	}
+	@Override
 	public ArrayList<IoxInvalidDataException> getDataerrs() {
 		return dataerrs;
 	}
+	@Override
+    public boolean isKeepLinetables() {
+        return keepLinetables;
+    }
+	@Override
+    public void setKeepLinetables(boolean keepLinetables, String ref1, String ref2) {
+        this.keepLinetables = keepLinetables;
+    }
+    @Override
+    public Iterator<String> lineTableTidIterator() {
+        return lineTid2mainTid.keySet().iterator();
+    }
+    @Override
+    public IomObject getLineObject(String lineTid) {
+        String mainTid=lineTid2mainTid.get(lineTid);
+        java.util.List<IomObject> lines=linepool.get(mainTid);
+        for(IomObject line:lines){
+            if(lineTid.equals(line.getobjectoid())) {
+                return line;
+            }
+        }
+        return null;
+    }
 }
 

@@ -35,6 +35,7 @@ import ch.interlis.iox.IoxDataPool;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
+import ch.interlis.iom_j.itf.impl.LineobjectIterator;
 import ch.interlis.iom_j.itf.impl.ItfAreaLinetable2Polygon;
 import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
 import ch.interlis.iom.*;
@@ -55,11 +56,14 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 	private ItfReader rawReader=null;
 	// maintable object buffer
 	private java.util.Map<String,IomObject> currentMainObjs=null;
+    private LineobjectIterator currentAreaAttrsIt=null;
+    private LineobjectIterator currentSurfaceAttrsIt=null;
 	private HashMap<AttributeDef,ItfSurfaceLinetable2Polygon> currentSurfaceAttrs=null;
 	private HashMap<AttributeDef,ItfAreaLinetable2Polygon> currentAreaAttrs=null;
 	private ObjectPoolManager objPool=null;
 	private ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
 	private boolean ignorePolygonBuildingErrors=false;
+	private boolean readLinetables=false;
 	private boolean allowItfAreaHoles=true; // default is like Interlis2 (not exactly according to Interlis1 spec)
 	private PipelinePool ioxDataPool=null;
 	private LogEventFactory errFact=null;
@@ -147,6 +151,13 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 		
 		// more buffered main objects?
 		if(currentMainObjs!=null){
+		    if(readLinetables) {
+		        if(currentAreaAttrsIt.hasNext()) {
+		            IomObject lineObj=currentAreaAttrsIt.next();
+	                return new ObjectEvent(lineObj);
+		        }
+		        // return surface linetable objects after main objects
+		    }
 			if(currentMainObjs.size()>0){
 				String nextTid=currentMainObjs.keySet().iterator().next();
 				IomObject nextObj=currentMainObjs.get(nextTid);
@@ -165,10 +176,18 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 				}
 				return new ObjectEvent(nextObj);
 			}
+            if(readLinetables) {
+                if(currentSurfaceAttrsIt.hasNext()) {
+                    IomObject lineObj=currentSurfaceAttrsIt.next();
+                    return new ObjectEvent(lineObj);
+                }
+            }
 			closePolygonizers();
 			currentMainObjs=null;
 			currentSurfaceAttrs=null;
+            currentSurfaceAttrsIt=null;
 			currentAreaAttrs=null;
+            currentAreaAttrsIt=null;
 		}
 
 		IoxEvent rawEvent=null;
@@ -361,7 +380,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 				}
 			}
 			// polygonize all collected linetables
-			// FOR all area attrs: polygonize and add polygon to main object
+			// FOR all area attrs: polygonize
 			for(AttributeDef areaAttr : currentAreaAttrs.keySet()){
 				String areaAttrName=areaAttr.getName();
 				setTopologyValidationDone(areaAttr);
@@ -382,7 +401,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 					continue;
 				}
 			}
-			// FOR all surface attrs: polygonize and add polygon to main object
+			// FOR all surface attrs: polygonize
 			for(AttributeDef surfaceAttr : currentSurfaceAttrs.keySet()){
 				String surfaceAttrName=surfaceAttr.getName();
 				setTopologyValidationDone(surfaceAttr);
@@ -406,6 +425,16 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 			if(currentMainObjs.keySet().size()==0) {
 				dataerrs.add( new IoxInvalidDataException("no main objects of "+aclass.getScopedName()+" but linetable objects"));
 				return null;
+			}
+			if(readLinetables) {
+	            currentAreaAttrsIt=new LineobjectIterator(currentAreaAttrs);
+                currentSurfaceAttrsIt=new LineobjectIterator(currentSurfaceAttrs);
+	            if(currentAreaAttrsIt.hasNext()) {
+	                IomObject lineObj=currentAreaAttrsIt.next();
+	                return new ObjectEvent(lineObj);
+	            }
+	            // do not return surface line table object here
+	            // return surface linetable objects after main objects
 			}
 			String nextTid=currentMainObjs.keySet().iterator().next();
 			IomObject nextObj=currentMainObjs.get(nextTid);
@@ -531,10 +560,13 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 			AttributeDef attr = (AttributeDef) attrObj;
 			Type type = Type.findReal (attr.getDomain());
 			if(type instanceof SurfaceType){
-				attrs_surfaceAttrs.put(attr, new ItfSurfaceLinetable2Polygon(attr,ignorePolygonBuildingErrors));
+			    ItfSurfaceLinetable2Polygon polygonBuilder=new ItfSurfaceLinetable2Polygon(attr,ignorePolygonBuildingErrors);
+                polygonBuilder.setKeepLinetables(readLinetables,ModelUtilities.getHelperTableMainTableRef(attr),ModelUtilities.getHelperTableMainTableRef2(attr));
+				attrs_surfaceAttrs.put(attr, polygonBuilder);
 			}else if(type instanceof AreaType){
 				ItfAreaLinetable2Polygon polygonBuilder = new ItfAreaLinetable2Polygon(attr,ignorePolygonBuildingErrors);
 				polygonBuilder.setAllowItfAreaHoles(allowItfAreaHoles);
+                polygonBuilder.setKeepLinetables(readLinetables,ModelUtilities.getHelperTableMainTableRef(attr),ModelUtilities.getHelperTableMainTableRef2(attr));
 				attrs_areaAttrs.put(attr, polygonBuilder);
 			}
 		  }
@@ -563,6 +595,12 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 	public boolean isReadEnumValAsItfCode(){
 		return rawReader.isReadEnumValAsItfCode();
 	}
+    public void setReadLinetables(boolean val){
+        readLinetables=val;
+    }
+    public boolean isReadLinetables(){
+        return readLinetables;
+    }
 
 	public ArrayList<IoxInvalidDataException> getDataErrs()
 	{
