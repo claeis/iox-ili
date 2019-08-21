@@ -25,6 +25,7 @@ import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.itf.ModelUtilities;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurveRing;
@@ -250,10 +251,40 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 			//Polygonizer polygonizer=new Polygonizer();
 			IoxPolygonizer polygonizer=new IoxPolygonizer(newVertexOffset);
 			//for(CompoundCurve boundary:segv){
-			for(CompoundCurve boundary:validator.getNodedSubstrings()){
-				//System.out.println(boundary);
-				polygonizer.add(boundary);
-			}
+            lines=new HashMap<String,IomObject>();
+            try {
+                HashMap<String,Integer> tidCount=new HashMap<String,Integer>();
+                HashMap<String,Integer> tidIdxs=new HashMap<String,Integer>();
+                for(CompoundCurve boundary:validator.getNodedSubstrings()) {
+                    String tid=(String)boundary.getUserData();
+                    Integer count=tidCount.get(tid);
+                    if(count==null) {
+                        tidCount.put(tid, 1);
+                        tidIdxs.put(tid, 1);
+                    }else {
+                        count+=1;
+                        tidCount.put(tid, count);
+                    }
+                }
+                for(CompoundCurve boundary:validator.getNodedSubstrings()){
+                    //System.out.println(boundary);
+                    String lineTid=(String)boundary.getUserData();
+                    int tidIdx=tidIdxs.get(lineTid);
+                    tidIdxs.put(lineTid,tidIdx+1);
+                    if(tidCount.get(lineTid)>1) {
+                        lineTid=lineTid+":"+tidIdx;
+                    }
+                    IomObject iomLine=Jtsext2iox.JTS2polyline(boundary);
+                    IomObject iomLinetableObj=new Iom_jObject(linetableIliqname,lineTid);
+                    iomLinetableObj.addattrobj(helperTableGeomAttrName, iomLine);
+                    lines.put(lineTid,iomLinetableObj);
+                    boundary.setUserData(lineTid);
+                    boundary.setSegmentsUserData(lineTid);
+                    polygonizer.add(boundary);
+                }
+            } catch (Iox2jtsException e) {
+                throw new IllegalStateException(e);
+            }
 			validator=null;
 			Collection cutEdges = polygonizer.getCutEdges();
 			if(!cutEdges.isEmpty()){
@@ -388,7 +419,13 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 	                    if(line.getattrvaluecount(mainTableRef1)==0) {
 	                        line.setattrvalue(mainTableRef1, tid);
 	                    }else if(line.getattrvaluecount(mainTableRef2)==0) {
-	                        line.setattrvalue(mainTableRef2, tid);
+	                        String ref1=line.getattrvalue(mainTableRef1);
+	                        if(ref1.compareTo(tid)>0) {
+	                            line.setattrvalue(mainTableRef1, tid);
+                                line.setattrvalue(mainTableRef2, ref1);
+	                        }else {
+	                            line.setattrvalue(mainTableRef2, tid);
+	                        }
 	                    }else {
 	                        throw new IllegalStateException("more than two refs in line");
 	                    }
@@ -430,7 +467,6 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
         ArrayList<String> hitTids=new ArrayList<String>();
         if(hit instanceof CurvePolygon){
             CurvePolygon cp=(CurvePolygon) hit;
-            String sep="";
             ArrayList<CurveSegment> segs=new ArrayList<CurveSegment>();
             CompoundCurveRing c=(CompoundCurveRing) cp.getExteriorRing();
             for(CompoundCurve cv:c.getLines()){
