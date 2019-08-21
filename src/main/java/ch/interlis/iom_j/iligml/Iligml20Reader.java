@@ -1065,4 +1065,10 @@ public class Iligml20Reader implements IoxReader,IoxIliReader {
     	HashMap<QName, Element> iliPropIter=iliProperties.get(aClass);
     	return iliPropIter.get(qName);
     }
+
+    @Override
+    public void setTopicFilter(String[] topicNames) {
+        // TODO Auto-generated method stub
+        
+    }
 }

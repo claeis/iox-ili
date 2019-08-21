@@ -60,6 +60,7 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 	private boolean renumberTids=false;
 	private HashMap tid2tid=null; // map<String oldTid,String newTid>
 	private IoxDataPool ioxDataPool=null;
+    private boolean skipBasket=false;
 
 	/** Creates a new reader.
 	 * @param in Input stream to read from.
@@ -220,12 +221,19 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 							tid2tid=new HashMap();
 						}
 						state=50;
-						if(bidPrefix==null){
-							event=new StartBasketEvent(modelName+"."+topicName,"itf"+Integer.toString(basketCount++));
-						}else{
-							event=new StartBasketEvent(modelName+"."+topicName,bidPrefix+"."+topicName);
+						String topicQName=modelName+"."+topicName;
+						if(filterTopics==null || !filterTopics.contains(topicQName)) {
+	                        if(bidPrefix==null){
+	                            event=new StartBasketEvent(topicQName,"itf"+Integer.toString(basketCount++));
+	                        }else{
+	                            event=new StartBasketEvent(topicQName,bidPrefix+"."+topicName);
+	                        }
+                            skipBasket=false;
+	                        return event;
+						}else {
+						    skipBasket=true;
 						}
-						return event;
+						break;
 					}else if(kind==ItfLineKind.EMOD){
 						state=120;
 					}else{
@@ -243,7 +251,11 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 						state=60;
 					}else if(kind==ItfLineKind.ETOP){
 						state=41;
-						return new EndBasketEvent();
+						if(skipBasket) {
+						    skipBasket=false; 
+						}else {
+	                        return new EndBasketEvent();
+						}
 					}else{
 						throw new IoxException(itfLine.getLineNumber(),"TABL or ETOP expected");
 					}
@@ -260,87 +272,91 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 						if(tid==null){
 							throw new IoxException(itfLine.getLineNumber(),"missing tid");
 						}
-						if(tid2tid!=null){
-							String tid2=newTid();
-							tid2tid.put(className+":"+tid, tid2);
-							tid=tid2;
+						if(!skipBasket) {
+	                        if(tid2tid!=null){
+	                            String tid2=newTid();
+	                            tid2tid.put(className+":"+tid, tid2);
+	                            tid=tid2;
+	                        }
+	                        String iliQName=modelName+"."+topicName+"."+className;
+	                        iomObj=createIomObject(iliQName,tid);
+	                        iomObj.setobjectline(itfLine.getLineNumber());
+	                        if(td!=null){
+	                            if(tag2class==null){
+	                                tag2class=ModelUtilities.getTagMap(td);
+	                            }
+	                            if(!tag2class.containsKey(iliQName)){
+	                                throw new IoxException(itfLine.getLineNumber(),"unknown class <"+iliQName+">");
+	                            }
+	                            Object aclassObj=tag2class.get(iliQName);
+	                            AbstractClassDef aclass;
+	                            if(aclassObj instanceof AbstractClassDef){
+	                                // main table
+	                                aclass=(AbstractClassDef)aclassObj;
+	                                polylineattrs=ModelUtilities.getPolylineAttrs(aclass);
+	                            }else{
+	                                // SURFACE or AREA helper table
+	                                surfaceOrAreaAttr=(AttributeDef)aclassObj;
+	                                aclass=(AbstractClassDef)surfaceOrAreaAttr.getContainer();
+	                                polylineattrs=new java.util.ArrayList();
+	                                polylineattrs.add(surfaceOrAreaAttr);
+	                            }
+	                            // start with first polyline attr in linev
+	                            polyAttrIdx=0;
+	                            // area or surface table?
+	                            if(surfaceOrAreaAttr!=null){
+	                                int startLineAttr;
+	                                // is SURFACE attr?
+	                                if(surfaceOrAreaAttr.getDomainResolvingAliases() instanceof SurfaceType){
+	                                    // attr is a SURFACE
+	                                    // add REF to main table
+	                                    String maintableref=ModelUtilities.getHelperTableMainTableRef(surfaceOrAreaAttr);
+	                                    String ref=null;
+	                                    if(propv.length<2) {
+	                                        throw new IoxInvalidDataException(itfLine.getLineNumber(),"missing reference to maintable "+aclass.getScopedName());
+	                                    }else {
+	                                        ref=propv[1];
+	                                    }
+	                                    if(tid2tid!=null){
+	                                        String oldRef=aclass.getName()+":"+ref;
+	                                        if(!tid2tid.containsKey(oldRef)){
+	                                            throw new IoxException(itfLine.getLineNumber(),"dangling reference <"+oldRef+">");
+	                                        }
+	                                        ref=(String)tid2tid.get(oldRef);
+	                                    }
+	                                    if(ref!=null) {
+	                                        IomObject structvalue = createIomObject("REF", null);
+	                                        structvalue.setobjectrefoid(ref);
+	                                        iomObj.addattrobj(maintableref,structvalue);
+	                                    }
+	                                    // start with prop[2], prop[0] is TID, prop[1] is REF to main table
+	                                    startLineAttr=2;
+	                                }else{
+	                                    // attr is an AREA
+	                                    // start with prop[1], prop[0] is TID
+	                                    startLineAttr=1;
+	                                }
+	                                // add line attributes
+	                                SurfaceOrAreaType saType=(SurfaceOrAreaType)surfaceOrAreaAttr.getDomainResolvingAliases();
+	                                Table lineAttrTable=saType.getLineAttributeStructure();
+	                                if(lineAttrTable!=null){
+	                                    setPrimAttrs(iomObj,propv,ModelUtilities.getIli1AttrList(lineAttrTable),startLineAttr);
+	                                }
+	                            }else{
+	                                // start with prop[1], prop[0] is TID
+	                                setPrimAttrs(iomObj,propv,ModelUtilities.getIli1AttrList(aclass),1);
+	                            }
+	                        }
+	                        event=new ObjectEvent(iomObj);
 						}
-						String iliQName=modelName+"."+topicName+"."+className;
-						iomObj=createIomObject(iliQName,tid);
-						iomObj.setobjectline(itfLine.getLineNumber());
-						if(td!=null){
-							if(tag2class==null){
-								tag2class=ModelUtilities.getTagMap(td);
-							}
-							if(!tag2class.containsKey(iliQName)){
-								throw new IoxException(itfLine.getLineNumber(),"unknown class <"+iliQName+">");
-							}
-							Object aclassObj=tag2class.get(iliQName);
-							AbstractClassDef aclass;
-							if(aclassObj instanceof AbstractClassDef){
-								// main table
-								aclass=(AbstractClassDef)aclassObj;
-								polylineattrs=ModelUtilities.getPolylineAttrs(aclass);
-							}else{
-								// SURFACE or AREA helper table
-								surfaceOrAreaAttr=(AttributeDef)aclassObj;
-								aclass=(AbstractClassDef)surfaceOrAreaAttr.getContainer();
-								polylineattrs=new java.util.ArrayList();
-								polylineattrs.add(surfaceOrAreaAttr);
-							}
-							// start with first polyline attr in linev
-							polyAttrIdx=0;
-							// area or surface table?
-							if(surfaceOrAreaAttr!=null){
-								int startLineAttr;
-								// is SURFACE attr?
-								if(surfaceOrAreaAttr.getDomainResolvingAliases() instanceof SurfaceType){
-									// attr is a SURFACE
-									// add REF to main table
-									String maintableref=ModelUtilities.getHelperTableMainTableRef(surfaceOrAreaAttr);
-									String ref=null;
-									if(propv.length<2) {
-                                        throw new IoxInvalidDataException(itfLine.getLineNumber(),"missing reference to maintable "+aclass.getScopedName());
-									}else {
-									    ref=propv[1];
-									}
-									if(tid2tid!=null){
-										String oldRef=aclass.getName()+":"+ref;
-										if(!tid2tid.containsKey(oldRef)){
-											throw new IoxException(itfLine.getLineNumber(),"dangling reference <"+oldRef+">");
-										}
-										ref=(String)tid2tid.get(oldRef);
-									}
-									if(ref!=null) {
-	                                    IomObject structvalue = createIomObject("REF", null);
-	                                    structvalue.setobjectrefoid(ref);
-	                                    iomObj.addattrobj(maintableref,structvalue);
-									}
-									// start with prop[2], prop[0] is TID, prop[1] is REF to main table
-									startLineAttr=2;
-								}else{
-									// attr is an AREA
-									// start with prop[1], prop[0] is TID
-									startLineAttr=1;
-								}
-								// add line attributes
-								SurfaceOrAreaType saType=(SurfaceOrAreaType)surfaceOrAreaAttr.getDomainResolvingAliases();
-								Table lineAttrTable=saType.getLineAttributeStructure();
-								if(lineAttrTable!=null){
-									setPrimAttrs(iomObj,propv,ModelUtilities.getIli1AttrList(lineAttrTable),startLineAttr);
-								}
-							}else{
-								// start with prop[1], prop[0] is TID
-								setPrimAttrs(iomObj,propv,ModelUtilities.getIli1AttrList(aclass),1);
-							}
-						}
-						event=new ObjectEvent(iomObj);
 						if(scanner.nextKind()==ItfLineKind.STPT){
 							state=100;
 						}else if(scanner.nextKind()==ItfLineKind.ELIN){
 							state=100;
 						}else{
-							return event;
+						    if(!skipBasket) {
+	                            return event;
+						    }
 						}
 					}else{
 						throw new IoxException(itfLine.getLineNumber(),"OBJE, PERI or ETAB expected");
@@ -356,79 +372,87 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 					break;
 				case 100:
 					if(kind==ItfLineKind.STPT){
-						// get coord
-						//EhiLogger.debug("STPT");
-						if(td!=null){
-							String propv[]=splitItfLine(itfLine.getContent());
-							AttributeDef polyAttr=(AttributeDef)polylineattrs.get(polyAttrIdx);
-							Type type = Type.findReal (polyAttr.getDomain());
-							Domain controlPointDomain = ((LineType)type).getControlPointDomain();
-							CoordType coordType=(CoordType) Type.findReal (controlPointDomain.getType());
-							polyAttrIs3D=coordType.getDimensions().length==3;
-							{
-								String polyAttrName=null;
-								if(surfaceOrAreaAttr!=null && polyAttrIdx==0){
-									polyAttrName=ModelUtilities.getHelperTableGeomAttrName(surfaceOrAreaAttr);
-								}else{
-									polyAttrName=polyAttr.getName();
-								}
-			                                        IomObject polylineValue = createIomObject("POLYLINE", null);
-								iomObj.addattrobj(polyAttrName,polylineValue);
+					    if(!skipBasket) {
+	                        // get coord
+	                        //EhiLogger.debug("STPT");
+	                        if(td!=null){
+	                            String propv[]=splitItfLine(itfLine.getContent());
+	                            AttributeDef polyAttr=(AttributeDef)polylineattrs.get(polyAttrIdx);
+	                            Type type = Type.findReal (polyAttr.getDomain());
+	                            Domain controlPointDomain = ((LineType)type).getControlPointDomain();
+	                            CoordType coordType=(CoordType) Type.findReal (controlPointDomain.getType());
+	                            polyAttrIs3D=coordType.getDimensions().length==3;
+	                            {
+	                                String polyAttrName=null;
+	                                if(surfaceOrAreaAttr!=null && polyAttrIdx==0){
+	                                    polyAttrName=ModelUtilities.getHelperTableGeomAttrName(surfaceOrAreaAttr);
+	                                }else{
+	                                    polyAttrName=polyAttr.getName();
+	                                }
+	                                                    IomObject polylineValue = createIomObject("POLYLINE", null);
+	                                iomObj.addattrobj(polyAttrName,polylineValue);
 
-								// unclipped polyline, add one sequence
-								polyAttrSequence = createIomObject("SEGMENTS", null);
-                                polylineValue.addattrobj("sequence", polyAttrSequence);
+	                                // unclipped polyline, add one sequence
+	                                polyAttrSequence = createIomObject("SEGMENTS", null);
+	                                polylineValue.addattrobj("sequence", polyAttrSequence);
 
-								//int segc=obj.numCoords();
-								//for(int segi=0;segi<segc;segi++){
-									// add control point
-                                                                        IomObject coordValue = createIomObject("COORD", null);
+	                                //int segc=obj.numCoords();
+	                                //for(int segi=0;segi<segc;segi++){
+	                                    // add control point
+	                                                                        IomObject coordValue = createIomObject("COORD", null);
 
-									coordValue.setattrvalue("C1",propv[0]);
-									coordValue.setattrvalue("C2",propv[1]);
-									if(polyAttrIs3D && propv.length>=3){
-										coordValue.setattrvalue("C3",propv[2]);
-									}
-									//coordValue.setattrvalue("A1",Double.toString(ordv[i]));
-									//coordValue.setattrvalue("A2",Double.toString(ordv[i+1]));
-									//if(is3D){
-									//	// no A3 in XTF!
-									//}
-									polyAttrSequence.addattrobj("segment", coordValue); // This line moved
-								//}
-							}
-						}
+	                                    coordValue.setattrvalue("C1",propv[0]);
+	                                    coordValue.setattrvalue("C2",propv[1]);
+	                                    if(polyAttrIs3D && propv.length>=3){
+	                                        coordValue.setattrvalue("C3",propv[2]);
+	                                    }
+	                                    //coordValue.setattrvalue("A1",Double.toString(ordv[i]));
+	                                    //coordValue.setattrvalue("A2",Double.toString(ordv[i+1]));
+	                                    //if(is3D){
+	                                    //  // no A3 in XTF!
+	                                    //}
+	                                    polyAttrSequence.addattrobj("segment", coordValue); // This line moved
+	                                //}
+	                            }
+	                        }
+					    }
 						state=100;
 					}else if(kind==ItfLineKind.LIPT){
 						// get coord
 						//EhiLogger.debug("LIPT");
-						if(td!=null){
-							String propv[]=splitItfLine(itfLine.getContent());
-                                                        IomObject coordValue = createIomObject("COORD", null);
+					    if(!skipBasket) {
+	                        if(td!=null){
+	                            String propv[]=splitItfLine(itfLine.getContent());
+	                                                        IomObject coordValue = createIomObject("COORD", null);
 
-							coordValue.setattrvalue("C1",propv[0]);
-							coordValue.setattrvalue("C2",propv[1]);
-							if(polyAttrIs3D && propv.length>=3){
-								coordValue.setattrvalue("C3",propv[2]);
-							}
-                                                        polyAttrSequence.addattrobj("segment", coordValue); // This line moved
-						}
+	                            coordValue.setattrvalue("C1",propv[0]);
+	                            coordValue.setattrvalue("C2",propv[1]);
+	                            if(polyAttrIs3D && propv.length>=3){
+	                                coordValue.setattrvalue("C3",propv[2]);
+	                            }
+	                                                        polyAttrSequence.addattrobj("segment", coordValue); // This line moved
+	                        }
+					    }
 						state=100;
 					}else if(kind==ItfLineKind.ARCP){
-						// get coord
-						if(td!=null){
-							String propv[]=splitItfLine(itfLine.getContent());
-                                                        IomObject coordValue = createIomObject("ARC", null);
-							coordValue.setattrvalue("A1",propv[0]);
-							coordValue.setattrvalue("A2",propv[1]);
-                                                        polyAttrSequence.addattrobj("segment", coordValue); // This line moved
-						}
+					    if(!skipBasket) {
+	                        // get coord
+	                        if(td!=null){
+	                            String propv[]=splitItfLine(itfLine.getContent());
+	                                                        IomObject coordValue = createIomObject("ARC", null);
+	                            coordValue.setattrvalue("A1",propv[0]);
+	                            coordValue.setattrvalue("A2",propv[1]);
+	                                                        polyAttrSequence.addattrobj("segment", coordValue); // This line moved
+	                        }
+					    }
 						state=101;
 					}else if(kind==ItfLineKind.ELIN){
-						// end of line OR empty line
-						// advance current attr to next in list of polyline attrs
-						polyAttrIdx++;
-						polyAttrSequence=null;
+                        if(!skipBasket) {
+                            // end of line OR empty line
+                            // advance current attr to next in list of polyline attrs
+                            polyAttrIdx++;
+                            polyAttrSequence=null;
+                        }
 						if(scanner.nextKind()==ItfLineKind.STPT){
 							// another line
 							state=100;
@@ -437,7 +461,9 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 							state=100;
 						}else{
 							state=60;
-							return event;
+	                        if(!skipBasket) {
+	                            return event;
+	                        }
 						}
 					}else{
 						throw new IoxException(itfLine.getLineNumber(),"STPT, LIPT, ARCP or ELIN expected");
@@ -447,18 +473,20 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 					if(kind!=ItfLineKind.LIPT){
 						throw new IoxException(itfLine.getLineNumber(),"LIPT expected");
 					}
-					// get coord
-					//EhiLogger.debug("LIPT");
-					if(td!=null){
-						String propv[]=splitItfLine(itfLine.getContent());
-						IomObject coordValue=null;
-						int last=polyAttrSequence.getattrvaluecount("segment")-1;
-						coordValue=polyAttrSequence.getattrobj("segment",last);
-						coordValue.setattrvalue("C1",propv[0]);
-						coordValue.setattrvalue("C2",propv[1]);
-						if(polyAttrIs3D && propv.length>=3){
-							coordValue.setattrvalue("C3",propv[2]);
-						}
+					if(!skipBasket) {
+	                    // get coord
+	                    //EhiLogger.debug("LIPT");
+	                    if(td!=null){
+	                        String propv[]=splitItfLine(itfLine.getContent());
+	                        IomObject coordValue=null;
+	                        int last=polyAttrSequence.getattrvaluecount("segment")-1;
+	                        coordValue=polyAttrSequence.getattrobj("segment",last);
+	                        coordValue.setattrvalue("C1",propv[0]);
+	                        coordValue.setattrvalue("C2",propv[1]);
+	                        if(polyAttrIs3D && propv.length>=3){
+	                            coordValue.setattrvalue("C3",propv[2]);
+	                        }
+	                    }
 					}
 					state=100;
 					break;
@@ -750,6 +778,7 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 		this.renumberTids = renumberTids;
 	}
 	private long tid=1;
+    private java.util.Set<String> filterTopics=null;
 	private String newTid(){
 		return Long.toString(tid++);
 	}
@@ -767,4 +796,11 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 	public void setIoxDataPool(IoxDataPool ioxDataPool) {
 		this.ioxDataPool = ioxDataPool;
 	}
+    @Override
+    public void setTopicFilter(String[] topicNames) {
+        this.filterTopics=new java.util.HashSet<String>();
+        for(String topicName:topicNames) {
+            filterTopics.add(topicName);
+        }
+    }
 }

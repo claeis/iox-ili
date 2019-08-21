@@ -82,28 +82,47 @@ public class ItfReader2Test {
 		EhiLogger.getInstance().addListener(errs);
 	}
 	
-	@Test
-	public void testSURFACEbasic() throws Iox2jtsException, IoxException {
-		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceBasic.itf"),false);
-		reader.setModel(td);
-		IoxEvent event=null;
-		HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
-		 do{
-		        event=reader.read();
-		        if(event instanceof StartTransferEvent){
-		        }else if(event instanceof StartBasketEvent){
-		        }else if(event instanceof ObjectEvent){
-		        	IomObject iomObj=((ObjectEvent)event).getIomObject();
-		    		System.out.println(iomObj);
-		    		assertNotNull(iomObj.getobjectoid());
-		    		objs.put(iomObj.getobjectoid(), iomObj);
-		        }else if(event instanceof EndBasketEvent){
-		        }else if(event instanceof EndTransferEvent){
-		        }
-		 }while(!(event instanceof EndTransferEvent));
-		 assertEquals("Test1.TopicA.TableA oid 10 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}}", 
-				 objs.get("10").toString());
-	}
+    @Test
+    public void testSURFACEbasic() throws Iox2jtsException, IoxException {
+        ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceBasic.itf"),false);
+        reader.setModel(td);
+        IoxEvent event=null;
+        HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
+         do{
+                event=reader.read();
+                if(event instanceof StartTransferEvent){
+                }else if(event instanceof StartBasketEvent){
+                }else if(event instanceof ObjectEvent){
+                    IomObject iomObj=((ObjectEvent)event).getIomObject();
+                    System.out.println(iomObj);
+                    assertNotNull(iomObj.getobjectoid());
+                    objs.put(iomObj.getobjectoid(), iomObj);
+                }else if(event instanceof EndBasketEvent){
+                }else if(event instanceof EndTransferEvent){
+                }
+         }while(!(event instanceof EndTransferEvent));
+         assertEquals("Test1.TopicA.TableA oid 10 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}}", 
+                 objs.get("10").toString());
+    }
+    @Test
+    public void testSURFACEbasicFilter() throws Iox2jtsException, IoxException {
+        ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceBasic.itf"),false);
+        reader.setModel(td);
+        reader.setTopicFilter(new String[] {"Test1.TopicA"});
+        IoxEvent event=null;
+         do{
+                event=reader.read();
+                if(event instanceof StartTransferEvent){
+                }else if(event instanceof StartBasketEvent){
+                    fail();
+                }else if(event instanceof ObjectEvent){
+                    fail();
+                }else if(event instanceof EndBasketEvent){
+                    fail();
+                }else if(event instanceof EndTransferEvent){
+                }
+         }while(!(event instanceof EndTransferEvent));
+    }
     @Test
     public void testSURFACEwithLinetables() throws Iox2jtsException, IoxException {
         ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceBasic.itf"),false);
@@ -308,6 +327,25 @@ public class ItfReader2Test {
 		 assertEquals("Test1.TopicB.TableB oid 10 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}, _itf_Form COORD {C1 115.0, C2 115.0}}", 
 				 objs.get("10").toString());
 	}
+    @Test
+    public void testAREAbasicFilter() throws Iox2jtsException, IoxException {
+        ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/AreaBasic.itf"),false);
+        reader.setModel(td);
+        reader.setTopicFilter(new String[] {"Test1.TopicB"});
+        IoxEvent event=null;
+         do{
+                event=reader.read();
+                if(event instanceof StartTransferEvent){
+                }else if(event instanceof StartBasketEvent){
+                    fail();
+                }else if(event instanceof ObjectEvent){
+                    fail();
+                }else if(event instanceof EndBasketEvent){
+                    fail();
+                }else if(event instanceof EndTransferEvent){
+                }
+         }while(!(event instanceof EndTransferEvent));
+    }
     @Test
     public void testAREAwithLinetables() throws Iox2jtsException, IoxException {
         ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/AreaTwoPolygons.itf"),false);

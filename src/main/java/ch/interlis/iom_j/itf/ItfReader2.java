@@ -622,4 +622,8 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 	public void setAllowItfAreaHoles(boolean allowItfAreaHoles) {
 		this.allowItfAreaHoles = allowItfAreaHoles;
 	}
+    @Override
+    public void setTopicFilter(String[] topicNames) {
+        rawReader.setTopicFilter(topicNames);
+    }
 }

@@ -1374,4 +1374,10 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 	public void setFactory(IoxFactoryCollection factory) throws IoxException {
 		this.factory=factory;
 	}
+
+    @Override
+    public void setTopicFilter(String[] topicNames) {
+        // TODO Auto-generated method stub
+        
+    }
 }
