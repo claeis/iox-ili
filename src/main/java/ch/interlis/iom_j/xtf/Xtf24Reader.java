@@ -1133,14 +1133,14 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 
 	private IomObject readReference(Viewable aclass,IomObject iomObj, StartElement element, RoleDef role, AssociationDef association) throws IoxException, XMLStreamException{
 		String refOid=element.getAttributeByName(QNAME_ILI_REF).getValue();
-		if(refOid.length()<=1){
+		if(refOid.length()<1){
 			throw new IoxException("unexpected reference value <"+refOid+">");
 		}
 		Attribute attrRefBid=element.getAttributeByName(QNAME_ILI_BID);
 		String refBid=null;
 		if(attrRefBid!=null) {
 			refBid=attrRefBid.getValue();
-			if(refBid.length()<=1){
+			if(refBid.length()<1){
 				throw new IoxException("unexpected reference value <"+refBid+">");
 			}
 		}
