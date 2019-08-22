@@ -10,6 +10,7 @@ LATEST
 - Validator: fixed NPE: if structAttributeName element without a nested structure element
 - ItfReader2: support reading linetables in addition to polygons
 - ItfReader2: support topic filter
+- XtfReade24: fixed attr/role namespace
 
 iox-ili 1.20.11 (2019-04-01)
 -----------------------------

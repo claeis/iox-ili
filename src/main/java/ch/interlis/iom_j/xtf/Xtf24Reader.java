@@ -25,6 +25,7 @@ import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Element;
+import ch.interlis.ili2c.metamodel.Model;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.Topic;
 import ch.interlis.ili2c.metamodel.TransferDescription;
@@ -824,12 +825,9 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 				}
 				// iliTopic
 				Topic topic = (Topic) topicObj;
-				String localTopicPart=topic.getName();
-				String modelNameSpace=model.getXmlns();
-				if(modelNameSpace==null){
-					modelNameSpace=NAMESPACE_ILIXMLBASE+model.getName();
-				}
-				QName topicQName=new QName(modelNameSpace, localTopicPart);
+				String topicName=topic.getName();
+				String modelNameSpace = getModelXmlNamespace(model);
+				QName topicQName=new QName(modelNameSpace, topicName);
 				iliTopics.put(topicQName, topic);
 				// iliClass
 				Iterator classIter=topic.iterator();
@@ -850,24 +848,20 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		    				continue;
 		    			}
 					}
-		    		Viewable viewable = (Viewable) classObj;
-		    		String localClassPart=viewable.getName();
-    				String nameSpace=model.getXmlns();
-    				if(nameSpace==null){
-    					nameSpace=NAMESPACE_ILIXMLBASE+model.getName();
-    				}
-    				QName classQName=new QName(nameSpace, localClassPart);
+		    		Viewable aClass = (Viewable) classObj;
+		    		String className=aClass.getName();
+    				QName classQName=new QName(modelNameSpace, className);
     				HashMap<QName, Element> transferElements=null;
     				if(iliTopics.containsKey(classQName) || iliClasses.containsKey(classQName)){
     					// conflict
-    					localClassPart=topic.getName()+"."+viewable.getName();
-    					QName extendedClassQName=new QName(nameSpace, localClassPart);
-    					iliClasses.put(extendedClassQName, viewable);
+    					className=topic.getName()+"."+aClass.getName();
+    					classQName=new QName(modelNameSpace, className);
+    					iliClasses.put(classQName, aClass);
     				}else{
-	    				iliClasses.put(classQName, viewable);
+	    				iliClasses.put(classQName, aClass);
     				}
     				// iliProperties
-					Iterator<ViewableTransferElement> elementIter=viewable.getAttributesAndRoles2();
+					Iterator<ViewableTransferElement> elementIter=aClass.getAttributesAndRoles2();
 					transferElements=new HashMap<QName, Element>();
 					Element element=null;
 					while (elementIter.hasNext()){
@@ -875,14 +869,27 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 						if(obj.obj instanceof Element){
 							element=(Element) obj.obj;
 							String elementName=element.getName();
-		    				QName eleQName=new QName(nameSpace, elementName);
+							Model modelOfElement=(Model)element.getContainer(Model.class);
+							String elementNs=modelNameSpace;
+							if(modelOfElement!=model) {
+							    elementNs=getModelXmlNamespace(modelOfElement);
+							}
+		    				QName eleQName=new QName(elementNs, elementName);
 			    			transferElements.put(eleQName, element);
 						}
 					}
-					iliProperties.put(viewable, transferElements);
+					iliProperties.put(aClass, transferElements);
 		    	}
 			}
 		}
+    }
+
+    private String getModelXmlNamespace(Model model) {
+        String modelNameSpace=model.getXmlns();
+        if(modelNameSpace==null){
+        	modelNameSpace=NAMESPACE_ILIXMLBASE+model.getName();
+        }
+        return modelNameSpace;
     }
     
     /** Get Topic of ili file
@@ -937,7 +944,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
             	QName qName=element.getName();
             	Element prop=getIliProperty(viewable, qName);
             	if(prop==null){
-            		throw new IoxSyntaxException("unexpected element: "+qName.getLocalPart());
+            		throw new IoxSyntaxException("unexpected element: "+qName+" in "+viewable.getScopedName());
             	}
             	// attribute
         		attrName=prop.getName();
