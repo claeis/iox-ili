@@ -7,9 +7,9 @@
 	</ili:headersection>
 	<ili:datasection>
 		<TopicB ili:bid="bidA">
-			<ClassA ili:tid="oidA">
+			<TopicB.ClassA ili:tid="oidA">
 				<attr1>text</attr1>
-			</ClassA>
+			</TopicB.ClassA>
 		</TopicB>
 		<AdditionalTopicC ili:bid="bidB">
 			<AdditionalClassC ili:tid="oidB">

@@ -7,12 +7,12 @@
 	</ili:headersection>
 	<ili:datasection>
 		<TopicE ili:bid="bidE1">
-			<TopicE ili:tid="oid1">
-			</TopicE>
+			<TopicE.TopicE ili:tid="oid1">
+			</TopicE.TopicE>
 		</TopicE>
 		<TopicE ili:bid="bidE2">
-			<TopicE ili:tid="oid2">
-			</TopicE>
+			<TopicE.TopicE ili:tid="oid2">
+			</TopicE.TopicE>
 		</TopicE>
 	</ili:datasection>
 </ili:transfer>

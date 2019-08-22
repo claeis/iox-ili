@@ -7,11 +7,11 @@
 	</ili:headersection>
 	<ili:datasection>
 		<TopicA ili:bid="bidA2">
-			<ClassB ili:tid="oidB">
+			<TopicA.ClassB ili:tid="oidB">
 				<attrNrDec>6.15</attrNrDec>
 				<attrWertNormal>6.15</attrWertNormal>
 				<attrWertExakt>6.15</attrWertExakt>
-			</ClassB>
+			</TopicA.ClassB>
 		</TopicA>
 	</ili:datasection>
 </ili:transfer>

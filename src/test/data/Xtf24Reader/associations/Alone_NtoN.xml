@@ -7,14 +7,14 @@
 	</ili:headersection>
 	<ili:datasection>
 		<Baum ili:bid="bid">
-			<Ast ili:tid="oid1">
-			</Ast>
-			<Blatt ili:tid="oid2">
-			</Blatt>
-			<Beziehung>
+			<Baum.Ast ili:tid="oid1">
+			</Baum.Ast>
+			<Baum.Blatt ili:tid="oid2">
+			</Baum.Blatt>
+			<Baum.Beziehung>
 				<bezAst ili:ref="oid1"/>
 				<bezBlatt ili:ref="oid2"/>
-			</Beziehung>
+			</Baum.Beziehung>
 		</Baum>
 	</ili:datasection>
 </ili:transfer>

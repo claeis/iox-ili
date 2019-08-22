@@ -748,7 +748,7 @@ public class Xtf24ReaderAssociationTest {
 			reader.read();
 			fail();
 		}catch(IoxException ioxEx){
-			assertEquals("unexpected element: {http://www.interlis.ch/xtf/2.4/Association}roleC in Association.Fail1.Beziehung",(ioxEx).getMessage());
+			assertEquals("line 17: unexpected element: {http://www.interlis.ch/xtf/2.4/Association}roleC in Association.Fail1.Beziehung",(ioxEx).getMessage());
 	        assertTrue(ioxEx instanceof IoxException);
 		}
 		reader.close();
