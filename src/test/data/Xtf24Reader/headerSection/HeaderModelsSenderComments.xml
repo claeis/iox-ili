@@ -5,7 +5,7 @@
 			<ili:model>Test1</ili:model>
 		</ili:models>
 		<ili:sender>Programmer1</ili:sender>
-		<ili:comments>Comment1</ili:comments>
+		<ili:comment>Comment1</ili:comment>
 	</ili:headersection>
 	<ili:datasection>
 	</ili:datasection>

@@ -75,12 +75,13 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
     // namespace
     private static final String NAMESPACE_ILIXMLBASE="http://www.interlis.ch/xtf/2.4/";
     private static final String NAMESPACE_ILIXMLBASE_INTERLIS=NAMESPACE_ILIXMLBASE+"INTERLIS";
+    public static final String XMLNS_XTF24=NAMESPACE_ILIXMLBASE_INTERLIS;
     private static final String NAMESPACE_GEOM="http://www.interlis.ch/geometry/1.0";
     private static final String NAMESPACE_XMLSCHEMA="http://www.w3.org/2001/XMLSchema-instance";
 	// qnames xml
     private static final QName QNAME_XML_HEADERSECTION=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"headersection");
     private static final QName QNAME_XML_HEADERSECTION_SENDER=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"sender");
-    private static final QName QNAME_XML_HEADERSECTION_COMMENT=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"comments");
+    private static final QName QNAME_XML_HEADERSECTION_COMMENT=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"comment");
     private static final QName QNAME_XML_DATASECTION=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"datasection");
     private static final QName QNAME_XML_MODELS=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"models");
     private static final QName QNAME_XML_MODEL=new QName(NAMESPACE_ILIXMLBASE_INTERLIS,"model");
@@ -488,7 +489,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 			}
 			int senderCount=0;
 			int commentCount=0;
-			while(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_XML_HEADERSECTION_SENDER) || event.isStartElement() && event.asStartElement().getName().equals(QNAME_XML_HEADERSECTION_COMMENT))){
+			while(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_XML_HEADERSECTION_SENDER) || event.asStartElement().getName().equals(QNAME_XML_HEADERSECTION_COMMENT))){
 				if(event.asStartElement().getName().equals(QNAME_XML_HEADERSECTION_SENDER)){
 					if(senderCount==0) {
 						// start sender
