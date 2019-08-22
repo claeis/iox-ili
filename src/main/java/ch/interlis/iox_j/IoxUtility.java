@@ -60,10 +60,11 @@ public class IoxUtility {
 					}else if(event instanceof XtfStartTransferEvent){
 						XtfStartTransferEvent xtfStart=(XtfStartTransferEvent)event;
 						addModels(ret, xtfStart);
+						return ret;
 					}
 				}
 			}catch(ch.interlis.iox.IoxException ex){
-				// ignore it
+				EhiLogger.logAdaption("failed to get modelnames from transferfile ("+ex.toString()+")");
 			}
 		}finally{
 			if(reader!=null){
