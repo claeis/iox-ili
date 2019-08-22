@@ -67,6 +67,7 @@ public class Iligml20Reader implements IoxReader,IoxIliReader {
     private static final String METAATTR_NAMESPACE = "ili2.iligml20.namespaceName";
     private static final String NAMESPACE_ILIGMLBASE="http://www.interlis.ch/ILIGML-2.0/";
     private static final String NAMESPACE_ILIGMLBASE_INTERLIS=NAMESPACE_ILIGMLBASE+"INTERLIS";
+    public static final String XMLNS_ILIGML=NAMESPACE_ILIGMLBASE_INTERLIS;
     private static final String NAMESPACE_GML="http://www.opengis.net/gml/3.2";
     private static final String NAMESPACE_XLINK="http://www.w3.org/1999/xlink";
     private static final String NAMESPACE_XSI="http://www.w3.org/2001/XMLSchema-instance";
