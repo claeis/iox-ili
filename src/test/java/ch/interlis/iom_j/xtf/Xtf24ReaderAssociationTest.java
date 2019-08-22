@@ -726,7 +726,7 @@ public class Xtf24ReaderAssociationTest {
 			reader.read();
 			fail();
 		}catch(IoxException ioxEx){
-			assertTrue((ioxEx).getMessage().contains("ili:delete references are not yet implemented."));
+			assertTrue((ioxEx).getMessage().contains("ili:delete links without tid is not yet implemented."));
 	        assertTrue(ioxEx instanceof IoxException);
 		}
 		reader.close();
