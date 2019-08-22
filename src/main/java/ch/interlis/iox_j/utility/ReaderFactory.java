@@ -50,15 +50,17 @@ public class ReaderFactory{
 	        throw new IoxException("unknown xml file");
 		}
 		
-        reader=new CsvReader(inputFile);
-        IoxEvent event5=null;
-		try{
-			event5=reader.read();
-			if(event5!=null){
-		        reader=new CsvReader(inputFile);
-				return reader;
-			}
-		}catch(IoxException ex){
+		if(IoxUtility.isCsvFilename(inputFile.getName())) {
+	        reader=new CsvReader(inputFile);
+	        IoxEvent event5=null;
+	        try{
+	            event5=reader.read();
+	            if(event5!=null){
+	                reader=new CsvReader(inputFile);
+	                return reader;
+	            }
+	        }catch(IoxException ex){
+	        }
 		}
 		
 		// no appropriate reader found
