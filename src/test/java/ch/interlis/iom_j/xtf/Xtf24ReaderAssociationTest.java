@@ -5,6 +5,8 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.ili2c.Ili2cFailure;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -746,7 +748,7 @@ public class Xtf24ReaderAssociationTest {
 			reader.read();
 			fail();
 		}catch(IoxException ioxEx){
-			assertTrue((ioxEx).getMessage().contains("unexpected element: roleC"));
+			assertEquals("unexpected element: {http://www.interlis.ch/xtf/2.4/Association}roleC in Association.Fail1.Beziehung",(ioxEx).getMessage());
 	        assertTrue(ioxEx instanceof IoxException);
 		}
 		reader.close();
