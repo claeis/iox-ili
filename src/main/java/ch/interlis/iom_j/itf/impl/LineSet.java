@@ -57,6 +57,7 @@ public class LineSet {
 				currentSegmentStartpoint=Iox2jtsext.coord2JTS(segment);
 			}
 			  if(currentBoundary!=null && currentBoundary.size()>0){
+		            // alter Rand abschliessen
 					boundaries.add(currentBoundary);
 					boundaryTids.add(currentBoundaryTid);
 			  }
@@ -182,10 +183,27 @@ public class LineSet {
 			boundaryTids.add(currentBoundaryTid);
 		}
 		
+		HashMap<String,Integer> tidCount=new HashMap<String,Integer>();
+        HashMap<String,Integer> tidIdxs=new HashMap<String,Integer>();
+		for(String tid:boundaryTids) {
+		    Integer count=tidCount.get(tid);
+		    if(count==null) {
+		        tidCount.put(tid, 1);
+                tidIdxs.put(tid, 1);
+		    }else {
+		        count+=1;
+		        tidCount.put(tid, count);
+		    }
+		}
 		ArrayList<CompoundCurve> segv=new ArrayList<CompoundCurve>(); 
 		java.util.Iterator<String> tids=boundaryTids.iterator();
 		for(ArrayList<CurveSegment> boundaryLine:boundaries){
             String tid=tids.next();
+            int tidIdx=tidIdxs.get(tid);
+            tidIdxs.put(tid,tidIdx+1);
+            if(tidCount.get(tid)>1) {
+                tid=tid+":"+tidIdx;
+            }
             CompoundCurve boundary=null;
             try {
                 boundary=jtsFact.createCompoundCurve(boundaryLine);

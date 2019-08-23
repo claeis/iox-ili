@@ -173,7 +173,8 @@ public class TranslateToTranslation implements IoxFilter {
 	private Element getTranslatedElement(Element modelElement) {
 		Element destEle=srctag2destElement.get(modelElement.getScopedName());
 		if(destEle==null){
-			throw new IllegalArgumentException("untranslated element "+modelElement.getScopedName());
+		    return modelElement;
+			//throw new IllegalArgumentException("untranslated element "+modelElement.getScopedName());
 		}
 		return destEle;
 	}

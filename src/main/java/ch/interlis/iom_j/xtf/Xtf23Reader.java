@@ -1305,4 +1305,10 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 	public void setModel(TransferDescription td) {
 		// not implemented
 	}
+
+    @Override
+    public void setTopicFilter(String[] topicNames) {
+        // TODO Auto-generated method stub
+        
+    }
 }

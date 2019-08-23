@@ -90,10 +90,10 @@ public class Intersection {
     public String toShortString() {
         Object seg1UserData=seg1.getUserData();
         Object seg2UserData=seg2.getUserData();
+        String tids[]=new String[2];
+        tids[0]=(String) (seg1UserData!=null?seg1UserData:curve1.getUserData());
+        tids[1]=(String) (seg2UserData!=null?seg2UserData:curve2.getUserData());
         if(isOverlay()) {
-            String tids[]=new String[2];
-            tids[0]=(String) (seg1UserData!=null?seg1UserData:curve1.getUserData());
-            tids[1]=(String) (seg2UserData!=null?seg2UserData:curve2.getUserData());
             Coordinate coord0=pt[0];
             Coordinate coord1=pt[1];
             if(coord0.compareTo(coord1)>0) {
@@ -101,17 +101,21 @@ public class Intersection {
                 coord1=pt[0];
             }
             return "Overlay"
-                    +" coord1 " + coord0.toString()+", coord2 "+coord1.toString() 
+                    +" coord1 " + toString(coord0)+", coord2 "+toString(coord1) 
                     + ", " + IoxInvalidDataException.formatTids(tids)
                     ;
         }
         return "Intersection"
                 + (pt.length==2?" overlap " + overlap+",":"")
-                +" coord1 " + pt[0].toString()+(pt.length==2?(", coord2 "+pt[1].toString()):"") 
-                + ", tid1 " + (seg1UserData!=null?seg1UserData:curve1.getUserData())
-                + ", tid2 " + (seg2UserData!=null?seg2UserData:curve2.getUserData())
+                +" coord1 " + toString(pt[0])+(pt.length==2?(", coord2 "+toString(pt[1])):"") 
+                + ", " + IoxInvalidDataException.formatTids(tids)
                 ;
         
+    }
+    public String toString(Coordinate coord) {
+        java.util.Formatter txt=new java.util.Formatter();
+        return txt.format("(%.3f, %.3f)", coord.x,coord.y).toString();
+        //return Double.coord.toString();
     }
 	public boolean isOverlay() {
 		return overlay;

@@ -27,6 +27,7 @@ import javax.xml.stream.events.*;
 
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.xtf.impl.MyHandler;
+import ch.interlis.iom_j.xtf.impl.XtfWriterAlt;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
@@ -39,6 +40,8 @@ import ch.ehi.basics.logging.EhiLogger;
  * @version $Revision: 1.0 $ $Date: 08.02.2007 $
  */
 public class XtfReader implements IoxReader {
+    public static final String XMLNS_XTF22=XtfWriterAlt.ili22Ns;
+    public static final String XMLNS_XTF23=XtfWriterAlt.ili23Ns;
 	private ch.interlis.iom_j.xtf.impl.MyHandler handler = null;
 	private java.io.InputStream inputFile=null;
 	private javax.xml.stream.XMLEventReader reader=null;

@@ -5,6 +5,8 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.ili2c.Ili2cFailure;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -976,34 +978,28 @@ public class Xtf24ReaderDataTest {
 	
 	// Es wird getestet ob eine Enumeration: OTHERS erstellt werden kann.
 	@Test
-	public void testEnumerationOthers_Fail() throws Iox2jtsException, IoxException {
+	public void testEnumerationOthers_ok() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"EnumerationOthers.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		try{
-			reader.read();
-			fail();
-		}catch(IoxException ex){
-			assertTrue((ex).getMessage().contains("OTHERS not yet implemented.")); // OTHERS not yet implemented
-		}
+        assertTrue(reader.read() instanceof  ObjectEvent);
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
 	
 	// Es wird getestet ob eine Enumeration: enumeration.OTHERS erstellt werden kann.
 	@Test
-	public void testSubEnumerationOthers_Fail() throws Iox2jtsException, IoxException {
+	public void testSubEnumerationOthers_ok() throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"subEnumerationOthers.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
-		try{
-			reader.read();
-			fail();
-		}catch(IoxException ex){
-			assertTrue((ex).getMessage().contains("OTHERS not yet implemented.")); // OTHERS not yet implemented
-		}
+        assertTrue(reader.read() instanceof  ObjectEvent);
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
@@ -1093,6 +1089,7 @@ public class Xtf24ReaderDataTest {
 			reader.read();
 			fail();
 		}catch(IoxException ex){
+		    EhiLogger.logError(ex);
 			assertTrue((ex).getMessage().contains(CHAR_ELE_FAIL+"attrBoolean1"));
     		assertTrue(ex instanceof IoxException);
 		}

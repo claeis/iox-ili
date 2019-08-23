@@ -7,10 +7,10 @@
 	</ili:headersection>
 	<ili:datasection>
 		<Fail3 ili:bid="bid">
-			<Ast ili:tid="oid1">
-			</Ast>
-			<Blatt ili:tid="oid2">
-			</Blatt>
+			<Fail3.Ast ili:tid="oid1">
+			</Fail3.Ast>
+			<Fail3.Blatt ili:tid="oid2">
+			</Fail3.Blatt>
 			<bezAstbezBlatt>
 				<bezAst ili:ref="oid1"/>
 				<bezBlatt ili:ref="oid2"/>

@@ -54,12 +54,15 @@ public class ReaderFactoryTest {
 	// Es wird getestet ob der passende Reader: CsvReader zurueckgegeben wird.
 	// Wenn keine Steuerzeichen und keine defaultDelimiter oder defaultRecordDelimiter vorhanden sind.
 	@Test
-	public void csvReader_itfExtension_Ok() throws IoxException {
+	public void csvReader_itfExtension_fail() {
 		IoxReader reader=null;
-		new ReaderFactory();
-		reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/UnknownFile.itf"),null);
-		assertFalse(reader instanceof ItfReader2);
-		assertTrue(reader instanceof CsvReader);
+		    try {
+                reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/UnknownFile.itf"),null);
+                fail();
+            } catch (IoxException e) {
+                assertEquals("no reader found",e.getMessage());
+            }
+		
 	}
 	
 	// Es wird getestet ob der passende Reader: CsvReader zurueckgegeben wird.
@@ -145,11 +148,14 @@ public class ReaderFactoryTest {
 	// Es wird getestet ob der passende Reader: CsvReader zurueckgegeben wird.
 	// Wenn die Dateiendung: txt aufweist.
 	@Test
-	public void csvReader_txtExtension_Ok() throws IoxException {
+	public void csvReader_txtExtension_fail() {
 		IoxReader reader=null;
-		new ReaderFactory();
-		reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/TextType.txt"),null);
-		assertTrue(reader instanceof CsvReader);
+		try {
+            reader=new ReaderFactory().createReader(new File("src/test/data/ReaderFactory/TextType.txt"),null);
+            fail();
+        } catch (IoxException e) {
+            assertEquals("no reader found",e.getMessage());
+        }
 	}
 	
 	// Es wird getestet ob der passende Reader: Iligml20Reader zurueckgegeben wird.

@@ -218,7 +218,7 @@ public class Xtf24ReaderHeaderTest {
 			reader.read();
 			fail();
 		}catch(IoxException ioxEx){
-			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"comments"));
+			assertTrue((ioxEx).getMessage().contains(START_ELE_FAIL+"comment"));
 	        assertTrue(ioxEx instanceof IoxException);
 		}
 		reader.close();

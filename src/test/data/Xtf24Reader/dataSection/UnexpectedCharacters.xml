@@ -7,12 +7,12 @@
 	</ili:headersection>
 	<ili:datasection>
 		<TopicA ili:bid="bidA">
-			<ClassA ili:tid="oidA">attrBoolean1
+			<TopicA.ClassA ili:tid="oidA">attrBoolean1
 				<attrText>normal text</attrText>
 				<attrMText>m text</attrMText>
 				<attrUri>http://www.interlis.ch</attrUri>
 				<attrName>Randomname</attrName>
-			</ClassA>
+			</TopicA.ClassA>
 		</TopicA>
 	</ili:datasection>
 </ili:transfer>

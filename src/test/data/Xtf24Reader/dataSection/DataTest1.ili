@@ -137,6 +137,7 @@ MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 		
 		CLASS ClassL =
 			attrL1 : BAG {1..*} OF StructA;
+			attrL2 : TEXT*30;
 		END ClassL;
 	
 	END TopicA;

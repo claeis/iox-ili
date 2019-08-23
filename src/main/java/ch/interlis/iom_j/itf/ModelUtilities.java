@@ -36,6 +36,7 @@ import ch.interlis.iom_j.itf.impl.ItfScanner;
  */
 public class ModelUtilities {
 	public static final String HELPER_TABLE_MAIN_TABLE_REF_PREFIX="_itf_ref_";
+    public static final String HELPER_TABLE_MAIN_TABLE_REF2_PREFIX="_itf_ref2_";
 	public static final String HELPER_TABLE_GEOM_ATTR_PREFIX="_itf_geom_";
 	/** Utility, no instances.
 	 */
@@ -446,6 +447,10 @@ public class ModelUtilities {
 	{
 		return HELPER_TABLE_MAIN_TABLE_REF_PREFIX+attr.getContainer().getName();
 	}
+    public static String getHelperTableMainTableRef2(AttributeDef attr)
+    {
+        return HELPER_TABLE_MAIN_TABLE_REF2_PREFIX+attr.getContainer().getName();
+    }
 	public static String getHelperTableGeomAttrName(AttributeDef attr)
 	{
 		return HELPER_TABLE_GEOM_ATTR_PREFIX+attr.getContainer().getName();

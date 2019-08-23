@@ -5,6 +5,8 @@ import java.io.File;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
+
+import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.ili2c.Ili2cFailure;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;

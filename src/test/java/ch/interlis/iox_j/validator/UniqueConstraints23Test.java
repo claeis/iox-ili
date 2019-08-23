@@ -706,15 +706,16 @@ public class UniqueConstraints23Test {
 	// Somit darf keine Fehlermeldung ausgegeben werden.
 	@Test
 	public void uniqueAttrValueAttr1_InStandAloneAssociationIsDifferent_Ok(){
-		Iom_jObject iomObjE=new Iom_jObject(CLASSA1,OID1);
-		Iom_jObject iomObjF=new Iom_jObject(CLASSB1,OID2);
-		Iom_jObject iomLinkEF=new Iom_jObject(ASSOCA, OID3);
-		iomLinkEF.addattrobj("a1", "REF").setobjectrefoid(OID1);
-		iomLinkEF.addattrobj("b1", "REF").setobjectrefoid(OID2);
+		Iom_jObject iomObjA=new Iom_jObject(CLASSA1,OID1);
+		Iom_jObject iomObjB2=new Iom_jObject(CLASSB1,OID2);
+        Iom_jObject iomObjB3=new Iom_jObject(CLASSB1,OID3);
+		Iom_jObject iomLinkEF=new Iom_jObject(ASSOCA, null);
+		iomLinkEF.addattrobj("a1", "REF").setobjectrefoid(iomObjA.getobjectoid());
+		iomLinkEF.addattrobj("b1", "REF").setobjectrefoid(iomObjB2.getobjectoid());
 		iomLinkEF.setattrvalue("attr1", "text");
 		Iom_jObject iomLinkEF2=new Iom_jObject(ASSOCA, null);
-		iomLinkEF2.addattrobj("a1", "REF").setobjectrefoid(OID1);
-		iomLinkEF2.addattrobj("b1", "REF").setobjectrefoid(OID2);
+		iomLinkEF2.addattrobj("a1", "REF").setobjectrefoid(iomObjA.getobjectoid());
+		iomLinkEF2.addattrobj("b1", "REF").setobjectrefoid(iomObjB3.getobjectoid());
 		iomLinkEF2.setattrvalue("attr1", "otherText");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -723,8 +724,9 @@ public class UniqueConstraints23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjE));
-		validator.validate(new ObjectEvent(iomObjF));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB2));
+        validator.validate(new ObjectEvent(iomObjB3));
 		validator.validate(new ObjectEvent(iomLinkEF));
 		validator.validate(new ObjectEvent(iomLinkEF2));
 		validator.validate(new EndBasketEvent());
@@ -1692,15 +1694,16 @@ public class UniqueConstraints23Test {
 	// Somit muss eine Fehlermeldung ausgegeben werden.
 	@Test
 	public void uniqueAttrValuesAttr1_InStandAloneAssociationExistsTwice_False(){
-		Iom_jObject iomObjE=new Iom_jObject(CLASSA1,OID1);
-		Iom_jObject iomObjF=new Iom_jObject(CLASSB1,OID2);
-		Iom_jObject iomLinkEF=new Iom_jObject(ASSOCA, OID3);
-		iomLinkEF.addattrobj("a1", "REF").setobjectrefoid(OID1);
-		iomLinkEF.addattrobj("b1", "REF").setobjectrefoid(OID2);
+		Iom_jObject iomObjA=new Iom_jObject(CLASSA1,OID1);
+		Iom_jObject iomObjB1=new Iom_jObject(CLASSB1,OID2);
+        Iom_jObject iomObjB2=new Iom_jObject(CLASSB1,OID3);
+		Iom_jObject iomLinkEF=new Iom_jObject(ASSOCA, null);
+		iomLinkEF.addattrobj("a1", "REF").setobjectrefoid(iomObjA.getobjectoid());
+		iomLinkEF.addattrobj("b1", "REF").setobjectrefoid(iomObjB1.getobjectoid());
 		iomLinkEF.setattrvalue("attr1", "text");
 		Iom_jObject iomLinkEF2=new Iom_jObject(ASSOCA, null);
-		iomLinkEF2.addattrobj("a1", "REF").setobjectrefoid(OID1);
-		iomLinkEF2.addattrobj("b1", "REF").setobjectrefoid(OID2);
+		iomLinkEF2.addattrobj("a1", "REF").setobjectrefoid(iomObjA.getobjectoid());
+		iomLinkEF2.addattrobj("b1", "REF").setobjectrefoid(iomObjB2.getobjectoid());
 		iomLinkEF2.setattrvalue("attr1", "text");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1709,8 +1712,9 @@ public class UniqueConstraints23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjE));
-		validator.validate(new ObjectEvent(iomObjF));
+		validator.validate(new ObjectEvent(iomObjA));
+		validator.validate(new ObjectEvent(iomObjB1));
+        validator.validate(new ObjectEvent(iomObjB2));
 		validator.validate(new ObjectEvent(iomLinkEF));
 		validator.validate(new ObjectEvent(iomLinkEF2));
 		validator.validate(new EndBasketEvent());

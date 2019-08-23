@@ -7,15 +7,15 @@
 	</ili:headersection>
 	<ili:datasection>
 		<TopicC ili:bid="bidC">
-			<ClassA ili:tid="oid1">
+			<TopicC.ClassA ili:tid="oid1">
 				<attrA>textOid1</attrA>
-			</ClassA>
-			<ClassB ili:tid="oid2">
+			</TopicC.ClassA>
+			<TopicC.ClassB ili:tid="oid2">
 				<attrA>textOid2</attrA>
-			</ClassB>
-			<ClassC ili:tid="oid3">
+			</TopicC.ClassB>
+			<TopicC.ClassC ili:tid="oid3">
 				<attrA>textOid3</attrA>
-			</ClassC>
+			</TopicC.ClassC>
 		</TopicC>
 	</ili:datasection>
 </ili:transfer>

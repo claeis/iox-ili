@@ -6,6 +6,16 @@ ideas/open issues
 LATEST
 -----------------------------
 
+iox-ili 1.20.12 (2019-08-23)
+-----------------------------
+- remove reference to javax.xml.bind.DatatypeConverter (because of removal in jdk11) 
+- Validator: show coord in XTF interscetion errormessage
+- Validator: fixed NPE: if structAttributeName element without a nested structure element
+- ItfReader2: support reading linetables in addition to polygons
+- ItfReader2: support topic filter
+- XtfReade24: fixed attr/role namespace
+- ReaderFactory: try CsvReader only if filename ends with .csv
+
 iox-ili 1.20.11 (2019-04-01)
 -----------------------------
 - XTF23/24Reader: support embedded association with attributes

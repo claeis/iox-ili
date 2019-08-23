@@ -7,14 +7,14 @@
 	</ili:headersection>
 	<ili:datasection>
 		<Fail2 ili:bid="bid">
-			<ClassA ili:tid="oid1">
-			</ClassA>
-			<ClassB ili:tid="oid2">
-			</ClassB>
-			<Beziehung>
+			<Fail2.ClassA ili:tid="oid1">
+			</Fail2.ClassA>
+			<Fail2.ClassB ili:tid="oid2">
+			</Fail2.ClassB>
+			<Fail2.Beziehung>
 				<roleA ili:ref="oid1"/>
 				<roleB ili:ref="oid2"/>
-			</Beziehung>
+			</Fail2.Beziehung>
 		</Fail2>
 	</ili:datasection>
 </ili:transfer>

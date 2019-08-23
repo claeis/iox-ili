@@ -696,8 +696,8 @@ public class AdditionalConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(3,logger.getErrs().size());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("intersection tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Intersection coord1 (571428.571, 207142.857), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (586666.667, 230000.000), tids o1, o1", logger.getErrs().get(1).getEventMsg());
 		assertEquals("Set Constraint AdditionalModelH.AdditionalTopicH.AdditionalClassH.Constraint1 is not true.", logger.getErrs().get(2).getEventMsg());
 	}
 	

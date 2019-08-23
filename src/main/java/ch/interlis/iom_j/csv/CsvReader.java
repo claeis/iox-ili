@@ -578,4 +578,9 @@ public class CsvReader implements IoxReader,IoxIliReader {
 	public String getLineSeparator() {
 		return lineSeparator;
 	}
+    @Override
+    public void setTopicFilter(String[] topicNames) {
+        // TODO Auto-generated method stub
+        
+    }
 }

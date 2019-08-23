@@ -225,7 +225,7 @@ public class Oid23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob die Definition einer Association ohne Oid moeglich ist.
+	// Es wird getestet ob die Definition einer Association ohne Oid kein Fehler liefert
 	@Test
 	public void associatianWithoutId_Ok(){
 		final String OBJ_B1="o_b1";
@@ -251,7 +251,7 @@ public class Oid23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob die Definition einer Association mit einer Oid moeglich ist.
+	// Es wird getestet ob eine Association mit einer Id keinen Fehler liefert
 	@Test
 	public void associatianWithId_Ok(){
 		final String OBJ_B1="o_b1";
@@ -277,9 +277,9 @@ public class Oid23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob die Definition einer Association mit einer uuoid als Oid moeglich ist.
+	// Es wird getestet ob eine Association mit gueltiger UUID kein Fehler gibt 
 	@Test
-	public void associatianWithOidUUOID_Ok(){
+	public void associatianWithUUID_Ok(){
 		final String OBJ_B1="o_b1";
 		final String OBJ_C1="o_c1";
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
@@ -303,12 +303,13 @@ public class Oid23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Klasse mit einer Oid, eine BAG einer Struktur erstellen kann.
+	// Es wird getestet ob eine Structur ohne Id keinen Fehler liefert
 	@Test
 	public void struct_Ok(){
 		final String OBJ_B1="o_b1";
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
-		objB1.addattrobj("attrB2", STRUCTA);
+        Iom_jObject structA=new Iom_jObject(STRUCTA, null);
+		objB1.addattrobj("attrB2", structA);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -435,9 +436,35 @@ public class Oid23Test {
 		assertEquals("Class Oid23.Topic.ClassB has to have an OID", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Association ohne Oid erstellt werden kann, wenn diese Stand Alone ist.
+    // Es wird getestet ob die Definition einer Association mit Id die keine Id haben sollt einen Fehler liefert
+    @Test
+    public void associatianWithoutId_superfluousId_Fail(){
+        final String OBJ_B1="o_b1";
+        final String OBJ_C1="o_c1";
+        Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
+        Iom_jObject objC1=new Iom_jObject(CLASSC, OBJ_C1);
+        Iom_jObject objBC=new Iom_jObject(ASSOCIATIONB2, "1");
+        objBC.addattrobj("b2", "REF").setobjectrefoid(OBJ_B1);
+        objBC.addattrobj("c2", "REF").setobjectrefoid(OBJ_C1);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new ObjectEvent(objC1));
+        validator.validate(new ObjectEvent(objBC));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Association Oid23.Topic.bc2 must not have an OID (1)", logger.getErrs().get(0).getEventMsg());
+    }
+	// Es wird getestet ob eine Association ohne Id, die aber eine Id haben muesste, einen Fehler liefert
 	@Test
-	public void associatianWithId_Fail(){
+	public void associatianWithId_missingId_Fail(){
 		final String OBJ_B1="o_b1";
 		final String OBJ_C1="o_c1";
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
@@ -462,9 +489,9 @@ public class Oid23Test {
 		assertEquals("Association Oid23.Topic.bc3 has to have an OID", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es wird getestet ob eine Association ohne Oid erstellt werden kann, wenn diese Stand Alone ist.
+	// Es wird getestet ob bei einer fehlenden UUID ein Fehler gemeldet wird 
 	@Test
-	public void associatianWithOid_Fail(){
+	public void associatianWithUUID_NoUUID_Fail(){
 		final String OBJ_B1="o_b1";
 		final String OBJ_C1="o_c1";
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
@@ -488,6 +515,32 @@ public class Oid23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Association Oid23.Topic.bc4 has to have an OID", logger.getErrs().get(0).getEventMsg());
 	}
+    // Es wird getestet ob eine Association mit ungueltiger UUID einen Fehler liefert
+    @Test
+    public void associatianWithUUID_MalformedUUID_Fail(){
+        final String OBJ_B1="o_b1";
+        final String OBJ_C1="o_c1";
+        Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
+        Iom_jObject objC1=new Iom_jObject(CLASSC, OBJ_C1);
+        Iom_jObject objBC=new Iom_jObject(ASSOCIATIONB4, "123e4567-TTTT-12d3-a456-426655440000");
+        objBC.addattrobj("b4", "REF").setobjectrefoid(OBJ_B1);
+        objBC.addattrobj("c4", "REF").setobjectrefoid(OBJ_C1);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new ObjectEvent(objC1));
+        validator.validate(new ObjectEvent(objBC));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("TID <123e4567-TTTT-12d3-a456-426655440000> is not a valid UUID", logger.getErrs().get(0).getEventMsg());
+    }
     
     @Test
     public void validateOidFirstLetterisStartWithNull_Fail() throws Exception {
@@ -732,6 +785,27 @@ public class Oid23Test {
         // Asserts
         assertEquals(1, logger.getErrs().size());
         assertEquals("value <1eg5mQXX2000004a> is not a valid OID in attribute attrC", logger.getErrs().get(0).getEventMsg());
+    }
+    // Es wird getestet ob eine Structur mit Id einen Fehler liefert
+    @Test
+    public void struct_superfluousId_Fail(){
+        final String OBJ_B1="o_b1";
+        Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
+        Iom_jObject structA=new Iom_jObject(STRUCTA, "1");
+        objB1.addattrobj("attrB2", structA);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Attribute attrB2[0] (Oid23.Topic.StructA) must not have an OID (1)", logger.getErrs().get(0).getEventMsg());
     }
 
 }
