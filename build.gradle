@@ -34,7 +34,8 @@ dependencies {
     testCompile (group: 'ch.interlis', name: 'ili2c-tool', version: '4.7.10'){
         exclude group: 'ch.interlis', module: 'iox-ili'
     }
-    deployerJars "org.apache.maven.wagon:wagon-ftp:3.0.0"
+    deployerJars "org.apache.maven.wagon:wagon-ftp:3.3.3"
+    deployerJars "org.apache.maven.wagon:wagon-ssh:3.3.3"
 }
 
 repositories {
