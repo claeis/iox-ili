@@ -416,15 +416,25 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 	                Polygon poly=polygons.get(tid);
 	                for(String lineTid:getTidAsArray(poly)){
 	                    IomObject line=getLineObject(lineTid);
+                        if(line==null) {
+                            throw new IllegalStateException();
+                        }
 	                    if(line.getattrvaluecount(mainTableRef1)==0) {
-	                        line.setattrvalue(mainTableRef1, tid);
+	                        IomObject ref=new Iom_jObject("REF",null);
+	                        ref.setobjectrefoid(tid);
+	                        line.addattrobj(mainTableRef1, ref);
 	                    }else if(line.getattrvaluecount(mainTableRef2)==0) {
-	                        String ref1=line.getattrvalue(mainTableRef1);
+	                        IomObject ref=line.getattrobj(mainTableRef1,0);
+	                        String ref1=ref.getobjectrefoid();
 	                        if(ref1.compareTo(tid)>0) {
-	                            line.setattrvalue(mainTableRef1, tid);
-                                line.setattrvalue(mainTableRef2, ref1);
+	                            ref.setobjectrefoid(tid);
+	                            ref=new Iom_jObject("REF",null);
+	                            ref.setobjectrefoid(ref1);
+	                            line.addattrobj(mainTableRef2, ref);
 	                        }else {
-	                            line.setattrvalue(mainTableRef2, tid);
+                                ref=new Iom_jObject("REF",null);
+                                ref.setobjectrefoid(tid);
+                                line.addattrobj(mainTableRef2, ref);
 	                        }
 	                    }else {
 	                        throw new IllegalStateException("more than two refs in line");
@@ -481,6 +491,11 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
             java.util.HashSet<String> uniqueTids=new java.util.HashSet<String>();
             for(CurveSegment seg:segs){
                 String tidx=seg.getUserData().toString();
+                if(tidx.startsWith(CompoundCurve.MODIFIED_TID_TAG)) {
+                    tidx=tidx.substring(CompoundCurve.MODIFIED_TID_TAG.length());
+                }else if(tidx.startsWith(CompoundCurve.OVERLAP_TID_TAG)) {
+                    tidx=tidx.substring(CompoundCurve.OVERLAP_TID_TAG.length());
+                }
                 if(!uniqueTids.contains(tidx)){
                     hitTids.add(tidx);
                     uniqueTids.add(tidx);

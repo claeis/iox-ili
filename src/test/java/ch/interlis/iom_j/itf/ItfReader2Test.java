@@ -81,6 +81,35 @@ public class ItfReader2Test {
 		errs=new LogCollector();
 		EhiLogger.getInstance().addListener(errs);
 	}
+    @Test
+    @Ignore
+    public void testUserData() throws Exception {
+        EhiLogger.getInstance().setTraceFilter(false);
+        Configuration ili2cConfig=new Configuration();
+        FileEntry fileEntry=new FileEntry("User.ili", FileEntryKind.ILIMODELFILE);
+        ili2cConfig.addFileEntry(fileEntry);
+        ili2cConfig.setGenerateWarnings(false);
+        TransferDescription td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
+        assertNotNull(td);
+        
+        ItfReader2 reader=new ItfReader2(new File("User.itf"),false);
+        reader.setModel(td);
+        reader.setReadLinetables(true);
+        IoxEvent event=null;
+        HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
+         do{
+                event=reader.read();
+                if(event instanceof StartTransferEvent){
+                }else if(event instanceof StartBasketEvent){
+                }else if(event instanceof ObjectEvent){
+                    IomObject iomObj=((ObjectEvent)event).getIomObject();
+                    assertNotNull(iomObj.getobjectoid());
+                    objs.put(iomObj.getobjectoid(), iomObj);
+                }else if(event instanceof EndBasketEvent){
+                }else if(event instanceof EndTransferEvent){
+                }
+         }while(!(event instanceof EndTransferEvent));
+    }
 	
     @Test
     public void testSURFACEbasic() throws Iox2jtsException, IoxException {
@@ -371,11 +400,11 @@ public class ItfReader2Test {
          assertNotNull(objs.get("3"));
          assertNotNull(objs.get("10"));
          assertNotNull(objs.get("11"));
-         assertEquals("Test1.TopicB.TableB_Form oid 1 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 140.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 110.0, C2 110.0}, COORD {C1 120.0, C2 110.0}]}}, _itf_ref_TableB 10}", 
+         assertEquals("Test1.TopicB.TableB_Form oid 1 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 140.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 110.0, C2 110.0}, COORD {C1 120.0, C2 110.0}]}}, _itf_ref_TableB -> 10 REF {}}", 
                  objs.get("1").toString());
-         assertEquals("Test1.TopicB.TableB_Form oid 2 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 110.0}, COORD {C1 120.0, C2 140.0}]}}, _itf_ref2_TableB 11, _itf_ref_TableB 10}", 
+         assertEquals("Test1.TopicB.TableB_Form oid 2 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 110.0}, COORD {C1 120.0, C2 140.0}]}}, _itf_ref2_TableB -> 11 REF {}, _itf_ref_TableB -> 10 REF {}}", 
                  objs.get("2").toString());
-         assertEquals("Test1.TopicB.TableB_Form oid 3 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 110.0}, COORD {C1 130.0, C2 110.0}, COORD {C1 130.0, C2 140.0}, COORD {C1 120.0, C2 140.0}]}}, _itf_ref_TableB 11}", 
+         assertEquals("Test1.TopicB.TableB_Form oid 3 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 110.0}, COORD {C1 130.0, C2 110.0}, COORD {C1 130.0, C2 140.0}, COORD {C1 120.0, C2 140.0}]}}, _itf_ref_TableB -> 11 REF {}}", 
                  objs.get("3").toString());
          assertEquals("Test1.TopicB.TableB oid 10 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}, _itf_Form COORD {C1 115.0, C2 115.0}}", 
                  objs.get("10").toString());
@@ -403,9 +432,9 @@ public class ItfReader2Test {
                 }
          }while(!(event instanceof EndTransferEvent));   
          assertEquals(3,objs.size());
-         assertEquals("Test1.TopicB.TableB_Form oid 1:2 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 111.0, C2 113.0}, COORD {C1 113.0, C2 111.0}, COORD {C1 110.0, C2 110.0}]}}, _itf_ref_TableB 10}", 
+         assertEquals("Test1.TopicB.TableB_Form oid 1:2 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 111.0, C2 113.0}, COORD {C1 113.0, C2 111.0}, COORD {C1 110.0, C2 110.0}]}}, _itf_ref_TableB -> 10 REF {}}", 
                  objs.get("1:2").toString());
-         assertEquals("Test1.TopicB.TableB_Form oid 1:1 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 110.0, C2 110.0}]}}, _itf_ref_TableB 10}", 
+         assertEquals("Test1.TopicB.TableB_Form oid 1:1 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 110.0, C2 110.0}]}}, _itf_ref_TableB -> 10 REF {}}", 
                  objs.get("1:1").toString());
          assertEquals("Test1.TopicB.TableB oid 10 {Form MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}, BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 113.0, C2 111.0}, COORD {C1 111.0, C2 113.0}, COORD {C1 110.0, C2 110.0}]}}}]}}, _itf_Form COORD {C1 115.0, C2 115.0}}", 
                  objs.get("10").toString());
@@ -431,17 +460,17 @@ public class ItfReader2Test {
          }while(!(event instanceof EndTransferEvent));   
          assertEquals(9,objs.size());
          assertNotNull(objs.get("1:1"));
-         assertEquals("Test1.TopicB.TableB_Form oid 3:2 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 130.0, C2 140.0}, COORD {C1 120.0, C2 140.0}]}}, _itf_ref2_TableB 12, _itf_ref_TableB 11}", 
+         assertEquals("Test1.TopicB.TableB_Form oid 3:2 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 130.0, C2 140.0}, COORD {C1 120.0, C2 140.0}]}}, _itf_ref2_TableB -> 12 REF {}, _itf_ref_TableB -> 11 REF {}}", 
                  objs.get("3:2").toString());
-         assertEquals("Test1.TopicB.TableB_Form oid 3:1 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 110.0}, COORD {C1 130.0, C2 110.0}, COORD {C1 130.0, C2 140.0}]}}, _itf_ref_TableB 11}", 
+         assertEquals("Test1.TopicB.TableB_Form oid 3:1 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 110.0}, COORD {C1 130.0, C2 110.0}, COORD {C1 130.0, C2 140.0}]}}, _itf_ref_TableB -> 11 REF {}}", 
                  objs.get("3:1").toString());
-         assertEquals("Test1.TopicB.TableB_Form oid 4 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 140.0}, COORD {C1 110.0, C2 160.0}, COORD {C1 130.0, C2 160.0}, COORD {C1 130.0, C2 140.0}]}}, _itf_ref_TableB 12}", 
+         assertEquals("Test1.TopicB.TableB_Form oid 4 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 140.0}, COORD {C1 110.0, C2 160.0}, COORD {C1 130.0, C2 160.0}, COORD {C1 130.0, C2 140.0}]}}, _itf_ref_TableB -> 12 REF {}}", 
                  objs.get("4").toString());
-         assertEquals("Test1.TopicB.TableB_Form oid 1:3 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 110.0}, COORD {C1 120.0, C2 140.0}]}}, _itf_ref2_TableB 11, _itf_ref_TableB 10}", 
+         assertEquals("Test1.TopicB.TableB_Form oid 1:3 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 110.0}, COORD {C1 120.0, C2 140.0}]}}, _itf_ref2_TableB -> 11 REF {}, _itf_ref_TableB -> 10 REF {}}", 
                  objs.get("1:3").toString());
-         assertEquals("Test1.TopicB.TableB_Form oid 1:2 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 140.0}, COORD {C1 110.0, C2 110.0}, COORD {C1 120.0, C2 110.0}]}}, _itf_ref_TableB 10}", 
+         assertEquals("Test1.TopicB.TableB_Form oid 1:2 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 140.0}, COORD {C1 110.0, C2 110.0}, COORD {C1 120.0, C2 110.0}]}}, _itf_ref_TableB -> 10 REF {}}", 
                  objs.get("1:2").toString());
-         assertEquals("Test1.TopicB.TableB_Form oid 1:1 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 140.0}, COORD {C1 110.0, C2 140.0}]}}, _itf_ref2_TableB 12, _itf_ref_TableB 10}", 
+         assertEquals("Test1.TopicB.TableB_Form oid 1:1 {_itf_geom_TableB POLYLINE {sequence SEGMENTS {segment [COORD {C1 120.0, C2 140.0}, COORD {C1 110.0, C2 140.0}]}}, _itf_ref2_TableB -> 12 REF {}, _itf_ref_TableB -> 10 REF {}}", 
                  objs.get("1:1").toString());
          assertEquals("Test1.TopicB.TableB oid 10 {Form MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 110.0, C2 110.0}, COORD {C1 110.0, C2 140.0}, COORD {C1 120.0, C2 140.0}, COORD {C1 120.0, C2 110.0}, COORD {C1 110.0, C2 110.0}]}}}}}, _itf_Form COORD {C1 115.0, C2 115.0}}", 
                  objs.get("10").toString());
