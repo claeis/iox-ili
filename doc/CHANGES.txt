@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- ItfReader2: swap topic filter logic
 
 iox-ili 1.20.12 (2019-08-23)
 -----------------------------

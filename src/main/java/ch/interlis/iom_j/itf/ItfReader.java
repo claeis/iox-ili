@@ -222,7 +222,7 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 						}
 						state=50;
 						String topicQName=modelName+"."+topicName;
-						if(filterTopics==null || !filterTopics.contains(topicQName)) {
+						if(filterTopics==null || filterTopics.contains(topicQName)) {
 	                        if(bidPrefix==null){
 	                            event=new StartBasketEvent(topicQName,"itf"+Integer.toString(basketCount++));
 	                        }else{

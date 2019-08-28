@@ -50,6 +50,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 	private java.io.InputStream inputFile=null;
     private ArrayList<String> models=new ArrayList<String>();
 	private Topic currentTopic=null;
+    private java.util.Set<String> filterTopics=null;
 	private TransferDescription td;
 	private int state = STATE_START;
 	
@@ -1356,7 +1357,9 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 
     @Override
     public void setTopicFilter(String[] topicNames) {
-        // TODO Auto-generated method stub
-        
+        this.filterTopics=new java.util.HashSet<String>();
+        for(String topicName:topicNames) {
+            filterTopics.add(topicName);
+        }
     }
 }

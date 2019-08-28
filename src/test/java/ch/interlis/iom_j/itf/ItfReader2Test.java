@@ -137,7 +137,7 @@ public class ItfReader2Test {
     public void testSURFACEbasicFilter() throws Iox2jtsException, IoxException {
         ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceBasic.itf"),false);
         reader.setModel(td);
-        reader.setTopicFilter(new String[] {"Test1.TopicA"});
+        reader.setTopicFilter(new String[] {"Test1.TopicB"});
         IoxEvent event=null;
          do{
                 event=reader.read();
@@ -360,7 +360,7 @@ public class ItfReader2Test {
     public void testAREAbasicFilter() throws Iox2jtsException, IoxException {
         ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/AreaBasic.itf"),false);
         reader.setModel(td);
-        reader.setTopicFilter(new String[] {"Test1.TopicB"});
+        reader.setTopicFilter(new String[] {"Test1.TopicA"});
         IoxEvent event=null;
          do{
                 event=reader.read();

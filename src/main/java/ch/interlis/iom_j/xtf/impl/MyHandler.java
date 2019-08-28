@@ -53,6 +53,7 @@ public class MyHandler
 	public static final String HEADER_OBJECT_MODELENTRY_URI="uri";
     public static final String HEADER_OBJECT_MODELENTRY_VERSION="version";
 	
+    private java.util.Set<String> filterTopics=null;
 	private java.util.HashMap<String, IomObject> header=null;
 	private boolean isIli22=false;
 	public boolean stopParser=false;
@@ -400,6 +401,12 @@ public class MyHandler
     	 * DATASECTION
     	 */
     	if(state==BEFORE_BASKET){
+            if(filterTopics==null || filterTopics.contains(name)) {
+                
+            }else {
+                skip=1;
+                return;
+            }
 			Attribute bid = event.getAttributeByName(new QName("BID"));
 	        if (bid == null){
 	        	// BID is mandatory
@@ -1096,4 +1103,10 @@ public class MyHandler
 	{
 		return factory.createIomObject(type,oid);
 	}
+    public void setTopicFilter(String[] topicNames) {
+        this.filterTopics=new java.util.HashSet<String>();
+        for(String topicName:topicNames) {
+            filterTopics.add(topicName);
+        }
+    }
   };

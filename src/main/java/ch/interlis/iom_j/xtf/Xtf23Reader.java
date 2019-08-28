@@ -33,6 +33,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 	private java.io.InputStream inputFile=null;
 	private int oidSpaceSize=0;
 	private ArrayList<String> models=null;
+    private java.util.Set<String> filterTopics=null;
 	private int state = START;
 
 	// state
@@ -1308,7 +1309,9 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 
     @Override
     public void setTopicFilter(String[] topicNames) {
-        // TODO Auto-generated method stub
-        
+        this.filterTopics=new java.util.HashSet<String>();
+        for(String topicName:topicNames) {
+            filterTopics.add(topicName);
+        }
     }
 }
