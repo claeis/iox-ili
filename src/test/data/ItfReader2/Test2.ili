@@ -1,0 +1,49 @@
+TRANSFER Test1;
+
+  DOMAIN
+    LKoord = COORD2 100.00 100.00
+                    900.00 900.00;
+
+MODEL Test2
+
+  TOPIC TopicA =
+    TABLE TableA =
+      Form: OPTIONAL SURFACE WITH (STRAIGHTS, ARCS) VERTEX LKoord
+                 WITHOUT OVERLAPS > 0.10
+        LINEATTR =
+          Linienart: OPTIONAL (
+            eins,
+            zwei,
+            drei);
+        END;
+      NO IDENT
+    END TableA;
+  END TopicA.
+
+  TOPIC TopicB =
+    TABLE TableB =
+      Form: OPTIONAL AREA WITH (STRAIGHTS, ARCS) VERTEX LKoord
+                 WITHOUT OVERLAPS > 0.10
+        LINEATTR =
+          Linienart: OPTIONAL (
+            eins,
+            zwei,
+            drei,
+            vier,
+            fuenf,
+            sechs,
+            sieben,
+            acht);
+        END;
+      NO IDENT
+    END TableB;
+  END TopicB.
+  
+END Test2.
+
+FORMAT FREE;
+CODE BLANK = DEFAULT, UNDEFINED = DEFAULT, CONTINUE = DEFAULT;
+TID = ANY;
+
+END.
+

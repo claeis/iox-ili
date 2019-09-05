@@ -2,11 +2,11 @@
 SCNT
 Beispiel Transfer-File
 ////
-MTID Test1
-MODL Test1
+MTID Test2
+MODL Test2
 TOPI TopicB
 TABL TableB_Form
-OBJE 1
+OBJE 1 0
 STPT 110.0 110.0
 LIPT 120.0 110.0
 LIPT 120.0 140.0
