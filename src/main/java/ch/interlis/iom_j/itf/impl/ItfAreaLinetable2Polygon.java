@@ -64,6 +64,7 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 	private Map<String,Polygon> polygons=new HashMap<String,Polygon>();
 	private Map<String,IomObject> mainTids=new HashMap<String,IomObject>();
 	private Map<String,IomObject> lines=null; 
+    private Map<String,IomObject> lineattrs=null; 
 	private boolean surfacesBuilt=false;
 	private String helperTableGeomAttrName=null;
 	private Table linattrTab=null;
@@ -119,6 +120,7 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 	public void close()
 	{
         lines=null;
+        lineattrs=null;
         mainTids=null;
 		if(objPool!=null){
 			objPool.close();
@@ -130,12 +132,16 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 	{
 		if(lines==null){
 			lines=objPool.newObjectPoolImpl2(new IomObjectSerializer());
+            lineattrs=objPool.newObjectPoolImpl2(new IomObjectSerializer());
 		}
 		IomObject polyline=iomObj.getattrobj(helperTableGeomAttrName, 0);
 		if(polyline==null){
 			dataerrs.add(new IoxInvalidDataException("empty line",linetableIliqname,iomObj.getobjectoid(),iomObj));
 		}else{
 			lines.put(iomObj.getobjectoid(),iomObj);
+			Iom_jObject lineattr=new Iom_jObject(iomObj);
+			lineattr.setattrundefined(helperTableGeomAttrName);
+            lineattrs.put(iomObj.getobjectoid(),lineattr);
 		}
 	}
 	public void addGeoRef(String tid,IomObject iomCoord)
@@ -190,11 +196,7 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 
 			ArrayList<CompoundCurve> segv=lineset.buildBoundaries(lines,jtsFact);
 			lineset=null;
-			if(!keepLinetables) {
-	            lines=null;     
-	            objPool.close();
-	            objPool=null;
-			}
+            lines=null;     
 
 			EhiLogger.traceState("validate noding..."+helperTableGeomAttrName+", maxOverlaps "+maxOverlaps+", offset "+newVertexOffset);
 			for(CompoundCurve seg : segv){
@@ -251,7 +253,9 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 			//Polygonizer polygonizer=new Polygonizer();
 			IoxPolygonizer polygonizer=new IoxPolygonizer(newVertexOffset);
 			//for(CompoundCurve boundary:segv){
-            lines=new HashMap<String,IomObject>();
+			if(keepLinetables) {
+	            lines=objPool.newObjectPoolImpl2(new IomObjectSerializer());
+			}
             try {
                 HashMap<String,Integer> tidCount=new HashMap<String,Integer>();
                 HashMap<String,Integer> tidIdxs=new HashMap<String,Integer>();
@@ -274,10 +278,12 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
                     if(tidCount.get(lineTid)>1) {
                         lineTid=lineTid+":"+tidIdx;
                     }
-                    IomObject iomLine=Jtsext2iox.JTS2polyline(boundary);
-                    IomObject iomLinetableObj=new Iom_jObject(linetableIliqname,lineTid);
-                    iomLinetableObj.addattrobj(helperTableGeomAttrName, iomLine);
-                    lines.put(lineTid,iomLinetableObj);
+                    if(keepLinetables) {
+                        IomObject iomLine=Jtsext2iox.JTS2polyline(boundary);
+                        IomObject iomLinetableObj=new Iom_jObject(linetableIliqname,lineTid);
+                        iomLinetableObj.addattrobj(helperTableGeomAttrName, iomLine);
+                        lines.put(lineTid,iomLinetableObj);
+                    }
                     boundary.setUserData(lineTid);
                     boundary.setSegmentsUserData(lineTid);
                     polygonizer.add(boundary);
@@ -491,11 +497,7 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
             java.util.HashSet<String> uniqueTids=new java.util.HashSet<String>();
             for(CurveSegment seg:segs){
                 String tidx=seg.getUserData().toString();
-                if(tidx.startsWith(CompoundCurve.MODIFIED_TID_TAG)) {
-                    tidx=tidx.substring(CompoundCurve.MODIFIED_TID_TAG.length());
-                }else if(tidx.startsWith(CompoundCurve.OVERLAP_TID_TAG)) {
-                    tidx=tidx.substring(CompoundCurve.OVERLAP_TID_TAG.length());
-                }
+                tidx = removeOverlapRemovalPrefix(tidx);
                 if(!uniqueTids.contains(tidx)){
                     hitTids.add(tidx);
                     uniqueTids.add(tidx);
@@ -503,6 +505,14 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
             }
         }
         return hitTids.toArray(new String[hitTids.size()]);
+    }
+    private String removeOverlapRemovalPrefix(String tidx) {
+        if(tidx.startsWith(CompoundCurve.MODIFIED_TID_TAG)) {
+            tidx=tidx.substring(CompoundCurve.MODIFIED_TID_TAG.length());
+        }else if(tidx.startsWith(CompoundCurve.OVERLAP_TID_TAG)) {
+            tidx=tidx.substring(CompoundCurve.OVERLAP_TID_TAG.length());
+        }
+        return tidx;
     }
     @Override
 	public ArrayList<IoxInvalidDataException> getDataerrs() {
@@ -529,6 +539,24 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
         if(!keepLinetables || lines==null) {
             throw new IllegalStateException("no linetable kept");
         }
-        return lines.get(lineTid);
+        IomObject line= lines.get(lineTid);
+        String pureLineTid=lineTid.replaceAll(":[0-9]+\\z", "");
+        pureLineTid = removeOverlapRemovalPrefix(pureLineTid);
+        IomObject lineattr=lineattrs.get(pureLineTid);
+        mergeAttrs(line,lineattr);
+        return line;
+    }
+    private void mergeAttrs(IomObject line, IomObject src) {
+        int attrc=src.getattrcount();
+        for(int attri=0;attri<attrc;attri++) {
+            String attrName=src.getattrname(attri);
+            int valuec=src.getattrvaluecount(attrName);
+            for(int valuei=0;valuei<valuec;valuei++) {
+                String valueStr=src.getattrprim(attrName, valuei);
+                if(valueStr!=null) {
+                    line.setattrvalue(attrName,valueStr);
+                }
+            }
+        }
     }
 }

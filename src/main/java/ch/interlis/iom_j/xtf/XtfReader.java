@@ -25,6 +25,7 @@ package ch.interlis.iom_j.xtf;
 
 import javax.xml.stream.events.*;
 
+import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.xtf.impl.MyHandler;
 import ch.interlis.iom_j.xtf.impl.XtfWriterAlt;
@@ -39,7 +40,7 @@ import ch.ehi.basics.logging.EhiLogger;
  * @author ce
  * @version $Revision: 1.0 $ $Date: 08.02.2007 $
  */
-public class XtfReader implements IoxReader {
+public class XtfReader implements IoxReader, IoxIliReader {
     public static final String XMLNS_XTF22=XtfWriterAlt.ili22Ns;
     public static final String XMLNS_XTF23=XtfWriterAlt.ili23Ns;
 	private ch.interlis.iom_j.xtf.impl.MyHandler handler = null;
@@ -143,4 +144,12 @@ public class XtfReader implements IoxReader {
 		handler.setFactory(factory);
 	}
 
+    @Override
+    public void setTopicFilter(String[] topicNames) {
+        handler.setTopicFilter(topicNames);
+    }
+
+    @Override
+    public void setModel(TransferDescription td) {
+    }
 }
