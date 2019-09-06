@@ -196,11 +196,7 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 
 			ArrayList<CompoundCurve> segv=lineset.buildBoundaries(lines,jtsFact);
 			lineset=null;
-			if(!keepLinetables) {
-	            lines=null;     
-	            objPool.close();
-	            objPool=null;
-			}
+            lines=null;     
 
 			EhiLogger.traceState("validate noding..."+helperTableGeomAttrName+", maxOverlaps "+maxOverlaps+", offset "+newVertexOffset);
 			for(CompoundCurve seg : segv){
@@ -257,7 +253,9 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 			//Polygonizer polygonizer=new Polygonizer();
 			IoxPolygonizer polygonizer=new IoxPolygonizer(newVertexOffset);
 			//for(CompoundCurve boundary:segv){
-            lines=new HashMap<String,IomObject>();
+			if(keepLinetables) {
+	            lines=objPool.newObjectPoolImpl2(new IomObjectSerializer());
+			}
             try {
                 HashMap<String,Integer> tidCount=new HashMap<String,Integer>();
                 HashMap<String,Integer> tidIdxs=new HashMap<String,Integer>();
@@ -280,10 +278,12 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
                     if(tidCount.get(lineTid)>1) {
                         lineTid=lineTid+":"+tidIdx;
                     }
-                    IomObject iomLine=Jtsext2iox.JTS2polyline(boundary);
-                    IomObject iomLinetableObj=new Iom_jObject(linetableIliqname,lineTid);
-                    iomLinetableObj.addattrobj(helperTableGeomAttrName, iomLine);
-                    lines.put(lineTid,iomLinetableObj);
+                    if(keepLinetables) {
+                        IomObject iomLine=Jtsext2iox.JTS2polyline(boundary);
+                        IomObject iomLinetableObj=new Iom_jObject(linetableIliqname,lineTid);
+                        iomLinetableObj.addattrobj(helperTableGeomAttrName, iomLine);
+                        lines.put(lineTid,iomLinetableObj);
+                    }
                     boundary.setUserData(lineTid);
                     boundary.setSegmentsUserData(lineTid);
                     polygonizer.add(boundary);
