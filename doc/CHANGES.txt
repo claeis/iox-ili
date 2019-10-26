@@ -5,6 +5,8 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- sort coords in curve segment intersection result
+- calc arc/arc intersection with smaller radius arc as base (ili2db#308)
 
 iox-ili 1.20.13 (2019-09-06)
 -----------------------------

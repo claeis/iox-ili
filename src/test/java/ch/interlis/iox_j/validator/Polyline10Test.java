@@ -430,7 +430,7 @@ public class Polyline10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(2,logger.getErrs().size());
-		assertEquals("Attribute lineWithoutOverlaps2dArcStraights has an invalid self-intersection at (484724.74487139157, 72000.0), coord2 (482275.25512860843, 72000.0)", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Attribute lineWithoutOverlaps2dArcStraights has an invalid self-intersection at (482275.25512860843, 72000.0), coord2 (484724.74487139157, 72000.0)", logger.getErrs().get(0).getEventMsg());
 		assertEquals("Attribute lineWithoutOverlaps2dArcStraights has an invalid self-intersection at (482500.0, 71500.0), coord2 (484670.0, 71810.0)", logger.getErrs().get(1).getEventMsg());
 	}
 	
@@ -471,7 +471,7 @@ public class Polyline10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(2,logger.getErrs().size());
-		assertEquals("Attribute lineWithoutOverlaps3dArcStraights has an invalid self-intersection at (484724.74487139157, 72000.0), coord2 (482275.25512860843, 72000.0)", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Attribute lineWithoutOverlaps3dArcStraights has an invalid self-intersection at (482275.25512860843, 72000.0), coord2 (484724.74487139157, 72000.0)", logger.getErrs().get(0).getEventMsg());
 		assertEquals("Attribute lineWithoutOverlaps3dArcStraights has an invalid self-intersection at (482500.0, 71500.0), coord2 (484670.0, 71810.0)", logger.getErrs().get(1).getEventMsg());
 	}
 }

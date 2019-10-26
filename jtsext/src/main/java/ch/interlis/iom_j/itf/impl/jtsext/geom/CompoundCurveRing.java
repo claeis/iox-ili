@@ -139,7 +139,7 @@ public class CompoundCurveRing extends LinearRing {
 		if(ret==false){
 			List<Intersection> isv = validator.getIntersections();
 			for(Intersection is:isv){
-				EhiLogger.traceState("invalid CompoundCurve: "+is.toString());
+				EhiLogger.traceState("invalid CompoundCurveRing: "+is.toString());
 			}
 		}
 		return ret;
