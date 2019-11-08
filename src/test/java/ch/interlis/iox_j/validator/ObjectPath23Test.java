@@ -445,15 +445,17 @@ public class ObjectPath23Test {
     @Test
     public void recursivelyObject_OK() throws Exception {
         Iom_jObject iomObjA = new Iom_jObject(CLASSA, OID1);
+        iomObjA.setattrvalue("isLeaf", "false");
         Iom_jObject iomObjA2 = new Iom_jObject(CLASSA, OID2);
+        iomObjA2.setattrvalue("isLeaf", "true");
         
         Iom_jObject iomObjA2A = new Iom_jObject(ASSOC_A2A, null);
-        iomObjA2A.addattrobj("role_a1", "REF").setobjectrefoid(iomObjA.getobjectoid());
-        iomObjA2A.addattrobj("role_a2", "REF").setobjectrefoid(iomObjA.getobjectoid());
+        iomObjA2A.addattrobj("role_parent", "REF").setobjectrefoid(iomObjA.getobjectoid());
+        iomObjA2A.addattrobj("role_child", "REF").setobjectrefoid(iomObjA.getobjectoid());
 
         Iom_jObject iomObjA2A2 = new Iom_jObject(ASSOC_A2A, null);
-        iomObjA2A2.addattrobj("role_a1", "REF").setobjectrefoid(iomObjA.getobjectoid());
-        iomObjA2A2.addattrobj("role_a2", "REF").setobjectrefoid(iomObjA2.getobjectoid());
+        iomObjA2A2.addattrobj("role_parent", "REF").setobjectrefoid(iomObjA.getobjectoid());
+        iomObjA2A2.addattrobj("role_child", "REF").setobjectrefoid(iomObjA2.getobjectoid());
         
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
@@ -944,20 +946,23 @@ public class ObjectPath23Test {
     @Test
     public void recursivelyObject_Fail() throws Exception {
         Iom_jObject iomObjA = new Iom_jObject(CLASSA, OID1);
+        iomObjA.setattrvalue("isLeaf", "false");
         Iom_jObject iomObjA2 = new Iom_jObject(CLASSA, OID2);
+        iomObjA2.setattrvalue("isLeaf", "true");
         Iom_jObject iomObjA3 = new Iom_jObject(CLASSA, OID3);
+        iomObjA3.setattrvalue("isLeaf", "true");
         
         Iom_jObject iomObjA2A = new Iom_jObject(ASSOC_A2A, null);
-        iomObjA2A.addattrobj("role_a1", "REF").setobjectrefoid(iomObjA.getobjectoid());
-        iomObjA2A.addattrobj("role_a2", "REF").setobjectrefoid(iomObjA.getobjectoid());
+        iomObjA2A.addattrobj("role_parent", "REF").setobjectrefoid(iomObjA.getobjectoid());
+        iomObjA2A.addattrobj("role_child", "REF").setobjectrefoid(iomObjA.getobjectoid());
 
         Iom_jObject iomObjA2A2 = new Iom_jObject(ASSOC_A2A, null);
-        iomObjA2A2.addattrobj("role_a1", "REF").setobjectrefoid(iomObjA.getobjectoid());
-        iomObjA2A2.addattrobj("role_a2", "REF").setobjectrefoid(iomObjA2.getobjectoid());
+        iomObjA2A2.addattrobj("role_parent", "REF").setobjectrefoid(iomObjA.getobjectoid());
+        iomObjA2A2.addattrobj("role_child", "REF").setobjectrefoid(iomObjA2.getobjectoid());
         
         Iom_jObject iomObjA2A3 = new Iom_jObject(ASSOC_A2A, null);
-        iomObjA2A3.addattrobj("role_a1", "REF").setobjectrefoid(iomObjA.getobjectoid());
-        iomObjA2A3.addattrobj("role_a2", "REF").setobjectrefoid(iomObjA3.getobjectoid());
+        iomObjA2A3.addattrobj("role_parent", "REF").setobjectrefoid(iomObjA.getobjectoid());
+        iomObjA2A3.addattrobj("role_child", "REF").setobjectrefoid(iomObjA3.getobjectoid());
         
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();

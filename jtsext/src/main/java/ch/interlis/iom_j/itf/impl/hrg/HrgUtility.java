@@ -285,13 +285,13 @@ public static void ISCICR(double AV1I[],double AV2I[],double AW1I[],double AW2I[
 	double[] AV2I_={AV2I[0]-dy, AV2I[1]-dy,AV2I[2]-dy,AV2I[3]-dy};
 	double[] AW1I_={AW1I[0]-dx, AW1I[1]-dx,AW1I[2]-dx,AW1I[3]-dx};
 	double[] AW2I_={AW2I[0]-dy, AW2I[1]-dy,AW2I[2]-dy,AW2I[3]-dy};
-	ISCICR_(AV1I_,AV2I_,AW1I_,AW2I_,NHO,H1O,H2O,overlap);
+	ISCICR_(AV1I_,AV2I_,AW1I_,AW2I_,NHO,H1O,H2O,overlap,dx,dy);
 	for(int i=1;i<=NHO[0] && i<=2;i++){
 		H1O[i]+=dx;
 		H2O[i]+=dy;
 	}
 }
-public static void ISCICR_(double AV1I[],double AV2I[],double AW1I[],double AW2I[],int NHO[],double H1O[],double H2O[],double overlap[])
+public static void ISCICR_(double AV1I[],double AV2I[],double AW1I[],double AW2I[],int NHO[],double H1O[],double H2O[],double overlap[],double _dx,double _dy)
 	{
 	//ENTRY ISCICR (AV1I,AV2I,AW1I,AW2I,NHO,H10,H20,MSGIO,Y2IPDO)
 	// 	intersection of 2 circles, R*8 arguments
@@ -542,8 +542,8 @@ public static void ISCICR_(double AV1I[],double AV2I[],double AW1I[],double AW2I
                         }else {
                             // AV1I[1],AV2I[1] lies inside the arc with center W
                             NHO[0] = NHO[0]+1;
-                            H1O[NHO[0]] =  AV1I[1];
-                            H2O[NHO[0]] = AV2I[1];
+                            H1O[NHO[0]] =  AV1I[3];
+                            H2O[NHO[0]] = AV2I[3];
                         }
                     }else {
                         // AW1I[1],AW2I[1] lies inside the arc with center V
@@ -575,10 +575,15 @@ public static void ISCICR_(double AV1I[],double AV2I[],double AW1I[],double AW2I
 			}
 
 			NP=2;
+			//System.out.println("RV "+RV+", RW "+RW);
+            //System.out.println("V1 "+ V1 +", XVF*D1/DVW "+ (XVF*D1/DVW)+", EFP*D2/DVW " + (EFP*D2/DVW));
+            //System.out.println("V2 "+ V2 +", XVF*D2/DVW "+ (XVF*D2/DVW) +",EFP*D1/DVW "+ (EFP*D1/DVW));
+			
 			P1[1] = V1 + XVF*D1/DVW + EFP*D2/DVW;
 			P2[1] = V2 + XVF*D2/DVW - EFP*D1/DVW;
 			P1[2] = V1 + XVF*D1/DVW - EFP*D2/DVW; 
 			P2[2] = V2 + XVF*D2/DVW + EFP*D1/DVW;
+			//System.out.println("p1 ("+(P1[1]+_dx)+","+(P2[1]+_dy)+"), p2 (" +(P1[2]+_dx)+","+(P2[2]+_dy)+")");
 			YCHKEX = true;
 		}else{
 			if(DVW >= RSUM+EPS){

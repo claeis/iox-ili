@@ -64,7 +64,6 @@ public class SetConstraint23Test {
 		Iom_jObject iomObjAssoc1=new Iom_jObject(TOPICA_ASSOC_ASSOC1, null);
 		iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R1, "REF").setobjectrefoid(iomObj1.getobjectoid());
 		iomObjAssoc1.addattrobj(TOPICA_ASSOC_ASSOC1_R2, "REF").setobjectrefoid(iomObj2.getobjectoid());
-		Iom_jObject iomObj3=new Iom_jObject(TOPICA_CLASS1, OID3);
 		Iom_jObject iomObj4=new Iom_jObject(TOPICA_CLASS2, OID4);
 		// association 2
 		Iom_jObject iomObjAssoc2=new Iom_jObject(TOPICA_ASSOC_ASSOC1, null);
@@ -80,7 +79,6 @@ public class SetConstraint23Test {
 		validator.validate(new ObjectEvent(iomObj1));
 		validator.validate(new ObjectEvent(iomObj2));
 		validator.validate(new ObjectEvent(iomObjAssoc1));
-		validator.validate(new ObjectEvent(iomObj3));
 		validator.validate(new ObjectEvent(iomObj4));
 		validator.validate(new ObjectEvent(iomObjAssoc2));
 		validator.validate(new EndBasketEvent());

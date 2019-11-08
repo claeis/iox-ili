@@ -25,10 +25,21 @@ public class CurveSegmentIntersector {
 			Coordinate endPt1 = ((ArcSegment) seg1).getNormalizedEndPoint();
 			Coordinate startPt2 = ((ArcSegment) seg2).getNormalizedStartPoint();
 			Coordinate endPt2 = ((ArcSegment) seg2).getNormalizedEndPoint();
-			double[] AV1I={0.0, startPt1.x,((ArcSegment) seg1).getMidPoint().x,endPt1.x};
-			double[] AV2I={0.0, startPt1.y,((ArcSegment) seg1).getMidPoint().y,endPt1.y};
-			double[] AW1I={0.0, startPt2.x,((ArcSegment) seg2).getMidPoint().x,endPt2.x};
-			double[] AW2I={0.0, startPt2.y,((ArcSegment) seg2).getMidPoint().y,endPt2.y};
+			double[] AV1I=null;
+			double[] AV2I=null;
+			double[] AW1I=null;
+			double[] AW2I=null;
+			if(((ArcSegment) seg1).getRadius()<((ArcSegment) seg2).getRadius()) {
+	            AV1I=new double[]{0.0, startPt1.x,((ArcSegment) seg1).getMidPoint().x,endPt1.x};
+	            AV2I=new double[]{0.0, startPt1.y,((ArcSegment) seg1).getMidPoint().y,endPt1.y};
+	            AW1I=new double[]{0.0, startPt2.x,((ArcSegment) seg2).getMidPoint().x,endPt2.x};
+	            AW2I=new double[]{0.0, startPt2.y,((ArcSegment) seg2).getMidPoint().y,endPt2.y};
+			}else {
+                AV1I=new double[]{0.0, startPt2.x,((ArcSegment) seg2).getMidPoint().x,endPt2.x};
+                AV2I=new double[]{0.0, startPt2.y,((ArcSegment) seg2).getMidPoint().y,endPt2.y};
+                AW1I=new double[]{0.0, startPt1.x,((ArcSegment) seg1).getMidPoint().x,endPt1.x};
+                AW2I=new double[]{0.0, startPt1.y,((ArcSegment) seg1).getMidPoint().y,endPt1.y};
+			}
 			int[] NHO=new int[1];
 			double[] H1O=new double[3];
 			double[] H2O=new double[3];
@@ -44,6 +55,7 @@ public class CurveSegmentIntersector {
 				isNum=2;
 				is[0]=new Coordinate(H1O[1],H2O[1]);
 				is[1]=new Coordinate(H1O[2],H2O[2]);
+	            normalizeIs();
 				overlap=OVERLAP[0];
 	        }else if(NHO[0]==3){
 	            isOverlay_=true;
@@ -51,6 +63,7 @@ public class CurveSegmentIntersector {
 	            isNum=2;
 	            is[0]=new Coordinate(H1O[1],H2O[1]);
 	            is[1]=new Coordinate(H1O[2],H2O[2]);
+	            normalizeIs();
 	            overlap=OVERLAP[0];
 			}else{
 				hasIntersection_=false;
@@ -77,8 +90,19 @@ public class CurveSegmentIntersector {
 			for(int i=0;i<isNum;i++){
 				is[i]=li.getIntersection(i);
 			}
+			normalizeIs();
 		}
 	}
+
+    private void normalizeIs() {
+        if(isNum>1) {
+            if(is[0].compareTo(is[1])>0) {
+                Coordinate t=is[0];
+                is[0]=is[1];
+                is[1]=t;
+            }
+        }
+    }
 
 	public boolean isOverlay() {
 		return isOverlay_;
@@ -117,6 +141,7 @@ public class CurveSegmentIntersector {
 			isNum=2;
 			is[0]=new Coordinate(H1O[1],H2O[1]);
 			is[1]=new Coordinate(H1O[2],H2O[2]);
+            normalizeIs();
 			overlap=OVERLAP[0];
 		}else{
 			hasIntersection_=false;

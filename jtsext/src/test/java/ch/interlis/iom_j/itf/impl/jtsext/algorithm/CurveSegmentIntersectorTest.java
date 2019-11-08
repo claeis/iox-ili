@@ -4,9 +4,14 @@ import static org.junit.Assert.*;
 
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.vividsolutions.jts.algorithm.RobustLineIntersector;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
+
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
 import ch.interlis.iox.IoxException;
 
@@ -69,52 +74,7 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(is.x==645009.110);
 		assertTrue(is.y==248677.980);
 	}
-	
-	@Test
-	public void differentResultInQgis() throws IoxException{
-		CurveSegmentIntersector li=new CurveSegmentIntersector();
-		// straight
-		StraightSegment s0=new StraightSegment(
-			new Coordinate(2625269.2470, 1238678.7230),
-			new Coordinate(2625285.5890, 1238688.2690)
-		);
-		// arc
-		ArcSegment s1=new ArcSegment(
-			new Coordinate(2625285.5890, 1238688.2690), 
-			new Coordinate(2625280.7330, 1238687.6640), 
-			new Coordinate(2625277.0910, 1238690.9320)
-		);
-		// intersection test
-		li.computeIntersection(s0, s1);
-        assertTrue(li.getIntersectionNum()==2);
-		assertTrue(li.hasIntersection());
-		// coord1
-		Coordinate is=li.getIntersection(0);
-		assertEquals(is.x,2625285.5890,EPS);
-		assertEquals(is.y,1238688.2690,EPS);
-		// coord2
-		Coordinate is2=li.getIntersection(1);
-        // Strange: QGIS shows: 2625285.3642271 1238688.13770137 as intersection pt!!! but see cross check below
-       final  double targetX = 2625285.3554505454;
-       final double targetY = 1238688.1325746486;
-        assertEquals(is2.x,targetX,EPS);
-        assertEquals(is2.y,targetY,EPS);
-        // cross check
-        ArcSegment s1b=new ArcSegment(
-                new Coordinate(2625285.5890, 1238688.2690), 
-                new Coordinate(targetX, targetY), 
-                new Coordinate(2625277.0910, 1238690.9320)
-            );
-        li.computeIntersection(s0, s1b);
-        assertFalse(li.isOverlay());
-        Coordinate is1b=li.getIntersection(0);
-        assertEquals(is1b.x,2625285.5890,EPS);
-        assertEquals(is1b.y,1238688.2690,EPS);
-        Coordinate is2b=li.getIntersection(1);
-        assertEquals(is2b.x,targetX,EPS);
-        assertEquals(is2b.y,targetY,EPS);
-	}
-	
+		
 	// two straight lines with same line length.
 	// startPoints and endPoints are same.
 	@Test
@@ -148,11 +108,11 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(li.getIntersectionNum()==2);
 		assertTrue(li.isOverlay());
 		// intSeg1
-		Coordinate is=li.getIntersection(0);
+		Coordinate is=li.getIntersection(1);
 		assertEquals(100.0,is.x,EPS);
 		assertEquals(200.0,is.y,EPS);
 		// intSeg2
-		Coordinate is2=li.getIntersection(1);
+		Coordinate is2=li.getIntersection(0);
 		assertEquals(100.0,is2.x,EPS);
 		assertEquals(100.0,is2.y,EPS);
 	}
@@ -190,11 +150,11 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(li.getIntersectionNum()==2);
 		assertTrue(li.isOverlay());
 		// intSeg1
-		Coordinate is=li.getIntersection(0);
+		Coordinate is=li.getIntersection(1);
 		assertEquals(100.0,is.x,EPS);
 		assertEquals(150.0,is.y,EPS);
 		// intSeg2
-		Coordinate is2=li.getIntersection(1);
+		Coordinate is2=li.getIntersection(0);
 		assertEquals(100.0,is2.x,EPS);
 		assertEquals(100.0,is2.y,EPS);
 	}
@@ -232,11 +192,11 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
 		// intSeg1
-		Coordinate is=li.getIntersection(0);
+		Coordinate is=li.getIntersection(1);
 		assertEquals(100.0,is.x,EPS);
 		assertEquals(180.0,is.y,EPS);
 		// intSeg2
-		Coordinate is2=li.getIntersection(1);
+		Coordinate is2=li.getIntersection(0);
 		assertEquals(100.0,is2.x,EPS);
 		assertEquals(120.0,is2.y,EPS);
 	}
@@ -253,11 +213,11 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(li.getIntersectionNum()==2);
 		assertTrue(li.isOverlay());
 		// intSeg1
-		Coordinate is=li.getIntersection(0);
+		Coordinate is=li.getIntersection(1);
         assertEquals(100.0,is.x,EPS);
         assertEquals(200.0,is.y,EPS);
 		// intSeg2
-		Coordinate is2=li.getIntersection(1);
+		Coordinate is2=li.getIntersection(0);
         assertEquals(100.0,is2.x,EPS);
         assertEquals(100.0,is2.y,EPS);
 	}
@@ -274,11 +234,11 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
         // intSeg1
-        Coordinate is=li.getIntersection(1);
+        Coordinate is=li.getIntersection(0);
         assertEquals(0.0,is.x,EPS);
         assertEquals(0.0,is.y,EPS);
         // intSeg2
-        Coordinate is2=li.getIntersection(0);
+        Coordinate is2=li.getIntersection(1);
         assertEquals(0.0,is2.x,EPS);
         assertEquals(10.0,is2.y,EPS);
 	}
@@ -335,11 +295,11 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
 		// intSeg1
-		Coordinate is=li.getIntersection(0);
+		Coordinate is=li.getIntersection(1);
         assertEquals(100.0,is.x,EPS);
         assertEquals(200.0,is.y,EPS);
 		// intSeg2
-		Coordinate is2=li.getIntersection(1);
+		Coordinate is2=li.getIntersection(0);
         assertEquals(100.0,is2.x,EPS);
         assertEquals(100.0,is2.y,EPS);
 	}
@@ -377,11 +337,11 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(li.hasIntersection());
 		assertTrue(li.getIntersectionNum()==2);
 		// intSeg1
-		Coordinate is=li.getIntersection(0);
+		Coordinate is=li.getIntersection(1);
 		assertEquals(60.0,is.x,EPS);
 		assertEquals(130.0,is.y,EPS);
 		// intSeg2
-		Coordinate is2=li.getIntersection(1);
+		Coordinate is2=li.getIntersection(0);
 		assertEquals(60.0,is2.x,EPS);
 		assertEquals(70.0,is2.y,EPS);
 	}
@@ -420,10 +380,10 @@ public class CurveSegmentIntersectorTest {
 		assertTrue(li.getIntersectionNum()==2);
 		// intSeg1
 		Coordinate is=li.getIntersection(1);
+        Coordinate is2=li.getIntersection(0);
         assertEquals(70.0,is.x,EPS);
         assertEquals(60.0,is.y,EPS);
 		// intSeg2
-		Coordinate is2=li.getIntersection(0);
         assertEquals(60.0,is2.x,EPS);
         assertEquals(130.0,is2.y,EPS);
 	}
@@ -544,6 +504,47 @@ public class CurveSegmentIntersectorTest {
         assertFalse(li.isOverlay());
         assertTrue(li.hasIntersection());
         assertEquals(1,li.getIntersectionNum());
+    }
+    @Test
+    @Ignore("ili2db#308")
+    public void twoARCS_issue308() {
+        CurveSegmentIntersector li=new CurveSegmentIntersector();
+        ArcSegment s0=new ArcSegment(new Coordinate(2653134.354, 1227788.188),
+                new Coordinate(2653137.455, 1227797.289),
+                new Coordinate(2653140.555, 1227806.391));
+        
+        System.out.println(s0.getCenterPoint()+" r "+s0.getRadius()+" "+s0.getSign()+" theta "+s0.getTheta());
+        System.out.println("s0 dist "+CurveSegment.dist(s0.getStartPoint(),s0.getEndPoint()));
+        //Coordinate c0=calcCircle(s0.getStartPoint().x,s0.getStartPoint().y,s0.getMidPoint().x,s0.getMidPoint().y,s0.getEndPoint().x,s0.getEndPoint().y);
+        //System.out.println(c0);
+        //System.out.println("start r "+CurveSegment.dist(c0, s0.getStartPoint()));
+        //System.out.println("mid   r "+CurveSegment.dist(c0, s0.getMidPoint()));
+        //System.out.println("end   r "+CurveSegment.dist(c0, s0.getEndPoint()));
+        //calcCircle(s0.getStartPoint().x,s0.getStartPoint().y,s0.getMidPoint().x,s0.getMidPoint().y,s0.getEndPoint().x,s0.getEndPoint().y);
+        ArcSegment s1=new ArcSegment(new Coordinate(2653135.557, 1227789.0),
+                new Coordinate(2653134.819, 1227788.796),
+                new Coordinate(2653134.354, 1227788.188));
+        System.out.println(s1.getCenterPoint()+" r "+s1.getRadius()+" "+s1.getSign()+" theta "+s1.getTheta());
+        System.out.println("s1 dist "+CurveSegment.dist(s1.getStartPoint(),s1.getEndPoint()));
+        Coordinate c1=new Coordinate(2659582.4124795417,1249587.8392729152);
+        
+        JtsextGeometryFactory fact=new JtsextGeometryFactory();
+        LineString l0=fact.createLineString(s0.getCoordinates());
+        LineString l1=fact.createLineString(s1.getCoordinates());
+        System.out.println("intersect "+ l0.intersection(l1));
+        //calcCircle(s1.getStartPoint().x,s1.getStartPoint().y,s1.getMidPoint().x,s1.getMidPoint().y,s1.getEndPoint().x,s1.getEndPoint().y);
+        li.computeIntersection(s1, s0);
+        if(li.hasIntersection()) {
+            if(li.getIntersectionNum()>=1) {
+                System.out.println(li.getIntersection(0));
+                if(li.getIntersectionNum()==2) {
+                    System.out.println(li.getIntersection(1));
+                }
+            }
+        }
+        assertFalse(li.isOverlay());
+        assertTrue(li.hasIntersection());
+        assertTrue(li.getIntersectionNum()==1);
     }
     
 }
