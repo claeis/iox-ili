@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- fix wrong polygons overlay (equal big arcs, but different direction of definition) (ilivalidator#202)
 
 iox-ili 1.20.14 (2019-11-08)
 -----------------------------
