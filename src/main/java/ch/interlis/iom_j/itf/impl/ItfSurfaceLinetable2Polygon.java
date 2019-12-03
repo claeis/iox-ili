@@ -176,7 +176,10 @@ public class ItfSurfaceLinetable2Polygon implements Linetable2Polygon {
 			linepool=objPool.newObjectPoolImpl2(new IomObjectArraySerializer());
 		}
 		IomObject structvalue=iomObj.getattrobj(helperTableMainTableRef,0);
-		String mainTid=structvalue.getobjectrefoid();
+		String mainTid=null;
+		if(structvalue!=null) {
+	        mainTid=structvalue.getobjectrefoid();
+		}
 		if(mainTid==null) {
 			dataerrs.add(new IoxInvalidDataException("boundary line without reference to main table",linetableIliqname,iomObj.getobjectoid(),iomObj));
 			return;

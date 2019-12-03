@@ -316,6 +316,9 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 	                                        throw new IoxInvalidDataException(itfLine.getLineNumber(),"missing reference to maintable "+aclass.getScopedName());
 	                                    }else {
 	                                        ref=propv[1];
+	                                        if(ref==null) {
+	                                            throw new IoxInvalidDataException(itfLine.getLineNumber(),"missing reference to maintable "+aclass.getScopedName());
+	                                        }
 	                                    }
 	                                    if(tid2tid!=null){
 	                                        String oldRef=aclass.getName()+":"+ref;
