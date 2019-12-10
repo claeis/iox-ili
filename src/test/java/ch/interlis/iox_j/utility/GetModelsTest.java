@@ -34,6 +34,13 @@ public class GetModelsTest {
 		expectedModels.add("SimpleCoord23");
 		assertEquals(expectedModels,models);
 	}
+    @Test
+    public void xtf23ReaderNoModels_Ok() throws IoxException {
+        List<String> models=IoxUtility.getModels(new File("src/test/data/Xtf23Reader/dataSection/SimpleCoord23noModels.xtf"));
+        java.util.ArrayList<String> expectedModels=new java.util.ArrayList<String>();
+        expectedModels.add("SimpleCoord23");
+        assertEquals(expectedModels,models);
+    }
 	
 	@Test
 	public void xtf24Reader_Ok() throws IoxException {
