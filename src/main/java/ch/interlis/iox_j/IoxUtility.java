@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.xtf.Xtf24Reader;
 import ch.interlis.iom_j.xtf.XtfStartTransferEvent;
 import ch.interlis.iom_j.xtf.impl.MyHandler;
 import ch.interlis.iox.IoxEvent;
@@ -60,7 +61,9 @@ public class IoxUtility {
 					}else if(event instanceof XtfStartTransferEvent){
 						XtfStartTransferEvent xtfStart=(XtfStartTransferEvent)event;
 						addModels(ret, xtfStart);
-						return ret;
+						if(reader instanceof Xtf24Reader) {
+						    return ret;
+						}
 					}
 				}
 			}catch(ch.interlis.iox.IoxException ex){

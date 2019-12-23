@@ -3,6 +3,8 @@ package ch.interlis.iom_j.itf.impl.jtsext.geom;
 import ch.interlis.iom_j.itf.impl.hrg.HrgUtility;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.CoordinateSequences;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class ArcSegment extends CurveSegment {
@@ -11,7 +13,7 @@ public class ArcSegment extends CurveSegment {
 	private Coordinate midPoint=null;
 	private Coordinate endPoint=null;
 	private Coordinate centerPoint=null;
-	private com.vividsolutions.jts.geom.CoordinateList ret=null;
+	private com.vividsolutions.jts.geom.Coordinate[] ret=null;
 	private static final double EPSILON=0.00000001;
 
 	public ArcSegment(Object userData,Coordinate startPoint, Coordinate midPoint,
@@ -47,10 +49,10 @@ public class ArcSegment extends CurveSegment {
 		return midPoint;
 	}
 
-	private void arc2straight(double p)
+	private static com.vividsolutions.jts.geom.Coordinate[] arc2straight(com.vividsolutions.jts.geom.Coordinate startPoint, com.vividsolutions.jts.geom.Coordinate midPoint,com.vividsolutions.jts.geom.Coordinate endPoint,double radius, com.vividsolutions.jts.geom.Coordinate centerPoint, double sign, double deta, double p)
 	//throws IoxException
 	{
-		    ret=new com.vividsolutions.jts.geom.CoordinateList();
+	        com.vividsolutions.jts.geom.CoordinateList ret=new com.vividsolutions.jts.geom.CoordinateList();
 		
 			com.vividsolutions.jts.geom.Coordinate p1=null;
 			p1=startPoint;
@@ -68,8 +70,6 @@ public class ArcSegment extends CurveSegment {
 			// Distanz zwischen Zwischenpunkt und Bogenendpunkt 
 			double b=CurveSegment.dist(arcPt_re,arcPt_ho,pt2_re,pt2_ho);
 			
-			getCenterPoint();
-
 			double r=radius;
 			// Kreismittelpunkt
 			double thetaM=deta;
@@ -115,14 +115,24 @@ public class ArcSegment extends CurveSegment {
 				}
 			}
 			ret.add(new com.vividsolutions.jts.geom.Coordinate(pt2_re, pt2_ho));
+			return ret.toCoordinateArray();
 	}
 
 	@Override
 	public Coordinate[] getCoordinates() {
 		if(ret==null){
-			arc2straight(0.001);
+		    getCenterPoint();
+		    if(isArcNormalized()) {
+	            com.vividsolutions.jts.geom.Coordinate[] ret=arc2straight(startPoint,midPoint,endPoint,radius,centerPoint,sign,deta,0.001);
+	            this.ret=ret;
+		    }else {
+                com.vividsolutions.jts.geom.Coordinate[] ret=arc2straight(endPoint,midPoint,startPoint,radius,centerPoint,-sign,deta,0.001);
+                com.vividsolutions.jts.geom.impl.CoordinateArraySequence tmp=new com.vividsolutions.jts.geom.impl.CoordinateArraySequence(ret);
+                CoordinateSequences.reverse(tmp);
+                this.ret=tmp.toCoordinateArray();
+		    }
 		}
-		return ret.toCoordinateArray();
+		return ret;
 	}
 
 	double radius;

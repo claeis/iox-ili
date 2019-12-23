@@ -1,0 +1,33 @@
+INTERLIS 2.3;
+
+CONTRACTED MODEL TestSuite2
+  AT "http://www.kogis.ch"
+  VERSION "2017-07-27" =
+
+  DOMAIN
+	BFS_Nummer = 1 .. 9999;
+
+  TOPIC Einheiten =
+	BASKET OID AS INTERLIS.UUIDOID ;
+	OID AS INTERLIS.UUIDOID ;
+
+	STRUCTURE KantonRef =
+	  KtNummer : MANDATORY 1 ..26;
+	  KtName : TEXT*50;
+	END KantonRef ;
+
+	CLASS Gemeinde =
+	  BFS_Nummer : MANDATORY BFS_Nummer;
+	  GdeName : MANDATORY TEXT;
+	  Kanton : MANDATORY KantonRef ;
+	END Gemeinde ;
+
+	CLASS Bezirk =
+	  BFS_Nummer : MANDATORY BFS_Nummer;
+	  BezName : MANDATORY TEXT;
+	  Kanton : KantonRef;
+	END Bezirk ;
+
+  END Einheiten;
+
+END TestSuite2.

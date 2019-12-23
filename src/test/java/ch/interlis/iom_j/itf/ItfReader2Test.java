@@ -310,6 +310,31 @@ public class ItfReader2Test {
              assertEquals("line 11: missing reference to maintable Test1.TopicA.TableA",ex.getMessage());
         }
     }
+    @Test
+    public void testSURFACEnullRefToMainObj() throws Iox2jtsException, IoxException {
+        ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceNullRefToMainObj.itf"),false);
+        reader.setModel(td);
+        IoxEvent event=null;
+        HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
+        try{
+             do{
+                    event=reader.read();
+                    if(event instanceof StartTransferEvent){
+                    }else if(event instanceof StartBasketEvent){
+                    }else if(event instanceof ObjectEvent){
+                        IomObject iomObj=((ObjectEvent)event).getIomObject();
+                        System.out.println(iomObj);
+                        assertNotNull(iomObj.getobjectoid());
+                        objs.put(iomObj.getobjectoid(), iomObj);
+                    }else if(event instanceof EndBasketEvent){
+                    }else if(event instanceof EndTransferEvent){
+                    }
+             }while(!(event instanceof EndTransferEvent));
+             fail();
+        }catch(IoxInvalidDataException ex){
+             assertEquals("line 11: missing reference to maintable Test1.TopicA.TableA",ex.getMessage());
+        }
+    }
 	@Test
 	public void testSURFACEnoMainTable() throws Iox2jtsException, IoxException {
 		ItfReader2 reader=new ItfReader2(new File("src/test/data/ItfReader2/SurfaceNoMainTable.itf"),false);
