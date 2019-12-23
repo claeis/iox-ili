@@ -5,6 +5,9 @@ ideas/open issues
 
 LATEST
 -----------------------------
+
+iox-ili 1.20.15 (2019-12-23)
+-----------------------------
 - fix wrong polygons overlay (equal big arcs, but different direction of definition) (ilivalidator#202)
 - fix NPE when reference to main table is UNDEFINED in surface table (ili1) (ilivalidator#213)
 - get model from first basket, if no MODELS element in transferfile (ilivalidator#214)
