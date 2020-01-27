@@ -6,6 +6,7 @@ ideas/open issues
 LATEST
 -----------------------------
 - fix translation of enum-values if different translations in same transfer
+- fix MultiPolygonZ WKB parser (ili2db#325)
 
 iox-ili 1.20.15 (2019-12-23)
 -----------------------------

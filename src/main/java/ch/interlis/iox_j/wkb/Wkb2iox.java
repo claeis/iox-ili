@@ -143,12 +143,17 @@ public class Wkb2iox
       dis.setOrder(ByteOrderValues.LITTLE_ENDIAN);
 
     int typeInt = dis.readInt();
-    int geometryType = typeInt & 0xff;
+    // Adds %1000 to make it compatible with withZ, withM encoding as specified by OGC 06-103r4
+    int geometryType = (typeInt & 0xffff)%1000;
     // determine if Z values are present
-    boolean hasZ = (typeInt & WKBConstants.ewkbIncludesZ) != 0;
+    boolean hasZ = ((typeInt & WKBConstants.ewkbIncludesZ) ==WKBConstants.ewkbIncludesZ) || ((typeInt & WKBConstants.wkbIncludesZ) ==WKBConstants.wkbIncludesZ);
+    boolean hasM = ((typeInt & WKBConstants.ewkbIncludesM) ==WKBConstants.ewkbIncludesM) || ((typeInt & WKBConstants.wkbIncludesM) ==WKBConstants.wkbIncludesM);
     inputDimension =  hasZ ? 3 : 2;
+    if(hasM) {
+        inputDimension+=1;
+    }
     // determine if SRIDs are present
-    hasSRID = (typeInt & WKBConstants.ewkbIncludesSRID) != 0;
+    hasSRID = (typeInt & WKBConstants.ewkbIncludesSRID) == WKBConstants.ewkbIncludesSRID;
 
     if (hasSRID) {
       SRID = dis.readInt();
