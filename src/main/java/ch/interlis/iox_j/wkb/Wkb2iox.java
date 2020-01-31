@@ -143,12 +143,16 @@ public class Wkb2iox
       dis.setOrder(ByteOrderValues.LITTLE_ENDIAN);
 
     int typeInt = dis.readInt();
-    int geometryType = typeInt & 0xff;
+    int geometryType = extractGeometryType(typeInt);
     // determine if Z values are present
-    boolean hasZ = (typeInt & WKBConstants.ewkbIncludesZ) != 0;
+    boolean hasZ = ((typeInt & WKBConstants.ewkbIncludesZ) ==WKBConstants.ewkbIncludesZ) || ((typeInt & WKBConstants.wkbIncludesZ) ==WKBConstants.wkbIncludesZ);
+    boolean hasM = ((typeInt & WKBConstants.ewkbIncludesM) ==WKBConstants.ewkbIncludesM) || ((typeInt & WKBConstants.wkbIncludesM) ==WKBConstants.wkbIncludesM);
     inputDimension =  hasZ ? 3 : 2;
+    if(hasM) {
+        inputDimension+=1;
+    }
     // determine if SRIDs are present
-    hasSRID = (typeInt & WKBConstants.ewkbIncludesSRID) != 0;
+    hasSRID = (typeInt & WKBConstants.ewkbIncludesSRID) == WKBConstants.ewkbIncludesSRID;
 
     if (hasSRID) {
       SRID = dis.readInt();
@@ -184,6 +188,11 @@ public class Wkb2iox
     //return null;
   }
 
+private int extractGeometryType(int typeInt) {
+    // Adds %1000 to make it compatible with withZ, withM encoding as specified by OGC 06-103r4
+    return (typeInt & 0xffff)%1000;
+}
+
   /**
    * Sets the SRID, if it was specified in the WKB
    *
@@ -216,7 +225,7 @@ public class Wkb2iox
 	    for(int coordi=0;coordi<coordc;coordi++){
 	        byte byteOrder = dis.readByte();
 	        int typeInt = dis.readInt();
-	        int geometryType = typeInt & 0xff;
+	        int geometryType = extractGeometryType(typeInt);
 	        if(geometryType==WKBConstants.wkbPoint){
 	        }else{
 	    	    throw new IllegalStateException("Unexpected WKB type " + geometryType);
@@ -253,7 +262,7 @@ public class Wkb2iox
 	for(int compi=0;compi<compc;compi++){
 	    byte byteOrder = dis.readByte();
 	    int typeInt = dis.readInt();
-	    int geometryType = typeInt & 0xff;
+        int geometryType = extractGeometryType(typeInt);
 	    switch (geometryType) {
 	      case WKBConstants.wkbLineString :
 	      {
@@ -369,7 +378,7 @@ public class Wkb2iox
 	    for(int polygoni=0;polygoni<polygonc;polygoni++){
 	        byte byteOrder = dis.readByte();
 	        int typeInt = dis.readInt();
-	        int geometryType = typeInt & 0xff;
+            int geometryType = extractGeometryType(typeInt);
 	        if(geometryType!=WKBConstants.wkbPolygon){
 	    	    throw new IllegalStateException("Unexpected WKB type " + geometryType);
 	        }
@@ -405,7 +414,7 @@ public class Wkb2iox
 	    for(int surfacei=0;surfacei<surfacec;surfacei++){
 	        byte byteOrder = dis.readByte();
 	        int typeInt = dis.readInt();
-	        int geometryType = typeInt & 0xff;
+            int geometryType = extractGeometryType(typeInt);
 	        if(geometryType!=WKBConstants.wkbCurvePolygon){
 	    	    throw new IllegalStateException("Unexpected WKB type " + geometryType);
 	        }
@@ -438,7 +447,7 @@ public class Wkb2iox
 	    for(int curvei=0;curvei<curvec;curvei++){
 	        byte byteOrder = dis.readByte();
 	        int typeInt = dis.readInt();
-	        int geometryType = typeInt & 0xff;
+            int geometryType = extractGeometryType(typeInt);
 	        if(geometryType==WKBConstants.wkbLineString){
 	        }else if(allowCurve && geometryType==WKBConstants.wkbCompoundCurve){
 	        }else{

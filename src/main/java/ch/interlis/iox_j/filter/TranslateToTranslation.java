@@ -47,7 +47,7 @@ public class TranslateToTranslation implements IoxFilter {
 	 */
 	private HashMap<String,Object> tag2class=null;
 	private HashMap<String,Topic> tag2topic=new HashMap<String,Topic>();
-	private HashMap<String,Element> srctag2destElement=new HashMap<String,Element>();
+	private HashMap<String,Element> srctag2destElement=null;
 	
 	public TranslateToTranslation(TransferDescription td,Settings config)
 	{
@@ -86,7 +86,8 @@ public class TranslateToTranslation implements IoxFilter {
 		}else if(event instanceof StartBasketEvent){
 			String destTopicName=((StartBasketEvent) event).getType();
 			Topic destTopic = tag2topic.get(destTopicName);
-			srctag2destElement=new HashMap<String,Element>();			
+			// reset mapping
+			resetMapping();
 			setupTranslation((Model)destTopic.getContainer());
 		}else if(event instanceof ObjectEvent){
 			translateObject(((ObjectEvent) event).getIomObject());
@@ -95,6 +96,10 @@ public class TranslateToTranslation implements IoxFilter {
 		}
 		return event;
 	}
+    private void resetMapping() {
+        srctag2destElement=new HashMap<String,Element>();
+        src2destEles=new HashMap<EnumerationType,Map<String,String>>();
+    }
 
 	private void translateObject(IomObject iomObj) {
 		Element modelElement = (Element)tag2class.get(iomObj.getobjecttag());
@@ -230,7 +235,7 @@ public class TranslateToTranslation implements IoxFilter {
 	}
 
 
-	Map<EnumerationType,Map<String,String>> src2destEles=new HashMap<EnumerationType,Map<String,String>>();
+	Map<EnumerationType,Map<String,String>> src2destEles=null;
 	private Map<String, String> getEnumMapping(
 			EnumerationType enumType,EnumerationType destEnumType) {
 		Map<String,String> src2dest=src2destEles.get(enumType);
