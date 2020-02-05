@@ -29,6 +29,7 @@ public class CompoundCurveNoder
   private Map<CompoundCurve,SortedSet<Integer>> nodes=null;
   private boolean isNoded=false;
   private boolean validateOnly=false;
+  private boolean enableCommonSegments=false;
   
   /**
    * Creates a new noding validator for a given set of linework.
@@ -222,7 +223,25 @@ private void computeIntersects(int ss0Idx,CompoundCurve ss0, int ss1Idx,Compound
 		  }else{
 			 // two intersection points 
 			  if(li.isOverlay()) {
-				  segIntAdd(li.getIntersection(0),li.getIntersection(1),e0_i,e0,e1_i,e1,s0,s1,li.getOverlap(),true);
+                  if(validateOnly){
+                      segIntAdd(li.getIntersection(0),li.getIntersection(1),e0_i,e0,e1_i,e1,s0,s1,li.getOverlap(),true);
+                  }else {
+                      if(enableCommonSegments) {
+                          // wenn es zwei Schnittpunkte gibt, muessen die Start und Endpunkt beider Segmente 
+                          // sein Schnittpunkt sein, um diese Schnittpunkte als neue Knoten einfuegen zu koennen 
+                          if((li.isIntersection(p00) && li.isIntersection(p01))  // start/end-punkt segment a
+                                    && (li.isIntersection(p10) && li.isIntersection(p11))){ // start/end-punkt segment b
+                                      createNode(e0,segIndex0);
+                                      createNode(e0,segIndex0+1);
+                                      createNode(e1,segIndex1);
+                                      createNode(e1,segIndex1+1);
+                          }else{
+                              segIntAdd(li.getIntersection(0),li.getIntersection(1),e0_i,e0,e1_i,e1,s0,s1,li.getOverlap(),true);
+                          }
+                      }else {
+                          segIntAdd(li.getIntersection(0),li.getIntersection(1),e0_i,e0,e1_i,e1,s0,s1,li.getOverlap(),true);
+                      }
+                  }
 			  }else if((e0!=e1 && e0.getNumSegments()==1 && e1.getNumSegments()==1) // Zwei Linien, je ein Segment, die zusammen ein Ring bilden
 					  && (li.isIntersection(endPts1[0]) && li.isIntersection(endPts1[1]))
 					  && (li.isIntersection(endPts2[0]) && li.isIntersection(endPts2[1]))){
@@ -309,4 +328,10 @@ private void computeIntersects(int ss0Idx,CompoundCurve ss0, int ss1Idx,Compound
 			throw new IllegalArgumentException("intersections");
 		}
 	}
+    public boolean isEnableCommonSegments() {
+        return enableCommonSegments;
+    }
+    public void setEnableCommonSegments(boolean removeCommonSegments) {
+        this.enableCommonSegments = removeCommonSegments;
+    }
 }

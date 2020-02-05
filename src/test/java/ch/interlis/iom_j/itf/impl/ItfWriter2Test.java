@@ -203,7 +203,6 @@ public class ItfWriter2Test {
 		writer.close();
 		writer=null;
 	}
-	@Ignore("Area overlay of lines not yet implemented.")
 	@Test
 	public void testAreaWithHole() throws Iox2jtsException, IoxException {
 		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestAreaWithHole.itf"),td);

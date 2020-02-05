@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- Broken ili1 export (ili2db#326)
 
 iox-ili 1.20.16 (2020-01-31)
 -----------------------------
