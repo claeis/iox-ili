@@ -58,6 +58,7 @@ public class CompoundCurveNoderTest {
 	    segs.add(A);
 	    segs.add(B);
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
+		validator.setEnableCommonSegments(true);
         validator.checkValid();
         Collection<? extends CompoundCurve> noded=validator.getNodedSubstrings();
         assertEquals("[COMPOUNDCURVE ((50 10, 20 10)), COMPOUNDCURVE ((20 10, 20 40)), COMPOUNDCURVE ((20 40, 50 40)), COMPOUNDCURVE ((10 10, 20 10)), COMPOUNDCURVE ((20 10, 20 40)), COMPOUNDCURVE ((20 40, 10 40, 10 10))]", noded.toString());
