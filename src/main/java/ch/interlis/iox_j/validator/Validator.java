@@ -157,7 +157,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private TransferDescription td=null;
 	private boolean doItfLineTables=false;
 	private boolean doItfOidPerTable=false;
-	private Settings config=null;
+	private Settings settings=null;
 	private boolean validationOff=false;
 	private String areaOverlapValidation=null;
 	private String constraintValidation=null;
@@ -199,12 +199,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	 * @param errs
 	 * @param errFact
 	 * @param pipelinePool
-	 * @param config to validate ITF files you normally need to set config.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
+	 * @param settings to validate ITF files you normally need to set config.setValue(Validator.CONFIG_DO_ITF_OIDPERTABLE, Validator.CONFIG_DO_ITF_OIDPERTABLE_DO);
 	 */
 	public Validator () { }
 
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
-			IoxLogging errs, LogEventFactory errFact, PipelinePool pipelinePool,Settings config) {
+			IoxLogging errs, LogEventFactory errFact, PipelinePool pipelinePool,Settings settings) {
 		super();
 		this.td = td;
 		this.validationConfig = validationConfig;
@@ -217,18 +217,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			errFact.setValidationConfig(validationConfig);
 		}
 		
-		this.config=config;
+		this.settings=settings;
 		this.patternForIdValidation = Pattern.compile(REGEX_FOR_ID_VALIDATION);
 		this.patternForTextOIdValidation = Pattern.compile(REGEX_FOR_TEXTOID_VALIDATION);
 		this.patternForStandartOidValidation = Pattern.compile(REGEX_FOR_STANDARTOID_VALIDATION);
-		this.config.setTransientObject(InterlisFunction.IOX_DATA_POOL,pipelinePool);
+		this.settings.setTransientObject(InterlisFunction.IOX_DATA_POOL,pipelinePool);
 		this.pipelinePool=pipelinePool;
 		objPoolManager=new ObjectPoolManager();
-		Map<String,Class> cf=(Map<String, Class>) config.getTransientObject(CONFIG_CUSTOM_FUNCTIONS);
+		Map<String,Class> cf=(Map<String, Class>) settings.getTransientObject(CONFIG_CUSTOM_FUNCTIONS);
 		if(cf!=null){
 			customFunctions=cf;
 		}
-		List<Class> resolverClasses=(List<Class>) config.getTransientObject(CONFIG_OBJECT_RESOLVERS);
+		List<Class> resolverClasses=(List<Class>) settings.getTransientObject(CONFIG_OBJECT_RESOLVERS);
 		if(resolverClasses!=null){
 			extObjResolvers=new ArrayList<ExternalObjectResolver>();
 			for(Class resolverClass:resolverClasses){
@@ -240,17 +240,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				} catch (IllegalAccessException e) {
 					throw new IllegalStateException(e);
 				}
-				resolver.init(td,config,validationConfig, objectPool, errFact);
+				resolver.init(td,settings,validationConfig, objectPool, errFact);
 				extObjResolvers.add(resolver);
 			}
 		}
 		
         // get/create repository manager
-        repositoryManager = (ch.interlis.ilirepository.ReposManager) config
+        repositoryManager = (ch.interlis.ilirepository.ReposManager) settings
                 .getTransientObject(UserSettings.CUSTOM_ILI_MANAGER);
 		
-		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(CONFIG_DO_ITF_LINETABLES));
-		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(config.getValue(CONFIG_DO_ITF_OIDPERTABLE));
+		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(settings.getValue(CONFIG_DO_ITF_LINETABLES));
+		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(settings.getValue(CONFIG_DO_ITF_OIDPERTABLE));
 		allObjectsAccessible=ValidationConfig.TRUE.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE));
 		if(!allObjectsAccessible){
 			errs.addEvent(errFact.logInfoMsg("assume unknown external objects"));
@@ -282,7 +282,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		defaultGeometryTypeValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION);
 		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class,objPoolManager);
 		linkPool=new LinkPool();
-		String filename=config.getValue(CONFIG_DEBUG_XTFOUT);
+		String filename=settings.getValue(CONFIG_DEBUG_XTFOUT);
 		if(filename!=null) {
 		    try {
                 writer=new XtfWriter(new File(filename),td);
@@ -371,7 +371,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
     private void validateInconsistentIliAndXMLVersion(ch.interlis.iox.IoxEvent event) {
-        String versionControl = config.getValue(CONFIG_DO_XTF_VERIFYMODEL);
+        String versionControl = settings.getValue(CONFIG_DO_XTF_VERIFYMODEL);
         if (versionControl != null && versionControl.equals(CONFIG_DO_XTF_VERIFYMODEL_DO) && event instanceof XtfStartTransferEvent) {            
             XtfStartTransferEvent startTransferEvent = (XtfStartTransferEvent) event;
             Collection<IomObject> headerObjValues = startTransferEvent.getHeaderObjects().values();
@@ -1564,7 +1564,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				} catch (IllegalAccessException e) {
 					throw new IllegalStateException(e);
 				}
-				functionTarget.init(td,config,validationConfig, objectPool, errFact);
+				functionTarget.init(td,settings,validationConfig, objectPool, errFact);
 				return functionTarget.evaluate(validationKind, usageScope, iomObj, actualArguments);
 			}
 			//TODO INTERLIS.convertUnit

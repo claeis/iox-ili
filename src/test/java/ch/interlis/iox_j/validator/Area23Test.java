@@ -1067,6 +1067,7 @@ public class Area23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+        //settings.setValue(Validator.CONFIG_DEBUG_XTFOUT,"src/test/data/validator/twoPolygon_OverlayExactlyOnEachOther_Fail.xtf");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -1470,10 +1471,9 @@ public class Area23Test {
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(2).getEventMsg());
 	}
 	
-	// prueft, ob 2 Polygone erstellt werden koennen, wenn 2 Polygone mit je einem Arc,
-	// welche uebereinander liegen und sich an den gleichen Punkten beruehren, erstellt werden koennen.
+	// prueft, ob 2 Polygone (mit je einem Arc) die genau uebereinanderliegen, als Fehler gemeldet wird
 	@Test
-	public void twoPolygon_WithArcsLieExactlyOnEachOther_Ok(){
+	public void twoPolygon_WithArcsLieExactlyOnEachOther_Fail(){
 		Iom_jObject objAreaSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		{
 			IomObject multisurfaceValue=objAreaSuccess.addattrobj("area3d", "MULTISURFACE");
@@ -1574,6 +1574,7 @@ public class Area23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+		//settings.setValue(Validator.CONFIG_DEBUG_XTFOUT,"src/test/data/validator/twoPolygon_WithArcsLieExactlyOnEachOther_Fail.xtf");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -1589,7 +1590,7 @@ public class Area23Test {
 	// prueft, ob 2 Polygone erstellt werden koennen, wenn 2 Polygone mit je einem Arc,
 	// welche uebereinander liegen und sich nicht an den gleichen Punkten beruehren, erstellt werden koennen.
 	@Test
-	public void twoPolygon_2ArcsLieNotExactlyOnEachOther_1ArcHas1PointMore_Ok(){
+	public void twoPolygon_2ArcsLieNotExactlyOnEachOther_1ArcHas1PointMore_Fail(){
 		Iom_jObject objAreaSuccess=new Iom_jObject(ILI_CLASSD, OID1);
 		{
 			IomObject multisurfaceValue=objAreaSuccess.addattrobj("area3d", "MULTISURFACE");
@@ -1690,6 +1691,7 @@ public class Area23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+        //settings.setValue(Validator.CONFIG_DEBUG_XTFOUT,"src/test/data/validator/twoPolygon_2ArcsLieNotExactlyOnEachOther_1ArcHas1PointMore_Fail.xtf");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
