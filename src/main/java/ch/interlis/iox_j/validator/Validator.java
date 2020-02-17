@@ -1036,15 +1036,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 		        if(uniquenessConstraint.getPrefix()!=null){
 		            PathEl[] attrPath = uniquenessConstraint.getPrefix().getPathElements();
-		            visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid,attrPath,0,parentObject,iomObj, role);
+		            visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid, aClass1,attrPath,0,parentObject,iomObj, role);
 		        }else {
-	                visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid,null,0,parentObject,iomObj, role);
+	                visitStructEle(checkUniqueConstraint,uniquenessConstraint,seenValues,iomObjOid, aClass1,null,0,parentObject,iomObj,role);
 		        }
 			}
 		}
 	}
 	
-	private void visitStructEle(String checkUniqueConstraint,UniquenessConstraint uniquenessConstraint, HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues, String iomObjOid, PathEl[] attrPath, int i, IomObject parentObject, IomObject iomObj, RoleDef role) {
+	private void visitStructEle(String checkUniqueConstraint,UniquenessConstraint uniquenessConstraint, HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenValues, String iomObjOid, Viewable iomObjClass, PathEl[] attrPath, int i, IomObject parentObject, IomObject iomObj,RoleDef role) {
 	    if(attrPath==null || i>=attrPath.length) {
 	        OutParam<AttributeArray> values = new OutParam<AttributeArray>();
             String oidOfObjectWithDuplicateValue = validateUnique(seenValues,iomObjOid,parentObject,iomObj,uniquenessConstraint, values, role);
@@ -1059,7 +1059,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 if(msg!=null && msg.length()>0){
                     logMsg(checkUniqueConstraint,msg);
                 } else {
-                    logMsg(checkUniqueConstraint,rsrc.getString("visitStructEle.uniqueIsViolatedValuesAlreadyExistInObject"), values.value.valuesAsString(), formatObjectId(oidOfObjectWithDuplicateValue));
+                    logMsg(checkUniqueConstraint,rsrc.getString("visitStructEle.uniqueIsViolatedValuesAlreadyExistInObject"), values.value.valuesAsString(), formatObjectId(oidOfObjectWithDuplicateValue,iomObjClass));
                 }
             }
 	        return;
@@ -1068,12 +1068,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         int structElec=iomObj.getattrvaluecount(attrName);
         for(int structElei=0;structElei<structElec;structElei++) {
             IomObject structEle=iomObj.getattrobj(attrName, structElei);
-            visitStructEle(checkUniqueConstraint,uniquenessConstraint, seenValues, iomObjOid, attrPath,i+1,parentObject,structEle, role);
+            visitStructEle(checkUniqueConstraint,uniquenessConstraint, seenValues, iomObjOid, iomObjClass,attrPath,i+1,parentObject,structEle, role);
         }
     }
-    private String formatObjectId(String oid) {
+    private String formatObjectId(String oid,Viewable classOfOid) {
         String actualLanguage = Locale.getDefault().getLanguage();
-        IomObject iomObj=objectPool.getObject(oid, null, null);
+        ArrayList<Viewable> classes=new ArrayList<Viewable>();
+        classes.add(classOfOid);
+        IomObject iomObj=objectPool.getObject(oid, classes, null);
         String keymsg = validationConfig.getConfigValue(iomObj.getobjecttag(), ValidationConfig.KEYMSG+"_"+actualLanguage);
         if (keymsg != null) {
             return LogEventFactory.formatMessage(keymsg, iomObj);
@@ -4102,5 +4104,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	public void setAutoSecondPass(boolean autoSecondPass) {
 		this.autoSecondPass = autoSecondPass;
+	}
+	public static void initItfValidation(Settings settings)
+	{
+        settings.setValue(CONFIG_DO_ITF_OIDPERTABLE, CONFIG_DO_ITF_OIDPERTABLE_DO);
 	}
 }
