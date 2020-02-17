@@ -229,21 +229,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			customFunctions=cf;
 		}
 		List<Class> resolverClasses=(List<Class>) settings.getTransientObject(CONFIG_OBJECT_RESOLVERS);
-		if(resolverClasses!=null){
-			extObjResolvers=new ArrayList<ExternalObjectResolver>();
-			for(Class resolverClass:resolverClasses){
-				ExternalObjectResolver resolver=null;
-				try {
-					resolver = (ExternalObjectResolver) resolverClass.newInstance();
-				} catch (InstantiationException e) {
-					throw new IllegalStateException(e);
-				} catch (IllegalAccessException e) {
-					throw new IllegalStateException(e);
-				}
-				resolver.init(td,settings,validationConfig, objectPool, errFact);
-				extObjResolvers.add(resolver);
-			}
-		}
 		
         // get/create repository manager
         repositoryManager = (ch.interlis.ilirepository.ReposManager) settings
@@ -282,6 +267,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		defaultGeometryTypeValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION);
 		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class,objPoolManager);
 		linkPool=new LinkPool();
+        if(resolverClasses!=null){
+            extObjResolvers=new ArrayList<ExternalObjectResolver>();
+            for(Class resolverClass:resolverClasses){
+                ExternalObjectResolver resolver=null;
+                try {
+                    resolver = (ExternalObjectResolver) resolverClass.newInstance();
+                } catch (InstantiationException e) {
+                    throw new IllegalStateException(e);
+                } catch (IllegalAccessException e) {
+                    throw new IllegalStateException(e);
+                }
+                resolver.init(td,settings,validationConfig, objectPool, errFact);
+                extObjResolvers.add(resolver);
+            }
+        }
 		String filename=settings.getValue(CONFIG_DEBUG_XTFOUT);
 		if(filename!=null) {
 		    try {
