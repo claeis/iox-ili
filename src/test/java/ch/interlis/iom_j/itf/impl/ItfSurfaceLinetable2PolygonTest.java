@@ -245,7 +245,8 @@ public class ItfSurfaceLinetable2PolygonTest {
 		//System.out.println(linetableObj);
 		builder.addItfLinetableObject(linetableObj);
 		ArrayList<IoxInvalidDataException> dataErrs=builder.getDataerrs();
-		assertEquals("boundary line without reference to main table", dataErrs.get(0).getMessage());
+        assertEquals(1, dataErrs.size());
+        assertEquals("boundary line without reference to main table", dataErrs.get(0).getMessage());
 	}
 
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn sich 2 Linien aus unterschiedlichen Randlinien ueberlagern.
@@ -282,8 +283,8 @@ public class ItfSurfaceLinetable2PolygonTest {
 		builder.addItfLinetableObject(linetableObj);
         builder.buildSurfaces();
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-        assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 400.000), tids 1, 2", errs.get(0).getLocalizedMessage());
         assertEquals(1, errs.size());
+        assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 400.000), tids 1, 2", errs.get(0).getLocalizedMessage());
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn der innere Rand einer Polygon,
@@ -320,9 +321,9 @@ public class ItfSurfaceLinetable2PolygonTest {
 		builder.addItfLinetableObject(linetableObj);
         builder.buildSurfaces();
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
+        assertEquals(2, errs.size());
         assertEquals("Intersection coord1 (340.000, 400.000), tids 1, 2", errs.get(0).getLocalizedMessage());
         assertEquals("Intersection coord1 (160.000, 400.000), tids 1, 2", errs.get(1).getLocalizedMessage());
-        assertEquals(2, errs.size());
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn ein Punkt des inneren Randes,
@@ -361,8 +362,8 @@ public class ItfSurfaceLinetable2PolygonTest {
         builder.buildSurfaces();
         // muss fehler overlay liefern.
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-        assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 300.000), tids 1, 2", errs.get(0).getLocalizedMessage());
         assertEquals(1, errs.size());
+        assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 300.000), tids 1, 2", errs.get(0).getLocalizedMessage());
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn sich 2 innere Raender ueberschneiden.
@@ -399,8 +400,8 @@ public class ItfSurfaceLinetable2PolygonTest {
         builder.buildSurfaces();
         // muss fehler: overlay liefern und nicht dangles.
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-        assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 300.000), tids 1, 2", errs.get(0).getLocalizedMessage());
         assertEquals(1, errs.size());
+        assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 300.000), tids 1, 2", errs.get(0).getLocalizedMessage());
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn der innere Rand ueber dem
@@ -438,8 +439,8 @@ public class ItfSurfaceLinetable2PolygonTest {
         builder.buildSurfaces();
         // muss fehler: overlay liefern und keine dangles.
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-        assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 400.000), tids 1, 2", errs.get(0).getLocalizedMessage());
         assertEquals(1, errs.size());
+        assertEquals("Overlay coord1 (100.000, 100.000), coord2 (100.000, 400.000), tids 1, 2", errs.get(0).getLocalizedMessage());
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn 1 Linie des inneren Randes einer Polygon
@@ -479,9 +480,9 @@ public class ItfSurfaceLinetable2PolygonTest {
         builder.buildSurfaces();
         // muss fehler: overlay und intersections liefern
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
+        assertEquals(2, errs.size());
         assertEquals("Intersection coord1 (260.000, 400.000), tids 1, 2:1", errs.get(0).getLocalizedMessage());
         assertEquals("Overlay coord1 (260.000, 360.000), coord2 (260.000, 400.000), tids 2:1, 2:1", errs.get(1).getLocalizedMessage());
-        assertEquals(2, errs.size());
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn keine Referenz auf das Polygon
@@ -530,9 +531,9 @@ public class ItfSurfaceLinetable2PolygonTest {
 		builder.addItfLinetableObject(linetableObj);
         builder.buildSurfaces();
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
+        assertEquals(2, errs.size());
         assertEquals("dangle tid 1", errs.get(0).getLocalizedMessage());
         assertEquals("no polygon", errs.get(1).getLocalizedMessage());
-        assertEquals(2, errs.size());
 	}
 	
 	// prueft ob ein Polygon erstellt werden kann, wenn 1 Punkt des inneren Randes,
@@ -649,8 +650,8 @@ public class ItfSurfaceLinetable2PolygonTest {
 		}
         builder.buildSurfaces();
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
-        assertEquals("Overlay coord1 (200.000, 240.000), coord2 (240.000, 240.000), tids 2, 3", errs.get(0).getLocalizedMessage());
         assertEquals(1, errs.size());
+        assertEquals("Overlay coord1 (200.000, 240.000), coord2 (240.000, 240.000), tids 2, 3", errs.get(0).getLocalizedMessage());
 	}
 	
 	// Es wird getestet, ob eine Polygon erstellt werden kann,
@@ -696,9 +697,9 @@ public class ItfSurfaceLinetable2PolygonTest {
 		}
         builder.buildSurfaces();
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
+        assertEquals(2, errs.size());
         assertEquals("Intersection coord1 (552.500, 150.000), tids 2, 3", errs.get(0).getLocalizedMessage());
         assertEquals("Intersection coord1 (547.500, 150.000), tids 2, 3", errs.get(1).getLocalizedMessage());
-        assertEquals(2, errs.size());
 	}
 	
 	// Es wird getestet, ob eine Polygon erstellt werden kann,
@@ -780,9 +781,9 @@ public class ItfSurfaceLinetable2PolygonTest {
 		builder.addItfLinetableObject(linetableObj);
         builder.buildSurfaces();
         ArrayList<IoxInvalidDataException> errs=builder.getDataerrs();
+        assertEquals(2, errs.size());
         assertEquals("superfluous outerboundary tid 10", errs.get(0).getLocalizedMessage());
         assertEquals("multipolygon detected", errs.get(1).getLocalizedMessage());
-        assertEquals(2, errs.size());
 	}
 	
 	// prueft ob 2 Polygone, welche aneinander liegen, erstellt werden koennen.

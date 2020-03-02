@@ -7,11 +7,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import ch.interlis.iom.IomObject;
-import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
@@ -19,16 +16,10 @@ import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
 import ch.interlis.iox.IoxException;
-import ch.interlis.iox_j.ObjectEvent;
-
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
-import com.vividsolutions.jts.noding.BasicSegmentString;
-import com.vividsolutions.jts.noding.SegmentString;
 
 public class CompoundCurveNoderTest {
     JtsextGeometryFactory fact = null;
@@ -67,15 +58,13 @@ public class CompoundCurveNoderTest {
 	    segs.add(A);
 	    segs.add(B);
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
-		try{
-			validator.checkValid();
-			fail();
-		}catch(RuntimeException ex){
-			assertTrue(ex.getMessage().startsWith("intersection"));
-		}
+		validator.setEnableCommonSegments(true);
+        validator.checkValid();
+        Collection<? extends CompoundCurve> noded=validator.getNodedSubstrings();
+        assertEquals("[COMPOUNDCURVE ((50 10, 20 10)), COMPOUNDCURVE ((20 10, 20 40)), COMPOUNDCURVE ((20 40, 50 40)), COMPOUNDCURVE ((10 10, 20 10)), COMPOUNDCURVE ((20 10, 20 40)), COMPOUNDCURVE ((20 40, 10 40, 10 10))]", noded.toString());
 	}
 	@Test
-	public void Line1openRing() throws ParseException {
+	public void Line1open() throws ParseException {
 	    WKTReader wktRdr = new WKTReader(fact);
 
 	    String wktB = "LINESTRING(10 10, 20 10, 20 40, 10 40)";
@@ -123,7 +112,7 @@ public class CompoundCurveNoderTest {
 		assertEquals("[COMPOUNDCURVE ((0 10, 10 10)), COMPOUNDCURVE ((10 10, 20 10)), COMPOUNDCURVE ((20 40, 10 40, 10 10))]", noded.toString());
 	}
 	@Test
-	public void Line1endptOnLine() throws ParseException {
+	public void Line1endptOnLineFail() throws ParseException {
 	    WKTReader wktRdr = new WKTReader(fact);
 
 	    String wktB = "LINESTRING(10 10, 20 10, 20 40, 10 40, 15 10)";
@@ -140,7 +129,7 @@ public class CompoundCurveNoderTest {
 		}
 	}
 	@Test
-	public void Line2endptOnLine() throws ParseException {
+	public void Line2endptOnLineFail() throws ParseException {
 	    WKTReader wktRdr = new WKTReader(fact);
 
 	    String wktA = "LINESTRING(10 10, 20 10, 20 40)";
@@ -189,7 +178,6 @@ public class CompoundCurveNoderTest {
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
 		validator.checkValid();
 		Collection<? extends CompoundCurve> noded=validator.getNodedSubstrings();
-		System.out.println(noded);
 		assertEquals("[COMPOUNDCURVE ((20 10, 15 40, 10 10, 15 0, 20 10)), COMPOUNDCURVE ((20 10, 25 40, 30 10, 25 0, 20 10))]", noded.toString());
 	}
 	@Test
@@ -204,7 +192,6 @@ public class CompoundCurveNoderTest {
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
 		validator.checkValid();
 		Collection<? extends CompoundCurve> noded=validator.getNodedSubstrings();
-		System.out.println(noded);
 		assertEquals("[COMPOUNDCURVE ((20 10, 15 30, 15 10, 20 10)), COMPOUNDCURVE ((20 10, 20 40, 10 40, 10 0, 20 0, 20 10))]", noded.toString());
 	}
 	@Test
@@ -231,9 +218,6 @@ public class CompoundCurveNoderTest {
 		CompoundCurveNoder validator=new CompoundCurveNoder(segs,false);
 		validator.checkValid();
 		Collection<? extends CompoundCurve> noded=validator.getNodedSubstrings();
-		System.out.println(noded);
 		assertEquals("[COMPOUNDCURVE (CIRCULARSTRING (110 110, 115 108, 120 110), (120 110, 120 140, 110 140, 110 110)), COMPOUNDCURVE ((110 110, 115 115, 115 120, 112 120, 110 110))]", noded.toString());
-		
 	}
-
 }

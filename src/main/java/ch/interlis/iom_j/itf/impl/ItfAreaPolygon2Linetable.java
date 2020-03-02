@@ -21,6 +21,7 @@ import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurvePolygon;
+import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveDissolver;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CurvePairInt;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
@@ -98,83 +99,61 @@ public class ItfAreaPolygon2Linetable {
 	
 	public List<IoxInvalidDataException> validate()  {
 		CompoundCurveNoder noder=new CompoundCurveNoder(recman,(java.util.List)lines,false);
-		if(!noder.isValid()){
-			List<IoxInvalidDataException> intersectionsWithoutCompleteOverlays=new ArrayList<IoxInvalidDataException>();
-			List<Intersection> intersections=noder.getIntersections();
-			Iterator<Intersection> intersectionIter=intersections.iterator();
-			
-			while(intersectionIter.hasNext()){
-				Intersection is=intersectionIter.next();
-				
-				CompoundCurve e0=is.getCurve1();
-				CompoundCurve e1=is.getCurve2();
-				int segIndex0=e0.getSegments().indexOf(is.getSegment1());
-				int segIndex1=e1.getSegments().indexOf(is.getSegment2());
-				Coordinate p00;
-				Coordinate p01;
-				Coordinate p11;
-				Coordinate p10;
-				String tid1=(String) e0.getUserData();
-				p00 = e0.getSegments().get(segIndex0).getStartPoint();
-				p01 = e0.getSegments().get(segIndex0).getEndPoint();
-				p10 = e1.getSegments().get(segIndex1).getStartPoint();
-				p11 = e1.getSegments().get(segIndex1).getEndPoint();
-				
-				if(is.isOverlay() &&
-				   is.isIntersection(p00) &&
-				   is.isIntersection(p01) &&
-				   is.isIntersection(p10) &&
-				   is.isIntersection(p11)) {
-				   // ignore intersections that are the result of identical segments
-				}else {
-					intersectionsWithoutCompleteOverlays.add(new IoxIntersectionException(iliqname, tid1, is));
-				}
-			}
-			
-			if(!intersectionsWithoutCompleteOverlays.isEmpty()) {
-				return intersectionsWithoutCompleteOverlays;
-			}
-		
-			if(polygons==null) {
-				return null;
-			}
-			STRtree polyidx=new STRtree();
-			
-			// fill the polygon index
-			for (int i=0;i<polygons.size();i++) {
-				Polygon currentPolygon=polygons.get(i);
-				if(currentPolygon!=null) {
-					Envelope env=new Envelope(currentPolygon.getEnvelopeInternal());
-					polyidx.insert(env, i);
-				}
-			}
-			
-			// check if the complete polygons overlay
-			HashSet<CurvePairInt> compared=new HashSet<CurvePairInt>();
-		    for (int i0=0;i0<polygons.size();i0++) {
-		    	Polygon e0=polygons.get(i0);
-				List<Integer> hits=polyidx.query(e0.getEnvelopeInternal());
-    			for (int hitIdx = 0; hitIdx < hits.size(); hitIdx++) {
-    				int i1=hits.get(hitIdx);
-					if(i0==i1) {
-    	        		continue;
-    	        	}
-    				CurvePairInt pair=new CurvePairInt(i0,i1);
-    				if(!compared.contains(pair)) {
-    					compared.add(pair);
-        	        	Polygon e1 = polygons.get(i1);
-    	            	if(CurvePolygon.polygonOverlays(e0, e1)){
-    	            		String tid1=(String) e0.getUserData();
-    	            		String tid2=(String) e1.getUserData();
-    						intersectionsWithoutCompleteOverlays.add(new IoxInvalidDataException("polygons overlay tid1 "+tid1+", tid2 "+tid2));
-    					}
-    				}
-				}
-		    }
-			if(!intersectionsWithoutCompleteOverlays.isEmpty()) {
-				return intersectionsWithoutCompleteOverlays;
-			}
-		}
+		noder.setEnableCommonSegments(true);
+        List<IoxInvalidDataException> intersectionsWithoutCompleteOverlays=new ArrayList<IoxInvalidDataException>();
+        List<Intersection> intersections=noder.getIntersections();
+        Iterator<Intersection> intersectionIter=intersections.iterator();
+        
+        while(intersectionIter.hasNext()){
+            Intersection is=intersectionIter.next();
+            CompoundCurve e0=is.getCurve1();
+            String tid1=(String) e0.getUserData();
+            intersectionsWithoutCompleteOverlays.add(new IoxIntersectionException(iliqname, tid1, is));
+        }
+        
+        if(!intersectionsWithoutCompleteOverlays.isEmpty()) {
+            return intersectionsWithoutCompleteOverlays;
+        }
+    
+        if(polygons==null) {
+            return null;
+        }
+        STRtree polyidx=new STRtree();
+        
+        // fill the polygon index
+        for (int i=0;i<polygons.size();i++) {
+            Polygon currentPolygon=polygons.get(i);
+            if(currentPolygon!=null) {
+                Envelope env=new Envelope(currentPolygon.getEnvelopeInternal());
+                polyidx.insert(env, i);
+            }
+        }
+        
+        // check if the complete polygons overlay
+        HashSet<CurvePairInt> compared=new HashSet<CurvePairInt>();
+        for (int i0=0;i0<polygons.size();i0++) {
+            Polygon e0=polygons.get(i0);
+            List<Integer> hits=polyidx.query(e0.getEnvelopeInternal());
+            for (int hitIdx = 0; hitIdx < hits.size(); hitIdx++) {
+                int i1=hits.get(hitIdx);
+                if(i0==i1) {
+                    continue;
+                }
+                CurvePairInt pair=new CurvePairInt(i0,i1);
+                if(!compared.contains(pair)) {
+                    compared.add(pair);
+                    Polygon e1 = polygons.get(i1);
+                    if(CurvePolygon.polygonOverlays(e0, e1)){
+                        String tid1=(String) e0.getUserData();
+                        String tid2=(String) e1.getUserData();
+                        intersectionsWithoutCompleteOverlays.add(new IoxInvalidDataException("polygons overlay tid1 "+tid1+", tid2 "+tid2));
+                    }
+                }
+            }
+        }
+        if(!intersectionsWithoutCompleteOverlays.isEmpty()) {
+            return intersectionsWithoutCompleteOverlays;
+        }
 		return null;
 	}
 	
@@ -182,6 +161,7 @@ public class ItfAreaPolygon2Linetable {
 		if(ioxlines==null){
 			{
 				CompoundCurveNoder noder=new CompoundCurveNoder(recman,(java.util.List)lines,false);
+				noder.setEnableCommonSegments(true);
 				if(!noder.isValid()){
 					for(Intersection is:noder.getIntersections()){
 						EhiLogger.logError("intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
@@ -192,9 +172,9 @@ public class ItfAreaPolygon2Linetable {
 				lines=noder.getNodedSubstrings();
 				noder=null;
 			}
-			//CompoundCurveDissolver dissolver=new CompoundCurveDissolver();
-			//dissolver.dissolve(lines);
-			//lines=dissolver.getDissolved();
+			CompoundCurveDissolver dissolver=new CompoundCurveDissolver();
+			dissolver.dissolve(lines);
+			lines=dissolver.getDissolved();
 			//ioxlines=new ArrayList<IomObject>();
 			ioxlines=new FileBasedCollection<IomObject>(recman,new IomObjectSerializer());
 			for(CompoundCurve line:lines){

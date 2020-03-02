@@ -203,35 +203,44 @@ public class ItfWriter2Test {
 		writer.close();
 		writer=null;
 	}
-	@Ignore("Area overlay of lines not yet implemented.")
 	@Test
 	public void testAreaWithHole() throws Iox2jtsException, IoxException {
 		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestAreaWithHole.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicB","bid1"));
-		IomObject iomObj=new Iom_jObject("Test1.TopicB.TableB","10");
-		IomObject polyline=newPolyline();
-		addCoord(polyline,110.0,  110.0);
-		addCoord(polyline,120.0,  110.0); 
-		addCoord(polyline,120.0,  140.0); 
-		addCoord(polyline,110.0,  140.0); 
-		addCoord(polyline,110.0,  110.0);
-		IomObject polygon=newPolygon();
-		addBoundary(polygon,polyline);
-		polyline=newPolyline();
-		addCoord(polyline,110.0,  110.0);
-		addCoord(polyline,115.0,  115.0); 
-		addCoord(polyline,115.0,  120.0); 
-		addCoord(polyline,112.0,  120.0); 
-		addCoord(polyline,110.0,  110.0);
-		addBoundary(polygon,polyline);
-		iomObj.addattrobj("Form", polygon);
-		writer.write(new ObjectEvent(iomObj));
-		iomObj=new Iom_jObject("Test1.TopicB.TableB","11");
-		polygon=newPolygon();
-		addBoundary(polygon,polyline);
-		iomObj.addattrobj("Form", polygon);
-		writer.write(new ObjectEvent(iomObj));
+		IomObject hole=null;
+		{
+            IomObject polygon=newPolygon();
+		    {
+	            IomObject shell=newPolyline();
+	            addCoord(shell,110.0,  110.0);
+	            addCoord(shell,120.0,  110.0); 
+	            addCoord(shell,120.0,  140.0); 
+	            addCoord(shell,110.0,  140.0); 
+	            addCoord(shell,110.0,  110.0);
+	            addBoundary(polygon,shell);
+		    }
+		    {
+	            hole=newPolyline();
+	            addCoord(hole,110.0,  110.0);
+	            addCoord(hole,115.0,  115.0); 
+	            addCoord(hole,115.0,  120.0); 
+	            addCoord(hole,112.0,  120.0); 
+	            addCoord(hole,110.0,  110.0);
+	            addBoundary(polygon,hole);
+		    }
+	        IomObject iomObj=new Iom_jObject("Test1.TopicB.TableB","10");
+	        iomObj.addattrobj("Form", polygon);
+	        writer.write(new ObjectEvent(iomObj));
+		}
+		{
+	        IomObject iomObj=new Iom_jObject("Test1.TopicB.TableB","11");
+	        IomObject polygon=newPolygon();
+	        addBoundary(polygon,hole);
+	        iomObj.addattrobj("Form", polygon);
+	        writer.write(new ObjectEvent(iomObj));
+		    
+		}
 		writer.write(new EndBasketEvent());
 		writer.write(new EndTransferEvent());
 		writer.close();

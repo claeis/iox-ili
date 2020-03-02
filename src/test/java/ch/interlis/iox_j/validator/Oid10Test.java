@@ -53,6 +53,7 @@ public class Oid10Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+        Validator.initItfValidation(settings);
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
@@ -72,11 +73,12 @@ public class Oid10Test {
 	@Test
 	public void duplicateOid_Fail() throws Exception {
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
-		Iom_jObject objB2=new Iom_jObject(CLASSB, OID1);
+		Iom_jObject objB2=new Iom_jObject(CLASSB, OID1); // duplicate oid, same class
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+        Validator.initItfValidation(settings);
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
@@ -91,14 +93,15 @@ public class Oid10Test {
 	
 	// Es wird getestet ob in unterschiedlichen Klassen die OIDs doppelt erstellt werden koennen.
 	@Test
-	public void differentTableDuplicateOid_Fail() throws Exception {
+	public void duplicateOid_differentTable_Ok() throws Exception {
 		Iom_jObject objB1=new Iom_jObject(CLASSB, OID1);
 		Iom_jObject objB2=new Iom_jObject(CLASSB, OID2);
-		Iom_jObject objC1=new Iom_jObject(CLASSC, OID1);
+		Iom_jObject objC1=new Iom_jObject(CLASSC, OID1); // duplicate OID but different class; ok in ITF
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+        Validator.initItfValidation(settings);
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
@@ -108,7 +111,6 @@ public class Oid10Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("OID o1 of object Oid1.Topic.ClassC already exists in CLASS Oid1.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==0);
 	}
 }

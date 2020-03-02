@@ -66,6 +66,7 @@ public class Area10Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+        Validator.initItfValidation(settings);
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -103,6 +104,7 @@ public class Area10Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+        Validator.initItfValidation(settings);
 		settings.setValue(Validator.CONFIG_DO_ITF_LINETABLES, Validator.CONFIG_DO_ITF_LINETABLES_DO);
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
@@ -212,6 +214,7 @@ public class Area10Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+        Validator.initItfValidation(settings);
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -268,6 +271,7 @@ public class Area10Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+        Validator.initItfValidation(settings);
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
@@ -329,6 +333,7 @@ public class Area10Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+        Validator.initItfValidation(settings);
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
