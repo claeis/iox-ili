@@ -5,6 +5,9 @@ ideas/open issues
 
 LATEST
 -----------------------------
+
+iox-ili 1.20.17 (2020-02-03)
+-----------------------------
 - Broken ili1 export (ili2db#326)
 - Validator: Unique constraints violation throws NPE (ili1) (ilivalidator#225)
 - Validator: pass objectPool to init of external object resolvers 
