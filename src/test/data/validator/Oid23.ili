@@ -17,6 +17,10 @@ MODEL Oid23
 		CLASS ClassC =
 		   attrC1 : TEXT*10;
 		END ClassC;
+
+		CLASS ClassD =
+		   attrD1 : TEXT*10;
+		END ClassD;
 		
 		ASSOCIATION bc1 =
 		  b1 -- {0..1} ClassB;
@@ -38,6 +42,12 @@ MODEL Oid23
 		  b4 -- {0..*} ClassB;
 		  c4 -- {0..*} ClassC;
 		END bc4;
+
+		ASSOCIATION bcd5 =
+		  b5 -- {0..*} ClassB;
+		  c5 -- {0..*} ClassC;
+		  d5 -- {0..*} ClassD;
+		END bcd5;
 		
 	END Topic;
 	

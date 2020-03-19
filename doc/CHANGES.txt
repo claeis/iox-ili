@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- Validator: ArrayIndexOutOfBoundsException with n-ary association (ilivalidator#232)
 
 iox-ili 1.20.17 (2020-03-01)
 -----------------------------
