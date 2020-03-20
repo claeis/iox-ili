@@ -6,6 +6,7 @@ ideas/open issues
 LATEST
 -----------------------------
 - Validator: ArrayIndexOutOfBoundsException with n-ary association (ilivalidator#232)
+- Wkb2iox: support EMPTY geometries (ili2db#338)
 
 iox-ili 1.20.17 (2020-03-01)
 -----------------------------

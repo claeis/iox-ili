@@ -210,6 +210,10 @@ private int extractGeometryType(int typeInt) {
   private IomObject readPoint() throws IOException
   {
     readCoordinate();
+    if(Double.isNaN(ordValues[0]) && Double.isNaN(ordValues[1])) {
+        // POINT EMPTY
+        return null;
+    }
 	IomObject ret=new ch.interlis.iom_j.Iom_jObject("COORD",null);
 	ret.setattrvalue("C1", Double.toString(ordValues[0]));
 	ret.setattrvalue("C2", Double.toString(ordValues[1]));
@@ -220,8 +224,12 @@ private int extractGeometryType(int typeInt) {
   }
   private IomObject readMultiPoint() throws IOException
   {
+      int coordc = dis.readInt();
+      if(coordc==0) {
+          // MULTIPOINT EMPTY
+          return null;
+      }
 		IomObject ret=new ch.interlis.iom_j.Iom_jObject(OBJ_MULTICOORD,null);
-	    int coordc = dis.readInt();
 	    for(int coordi=0;coordi<coordc;coordi++){
 	        byte byteOrder = dis.readByte();
 	        int typeInt = dis.readInt();
@@ -244,10 +252,14 @@ private int extractGeometryType(int typeInt) {
 //				<byte order> <wkblinestring> [ <num> <wkbpoint binary>... ]
 //	  <wkblinearring> ::= <num> <wkbpoint binary>...
 
+      int coordc = dis.readInt();
+      if(coordc==0) {
+          // LINESTRING EMPTY
+          return null;
+      }
 	    IomObject ret=new ch.interlis.iom_j.Iom_jObject("POLYLINE",null);
 		IomObject sequence=new ch.interlis.iom_j.Iom_jObject("SEGMENTS",null);
 		ret.addattrobj("sequence",sequence);
-    int coordc = dis.readInt();
 	for(int coordi=0;coordi<coordc;coordi++){
 		sequence.addattrobj("segment", readPoint());
 	}
@@ -256,6 +268,10 @@ private int extractGeometryType(int typeInt) {
   private IomObject readCompoundCurve() throws IOException
   {
     int compc = dis.readInt();
+    if(compc==0) {
+        // EMPTY
+        return null;
+    }
 	IomObject ret=new ch.interlis.iom_j.Iom_jObject("POLYLINE",null);
 	IomObject sequence=new ch.interlis.iom_j.Iom_jObject("SEGMENTS",null);
 	ret.addattrobj("sequence",sequence);
@@ -318,7 +334,10 @@ private int extractGeometryType(int typeInt) {
 //		<byte order> <wkbpolygon> [ <num> <wkblinearring binary>... ]
 //		| <triangle binary representation>
     int holec = dis.readInt();
-
+    if(holec==0) {
+        // POLYGON EMPTY
+        return null;
+    }
 	IomObject ret=new ch.interlis.iom_j.Iom_jObject("MULTISURFACE",null);
 	IomObject surface=new ch.interlis.iom_j.Iom_jObject("SURFACE",null);
 	ret.addattrobj("surface",surface);
@@ -346,7 +365,10 @@ private int extractGeometryType(int typeInt) {
 	  
 	  
     int ringc = dis.readInt();
-
+    if(ringc==0) {
+        // EMPTY
+        return null;
+    }
 	IomObject ret=new ch.interlis.iom_j.Iom_jObject("MULTISURFACE",null);
 	IomObject surface=new ch.interlis.iom_j.Iom_jObject("SURFACE",null);
 	ret.addattrobj("surface",surface);
@@ -373,8 +395,12 @@ private int extractGeometryType(int typeInt) {
 			  | <triangle binary representation>
 
 */
-	  IomObject ret=null;
 	    int polygonc = dis.readInt();
+	    if(polygonc==0) {
+	        // MULTIPOLYGON EMPTY
+	        return null;
+	    }
+	      IomObject ret=null;
 	    for(int polygoni=0;polygoni<polygonc;polygoni++){
 	        byte byteOrder = dis.readByte();
 	        int typeInt = dis.readInt();
@@ -409,8 +435,12 @@ private int extractGeometryType(int typeInt) {
 			  <curvepolygon binary representation>
 			  | <polyhedralsurface binary representation>					  
 */
-	  IomObject ret=null;
 	    int surfacec = dis.readInt();
+	    if(surfacec==0) {
+	        // EMPTY
+	        return null;
+	    }
+	      IomObject ret=null;
 	    for(int surfacei=0;surfacei<surfacec;surfacei++){
 	        byte byteOrder = dis.readByte();
 	        int typeInt = dis.readInt();
@@ -442,8 +472,11 @@ private int extractGeometryType(int typeInt) {
 [ <num> <linestring binary representation>... ]
 
 */
+      int curvec = dis.readInt();
+      if(curvec==0) {
+          return null;
+      }
 		IomObject ret=new ch.interlis.iom_j.Iom_jObject(OBJ_MULTIPOLYLINE,null);
-	    int curvec = dis.readInt();
 	    for(int curvei=0;curvei<curvec;curvei++){
 	        byte byteOrder = dis.readByte();
 	        int typeInt = dis.readInt();
