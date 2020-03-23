@@ -397,6 +397,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
             }else{
                 iomObj=createIomObject(viewable.getScopedName(), null);
             }
+            iomObj.setobjectline(element.getLocation().getLineNumber());
             event=xmlreader.nextEvent(); // after create iomObj
             event=skipSpacesAndGetNextEvent(event);
             // attributes
@@ -893,20 +894,6 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
             return rootEle;
         }
         return element;
-    }
-
-    private AttributeDef getRootExtending(AttributeDef attr) {
-        AttributeDef ret=(AttributeDef)attr.getExtending();
-        if(ret!=null){
-            while(true){
-                Element ret1=ret.getExtending();
-                if(ret1==null){
-                    break;
-                }
-                ret=(AttributeDef)ret1;
-            }
-        }
-        return ret;
     }
 
     private String getModelXmlNamespace(Model model) {
