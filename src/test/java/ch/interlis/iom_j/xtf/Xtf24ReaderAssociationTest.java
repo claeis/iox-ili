@@ -62,6 +62,7 @@ public class Xtf24ReaderAssociationTest {
         
         IomObject association = iomObject.getattrobj("rolle_A", 0);
         assertNotNull(association);
+        assertEquals("oid1", association.getobjectrefoid());
         assertEquals("12", association.getattrvalue("attr_Assoc"));
         
         assertTrue(reader.read() instanceof  EndBasketEvent);

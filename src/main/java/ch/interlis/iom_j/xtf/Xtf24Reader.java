@@ -1174,18 +1174,23 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 	            event = xmlreader.nextEvent();
 	        }
 	        
+            IomObject aObject=null;
 	        if (event != null && event.isStartElement()) {
 	            element = (StartElement) event;
 	            iomObj.addattrobj(role.getName(), readObject(event));
+                aObject=iomObj.getattrobj(role.getName(), 0);
 	        } else {
-	            iomObj.addattrobj(role.getName(),"REF").setobjectrefoid(refOid);
-	            IomObject aObject=iomObj.getattrobj(role.getName(), 0);
+	            iomObj.addattrobj(role.getName(),"REF");
+	            aObject=iomObj.getattrobj(role.getName(), 0);
+	        }
+	        if(aObject!=null) {
+	            aObject.setobjectrefoid(refOid);
 	            if(orderPos!=null){
 	                aObject.setobjectreforderpos(orderPos);
 	            }
 	            if(refBid!=null) {
 	                aObject.setobjectrefbid(refBid);
-	            }	            
+	            }               
 	        }
 		}
 		return iomObj;

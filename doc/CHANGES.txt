@@ -10,6 +10,7 @@ LATEST
 - Xtf24Reader: wrong xmlns for extended attributes (ilivalidator#235)
 - Xtf24Reader: fails to read STRUCTUREs defined at model level (ilivalidator#236)
 - Xtf24Reader: missing line number in messages (ilivalidator#237)
+- Xtf24Reader: fails to read ref of embedded assoc with attrs (ilivalidator#238)
 - ili2c-5.0.7-SNAPSHOT
 
 iox-ili 1.20.17 (2020-03-01)
