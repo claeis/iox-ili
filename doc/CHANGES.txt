@@ -7,6 +7,8 @@ LATEST
 -----------------------------
 - Validator: ArrayIndexOutOfBoundsException with n-ary association (ilivalidator#232)
 - Wkb2iox: support EMPTY geometries (ili2db#338)
+- Xtf24Reader: wrong xmlns for extended attributes (ilivalidator#235)
+- ili2c-5.0.7-SNAPSHOT
 
 iox-ili 1.20.17 (2020-03-01)
 -----------------------------

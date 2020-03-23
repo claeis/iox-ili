@@ -851,25 +851,53 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
     				// iliProperties
 					Iterator<ViewableTransferElement> elementIter=aClass.getAttributesAndRoles2();
 					transferElements=new HashMap<QName, Element>();
-					Element element=null;
 					while (elementIter.hasNext()){
 						ViewableTransferElement obj = (ViewableTransferElement) elementIter.next();
-						if(obj.obj instanceof Element){
-							element=(Element) obj.obj;
-							String elementName=element.getName();
-							Model modelOfElement=(Model)element.getContainer(Model.class);
-							String elementNs=modelNameSpace;
-							if(modelOfElement!=model) {
-							    elementNs=getModelXmlNamespace(modelOfElement);
-							}
-		    				QName eleQName=new QName(elementNs, elementName);
-			    			transferElements.put(eleQName, element);
-						}
+	                    Element element=(Element) obj.obj;
+	                    Element rootEle=getRootEle(element);
+                        String elementNs=modelNameSpace;
+                        Model modelOfElement=(Model)rootEle.getContainer(Model.class);
+                        if(modelOfElement!=model) {
+                            elementNs=getModelXmlNamespace(modelOfElement);
+                        }
+                        QName eleQName=new QName(elementNs, element.getName());
+                        transferElements.put(eleQName, element);
 					}
 					iliProperties.put(aClass, transferElements);
 		    	}
 			}
 		}
+    }
+
+    private Element getRootEle(Element element) {
+        Element rootEle=null;
+        if(element instanceof RoleDef){
+            RoleDef role=(RoleDef)element;
+            rootEle=role.getRootExtending();
+        }else if(element instanceof AttributeDef){
+            AttributeDef attr=(AttributeDef)element;
+            rootEle=attr.getRootExtending();
+        }else {
+            throw new IllegalStateException("unexpected class "+element.getClass().getName());
+        }
+        if(rootEle!=null) {
+            return rootEle;
+        }
+        return element;
+    }
+
+    private AttributeDef getRootExtending(AttributeDef attr) {
+        AttributeDef ret=(AttributeDef)attr.getExtending();
+        if(ret!=null){
+            while(true){
+                Element ret1=ret.getExtending();
+                if(ret1==null){
+                    break;
+                }
+                ret=(AttributeDef)ret1;
+            }
+        }
+        return ret;
     }
 
     private String getModelXmlNamespace(Model model) {
