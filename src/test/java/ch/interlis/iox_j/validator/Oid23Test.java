@@ -36,10 +36,12 @@ public class Oid23Test {
 	
 	private final static String CLASSB=TOPIC+".ClassB";
 	private final static String CLASSC=TOPIC+".ClassC";
+    private final static String CLASSD=TOPIC+".ClassD";
 	// ASSOCIATION
 	private final static String ASSOCIATIONB2=TOPIC+".bc2";
 	private final static String ASSOCIATIONB3=TOPIC+".bc3";
 	private final static String ASSOCIATIONB4=TOPIC+".bc4";
+    private final static String ASSOCIATIONBCD5=TOPIC+".bcd5";
 	// STRUCTURE
 	private final static String STRUCTA=TOPIC+".StructA";
 	// TD
@@ -461,6 +463,35 @@ public class Oid23Test {
         // Asserts
         assertTrue(logger.getErrs().size()==1);
         assertEquals("Association Oid23.Topic.bc2 must not have an OID (1)", logger.getErrs().get(0).getEventMsg());
+    }
+    @Test
+    public void associatianNaryWithoutId_superfluousId_Fail(){
+        final String OBJ_B1="o_b1";
+        final String OBJ_C1="o_c1";
+        final String OBJ_D1="o_d1";
+        Iom_jObject objB1=new Iom_jObject(CLASSB, OBJ_B1);
+        Iom_jObject objC1=new Iom_jObject(CLASSC, OBJ_C1);
+        Iom_jObject objD1=new Iom_jObject(CLASSD, OBJ_D1);
+        Iom_jObject objBCD=new Iom_jObject(ASSOCIATIONBCD5, "1");
+        objBCD.addattrobj("b5", "REF").setobjectrefoid(OBJ_B1);
+        objBCD.addattrobj("c5", "REF").setobjectrefoid(OBJ_C1);
+        objBCD.addattrobj("d5", "REF").setobjectrefoid(OBJ_D1);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new ObjectEvent(objC1));
+        validator.validate(new ObjectEvent(objD1));
+        validator.validate(new ObjectEvent(objBCD));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Association Oid23.Topic.bcd5 must not have an OID (1)", logger.getErrs().get(0).getEventMsg());
     }
 	// Es wird getestet ob eine Association ohne Id, die aber eine Id haben muesste, einen Fehler liefert
 	@Test

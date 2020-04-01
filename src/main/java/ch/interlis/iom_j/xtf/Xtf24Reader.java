@@ -29,6 +29,7 @@ import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.Model;
 import ch.interlis.ili2c.metamodel.RoleDef;
+import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.ili2c.metamodel.Topic;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.View;
@@ -396,6 +397,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
             }else{
                 iomObj=createIomObject(viewable.getScopedName(), null);
             }
+            iomObj.setobjectline(element.getLocation().getLineNumber());
             event=xmlreader.nextEvent(); // after create iomObj
             event=skipSpacesAndGetNextEvent(event);
             // attributes
@@ -812,64 +814,86 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 			}
 			// iliModel
 			Model model = (Model) modelObj;
+            String modelNameSpace = getModelXmlNamespace(model);
 			Iterator modelIterator = model.iterator();
 			while(modelIterator.hasNext()){
 				Object topicObj = modelIterator.next();
-				if(!(topicObj instanceof Topic)){
-					continue;
+				if(topicObj instanceof Topic){
+	                // iliTopic
+	                Topic topic = (Topic) topicObj;
+	                String topicName=(String)def2name.get(topic);
+	                QName topicQName=new QName(modelNameSpace, topicName);
+	                iliTopics.put(topicQName, topic);
+	                // iliClass
+	                Iterator classIter=topic.iterator();
+	                while(classIter.hasNext()){
+	                    Object classObj=classIter.next();
+	                    if(!(classObj instanceof Viewable)){
+	                        continue;
+	                    }
+	                    // iliView
+	                    if(classObj instanceof View){
+	                        if(topic.isViewTopic()){
+	                            View view=(View) classObj;
+	                            if(!view.isTransient()){
+	                            }else{
+	                                continue;
+	                            }
+	                        }else{
+	                            continue;
+	                        }
+	                    }
+	                    Viewable aClass = (Viewable) classObj;
+	                    String className=(String)def2name.get(aClass);
+	                    QName classQName=new QName(modelNameSpace, className);
+	                    setupViewable(aClass,classQName);
+	                }
+				}else if(topicObj instanceof Table) {
+                    Table aClass = (Table) topicObj;
+                    if(!aClass.isAbstract()) {
+                        String className=(String)def2name.get(aClass);
+                        QName classQName=new QName(modelNameSpace, className);
+                        setupViewable(aClass,classQName);
+                    }
 				}
-				// iliTopic
-				Topic topic = (Topic) topicObj;
-				String topicName=(String)def2name.get(topic);
-				String modelNameSpace = getModelXmlNamespace(model);
-				QName topicQName=new QName(modelNameSpace, topicName);
-				iliTopics.put(topicQName, topic);
-				// iliClass
-				Iterator classIter=topic.iterator();
-		    	while(classIter.hasNext()){
-		    		Object classObj=classIter.next();
-		    		if(!(classObj instanceof Viewable)){
-    					continue;
-    				}
-		    		// iliView
-		    		if(classObj instanceof View){
-		    			if(topic.isViewTopic()){
-							View view=(View) classObj;
-							if(!view.isTransient()){
-							}else{
-								continue;
-							}
-		    			}else{
-		    				continue;
-		    			}
-					}
-		    		Viewable aClass = (Viewable) classObj;
-		    		String className=(String)def2name.get(aClass);
-    				QName classQName=new QName(modelNameSpace, className);
-    				HashMap<QName, Element> transferElements=null;
-                    iliClasses.put(classQName, aClass);
-    				// iliProperties
-					Iterator<ViewableTransferElement> elementIter=aClass.getAttributesAndRoles2();
-					transferElements=new HashMap<QName, Element>();
-					Element element=null;
-					while (elementIter.hasNext()){
-						ViewableTransferElement obj = (ViewableTransferElement) elementIter.next();
-						if(obj.obj instanceof Element){
-							element=(Element) obj.obj;
-							String elementName=element.getName();
-							Model modelOfElement=(Model)element.getContainer(Model.class);
-							String elementNs=modelNameSpace;
-							if(modelOfElement!=model) {
-							    elementNs=getModelXmlNamespace(modelOfElement);
-							}
-		    				QName eleQName=new QName(elementNs, elementName);
-			    			transferElements.put(eleQName, element);
-						}
-					}
-					iliProperties.put(aClass, transferElements);
-		    	}
 			}
 		}
+    }
+
+    private void setupViewable(Viewable aClass,QName classQName)
+    {
+        HashMap<QName, Element> transferElements=null;
+        iliClasses.put(classQName, aClass);
+        // iliProperties
+        Iterator<ViewableTransferElement> elementIter=aClass.getAttributesAndRoles2();
+        transferElements=new HashMap<QName, Element>();
+        while (elementIter.hasNext()){
+            ViewableTransferElement obj = (ViewableTransferElement) elementIter.next();
+            Element element=(Element) obj.obj;
+            Element rootEle=getRootEle(element);
+            Model modelOfElement=(Model)rootEle.getContainer(Model.class);
+            String elementNs=getModelXmlNamespace(modelOfElement);
+            QName eleQName=new QName(elementNs, element.getName());
+            transferElements.put(eleQName, element);
+        }
+        iliProperties.put(aClass, transferElements);
+        
+    }
+    private Element getRootEle(Element element) {
+        Element rootEle=null;
+        if(element instanceof RoleDef){
+            RoleDef role=(RoleDef)element;
+            rootEle=role.getRootExtending();
+        }else if(element instanceof AttributeDef){
+            AttributeDef attr=(AttributeDef)element;
+            rootEle=attr.getRootExtending();
+        }else {
+            throw new IllegalStateException("unexpected class "+element.getClass().getName());
+        }
+        if(rootEle!=null) {
+            return rootEle;
+        }
+        return element;
     }
 
     private String getModelXmlNamespace(Model model) {
@@ -1150,18 +1174,23 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 	            event = xmlreader.nextEvent();
 	        }
 	        
+            IomObject aObject=null;
 	        if (event != null && event.isStartElement()) {
 	            element = (StartElement) event;
 	            iomObj.addattrobj(role.getName(), readObject(event));
+                aObject=iomObj.getattrobj(role.getName(), 0);
 	        } else {
-	            iomObj.addattrobj(role.getName(),"REF").setobjectrefoid(refOid);
-	            IomObject aObject=iomObj.getattrobj(role.getName(), 0);
+	            iomObj.addattrobj(role.getName(),"REF");
+	            aObject=iomObj.getattrobj(role.getName(), 0);
+	        }
+	        if(aObject!=null) {
+	            aObject.setobjectrefoid(refOid);
 	            if(orderPos!=null){
 	                aObject.setobjectreforderpos(orderPos);
 	            }
 	            if(refBid!=null) {
 	                aObject.setobjectrefbid(refBid);
-	            }	            
+	            }               
 	        }
 		}
 		return iomObj;

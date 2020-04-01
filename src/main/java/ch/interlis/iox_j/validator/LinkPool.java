@@ -37,9 +37,11 @@ public class LinkPool {
 				// standalone association is only possible with ili2
 				throw new IllegalArgumentException("doItfOidPerTable!=false");
 			}
-			RoleDef oppRole=role.getOppEnd();
-			String sourceOid=iomObj.getattrobj(oppRole.getName(),0).getobjectrefoid();
-			increaseCounter(sourceOid, null, role, false);
+			if(role.hasOneOppEnd()) {
+	            RoleDef oppRole=role.getOppEnd();
+	            String sourceOid=iomObj.getattrobj(oppRole.getName(),0).getobjectrefoid();
+	            increaseCounter(sourceOid, null, role, false);
+			}
 		}
 	}
 
