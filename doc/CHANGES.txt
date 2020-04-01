@@ -5,13 +5,17 @@ ideas/open issues
 
 LATEST
 -----------------------------
+
+iox-ili 1.20.18 (2020-04-01)
+-----------------------------
 - Validator: ArrayIndexOutOfBoundsException with n-ary association (ilivalidator#232)
 - Wkb2iox: support EMPTY geometries (ili2db#338)
 - Xtf24Reader: wrong xmlns for extended attributes (ilivalidator#235)
 - Xtf24Reader: fails to read STRUCTUREs defined at model level (ilivalidator#236)
 - Xtf24Reader: missing line number in messages (ilivalidator#237)
 - Xtf24Reader: fails to read ref of embedded assoc with attrs (ilivalidator#238)
-- ili2c-5.0.7-SNAPSHOT
+- ili2c-5.0.7
+- ehibasics-1.3.0
 
 iox-ili 1.20.17 (2020-03-01)
 -----------------------------
