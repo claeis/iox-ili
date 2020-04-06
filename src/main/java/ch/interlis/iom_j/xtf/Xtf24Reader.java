@@ -1391,4 +1391,9 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
             filterTopics.add(topicName);
         }
     }
+
+    @Override
+    public String getMimeType() {
+        return XTF_24;
+    }
 }

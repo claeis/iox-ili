@@ -17,6 +17,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import ch.interlis.ili2c.metamodel.AssociationDef;
+import ch.interlis.ili2c.metamodel.Model;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
@@ -1313,5 +1314,10 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
         for(String topicName:topicNames) {
             filterTopics.add(topicName);
         }
+    }
+
+    @Override
+    public String getMimeType() {
+        return XTF_23;
     }
 }

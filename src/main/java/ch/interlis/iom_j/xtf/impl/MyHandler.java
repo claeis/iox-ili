@@ -55,7 +55,7 @@ public class MyHandler
 	
     private java.util.Set<String> filterTopics=null;
 	private java.util.HashMap<String, IomObject> header=null;
-	private boolean isIli22=false;
+	private boolean ili22=false;
 	public boolean stopParser=false;
 	public ch.interlis.iox.IoxEvent returnObject=null;
 	class Element {
@@ -183,9 +183,9 @@ public class MyHandler
     	if(state==BEFORE_TRANSFER) {
     		if(name.equals("TRANSFER")){
 	    		state=BEFORE_HEADERSECTION;
-	    		isIli22=event.getName().getNamespaceURI().equals(XtfWriterAlt.ili22Ns);
+	    		ili22=event.getName().getNamespaceURI().equals(XtfWriterAlt.ili22Ns);
 	    		returnObject=new XtfStartTransferEvent();
-	    		if(isIli22){
+	    		if(ili22){
 	    			((StartTransferEvent)returnObject).setVersion("2.2");
 	    		}else{
 	    			((StartTransferEvent)returnObject).setVersion("2.3");
@@ -306,7 +306,7 @@ public class MyHandler
 			String attrName;
 			String attrVal=attr.getValue();
 			// TAG
-			if(!isIli22){
+			if(!ili22){
 				Attribute tag = event.getAttributeByName(new QName("TAG"));
 				if (tag == null){
 					// TAG is mandatory
@@ -339,7 +339,7 @@ public class MyHandler
 			Attribute attr = null;
 			String classTag=null;
 			String attrName=null;
-			if(!isIli22){
+			if(!ili22){
 				attr = event.getAttributeByName(new QName("ATTR"));
 				classTag=tag.getValue();
 				if(attr!=null){
@@ -646,7 +646,7 @@ public class MyHandler
 				javax.xml.stream.Location loc=event.getLocation();
 				object.setobjectcol(loc.getColumnNumber());
 				object.setobjectline(loc.getLineNumber());
-				if(isIli22 && oid==null && objStack.size()==0){
+				if(ili22 && oid==null && objStack.size()==0){
 					throw new IllegalArgumentException ("Attribute OID missing in object "+loc.getLineNumber());
 				}
 				if(oid!=null){
@@ -1070,7 +1070,7 @@ public class MyHandler
 		if(oid==null){
 			return null;
 		}
-		if(!isIli22){
+		if(!ili22){
 			return oid;
 		}
 		// ASSERT: isIli22
@@ -1108,5 +1108,8 @@ public class MyHandler
         for(String topicName:topicNames) {
             filterTopics.add(topicName);
         }
+    }
+    public boolean isIli22() {
+        return ili22;
     }
   };

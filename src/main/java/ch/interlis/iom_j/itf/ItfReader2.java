@@ -626,4 +626,8 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
     public void setTopicFilter(String[] topicNames) {
         rawReader.setTopicFilter(topicNames);
     }
+    @Override
+    public String getMimeType() {
+        return ITF_10;
+    }
 }
