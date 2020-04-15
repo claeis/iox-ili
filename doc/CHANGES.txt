@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- Validator: Check Base64 input character (ilivalidator#246)
 - IoxIliReader.getMimeType() added
 
 iox-ili 1.20.18 (2020-04-01)

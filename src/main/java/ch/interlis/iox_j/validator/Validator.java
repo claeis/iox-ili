@@ -30,6 +30,7 @@ import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.AssociationPath;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.AttributeRef;
+import ch.interlis.ili2c.metamodel.BlackboxType;
 import ch.interlis.ili2c.metamodel.Cardinality;
 import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.Constant;
@@ -130,11 +131,13 @@ import ch.interlis.iox_j.validator.functions.Interlis;
 import ch.interlis.iox_j.validator.functions.Interlis_ext;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
-	private static final String ENUM_TREE_VALUES = "ENUM_TREE_VALUES";
+    private static final String ENUM_TREE_VALUES = "ENUM_TREE_VALUES";
     public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
 	public static final String REGEX_FOR_ID_VALIDATION = "^[0-9a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
 	public static final String REGEX_FOR_TEXTOID_VALIDATION = "^[a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
 	public static final String REGEX_FOR_STANDARTOID_VALIDATION = "^[a-zA-Z][0-9a-zA-Z]*";
+	public static final String REGEX_FOR_BASE64_VALIDATION = "[a-zA-Z0-9+/= \\t\\n\\r]+";
+
 	public static final String CONFIG_DO_ITF_LINETABLES="ch.interlis.iox_j.validator.doItfLinetables";
 	public static final String CONFIG_DO_ITF_LINETABLES_DO="doItfLinetables";
 	public static final String CONFIG_DO_ITF_OIDPERTABLE="ch.interlis.iox_j.validator.doItfOidPerTable";
@@ -165,6 +168,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	Pattern patternForIdValidation = null;
 	Pattern patternForTextOIdValidation = null;
 	Pattern patternForStandartOidValidation = null;
+    Pattern patternForBase64Validation = null;
 	private boolean enforceTypeValidation=false;
 	private boolean enforceConstraintValidation=false;
 	private boolean enforceTargetValidation=false;
@@ -221,6 +225,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		this.patternForIdValidation = Pattern.compile(REGEX_FOR_ID_VALIDATION);
 		this.patternForTextOIdValidation = Pattern.compile(REGEX_FOR_TEXTOID_VALIDATION);
 		this.patternForStandartOidValidation = Pattern.compile(REGEX_FOR_STANDARTOID_VALIDATION);
+        this.patternForBase64Validation = Pattern.compile(REGEX_FOR_BASE64_VALIDATION);
 		this.settings.setTransientObject(InterlisFunction.IOX_DATA_POOL,pipelinePool);
 		this.pipelinePool=pipelinePool;
 		objPoolManager=new ObjectPoolManager();
@@ -3652,11 +3657,28 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             }
                         }
                     }				    
+                } else if (type instanceof BlackboxType) {
+                    if(((BlackboxType) type).getKind()==BlackboxType.eBINARY) {
+                        String actualValue = iomObj.getattrvalue(attrName);
+                        if (actualValue != null) {
+                            Matcher matcher = patternForBase64Validation.matcher(actualValue);
+                            if (!matcher.matches()) {
+                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.attributeXHasAInvalidValueY"), attrPath, shortcutValue(actualValue)));
+                            }
+                        }                   
+                    }
 				}
 			}
 		}
 	}
 
+    private static String shortcutValue(String value) {
+        int MAX_LEN=20;
+        if(value==null || value.length()<=MAX_LEN) {
+            return value;
+        }
+        return value.substring(0,MAX_LEN)+"...";
+    }
     private boolean isValidEnumTreeValue(String actualValue, String attrPath, Type type) {
         EnumTreeValueType enumTreeValueType = (EnumTreeValueType) type;
         if (actualValue != null) {
