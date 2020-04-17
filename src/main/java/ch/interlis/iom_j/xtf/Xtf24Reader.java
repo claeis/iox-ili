@@ -1,6 +1,5 @@
 package ch.interlis.iom_j.xtf;
 
-import java.awt.Event;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
