@@ -2,12 +2,9 @@ package ch.interlis.iox_j.logging;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 
 import org.interlis2.validator.models.ILIVERRORS;
 import org.interlis2.validator.models.IliVErrors.ErrorLog.Error_Type;
-
-import com.vividsolutions.jts.index.strtree.STRtree;
 
 import ch.ehi.basics.logging.AbstractStdListener;
 import ch.ehi.basics.logging.LogEvent;
@@ -23,7 +20,6 @@ import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
 import ch.interlis.iox_j.StartBasketEvent;
 import ch.interlis.iox_j.StartTransferEvent;
-import ch.interlis.models.ILISMETA07;
 
 public class XtfErrorsLogger implements LogListener {
 	private static final String UNDEFINED_MESSAGE = "UNDEFINED MESSAGE";
