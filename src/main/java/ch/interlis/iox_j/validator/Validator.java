@@ -2382,14 +2382,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateReferenceAttrs.validateReferenceAttr"),attrQName));
 						}
 
+                        IomObject refAttrStruct = iomStruct.getattrobj(refAttr.getName(), 0);
+                        String targetOid = null;
+                        if(refAttrStruct!=null){
+                            targetOid=refAttrStruct.getobjectrefoid();
+                        }
+
 						AbstractClassDef targetClass = refAttrType.getReferred();
 						ArrayList<Viewable> destinationClasses = new ArrayList<Viewable>();
 						destinationClasses.add(targetClass);
-						IomObject refAttrStruct = iomStruct.getattrobj(refAttr.getName(), 0);
-						String targetOid = null;
-						if(refAttrStruct!=null){
-							targetOid=refAttrStruct.getobjectrefoid();
-						}
 						String targetObjClassStr = null;
 						OutParam<String> bidOfTargetObj = new OutParam<String>();
 						IomObject targetObject = null;
@@ -2429,20 +2430,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							// EXTERNAL
 							// not found in internal pool?
 							if(targetObject==null){
-								boolean extObjFound=false;
-								// use external object resolver to find external objects.
-								if(extObjResolvers!=null){
-									// call custom function to verify in external data pools
-									for(ExternalObjectResolver extObjResolver:extObjResolvers){
-										if(extObjResolver.objectExists(targetOid, destinationClasses)){
-                                            extObjFound = true;
-                                            break;
-										}
-									}
-								}
-								if(allObjectsAccessible && !extObjFound){
-									logMsg(validateTarget,rsrc.getString("validateReferenceAttrs.noObjectFoundWithOid"), targetOid);
-								}
+							    if(targetOid!=null) {
+	                                boolean extObjFound=false;
+	                                // use external object resolver to find external objects.
+	                                if(extObjResolvers!=null){
+	                                    // call custom function to verify in external data pools
+	                                    for(ExternalObjectResolver extObjResolver:extObjResolvers){
+	                                        if(extObjResolver.objectExists(targetOid, destinationClasses)){
+	                                            extObjFound = true;
+	                                            break;
+	                                        }
+	                                    }
+	                                }
+	                                if(allObjectsAccessible && !extObjFound){
+	                                    logMsg(validateTarget,rsrc.getString("validateReferenceAttrs.noObjectFoundWithOid"), targetOid);
+	                                }
+							    }
 							}
 						}
 						if(targetObject != null){
@@ -3391,6 +3394,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 				if(topologyDone==null){
 					 int structc=iomObj.getattrvaluecount(attrName);
+					 if(structc==1 && type instanceof ReferenceType) {
+					     IomObject refObj=iomObj.getattrobj(attrName, 0);
+					     if(refObj==null || refObj.getobjectrefoid()==null) {
+					         structc=0;
+					     }
+					 }
 					 if(structc==0 && isAttributeMandatory(attr)) {
 						 if(doItfLineTables && type instanceof SurfaceType){
 							 // SURFACE; no attrValue in maintable

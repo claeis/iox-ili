@@ -6,6 +6,7 @@ ideas/open issues
 LATEST
 -----------------------------
 - Validator: Check Base64 input character (ilivalidator#246)
+- Validator: fix No object found with OID null (ilivalidator#249)
 - IoxIliReader.getMimeType() added
 - improve ili2c core/tool separation
 - ili2c-5.1.0-SNAPSHOT
