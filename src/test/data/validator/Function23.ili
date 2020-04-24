@@ -263,8 +263,10 @@ MODEL Function23
 		END ClassZG;
 		
 		CLASS ClassZH =
+			attr1 : 0 .. 5 [INTERLIS.m];
+			attr2 : 0 .. 5 [INTERLIS.m];
 			MANDATORY CONSTRAINT
-				INTERLIS.convertUnit(5);
+				INTERLIS.convertUnit(attr1)==attr2;
 		END ClassZH;
 		
 	END Topic;
