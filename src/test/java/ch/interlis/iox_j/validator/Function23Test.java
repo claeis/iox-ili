@@ -1694,6 +1694,7 @@ public class Function23Test {
 	// Es wird getestet ob eine Warnungsmeldung ausgegeben wird, wenn die Funktion noch nicht implementiert wurde.
 	// Die Funktion wurde zwar gefunden, sie ist jedoch nicht implementiert, deshalb die Warnung Function(Name) wurde noch nicht implementiert.
 	@Test
+	@Ignore("ilivalidator#250")
 	public void function_notYetImplemented_Fail(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSZH, OBJ_OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
