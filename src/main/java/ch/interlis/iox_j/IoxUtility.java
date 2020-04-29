@@ -12,6 +12,7 @@ import ch.interlis.iox.IoxReader;
 import ch.interlis.iox.StartBasketEvent;
 import ch.interlis.iox_j.utility.ReaderFactory;
 
+@Deprecated
 public class IoxUtility {
 	private IoxUtility(){}
 	public static boolean isItfFilename(String filename)

@@ -59,7 +59,7 @@ public class IoxUtility {
 	 * @return list of model names (list&lt;String modelname&gt;) 
 	 * @throws ch.interlis.iox.IoxException
 	 */
-	public static java.util.ArrayList<String> getModels(java.io.File xtffile)
+	public static java.util.List<String> getModels(java.io.File xtffile)
 		throws ch.interlis.iox.IoxException
 	{
 		ArrayList<String> ret=new ArrayList<String>();
@@ -210,30 +210,17 @@ public class IoxUtility {
         return modelVersion;
     }
 
-	private static String version=null;
-	public static String getVersion() {
-		  if(version==null){
-		java.util.ResourceBundle resVersion = java.util.ResourceBundle.getBundle("ch/interlis/iox_j/Version");
-			// Major version numbers identify significant functional changes.
-			// Minor version numbers identify smaller extensions to the functionality.
-			// Micro versions are even finer grained versions.
-			StringBuffer ret=new StringBuffer(20);
-		ret.append(resVersion.getString("versionMajor"));
-			ret.append('.');
-		ret.append(resVersion.getString("versionMinor"));
-			ret.append('.');
-		ret.append(resVersion.getString("versionMicro"));
-		ret.append('-');
-		if(resVersion.containsKey("versionBranch")){
-            String branch=ch.ehi.basics.tools.StringUtility.purge(resVersion.getString("versionBranch"));
-            if(branch!=null){
-               ret.append(branch);
-               ret.append('-');
-            }
-		}
-		ret.append(resVersion.getString("versionDate"));
-			version=ret.toString();
-		  }
-		  return version;
-	}
+    private static String version = null;
+
+    public static String getVersion() {
+        if (version == null) {
+            java.util.ResourceBundle resVersion = java.util.ResourceBundle.getBundle("ch/interlis/iox_j/Version");
+            StringBuffer ret = new StringBuffer(20);
+            ret.append(resVersion.getString("version"));
+            ret.append('-');
+            ret.append(resVersion.getString("versionCommit"));
+            version = ret.toString();
+        }
+        return version;
+    }
 }
