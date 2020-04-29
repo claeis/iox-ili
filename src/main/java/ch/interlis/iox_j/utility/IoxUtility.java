@@ -179,7 +179,7 @@ public class IoxUtility {
 		//EhiLogger.debug("model from xtf <"+model+">");
 		return model;
 	}
-    public String getModelVersion(String[] dataFiles, LogEventFactory errFactory)
+    static public String getModelVersion(String[] dataFiles, LogEventFactory errFactory)
             throws IoxException 
     {
         String modelVersion=null;
