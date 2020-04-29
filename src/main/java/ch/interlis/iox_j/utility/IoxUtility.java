@@ -3,12 +3,21 @@ package ch.interlis.iox_j.utility;
 import java.util.ArrayList;
 
 import ch.ehi.basics.logging.EhiLogger;
+import ch.interlis.ili2c.metamodel.Model;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.itf.ItfReader;
+import ch.interlis.iom_j.itf.ItfReader2;
+import ch.interlis.iom_j.xtf.Xtf23Reader;
+import ch.interlis.iom_j.xtf.Xtf24Reader;
+import ch.interlis.iom_j.xtf.XtfReader;
 import ch.interlis.iom_j.xtf.XtfStartTransferEvent;
 import ch.interlis.iom_j.xtf.impl.MyHandler;
 import ch.interlis.iox.IoxEvent;
+import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxReader;
 import ch.interlis.iox.StartBasketEvent;
+import ch.interlis.iox_j.StartTransferEvent;
+import ch.interlis.iox_j.logging.LogEventFactory;
 import ch.interlis.iox_j.utility.ReaderFactory;
 
 public class IoxUtility {
@@ -170,6 +179,36 @@ public class IoxUtility {
 		//EhiLogger.debug("model from xtf <"+model+">");
 		return model;
 	}
+    public String getModelVersion(String[] dataFiles, LogEventFactory errFactory)
+            throws IoxException 
+    {
+        String modelVersion=null;
+        String dataFile=dataFiles[0];
+        IoxReader ioxReader=null;
+        try {
+            ioxReader=new ReaderFactory().createReader(new java.io.File(dataFile), errFactory);
+            if(ioxReader instanceof Xtf24Reader) {
+                modelVersion=Model.ILI2_4;
+            }else if(ioxReader instanceof XtfReader) {
+                modelVersion=Model.ILI2_3;
+                IoxEvent event = ioxReader.read();
+                if(event instanceof StartTransferEvent && ((StartTransferEvent) event).getVersion().equals("2.2")) {
+                    modelVersion=Model.ILI2_2;
+                }
+            }else if(ioxReader instanceof Xtf23Reader) {
+                modelVersion=Model.ILI2_3;
+            }else if(ioxReader instanceof ItfReader) {
+                modelVersion=Model.ILI1;
+            }else if(ioxReader instanceof ItfReader2) {
+                modelVersion=Model.ILI1;
+            }
+        }finally {
+            if(ioxReader!=null) {
+                ioxReader.close();
+            }
+        }
+        return modelVersion;
+    }
 
 	private static String version=null;
 	public static String getVersion() {
