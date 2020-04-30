@@ -3,7 +3,7 @@ public class ILIREPOSITORY20{
   private ILIREPOSITORY20() {}
   public final static String MODEL= "IliRepository20";
   public final static String RepositoryIndex= "IliRepository20.RepositoryIndex";
-  public static ch.interlis.iom_j.xtf.XtfModel getXtfModel(){ return new ch.interlis.iom_j.xtf.XtfModel("IliRepository20","http://models.interlis.ch/core","2020-01-15"); }
+  public static ch.interlis.iom_j.xtf.XtfModel getXtfModel(){ return new ch.interlis.iom_j.xtf.XtfModel("IliRepository20","http://models.interlis.ch/core","2020-04-17"); }
   static public ch.interlis.iox.IoxFactory getIoxFactory()
   {
     return new ch.interlis.iox.IoxFactory(){
@@ -36,6 +36,7 @@ public class ILIREPOSITORY20{
       ,"File"
       ,"Version"
       ,"VersionComment"
+      ,"NameLanguage"
       ,"publishingDate"
       ,"Original"
       ,"dependsOnModel"

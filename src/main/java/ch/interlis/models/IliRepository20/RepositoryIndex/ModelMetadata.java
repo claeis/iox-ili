@@ -33,13 +33,13 @@ public class ModelMetadata extends ch.interlis.iom_j.Iom_jObject
     setattrvalue("SchemaLanguage", value);
   }
   public final static String tag_File="File";
-  /** path of ili-file, as it is in the repository e.g. "av/ch/dm01/24/DM.01-AV-CH_LV03_24d_ili1.ili"
+  /** Path of ili-file, as it is in the repository e.g. "av/ch/dm01/24/DM.01-AV-CH_LV03_24d_ili1.ili"
    */
   public String getFile() {
     String value=getattrvalue("File");
     return value;
   }
-  /** path of ili-file, as it is in the repository e.g. "av/ch/dm01/24/DM.01-AV-CH_LV03_24d_ili1.ili"
+  /** Path of ili-file, as it is in the repository e.g. "av/ch/dm01/24/DM.01-AV-CH_LV03_24d_ili1.ili"
    */
   public void setFile(String value) {
     setattrvalue("File", value);
@@ -57,25 +57,37 @@ public class ModelMetadata extends ch.interlis.iom_j.Iom_jObject
     setattrvalue("Version", value);
   }
   public final static String tag_VersionComment="VersionComment";
-  /** Comment about this version (surch as "Draft")
+  /** Comment about this version (such as "Draft")
    */
   public String getVersionComment() {
     String value=getattrvalue("VersionComment");
     return value;
   }
-  /** Comment about this version (surch as "Draft")
+  /** Comment about this version (such as "Draft")
    */
   public void setVersionComment(String value) {
     setattrvalue("VersionComment", value);
   }
+  public final static String tag_NameLanguage="NameLanguage";
+  /** Language of the model as it appears in the ili-file after the model-name (e.g. "DE")
+   */
+  public String getNameLanguage() {
+    String value=getattrvalue("NameLanguage");
+    return value;
+  }
+  /** Language of the model as it appears in the ili-file after the model-name (e.g. "DE")
+   */
+  public void setNameLanguage(String value) {
+    setattrvalue("NameLanguage", value);
+  }
   public final static String tag_publishingDate="publishingDate";
-  /** date of last publication of this version e.g. "2004-06-04". This should change even with the most minor editorial changes.
+  /** Date of last publication of this version e.g. "2004-06-04". This should change even with the most minor editorial changes.
    */
   public String getpublishingDate() {
     String value=getattrvalue("publishingDate");
     return value;
   }
-  /** date of last publication of this version e.g. "2004-06-04". This should change even with the most minor editorial changes.
+  /** Date of last publication of this version e.g. "2004-06-04". This should change even with the most minor editorial changes.
    */
   public void setpublishingDate(String value) {
     setattrvalue("publishingDate", value);
@@ -95,7 +107,7 @@ public class ModelMetadata extends ch.interlis.iom_j.Iom_jObject
     setattrvalue("Original", value);
   }
   public final static String tag_dependsOnModel="dependsOnModel";
-  /** union of IMPORT and TRANSLATION OF from models as it is in the ili-file, so that a tool can fetch all required files, before it requires to read/compile them.
+  /** Union of IMPORT and TRANSLATION OF from models as it is in the ili-file, so that a tool can fetch all required files, before it requires to read/compile them.
    */
   public int sizedependsOnModel() {return getattrvaluecount("dependsOnModel");}
   public ch.interlis.models.IliRepository20.ModelName_[] getdependsOnModel() {
@@ -106,7 +118,7 @@ public class ModelMetadata extends ch.interlis.iom_j.Iom_jObject
     }
     return value;
   }
-  /** union of IMPORT and TRANSLATION OF from models as it is in the ili-file, so that a tool can fetch all required files, before it requires to read/compile them.
+  /** Union of IMPORT and TRANSLATION OF from models as it is in the ili-file, so that a tool can fetch all required files, before it requires to read/compile them.
    */
   public void adddependsOnModel(ch.interlis.models.IliRepository20.ModelName_ value) {
     addattrobj("dependsOnModel", value);
@@ -141,7 +153,7 @@ public class ModelMetadata extends ch.interlis.iom_j.Iom_jObject
     addattrobj("followupModel", value);
   }
   public final static String tag_derivedModel="derivedModel";
-  /** any known derived models. A derived model is one, that does not DEPENDS ON/IMPORT a base model, but otherwise/more weakly depends on a base model, e.g a publication model that depends on a model used for data production.
+  /** Any known derived models. A derived model is one, that does not DEPENDS ON/IMPORT a base model, but otherwise/more weakly depends on a base model, e.g a publication model that depends on a model used for data production.
    */
   public int sizederivedModel() {return getattrvaluecount("derivedModel");}
   public ch.interlis.models.IliRepository20.ModelName_[] getderivedModel() {
@@ -152,7 +164,7 @@ public class ModelMetadata extends ch.interlis.iom_j.Iom_jObject
     }
     return value;
   }
-  /** any known derived models. A derived model is one, that does not DEPENDS ON/IMPORT a base model, but otherwise/more weakly depends on a base model, e.g a publication model that depends on a model used for data production.
+  /** Any known derived models. A derived model is one, that does not DEPENDS ON/IMPORT a base model, but otherwise/more weakly depends on a base model, e.g a publication model that depends on a model used for data production.
    */
   public void addderivedModel(ch.interlis.models.IliRepository20.ModelName_ value) {
     addattrobj("derivedModel", value);
@@ -242,7 +254,7 @@ public class ModelMetadata extends ch.interlis.iom_j.Iom_jObject
     setattrvalue("furtherMetadata", value);
   }
   public final static String tag_knownWMS="knownWMS";
-  /** any known WMS that serve data according to this model
+  /** Any known WMS that serve data according to this model
    */
   public int sizeknownWMS() {return getattrvaluecount("knownWMS");}
   public ch.interlis.models.IliRepository20.WebService_[] getknownWMS() {
@@ -253,13 +265,13 @@ public class ModelMetadata extends ch.interlis.iom_j.Iom_jObject
     }
     return value;
   }
-  /** any known WMS that serve data according to this model
+  /** Any known WMS that serve data according to this model
    */
   public void addknownWMS(ch.interlis.models.IliRepository20.WebService_ value) {
     addattrobj("knownWMS", value);
   }
   public final static String tag_knownWFS="knownWFS";
-  /** any knwon WFS that serve data according to this model
+  /** Any known WFS that serve data according to this model
    */
   public int sizeknownWFS() {return getattrvaluecount("knownWFS");}
   public ch.interlis.models.IliRepository20.WebService_[] getknownWFS() {
@@ -270,13 +282,13 @@ public class ModelMetadata extends ch.interlis.iom_j.Iom_jObject
     }
     return value;
   }
-  /** any knwon WFS that serve data according to this model
+  /** Any known WFS that serve data according to this model
    */
   public void addknownWFS(ch.interlis.models.IliRepository20.WebService_ value) {
     addattrobj("knownWFS", value);
   }
   public final static String tag_knownPortal="knownPortal";
-  /** any known portal where a user could view or download data according to this model
+  /** Any known portal where a user could view or download data according to this model
    */
   public int sizeknownPortal() {return getattrvaluecount("knownPortal");}
   public ch.interlis.models.IliRepository20.WebSite_[] getknownPortal() {
@@ -287,19 +299,19 @@ public class ModelMetadata extends ch.interlis.iom_j.Iom_jObject
     }
     return value;
   }
-  /** any known portal where a user could view or download data according to this model
+  /** Any known portal where a user could view or download data according to this model
    */
   public void addknownPortal(ch.interlis.models.IliRepository20.WebSite_ value) {
     addattrobj("knownPortal", value);
   }
   public final static String tag_browseOnly="browseOnly";
-  /** true, if this model should be ignored during model-file look-up
+  /** True, if this model should be ignored during model-file look-up
    */
   public boolean getbrowseOnly() {
     String value=getattrvalue("browseOnly");
     return value!=null && value.equals("true");
   }
-  /** true, if this model should be ignored during model-file look-up
+  /** True, if this model should be ignored during model-file look-up
    */
   public void setbrowseOnly(boolean value) {
     setattrvalue("browseOnly", value?"true":"false");
