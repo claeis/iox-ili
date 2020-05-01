@@ -25,6 +25,7 @@ package ch.interlis.iom_j.xtf;
 
 import javax.xml.stream.events.*;
 
+import ch.interlis.ili2c.metamodel.Model;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.xtf.impl.MyHandler;
@@ -151,5 +152,13 @@ public class XtfReader implements IoxReader, IoxIliReader {
 
     @Override
     public void setModel(TransferDescription td) {
+    }
+
+    @Override
+    public String getMimeType() {
+        if(handler!=null && handler.isIli22()) {
+            return XTF_22;
+        }
+        return XTF_23;
     }
 }

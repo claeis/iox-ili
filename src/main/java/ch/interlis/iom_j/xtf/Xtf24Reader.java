@@ -1,6 +1,5 @@
 package ch.interlis.iom_j.xtf;
 
-import java.awt.Event;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -1390,5 +1389,10 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
         for(String topicName:topicNames) {
             filterTopics.add(topicName);
         }
+    }
+
+    @Override
+    public String getMimeType() {
+        return XTF_24;
     }
 }

@@ -1072,4 +1072,9 @@ public class Iligml20Reader implements IoxReader,IoxIliReader {
         // TODO Auto-generated method stub
         
     }
+
+    @Override
+    public String getMimeType() {
+        return ILIGML_20;
+    }
 }

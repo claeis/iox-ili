@@ -83,7 +83,7 @@ MODEL TestSuite
 	  stoecke : 1 .. 9 ;
 	  Status : (projektiert, real);
 	  Datum : INTERLIS.XMLDate;
-	MANDATORY CONSTRAINT NOT (Status == "real") OR DEFINED (Datum);
+	MANDATORY CONSTRAINT NOT (Status == #real) OR DEFINED (Datum);
     END Gebaeude;
 
 	CLASS Gebaeude2 EXTENDS Gebaeude =

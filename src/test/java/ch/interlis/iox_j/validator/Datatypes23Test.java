@@ -73,6 +73,23 @@ public class Datatypes23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    public void blackboxBinaryOk(){
+        Iom_jObject objTrue=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objTrue.setattrvalue("boxBin", "AAAA");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objTrue));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
 
 	// Eine richtige Eingabe einer uuid.
 	@Test
@@ -1336,6 +1353,24 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("value <8> is not a BOOLEAN in attribute aBoolean", logger.getErrs().get(0).getEventMsg());
 	}
+    @Test
+    public void blackboxBinaryFail(){
+        Iom_jObject objTrue=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+        objTrue.setattrvalue("boxBin", "http://");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+        validator.validate(new ObjectEvent(objTrue));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Attribute <boxBin> has a invalid value <http://>", logger.getErrs().get(0).getEventMsg());
+    }
 
 	// Es wird getestet ob die horizontale Ansicht: top beinhaltet.
 	@Test

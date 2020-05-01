@@ -583,4 +583,8 @@ public class CsvReader implements IoxReader,IoxIliReader {
         // TODO Auto-generated method stub
         
     }
+    @Override
+    public String getMimeType() {
+        return "text/csv";
+    }
 }

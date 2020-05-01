@@ -96,8 +96,8 @@ MODEL Datatypes23
 		   hcoord : Hkoord;
 		   
 		   !! BlackBoxType
-		   !!box1 : BLACKBOX XML;
-		   !!box2 : BLACKBOX BINARY;
+		   boxXml : BLACKBOX XML;
+		   boxBin : BLACKBOX BINARY;
 		   
 		   !! ClassType
 		   aClass : CLASS;
