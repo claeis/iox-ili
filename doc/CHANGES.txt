@@ -5,12 +5,15 @@ ideas/open issues
 
 LATEST
 -----------------------------
+
+iox-ili 1.21.0 (2020-05-01)
+-----------------------------
 - Validator: Check Base64 input character (ilivalidator#246)
 - Validator: fix No object found with OID null (ilivalidator#249)
 - IoxIliReader.getMimeType() added
 - IoxUtility.getModelVersion() added
 - improve ili2c core/tool separation
-- ili2c-5.1.0-SNAPSHOT
+- ili2c-5.1.0
 
 iox-ili 1.20.18 (2020-04-01)
 -----------------------------
