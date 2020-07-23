@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- Validator: Overlaying AREA not detected (ilivalidator#263)
 
 iox-ili 1.21.0 (2020-05-01)
 -----------------------------

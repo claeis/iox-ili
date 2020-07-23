@@ -682,6 +682,71 @@ public class Area23Test {
 		assertEquals("Intersection coord1 (503669.065, 77338.129), tids o1, o2", logger.getErrs().get(3).getEventMsg());
 		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(4).getEventMsg());
 	}
+    @Test
+    public void twoPolygon_OneInsideOther_Fail(){
+        Iom_jObject polygon1=new Iom_jObject(ILI_CLASSD, OID1);
+        {
+            IomObject multisurface=polygon1.addattrobj("area2d", "MULTISURFACE");
+            IomObject surface = multisurface.addattrobj("surface", "SURFACE");
+            // outer boundary
+            IomObject outerBoundary = surface.addattrobj("boundary", "BOUNDARY");
+            IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+            IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+            IomObject seg0=segments.addattrobj("segment", "COORD");
+            seg0.setattrvalue("C1", "480000.000");
+            seg0.setattrvalue("C2", "70000.000");
+            IomObject seg1=segments.addattrobj("segment", "COORD");
+            seg1.setattrvalue("C1", "550000.000");
+            seg1.setattrvalue("C2", "70000.000");
+            IomObject seg2=segments.addattrobj("segment", "COORD");
+            seg2.setattrvalue("C1", "550000.000");
+            seg2.setattrvalue("C2", "80000.000");
+            IomObject seg3=segments.addattrobj("segment", "COORD");
+            seg3.setattrvalue("C1", "480000.000");
+            seg3.setattrvalue("C2", "80000.000");
+            IomObject seg4=segments.addattrobj("segment", "COORD");
+            seg4.setattrvalue("C1", "480000.000");
+            seg4.setattrvalue("C2", "70000.000");
+        }
+        Iom_jObject polygon2=new Iom_jObject(ILI_CLASSD, OID2);
+        {
+            IomObject multisurface=polygon2.addattrobj("area2d", "MULTISURFACE");
+            IomObject surface = multisurface.addattrobj("surface", "SURFACE");
+            IomObject outerBoundary = surface.addattrobj("boundary", "BOUNDARY");
+            IomObject polyline = outerBoundary.addattrobj("polyline", "POLYLINE");
+            IomObject segments=polyline.addattrobj("sequence", "SEGMENTS");
+            IomObject seg0=segments.addattrobj("segment", "COORD");
+            seg0.setattrvalue("C1", "500000.000");
+            seg0.setattrvalue("C2", "72000.000");
+            IomObject seg1=segments.addattrobj("segment", "COORD");
+            seg1.setattrvalue("C1", "505000.000");
+            seg1.setattrvalue("C2", "72000.000");
+            IomObject seg2=segments.addattrobj("segment", "COORD");
+            seg2.setattrvalue("C1", "505000.000");
+            seg2.setattrvalue("C2", "78000.000");
+            IomObject seg3=segments.addattrobj("segment", "COORD");
+            seg3.setattrvalue("C1", "500000.000");
+            seg3.setattrvalue("C2", "78000.000");
+            IomObject seg4=segments.addattrobj("segment", "COORD");
+            seg4.setattrvalue("C1", "500000.000");
+            seg4.setattrvalue("C2", "72000.000");
+        }
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+        validator.validate(new ObjectEvent(polygon1));
+        validator.validate(new ObjectEvent(polygon2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(2,logger.getErrs().size());
+        assertEquals("polygons overlay tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
+        assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(1).getEventMsg());
+    }
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn die Outerboundary des zweiten Polygons,
 	// die Outer und Innerboundary des ersten Polygons ueberschneidet.
