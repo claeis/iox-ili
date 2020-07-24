@@ -200,12 +200,14 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 				}
 				return rawEvent;
 			}else if(rawEvent instanceof EndTransferEvent){
-				if(dataerrs.size()>0){
-	        		for(IoxInvalidDataException dataerr:dataerrs){
-	        			errFact.addEvent(errFact.logError(dataerr));
-	        		}
-					throw new IoxInvalidDataException("failed to build polygons");
-				}
+			    if(!ignorePolygonBuildingErrors) {
+	                if(dataerrs.size()>0){
+	                    for(IoxInvalidDataException dataerr:dataerrs){
+	                        errFact.addEvent(errFact.logError(dataerr));
+	                    }
+	                    throw new IoxInvalidDataException("failed to build polygons");
+	                }
+			    }
 			}
 			break;
 		}
@@ -622,6 +624,12 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 	public void setAllowItfAreaHoles(boolean allowItfAreaHoles) {
 		this.allowItfAreaHoles = allowItfAreaHoles;
 	}
+    public boolean isIgnorePolygonBuildingErrors() {
+        return ignorePolygonBuildingErrors;
+    }
+    public void setIgnorePolygonBuildingErrors(boolean ignorePolygonBuildingErrors) {
+        this.ignorePolygonBuildingErrors = ignorePolygonBuildingErrors;
+    }
     @Override
     public void setTopicFilter(String[] topicNames) {
         rawReader.setTopicFilter(topicNames);
