@@ -7,6 +7,7 @@ LATEST
 -----------------------------
 - Validator: Overlaying AREA not detected (ilivalidator#263)
 - add standard wkb support (#88)
+- MultiSurface / Unexpected WKB type 3 (ili2db#358)
 
 iox-ili 1.21.0 (2020-05-01)
 -----------------------------

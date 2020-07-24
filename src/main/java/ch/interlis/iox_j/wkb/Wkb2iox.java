@@ -445,13 +445,22 @@ private int extractGeometryType(int typeInt) {
 	        byte byteOrder = dis.readByte();
 	        int typeInt = dis.readInt();
             int geometryType = extractGeometryType(typeInt);
-	        if(geometryType!=WKBConstants.wkbCurvePolygon){
+	        if(geometryType!=WKBConstants.wkbCurvePolygon && geometryType!=WKBConstants.wkbPolygon){
 	    	    throw new IllegalStateException("Unexpected WKB type " + geometryType);
 	        }
 	        if(ret==null){
-	        	ret=readCurvePolygon();
+	            if(geometryType==WKBConstants.wkbPolygon) {
+	                ret=readPolygon();
+	            }else {
+	                ret=readCurvePolygon();
+	            }
 	        }else{
-	        	IomObject poly=readCurvePolygon();
+	        	IomObject poly=null;
+                if(geometryType==WKBConstants.wkbPolygon) {
+                    poly=readPolygon();
+                }else {
+                    poly=readCurvePolygon();
+                }
 	        	IomObject surface=poly.getattrobj("surface", 0);
 		    	ret.addattrobj("surface",surface);
 	        }
