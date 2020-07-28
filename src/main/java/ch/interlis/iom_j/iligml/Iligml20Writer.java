@@ -30,6 +30,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.ehi.iox.objpool.impl.IomObjectSerializer;
 import ch.interlis.iom.*;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox.EndBasketEvent;
@@ -289,7 +290,7 @@ import java.util.Map;
         private void writeStartBasket(String type,String bid,int consistency, int kind,String startstate,String endstate, String[] topicv)
 		throws IoxException
         {
-        	pool=recman.newObjectPool();
+        	pool=recman.newObjectPool(new IomObjectSerializer());
         	fixrefs=new HashMap<String,FixRefs>();
         	currentTopic=type;
 			try{
