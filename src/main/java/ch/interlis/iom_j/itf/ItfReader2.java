@@ -52,6 +52,9 @@ import java.util.Iterator;
 public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 
 	static final public String SAVED_GEOREF_PREFIX="_itf_";
+	static final public int POLYGON_BUILDING_ERRORS_ON=0;
+    static final public int POLYGON_BUILDING_ERRORS_OFF=1;
+    static final public int POLYGON_BUILDING_ERRORS_WARNING=1;
 	
 	private ItfReader rawReader=null;
 	// maintable object buffer
@@ -62,7 +65,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 	private HashMap<AttributeDef,ItfAreaLinetable2Polygon> currentAreaAttrs=null;
 	private ObjectPoolManager objPool=null;
 	private ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
-	private boolean ignorePolygonBuildingErrors=false;
+	private int ignorePolygonBuildingErrors=POLYGON_BUILDING_ERRORS_ON;
 	private boolean readLinetables=false;
 	private boolean allowItfAreaHoles=true; // default is like Interlis2 (not exactly according to Interlis1 spec)
 	private PipelinePool ioxDataPool=null;
@@ -107,7 +110,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 	}
 	private void init(boolean ignorePolygonBuildingErrors1){
 		objPool=new ObjectPoolManager();
-		ignorePolygonBuildingErrors=ignorePolygonBuildingErrors1;
+		ignorePolygonBuildingErrors=ignorePolygonBuildingErrors1?POLYGON_BUILDING_ERRORS_OFF:POLYGON_BUILDING_ERRORS_ON;
 	}
 	private void initErrFact(LogEventFactory errFact) {
 		if(errFact==null){
@@ -200,12 +203,20 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 				}
 				return rawEvent;
 			}else if(rawEvent instanceof EndTransferEvent){
-			    if(!ignorePolygonBuildingErrors) {
+			    if(ignorePolygonBuildingErrors!=POLYGON_BUILDING_ERRORS_OFF) {
 	                if(dataerrs.size()>0){
 	                    for(IoxInvalidDataException dataerr:dataerrs){
-	                        errFact.addEvent(errFact.logError(dataerr));
+	                        if(ignorePolygonBuildingErrors==POLYGON_BUILDING_ERRORS_WARNING) {
+	                            errFact.addEvent(errFact.logWarning(dataerr));
+	                        }else {
+	                            errFact.addEvent(errFact.logError(dataerr));
+	                        }
 	                    }
-	                    throw new IoxInvalidDataException("failed to build polygons");
+	                    if(ignorePolygonBuildingErrors==POLYGON_BUILDING_ERRORS_ON) {
+	                        throw new IoxInvalidDataException("failed to build polygons");
+	                    }else if(ignorePolygonBuildingErrors==POLYGON_BUILDING_ERRORS_WARNING) {
+                                errFact.addEvent(errFact.logWarning(new IoxInvalidDataException("failed to build polygons")));
+	                    }
 	                }
 			    }
 			}
@@ -624,10 +635,10 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 	public void setAllowItfAreaHoles(boolean allowItfAreaHoles) {
 		this.allowItfAreaHoles = allowItfAreaHoles;
 	}
-    public boolean isIgnorePolygonBuildingErrors() {
+    public int getIgnorePolygonBuildingErrors() {
         return ignorePolygonBuildingErrors;
     }
-    public void setIgnorePolygonBuildingErrors(boolean ignorePolygonBuildingErrors) {
+    public void setIgnorePolygonBuildingErrors(int ignorePolygonBuildingErrors) {
         this.ignorePolygonBuildingErrors = ignorePolygonBuildingErrors;
     }
     @Override

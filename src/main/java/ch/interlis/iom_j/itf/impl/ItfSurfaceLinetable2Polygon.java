@@ -25,6 +25,7 @@ import ch.interlis.ili2c.metamodel.SurfaceOrAreaType;
 import ch.interlis.ili2c.metamodel.SurfaceType;
 import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.itf.ItfReader2;
 import ch.interlis.iom_j.itf.impl.jtsext.algorithm.CurveSegmentIntersector;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
@@ -113,15 +114,20 @@ public class ItfSurfaceLinetable2Polygon implements Linetable2Polygon {
 	private double newVertexOffset=0.0;
 	private ObjectPoolManager objPool=null;
     private boolean keepLinetables=false;
-	private boolean ignorePolygonBuildingErrors=false;
+	private int ignorePolygonBuildingErrors;
 	ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>();
 	private String linetableIliqname=null;
 	private String geomattrIliqname=null;
-	public ItfSurfaceLinetable2Polygon(AttributeDef surfaceAttr,boolean ignorePolygonBuildingErrors1)
+    public ItfSurfaceLinetable2Polygon(AttributeDef surfaceAttr,boolean ignorePolygonBuildingErrors1)
+    {
+        this(surfaceAttr,ignorePolygonBuildingErrors1?ItfReader2.POLYGON_BUILDING_ERRORS_OFF:ItfReader2.POLYGON_BUILDING_ERRORS_ON);
+    }
+	public ItfSurfaceLinetable2Polygon(AttributeDef surfaceAttr,int ignorePolygonBuildingErrors1)
 	{
 		linetableIliqname=surfaceAttr.getContainer().getScopedName(null)+"_"+surfaceAttr.getName();
 		geomattrIliqname=surfaceAttr.getContainer().getScopedName(null)+"."+surfaceAttr.getName();
-		ignorePolygonBuildingErrors=ignorePolygonBuildingErrors1;
+	    ignorePolygonBuildingErrors=ignorePolygonBuildingErrors1;
+
 		PrecisionDecimal overlapDef=((SurfaceType)surfaceAttr.getDomainResolvingAliases()).getMaxOverlap();
 		if(overlapDef!=null){
 			maxOverlaps=overlapDef.doubleValue();
