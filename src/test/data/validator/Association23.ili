@@ -96,6 +96,11 @@ MODEL Association23
 		  e1 -- {1..*} ClassE;
 		  f1 -- {1..*} ClassF;
 		END ef1;
+
+		ASSOCIATION ef2 =
+		  e2 -- {0..*} ClassE;
+		  f2 -- {0..*} ClassF;
+		END ef2;
 		
 		ASSOCIATION gh1 =
 		  g1 -- {1..1} ClassG;

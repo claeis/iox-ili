@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
@@ -88,6 +89,9 @@ public class Association23Test {
 	
 	private final static String ILI_ASSOC_EF1_E1="e1";
 	private final static String ILI_ASSOC_EF1_F1="f1";
+
+    private final static String ILI_ASSOC_EF2_E2="e2";
+    private final static String ILI_ASSOC_EF2_F2="f2";
 	
 	private final static String ILI_ASSOC_GH1_G1="g1";
 	private final static String ILI_ASSOC_GH1_H1="h1";
@@ -97,6 +101,7 @@ public class Association23Test {
 	private final static String ILI_ASSOC_ABP2=ILI_TOPIC+".abp2";
 	private final static String ILI_ASSOC_ABD2=ILI_TOPIC+".abd2";
 	private final static String ILI_ASSOC_EF1=ILI_TOPIC+".ef1";
+    private final static String ILI_ASSOC_EF2=ILI_TOPIC+".ef2";
 	private final static String ILI_ASSOC_GH1=ILI_TOPICB+".gh1";
 	private final static String ILI_TOPICB_ASSOC_EF1=ILI_TOPICB+".ef1";
 	private final static String ILI_TOPICB_ASSOC_EF1_E1="e1";
@@ -310,9 +315,9 @@ public class Association23Test {
 	public void standAloneAsso_NtoN_Ok(){
 		Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OBJ_OID1);
 		Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OBJ_OID2);
-		Iom_jObject iomLinkEF=new Iom_jObject(ILI_ASSOC_EF1, null);
-		iomLinkEF.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
-		iomLinkEF.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+		Iom_jObject iomLinkEF1=new Iom_jObject(ILI_ASSOC_EF1, null);
+		iomLinkEF1.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
+		iomLinkEF1.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -322,12 +327,66 @@ public class Association23Test {
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
 		validator.validate(new ObjectEvent(iomObjE));
 		validator.validate(new ObjectEvent(iomObjF));
-		validator.validate(new ObjectEvent(iomLinkEF));
+		validator.validate(new ObjectEvent(iomLinkEF1));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(0,logger.getErrs().size());
 	}
+    @Test
+    public void standAloneAsso_NtoN_duplicateLink_Fail(){
+        Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OBJ_OID1);
+        Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OBJ_OID2);
+        Iom_jObject iomLinkEF1=new Iom_jObject(ILI_ASSOC_EF1, null);
+        iomLinkEF1.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
+        iomLinkEF1.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+        Iom_jObject iomLinkEF2=new Iom_jObject(ILI_ASSOC_EF1, null);
+        iomLinkEF2.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
+        iomLinkEF2.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+        validator.validate(new ObjectEvent(iomObjE));
+        validator.validate(new ObjectEvent(iomObjF));
+        validator.validate(new ObjectEvent(iomLinkEF1));
+        validator.validate(new ObjectEvent(iomLinkEF2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1,logger.getErrs().size());
+        assertEquals("OID o1:o2 of object Association23.Topic.ef1 already exists in ASSOCIATION Association23.Topic.ef1.", logger.getErrs().get(0).getEventMsg());
+    }
+    @Test
+    @Ignore("ilivalidator#266")
+    public void standAloneAsso_NtoN_similarLink_Ok(){
+        Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OBJ_OID1);
+        Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OBJ_OID2);
+        Iom_jObject iomLinkEF1=new Iom_jObject(ILI_ASSOC_EF1, null);
+        iomLinkEF1.addattrobj(ILI_ASSOC_EF1_E1, "REF").setobjectrefoid(OBJ_OID1);
+        iomLinkEF1.addattrobj(ILI_ASSOC_EF1_F1, "REF").setobjectrefoid(OBJ_OID2);
+        Iom_jObject iomLinkEF2=new Iom_jObject(ILI_ASSOC_EF2, null);
+        iomLinkEF2.addattrobj(ILI_ASSOC_EF2_E2, "REF").setobjectrefoid(OBJ_OID1);
+        iomLinkEF2.addattrobj(ILI_ASSOC_EF2_F2, "REF").setobjectrefoid(OBJ_OID2);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+        validator.validate(new ObjectEvent(iomObjE));
+        validator.validate(new ObjectEvent(iomObjF));
+        validator.validate(new ObjectEvent(iomLinkEF1));
+        validator.validate(new ObjectEvent(iomLinkEF2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0,logger.getErrs().size());
+    }
 	
 	// Wenn in einer Stand Alone Association von der KlasseF eine Beziehung zur KlasseE ueber den Rollennamen: e1,
 	// Von der KlasseE eine Beziehung zur KlasseF ueber den Rollennamen: f1,
