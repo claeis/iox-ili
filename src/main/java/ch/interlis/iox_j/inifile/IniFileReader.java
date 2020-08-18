@@ -43,7 +43,7 @@ public class IniFileReader {
                 // Header line
                 if (c == '[') {
                     pushbackReader.unread(c);
-                    header = parseHeaderLine(pushbackReader);
+                    header = parseSectionHeader(pushbackReader);
                 } else if (c == '#') {
                     pushbackReader.unread(c);
                     parseComment(pushbackReader);
@@ -69,7 +69,7 @@ public class IniFileReader {
         }
     }
 
-    private static String parseHeaderLine(PushbackReader line) throws IOException {
+    private static String parseSectionHeader(PushbackReader line) throws IOException {
         int c;
         skipSpaces(line);
         c = line.read();
@@ -77,27 +77,44 @@ public class IniFileReader {
             return null;
         }
         if (c != '[') {
-            throw new IOException("unexpected char '" + (char) c + "' in header value");
+            throw new IOException("unexpected character " + quoteChar(c) + " in section header");
         }
         skipSpaces(line);
         String headerName = parseName(line);
         skipSpaces(line);
         c = line.read();
         if (c != ']') {
-            throw new IOException("unexpected char '" + (char) c + "' in header value");
+            throw new IOException("unexpected character " + quoteChar(c) + " in section header");
         }
         parseComment(line);
         return headerName;
     }
 
+    private static String quoteChar(int c) {
+        if(c==-1) {
+            return "EOL";
+        }
+        if(Character.isISOControl(c) || !Character.isDefined(c) || Character.isWhitespace(c)) {
+            return "'\\u"+Integer.toHexString(c)+"'";
+        }
+        return "'"+Character.toString((char)c)+"'";
+    }
+
     private static void parseComment(PushbackReader line) {
         // no need to read comment
     }
-
     private static String parseName(PushbackReader line) throws IOException {
-        StringBuilder value = new StringBuilder();
+        return parseValue(line,true);
+    }
+    private static String parseValue(PushbackReader line) throws IOException {
+        return parseValue(line,false);
+    }
+
+    private static String parseValue(PushbackReader line,boolean parseName) throws IOException {
+        String ret=null;
         int c = line.read();
         if (c == '"') {
+            StringBuilder value = new StringBuilder();
             // quoted name
             c = line.read();
             while (true) {
@@ -111,11 +128,11 @@ public class IniFileReader {
                 }else if(c=='\\') {
                     c=line.read();
                     if (c == -1) {
-                        throw new IOException("unexpected end of name");
+                        throw new IOException("unexpected end of "+(parseName?"name":"value"));
                     }else if(c=='\\' || c=='"') {
                         value.append((char) c);
                     }else {
-                        throw new IOException("unexpected character '"+(char)c+"' after escape");
+                        throw new IOException("unexpected character "+quoteChar(c)+" after escape");
                     }
                 }else {
                     value.append((char) c);
@@ -123,23 +140,31 @@ public class IniFileReader {
                 // read next
                 c = line.read();
             }
+            ret=value.toString();
         } else {
-            // unquoted name
+            StringBuilder value = new StringBuilder();
+            // unquoted name/value
             while (true) {
                 // end of line?
                 if (c == -1) {
                     break;
                 }
-                // space?
-                if (c == ' ' || c == '\t') {
-                    break;
-                }
-                // any non name character?
-                if (!Character.isDigit(c) && !Character.isLetter(c) && c != '_' && c != '.' && c != '-' && c != '?'
-                        && c != ':' && c != '}' && c != '{') {
+                if(parseName) {
+                    // space?
+                    if (c == ' ' || c == '\t') {
                         break;
+                    }
+                    // any non name character?
+                    if (!Character.isDigit(c) && !Character.isLetter(c) && c != '_' && c != '.' && c != '-' && c != '?'
+                            && c != ':' && c != '}' && c != '{') {
+                            break;
+                    }
+                }else {
+                    if (c == '#') {
+                        break;
+                    }
                 }
-                // a name character, append it
+                // a valid character, append it
                 value.append((char) c);
                 // read next
                 c = line.read();
@@ -147,11 +172,12 @@ public class IniFileReader {
             if (c != -1) {
                 line.unread(c);
             }
-            if (value.length() == 0) {
-                throw new IOException("unexpected end of name");
-            }
+            ret=value.toString().trim();
         }
-        return value.toString();
+        if (parseName && ret.length() == 0) {
+            throw new IOException("unexpected end of name");
+        }
+        return ret;
     }
 
     private static void skipSpaces(PushbackReader line) throws IOException {
@@ -172,10 +198,10 @@ public class IniFileReader {
         skipSpaces(line);
         c = line.read();
         if (c != '=') {
-            throw new IOException("unexpected char '" + (char) c + "' in key value");
+            throw new IOException("unexpected character " + quoteChar(c) + " in key value line");
         }
         skipSpaces(line);
-        String value = parseName(line);
+        String value = parseValue(line);
         skipSpaces(line);
         parseComment(line);
         keyAndValue[0] = key;

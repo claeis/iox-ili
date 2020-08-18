@@ -42,7 +42,7 @@ public class IniFileReaderTest {
     public void withUmlaute_OK() throws Exception {
         ValidationConfig ini = IniFileReader.readFile(new File("src/test/data/inifile/withUmlaute.ini"));
         assertNotNull(ini.getConfigParams("Beispiel1.Bodenbedeckung.Gebaeude"));
-        assertEquals("\u00F6ssekuranz-Nr", ini.getConfigValue("Beispiel1.Bodenbedeckung.Gebaeude", "keymsg.de"));
+        assertEquals("\u00F6ssekuranz-Nr {AssNr}", ini.getConfigValue("Beispiel1.Bodenbedeckung.Gebaeude", "keymsg.de"));
     } 
     
     @Test
@@ -73,35 +73,22 @@ public class IniFileReaderTest {
         assertEquals("Assurance-Nr{AssNr}", ini.getConfigValue("Beispiel1.Bodenbedeckung.Gebaeude", "keymsg.fr"));
     }  
     
-//          ----------------------->>>>>>>>>>>>> Errors <<<<<<<<<<<<<<---------------------------------
-//          ----------------------->>>>>>>>>>>>> Errors <<<<<<<<<<<<<<---------------------------------
-    
     @Test
-    public void noQuotesSpace_Fail() throws Exception {
-        ValidationConfig ini = IniFileReader.readFile(new File("src/test/data/inifile/noQuotesSpace_Fail.ini"));
+    public void noQuotesSpace() throws Exception {
+        ValidationConfig ini = IniFileReader.readFile(new File("src/test/data/inifile/noQuotesSpace.ini"));
         assertNotNull(ini.getConfigParams("Beispiel1.Bodenbedeckung.Gebaeude"));
-        assertFalse("One Fail occurred for empty row",
-                ini.getConfigValue("Beispiel1.Bodenbedeckung.Gebaeude", "keymsg.de")== "Assekuranz-Nr {AssNr}");
+        assertEquals("Assekuranz-Nr {AssNr}",ini.getConfigValue("Beispiel1.Bodenbedeckung.Gebaeude", "keymsg.de"));
     }
+//          ----------------------->>>>>>>>>>>>> Errors <<<<<<<<<<<<<<---------------------------------
+//          ----------------------->>>>>>>>>>>>> Errors <<<<<<<<<<<<<<---------------------------------
     
-    @Test
-    public void noQuotesExpectedCharacter_Fail() throws Exception {
-        ValidationConfig ini = IniFileReader.readFile(new File("src/test/data/inifile/noQuotesSpace_Fail.ini"));
-        assertFalse(ini.getConfigParams("Beispiel1.Bodenbe#deckung.Gebaeude") != null);
-    }
-    
-    @Test
-    public void withQuotesBackSlash_Fail() throws Exception {
-        ValidationConfig ini = IniFileReader.readFile(new File("src/test/data/inifile/noQuotesSpace_Fail.ini"));
-        assertFalse(ini.getConfigParams("Beispiel1.Bodenbe#deckung.Gebaeude") != null);
-    }
     @Test
     public void lastQuotesKeyValueIsMissing_Fail() throws Exception {
         ValidationConfig ini = null;
         try {
             ini = IniFileReader.readFile(new File("src/test/data/inifile/lastQuotesKeyValueIsMissing_Fail.ini"));
         } catch (Exception e) {
-            assertTrue(true);
+            assertEquals("unexpected character 'A' in key value line",e.getMessage());
         }
     }
     @Test
@@ -110,7 +97,7 @@ public class IniFileReaderTest {
         try {
             ini = IniFileReader.readFile(new File("src/test/data/inifile/lastQuotesHeaderIsMissing_Fail.ini"));
         } catch (Exception e) {
-            assertTrue(true);
+            assertEquals("unexpected character EOL in section header",e.getMessage());
         }
     }
     @Test
@@ -119,7 +106,7 @@ public class IniFileReaderTest {
         try {
             ini = IniFileReader.readFile(new File("src/test/data/inifile/equalsIsMissing_Fail.ini"));
         } catch (Exception e) {
-            assertTrue(true);
+            assertEquals("unexpected character '\"' in key value line",e.getMessage());
         }
     }
 }
