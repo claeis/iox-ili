@@ -358,10 +358,9 @@ public class Association23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1,logger.getErrs().size());
-        assertEquals("OID o1:o2 of object Association23.Topic.ef1 already exists in ASSOCIATION Association23.Topic.ef1.", logger.getErrs().get(0).getEventMsg());
+        assertEquals("OID Association23.Topic.ef1:o1:o2 of object Association23.Topic.ef1 already exists in ASSOCIATION Association23.Topic.ef1.", logger.getErrs().get(0).getEventMsg());
     }
     @Test
-    @Ignore("ilivalidator#266")
     public void standAloneAsso_NtoN_similarLink_Ok(){
         Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OBJ_OID1);
         Iom_jObject iomObjF=new Iom_jObject(ILI_CLASSF, OBJ_OID2);

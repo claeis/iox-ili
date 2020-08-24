@@ -777,7 +777,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							}
 						}else if(objA.obj instanceof RoleDef){
 							RoleDef roleDef = (RoleDef) objA.obj;
-							validateRoleReference(roleDef, iomObj);
+							validateRoleReference(basketId,roleDef, iomObj);
 						}
 					}
 					if(classOfCurrentObj instanceof AbstractClassDef){
@@ -2199,7 +2199,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private void validateRoleReference(RoleDef role, IomObject iomObj){
+	private void validateRoleReference(String bidOfObj,RoleDef role, IomObject iomObj){
 		Object modelElement=tag2class.get(iomObj.getobjecttag());
 		Viewable classObj = (Viewable) modelElement;
 		String roleQName = getScopedName(role);
@@ -2253,7 +2253,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(oid==null){
 				oid=ObjectPool.getAssociationId(iomObj, (AssociationDef) modelElement);
 			}
-			String bidOfObj = objectPool.getBidOfObject(oid, classObj);
 			if(!role.isExternal()){
 				if(targetOid!=null){
 					if(isBasketSame(bidOfObj, targetObj)){

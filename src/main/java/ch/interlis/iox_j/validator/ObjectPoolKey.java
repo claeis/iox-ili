@@ -39,6 +39,9 @@ public class ObjectPoolKey implements java.lang.Comparable {
 		if (getClassValue() == null) {
 			if (other.getClassValue() != null)
 				return -1;
+		}else if (other.getClassValue() == null) {
+		    //ASSERT getClassValue() != null
+            return 1;
 		} else {
 			int c=getClassValue().getScopedName().compareTo(other.getClassValue().getScopedName());
 			if(c!=0) {

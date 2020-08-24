@@ -11,6 +11,7 @@ LATEST
 - ItfReader2/ignorePolygonBuildingErrors disables all errors from polygon building
 - remove use of ObjectOutputStream.writeObject() (ili2db#354) 
 - improve error messages in INI-file parsing (ilivalidator#271)
+- wrongly reports duplicate TIDs (ilivalidator#266)
 
 iox-ili 1.21.0 (2020-05-01)
 -----------------------------
