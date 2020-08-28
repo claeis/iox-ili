@@ -266,6 +266,47 @@ public class CurvePolygonOverlayTest {
 		//System.out.println(isOverlay);
 		assertEquals(true, isOverlay);
 	}
+    @Test
+    public void twoPolygon_OneInsideOther_True() throws IoxException {
+        LinearRing shell=null;
+        Polygon polygon1=null;
+        {
+            coords=new com.vividsolutions.jts.geom.Coordinate[5];
+            com.vividsolutions.jts.geom.Coordinate coord1=new com.vividsolutions.jts.geom.Coordinate(new Double("500000.000"), new Double("100000.000"));
+            coords[0]=coord1;
+            com.vividsolutions.jts.geom.Coordinate coord2=new com.vividsolutions.jts.geom.Coordinate(new Double("800000.000"), new Double("100000.000"));
+            coords[1]=coord2;
+            com.vividsolutions.jts.geom.Coordinate coord3=new com.vividsolutions.jts.geom.Coordinate(new Double("800000.000"), new Double("200000.000"));
+            coords[2]=coord3;
+            com.vividsolutions.jts.geom.Coordinate coord4=new com.vividsolutions.jts.geom.Coordinate(new Double("500000.000"), new Double("200000.000"));
+            coords[3]=coord4;
+            com.vividsolutions.jts.geom.Coordinate coord5=new com.vividsolutions.jts.geom.Coordinate(new Double("500000.000"), new Double("100000.000"));
+            coords[4]=coord5;
+            shell=new LinearRing(coords, new PrecisionModel(), 2056);
+        }
+        polygon1=new Polygon(shell, null, new PrecisionModel(), 2056);
+        
+        Polygon polygon2=null;
+        {
+            coords=new com.vividsolutions.jts.geom.Coordinate[5];
+            com.vividsolutions.jts.geom.Coordinate coord1=new com.vividsolutions.jts.geom.Coordinate(new Double("550000.000"), new Double("120000.000"));
+            coords[0]=coord1;
+            com.vividsolutions.jts.geom.Coordinate coord2=new com.vividsolutions.jts.geom.Coordinate(new Double("600000.000"), new Double("120000.000"));
+            coords[1]=coord2;
+            com.vividsolutions.jts.geom.Coordinate coord3=new com.vividsolutions.jts.geom.Coordinate(new Double("600000.000"), new Double("180000.000"));
+            coords[2]=coord3;
+            com.vividsolutions.jts.geom.Coordinate coord4=new com.vividsolutions.jts.geom.Coordinate(new Double("550000.000"), new Double("180000.000"));
+            coords[3]=coord4;
+            com.vividsolutions.jts.geom.Coordinate coord5=new com.vividsolutions.jts.geom.Coordinate(new Double("550000.000"), new Double("120000.000"));
+            coords[4]=coord5;
+            shell=new LinearRing(coords, new PrecisionModel(), 2056);
+        }
+        polygon2=new Polygon(shell, null, new PrecisionModel(), 2056);
+
+        boolean isOverlay=CurvePolygon.polygonOverlays(polygon1, polygon2);
+        //System.out.println(isOverlay);
+        assertEquals(true, isOverlay);
+    }
 
 	// es wird false erwartet, da eine Polygon, welche innerhalb der InnerBoundary
 	// einer anderen Polygon liegt, erstellt wird.

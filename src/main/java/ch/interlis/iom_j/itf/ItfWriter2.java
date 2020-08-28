@@ -30,6 +30,7 @@ import ch.interlis.iox.IoxFactoryCollection;
 import ch.interlis.iom.*;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.ehi.iox.objpool.impl.IomObjectSerializer;
 import ch.interlis.ili2c.metamodel.*;
 
 import java.util.HashMap;
@@ -320,7 +321,7 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 		java.util.Map<String, IomObject> m=null;
 		m=pools.get(classQName);
 		if(m==null){
-    		m = recman.newObjectPool();
+    		m = recman.newObjectPool(new IomObjectSerializer());
 			pools.put(classQName,m);
 		}
 		return m;

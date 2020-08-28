@@ -30,6 +30,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.ehi.iox.objpool.impl.IomObjectSerializer;
 import ch.interlis.iom.*;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox.EndBasketEvent;
@@ -998,7 +999,7 @@ import java.util.Map;
     		java.util.Map<String, IomObject> m=null;
     		m=pools.get(classQName);
     		if(m==null){
-        		m = recman.newObjectPool();
+        		m = recman.newObjectPool(new IomObjectSerializer());
     			pools.put(classQName,m);
     		}
     		return m;

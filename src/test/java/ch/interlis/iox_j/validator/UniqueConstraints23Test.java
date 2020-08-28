@@ -1211,7 +1211,7 @@ public class UniqueConstraints23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("Unique is violated! Values ValueA1, ValueB1 already exist in Object: o1:o2",
+        assertEquals("Unique is violated! Values ValueA1, ValueB1 already exist in Object: UniqueConstraints23.LinkObjUnique.assocAB:o1:o2",
                 logger.getErrs().get(0).getEventMsg());
     }
 	
@@ -1721,7 +1721,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values text already exist in Object: o1:o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique is violated! Values text already exist in Object: UniqueConstraints23.Topic.assoA:o1:o2", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// In beiden Objekten wird je ueber eine Structure auf ein attribute einer SURFACE verwiesen, Beide Attribute wurden mit den Selben Values erstellt.

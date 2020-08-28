@@ -76,20 +76,26 @@ import ch.interlis.iox_j.jts.Iox2jtsException;
 <wkbpoint binary> ::= <wkbx> <wkby>	
  */
 public class Iox2wkb {
-	  private int outputDimension = 2;
-	  private ByteArrayOutputStream os = null;
+    private int outputDimension = 2;
+    private ByteArrayOutputStream os = null;
+    private boolean asEWKB = true; 
 	// utility, no instances
 	private Iox2wkb(){}
-	  public Iox2wkb(int outputDimension) {
-		    this(outputDimension, java.nio.ByteOrder.BIG_ENDIAN);
-	  }
-	  public Iox2wkb(int outputDimension, java.nio.ByteOrder byteOrder) {
-		    this.outputDimension = outputDimension;
-		    os = new ByteArrayOutputStream(byteOrder);
-		    
-		    if (outputDimension < 2 || outputDimension > 3)
-		      throw new IllegalArgumentException("Output dimension must be 2 or 3");
-		  }
+    public Iox2wkb(int outputDimension) {
+        this(outputDimension, java.nio.ByteOrder.BIG_ENDIAN, true);
+    }
+    public Iox2wkb(int outputDimension, java.nio.ByteOrder byteOrder) {
+        this(outputDimension, byteOrder, true);
+    }
+    public Iox2wkb(int outputDimension, java.nio.ByteOrder byteOrder, boolean asEWKB) {
+        this.outputDimension = outputDimension;
+        this.asEWKB=asEWKB;
+        os = new ByteArrayOutputStream(byteOrder);
+        
+        if (outputDimension < 2 || outputDimension > 3)
+          throw new IllegalArgumentException("Output dimension must be 2 or 3");
+    }
+
 	private static double sqr(double x)
 	{
 		return x*x;
@@ -156,7 +162,7 @@ public class Iox2wkb {
 
 			for(int coordi=0;coordi<coordc;coordi++){
 				IomObject coord=obj.getattrobj(Wkb2iox.ATTR_COORD,coordi);
-				Iox2wkb helper=new Iox2wkb(outputDimension,os.order());
+                Iox2wkb helper=new Iox2wkb(outputDimension,os.order(),asEWKB);
 				os.write(helper.coord2wkb(coord));
 			}
 		} catch (IOException e) {
@@ -801,7 +807,7 @@ public class Iox2wkb {
 					IomObject boundary=surface.getattrobj("boundary",boundaryi);
 					int polylinec = boundary.getattrvaluecount("polyline");
                     if(asCurvePolygon){
-						Iox2wkb helper=new Iox2wkb(outputDimension,os.order());
+                        Iox2wkb helper=new Iox2wkb(outputDimension,os.order(),asEWKB);
 						if(polylinec==1) {
                             IomObject polyline=boundary.getattrobj("polyline",0);
                             os.write(helper.polyline2wkb(polyline,true,asCurvePolygon,strokeP));
@@ -862,7 +868,7 @@ public class Iox2wkb {
 				IomObject surface=obj.getattrobj("surface",surfacei);
 				IomObject iomSurfaceClone=new ch.interlis.iom_j.Iom_jObject("MULTISURFACE",null);
 				iomSurfaceClone.addattrobj("surface",surface);
-				Iox2wkb helper=new Iox2wkb(outputDimension,os.order());
+                Iox2wkb helper=new Iox2wkb(outputDimension,os.order(),asEWKB);
 				os.write(helper.surface2wkb(iomSurfaceClone,asCurvePolygon,strokeP));
 			}
 		} catch (IOException e) {
@@ -888,7 +894,7 @@ public class Iox2wkb {
 
 			for(int polylinei=0;polylinei<polylinec;polylinei++){
 				IomObject polyline=obj.getattrobj("polyline",polylinei);
-				Iox2wkb helper=new Iox2wkb(outputDimension,os.order());
+                Iox2wkb helper=new Iox2wkb(outputDimension,os.order(),asEWKB);
 				os.write(helper.polyline2wkb(polyline,false,asCurve,strokeP));
 			}
 		} catch (IOException e) {
@@ -909,8 +915,9 @@ public class Iox2wkb {
 	  private void writeGeometryType(int geometryType)
 	      throws IOException
 	  {
-	    int flag3D = (outputDimension == 3) ? WKBConstants.ewkbIncludesZ : 0;
-	    int typeInt = geometryType | flag3D;
+        int flagIncludeZ = asEWKB? WKBConstants.ewkbIncludesZ : WKBConstants.wkbIncludesZ;
+        int flag3D = (outputDimension == 3) ? flagIncludeZ : 0;
+        int typeInt = geometryType + flag3D;
 	    os.writeInt(typeInt);
 	  }
 	  private void writeCoord(double xCoord,double yCoord,double zCoord)

@@ -103,6 +103,6 @@ public class CurvePolygon extends Polygon {
 		}
 
 		public static boolean polygonOverlays(Polygon e0, Polygon e1) {
-			return e0.equals(e1) || e0.overlaps(e1);
+			return e0.equals(e1) || e0.overlaps(e1) || e0.within(e1) || e1.within(e0);
 		}
 }

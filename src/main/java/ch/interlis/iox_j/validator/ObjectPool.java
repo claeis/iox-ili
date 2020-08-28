@@ -45,8 +45,7 @@ public class ObjectPool {
 		String tag=assocDef.getScopedName(null);
 		String tid=null;
 		Iterator<ViewableTransferElement> rolei=assocDef.getAttributesAndRoles2();
-		String sep="";
-		tid="";
+		tid=tag;
 		boolean missingRef=false;
 		while(rolei.hasNext()){
 			ViewableTransferElement prop=rolei.next();
@@ -58,8 +57,7 @@ public class ObjectPool {
 					ref=refObj.getobjectrefoid();
 				}
 				if(ref!=null){
-					tid=tid+sep+ref;
-					sep=":";
+					tid=tid+":"+ref;
 				}else{
 			 		//throw new IllegalStateException("REF required ("+tag+"/"+roleName+")");
 			 		missingRef=true;
@@ -75,16 +73,15 @@ public class ObjectPool {
 	public IomObject addObject(IomObject iomObj, String currentBasketId){
 		String oid = iomObj.getobjectoid();
 		Object modelEle = tag2class.get(iomObj.getobjecttag());
+        ObjectPoolKey key = null;
 		if(oid==null){
 			oid=getAssociationId(iomObj, (AssociationDef)modelEle);
 			if(oid==null) {
 			    throw new IllegalStateException("Association with missin REF "+iomObj.getobjecttag());
 			}
 		}
-		Viewable classValue = (Viewable) modelEle;
-		ObjectPoolKey key = null;
 		if(doItfOidPerTable){
-			key=new ObjectPoolKey(oid, classValue, currentBasketId);
+			key=new ObjectPoolKey(oid, (Viewable<?>)modelEle, currentBasketId);
 		} else {
 			key=new ObjectPoolKey(oid, null, currentBasketId);
 		}
@@ -152,7 +149,9 @@ public class ObjectPool {
 				}
 			}
 		}
-		retBasketId.value=null;
+		if(retBasketId!=null) {
+	        retBasketId.value=null;
+		}
 		return null;
 	}
 }

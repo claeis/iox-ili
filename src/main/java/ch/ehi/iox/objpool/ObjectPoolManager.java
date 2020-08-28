@@ -25,6 +25,7 @@ public class ObjectPoolManager {
 		initGcTime=getTotalGcTime();
 	}
 
+	@Deprecated
 	public <K,V> java.util.Map<K, V> newObjectPool() {
 		flushWriteQueues();
 		ObjPoolImpl m=null;

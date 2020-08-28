@@ -6,6 +6,16 @@ ideas/open issues
 LATEST
 -----------------------------
 
+iox-ili 1.21.1 (2020-08-28)
+-----------------------------
+- Validator: Overlaying AREA not detected (ilivalidator#263)
+- add standard wkb support (#88)
+- MultiSurface / Unexpected WKB type 3 (ili2db#358)
+- ItfReader2/ignorePolygonBuildingErrors disables all errors from polygon building
+- remove use of ObjectOutputStream.writeObject() (ili2db#354) 
+- improve error messages in INI-file parsing (ilivalidator#271)
+- wrongly reports duplicate TIDs (ilivalidator#266)
+
 iox-ili 1.21.0 (2020-05-01)
 -----------------------------
 - Validator: Check Base64 input character (ilivalidator#246)

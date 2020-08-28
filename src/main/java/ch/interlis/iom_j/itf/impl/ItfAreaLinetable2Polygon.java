@@ -26,6 +26,7 @@ import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iom_j.itf.ItfReader2;
 import ch.interlis.iom_j.itf.ModelUtilities;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurveRing;
@@ -72,7 +73,7 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 	private double newVertexOffset=0.0;
 	private JtsextGeometryFactory jtsFact=new JtsextGeometryFactory();
 	private ObjectPoolManager objPool = null;
-	private boolean ignorePolygonBuildingErrors=false;
+	private int ignorePolygonBuildingErrors;
 	ArrayList<IoxInvalidDataException> dataerrs=new ArrayList<IoxInvalidDataException>(); 
 	private String linetableIliqname=null;
 	private String geomattrIliqname=null;
@@ -81,11 +82,15 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
     private String mainTableRef1=null;
     private String mainTableRef2=null;
 
-	public ItfAreaLinetable2Polygon(AttributeDef surfaceAttr,boolean ignorePolygonBuildingErrors1)
+    public ItfAreaLinetable2Polygon(AttributeDef surfaceAttr,boolean ignorePolygonBuildingErrors1)
+    {
+        this(surfaceAttr,ignorePolygonBuildingErrors1?ItfReader2.POLYGON_BUILDING_ERRORS_OFF:ItfReader2.POLYGON_BUILDING_ERRORS_ON);
+    }
+	public ItfAreaLinetable2Polygon(AttributeDef surfaceAttr,int ignorePolygonBuildingErrors1)
 	{
 		linetableIliqname=surfaceAttr.getContainer().getScopedName(null)+"_"+surfaceAttr.getName();
 		geomattrIliqname=surfaceAttr.getContainer().getScopedName(null)+"."+surfaceAttr.getName();
-		ignorePolygonBuildingErrors=ignorePolygonBuildingErrors1;
+        ignorePolygonBuildingErrors=ignorePolygonBuildingErrors1;
 		maxOverlaps=((AreaType)surfaceAttr.getDomainResolvingAliases()).getMaxOverlap().doubleValue();
 		if(maxOverlaps>0){
 		    NumericalType[] dimensions = ((CoordType) ((AreaType)surfaceAttr.getDomainResolvingAliases()).getControlPointDomain().getType()).getDimensions();
@@ -301,7 +306,7 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 						throw new IllegalStateException(e);
 					}
 				}
-				if(!ignorePolygonBuildingErrors){
+				if(ignorePolygonBuildingErrors==ItfReader2.POLYGON_BUILDING_ERRORS_ON){
 					throw new IoxInvalidDataException("cut edges");
 				}
 			}
@@ -314,7 +319,7 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 							throw new IllegalStateException(e);
 						}
 				}
-				if(!ignorePolygonBuildingErrors){
+                if(ignorePolygonBuildingErrors==ItfReader2.POLYGON_BUILDING_ERRORS_ON){
 					throw new IoxInvalidDataException("dangles");
 				}
 			}
@@ -327,7 +332,7 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 						throw new IllegalStateException(e);
 					}
 				}
-				if(!ignorePolygonBuildingErrors){
+                if(ignorePolygonBuildingErrors==ItfReader2.POLYGON_BUILDING_ERRORS_ON){
 					throw new IoxInvalidDataException("invalid ring lines");
 				}
 			}
@@ -366,7 +371,7 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 				}
 				if(hit==null){
 					IoxInvalidDataException ex=new IoxInvalidDataException("no polygon for tid "+tid,geomattrIliqname,tid,Jtsext2iox.JTS2coord(coord));
-					if(ignorePolygonBuildingErrors){
+	                if(ignorePolygonBuildingErrors!=ItfReader2.POLYGON_BUILDING_ERRORS_ON){
 						dataerrs.add(ex);
 					}else{
 						throw ex;
@@ -388,7 +393,7 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 						} catch (Iox2jtsException e) {
 							throw new IllegalStateException(e);
 						}
-						if(ignorePolygonBuildingErrors){
+		                if(ignorePolygonBuildingErrors!=ItfReader2.POLYGON_BUILDING_ERRORS_ON){
 							dataerrs.add(ex);
 						}else{
 							throw ex;
@@ -409,7 +414,7 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 						} catch (Iox2jtsException e) {
 							throw new IllegalStateException(e);
 						}
-						if(ignorePolygonBuildingErrors){
+		                if(ignorePolygonBuildingErrors!=ItfReader2.POLYGON_BUILDING_ERRORS_ON){
 							dataerrs.add(ex);
 						}else{
 							throw ex;
