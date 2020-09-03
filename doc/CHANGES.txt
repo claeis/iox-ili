@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- switch linkpool from heap to file (ili2db#363)
 
 iox-ili 1.21.1 (2020-08-28)
 -----------------------------

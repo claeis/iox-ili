@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
@@ -39,103 +40,126 @@ public abstract class AbstractIomObjectSerializer {
     private HashMap<Integer,String> idx2name=new HashMap<Integer,String>();
     private int nameIdx=1;
     protected JtsextGeometryFactory factory=new JtsextGeometryFactory();
+    private Map<Integer,IomObject> id2obj=null;
+    private Map<IomObject,Integer> obj2id=null;
+    private int nextId=0;
+    protected void startObject() {
+        nextId=1;
+        id2obj=new HashMap<Integer,IomObject>();
+        obj2id=new HashMap<IomObject,Integer>();
+    }
+    protected void endObject() {
+        id2obj=null;
+        obj2id=null;
+    }
 
     protected void writeIomObject(ByteArrayOutputStream byteStream, IomObject iomObj) {
-        writeInt(byteStream,mapName2Idx(iomObj.getobjecttag()));
-        byte metaAttrs=0;
-		String oid=iomObj.getobjectoid();
-		if(oid!=null) {
-		    metaAttrs |= META_OID;
-		}
-        int col = iomObj.getobjectcol();
-        if(col!=0) {
-            metaAttrs |= META_COL;
-        }
-        int line = iomObj.getobjectline();
-        if(line!=0) {
-            metaAttrs |= META_LINE;
-        }
-        int consistency = iomObj.getobjectconsistency();
-        if(consistency!=0) {
-            metaAttrs |= META_CONSISTENCY;
-        }
-        int operation = iomObj.getobjectoperation();
-        if(operation!=0) {
-            metaAttrs |= META_OPERATION;
-        }
-        long reforderpos = iomObj.getobjectreforderpos();
-        if(reforderpos!=0) {
-            metaAttrs |= META_REFORDERPOS;
-        }
-        String refbid = iomObj.getobjectrefbid();
-        if(refbid!=null) {
-            metaAttrs |= META_REFBID;
-        }
-        String refoid = iomObj.getobjectrefoid();
-        if(refoid!=null) {
-            metaAttrs |= META_REFOID;
-        }
-
-        writeByte(byteStream,metaAttrs);
-        if(oid!=null) {
-            writeString(byteStream,oid);
-        }
-        if(col!=0) {
-            writeInt(byteStream,col);
-        }
-        if(line!=0) {
-            writeInt(byteStream,line);
-        }
-        if(consistency!=0) {
-            writeInt(byteStream,consistency);
-        }
-        if(operation!=0) {
-            writeInt(byteStream,operation);
-        }
-        if(reforderpos!=0) {
-            writeLong(byteStream,reforderpos);
-        }
-        if(refbid!=null) {
-            writeString(byteStream,refbid);
-        }
-        if(refoid!=null) {
-            writeString(byteStream,refoid);
-        }
-        
-        int attrc = iomObj.getattrcount();
-        writeInt(byteStream,attrc);
-        
-        String propNames[]=new String[attrc];
-        for(int i=0;i<attrc;i++){
-               propNames[i]=iomObj.getattrname(i);
-        }
-        java.util.Arrays.sort(propNames);
-        for(int i=0;i<attrc;i++){
-            String propName=propNames[i];
-            String value=iomObj.getattrprim(propName,0);
-            if(value!=null){
-                writeByte(byteStream,PRIMITIVE);
-                writeInt(byteStream,mapName2Idx(propName));
-                writeString(byteStream,value);
-            }else {
-                int propc=iomObj.getattrvaluecount(propName);
-                if(propc==1) {
-                    writeByte(byteStream,SINGLE_COMPLEX);
-                    writeInt(byteStream,mapName2Idx(propName));
-                    IomObject structvalue=iomObj.getattrobj(propName,0);
-                    writeIomObject(byteStream,structvalue);
-                }else {
-                    writeByte(byteStream,COMPLEX);
-                    writeInt(byteStream,mapName2Idx(propName));
-                    writeInt(byteStream,propc);
-                    for(int propi=0;propi<propc;propi++){
-                        IomObject structvalue=iomObj.getattrobj(propName,propi);
-                        writeIomObject(byteStream,structvalue);
-                    }
-                }
-                
+        if(obj2id.containsKey(iomObj)) {
+            byte metaAttrs=0;
+            writeInt(byteStream,obj2id.get(iomObj));
+        }else {
+            obj2id.put(iomObj, nextId);
+            writeInt(byteStream,nextId);
+            nextId++;
+            byte metaAttrs=0;
+            String oid=iomObj.getobjectoid();
+            if(oid!=null) {
+                metaAttrs |= META_OID;
             }
-         }
+            int col = iomObj.getobjectcol();
+            if(col!=0) {
+                metaAttrs |= META_COL;
+            }
+            int line = iomObj.getobjectline();
+            if(line!=0) {
+                metaAttrs |= META_LINE;
+            }
+            int consistency = iomObj.getobjectconsistency();
+            if(consistency!=0) {
+                metaAttrs |= META_CONSISTENCY;
+            }
+            int operation = iomObj.getobjectoperation();
+            if(operation!=0) {
+                metaAttrs |= META_OPERATION;
+            }
+            long reforderpos = iomObj.getobjectreforderpos();
+            if(reforderpos!=0) {
+                metaAttrs |= META_REFORDERPOS;
+            }
+            String refbid = iomObj.getobjectrefbid();
+            if(refbid!=null) {
+                metaAttrs |= META_REFBID;
+            }
+            String refoid = iomObj.getobjectrefoid();
+            if(refoid!=null) {
+                metaAttrs |= META_REFOID;
+            }
+
+            writeByte(byteStream,metaAttrs);
+            
+            writeInt(byteStream,mapName2Idx(iomObj.getobjecttag()));
+            
+            if(oid!=null) {
+                writeString(byteStream,oid);
+            }
+            if(col!=0) {
+                writeInt(byteStream,col);
+            }
+            if(line!=0) {
+                writeInt(byteStream,line);
+            }
+            if(consistency!=0) {
+                writeInt(byteStream,consistency);
+            }
+            if(operation!=0) {
+                writeInt(byteStream,operation);
+            }
+            if(reforderpos!=0) {
+                writeLong(byteStream,reforderpos);
+            }
+            if(refbid!=null) {
+                writeString(byteStream,refbid);
+            }
+            if(refoid!=null) {
+                writeString(byteStream,refoid);
+            }
+            
+            int attrc = iomObj.getattrcount();
+            writeInt(byteStream,attrc);
+            
+            String propNames[]=new String[attrc];
+            for(int i=0;i<attrc;i++){
+                   propNames[i]=iomObj.getattrname(i);
+            }
+            java.util.Arrays.sort(propNames);
+            for(int i=0;i<attrc;i++){
+                String propName=propNames[i];
+                String value=iomObj.getattrprim(propName,0);
+                if(value!=null){
+                    writeByte(byteStream,PRIMITIVE);
+                    writeInt(byteStream,mapName2Idx(propName));
+                    writeString(byteStream,value);
+                }else {
+                    int propc=iomObj.getattrvaluecount(propName);
+                    if(propc==1) {
+                        writeByte(byteStream,SINGLE_COMPLEX);
+                        writeInt(byteStream,mapName2Idx(propName));
+                        IomObject structvalue=iomObj.getattrobj(propName,0);
+                        writeIomObject(byteStream,structvalue);
+                    }else {
+                        writeByte(byteStream,COMPLEX);
+                        writeInt(byteStream,mapName2Idx(propName));
+                        writeInt(byteStream,propc);
+                        for(int propi=0;propi<propc;propi++){
+                            IomObject structvalue=iomObj.getattrobj(propName,propi);
+                            writeIomObject(byteStream,structvalue);
+                        }
+                    }
+                    
+                }
+             }
+            
+        }
     }
 	
     protected int mapName2Idx(String name) {
@@ -197,9 +221,13 @@ public abstract class AbstractIomObjectSerializer {
     }
 
     protected IomObject readIomObject(ByteArrayInputStream in) {
+        int id=readInt(in);
+        if(id2obj.containsKey(id)) {
+            return id2obj.get(id);
+        }
+        int metaAttrs=readByte(in);
         String tag=mapIdx2Name(readInt(in));
 
-        int metaAttrs=readByte(in);
         String oid=null;
         if((metaAttrs&META_OID) != 0) {
             oid=readString(in);
@@ -235,6 +263,7 @@ public abstract class AbstractIomObjectSerializer {
         
         
         IomObject ret=new Iom_jObject(tag, oid);
+        id2obj.put(id, ret);
         if(col!=0) {
             ret.setobjectcol(col);
         }

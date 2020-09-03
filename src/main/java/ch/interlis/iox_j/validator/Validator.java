@@ -271,7 +271,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		constraintValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.CONSTRAINT_VALIDATION);
 		defaultGeometryTypeValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION);
 		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class,objPoolManager);
-		linkPool=new LinkPool();
+		linkPool=new LinkPool(objPoolManager);
         if(resolverClasses!=null){
             extObjResolvers=new ArrayList<ExternalObjectResolver>();
             for(Class resolverClass:resolverClasses){
@@ -2183,7 +2183,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				configOffOufputReduction.add(ValidationConfig.MULTIPLICITY+":"+roleQName);
 				errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateRoleCardinality.validateMultiplicityOfRole"),roleQName));
 			}
-			int nrOfTargetObjs=linkPool.getTargetObjectCount(iomObj,role,doItfOidPerTable);
+			long nrOfTargetObjs=linkPool.getTargetObjectCount(iomObj,role,doItfOidPerTable);
 			long cardMin=role.getCardinality().getMinimum();
 			long cardMax=role.getCardinality().getMaximum();
 			if((nrOfTargetObjs>=cardMin && nrOfTargetObjs<=cardMax)){

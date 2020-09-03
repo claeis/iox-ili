@@ -2,16 +2,23 @@ package ch.interlis.iox_j.validator;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.ehi.iox.objpool.impl.LongSerializer;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.iom.IomObject;
 
 public class LinkPool {
-	Map<LinkPoolKey, Integer> collectionOfReferenceObj = new HashMap<LinkPoolKey, Integer>();
+	Map<LinkPoolKey, Long> collectionOfReferenceObj = null;;
 	
-	// returns the number of referenced objects consisting of OID and role-name.
-	public int getTargetObjectCount(IomObject iomObj, RoleDef role, boolean doItfOidPerTable) {
-		Integer ret = null;
+	public LinkPool(ObjectPoolManager objPoolManager) {
+	    collectionOfReferenceObj=objPoolManager.newObjectPool2(new LinkPoolKeySerializer(), new LongSerializer());
+    }
+
+    // returns the number of referenced objects consisting of OID and role-name.
+	public long getTargetObjectCount(IomObject iomObj, RoleDef role, boolean doItfOidPerTable) {
+		Long ret = null;
 		if(doItfOidPerTable){
 			ret=collectionOfReferenceObj.get(new LinkPoolKey(iomObj.getobjectoid(), iomObj.getobjecttag(), role.getName()));
 		} else {
@@ -53,11 +60,11 @@ public class LinkPool {
 			key=new LinkPoolKey(oid, null, role.getName());
 		}
 		if(collectionOfReferenceObj.containsKey(key)){
-			int counter=collectionOfReferenceObj.get(key);
+			long counter=collectionOfReferenceObj.get(key);
 			counter+=1;
 			collectionOfReferenceObj.put(key,counter);
 		}else{
-			collectionOfReferenceObj.put(key,1);
+			collectionOfReferenceObj.put(key,1L);
 		}
 	}
 }
