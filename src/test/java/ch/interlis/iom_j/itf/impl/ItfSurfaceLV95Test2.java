@@ -36,7 +36,7 @@ public class ItfSurfaceLV95Test2 {
 	{
 		// compile model
 		Configuration ili2cConfig=new Configuration();
-		FileEntry fileEntry=new FileEntry("src/test/data/itf/Test2LV95.ili", FileEntryKind.ILIMODELFILE);
+		FileEntry fileEntry=new FileEntry("src/test/data/Itf/Test2LV95.ili", FileEntryKind.ILIMODELFILE);
 		ili2cConfig.addFileEntry(fileEntry);
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
