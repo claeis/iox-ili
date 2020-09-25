@@ -114,6 +114,10 @@ MODEL Configuration23 AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" 
 		CLASS ClassP =
 			lcoord : Lkoord;
 		END ClassP;
+
+		CLASS ClassP2 =
+			geom : POLYLINE WITH (STRAIGHTS) VERTEX Lkoord;
+		END ClassP2;
 		
 		CLASS ClassQ =
 		   attrA1 : TEXT*10;

@@ -269,7 +269,9 @@ public class Iox2jtsext {
 		return new CompoundCurve(ret,new JtsextGeometryFactory());
 	}
 	private static boolean logMsg(LogEventFactory errs,String validateKind,String msg,String... args){
-		 if(ValidationConfig.WARNING.equals(validateKind)){
+        if(ValidationConfig.OFF.equals(validateKind)){
+            return false;
+        }else if(ValidationConfig.WARNING.equals(validateKind)){
 			 errs.addEvent(errs.logWarningMsg(msg, args));
 			 return false;
 		 }else{

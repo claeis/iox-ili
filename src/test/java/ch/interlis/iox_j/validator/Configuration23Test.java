@@ -61,6 +61,7 @@ public class Configuration23Test {
 	private final static String CLASSN=TOPIC+".ClassN";
 	private final static String CLASSO=TOPIC+".ClassO";
 	private final static String CLASSP=TOPIC+".ClassP";
+    private final static String CLASSP2=TOPIC+".ClassP2";
 	private final static String CLASSQ=TOPIC+".ClassQ";
 	private final static String CLASSR=TOPIC+".ClassR";
 	private final static String CLASSS=TOPIC+".ClassS";
@@ -1634,6 +1635,35 @@ public class Configuration23Test {
 		assertTrue(logger.getWarn().size()==1);
 		assertEquals("value 10000.000 is out of range in attribute lcoord",logger.getWarn().get(0).getEventMsg());
 	}
+    // parameter=default=off
+    @Test
+    public void datatype__polylineTypeDuplicateCoordConfigGeomDefaultOff(){
+        Iom_jObject obj1=new Iom_jObject(CLASSP2, OID1);
+        IomObject polylineValue=obj1.addattrobj("geom", "POLYLINE");
+        IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+        IomObject coordStart=segments.addattrobj("segment", "COORD");
+        coordStart.setattrvalue("C1", "480000.000");
+        coordStart.setattrvalue("C2", "70000.000");
+        IomObject coordEnd=segments.addattrobj("segment", "COORD");
+        coordEnd.setattrvalue("C1", "480001.000");
+        coordEnd.setattrvalue("C2", "70001.000");
+        IomObject coordEnd2=segments.addattrobj("segment", "COORD");
+        coordEnd2.setattrvalue("C1", "480001.000");
+        coordEnd2.setattrvalue("C2", "70001.000");
+        ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION, ValidationConfig.OFF);
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID1));
+        validator.validate(new ObjectEvent(obj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
 	
 	// target=on. Erwarte den Fehler:
 	// t1 should associate 1 to 1 target objects (instead of 3)
