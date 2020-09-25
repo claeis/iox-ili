@@ -296,7 +296,9 @@ public class ItfSurfaceLinetable2Polygon implements Linetable2Polygon {
 			if(dataerrs.size()>0) {
 				polygonValid=false;
 			}
-	        if(ValidationConfig.WARNING.equals(validationType)){
+            if(ValidationConfig.OFF.equals(validationType)){
+                // ignore errors
+            }else if(ValidationConfig.WARNING.equals(validationType)){
 	               for(IoxInvalidDataException err:dataerrs){
 	                   errFact.addEvent(errFact.logWarning(err));
 	               }

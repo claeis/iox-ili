@@ -62,6 +62,7 @@ public class Configuration23Test {
 	private final static String CLASSO=TOPIC+".ClassO";
 	private final static String CLASSP=TOPIC+".ClassP";
     private final static String CLASSP2=TOPIC+".ClassP2";
+    private final static String CLASSP3=TOPIC+".ClassP3";
 	private final static String CLASSQ=TOPIC+".ClassQ";
 	private final static String CLASSR=TOPIC+".ClassR";
 	private final static String CLASSS=TOPIC+".ClassS";
@@ -1650,6 +1651,44 @@ public class Configuration23Test {
         IomObject coordEnd2=segments.addattrobj("segment", "COORD");
         coordEnd2.setattrvalue("C1", "480001.000");
         coordEnd2.setattrvalue("C2", "70001.000");
+        ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION, ValidationConfig.OFF);
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID1));
+        validator.validate(new ObjectEvent(obj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
+    public void datatype__surfaceTypeDangleConfigGeomDefaultOff(){
+        Iom_jObject obj1=new Iom_jObject(CLASSP3, OID1);
+        IomObject multisurfaceValue=obj1.addattrobj("geom", "MULTISURFACE");
+        IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
+        IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+        // polyline
+        IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+        IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+        IomObject segment=segments.addattrobj("segment", "COORD");
+        segment.setattrvalue("C1", "480000.000");
+        segment.setattrvalue("C2", "70000.000");
+        segment=segments.addattrobj("segment", "COORD");
+        segment.setattrvalue("C1", "500000.000");
+        segment.setattrvalue("C2", "70000.000");
+        segment=segments.addattrobj("segment", "COORD");
+        segment.setattrvalue("C1", "500000.000");
+        segment.setattrvalue("C2", "90000.000");
+        segment=segments.addattrobj("segment", "COORD");
+        segment.setattrvalue("C1", "480000.000");
+        segment.setattrvalue("C2", "90000.000");
+        segment=segments.addattrobj("segment", "COORD");
+        segment.setattrvalue("C1", "480000.000");
+        segment.setattrvalue("C2", "70001.000");
         ValidationConfig modelConfig=new ValidationConfig();
         modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION, ValidationConfig.OFF);
         LogCollector logger=new LogCollector();
