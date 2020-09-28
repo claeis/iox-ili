@@ -7,6 +7,7 @@ LATEST
 -----------------------------
 - switch linkpool from heap to file (ili2db#363)
 - Validator: Attempting to disable geometry validation with no success (ilivalidator#272)
+- Wkb2iox: throw an exception if coordinates with NaN (ili2db#367) 
 
 iox-ili 1.21.1 (2020-08-28)
 -----------------------------
