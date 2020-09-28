@@ -112,7 +112,7 @@ public class Wkb2iox
       return read(new ByteArrayInStream(bytes));
     }
     catch (IOException ex) {
-      throw new RuntimeException("Unexpected IOException caught: " + ex.getMessage());
+      throw new ParseException(ex);
     }
   }
 
@@ -164,7 +164,7 @@ public class Wkb2iox
 
     switch (geometryType) {
       case WKBConstants.wkbPoint :
-        return readPoint();
+        return readPoint(true);
       case WKBConstants.wkbMultiPoint :
           return readMultiPoint();
       case WKBConstants.wkbLineString :
@@ -209,10 +209,17 @@ private int extractGeometryType(int typeInt) {
 
   private IomObject readPoint() throws IOException
   {
+      return readPoint(false);
+  }
+  private IomObject readPoint(boolean enableEmpty) throws IOException
+  {
     readCoordinate();
     if(Double.isNaN(ordValues[0]) && Double.isNaN(ordValues[1])) {
-        // POINT EMPTY
-        return null;
+        if(enableEmpty) {
+            // POINT EMPTY
+            return null;
+        }
+        throw new IOException("unexpected NaN in WKB");
     }
 	IomObject ret=new ch.interlis.iom_j.Iom_jObject("COORD",null);
 	ret.setattrvalue("C1", Double.toString(ordValues[0]));

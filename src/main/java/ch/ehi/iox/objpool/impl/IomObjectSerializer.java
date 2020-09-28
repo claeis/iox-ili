@@ -10,9 +10,11 @@ public class IomObjectSerializer extends AbstractIomObjectSerializer implements 
 	@Override
 	public byte[] getBytes(IomObject iomObj) throws IOException {
         ByteArrayOutputStream  byteStream = new ByteArrayOutputStream();
+        startObject();
 		writeInt(byteStream,MAGIC);
 		writeIomObject(byteStream, iomObj);
 		writeInt(byteStream,MAGIC);
+		endObject();
 		return byteStream.toByteArray();
 	}
 
@@ -20,6 +22,7 @@ public class IomObjectSerializer extends AbstractIomObjectSerializer implements 
 	@Override
 	public IomObject getObject(byte[] bytes) throws IOException, ClassNotFoundException {
 		ByteArrayInputStream in=new ByteArrayInputStream(bytes);
+        startObject();
 		if(readInt(in)!=MAGIC){
 			throw new IllegalArgumentException();
 		}
@@ -29,6 +32,7 @@ public class IomObjectSerializer extends AbstractIomObjectSerializer implements 
 		if(readInt(in)!=MAGIC){
 			throw new IllegalArgumentException();
 		}
+        endObject();
 		return ret;
 	}
 }

@@ -15,9 +15,11 @@ public class ArcSegment extends CurveSegment {
 	private Coordinate centerPoint=null;
 	private com.vividsolutions.jts.geom.Coordinate[] ret=null;
 	private static final double EPSILON=0.00000001;
+	private final double P;
 
 	public ArcSegment(Object userData,Coordinate startPoint, Coordinate midPoint,
-			Coordinate endPoint) {
+			Coordinate endPoint,double p) {
+	    this.P=p;
 		this.userData=userData;
 		this.startPoint=new Coordinate(startPoint);
 		this.midPoint=new Coordinate(midPoint);
@@ -26,10 +28,18 @@ public class ArcSegment extends CurveSegment {
 			this.midPoint.z=(this.endPoint.z+this.startPoint.z)/2.0;
 		}
 	}
+    public ArcSegment(Object userData,Coordinate startPoint, Coordinate midPoint,
+            Coordinate endPoint) {
+        this(userData,startPoint,midPoint,endPoint,0.001);
+    }
 	public ArcSegment(Coordinate startPoint, Coordinate midPoint,
 			Coordinate endPoint) {
 		this(null,startPoint,midPoint,endPoint);
 	}
+    public ArcSegment(Coordinate startPoint, Coordinate midPoint,
+            Coordinate endPoint,double p) {
+        this(null,startPoint,midPoint,endPoint,p);
+    }
 
 	@Override
 	public Coordinate getEndPoint()  {
@@ -81,38 +91,43 @@ public class ArcSegment extends CurveSegment {
 
 			ret.add(new com.vividsolutions.jts.geom.Coordinate(pt1_re, pt1_ho));
 			
-			if(a>2*p){
-				// Zentriwinkel zwischen pt1 und arcPt
-				double alpha=2.0*Math.asin(a/2.0/Math.abs(r));
-				// anzahl Schritte
-				int alphan=(int)Math.ceil(alpha/theta);
-				// Winkelschrittweite
-				double alphai=alpha/(alphan*(sign));
-				double ri=Math.atan2(pt1_re-reM,pt1_ho-hoM);
-				for(int i=1;i<alphan;i++){
-					ri += alphai;
-					double pti_re=reM + Math.abs(r) * Math.sin(ri);
-					double pti_ho=hoM + Math.abs(r) * Math.cos(ri);
-					ret.add(new com.vividsolutions.jts.geom.Coordinate(pti_re, pti_ho));
-				}
-			}
+			if(sign==0.0 || p==0.0) {
+                ret.add(new com.vividsolutions.jts.geom.Coordinate(arcPt_re, arcPt_ho));
+			}else {
+	            if(a>2*p){
+	                // Zentriwinkel zwischen pt1 und arcPt
+	                double alpha=2.0*Math.asin(a/2.0/Math.abs(r));
+	                // anzahl Schritte
+	                int alphan=(int)Math.ceil(alpha/theta);
+	                // Winkelschrittweite
+	                double alphai=alpha/(alphan*(sign));
+	                double ri=Math.atan2(pt1_re-reM,pt1_ho-hoM);
+	                for(int i=1;i<alphan;i++){
+	                    ri += alphai;
+	                    double pti_re=reM + Math.abs(r) * Math.sin(ri);
+	                    double pti_ho=hoM + Math.abs(r) * Math.cos(ri);
+	                    ret.add(new com.vividsolutions.jts.geom.Coordinate(pti_re, pti_ho));
+	                }
+	            }
 
-			ret.add(new com.vividsolutions.jts.geom.Coordinate(arcPt_re, arcPt_ho));
+	            ret.add(new com.vividsolutions.jts.geom.Coordinate(arcPt_re, arcPt_ho));
 
-			if(b>2*p){
-				// Zentriwinkel zwischen arcPt und pt2
-				double beta=2.0*Math.asin(b/2.0/Math.abs(r));
-				// anzahl Schritte
-				int betan=(int)Math.ceil((beta/theta));
-				// Winkelschrittweite
-				double betai=beta/(betan*(sign));
-				double ri=Math.atan2(arcPt_re-reM,arcPt_ho-hoM);
-				for(int i=1;i<betan;i++){
-					ri += betai;
-					double pti_re=reM + Math.abs(r) * Math.sin(ri);
-					double pti_ho=hoM + Math.abs(r) * Math.cos(ri);
-					ret.add(new com.vividsolutions.jts.geom.Coordinate(pti_re, pti_ho));
-				}
+	            if(b>2*p){
+	                // Zentriwinkel zwischen arcPt und pt2
+	                double beta=2.0*Math.asin(b/2.0/Math.abs(r));
+	                // anzahl Schritte
+	                int betan=(int)Math.ceil((beta/theta));
+	                // Winkelschrittweite
+	                double betai=beta/(betan*(sign));
+	                double ri=Math.atan2(arcPt_re-reM,arcPt_ho-hoM);
+	                for(int i=1;i<betan;i++){
+	                    ri += betai;
+	                    double pti_re=reM + Math.abs(r) * Math.sin(ri);
+	                    double pti_ho=hoM + Math.abs(r) * Math.cos(ri);
+	                    ret.add(new com.vividsolutions.jts.geom.Coordinate(pti_re, pti_ho));
+	                }
+	            }
+			    
 			}
 			ret.add(new com.vividsolutions.jts.geom.Coordinate(pt2_re, pt2_ho));
 			return ret.toCoordinateArray();
@@ -123,10 +138,10 @@ public class ArcSegment extends CurveSegment {
 		if(ret==null){
 		    getCenterPoint();
 		    if(isArcNormalized()) {
-	            com.vividsolutions.jts.geom.Coordinate[] ret=arc2straight(startPoint,midPoint,endPoint,radius,centerPoint,sign,deta,0.001);
+	            com.vividsolutions.jts.geom.Coordinate[] ret=arc2straight(startPoint,midPoint,endPoint,radius,centerPoint,sign,deta,P);
 	            this.ret=ret;
 		    }else {
-                com.vividsolutions.jts.geom.Coordinate[] ret=arc2straight(endPoint,midPoint,startPoint,radius,centerPoint,-sign,deta,0.001);
+                com.vividsolutions.jts.geom.Coordinate[] ret=arc2straight(endPoint,midPoint,startPoint,radius,centerPoint,-sign,deta,P);
                 com.vividsolutions.jts.geom.impl.CoordinateArraySequence tmp=new com.vividsolutions.jts.geom.impl.CoordinateArraySequence(ret);
                 CoordinateSequences.reverse(tmp);
                 this.ret=tmp.toCoordinateArray();

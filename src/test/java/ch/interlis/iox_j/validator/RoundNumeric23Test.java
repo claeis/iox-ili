@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import java.math.BigDecimal;
 import org.junit.Test;
 
+import junit.framework.Assert;
+
 public class RoundNumeric23Test {
 	// prueft, ob 4(6) erfolgreich auf 50 aufrundet
 	// und das Resultat erfolgreich in der precision:1 zurueckgegeben wird.
@@ -172,4 +174,37 @@ public class RoundNumeric23Test {
 		BigDecimal result=Validator.roundNumeric(12, "-0.999999999996");
 		assertEquals("-0.999999999996", result.toString());
 	}
+    @Test
+    public void NaN(){
+        try {
+            BigDecimal result=Validator.roundNumeric(12, Double.toString(Double.NaN));
+            fail();
+        }catch(NumberFormatException ex) {
+        }
+    }
+    @Test
+    public void positiveInfinity(){
+        try {
+            BigDecimal result=Validator.roundNumeric(12, Double.toString(Double.POSITIVE_INFINITY));
+            fail();
+        }catch(NumberFormatException ex) {
+        }
+    }
+    @Test
+    public void negativeInfinity(){
+        try {
+            BigDecimal result=Validator.roundNumeric(12, Double.toString(Double.NEGATIVE_INFINITY));
+            fail();
+        }catch(NumberFormatException ex) {
+        }
+    }
+    @Test
+    public void wrongSyntax(){
+        try {
+            BigDecimal result=Validator.roundNumeric(12, "abcd");
+            fail();
+        }catch(NumberFormatException ex) {
+        }
+    }
+	
 }
