@@ -31,6 +31,7 @@ import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.hrg.HrgUtility;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 
@@ -96,17 +97,7 @@ public class Iox2wkb {
           throw new IllegalArgumentException("Output dimension must be 2 or 3");
     }
 
-	private static double sqr(double x)
-	{
-		return x*x;
-	}
-	private static double dist(double re1,double ho1,double re2,double ho2)
-	{
-		double ret;
-		ret=Math.sqrt(sqr(re2-re1)+sqr(ho2-ho1));
-		return ret;
-	}
-	  public static String bytesToHex(byte[] bytes)
+	public static String bytesToHex(byte[] bytes)
 	  {
 	    StringBuffer buf = new StringBuffer();
 	    for (int i = 0; i < bytes.length; i++) {
@@ -241,81 +232,11 @@ public class Iox2wkb {
 			int lastCoord=ret.size();
 			com.vividsolutions.jts.geom.Coordinate p1=null;
 			p1=ret.getCoordinate(lastCoord-1);
-			double pt1_re=p1.x;
-			double pt1_ho=p1.y;
-			//EhiLogger.debug("pt1 "+pt1_re+", "+pt1_ho);
-			//EhiLogger.debug("arc "+arcPt_re+", "+arcPt_ho);
-			//EhiLogger.debug("pt2 "+pt2_re+", "+pt2_ho);
-			/*
-			if(c3==null){
-				ret.setDimension(IFMEFeature.FME_TWO_D);
-				ret.add2DCoordinate(p2_x, p2_y);
-			}else{
-				double zCoord = Double.parseDouble(c3);
-				ret.setDimension(IFMEFeature.FME_THREE_D);
-				ret.add3DCoordinate(p2_x, p2_y, zCoord);
+			ArcSegment arc=new ArcSegment(p1, new Coordinate(arcPt_re, arcPt_ho),new Coordinate(pt2_re, pt2_ho),p);
+			Coordinate[] coords = arc.getCoordinates();
+			for(int i=1;i<coords.length;i++) {
+	            ret.add(coords[i]);
 			}
-			*/
-			// letzter Punkt ein Bogenzwischenpunkt?
-		
-			// Zwischenpunkte erzeugen
-
-			// Distanz zwischen Bogenanfanspunkt und Zwischenpunkt
-			double a=dist(pt1_re,pt1_ho,arcPt_re,arcPt_ho);
-			// Distanz zwischen Zwischenpunkt und Bogenendpunkt 
-			double b=dist(arcPt_re,arcPt_ho,pt2_re,pt2_ho);
-
-			// Zwischenpunkte erzeugen, so dass maximale Pfeilhoehe nicht 
-			// ueberschritten wird
-			// Distanz zwischen Bogenanfanspunkt und Bogenendpunkt 
-			double c=dist(pt1_re,pt1_ho,pt2_re,pt2_ho);
-			// Radius bestimmen
-			double s=(a+b+c)/2.0;
-			double ds=Math.atan2(pt2_re-arcPt_re,pt2_ho-arcPt_ho)-Math.atan2(pt1_re-arcPt_re,pt1_ho-arcPt_ho);
-			double rSign=(Math.sin(ds)>0.0)?-1.0:1.0;
-			double r=a*b*c/4.0/Math.sqrt(s*(s-a)*(s-b)*(s-c))*rSign;
-			// Kreismittelpunkt
-			double thetaM=Math.atan2(arcPt_re-pt1_re,arcPt_ho-pt1_ho)+Math.acos(a/2.0/r);
-			double reM=pt1_re+r*Math.sin(thetaM);
-			double hoM=pt1_ho+r*Math.cos(thetaM);
-
-			// mindest Winkelschrittweite
-			double theta=2*Math.acos(1-p/Math.abs(r));
-
-			if(a>2*p){
-				// Zentriwinkel zwischen pt1 und arcPt
-				double alpha=2.0*Math.asin(a/2.0/Math.abs(r));
-				// anzahl Schritte
-				int alphan=(int)Math.ceil(alpha/theta);
-				// Winkelschrittweite
-				double alphai=alpha/(alphan*(r>0.0?1:-1));
-				double ri=Math.atan2(pt1_re-reM,pt1_ho-hoM);
-				for(int i=1;i<alphan;i++){
-					ri += alphai;
-					double pti_re=reM + Math.abs(r) * Math.sin(ri);
-					double pti_ho=hoM + Math.abs(r) * Math.cos(ri);
-					ret.add(new com.vividsolutions.jts.geom.Coordinate(pti_re, pti_ho));
-				}
-			}
-
-			ret.add(new com.vividsolutions.jts.geom.Coordinate(arcPt_re, arcPt_ho));
-
-			if(b>2*p){
-				// Zentriwinkel zwischen arcPt und pt2
-				double beta=2.0*Math.asin(b/2.0/Math.abs(r));
-				// anzahl Schritte
-				int betan=(int)Math.ceil((beta/theta));
-				// Winkelschrittweite
-				double betai=beta/(betan*(r>0.0?1:-1));
-				double ri=Math.atan2(arcPt_re-reM,arcPt_ho-hoM);
-				for(int i=1;i<betan;i++){
-					ri += betai;
-					double pti_re=reM + Math.abs(r) * Math.sin(ri);
-					double pti_ho=hoM + Math.abs(r) * Math.cos(ri);
-					ret.add(new com.vividsolutions.jts.geom.Coordinate(pti_re, pti_ho));
-				}
-			}
-			ret.add(new com.vividsolutions.jts.geom.Coordinate(pt2_re, pt2_ho));
 		}
 	}
 	private int arc2JTS(IomObject startPt,IomObject value,double p)
@@ -389,76 +310,14 @@ public class Iox2wkb {
 					throw new Iox2wkbException("failed to read C3 <"+p1c3+">",ex);
 				}
 			}
+
+            ArcSegment arc=new ArcSegment(new Coordinate(pt1_re,pt1_ho), new Coordinate(arcPt_re, arcPt_ho),new Coordinate(pt2_re, pt2_ho),p);
+            Coordinate[] coords = arc.getCoordinates();
+            for(int i=1;i<coords.length;i++) {
+                writeCoord(coords[i].x,coords[i].y,0.0);
+                pointc++;
+            }
 			
-			//EhiLogger.debug("pt1 "+pt1_re+", "+pt1_ho);
-			//EhiLogger.debug("arc "+arcPt_re+", "+arcPt_ho);
-			//EhiLogger.debug("pt2 "+pt2_re+", "+pt2_ho);
-			// letzter Punkt ein Bogenzwischenpunkt?
-		
-			// Zwischenpunkte erzeugen
-
-			// Distanz zwischen Bogenanfanspunkt und Zwischenpunkt
-			double a=dist(pt1_re,pt1_ho,arcPt_re,arcPt_ho);
-			// Distanz zwischen Zwischenpunkt und Bogenendpunkt 
-			double b=dist(arcPt_re,arcPt_ho,pt2_re,pt2_ho);
-
-			// Zwischenpunkte erzeugen, so dass maximale Pfeilhoehe nicht 
-			// ueberschritten wird
-
-			double Z1O[]=new double[1];
-            double Z2O[]=new double[1];
-            double DETAO[]=new double[1];
-            double SIGNO[]=new double[1];
-            HrgUtility.CTRC3P(pt1_re,pt1_ho,  arcPt_re,arcPt_ho,pt2_re,pt2_ho, Z1O,Z2O,DETAO,SIGNO);
-            double rSign=SIGNO[0];
-            
-            // Kreismittelpunkt
-            double thetaM=DETAO[0];
-            double reM=Z1O[0];
-            double hoM=Z2O[0];
-            double rAbs=CurveSegment.dist(pt1_re,pt1_ho,reM,hoM);
-			
-			// mindest Winkelschrittweite
-            double theta=2*Math.acos(1-p/rAbs);
-
-			if(a>2*p){
-				// Zentriwinkel zwischen pt1 und arcPt
-				double alpha=2.0*Math.asin(a/2.0/rAbs);
-				// anzahl Schritte
-				int alphan=(int)Math.ceil(alpha/theta);
-				// Winkelschrittweite
-				double alphai=alpha/(alphan*rSign);
-				double ri=Math.atan2(pt1_re-reM,pt1_ho-hoM);
-				for(int i=1;i<alphan;i++){
-					ri += alphai;
-					double pti_re=reM + rAbs * Math.sin(ri);
-					double pti_ho=hoM + rAbs * Math.cos(ri);
-					writeCoord(pti_re, pti_ho,0.0);
-					pointc++;
-				}
-			}
-
-			writeCoord(arcPt_re, arcPt_ho,0.0);
-			pointc++;
-
-			if(b>2*p){
-				// Zentriwinkel zwischen arcPt und pt2
-				double beta=2.0*Math.asin(b/2.0/rAbs);
-				// anzahl Schritte
-				int betan=(int)Math.ceil((beta/theta));
-				// Winkelschrittweite
-				double betai=beta/(betan*rSign);
-				double ri=Math.atan2(arcPt_re-reM,arcPt_ho-hoM);
-				for(int i=1;i<betan;i++){
-					ri += betai;
-					double pti_re=reM + rAbs * Math.sin(ri);
-					double pti_ho=hoM + rAbs * Math.cos(ri);
-					writeCoord(pti_re, pti_ho,0.0);
-					pointc++;
-				}
-			}
-			writeCoord(pt2_re, pt2_ho,pt2_z);
-			pointc++;
 			return pointc;
 	}
 	/** Converts a COORD to a JTS Coordinate.
