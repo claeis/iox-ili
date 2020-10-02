@@ -5,6 +5,9 @@ ideas/open issues
 
 LATEST
 -----------------------------
+
+iox-ili 1.21.3 (2020-10-02)
+-----------------------------
 - Validator: fix java.io.NotSerializableException (ilivalidator#280)
 
 iox-ili 1.21.2 (2020-09-28)
