@@ -172,10 +172,10 @@ public abstract class AbstractIomObjectSerializer {
         return idx;
     }
 	protected String mapIdx2Name(int idx) {
-        String name=idx2name.get(idx);
-        if(name==null) {
+        if(!idx2name.containsKey(idx)) {
             throw new IllegalStateException();
         }
+        String name=idx2name.get(idx);
         return name;
     }
 

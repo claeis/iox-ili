@@ -45,7 +45,7 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 		try{
 			objectPoolManager=objectPoolManager1;
 			valueSerializer=valueSerializer1;
-			tree= new BTree<K, Long>( ObjectPoolManager.getCacheTmpFilename() , new JavaComparator<K>());
+			tree= new BTree<K, Long>( ObjectPoolManager.getCacheTmpFilename() , new JavaComparator<K>(),keySerializer,new LongSerializer());
 			outFilename=ObjectPoolManager.getCacheTmpFilename();
 			outFile=new RandomAccessFile(outFilename, "rw");
 		}catch(IOException e){

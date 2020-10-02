@@ -151,6 +151,29 @@ public class Association23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
     @Test
+    public void embeddedAssoHugeMultiplicity_Ok(){
+
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+        Iom_jObject iomObjA_1=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
+        validator.validate(new ObjectEvent(iomObjA_1));
+        for(int i=0;i<100000;i++) {
+        //for(int i=0;i<500;i++) {
+            Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID3+i);
+            iomObjB.addattrobj(ILI_ASSOC_AB3_A3, "REF").setobjectrefoid(iomObjA_1.getobjectoid());
+            validator.validate(new ObjectEvent(iomObjB));
+        }
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
     public void embeddedAsso_Attr_Ok(){
         Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
         Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);

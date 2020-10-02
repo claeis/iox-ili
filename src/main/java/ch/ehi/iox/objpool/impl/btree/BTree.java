@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import ch.ehi.iox.objpool.impl.LongSerializer;
 import ch.ehi.iox.objpool.impl.Serializer;
 
 
@@ -123,7 +124,7 @@ public class BTree<Key, Value>  {
     /**
      * Initializes an empty B-tree.
      */
-    public BTree(java.io.File path,java.util.Comparator<Key> keyComparator) 
+    public BTree(java.io.File path,java.util.Comparator<Key> keyComparator,Serializer keySerializer,Serializer valueSerializer) 
     		throws java.io.IOException 
     {
     	this.keyComparator=keyComparator;
@@ -329,31 +330,45 @@ public class BTree<Key, Value>  {
     private boolean eq(Key k1, Key k2) {
         return keyComparator.compare(k1, k2) == 0;
     }
-	public void serialzeKey(ByteArrayOutputStream bytes, Key key) throws IOException {
-		ObjectOutputStream out=new ObjectOutputStream(bytes);
-		out.writeObject(key);
-		out.flush();
+    public void writeInt(ByteArrayOutputStream outFile, int val) throws IOException {
+        byte[] intBuf=new byte[4];
+        LongSerializer.integerToBytes(val, intBuf, 0);
+        outFile.write(intBuf);
+    }
+    private int readInt(ByteArrayInputStream outFile) throws IOException {
+        byte[] bytes=new byte[4];
+        outFile.read(bytes);
+        return LongSerializer.bytesToInteger(bytes, 0);
+    }
+	public void serialzeKey(ByteArrayOutputStream outFile, Key key) throws IOException {
+        byte[] bytes=keySerializer.getBytes(key);
+        writeInt(outFile, bytes.length);
+        outFile.write(bytes);
 	}
-	public void serialzeValue(ByteArrayOutputStream bytes, Value val) throws IOException {
-		ObjectOutputStream out=new ObjectOutputStream(bytes);
-		out.writeObject(val);
-		out.flush();
+	public void serialzeValue(ByteArrayOutputStream outFile, Value val) throws IOException {
+        byte[] bytes=valueSerializer.getBytes(val);
+        writeInt(outFile, bytes.length);
+        outFile.write(bytes);
 	}
-	public Key deserialzeKey(ByteArrayInputStream bytes) throws IOException {
-		ObjectInputStream in=new ObjectInputStream(bytes);
-		try {
-			return (Key) in.readObject();
-		} catch (ClassNotFoundException e) {
-			throw new IOException(e);
-		}
+	public Key deserialzeKey(ByteArrayInputStream outFile) throws IOException {
+        int size=readInt(outFile);
+        byte[] bytes=new byte[size];
+        outFile.read(bytes);
+        try {
+            return keySerializer.getObject(bytes);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
 	}
-	public Object deserialzeValue(ByteArrayInputStream bytes) throws IOException {
-		ObjectInputStream in=new ObjectInputStream(bytes);
-		try {
-			return in.readObject();
-		} catch (ClassNotFoundException e) {
-			throw new IOException(e);
-		}
+    public Object deserialzeValue(ByteArrayInputStream outFile) throws IOException {
+        int size=readInt(outFile);
+        byte[] bytes=new byte[size];
+        outFile.read(bytes);
+        try {
+            return valueSerializer.getObject(bytes);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
 	}
 	public void cachePut(NodeId nodeId, Node node) {
 		cache.put(nodeId, node);
