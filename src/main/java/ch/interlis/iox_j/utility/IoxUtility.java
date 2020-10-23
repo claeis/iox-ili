@@ -12,9 +12,12 @@ import ch.interlis.iom_j.xtf.Xtf24Reader;
 import ch.interlis.iom_j.xtf.XtfReader;
 import ch.interlis.iom_j.xtf.XtfStartTransferEvent;
 import ch.interlis.iom_j.xtf.impl.MyHandler;
+import ch.interlis.iox.EndBasketEvent;
+import ch.interlis.iox.EndTransferEvent;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxReader;
+import ch.interlis.iox.ObjectEvent;
 import ch.interlis.iox.StartBasketEvent;
 import ch.interlis.iox_j.StartTransferEvent;
 import ch.interlis.iox_j.logging.LogEventFactory;
@@ -208,6 +211,20 @@ public class IoxUtility {
             }
         }
         return modelVersion;
+    }
+    public static IoxEvent cloneIoxEvent(IoxEvent event) {
+        if(event instanceof StartTransferEvent) {
+            event=new ch.interlis.iox_j.StartTransferEvent();
+        }else if(event instanceof StartBasketEvent) {
+            event=new ch.interlis.iox_j.StartBasketEvent(((StartBasketEvent) event).getType(),((StartBasketEvent) event).getBid());
+        }else if(event instanceof ObjectEvent) {
+            event=new ch.interlis.iox_j.ObjectEvent(new ch.interlis.iom_j.Iom_jObject(((ObjectEvent) event).getIomObject()));
+        }else if(event instanceof EndBasketEvent) {
+            event=new ch.interlis.iox_j.EndBasketEvent();
+        }else if(event instanceof EndTransferEvent) {
+            event=new ch.interlis.iox_j.EndTransferEvent();
+        }
+        return event;
     }
 
     private static String version = null;
