@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- ReduceToBaseModel moved from iox-ili
 
 iox-ili 1.21.3 (2020-10-02)
 -----------------------------
