@@ -50,7 +50,13 @@ public class ReduceToBaseModel implements IoxFilter {
 	
 	public ReduceToBaseModel(List<Model> exportModels,TransferDescription td,Settings config)
 	{
-		this.td=td;
+		setup(exportModels, td, config);
+	}
+    protected ReduceToBaseModel()
+    {
+        
+    }
+    protected void setup(List<Model> exportModels,TransferDescription td,Settings config) {
 		this.destModels=exportModels;
         this.doItfLineTables = Validator.CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(Validator.CONFIG_DO_ITF_LINETABLES));
         if(doItfLineTables){
@@ -78,7 +84,7 @@ public class ReduceToBaseModel implements IoxFilter {
 			}
 			
 		}
-	}
+    }
 	private void setupTranslation(Topic srcTopic){
 		Topic destTopic=srcTopic;
 		do{
