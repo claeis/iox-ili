@@ -228,29 +228,33 @@ public class Interlis {
             }
             return new Value((Viewable)td.getElement(targetViewable.getComplexObjects().iterator().next().getobjecttag()));
         } else if (currentFunction.getScopedName(null).equals("INTERLIS.areAreas")){
+            /*
+             * FUNCTION areAreas (Objects: OBJECTS OF ANYCLASS; 
+             *   SurfaceBag: ATTRIBUTE OF @ Objects RESTRICTION (BAG OF ANYSTRUCTURE);
+             *   SurfaceAttr: ATTRIBUTE OF @ SurfaceBag RESTRICTION (SURFACE)): BOOLEAN;
+             */
             FunctionCall functionCall = (FunctionCall) expression;
             Evaluable[] arguments = functionCall.getArguments();
-            // founded objects (list<IomObjects)
-            Value value=validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[0], firstRole);
-            if (value.skipEvaluation()){
-                return value;
+            // argument Objects (list<IomObjects)
+            Value argObjects=validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[0], firstRole);
+            if (argObjects.skipEvaluation()){
+                return argObjects;
             }
-            if (value.isUndefined()){
+            if (argObjects.isUndefined()){
                 return Value.createSkipEvaluation();
             }
-            // count of objects condition returns attrName of BAG / undefined=(numericIsDefined=false)
-            Value surfaceBag=validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[1], firstRole);
-            if (surfaceBag.skipEvaluation()){
-                return surfaceBag;
+            // argument SurfaceBag
+            Value argSurfaceBag=validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[1], firstRole);
+            if (argSurfaceBag.skipEvaluation()){
+                return argSurfaceBag;
             }
             Viewable currentClass=(Viewable) td.getElement(iomObj.getobjecttag());
-            //PathEl surfaceBagPath[]=parseObjectPath(currentClass, surfaceBag.getValue());
             ObjectPath surfaceBagObjPath = null;
             PathEl surfaceBagPath[] = null;
             Viewable viewable = null;
-            if(!surfaceBag.isUndefined()) {
+            if(!argSurfaceBag.isUndefined()) {
                 try {
-                    surfaceBagObjPath = validator.parseObjectOrAttributePath(currentClass, surfaceBag.getValue());
+                    surfaceBagObjPath = validator.parseObjectOrAttributePath(currentClass, argSurfaceBag.getValue());
                     if (surfaceBagObjPath.getPathElements() != null) {
                         PathEl surfaceBagPathEl[] = surfaceBagObjPath.getPathElements();
                         surfaceBagPath = surfaceBagPathEl;          
@@ -260,12 +264,12 @@ public class Interlis {
                     EhiLogger.logError(e);
                 }
             }
-            // name of surface (textType)
-            Value surfaceAttr=validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[2], firstRole);
-            if (surfaceAttr.skipEvaluation()){
-                return surfaceAttr;
+            // argument SurfaceAttr
+            Value argSurfaceAttr=validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj,arguments[2], firstRole);
+            if (argSurfaceAttr.skipEvaluation()){
+                return argSurfaceAttr;
             }
-            if (surfaceAttr.isUndefined()){
+            if (argSurfaceAttr.isUndefined()){
                 return Value.createSkipEvaluation();
             }
             
@@ -276,10 +280,10 @@ public class Interlis {
                 attrObjClass = currentClass;
             }               
             
-            ObjectPath surfaceAttrObjPath;
             PathEl surfaceAttrPath[] = null;
+            ObjectPath surfaceAttrObjPath = null;
             try {
-                surfaceAttrObjPath = validator.parseObjectOrAttributePath(attrObjClass, surfaceAttr.getValue());
+                surfaceAttrObjPath = validator.parseObjectOrAttributePath(attrObjClass, argSurfaceAttr.getValue());
                 if (surfaceAttrObjPath.getPathElements() != null) {
                     PathEl surfaceAttrPathEl[] = surfaceAttrObjPath.getPathElements(); 
                     surfaceAttrPath = surfaceAttrPathEl;                        
@@ -287,14 +291,13 @@ public class Interlis {
             } catch (Ili2cException e) {
                 EhiLogger.logError(e);
             }
-            //parsePath(surfaceAttr.getValue())
             for(Function aFunction:functions.keySet()) {
                 if(aFunction==currentFunction) {
                     Value isArea=functions.get(currentFunction);
                     return isArea;
                 }
             }
-            Value isArea = validator.evaluateAreArea(iomObj, value, surfaceBagPath, surfaceAttrPath, currentFunction);
+            Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction);
             functions.put(currentFunction, isArea);
             return isArea;
         }
