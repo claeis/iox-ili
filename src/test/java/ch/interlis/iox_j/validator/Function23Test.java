@@ -1621,6 +1621,7 @@ public class Function23Test {
 		endSegment6.setattrvalue("C1", "484000.000");
 		endSegment6.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();

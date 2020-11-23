@@ -600,6 +600,7 @@ public class AdditionalConstraints23Test {
 		objSurfaceSuccess.setattrvalue("Art", "a");
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelI");
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -685,6 +686,7 @@ public class AdditionalConstraints23Test {
 		endSegment3Inner.setattrvalue("C2", "150000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelH");
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
