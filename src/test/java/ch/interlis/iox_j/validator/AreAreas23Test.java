@@ -3,6 +3,8 @@ package ch.interlis.iox_j.validator;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Collections;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -15,6 +17,7 @@ import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iox.IoxLogEvent;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
@@ -311,6 +314,7 @@ public class AreAreas23Test {
 
         // Create and run validator.
         ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
         Settings settings = new Settings();
@@ -351,6 +355,7 @@ public class AreAreas23Test {
 
         // Create and run validator.
         ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
         Settings settings = new Settings();
@@ -385,6 +390,7 @@ public class AreAreas23Test {
 
         // Create and run validator.
         ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
         Settings settings = new Settings();
@@ -419,6 +425,7 @@ public class AreAreas23Test {
 
         // Create and run validator.
         ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
         Settings settings = new Settings();
@@ -461,6 +468,7 @@ public class AreAreas23Test {
 
         // Create and run validator.
         ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
         Settings settings = new Settings();
@@ -492,6 +500,7 @@ public class AreAreas23Test {
 
         // Create and run validator.
         ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
         Settings settings = new Settings();
@@ -508,6 +517,42 @@ public class AreAreas23Test {
                 logger.getErrs().get(0).getEventMsg());
     }
     @Test
+    public void classE_allObjectE_TwoObject_Overlap_DetailMsgs_Fail() {
+
+        IomObject structA = createRectangle("486000.000", "75000.000", "490000.000", "80000.000");
+        Iom_jObject classE1 = new Iom_jObject(CLASSE, OID1);
+        classE1.setattrvalue("art", "a");
+        classE1.addattrobj("flaeche", structA);
+
+        IomObject structA2 = createRectangle("488000.000", "77000.000", "494000.000", "78000.000"); // overlaps structA
+        Iom_jObject classE2 = new Iom_jObject(CLASSE, OID2);
+        classE2.setattrvalue("art", "a");
+        classE2.addattrobj("flaeche", structA2);
+
+        // Create and run validator.
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(classE1));
+        validator.validate(new ObjectEvent(classE2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts.
+        assertEquals(3, logger.getErrs().size());
+        java.util.ArrayList<String> errs=new java.util.ArrayList<String>();
+        for(IoxLogEvent err:logger.getErrs()) {
+            errs.add(err.getEventMsg());
+        }
+        Collections.sort(errs);
+        assertEquals("Intersection coord1 (490000.000, 77000.000),",errs.get(0).trim());
+        assertEquals("Intersection coord1 (490000.000, 78000.000),",errs.get(1).trim());
+        assertEquals("Set Constraint AreAreas23.Topic.ClassE.Constraint1 is not true.",errs.get(2));
+    }
+    @Test
     public void classF_allObjectF_TwoObject_Overlap_Fail() {
 
         IomObject structA = createStructA("486000.000", "75000.000", "490000.000", "80000.000");
@@ -522,6 +567,7 @@ public class AreAreas23Test {
 
         // Create and run validator.
         ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
         Settings settings = new Settings();

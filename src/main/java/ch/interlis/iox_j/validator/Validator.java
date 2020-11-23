@@ -2,11 +2,8 @@ package ch.interlis.iox_j.validator;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,7 +33,6 @@ import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.Constant;
 import ch.interlis.ili2c.metamodel.Constant.Enumeration;
 import ch.interlis.ili2c.metamodel.Constraint;
-import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.CoordType;
 import ch.interlis.ili2c.metamodel.DataModel;
 import ch.interlis.ili2c.metamodel.Domain;
@@ -65,7 +61,6 @@ import ch.interlis.ili2c.metamodel.MandatoryConstraint;
 import ch.interlis.ili2c.metamodel.Model;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
-import ch.interlis.ili2c.metamodel.OIDType;
 import ch.interlis.ili2c.metamodel.ObjectPath;
 import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.Objects;
@@ -77,7 +72,6 @@ import ch.interlis.ili2c.metamodel.PathElThis;
 import ch.interlis.ili2c.metamodel.PlausibilityConstraint;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
-import ch.interlis.ili2c.metamodel.PredefinedModel;
 import ch.interlis.ili2c.metamodel.Projection;
 import ch.interlis.ili2c.metamodel.ReferenceType;
 import ch.interlis.ili2c.metamodel.RoleDef;
@@ -92,7 +86,6 @@ import ch.interlis.ili2c.metamodel.Topic;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.Type;
 import ch.interlis.ili2c.metamodel.TypeAlias;
-import ch.interlis.ili2c.metamodel.UniqueEl;
 import ch.interlis.ili2c.metamodel.UniquenessConstraint;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
@@ -102,13 +95,11 @@ import ch.interlis.ilirepository.impl.RepositoryAccessException;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
-import ch.interlis.iom_j.ViewableProperty;
 import ch.interlis.iom_j.itf.impl.ItfAreaPolygon2Linetable;
 import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
-import ch.interlis.iom_j.xtf.XtfReader;
 import ch.interlis.iom_j.xtf.XtfStartTransferEvent;
 import ch.interlis.iom_j.xtf.XtfWriter;
 import ch.interlis.iom_j.xtf.impl.MyHandler;
@@ -248,6 +239,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         disableRounding=ValidationConfig.TRUE.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_ROUNDING));
         if(disableRounding){
             errs.addEvent(errFact.logInfoMsg("disable rounding"));
+        }
+        disableAreAreasMessages=ValidationConfig.TRUE.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES));
+        if(disableAreAreasMessages){
+            errs.addEvent(errFact.logInfoMsg("disable areAreas() messages"));
         }
 		boolean allowOnlyRelaxedMultiplicity=ValidationConfig.ON.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ALLOW_ONLY_MULTIPLICITY_REDUCTION));
 		if(allowOnlyRelaxedMultiplicity){
@@ -2064,6 +2059,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			List<IoxInvalidDataException> intersections=polygonPool.validate();
 			if(intersections!=null){
+	            if(!disableAreAreasMessages && intersections.size()>0){
+	                for(IoxInvalidDataException ex:intersections){ // iterate through non-overlay intersections
+	                    String tid1=ex.getTid();
+	                    String iliqname=ex.getIliqname();
+	                    errFact.setTid(tid1);
+	                    errFact.setIliqname(iliqname);
+	                    if(ex instanceof IoxIntersectionException) {
+	                        logMsg(areaOverlapValidation, ((IoxIntersectionException) ex).getIntersection().toShortString());
+	                        EhiLogger.traceState(ex.toString());
+	                    }else {
+	                        logMsg(areaOverlapValidation, ex.getMessage());
+	                    }
+	                }
+	                setCurrentMainObj(null);
+	            }
 			    EhiLogger.traceState(iliClassQName+ ":" + currentFunction.getScopedName(null) + " returned false"); 
 			    // not a valid area topology
 			    return new Value(false); 
@@ -2123,6 +2133,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		            }
 		            List<IoxInvalidDataException> intersections=polygonPool.validate();
 		            if(intersections!=null) {
+		                if(!disableAreAreasMessages && intersections.size()>0){
+		                    for(IoxInvalidDataException ex:intersections){ // iterate through non-overlay intersections
+		                        String tid1=ex.getTid();
+		                        String iliqname=ex.getIliqname();
+		                        errFact.setTid(tid1);
+		                        errFact.setIliqname(iliqname);
+		                        if(ex instanceof IoxIntersectionException) {
+		                            logMsg(areaOverlapValidation, ((IoxIntersectionException) ex).getIntersection().toShortString());
+		                            EhiLogger.traceState(ex.toString());
+		                        }else {
+		                            logMsg(areaOverlapValidation, ex.getMessage());
+		                        }
+		                    }
+		                    setCurrentMainObj(null);
+		                }
+		                EhiLogger.traceState(iliClassQName+ ":" + currentFunction.getScopedName(null) + " returned false"); 
 		                return new Value(false);
 		            }		            
 		      }
@@ -2909,6 +2935,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	Map<String , String> uniqueObjectIDs = new HashMap<String, String>();
 	HashSet<Object> loggedObjects=new HashSet<Object>();
     private boolean disableRounding=false;
+    private boolean disableAreAreasMessages=false;
     private Interlis interlisFunction;
     private Interlis_ext interlis_ext;
     private Math mathFunction;
