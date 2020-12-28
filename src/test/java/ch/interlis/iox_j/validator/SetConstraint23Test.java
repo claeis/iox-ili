@@ -626,6 +626,7 @@ public class SetConstraint23Test {
             endSegment4.setattrvalue("C2", "75000.000"); 
         }
         ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
         LogCollector logger=new LogCollector();
         LogEventFactory errFactory=new LogEventFactory();
         Settings settings=new Settings();

@@ -37,6 +37,18 @@ CONTRACTED MODEL AreAreas23
 			SET CONSTRAINT INTERLIS_ext.areAreas3(ALL,UNDEFINED,"attr4->attr3->attr2->flaeche");
 		END ClassD3;
 		
+		CLASS ClassE =
+		    art: (a, b, c);
+			flaeche : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			SET CONSTRAINT WHERE art == #a: INTERLIS.areAreas(ALL,UNDEFINED,>>flaeche);
+		END ClassE;
+
+		CLASS ClassF =
+		    art: (a, b, c);
+			attr2 : BAG OF StructA;
+			SET CONSTRAINT WHERE art == #a: INTERLIS.areAreas(ALL,>>attr2,>>StructA->flaeche);
+		END ClassF;
+		
 	END Topic;
 	
 END AreAreas23.

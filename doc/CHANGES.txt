@@ -6,6 +6,12 @@ ideas/open issues
 LATEST
 -----------------------------
 
+iox-ili 1.21.4 (2020-12-28)
+-----------------------------
+- ReduceToBaseModel moved from ili2db
+- IoxUtility.cloneIoxEvent() added
+- INTERLIS.areAreas() should report validation details (ilivalidator#240)
+
 iox-ili 1.21.3 (2020-10-02)
 -----------------------------
 - Validator: fix java.io.NotSerializableException (ilivalidator#280)
