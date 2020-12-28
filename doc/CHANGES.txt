@@ -5,7 +5,10 @@ ideas/open issues
 
 LATEST
 -----------------------------
-- ReduceToBaseModel moved from iox-ili
+
+iox-ili 1.21.4 (2020-12-28)
+-----------------------------
+- ReduceToBaseModel moved from ili2db
 - IoxUtility.cloneIoxEvent() added
 - INTERLIS.areAreas() should report validation details (ilivalidator#240)
 
