@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- fix NPE if rings have equal coordinates (ili2db#376)
 
 iox-ili 1.21.4 (2020-12-28)
 -----------------------------
