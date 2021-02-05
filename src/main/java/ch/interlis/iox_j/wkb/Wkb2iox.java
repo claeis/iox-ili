@@ -183,6 +183,8 @@ public class Wkb2iox
           return readMultiPolygon();
       case WKBConstants.wkbMultiSurface :
           return readMultiSurface();
+      case WKBConstants.wkbCircularString :
+          return readCircularString();
     }
     throw new ParseException("Unknown WKB type " + geometryType);
     //return null;
@@ -512,6 +514,39 @@ private int extractGeometryType(int typeInt) {
 	    }
 	    return ret;
   }
+  
+  private IomObject readCircularString() throws IOException
+  {
+
+//	  <circularstring binary representation> ::=
+//			    <byte order> <wkbcircularstring> [ <num> <wkbpoint binary>... ]
+
+      int coordc = dis.readInt();
+      if(coordc==0) {
+          return null;
+      }
+	    IomObject ret=new ch.interlis.iom_j.Iom_jObject("POLYLINE",null);
+		IomObject sequence=new ch.interlis.iom_j.Iom_jObject("SEGMENTS",null);
+		ret.addattrobj("sequence",sequence);
+		for(int coordi=0;coordi<coordc;coordi++){
+			if( coordi==0){
+				// add start point
+				sequence.addattrobj("segment", readPoint());
+			}else{
+				IomObject arcPt=readPoint();coordi++;
+				if(coordi>=coordc){
+					throw new IllegalStateException("missing coord");
+				}
+				IomObject endPt=readPoint();
+				endPt.setobjecttag("ARC");
+				endPt.setattrvalue("A1", arcPt.getattrvalue("C1"));
+				endPt.setattrvalue("A2", arcPt.getattrvalue("C2"));
+				sequence.addattrobj("segment", endPt);
+			}
+		}
+	return ret;
+  }
+  
   /**
    * Reads a coordinate value with the specified dimensionality.
    * Makes the X and Y ordinates precise according to the precision model
