@@ -6,6 +6,7 @@ ideas/open issues
 LATEST
 -----------------------------
 - fix NPE if rings have equal coordinates (ili2db#376)
+- fix Unknown WKB type 8 (#92)
 
 iox-ili 1.21.4 (2020-12-28)
 -----------------------------
