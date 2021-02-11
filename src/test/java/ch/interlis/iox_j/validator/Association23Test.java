@@ -911,7 +911,7 @@ public class Association23Test {
     // Wenn in einer N:N Association der Link ohne Referenzen ist, 
     // soll eine Fehlermeldung ausgegeben werden.
     @Test
-    public void standAloneAsso_NtoN_noRefInLink_Fail(){
+    public void standAloneAsso_NtoN_noRefsInLink_Fail(){
         Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
         Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
         Iom_jObject iomObj_ab=new Iom_jObject(ILI_ASSOC_AB2, null);
@@ -931,6 +931,30 @@ public class Association23Test {
         assertTrue(logger.getErrs().size()>0);
         assertEquals("Role Association23.Topic.ab2.a2 requires a reference to another object", logger.getErrs().get(0).getEventMsg());
         assertEquals("Role Association23.Topic.ab2.b2 requires a reference to another object", logger.getErrs().get(1).getEventMsg());
+    }
+    // Wenn in einer N:N Association der Link ohne Referenzen ist, 
+    // soll eine Fehlermeldung ausgegeben werden.
+    @Test
+    public void standAloneAsso_NtoN_noRefInLink_Fail(){
+        Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
+        Iom_jObject iomObjB=new Iom_jObject(ILI_CLASSB, OBJ_OID2);
+        Iom_jObject iomObj_ab=new Iom_jObject(ILI_ASSOC_AB2, null);
+        iomObj_ab.addattrobj(ILI_ASSOC_AB2_A2, "REF").setobjectrefoid(iomObjA.getobjectoid());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+        validator.validate(new ObjectEvent(iomObjA));
+        validator.validate(new ObjectEvent(iomObjB));
+        validator.validate(new ObjectEvent(iomObj_ab));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()>0);
+        assertEquals("Role Association23.Topic.ab2.b2 requires a reference to another object", logger.getErrs().get(0).getEventMsg());
     }
 	
 	// Die OID a1 der Klasse A, welche von der Klasse B mit der Rolle b1 Verbunden wird, existiert nicht.

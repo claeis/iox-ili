@@ -46,8 +46,7 @@ public class LinkPool {
 			}
 			if(role.hasOneOppEnd()) {
 	            RoleDef oppRole=role.getOppEnd();
-	            String sourceOid=iomObj.getattrobj(oppRole.getName(),0).getobjectrefoid();
-	            increaseCounter(sourceOid, null, role, false);
+                increaseCounter(targetOid, null, oppRole, false);
 			}
 		}
 	}
