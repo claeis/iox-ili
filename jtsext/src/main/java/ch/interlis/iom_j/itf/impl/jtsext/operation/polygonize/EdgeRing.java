@@ -54,6 +54,9 @@ class EdgeRing {
       if (! tryShellEnv.contains(testEnv)) continue;
       
       testPt = CoordinateArrays.ptNotInList(testRing.getCoordinates(), tryShellRing.getCoordinates());
+      // no point found; same ring
+      if(testPt==null) continue;
+      
       boolean isContained = false;
       if (CGAlgorithms.isPointInRing(testPt, tryShellRing.getCoordinates()) )
         isContained = true;

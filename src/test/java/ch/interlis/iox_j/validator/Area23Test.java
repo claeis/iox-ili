@@ -4146,7 +4146,6 @@ public class Area23Test {
     // prueft, ob die Validierung einen Fehler meldet, wenn ein Polygon,
     // innerhalb eines anderen Polygons liegt.
     @Test
-    @Ignore("testcase for ilivalidator#219")
     public void twoPolygon_Polygon2OverlapsPolygon1_Fail(){
         Iom_jObject obj1=new Iom_jObject(ILI_CLASSD, OID1);
         IomObject multisurface=obj1.addattrobj("area2d", "MULTISURFACE");
@@ -4260,7 +4259,9 @@ public class Area23Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertTrue(logger.getErrs().size()==1);
+        assertTrue(logger.getErrs().size()==2);
+        assertEquals("polygons overlay tid1 o1, tid2 o2",logger.getErrs().get(0).getEventMsg());
+        assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d",logger.getErrs().get(1).getEventMsg());
     }
     // prueft, ob die Validierung keinen Fehler meldet, wenn ein Polygon,
     // genau ueber einem InnerBoundary eines anderen Polygons liegt.

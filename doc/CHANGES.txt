@@ -6,6 +6,12 @@ ideas/open issues
 LATEST
 -----------------------------
 
+iox-ili 1.21.5 (2021-02-11)
+-----------------------------
+- fix NPE if LinkObj has only one reference
+- fix NPE if rings have equal coordinates (ili2db#376)
+- fix Unknown WKB type 8 (#92)
+
 iox-ili 1.21.4 (2020-12-28)
 -----------------------------
 - ReduceToBaseModel moved from ili2db
