@@ -10,6 +10,7 @@ import ch.interlis.iox.IoxDataPool;
 
 public class PipelinePool implements IoxDataPool {
 	private HashMap<Object,Map<String,Object>> elements=new HashMap<Object,Map<String,Object>>();
+    private Map<String,Object> values=new HashMap<String,Object>();
 	public Collection<Object> getElements() {
 		return elements.keySet();
 	}
@@ -57,15 +58,13 @@ public class PipelinePool implements IoxDataPool {
 	}
 
 	@Override
-	public Object getIntermediateValue(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public Object getIntermediateValue(String valueName) {
+        return values.get(valueName);
 	}
 
 	@Override
 	public Set<String> getIntermediateValues() {
-		// TODO Auto-generated method stub
-		return null;
+		return values.keySet();
 	}
 
 	@Override
@@ -75,9 +74,8 @@ public class PipelinePool implements IoxDataPool {
 	}
 
 	@Override
-	public void setIntermediateValue(String arg0, Object arg1) {
-		// TODO Auto-generated method stub
-		
+	public void setIntermediateValue(String valueName, Object value) {
+        values.put(valueName,value);
 	}
 
 	@Override
