@@ -109,9 +109,11 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 	{
 		flush();
 		
-    	for(Map<String, IomObject> m:pools.values()){
-    		m.clear();
-    	}
+		if(pools!=null) {
+	        for(Map<String, IomObject> m:pools.values()){
+	            m.clear();
+	        }
+		}
     	pools=null;
 		
 		if(out!=null){

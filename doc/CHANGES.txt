@@ -6,6 +6,7 @@ ideas/open issues
 LATEST
 -----------------------------
 - implement PipelinePool.setIntermediateValue(String valueName, Object value)/getIntermediateValue(String valueName)
+- fix NPE if no events sent to ItfWriter2
 
 iox-ili 1.21.5 (2021-02-11)
 -----------------------------
