@@ -218,6 +218,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		this.patternForStandartOidValidation = Pattern.compile(REGEX_FOR_STANDARTOID_VALIDATION);
         this.patternForBase64Validation = Pattern.compile(REGEX_FOR_BASE64_VALIDATION);
 		this.settings.setTransientObject(InterlisFunction.IOX_DATA_POOL,pipelinePool);
+        this.settings.setTransientObject(InterlisFunction.IOX_VALIDATOR,this);
 		this.pipelinePool=pipelinePool;
 		objPoolManager=new ObjectPoolManager();
 		Map<String,Class> cf=(Map<String, Class>) settings.getTransientObject(CONFIG_CUSTOM_FUNCTIONS);
