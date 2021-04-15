@@ -20,7 +20,7 @@ import ch.interlis.iox_j.StartTransferEvent;
 import ch.interlis.iox_j.logging.LogEventFactory;
 
 public class AdditionalConstraints23Test {
-	private TransferDescription td=null;
+    private TransferDescription td=null;
 	// OID
 	private final static String OID1 ="o1";
 	private final static String OID2 ="o2";
@@ -37,7 +37,15 @@ public class AdditionalConstraints23Test {
 	private final static String CLASSH=TOPIC+".ClassH";
 	private final static String CLASSI=TOPIC+".ClassI";
 	private final static String CLASSJ=TOPIC+".ClassJ";
-	// STRUCT
+    private final static String CLASSK=TOPIC+".ClassK";
+    private static final String CLASSK_ATTR_K = "attrK";
+    private final static String CLASSL=TOPIC+".ClassL";
+    private static final String CLASSL_ATTR_L = "attrL";
+    private final static String ASSOC_K2L_N2N=TOPIC+".k2l_n2n";
+    private static final String ASSOC_K2L_N2N_ROLEL_N2N = "roleL_n2n";
+    private static final String ASSOC_K2L_N2N_ROLEK_N2N = "roleK_n2n";
+    private static final String ASSOC_K2L_N21_ROLEK_N21 = "roleK_n21";
+    // STRUCT
 	private final static String STRUCTA=TOPIC+".StructA";	
 	private final static String STRUCTB=TOPIC+".StructB";
 	// BID
@@ -775,4 +783,133 @@ public class AdditionalConstraints23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+	private static void setRef(IomObject iomObj,String roleName, String refid) {
+        iomObj.addattrobj(roleName, "REF").setobjectrefoid(refid);
+	}
+    @Test
+    public void assoc_N2N_ObjectPathWithRolename() {
+        Iom_jObject objK=new Iom_jObject(CLASSK, "o1");
+        objK.setattrvalue(CLASSK_ATTR_K, "valueK");
+        Iom_jObject objL=new Iom_jObject(CLASSL, "o2");
+        objL.setattrvalue(CLASSL_ATTR_L, "valueL");
+        Iom_jObject linkObj1=new Iom_jObject(ASSOC_K2L_N2N,null);
+        setRef(linkObj1,ASSOC_K2L_N2N_ROLEK_N2N,objK.getobjectoid());
+        setRef(linkObj1,ASSOC_K2L_N2N_ROLEL_N2N,objL.getobjectoid());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelK_Assoc;");
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID1));
+        validator.validate(new ObjectEvent(objK));
+        validator.validate(new ObjectEvent(objL));
+        validator.validate(new ObjectEvent(linkObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }	
+    @Test
+    public void assoc_N2N_ObjectPathWithRolename_Fail() {
+        Iom_jObject objK=new Iom_jObject(CLASSK, "o1");
+        objK.setattrvalue(CLASSK_ATTR_K, "valueK");
+        Iom_jObject objL=new Iom_jObject(CLASSL, "o2");
+        objL.setattrvalue(CLASSL_ATTR_L, "valueK"); // violates mandatory constraint
+        Iom_jObject linkObj1=new Iom_jObject(ASSOC_K2L_N2N,null);
+        setRef(linkObj1,ASSOC_K2L_N2N_ROLEK_N2N,objK.getobjectoid());
+        setRef(linkObj1,ASSOC_K2L_N2N_ROLEL_N2N,objL.getobjectoid());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelK_Assoc;");
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID1));
+        validator.validate(new ObjectEvent(objK));
+        validator.validate(new ObjectEvent(objL));
+        validator.validate(new ObjectEvent(linkObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Mandatory Constraint AdditionalModelK_Assoc.Topic.View_n2n.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+    }   
+    @Test
+    public void assoc_N21_ObjectPathWithRolename() {
+        Iom_jObject objK=new Iom_jObject(CLASSK, "o1");
+        objK.setattrvalue(CLASSK_ATTR_K, "valueK");
+        Iom_jObject objL=new Iom_jObject(CLASSL, "o2");
+        setRef(objL,ASSOC_K2L_N21_ROLEK_N21,objK.getobjectoid());
+        Iom_jObject linkObj1=new Iom_jObject(ASSOC_K2L_N2N,null);
+        setRef(linkObj1,ASSOC_K2L_N2N_ROLEK_N2N,objK.getobjectoid());
+        setRef(linkObj1,ASSOC_K2L_N2N_ROLEL_N2N,objL.getobjectoid());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelK_Assoc;");
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID1));
+        validator.validate(new ObjectEvent(objK));
+        validator.validate(new ObjectEvent(objL));
+        validator.validate(new ObjectEvent(linkObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }   
+    @Test
+    public void assoc_N21_ObjectPathWithRolename_Fail() {
+        Iom_jObject objK=new Iom_jObject(CLASSK, "o1");
+        objK.setattrvalue(CLASSK_ATTR_K, "a");  // violates mandatory constraint
+        Iom_jObject objL=new Iom_jObject(CLASSL, "o2");
+        setRef(objL,ASSOC_K2L_N21_ROLEK_N21,objK.getobjectoid());
+        Iom_jObject linkObj1=new Iom_jObject(ASSOC_K2L_N2N,null);
+        setRef(linkObj1,ASSOC_K2L_N2N_ROLEK_N2N,objK.getobjectoid());
+        setRef(linkObj1,ASSOC_K2L_N2N_ROLEL_N2N,objL.getobjectoid());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelK_Assoc;");
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID1));
+        validator.validate(new ObjectEvent(objK));
+        validator.validate(new ObjectEvent(objL));
+        validator.validate(new ObjectEvent(linkObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Mandatory Constraint AdditionalModelK_Assoc.Topic.View_n21.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+    }   
+    @Test
+    public void assoc_class_N2N_ObjectPathWithRolename_Fail() {
+        Iom_jObject objK=new Iom_jObject(CLASSK, "o1");
+        Iom_jObject objL=new Iom_jObject(CLASSL, "o2");
+        //Iom_jObject linkObj1=new Iom_jObject(ASSOC_K2L_N2N,null);  // missing link violates constraint
+        //setRef(linkObj1,ASSOC_K2L_N2N_ROLEK_N2N,objK.getobjectoid());
+        //setRef(linkObj1,ASSOC_K2L_N2N_ROLEL_N2N,objL.getobjectoid());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AdditionalModelK_Assoc;");
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID1));
+        validator.validate(new ObjectEvent(objK));
+        validator.validate(new ObjectEvent(objL));
+        //validator.validate(new ObjectEvent(linkObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Mandatory Constraint AdditionalModelK_Assoc.Topic.View_class_n2n.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+    }   
 }

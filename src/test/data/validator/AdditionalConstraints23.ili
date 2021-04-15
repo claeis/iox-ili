@@ -72,10 +72,15 @@ CONTRACTED MODEL AdditionalConstraints23 AT "mailto:ceis@localhost" VERSION "201
 			attrL : TEXT*10;
 		END ClassL;
 		
-		ASSOCIATION k2l =
-		  roleK -- {0..*} ClassK;
-		  roleL -- {0..*} ClassL;
-		END k2l;
+		ASSOCIATION k2l_n2n =
+		  roleK_n2n -- {0..*} ClassK;
+		  roleL_n2n -- {0..*} ClassL;
+		END k2l_n2n;
+
+		ASSOCIATION k2l_n21 =
+		  roleK_n21 -- {0..1} ClassK;
+		  roleL_n21 -- {0..*} ClassL;
+		END k2l_n21;
 		
 	END Topic;
 END AdditionalConstraints23.
@@ -208,17 +213,32 @@ CONTRACTED MODEL AdditionalModelI AT "mailto:ceis@localhost" VERSION "2016-03-29
   END AdditionalTopicI;
 END AdditionalModelI.
 
-CONTRACTED MODEL AdditionalModelK AT "mailto:ceis@localhost" VERSION "2016-03-29" =
+CONTRACTED MODEL AdditionalModelK_Assoc AT "mailto:ceis@localhost" VERSION "2016-03-29" =
   IMPORTS AdditionalConstraints23;
-  VIEW TOPIC AdditionalTopicK =
+  VIEW TOPIC Topic =
   	DEPENDS ON AdditionalConstraints23.Topic;
     
-  	VIEW AdditionalAssocK2L
-   	PROJECTION OF AdditionalConstraints23.Topic.k2l;
+  	VIEW View_n2n
+   	PROJECTION OF AdditionalConstraints23.Topic.k2l_n2n;
     	=
-       ALL OF k2l;
-       !!MANDATORY CONSTRAINT roleK->attrK<>roleL->attrL; !! requires fix in ili2c
-    END AdditionalAssocK2L;
+       ALL OF k2l_n2n;
+       MANDATORY CONSTRAINT roleK_n2n->attrK<>roleL_n2n->attrL;
+    END View_n2n;
+
+  	VIEW View_n21
+   	PROJECTION OF AdditionalConstraints23.Topic.ClassL;
+    	=
+       ALL OF ClassL;
+       MANDATORY CONSTRAINT roleK_n21->attrK<>"a";
+    END View_n21;
+
+  	VIEW View_class_n2n
+   	PROJECTION OF AdditionalConstraints23.Topic.ClassK;
+    	=
+       ALL OF ClassK;
+       MANDATORY CONSTRAINT INTERLIS.objectCount(roleL_n2n)>0;
+    END View_class_n2n;
     
-  END AdditionalTopicK;
-END AdditionalModelK.
+  END Topic;
+  
+END AdditionalModelK_Assoc.
