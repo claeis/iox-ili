@@ -1,0 +1,24 @@
+INTERLIS 2.3;
+
+MODEL RuntimeSystem23
+  AT "mailto:ce@eisenhutinformatik.ch"
+  VERSION "2018-06-05" =
+  
+  IMPORTS MinimalRuntimeSystem01;
+  
+  TOPIC TopicA =
+    CLASS ClassA =
+      attrA : 1..40;
+      MANDATORY CONSTRAINT attrA==INTERLIS.len(PARAMETER MinimalRuntimeSystem01.CurrentDateTime);
+    END ClassA;
+  END TopicA;
+
+  TOPIC TopicB =
+    CLASS ClassB =
+      attrA : 1..40;
+      MANDATORY CONSTRAINT attrA==INTERLIS.len(MinimalRuntimeSystem01.getParameterValue("MinimalRuntimeSystem01.CurrentDateTime"));
+    END ClassB;
+  END TopicB;
+  
+END RuntimeSystem23.
+

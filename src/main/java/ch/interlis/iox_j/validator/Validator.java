@@ -64,6 +64,7 @@ import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.ObjectPath;
 import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.Objects;
+import ch.interlis.ili2c.metamodel.ParameterValue;
 import ch.interlis.ili2c.metamodel.PathEl;
 import ch.interlis.ili2c.metamodel.PathElAbstractClassRole;
 import ch.interlis.ili2c.metamodel.PathElAssocRole;
@@ -118,6 +119,7 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 import ch.interlis.iox_j.utility.ReaderFactory;
 import ch.interlis.iox_j.validator.functions.Text;
 import ch.interlis.iox_j.validator.functions.Math;
+import ch.interlis.iox_j.validator.functions.MinimalRuntimeSystem;
 import ch.interlis.iox_j.validator.functions.Interlis;
 import ch.interlis.iox_j.validator.functions.Interlis_ext;
 
@@ -1526,6 +1528,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			    
 			    return mathFunction.evaluateFunction(currentFunction, functionCallObj, parentObject,
 			            validationKind, usageScope, iomObj, texttype, firstRole);
+            } else if (currentFunction.getScopedName(null).startsWith("MinimalRuntimeSystem01.")) {
+                if(rtsFunction == null) {
+                    rtsFunction = new MinimalRuntimeSystem(this, td, validationConfig);
+                }
+                
+                return rtsFunction.evaluateFunction(currentFunction, functionCallObj, parentObject,
+                        validationKind, usageScope, iomObj, texttype, firstRole);
 			} else if (!currentFunction.getScopedName(null).equals("INTERLIS.convertUnit") && 
 			        currentFunction.getScopedName(null).startsWith("INTERLIS.")) {
 			    if (interlisFunction == null) {
@@ -1594,11 +1603,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 			return new Value(listOfIomObjects);
+        } else if(expression instanceof ParameterValue) {
+            ParameterValue paramValue=(ParameterValue)expression;
+            String paramName=paramValue.getParameter().getScopedName();
+            String value=(String)td.getActualRuntimeParameter(paramName);
+            if(value!=null) {
+                return new Value(texttype,value);
+            }
+            return Value.createUndefined();
 		} else {
 			errs.addEvent(errFact.logWarningMsg(rsrc.getString("evaluateExpression.ExpressionIsNotYetImplemented"), expression.toString()));
 		}
 		return Value.createSkipEvaluation(); // skip further evaluation
-		//TODO instance of ParameterValue
 		//TODO instance of ViewableAggregate
 		//TODO instance of ViewableAlias
 	}
@@ -2937,10 +2953,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	HashSet<Object> loggedObjects=new HashSet<Object>();
     private boolean disableRounding=false;
     private boolean disableAreAreasMessages=false;
-    private Interlis interlisFunction;
-    private Interlis_ext interlis_ext;
-    private Math mathFunction;
-    private Text textFunction;
+    private Interlis interlisFunction=null;
+    private Interlis_ext interlis_ext=null;
+    private Math mathFunction=null;
+    private Text textFunction=null;
+    private MinimalRuntimeSystem rtsFunction=null;
 	
 	private void validateObject(IomObject iomObj,String attrPath,Viewable assocClass) throws IoxException {
 		// validate if object is null
