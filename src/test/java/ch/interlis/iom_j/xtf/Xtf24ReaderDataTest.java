@@ -791,13 +791,13 @@ public class Xtf24ReaderDataTest {
         assertEquals("480000.000", segment.getattrvalue("A1"));
         assertEquals("70000.000", segment.getattrvalue("A2"));
         assertEquals("5000.000", segment.getattrvalue("C3"));
-        assertEquals("480000.000", segment.getattrvalue("C1"));
+        assertEquals("480005.000", segment.getattrvalue("C1"));
         assertEquals("70000.000", segment.getattrvalue("C2"));
         
         IomObject segment1 = sequence.getattrobj("segment", 1);
         assertNotNull(segment1);
         assertEquals("5000.000", segment1.getattrvalue("C3"));
-        assertEquals("480000.000", segment1.getattrvalue("C1"));
+        assertEquals("480010.000", segment1.getattrvalue("C1"));
         assertEquals("70000.000", segment1.getattrvalue("C2"));
 		
 		assertTrue(reader.read() instanceof  EndBasketEvent);
@@ -830,13 +830,13 @@ public class Xtf24ReaderDataTest {
         assertEquals("480000.000", segment.getattrvalue("A1"));
         assertEquals("70000.000", segment.getattrvalue("A2"));
         assertEquals("5000.000", segment.getattrvalue("C3"));
-        assertEquals("480000.000", segment.getattrvalue("C1"));
+        assertEquals("480005.000", segment.getattrvalue("C1"));
         assertEquals("70000.000", segment.getattrvalue("C2"));
         
         IomObject segment1 = sequence.getattrobj("segment", 1);
         assertNotNull(segment1);
         assertEquals("5000.000", segment1.getattrvalue("C3"));
-        assertEquals("480000.000", segment1.getattrvalue("C1"));
+        assertEquals("480010.000", segment1.getattrvalue("C1"));
         assertEquals("70000.000", segment1.getattrvalue("C2"));
         
         assertTrue(reader.read() instanceof  EndBasketEvent);

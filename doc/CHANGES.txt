@@ -10,6 +10,7 @@ LATEST
 - pass Validator instance to InterlisFunction.init() (ilivalidator#303)
 - Validator: support RunTimeParameterDef (ilivalidator#221)
 - Xtf24Reader: removed superfluous whitespace check after coord (ilivalidator#305)
+- Xtf23Reader: removed superfluous whitespace check after coord (ilivalidator#305)
 - ili2c-5.2.1-SNAPSHOT
 
 iox-ili 1.21.5 (2021-02-11)

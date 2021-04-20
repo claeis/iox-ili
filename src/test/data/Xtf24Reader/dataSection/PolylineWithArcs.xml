@@ -11,14 +11,14 @@
 				<attrO1>
 					<geom:polyline>
 						<geom:arc>
-							<geom:c1>480000.000</geom:c1>
+							<geom:c1>480005.000</geom:c1>
 							<geom:c2>70000.000</geom:c2>
 							<geom:c3>5000.000</geom:c3>
 							<geom:a1>480000.000</geom:a1>
 							<geom:a2>70000.000</geom:a2>
 						</geom:arc>
 						<geom:coord>
-							<geom:c1>480000.000</geom:c1>
+							<geom:c1>480010.000</geom:c1>
 							<geom:c2>70000.000</geom:c2>
 							<geom:c3>5000.000</geom:c3>
 						</geom:coord>
