@@ -1301,9 +1301,6 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 				event=skipSpacesAndGetNextEvent(event);
 				sequence.addattrobj("segment", readSegment(event, segmentType));
 				event=xmlreader.nextEvent();
-				if(!event.isCharacters() && event.getEventType()!=XMLEvent.COMMENT){
-					throw new IoxSyntaxException(event2msgtext(event));
-				}
 				event=skipSpacesAndGetNextEvent(event);
 			}
 		}
