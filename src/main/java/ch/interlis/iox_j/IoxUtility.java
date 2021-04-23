@@ -172,7 +172,7 @@ public class IoxUtility {
 
 	public static String getVersion() {
 		if (version == null) {
-			java.util.ResourceBundle resVersion = java.util.ResourceBundle.getBundle("ch/interlis/iox_j/Version");
+			java.util.ResourceBundle resVersion = java.util.ResourceBundle.getBundle("ch.interlis.iox_j.Version");
 			StringBuffer ret = new StringBuffer(20);
 			ret.append(resVersion.getString("version"));
 			ret.append('-');
