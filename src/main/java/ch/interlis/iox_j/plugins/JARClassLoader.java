@@ -1,13 +1,9 @@
 package ch.interlis.iox_j.plugins;
 
 import java.io.*;
-import java.lang.reflect.Modifier;
-import java.net.*;
 import java.util.*;
 import java.util.jar.*;
 import java.util.zip.*;
-
-import ch.interlis.iox_j.validator.InterlisFunction;
 
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -18,23 +14,17 @@ import java.net.JarURLConnection;
  */
 class JARClassLoader extends URLClassLoader
 {
-	private String path;
-	private JAR jar;
-	private ArrayList<String> pluginClasses = new ArrayList<String>();
+	private ArrayList<String> pluginClassnames = new ArrayList<String>();
 
-
-	public JARClassLoader(String path,PluginLoader pluginLoader)
+	public JARClassLoader(String path)
 		throws IOException
 	{
 
 		super(new URL[] { new URL("file","",path) });
-
 		URL u = new URL("jar", "", new URL("file","",path) + "!/");
 		JarURLConnection uc = (JarURLConnection)u.openConnection();
 
 		JarFile zipFile = uc.getJarFile();
-
-		jar = new JAR(path,this);
 
 		Enumeration entires = zipFile.entries();
 		while(entires.hasMoreElements())
@@ -43,27 +33,21 @@ class JARClassLoader extends URLClassLoader
 			String name = entry.getName();
 			//System.err.println(name);
 			if(name.endsWith(PluginLoader.IOX_PLUGIN+".class")){
-				pluginClasses.add(name);
+	            name = fileToClass(name);
+				pluginClassnames.add(name);
 			}
 		}
-
-		pluginLoader.addPluginJAR(jar);
-
 	}
-	void loadAllPlugins()
+	void loadAllPlugins(PluginLoader pluginLoader)
 	{
-
-		boolean ok = true;
-
-		for(int i = 0; i < pluginClasses.size(); i++)
+		for(int i = 0; i < pluginClassnames.size(); i++)
 		{
-			String name = (String)pluginClasses.get(i);
-			name = fileToClass(name);
+			String name = (String)pluginClassnames.get(i);
 			try
 			{
 				Class clazz = loadClass(name);
 				IoxPlugin plugin=(IoxPlugin)clazz.newInstance();
-				jar.addPlugin(plugin);
+				pluginLoader.addPlugin(plugin);
 			}
 			catch(Throwable t)
 			{
@@ -84,41 +68,4 @@ class JARClassLoader extends URLClassLoader
 				clsName[i] = '.';
 		return new String(clsName,0,clsName.length - 6);
 	}
-
-	/**
-	 * A JAR file.
-	 */
-	public static class JAR
-	{
-		public JARClassLoader getClassLoader()
-		{
-			return classLoader;
-		}
-	
-	
-		private void addPlugin(IoxPlugin plugin)
-		{
-			plugins.addElement(plugin);
-		}
-	
-		public IoxPlugin[] getPlugins()
-		{
-			IoxPlugin[] array = new IoxPlugin[plugins.size()];
-			plugins.copyInto(array);
-			return array;
-		}
-	
-		public JAR(String path, JARClassLoader classLoader)
-		{
-			this.path = path;
-			this.classLoader = classLoader;
-			plugins = new Vector<IoxPlugin>();
-		}
-		
-		// private members
-		private String path;
-		private JARClassLoader classLoader;
-		private Vector<IoxPlugin> plugins;
-	}
-
 }
