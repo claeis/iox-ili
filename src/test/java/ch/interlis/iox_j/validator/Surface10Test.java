@@ -753,12 +753,17 @@ public class Surface10Test {
 		IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		// polyline
+		// 480000.000 70000.000 0.000 850000.000 310000.000 5000.000
 		IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
 		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
 		IomObject segment=segments.addattrobj("segment", "COORD");
 		segment.setattrvalue("C1", "4800000.000");
 		segment.setattrvalue("C2", "700000.000");
 		segment.setattrvalue("C3", "50000.000");
+        segment=segments.addattrobj("segment", "COORD");
+        segment.setattrvalue("C1", "480001.000");
+        segment.setattrvalue("C2", "70000.000");
+        segment.setattrvalue("C3", "4000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();

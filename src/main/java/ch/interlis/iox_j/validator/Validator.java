@@ -3906,12 +3906,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		boolean foundErrs=false;
 		if (polylineValue.getobjecttag().equals("POLYLINE")){
 			boolean clipped = polylineValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
+            if(!clipped && polylineValue.getattrvaluecount("sequence")>1){
+                // an unclipped polyline should have only one sequence element
+                logMsg(validateType, rsrc.getString("validatePolyline.invalidNumberOfSequenceInCompleteBasket"));
+                foundErrs = foundErrs || true;
+            }
 			for(int sequencei=0;sequencei<polylineValue.getattrvaluecount("sequence");sequencei++){
-				if(!clipped && sequencei>0){
-					// an unclipped polyline should have only one sequence element
-					logMsg(validateType, rsrc.getString("validatePolyline.invalidNumberOfSequenceInCompleteBasket"));
-					foundErrs = foundErrs || true;
-				}
 				IomObject sequence=polylineValue.getattrobj("sequence",sequencei);
 				LineForm[] lineforms = polylineType.getLineForms();
 				HashSet<String> lineformNames=new HashSet<String>();
@@ -3919,6 +3919,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					lineformNames.add(lf.getName());
 				}
 				if(sequence.getobjecttag().equals("SEGMENTS")){
+		            if(sequence.getattrvaluecount("segment")<=1){
+		                logMsg(validateType, rsrc.getString("validatePolyline.invalidNumberOfSegments"));
+		                foundErrs = foundErrs || true;
+		            }
 					for(int segmenti=0;segmenti<sequence.getattrvaluecount("segment");segmenti++){
 						// segment = all segments which are in the actual sequence.
 						IomObject segment=sequence.getattrobj("segment",segmenti);
