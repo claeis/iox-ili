@@ -294,7 +294,9 @@ public abstract class AbstractIomObjectSerializer {
             if(propType==PRIMITIVE){
                 String propName=propNames[i]=mapIdx2Name(readInt(in));
                 String value=readString(in);
-                ret.setattrvalue(propName,value);
+                if(value!=null) {
+                    ret.setattrvalue(propName,value);
+                }
             }else if(propType==SINGLE_COMPLEX){
                 String propName=propNames[i]=mapIdx2Name(readInt(in));
                 IomObject structValue=readIomObject(in);

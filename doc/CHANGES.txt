@@ -7,6 +7,7 @@ LATEST
 -----------------------------
 - implement PipelinePool.setIntermediateValue(String valueName, Object value)/getIntermediateValue(String valueName)
 - fix NPE if no events sent to ItfWriter2
+- ObjectPool: fix "illegal value null for attrname" (ili2db#401)
 - pass Validator instance to InterlisFunction.init() (ilivalidator#303)
 - Validator: support RunTimeParameterDef (ilivalidator#221)
 - Validator: validate number of segments in POLYLINEs (ilivalidator#299)
