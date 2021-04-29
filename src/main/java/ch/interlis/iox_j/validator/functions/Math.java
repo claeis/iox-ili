@@ -47,8 +47,8 @@ public class Math {
                     return Value.createSkipEvaluation();
                 }
                 if (firstValue.getValue() != null && secondValue.getValue() != null) {
-                    Integer value1 = Integer.parseInt(firstValue.getValue());
-                    Integer value2 = Integer.parseInt(secondValue.getValue());
+                    Double value1 = Double.parseDouble(firstValue.getValue());
+                    Double value2 = Double.parseDouble(secondValue.getValue());
                     return new Value(value1 + value2);
                 }
 
@@ -72,8 +72,8 @@ public class Math {
                     return Value.createSkipEvaluation();
                 }
                 if (firstValue.getValue() != null && secondValue.getValue() != null) {
-                    Integer value1 = Integer.parseInt(firstValue.getValue());
-                    Integer value2 = Integer.parseInt(secondValue.getValue());
+                    Double value1 = Double.parseDouble(firstValue.getValue());
+                    Double value2 = Double.parseDouble(secondValue.getValue());
                     return new Value(value1 - value2);
                 }
 
@@ -97,8 +97,8 @@ public class Math {
                     return Value.createSkipEvaluation();
                 }
                 if (firstValue.getValue() != null && secondValue.getValue() != null) {
-                    Integer value1 = Integer.parseInt(firstValue.getValue());
-                    Integer value2 = Integer.parseInt(secondValue.getValue());
+                    Double value1 = Double.parseDouble(firstValue.getValue());
+                    Double value2 = Double.parseDouble(secondValue.getValue());
                     return new Value(value1 * value2);
                 }
 
@@ -122,8 +122,8 @@ public class Math {
                     return Value.createSkipEvaluation();
                 }
                 if (firstValue.getValue() != null && secondValue.getValue() != null) {
-                    Integer value1 = Integer.parseInt(firstValue.getValue());
-                    Integer value2 = Integer.parseInt(secondValue.getValue());
+                    Double value1 = Double.parseDouble(firstValue.getValue());
+                    Double value2 = Double.parseDouble(secondValue.getValue());
                     return new Value(value1 / value2);
                 }
 
@@ -140,7 +140,7 @@ public class Math {
                     return Value.createSkipEvaluation();
                 }
                 if (firstValue.getValue() != null) {
-                    Integer value1 = Integer.parseInt(firstValue.getValue());
+                    Double value1 = Double.parseDouble(firstValue.getValue());
                     return new Value(java.lang.Math.abs(value1));
                 }
             }
@@ -243,7 +243,7 @@ public class Math {
                     return Value.createSkipEvaluation();
                 }
                 if (firstValue.getValue() != null) {
-                    int value1 = Integer.parseInt(firstValue.getValue());
+                    Double value1 = Double.parseDouble(firstValue.getValue());
                     Double cbrt = java.lang.Math.cbrt(value1);
                     return new Value(cbrt.intValue());
                 }
