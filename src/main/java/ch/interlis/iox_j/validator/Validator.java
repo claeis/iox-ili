@@ -454,11 +454,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 return false;
             }
         } else if (domain == td.INTERLIS.STANDARDOID) {
-            if (!isValidStandartOId(bid)) {
+            if (!isValidAnnexOid(bid)) {
                 return false;
             }
         } else if (type instanceof TextOIDType) {
-            if (!isValidTextOId(bid)) {
+            if (!isValidTextOid(bid,((TextType)((TextOIDType)type).getOIDType()).getMaxLength())) {
                 return false;
             }
         }
@@ -482,7 +482,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	    }
     }
     
-    private boolean isValidStandartOId(String valueStr) {
+    private boolean isValidAnnexOid(String valueStr) {
         if(valueStr==null) {
             return false;
         }
@@ -499,11 +499,19 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
     }
     
-    private boolean isValidTextOId(String valueStr) {
+    private boolean isValidTextOid(String valueStr,int maxLength) {
         if(valueStr==null) {
             return false;
         }
-        
+        int len=valueStr.length();
+        if(len==0) {
+            return false;
+        }
+        if(maxLength!=-1) {
+            if(len>maxLength) {
+                return false;
+            }
+        }
         Matcher matcher = patternForTextOIdValidation.matcher(valueStr);
         if (matcher.matches()) {
             return true;
@@ -3045,11 +3053,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				} else if(oidType!=null && oidType==td.INTERLIS.I32OID){
 					// valid i32OID.
 				} else if(oidType!=null && oidType==td.INTERLIS.STANDARDOID) {
-                    if (!isValidStandartOId(oid)) {
+                    if (!isValidAnnexOid(oid)) {
                         errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.valueIsNotAValidOid"), oid));
                     }
 				} else if (oidType!=null && oidType.getType() instanceof TextOIDType) {
-                    if (!isValidTextOId(oid)) {
+                    if (!isValidTextOid(oid,((TextType)((TextOIDType) oidType.getType()).getOIDType()).getMaxLength())) {
                         errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.valueIsNotAValidOid"), oid));
                     }
 				}
@@ -3663,12 +3671,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					validateTextType(iomObj, attrPath, attrName, validateType, type, value);
                 }else if(type instanceof TextOIDType){
                     String value=iomObj.getattrvalue(attrName);
-                    if (value != null && isDomainStandardOid(attr)) {
-                        if (!isValidStandartOId(value)) {
+                    if (value != null && isDomainAnnexOid(attr)) {
+                        if (!isValidAnnexOid(value)) {
+                            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.valueXIsNotAValidOidInAttributeY"), value, attrPath));
+                        }                        
+                    } else if (value != null && isDomainUuid(attr)) {
+                        if (!isValidUuid(value)) {
                             errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.valueXIsNotAValidOidInAttributeY"), value, attrPath));
                         }                        
                     } else if (value != null && isDomainTextOid(attr)) {
-                        if (!isValidTextOId(value)) {
+                        if (!isValidTextOid(value,((TextType)((TextOIDType)type).getOIDType()).getMaxLength())) {
                             errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.valueXIsNotAValidOidInAttributeY"), value, attrPath));
                         }                        
                     }
@@ -4119,11 +4131,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
         return false;
     }
-    private static boolean isDomainStandardOid(AttributeDef attr){
+    private static boolean isDomainAnnexOid(AttributeDef attr){
         TransferDescription td=(TransferDescription) attr.getContainer(TransferDescription.class);
         Type type=attr.getDomain();
         while(type instanceof TypeAlias) {
             if (((TypeAlias) type).getAliasing() == td.INTERLIS.STANDARDOID) {
+                return true;
+            }
+            type=((TypeAlias) type).getAliasing().getType();
+        }
+        return false;
+    }
+    private static boolean isDomainUuid(AttributeDef attr){
+        TransferDescription td=(TransferDescription) attr.getContainer(TransferDescription.class);
+        Type type=attr.getDomain();
+        while(type instanceof TypeAlias) {
+            if (((TypeAlias) type).getAliasing() == td.INTERLIS.UUIDOID) {
                 return true;
             }
             type=((TypeAlias) type).getAliasing().getType();

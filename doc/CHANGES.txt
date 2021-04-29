@@ -13,6 +13,7 @@ LATEST
 - Validator: validate number of segments in POLYLINEs (ilivalidator#299)
 - Validator: report tids/attrpath in areAreas() function (ilivalidator#241)
 - Validator: fix Math evaluation (ilivalidator#301, ilivalidator#304) 
+- Validator: fix TextOID length check (ilivalidator#278) 
 - support IoxPlugins without jar file scanning (ilivalidator#222)
 - Xtf24Reader: removed superfluous whitespace check after coord (ilivalidator#305)
 - Xtf23Reader: removed superfluous whitespace check after coord (ilivalidator#305)

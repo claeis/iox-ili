@@ -613,6 +613,25 @@ public class Oid23Test {
  // ------------------------------------------------------------------------------------------- //
     
     @Test
+    public void textOidAttrValueLength_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSA, OID1);
+        objB1.setattrvalue("TextID", "A1234567890123456789012345678901234567890123456789");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC3,BID));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("value <A1234567890123456789012345678901234567890123456789> is not a valid OID in attribute TextID", logger.getErrs().get(0).getEventMsg());
+    }
+    
+    @Test
     public void textOidAttrValueStartWithNumber_Fail() throws Exception {
         Iom_jObject objB1=new Iom_jObject(CLASSA, OID1);
         objB1.setattrvalue("TextID", "1bcdefg_hilmno16");
