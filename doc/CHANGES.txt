@@ -16,6 +16,7 @@ LATEST
 - Xtf24Reader: removed superfluous whitespace check after coord (ilivalidator#305)
 - Xtf23Reader: removed superfluous whitespace check after coord (ilivalidator#305)
 - added native-image config
+- added Iox2jts.polyline2JTSlineString() (ili2db#399)
 - ili2c-5.2.1
 
 iox-ili 1.21.5 (2021-02-11)
