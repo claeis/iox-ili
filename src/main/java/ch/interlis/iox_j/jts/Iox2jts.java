@@ -24,6 +24,8 @@ package ch.interlis.iox_j.jts;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateList;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
@@ -323,6 +325,16 @@ public class Iox2jts {
 		}
 		return ret;
 	}
+    public static com.vividsolutions.jts.geom.LineString polyline2JTSlineString(IomObject polylineObj,boolean isSurfaceOrArea,double p)
+    throws Iox2jtsException
+    {
+        if(polylineObj==null){
+            return null;
+        }
+        CoordinateList coordinates=polyline2JTS(polylineObj, isSurfaceOrArea, p);
+        LineString polyline = new GeometryFactory().createLineString(coordinates.toCoordinateArray());
+        return polyline;
+    }
 	/** Converts a MULTIPOLYLINE to a JTS MultiLineString.
 	 * @param obj INTERLIS MULTIPOLYLINE structure
 	 * @param strokeP maximum stroke to use when removing ARCs

@@ -122,6 +122,13 @@ public class Value {
 		if(skipEvaluation()){
 			throw new IllegalArgumentException();
 		}
+		if(numericIsDefined) {
+		    return Double.toString(numeric);
+		}else if(oid!=null) {
+		    return oid;
+		}else if(booleanIsDefined) {
+		    return booleanValue?"true":"false";
+		}
 		return value;
 	}
 	

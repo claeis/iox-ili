@@ -548,8 +548,8 @@ public class AreAreas23Test {
             errs.add(err.getEventMsg());
         }
         Collections.sort(errs);
-        assertEquals("Intersection coord1 (490000.000, 77000.000),",errs.get(0).trim());
-        assertEquals("Intersection coord1 (490000.000, 78000.000),",errs.get(1).trim());
+        assertEquals("Intersection coord1 (490000.000, 77000.000), tids o1/flaeche[1], o2/flaeche[1]",errs.get(0).trim());
+        assertEquals("Intersection coord1 (490000.000, 78000.000), tids o1/flaeche[1], o2/flaeche[1]",errs.get(1).trim());
         assertEquals("Set Constraint AreAreas23.Topic.ClassE.Constraint1 is not true.",errs.get(2));
     }
     @Test

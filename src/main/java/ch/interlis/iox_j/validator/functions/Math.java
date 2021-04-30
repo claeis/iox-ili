@@ -47,8 +47,8 @@ public class Math {
                     return Value.createSkipEvaluation();
                 }
                 if (firstValue.getValue() != null && secondValue.getValue() != null) {
-                    Integer value1 = Integer.parseInt(firstValue.getValue());
-                    Integer value2 = Integer.parseInt(secondValue.getValue());
+                    Double value1 = Double.parseDouble(firstValue.getValue());
+                    Double value2 = Double.parseDouble(secondValue.getValue());
                     return new Value(value1 + value2);
                 }
 
@@ -72,8 +72,8 @@ public class Math {
                     return Value.createSkipEvaluation();
                 }
                 if (firstValue.getValue() != null && secondValue.getValue() != null) {
-                    Integer value1 = Integer.parseInt(firstValue.getValue());
-                    Integer value2 = Integer.parseInt(secondValue.getValue());
+                    Double value1 = Double.parseDouble(firstValue.getValue());
+                    Double value2 = Double.parseDouble(secondValue.getValue());
                     return new Value(value1 - value2);
                 }
 
@@ -97,8 +97,8 @@ public class Math {
                     return Value.createSkipEvaluation();
                 }
                 if (firstValue.getValue() != null && secondValue.getValue() != null) {
-                    Integer value1 = Integer.parseInt(firstValue.getValue());
-                    Integer value2 = Integer.parseInt(secondValue.getValue());
+                    Double value1 = Double.parseDouble(firstValue.getValue());
+                    Double value2 = Double.parseDouble(secondValue.getValue());
                     return new Value(value1 * value2);
                 }
 
@@ -122,8 +122,8 @@ public class Math {
                     return Value.createSkipEvaluation();
                 }
                 if (firstValue.getValue() != null && secondValue.getValue() != null) {
-                    Integer value1 = Integer.parseInt(firstValue.getValue());
-                    Integer value2 = Integer.parseInt(secondValue.getValue());
+                    Double value1 = Double.parseDouble(firstValue.getValue());
+                    Double value2 = Double.parseDouble(secondValue.getValue());
                     return new Value(value1 / value2);
                 }
 
@@ -140,7 +140,7 @@ public class Math {
                     return Value.createSkipEvaluation();
                 }
                 if (firstValue.getValue() != null) {
-                    Integer value1 = Integer.parseInt(firstValue.getValue());
+                    Double value1 = Double.parseDouble(firstValue.getValue());
                     return new Value(java.lang.Math.abs(value1));
                 }
             }
@@ -243,7 +243,7 @@ public class Math {
                     return Value.createSkipEvaluation();
                 }
                 if (firstValue.getValue() != null) {
-                    int value1 = Integer.parseInt(firstValue.getValue());
+                    Double value1 = Double.parseDouble(firstValue.getValue());
                     Double cbrt = java.lang.Math.cbrt(value1);
                     return new Value(cbrt.intValue());
                 }
@@ -566,19 +566,19 @@ public class Math {
         } else if (currentFunction.getScopedName(null).equals("Math.avg")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
-                Value surfaceAttr = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
-                if (surfaceAttr.skipEvaluation()) {
-                    return surfaceAttr;
+                Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                if (firstValue.skipEvaluation()) {
+                    return firstValue;
                 }
-                if (surfaceAttr.isUndefined()) {
+                if (firstValue.isUndefined()) {
                     return Value.createSkipEvaluation();
                 }
                 
-                if (surfaceAttr.getValue() != null ) {
+                if (firstValue.getValue() != null ) {
                     Viewable currentClass=(Viewable) td.getElement(iomObj.getobjecttag());
                     ObjectPath attributePath = null;
                     try {
-                        attributePath = validator.parseObjectOrAttributePath(currentClass, surfaceAttr.getValue());
+                        attributePath = validator.parseObjectOrAttributePath(currentClass, firstValue.getValue());
                     } catch (Ili2cException e) {
                         EhiLogger.logError(e);
                     }
@@ -598,19 +598,19 @@ public class Math {
         } else if (currentFunction.getScopedName(null).equals("Math.max2")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
-                Value surfaceAttr = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
-                if (surfaceAttr.skipEvaluation()) {
-                    return surfaceAttr;
+                Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                if (firstValue.skipEvaluation()) {
+                    return firstValue;
                 }
-                if (surfaceAttr.isUndefined()) {
+                if (firstValue.isUndefined()) {
                     return Value.createSkipEvaluation();
                 }
                 
-                if (surfaceAttr.getValue() != null ) {
+                if (firstValue.getValue() != null ) {
                     Viewable currentClass=(Viewable) td.getElement(iomObj.getobjecttag());
                     ObjectPath attributePath = null;
                     try {
-                        attributePath = validator.parseObjectOrAttributePath(currentClass, surfaceAttr.getValue());
+                        attributePath = validator.parseObjectOrAttributePath(currentClass, firstValue.getValue());
                     } catch (Ili2cException e) {
                         EhiLogger.logError(e);
                     }
@@ -636,19 +636,19 @@ public class Math {
         } else if (currentFunction.getScopedName(null).equals("Math.min2")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
-                Value surfaceAttr = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
-                if (surfaceAttr.skipEvaluation()) {
-                    return surfaceAttr;
+                Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                if (firstValue.skipEvaluation()) {
+                    return firstValue;
                 }
-                if (surfaceAttr.isUndefined()) {
+                if (firstValue.isUndefined()) {
                     return Value.createSkipEvaluation();
                 }
                 
-                if (surfaceAttr.getValue() != null ) {
+                if (firstValue.getValue() != null ) {
                     Viewable currentClass=(Viewable) td.getElement(iomObj.getobjecttag());
                     ObjectPath attributePath = null;
                     try {
-                        attributePath = validator.parseObjectOrAttributePath(currentClass, surfaceAttr.getValue());
+                        attributePath = validator.parseObjectOrAttributePath(currentClass, firstValue.getValue());
                     } catch (Ili2cException e) {
                         EhiLogger.logError(e);
                     }
@@ -674,19 +674,19 @@ public class Math {
         } else if (currentFunction.getScopedName(null).equals("Math.sum")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
-                Value surfaceAttr = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
-                if (surfaceAttr.skipEvaluation()) {
-                    return surfaceAttr;
+                Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                if (firstValue.skipEvaluation()) {
+                    return firstValue;
                 }
-                if (surfaceAttr.isUndefined()) {
+                if (firstValue.isUndefined()) {
                     return Value.createSkipEvaluation();
                 }
                 
-                if (surfaceAttr.getValue() != null ) {
+                if (firstValue.getValue() != null ) {
                     Viewable currentClass=(Viewable) td.getElement(iomObj.getobjecttag());
                     ObjectPath attributePath = null;
                     try {
-                        attributePath = validator.parseObjectOrAttributePath(currentClass, surfaceAttr.getValue());
+                        attributePath = validator.parseObjectOrAttributePath(currentClass, firstValue.getValue());
                     } catch (Ili2cException e) {
                         EhiLogger.logError(e);
                     }

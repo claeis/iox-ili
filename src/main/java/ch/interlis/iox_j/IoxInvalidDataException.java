@@ -63,11 +63,18 @@ public class IoxInvalidDataException extends IoxException {
 	@Override
 	public String getMessage() {
 		StringBuilder ret=new StringBuilder();
+		String sep="";
 		if(iliqname!=null){
+            ret.append(sep);
 			ret.append(iliqname);
-			ret.append(": ");
+			sep=": ";
 		}
-		ret.append(super.getMessage());
+		String supMsg=super.getMessage();
+		if(supMsg!=null) {
+            ret.append(sep);
+	        ret.append(supMsg);
+            sep=": ";
+		}
 		if(geom!=null){
 		}
 		return ret.toString();

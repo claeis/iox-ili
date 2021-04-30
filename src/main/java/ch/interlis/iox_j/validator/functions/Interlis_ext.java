@@ -22,13 +22,11 @@ public class Interlis_ext {
     private TransferDescription td = null;
     private ch.interlis.iox.IoxValidationConfig validationConfig = null;
     private Validator validator=null;
-    private Iterator<String> allObjIterator=null;
     
-    public Interlis_ext(Validator validator, TransferDescription td, ch.interlis.iox.IoxValidationConfig validationConfig, Iterator<String> allObjIterator) {
+    public Interlis_ext(Validator validator, TransferDescription td, ch.interlis.iox.IoxValidationConfig validationConfig) {
         this.td = td;
         this.validationConfig = validationConfig;
         this.validator=validator;
-        this.allObjIterator=allObjIterator;
     }
     
     public Value evaluateFunction(Function currentFunction, IomObject parentObject,
@@ -63,7 +61,20 @@ public class Interlis_ext {
             if (argSurfaceBag.skipEvaluation()){
                 return argSurfaceBag;
             }
-            Viewable currentClass=(Viewable) td.getElement(iomObj.getobjecttag());
+            Viewable currentClass=null;
+            if(iomObj!=null) {
+                currentClass=(Viewable) td.getElement(iomObj.getobjecttag());
+            }else if(argObjects.getViewable()!=null) {
+                currentClass=argObjects.getViewable();
+            }else if(argObjects.getComplexObjects()!=null) {
+                Iterator<IomObject> it = argObjects.getComplexObjects().iterator();
+                if(!it.hasNext()) {
+                    return new Value(true);
+                }
+                currentClass=(Viewable) td.getElement(it.next().getobjecttag());
+            }else {
+                throw new IllegalStateException("unkown class in "+usageScope);
+            }
             ObjectPath surfaceBagObjPath = null;
             PathEl surfaceBagPath[] = null;
             Viewable viewable = null;

@@ -8,10 +8,11 @@ MODEL MathFunction23
 		CLASS ClassA1 =
 			attr1: TEXT;
 			attr2: TEXT;
+			attr3: TEXT;
 			MANDATORY CONSTRAINT
-				Math.add(attr1, attr2)==5;
+				Math.add(attr1, Math.add(attr2, attr3))==6;
 		END ClassA1;
-
+		
 		CLASS ClassA2 =
 			attr1: TEXT;
 			attr2: TEXT;

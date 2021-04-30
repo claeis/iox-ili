@@ -535,7 +535,7 @@ public class Xtf24ReaderDataTest {
 	
 	// Es wird getestet ob Coordinaten ohne Fehler erstellt werden koennen.
 	@Test
-	public void testCoords_Ok()  throws Iox2jtsException, IoxException {
+	public void testCoord_Ok()  throws Iox2jtsException, IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"Coord.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);
@@ -630,6 +630,102 @@ public class Xtf24ReaderDataTest {
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void testCoordNoSpace_Ok()  throws Iox2jtsException, IoxException {
+        Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"CoordNoSpace.xml"));
+        reader.setModel(td);
+        assertTrue(reader.read() instanceof  StartTransferEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        
+        // 1. ObjectEvent
+        IoxEvent event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        IomObject iomObject = ((ObjectEvent) event).getIomObject();
+
+        // DataTest1.TopicB.Coord1D oid oid1D {attr1 COORD {C1 480000.000}}
+        assertEquals("DataTest1.TopicB.Coord1D", iomObject.getobjecttag());
+        assertEquals("oid1D", iomObject.getobjectoid());
+        
+        IomObject attr1 = iomObject.getattrobj("attr1", 0);
+        assertNotNull(attr1);
+        assertEquals("480000.000", attr1.getattrvalue("C1"));
+        
+        // 2. ObjectEvent
+        event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        iomObject = ((ObjectEvent) event).getIomObject();
+
+        // DataTest1.TopicB.Coord2D oid oid2D {attr2 COORD {C1 480000.000, C2 70000.000}}
+        assertEquals("DataTest1.TopicB.Coord2D", iomObject.getobjecttag());
+        assertEquals("oid2D", iomObject.getobjectoid());
+        
+        IomObject attr2 = iomObject.getattrobj("attr2", 0);
+        assertNotNull(attr1);
+        assertEquals("480000.000", attr2.getattrvalue("C1"));
+        assertEquals("70000.000", attr2.getattrvalue("C2"));
+        
+        // 3. ObjectEvent
+        event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        iomObject = ((ObjectEvent) event).getIomObject();
+
+        // DataTest1.TopicB.Coord3D oid oid3D {attr3 COORD {C3 5000.000, C1 480000.000, C2 70000.000}}
+        assertEquals("DataTest1.TopicB.Coord3D", iomObject.getobjecttag());
+        assertEquals("oid3D", iomObject.getobjectoid());
+        
+        IomObject attr3 = iomObject.getattrobj("attr3", 0);
+        assertNotNull(attr1);
+        assertEquals("5000.000", attr3.getattrvalue("C3"));
+        assertEquals("480000.000", attr3.getattrvalue("C1"));
+        assertEquals("70000.000", attr3.getattrvalue("C2"));
+        
+        
+        // 4. ObjectEvent
+        event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        iomObject = ((ObjectEvent) event).getIomObject();
+
+        // DataTest1.TopicB.MultiCoord oid mOid {attr4 SEGMENTS {segment [COORD {C3 5000.111, C1 480000.111, C2 70000.111}, COORD {C3 5000.222, C1 480000.222, C2 70000.222}, COORD {C3 5000.333, C1 480000.333, C2 70000.333}, COORD {C3 5000.444, C1 480000.444, C2 70000.444}, COORD {C3 5000.555, C1 480000.555, C2 70000.555}]}}
+        assertEquals("DataTest1.TopicB.MultiCoord", iomObject.getobjecttag());
+        assertEquals("mOid", iomObject.getobjectoid());
+                
+        IomObject attr4 = iomObject.getattrobj("attr4", 0);
+        assertNotNull(attr4);
+        IomObject segment1 = attr4.getattrobj("segment", 0);
+        assertNotNull(segment1);
+        assertEquals("5000.111", segment1.getattrvalue("C3"));
+        assertEquals("480000.111", segment1.getattrvalue("C1"));
+        assertEquals("70000.111", segment1.getattrvalue("C2"));
+        
+        IomObject segment2 = attr4.getattrobj("segment", 1);
+        assertNotNull(segment2);
+        assertEquals("5000.222", segment2.getattrvalue("C3"));
+        assertEquals("480000.222", segment2.getattrvalue("C1"));
+        assertEquals("70000.222", segment2.getattrvalue("C2"));
+        
+        IomObject segment3 = attr4.getattrobj("segment", 2);
+        assertNotNull(segment3);
+        assertEquals("5000.333", segment3.getattrvalue("C3"));
+        assertEquals("480000.333", segment3.getattrvalue("C1"));
+        assertEquals("70000.333", segment3.getattrvalue("C2"));
+        
+        IomObject segment4 = attr4.getattrobj("segment", 3);
+        assertNotNull(segment4);
+        assertEquals("5000.444", segment4.getattrvalue("C3"));
+        assertEquals("480000.444", segment4.getattrvalue("C1"));
+        assertEquals("70000.444", segment4.getattrvalue("C2"));
+        
+        IomObject segment5 = attr4.getattrobj("segment", 4);
+        assertNotNull(segment5);
+        assertEquals("5000.555", segment5.getattrvalue("C3"));
+        assertEquals("480000.555", segment5.getattrvalue("C1"));
+        assertEquals("70000.555", segment5.getattrvalue("C2"));
+        
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
 	
 	// Es wird getestet ob eine Gerade vom Typ Polyline ohne Fehler erstellt werden koennen.
 	@Test
@@ -695,13 +791,13 @@ public class Xtf24ReaderDataTest {
         assertEquals("480000.000", segment.getattrvalue("A1"));
         assertEquals("70000.000", segment.getattrvalue("A2"));
         assertEquals("5000.000", segment.getattrvalue("C3"));
-        assertEquals("480000.000", segment.getattrvalue("C1"));
+        assertEquals("480005.000", segment.getattrvalue("C1"));
         assertEquals("70000.000", segment.getattrvalue("C2"));
         
         IomObject segment1 = sequence.getattrobj("segment", 1);
         assertNotNull(segment1);
         assertEquals("5000.000", segment1.getattrvalue("C3"));
-        assertEquals("480000.000", segment1.getattrvalue("C1"));
+        assertEquals("480010.000", segment1.getattrvalue("C1"));
         assertEquals("70000.000", segment1.getattrvalue("C2"));
 		
 		assertTrue(reader.read() instanceof  EndBasketEvent);
@@ -709,6 +805,45 @@ public class Xtf24ReaderDataTest {
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void testPolylinesWithArcsNoSpace_Ok()  throws Iox2jtsException, IoxException {
+        Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"PolylineWithArcsNoSpace.xml"));
+        reader.setModel(td);
+        assertTrue(reader.read() instanceof  StartTransferEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        
+        IoxEvent event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        IomObject iomObject = ((ObjectEvent) event).getIomObject();
+
+        // DataTest1.TopicB.ClassO oid oidO {attrO1 POLYLINE {sequence SEGMENTS {segment [ARC {C3 5000.000, A1 480000.000, A2 70000.000, C1 480000.000, C2 70000.000}, COORD {C3 5000.000, C1 480000.000, C2 70000.000}]}}}
+        assertEquals("DataTest1.TopicB.ClassO", iomObject.getobjecttag());
+        assertEquals("oidO", iomObject.getobjectoid());
+        
+        IomObject attrO1 = iomObject.getattrobj("attrO1", 0);
+        assertNotNull(attrO1);
+        IomObject sequence = attrO1.getattrobj("sequence", 0);
+        assertNotNull(sequence);
+        IomObject segment = sequence.getattrobj("segment", 0);
+        assertNotNull(segment);
+        
+        assertEquals("480000.000", segment.getattrvalue("A1"));
+        assertEquals("70000.000", segment.getattrvalue("A2"));
+        assertEquals("5000.000", segment.getattrvalue("C3"));
+        assertEquals("480005.000", segment.getattrvalue("C1"));
+        assertEquals("70000.000", segment.getattrvalue("C2"));
+        
+        IomObject segment1 = sequence.getattrobj("segment", 1);
+        assertNotNull(segment1);
+        assertEquals("5000.000", segment1.getattrvalue("C3"));
+        assertEquals("480010.000", segment1.getattrvalue("C1"));
+        assertEquals("70000.000", segment1.getattrvalue("C2"));
+        
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
 	
 	// Es wird getestet ob ein Bogen mit einem Radius vom Typ Polyline ohne Fehler erstellt werden koennen.
 	@Test

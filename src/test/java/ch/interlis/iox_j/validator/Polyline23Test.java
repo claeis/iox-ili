@@ -71,6 +71,28 @@ public class Polyline23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    public void oneSegment_Fail(){
+        Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
+        IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d", "POLYLINE");
+        IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+        IomObject coordStart=segments.addattrobj("segment", "COORD");
+        coordStart.setattrvalue("C1", "480000.000");
+        coordStart.setattrvalue("C2", "70000.000");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+        validator.validate(new ObjectEvent(objStraightsSuccess));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("invalid number of segments in POLYLINE", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// Es wird getestet ob eine 3d Linie erstellt werden kann.
 	@Test
@@ -385,14 +407,24 @@ public class Polyline23Test {
 		Iom_jObject objStraightsFail=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
 		IomObject polylineValue=objStraightsFail.addattrobj("straights2d", "POLYLINE");
 		polylineValue.setobjectconsistency(IomConstants.IOM_COMPLETE);
-		IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject segment2=polylineValue.addattrobj("sequence", "SEGMENTS");
-		IomObject coordStart=segments.addattrobj("segment", "COORD");
-		IomObject coordEnd=segments.addattrobj("segment", "COORD");
-		coordStart.setattrvalue("C1", "480000.000");
-		coordEnd.setattrvalue("C1", "480000.000");
-		coordStart.setattrvalue("C2", "70000.000");
-		coordEnd.setattrvalue("C2", "70000.000");
+		{
+	        IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+	        IomObject coordStart=segments.addattrobj("segment", "COORD");
+	        IomObject coordEnd=segments.addattrobj("segment", "COORD");
+	        coordStart.setattrvalue("C1", "480000.000");
+	        coordEnd.setattrvalue("C1", "480000.000");
+	        coordStart.setattrvalue("C2", "70000.000");
+	        coordEnd.setattrvalue("C2", "70000.000");
+		}
+        IomObject segment2=polylineValue.addattrobj("sequence", "SEGMENTS");
+        {
+            IomObject coordStart=segment2.addattrobj("segment", "COORD");
+            IomObject coordEnd=segment2.addattrobj("segment", "COORD");
+            coordStart.setattrvalue("C1", "480000.000");
+            coordEnd.setattrvalue("C1", "480000.000");
+            coordStart.setattrvalue("C2", "70000.000");
+            coordEnd.setattrvalue("C2", "70000.000");
+        }
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();

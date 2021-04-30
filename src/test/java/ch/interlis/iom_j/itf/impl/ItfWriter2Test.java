@@ -73,17 +73,23 @@ public class ItfWriter2Test {
 		assertNotNull(td);
 	}
 	
+    @Test
+    public void testNoEvents() throws Iox2jtsException, IoxException {
+        ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestNoEvents.itf"),td);
+        writer.close();
+        writer=null;
+    }
 	@Test
-	public void testF1() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestF1.itf"),td);
+	public void testNoBaskets() throws Iox2jtsException, IoxException {
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestNoBaskets.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new EndTransferEvent());
 		writer.close();
 		writer=null;
 	}
 	@Test
-	public void testF3() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestF3.itf"),td);
+	public void testEmptyBasket() throws Iox2jtsException, IoxException {
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestEmptyBasket.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicF","bid1"));
 		writer.write(new EndBasketEvent());
@@ -92,8 +98,8 @@ public class ItfWriter2Test {
 		writer=null;
 	}
 	@Test
-	public void testF4() throws Iox2jtsException, IoxException {
-		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestF4.itf"),td);
+	public void testSimple() throws Iox2jtsException, IoxException {
+		ItfWriter2 writer=new ItfWriter2(new File(TEST_OUT,"TestSimple.itf"),td);
 		writer.write(new StartTransferEvent());
 		writer.write(new StartBasketEvent("Test1.TopicF","bid1"));
 		writer.write(new ObjectEvent(new Iom_jObject("Test1.TopicF.TableF0","10")));

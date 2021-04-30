@@ -1,0 +1,6 @@
+{
+  "bundles":[
+    {"name":"ch.interlis.iox_j.Version"},
+    {"name":"ch.interlis.iox_j.validator.ValidatorMessages"}
+  ]
+}

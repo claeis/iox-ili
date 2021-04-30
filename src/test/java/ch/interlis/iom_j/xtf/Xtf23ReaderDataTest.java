@@ -712,17 +712,61 @@ public class Xtf23ReaderDataTest {
         IomObject segment = sequence.getattrobj("segment", 0);
         assertNotNull(segment);
         
-        assertEquals("480005.000", segment.getattrvalue("A1"));
-        assertEquals("70005.000", segment.getattrvalue("A2"));
+        assertEquals("480000.000", segment.getattrvalue("A1"));
+        assertEquals("70000.000", segment.getattrvalue("A2"));
         assertEquals("5000.000", segment.getattrvalue("C3"));
-        assertEquals("480000.000", segment.getattrvalue("C1"));
+        assertEquals("480005.000", segment.getattrvalue("C1"));
         assertEquals("70000.000", segment.getattrvalue("C2"));
+
+        IomObject segment1 = sequence.getattrobj("segment", 1);
+        assertNotNull(segment1);
+        assertEquals("5000.000", segment1.getattrvalue("C3"));
+        assertEquals("480010.000", segment1.getattrvalue("C1"));
+        assertEquals("70000.000", segment1.getattrvalue("C2"));
         
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void testPolylinesWithArcsNoSpace_Ok()  throws Iox2jtsException, IoxException {
+        Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"PolylineWithArcsNoSpace.xtf"));
+        assertTrue(reader.read() instanceof  StartTransferEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        
+        IoxEvent event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        IomObject iomObject = ((ObjectEvent) event).getIomObject();
+        
+        assertEquals("DataTest1.TopicB.ClassO", iomObject.getobjecttag());
+        assertEquals("oidO", iomObject.getobjectoid());
+        
+        // DataTest1.TopicB.ClassO oid oidO {attrO1 POLYLINE {sequence SEGMENTS {segment ARC {A1 480005.000, A2 70005.000, C1 480000.000, C2 70000.000, C3 5000.000}}}}
+        IomObject attrO1 = iomObject.getattrobj("attrO1", 0);
+        assertNotNull(attrO1);
+        IomObject sequence = attrO1.getattrobj("sequence", 0);
+        assertNotNull(sequence);
+        IomObject segment = sequence.getattrobj("segment", 0);
+        assertNotNull(segment);
+        
+        assertEquals("480000.000", segment.getattrvalue("A1"));
+        assertEquals("70000.000", segment.getattrvalue("A2"));
+        assertEquals("5000.000", segment.getattrvalue("C3"));
+        assertEquals("480005.000", segment.getattrvalue("C1"));
+        assertEquals("70000.000", segment.getattrvalue("C2"));
+
+        IomObject segment1 = sequence.getattrobj("segment", 1);
+        assertNotNull(segment1);
+        assertEquals("5000.000", segment1.getattrvalue("C3"));
+        assertEquals("480010.000", segment1.getattrvalue("C1"));
+        assertEquals("70000.000", segment1.getattrvalue("C2"));
+        
+        assertTrue(reader.read() instanceof EndBasketEvent);
+        assertTrue(reader.read() instanceof EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
 	
 	// Es wird getestet ob ein Bogen mit einem Radius vom Typ Polyline ohne Fehler gelesen werden kann.
 	@Test

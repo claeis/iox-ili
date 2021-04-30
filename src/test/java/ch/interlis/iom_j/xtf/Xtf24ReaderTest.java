@@ -54,6 +54,15 @@ public class Xtf24ReaderTest {
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void testTransferNoSpace_Ok()  throws Iox2jtsException, IoxException {
+        Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"EmptyTransferNoSpace.xml"));
+        reader.setModel(td);
+        assertTrue(reader.read() instanceof StartTransferEvent);
+        assertTrue(reader.read() instanceof EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
 	
 	// Es wird getestet ob ein xtf file mit Textzeichen zwischen den Zeilen erkannt wird und eine Fehlermeldung ausgegeben wird.
 	@Test
@@ -130,6 +139,21 @@ public class Xtf24ReaderTest {
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void testMultipleBasketsNoSpace_Ok() throws Iox2jtsException, IoxException {
+        Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MultipleBasketsNoSpace.xml"));
+        reader.setModel(td);
+        assertTrue(reader.read() instanceof  StartTransferEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
 	
 	// Es wird getestet ob leere Objekte ohne Syntaxfehler erstellt werden koennen.
 	@Test
@@ -229,6 +253,27 @@ public class Xtf24ReaderTest {
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void testMultipleBasketsAndObjectsNoSpace_Ok()  throws Iox2jtsException, IoxException {
+        Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"MultipleBasketsAndObjectsNoSpace.xml"));
+        reader.setModel(td);
+        assertTrue(reader.read() instanceof  StartTransferEvent); // Test1
+        assertTrue(reader.read() instanceof  StartBasketEvent); // Test1.TopicA, bid1
+        assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicA.ClassA oid x21 {}
+        assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicA.ClassA oid x20 {}
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent); // Test1.TopicB, bid2
+        assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicB.ClassB oid x31 {}
+        assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicB.ClassB oid x30 {}
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent); // Test1.TopicC, bid3
+        assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicC.ClassC oid x41 {}
+        assertTrue(reader.read() instanceof  ObjectEvent); // Test1.TopicC.ClassC oid x40 {}
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
 	
 	// In diesem Test soll getestet werden, ob kind aus den Transferinformationen innerhalb von StartBasketEvent gesetzt werden kann.
 	@Test

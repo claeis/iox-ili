@@ -70,6 +70,7 @@ public class MathFunction23Test {
     // ATTR
     private final static String ATTR1 = "attr1";
     private final static String ATTR2 = "attr2";
+    private final static String ATTR3 = "attr3";
 
     // #############################################################//
     // ######################### GENEREL ###########################//
@@ -98,8 +99,9 @@ public class MathFunction23Test {
     @Test
     public void add_Ok() {
         Iom_jObject iomObjA = new Iom_jObject(CLASSA1, OID1);
-        iomObjA.setattrvalue(ATTR1, "3");
+        iomObjA.setattrvalue(ATTR1, "1");
         iomObjA.setattrvalue(ATTR2, "2");
+        iomObjA.setattrvalue(ATTR3, "3");
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
@@ -706,8 +708,9 @@ public class MathFunction23Test {
     @Test
     public void add_Fail() {
         Iom_jObject iomObjA = new Iom_jObject(CLASSA1, OID1);
-        iomObjA.setattrvalue(ATTR1, "3");
+        iomObjA.setattrvalue(ATTR1, "2");
         iomObjA.setattrvalue(ATTR2, "3");
+        iomObjA.setattrvalue(ATTR3, "4");
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
