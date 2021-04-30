@@ -14,6 +14,7 @@ LATEST
 - Validator: report tids/attrpath in areAreas() function (ilivalidator#241)
 - Validator: fix Math evaluation (ilivalidator#301, ilivalidator#304) 
 - Validator: fix TextOID length check (ilivalidator#278) 
+- Validator: fix objectCount(ALL) if basket but no objects (ilivalidator#261)
 - support IoxPlugins without jar file scanning (ilivalidator#222)
 - Xtf24Reader: removed superfluous whitespace check after coord (ilivalidator#305)
 - Xtf23Reader: removed superfluous whitespace check after coord (ilivalidator#305)

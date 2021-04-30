@@ -43,4 +43,11 @@ MODEL SetConstraint23
 		END Class1;
 	END TopicB;
 
+	TOPIC TopicC=
+		CLASS Class1 =
+			attr1: TEXT*20;
+			SET CONSTRAINT INTERLIS.objectCount(ALL) >0;
+		END Class1;
+	END TopicC;
+	
 END SetConstraint23.

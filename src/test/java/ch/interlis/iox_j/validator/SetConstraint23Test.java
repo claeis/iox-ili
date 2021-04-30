@@ -44,6 +44,9 @@ public class SetConstraint23Test {
 	private final static String TOPICB="SetConstraint23.TopicB";
 	private static final String TOPICB_CLASS1=TOPICB+".Class1";
 		
+    private final static String TOPICC="SetConstraint23.TopicC";
+    private static final String TOPICC_CLASS1=TOPICC+".Class1";
+    
 	@Before
 	public void setUp() throws Exception {
 		// ili-datei lesen
@@ -118,11 +121,39 @@ public class SetConstraint23Test {
         assertEquals("Set Constraint SetConstraint23.TopicA.Class1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
     }
 	
-	// prueft ob die setConstraint Bedingung mit einer WHERE Klausel erstellt werde kann,
-	// wenn die Anzahl der erstellten Objekte, mit der Anzahl der Bedingung uebereinstimmt
-	// und die PreCondition erfuellt wird.
+    @Test
+    public void objectCount_Ok(){
+        Iom_jObject iomObj1=new Iom_jObject(TOPICC_CLASS1, OID1);
+        iomObj1.setattrvalue("attr1", "a");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPICC,BID1));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
+    public void objectCount_Fail(){
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPICC,BID1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        assertEquals(1,logger.getErrs().size());
+        assertEquals("Set Constraint SetConstraint23.TopicC.Class1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+    }
+    
 	@Test
-	public void countOfValidPreConditionObjs_ValidToSecondCondition_Fail(){
+	public void preCondition_ObjectCount_Ok(){
 		Iom_jObject iomObj1=new Iom_jObject(TOPICB_CLASS1, OID1);
 		iomObj1.setattrvalue("attr1", "a");
 		Iom_jObject iomObj2=new Iom_jObject(TOPICB_CLASS1, OID2);
@@ -140,16 +171,25 @@ public class SetConstraint23Test {
 		validator.validate(new EndTransferEvent());
 		assertTrue(logger.getErrs().size()==0);
 	}
+	
+    @Test
+    public void preCondition_ObjectCount_NoObjects_Ok(){
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPICB,BID1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        assertTrue(logger.getErrs().size()==0);
+    }
 
-	// prueft ob die setConstraint Bedingung mit der WHERE Klausel eine Fehlermeldung ausgibt,
-	// wenn die Anzahl der Objekte welche die PreCondition erfuellen, nicht der Anzahl der
-	// zweiten Bedingung entspricht.
 	@Test
-	public void countOfValidPreConditionObjs_InvalidToSecondCondition_Fail(){
+	public void preCondition_ObjectCount_Fail(){
 		Iom_jObject iomObj1=new Iom_jObject(TOPICB_CLASS1, OID1);
-		iomObj1.setattrvalue("attr1", "a");
-		Iom_jObject iomObj2=new Iom_jObject(TOPICB_CLASS1, OID2);
-		iomObj2.setattrvalue("attr1", "b");
+		iomObj1.setattrvalue("attr1", "b");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -158,7 +198,6 @@ public class SetConstraint23Test {
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPICB,BID1));
 		validator.validate(new ObjectEvent(iomObj1));
-		validator.validate(new ObjectEvent(iomObj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts

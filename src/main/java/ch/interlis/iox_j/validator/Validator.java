@@ -435,6 +435,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             Topic topic = (Topic)td.getElement(event.getType());
             Model model=(Model) topic.getContainer();
             seenModels.add(model.getName());
+            collectSetConstraints(topic);
             Domain bidDomain=topic.getBasketOid();
             if (bidDomain!=null && !isAValidBasketOID(bidDomain, event.getBid())) {
                 isValid = false;
@@ -727,7 +728,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 											errs.addEvent(errFact.logInfoMsg(rsrc.getString("iterateThroughAllObjects.validationConfigurationCheckOff"), constraintName, iomObj.getobjectoid()));
 										}
 									} else {
-										collectSetConstraintObjs(checkAdditionalConstraint, constraintName, iomObj, setConstraint);
+										collectSetConstraintObj(checkAdditionalConstraint, constraintName, iomObj, setConstraint);
 									}
 								} else if(additionalConstraint instanceof UniquenessConstraint){
 									UniquenessConstraint uniquenessConstraint = (UniquenessConstraint) additionalConstraint; // uniquenessConstraint not null.
@@ -846,7 +847,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateConstraints.validationConfigurationCheckOff"), constraintName, iomObj.getobjectoid()));
 							}
 						} else {
-							collectSetConstraintObjs(checkSetConstraint, constraintName, iomObj, setConstraint);
+							collectSetConstraintObj(checkSetConstraint, constraintName, iomObj, setConstraint);
 						}
 					}
 					// plausibility constraint
@@ -1099,12 +1100,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private HashMap<SetConstraint,Collection<String>> setConstraints=new HashMap<SetConstraint,Collection<String>>();
 	private Iterator<String> allObjIterator=null;
 	
-	private void collectSetConstraintObjs(String validationKind, String constraintName, IomObject iomObj, SetConstraint setConstraintObj) {
-		Evaluable preCondition = (Evaluable) setConstraintObj.getPreCondition();
+	private void collectSetConstraintObj(String validationKind, String constraintName, IomObject iomObj, SetConstraint setConstraint) {
+		Evaluable preCondition = (Evaluable) setConstraint.getPreCondition();
+        Collection<String> objs=setConstraints.get(setConstraint);
+        if(objs==null){
+            // mark set constraint as evaluable / might have objects
+            objs=new HashSet<String>();
+            setConstraints.put(setConstraint,objs);
+        }
 		if(preCondition != null){
 			Value preConditionValue = evaluateExpression(null, validationKind, constraintName, iomObj, preCondition,null);
 			if (preConditionValue.isNotYetImplemented()){
-				errs.addEvent(errFact.logWarningMsg(rsrc.getString("collectSetConstraintObjs.functionInSetConstraintIsNotYetImplemented"), getScopedName(setConstraintObj)));
+				errs.addEvent(errFact.logWarningMsg(rsrc.getString("collectSetConstraintObjs.functionInSetConstraintIsNotYetImplemented"), getScopedName(setConstraint)));
 				return;
 			}
 			if (preConditionValue.skipEvaluation()){
@@ -1117,70 +1124,113 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			// consider object in set constraint
 		}
 		// save object
-		Collection<String> objs=setConstraints.get(setConstraintObj);
-		if(objs==null){
-			objs=new HashSet<String>();
-			setConstraints.put(setConstraintObj,objs);
-		}
 		String oid=iomObj.getobjectoid();
 		if(oid==null) {
 	        oid=ObjectPool.getAssociationId(iomObj, (AssociationDef)td.getElement(iomObj.getobjecttag()));
 		}
 		objs.add(oid);
 	}
+    private void collectSetConstraints(Topic topic) {
+        while(topic!=null) {
+            Iterator<Element> eleIt = topic.iterator();
+            while(eleIt.hasNext()) {
+                Element ele=eleIt.next();
+                if(ele instanceof Viewable) {
+                    Viewable view=(Viewable)ele;
+                    Iterator cIt = view.iterator();
+                    while(cIt.hasNext()) {
+                        Object cObj = cIt.next();
+                        if(cObj instanceof SetConstraint) {
+                            SetConstraint setConstraint=(SetConstraint)cObj;
+                            if(!setConstraints.containsKey(setConstraint)){
+                                // mark set constraint as seen
+                                setConstraints.put(setConstraint,null);
+                            }
+                        }
+                    }
+                }
+            }
+            topic=(Topic)topic.getExtending();
+        }
+    }
 	
-	private void validateSetConstraint(SetConstraint setConstraintObj) {
+	private void validateSetConstraint(SetConstraint setConstraint) {
 		if(!ValidationConfig.OFF.equals(constraintValidation)){
-			Collection<String> objs=setConstraints.get(setConstraintObj);
-			String constraintName = getScopedName(setConstraintObj);
+			Collection<String> objs=setConstraints.get(setConstraint);
+			String constraintName = getScopedName(setConstraint);
 			String checkConstraint = null;
 			if(!enforceConstraintValidation){
 				checkConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
 			}
 			if(ValidationConfig.OFF.equals(checkConstraint)){
-				if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+getScopedName(setConstraintObj))){
-					configOffOufputReduction.add(ValidationConfig.CHECK+":"+getScopedName(setConstraintObj));
-					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateSetConstraint.validationConfigurationCheckOff"), getScopedName(setConstraintObj)));
+				if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+getScopedName(setConstraint))){
+					configOffOufputReduction.add(ValidationConfig.CHECK+":"+getScopedName(setConstraint));
+					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateSetConstraint.validationConfigurationCheckOff"), getScopedName(setConstraint)));
 				}
 			}else{
-				if(!constraintOutputReduction.contains(setConstraintObj+":"+constraintName)){
-					constraintOutputReduction.add(setConstraintObj+":"+constraintName);
-					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateSetConstraint.validateSetConstraint"),getScopedName(setConstraintObj)));
+				if(!constraintOutputReduction.contains(setConstraint+":"+constraintName)){
+					constraintOutputReduction.add(setConstraint+":"+constraintName);
+					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateSetConstraint.validateSetConstraint"),getScopedName(setConstraint)));
 				}
-				if(objs!=null && objs.size()>0){
-					for(String oid:objs){
-						allObjIterator=objs.iterator();
-						IomObject iomObj=objectPool.getObject(oid, null, null);
-						setCurrentMainObj(iomObj);
-						errFact.setDefaultCoord(getDefaultCoord(iomObj));
-						Evaluable condition = (Evaluable) setConstraintObj.getCondition();
-						Value constraintValue = evaluateExpression(null, checkConstraint, constraintName, iomObj, condition,null);
-						if (constraintValue.isNotYetImplemented()){
-							errs.addEvent(errFact.logWarningMsg(rsrc.getString("validateSetConstraint.functionInSetConstraintIsNotYetImplemented"), getScopedName(setConstraintObj)));
-							return;
-						}
-						if (constraintValue.skipEvaluation()){
-							return;
-						}
-						if (constraintValue.isTrue()){
-							// ok
-						} else {
-			                String actualLanguage = Locale.getDefault().getLanguage();
-			                String msg = validationConfig.getConfigValue(getScopedName(setConstraintObj), ValidationConfig.MSG+"_"+actualLanguage);
-			                if (msg == null) {
-			                    msg=validationConfig.getConfigValue(getScopedName(setConstraintObj), ValidationConfig.MSG);
-			                }
-							if(msg!=null && msg.length()>0){
-								logMsg(checkConstraint,msg);
-							} else {
-								if(!setConstraintOufputReduction.contains(setConstraintObj+":"+constraintName)){
-									setConstraintOufputReduction.add(setConstraintObj+":"+constraintName);
-									logMsg(checkConstraint,rsrc.getString("validateSetConstraint.setConstraintIsNotTrue"), constraintName);
-								}
-							}
-						}
-					}
-				}
+                Evaluable preCondition = (Evaluable) setConstraint.getPreCondition();
+                if(preCondition!=null) {
+                }else {
+                    if(objs==null) {
+                        objs=new HashSet<String>();
+                    }
+                }
+                Iterator<String> objIt=null;
+                if(objs==null){
+                    objIt=new HashSet<String>().iterator();
+                }else {
+                    objIt=objs.iterator();
+                }
+                String oid=null;
+                while(true){
+                    if(objIt.hasNext()) {
+                        oid=objIt.next();
+                    }
+                    if(objs==null){
+                        allObjIterator=null;
+                    }else {
+                        allObjIterator=objs.iterator();
+                    }
+                    IomObject iomObj=null;
+                    if(oid!=null) {
+                        iomObj=objectPool.getObject(oid, null, null);
+                        setCurrentMainObj(iomObj);
+                        errFact.setDefaultCoord(getDefaultCoord(iomObj));
+                    }
+                    Evaluable condition = (Evaluable) setConstraint.getCondition();
+                    Value constraintValue = evaluateExpression(null, checkConstraint, constraintName, iomObj, condition,null);
+                    if (constraintValue.isNotYetImplemented()){
+                        errs.addEvent(errFact.logWarningMsg(rsrc.getString("validateSetConstraint.functionInSetConstraintIsNotYetImplemented"), getScopedName(setConstraint)));
+                        return;
+                    }
+                    if (constraintValue.skipEvaluation()){
+                        return;
+                    }
+                    if (constraintValue.isTrue()){
+                        // ok
+                    } else {
+                        String actualLanguage = Locale.getDefault().getLanguage();
+                        String msg = validationConfig.getConfigValue(getScopedName(setConstraint), ValidationConfig.MSG+"_"+actualLanguage);
+                        if (msg == null) {
+                            msg=validationConfig.getConfigValue(getScopedName(setConstraint), ValidationConfig.MSG);
+                        }
+                        if(msg!=null && msg.length()>0){
+                            logMsg(checkConstraint,msg);
+                        } else {
+                            if(!setConstraintOufputReduction.contains(setConstraint+":"+constraintName)){
+                                setConstraintOufputReduction.add(setConstraint+":"+constraintName);
+                                logMsg(checkConstraint,rsrc.getString("validateSetConstraint.setConstraintIsNotTrue"), constraintName);
+                            }
+                        }
+                    }
+                    if(!objIt.hasNext()) {
+                        break;
+                    }
+                }
 			}
 		}
 	}
@@ -1546,14 +1596,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			} else if (!currentFunction.getScopedName(null).equals("INTERLIS.convertUnit") && 
 			        currentFunction.getScopedName(null).startsWith("INTERLIS.")) {
 			    if (interlisFunction == null) {
-			        interlisFunction = new Interlis(this, td, validationConfig, allObjIterator);
+			        interlisFunction = new Interlis(this, td, validationConfig);
 			    }
 			    
 			    return interlisFunction.evaluateFunction(currentFunction, functionCallObj, parentObject,
 			            validationKind, usageScope, iomObj, texttype, expression, functions, td, firstRole);
 			} else if (currentFunction.getScopedName(null).startsWith("INTERLIS_ext.")) {
 			    if (interlis_ext == null) {
-			        interlis_ext = new Interlis_ext(this, td, validationConfig, allObjIterator);
+			        interlis_ext = new Interlis_ext(this, td, validationConfig);
 			    }
 			    
 			    return interlis_ext.evaluateFunction(currentFunction, parentObject, validationKind, usageScope, iomObj, expression, functions, td, firstRole);
@@ -1598,11 +1648,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			return getValueFromObjectPath(parentObject, iomObj, pathElements, firstRole);
 		} else if(expression instanceof Objects) {
 			// objects
+            if(allObjIterator==null){
+                //throw new IllegalStateException(rsrc.getString("evaluateExpression.argumentAllRequiresASetConstraint"));
+                return Value.createSkipEvaluation();
+           }
 			Iterator<String> objectIterator = allObjIterator;
 			List<IomObject> listOfIomObjects = new ArrayList<IomObject>();
-			if(allObjIterator==null){
-				 throw new IllegalStateException(rsrc.getString("evaluateExpression.argumentAllRequiresASetConstraint"));
-			}
 			while(objectIterator.hasNext()){
 				String oid=objectIterator.next();
 				IomObject aIomObj = objectPool.getObject(oid, null, null);
@@ -1632,6 +1683,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
     public Value getValueFromObjectPath(IomObject parentObject,IomObject iomObjStart, PathEl[] pathElements, RoleDef firstRole) {
+        if(iomObjStart==null) {
+            return Value.createSkipEvaluation();
+        }
         ArrayList<IomObject> currentObjects=new ArrayList<IomObject>();
         ArrayList<IomObject> nextCurrentObjects=new ArrayList<IomObject>();
         RoleDef role = null;
@@ -1674,7 +1728,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                     nextCurrentObjects.add(parentObject);
                                 }
                             }
-                        }else {
+                        }else{
                             String targetOid = null;
                             IomObject roleDefValue = iomObj.getattrobj(role.getName(), 0);
                             if (roleDefValue != null) {
