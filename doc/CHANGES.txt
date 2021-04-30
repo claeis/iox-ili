@@ -5,6 +5,9 @@ ideas/open issues
 
 LATEST
 -----------------------------
+
+iox-ili 1.21.6 (2021-04-30)
+-----------------------------
 - implement PipelinePool.setIntermediateValue(String valueName, Object value)/getIntermediateValue(String valueName)
 - fix NPE if no events sent to ItfWriter2
 - ObjectPool: fix "illegal value null for attrname" (ili2db#401)
