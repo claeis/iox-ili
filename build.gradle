@@ -13,8 +13,8 @@ configurations {
 //    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 //}
 
-sourceCompatibility = "1.6" 
-targetCompatibility = "1.6"
+sourceCompatibility = JavaVersion.VERSION_1_6 
+targetCompatibility = JavaVersion.VERSION_1_6
 compileJava.options.encoding = 'US-ASCII'
 //compileJava.options.compilerArgs << '-Xlint:unchecked'
 //compileJava.options.deprecation = true
@@ -92,11 +92,16 @@ sourceSets {
 }
 
 task generateMyResources {
+	def versionPropsFile = new File(generatedResources,"ch/interlis/iox_j/Version.properties")
+	def version="$project.version"
+	def hash=getGitHash()
+	inputs.property("version","$project.version")
+	inputs.property("hash",getGitHash())
+	outputs.file versionPropsFile
 	doLast {
 		def versionProps = new Properties()
-		versionProps.setProperty('version', "$project.version")
-		versionProps.setProperty('versionCommit', getGitHash())
-		def versionPropsFile = new File(generatedResources,"ch/interlis/iox_j/Version.properties")
+		versionProps.setProperty('version', version)
+		versionProps.setProperty('versionCommit', hash)
 		versionPropsFile.getParentFile().mkdirs();
 		versionProps.store(versionPropsFile.newWriter(), null);
 	}
