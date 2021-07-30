@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Map;
 
 import ch.ehi.basics.settings.Settings;
+import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.Enumeration;
 import ch.interlis.ili2c.metamodel.EnumerationType;
+import ch.interlis.ili2c.metamodel.ExtendableContainer;
 import ch.interlis.ili2c.metamodel.Model;
 import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.RoleDef;
@@ -71,14 +73,40 @@ public class TranslateToTranslation implements IoxFilter {
 	}
 	private void setupTranslation(Element destEle){
 		Element srcEle=destEle.getTranslationOfOrSame();
+		if(srctag2destElement.containsKey(srcEle.getScopedName())){
+		    return;
+		}
 		srctag2destElement.put(srcEle.getScopedName(), destEle);
 		if(destEle instanceof Container){
 			Iterator it=((Container) destEle).iterator();
 			while(it.hasNext()){
 				setupTranslation((Element)it.next());
 			}
+			if(destEle instanceof ExtendableContainer) {
+			    Element extending = ((ExtendableContainer) destEle).getExtending();
+			    if(extending!=null) {
+	                setupTranslation(extending);
+			    }
+			}
 		}
 	}
+    private void setupStructMapping(Table destStruct) {
+        Element srcEle=destStruct.getTranslationOfOrSame();
+        if(srctag2destElement.containsKey(srcEle.getScopedName())) {
+            return;
+        }
+        Container destContainer=destStruct;
+        {
+            destContainer=destContainer.getContainer();
+            Iterator it=destContainer.iterator();
+            while(it.hasNext()){
+                Element destEle=(Element)it.next();
+                if(destEle instanceof Table && !((Table) destEle).isIdentifiable()) {
+                    setupTranslation(destEle);
+                }
+            }
+        }while(!(destContainer instanceof Model));
+    }
 	
 	@Override
 	public IoxEvent filter(IoxEvent event) throws IoxException {
@@ -88,7 +116,7 @@ public class TranslateToTranslation implements IoxFilter {
 			Topic destTopic = tag2topic.get(destTopicName);
 			// reset mapping
 			resetMapping();
-			setupTranslation((Model)destTopic.getContainer());
+			setupTranslation(destTopic);
 		}else if(event instanceof ObjectEvent){
 			translateObject(((ObjectEvent) event).getIomObject());
 		}else if(event instanceof EndBasketEvent){
@@ -178,8 +206,7 @@ public class TranslateToTranslation implements IoxFilter {
 	private Element getTranslatedElement(Element modelElement) {
 		Element destEle=srctag2destElement.get(modelElement.getScopedName());
 		if(destEle==null){
-		    return modelElement;
-			//throw new IllegalArgumentException("untranslated element "+modelElement.getScopedName());
+			throw new IllegalArgumentException("untranslated element "+modelElement.getScopedName());
 		}
 		return destEle;
 	}
@@ -220,6 +247,7 @@ public class TranslateToTranslation implements IoxFilter {
 				}else{
 					IomObject structValue=(IomObject)attrValue;
 					if(isCompType){
+					    setupStructMapping(((CompositionType)destAttr.getDomain()).getComponentType());
 						translateObject(structValue);
 					}
 					iomObj.addattrobj(destAttrName, structValue);
@@ -228,7 +256,7 @@ public class TranslateToTranslation implements IoxFilter {
 		}
 	}
 
-	private String translateEnumValue(String attrValue, EnumerationType enumType,EnumerationType destEnumType) {
+    private String translateEnumValue(String attrValue, EnumerationType enumType,EnumerationType destEnumType) {
 		Map<String,String> src2dest=getEnumMapping(enumType,destEnumType);
 		String destValue=src2dest.get(attrValue);
 		return destValue;

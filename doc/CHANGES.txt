@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- TranslateToTranslation: fix mapping of struct at model level (ili2db#405)
 
 iox-ili 1.21.6 (2021-04-30)
 -----------------------------
