@@ -1652,7 +1652,28 @@ public class Datatypes23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("invalid format of date value <216-2-2> in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
-	
+
+	// Eingabe des Datums zu kurz (jjjj-mm-dd). Eingabe unzulaessig.
+	@Test
+	public void dateWithinRangeLengthToShortFail(){
+		Iom_jObject objLengthToLong=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		// Set Attributes
+		objLengthToLong.setattrvalue("aDate", "2021-9-7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objLengthToLong));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("invalid format of date value <2021-9-7> in attribute aDate", logger.getErrs().get(0).getEventMsg());
+	}
+
 	// Eingabe des Datum Jahres zu lang (jjjj). Eingabe unzulaessig.
 	@Test
 	public void dateLengthToLongFail(){
