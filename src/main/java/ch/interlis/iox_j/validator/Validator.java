@@ -3550,8 +3550,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					// Value matches regex and is not null and is in range of type.
 					String valueStr = iomObj.getattrvalue(attrName);
 					FormattedType subType = (FormattedType) type;
+					// The length is explicitly tested because the generated regular expression does not test the length of the value.
 					if (valueStr != null){
-						if (!valueStr.matches(subType.getRegExp())) {
+						if (!valueStr.matches(subType.getRegExp()) || valueStr.length() != 10) {
 							logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfDateValueXInAttributeY"), valueStr, attrPath);
 						} else if(!subType.isValueInRange(valueStr)){
 							logMsg(validateType, rsrc.getString("validateAttrValue.dateValueXIsNotInRangeInAttributeY"), valueStr, attrPath);
