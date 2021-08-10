@@ -1650,7 +1650,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <216-2-2> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of date value <216-2-2> in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Eingabe des Datum Jahres zu lang (jjjj). Eingabe unzulaessig.
@@ -1671,7 +1671,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <20016-12-15> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of date value <20016-12-15> in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Zeitangabe Stunde zu lang. unzulaessig.
