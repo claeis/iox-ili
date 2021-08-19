@@ -273,6 +273,15 @@ import java.util.Map;
 									throw new IoxException("max one COORD value allowed ("+iliAttrName+")");
 								}
 							}
+							else if (child.getobjecttag().equals("MULTICOORD")) {
+								xout.writeStartElement(xmlns_attr, iliAttrName);
+								writeMultiCoord(child);
+								xout.writeEndElement(/*attr*/);
+								if (valueCount > 1)
+								{
+									throw new IoxException("max one MULTICOORD value allowed (" + iliAttrName + ")");
+								}
+							}
 							else if (child.getobjecttag().equals("POLYLINE"))
 							{
 								// POLYLINE
@@ -392,6 +401,27 @@ import java.util.Map;
 		}
 
         }
+
+        private void writeMultiCoord(IomObject obj)
+                throws IoxException
+        {
+        /*
+             <geom:multicoord>
+             (* CoordValue *)
+             </geom:multicoord>.
+        */
+            try {
+                xout.writeStartElement(geomNs,"multicoord");
+                for (int coordi = 0; coordi < obj.getattrvaluecount("coord"); coordi++) {
+                    IomObject coord = obj.getattrobj("coord", coordi);
+                    writeCoord(coord);
+                }
+                xout.writeEndElement();
+            }catch(XMLStreamException ex){
+                throw new IoxException(ex);
+            }
+        }
+
         /** writes a arc segment value.
          */
         private void writeArc(IomObject obj)
