@@ -69,7 +69,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
     
     // segmentType
     private enum SegmentType {
-    	C1,C2,C3,A1,A2,R,MULTICOORD
+        C1,C2,C3,A1,A2,R
     }
     
     // enum
@@ -1341,8 +1341,6 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 					case A1: segment.setattrvalue("A1", event.asCharacters().getData());
 						break;
 					case A2: segment.setattrvalue("A2", event.asCharacters().getData());
-						break;
-					case MULTICOORD: segment.setattrvalue("multicoord", event.asCharacters().getData());
 						break;
 					case R: segment.setattrvalue("R", event.asCharacters().getData());
 						break;
