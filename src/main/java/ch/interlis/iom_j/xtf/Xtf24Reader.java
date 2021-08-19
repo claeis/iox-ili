@@ -1005,24 +1005,16 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                             throw new IoxSyntaxException(event2msgtext(event));
                         }
                     }else if(event.asStartElement().getName().equals(QNAME_GEOM_MULTICOORD)){
-                        if(!event.isStartElement()){
-                            throw new IoxSyntaxException(event2msgtext(event));
+                        IomObject multicoord = readMultiCoord(event);
+                        if (multicoord.getattrcount() == 0) {
+                            throw new IoxException("expected multicoord. unexpected event: " + event.asStartElement().getName().getLocalPart());
                         }
-                        event=xmlreader.nextEvent(); // <multicoord>
-                        event=skipSpacesAndGetNextEvent(event);
-                        if(!event.isStartElement()){
-                            throw new IoxSyntaxException(event2msgtext(event));
-                        }
-                        IomObject returnedObj=readSequence(event);
-                        if(returnedObj.getattrcount()==0){
-                            throw new IoxException("expected multicoord. unexpected event: "+event.asStartElement().getName().getLocalPart());
-                        }
-                        iomObj.addattrobj(attrName, returnedObj);
-                        event=xmlreader.nextEvent(); // <coord>
-                        event=skipSpacesAndGetNextEvent(event);
-                        if(event.isEndElement()){
-                            attrName=null;
-                        }else{
+                        iomObj.addattrobj(attrName, multicoord);
+                        event = xmlreader.nextEvent(); // <multicoord>
+                        event = skipSpacesAndGetNextEvent(event);
+                        if (event.isEndElement()) { // </attribute>
+                            attrName = null;
+                        } else {
                             throw new IoxSyntaxException(event2msgtext(event));
                         }
                     }else if(event.asStartElement().getName().equals(QNAME_GEOM_POLYLINE)){
@@ -1306,6 +1298,23 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		}
 		return sequence;
 	}
+
+    private IomObject readMultiCoord(XMLEvent event) throws XMLStreamException, IoxException {
+        IomObject multicoord = createIomObject("MULTICOORD", null);
+        event=xmlreader.nextEvent();
+        event=skipSpacesAndGetNextEvent(event);
+
+        if (event.isStartElement()) {
+            while (event.isStartElement()) {
+                event = xmlreader.nextEvent();
+                event = skipSpacesAndGetNextEvent(event);
+                multicoord.addattrobj("coord", readSegment(event, SEGMENTTYPE_COORD));
+                event = xmlreader.nextEvent();
+                event = skipSpacesAndGetNextEvent(event);
+            }
+        }
+        return multicoord;
+    }
     
 	/** Prepare segment
 	 * @param event
