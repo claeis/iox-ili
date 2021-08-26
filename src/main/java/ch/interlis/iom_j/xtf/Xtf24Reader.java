@@ -1006,9 +1006,6 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                         }
                     }else if(event.asStartElement().getName().equals(QNAME_GEOM_MULTICOORD)){
                         IomObject multicoord = readMultiCoord(event);
-                        if (multicoord.getattrcount() == 0) {
-                            throw new IoxException("expected multicoord. unexpected event: " + event.asStartElement().getName().getLocalPart());
-                        }
                         iomObj.addattrobj(attrName, multicoord);
                         event = xmlreader.nextEvent(); // <multicoord>
                         event = skipSpacesAndGetNextEvent(event);
@@ -1313,6 +1310,11 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                 event = skipSpacesAndGetNextEvent(event);
             }
         }
+
+        if (multicoord.getattrcount() == 0) {
+            throw new IoxException("expected multicoord. unexpected event: " + event.asStartElement().getName().getLocalPart());
+        }
+
         return multicoord;
     }
     
