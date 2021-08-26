@@ -589,41 +589,41 @@ public class Xtf24ReaderDataTest {
         assertTrue(event instanceof ObjectEvent);
         iomObject = ((ObjectEvent) event).getIomObject();
 
-        // DataTest1.TopicB.MultiCoord oid mOid {attr4 SEGMENTS {segment [COORD {C3 5000.111, C1 480000.111, C2 70000.111}, COORD {C3 5000.222, C1 480000.222, C2 70000.222}, COORD {C3 5000.333, C1 480000.333, C2 70000.333}, COORD {C3 5000.444, C1 480000.444, C2 70000.444}, COORD {C3 5000.555, C1 480000.555, C2 70000.555}]}}
+        // DataTest1.TopicB.MultiCoord oid mOid {attr4 MULTICOORD {coord [COORD {C1 480000.111, C2 70000.111, C3 5000.111}, COORD {C1 480000.222, C2 70000.222, C3 5000.222}, COORD {C1 480000.333, C2 70000.333, C3 5000.333}, COORD {C1 480000.444, C2 70000.444, C3 5000.444}, COORD {C1 480000.555, C2 70000.555, C3 5000.555}]}}
         assertEquals("DataTest1.TopicB.MultiCoord", iomObject.getobjecttag());
         assertEquals("mOid", iomObject.getobjectoid());
                 
         IomObject attr4 = iomObject.getattrobj("attr4", 0);
         assertNotNull(attr4);
-        IomObject segment1 = attr4.getattrobj("segment", 0);
-        assertNotNull(segment1);
-        assertEquals("5000.111", segment1.getattrvalue("C3"));
-        assertEquals("480000.111", segment1.getattrvalue("C1"));
-        assertEquals("70000.111", segment1.getattrvalue("C2"));
+        IomObject coord1 = attr4.getattrobj("coord", 0);
+        assertNotNull(coord1);
+        assertEquals("5000.111", coord1.getattrvalue("C3"));
+        assertEquals("480000.111", coord1.getattrvalue("C1"));
+        assertEquals("70000.111", coord1.getattrvalue("C2"));
         
-        IomObject segment2 = attr4.getattrobj("segment", 1);
-        assertNotNull(segment2);
-        assertEquals("5000.222", segment2.getattrvalue("C3"));
-        assertEquals("480000.222", segment2.getattrvalue("C1"));
-        assertEquals("70000.222", segment2.getattrvalue("C2"));
+        IomObject coord2 = attr4.getattrobj("coord", 1);
+        assertNotNull(coord2);
+        assertEquals("5000.222", coord2.getattrvalue("C3"));
+        assertEquals("480000.222", coord2.getattrvalue("C1"));
+        assertEquals("70000.222", coord2.getattrvalue("C2"));
         
-        IomObject segment3 = attr4.getattrobj("segment", 2);
-        assertNotNull(segment3);
-        assertEquals("5000.333", segment3.getattrvalue("C3"));
-        assertEquals("480000.333", segment3.getattrvalue("C1"));
-        assertEquals("70000.333", segment3.getattrvalue("C2"));
+        IomObject coord3 = attr4.getattrobj("coord", 2);
+        assertNotNull(coord3);
+        assertEquals("5000.333", coord3.getattrvalue("C3"));
+        assertEquals("480000.333", coord3.getattrvalue("C1"));
+        assertEquals("70000.333", coord3.getattrvalue("C2"));
         
-        IomObject segment4 = attr4.getattrobj("segment", 3);
-        assertNotNull(segment4);
-        assertEquals("5000.444", segment4.getattrvalue("C3"));
-        assertEquals("480000.444", segment4.getattrvalue("C1"));
-        assertEquals("70000.444", segment4.getattrvalue("C2"));
+        IomObject coord4 = attr4.getattrobj("coord", 3);
+        assertNotNull(coord4);
+        assertEquals("5000.444", coord4.getattrvalue("C3"));
+        assertEquals("480000.444", coord4.getattrvalue("C1"));
+        assertEquals("70000.444", coord4.getattrvalue("C2"));
         
-        IomObject segment5 = attr4.getattrobj("segment", 4);
-        assertNotNull(segment5);
-        assertEquals("5000.555", segment5.getattrvalue("C3"));
-        assertEquals("480000.555", segment5.getattrvalue("C1"));
-        assertEquals("70000.555", segment5.getattrvalue("C2"));
+        IomObject coord5 = attr4.getattrobj("coord", 4);
+        assertNotNull(coord5);
+        assertEquals("5000.555", coord5.getattrvalue("C3"));
+        assertEquals("480000.555", coord5.getattrvalue("C1"));
+        assertEquals("70000.555", coord5.getattrvalue("C2"));
         
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
@@ -685,41 +685,41 @@ public class Xtf24ReaderDataTest {
         assertTrue(event instanceof ObjectEvent);
         iomObject = ((ObjectEvent) event).getIomObject();
 
-        // DataTest1.TopicB.MultiCoord oid mOid {attr4 SEGMENTS {segment [COORD {C3 5000.111, C1 480000.111, C2 70000.111}, COORD {C3 5000.222, C1 480000.222, C2 70000.222}, COORD {C3 5000.333, C1 480000.333, C2 70000.333}, COORD {C3 5000.444, C1 480000.444, C2 70000.444}, COORD {C3 5000.555, C1 480000.555, C2 70000.555}]}}
+        // DataTest1.TopicB.MultiCoord oid mOid {attr4 MULTICOORD {coord [COORD {C1 480000.111, C2 70000.111, C3 5000.111}, COORD {C1 480000.222, C2 70000.222, C3 5000.222}, COORD {C1 480000.333, C2 70000.333, C3 5000.333}, COORD {C1 480000.444, C2 70000.444, C3 5000.444}, COORD {C1 480000.555, C2 70000.555, C3 5000.555}]}}
         assertEquals("DataTest1.TopicB.MultiCoord", iomObject.getobjecttag());
         assertEquals("mOid", iomObject.getobjectoid());
                 
         IomObject attr4 = iomObject.getattrobj("attr4", 0);
         assertNotNull(attr4);
-        IomObject segment1 = attr4.getattrobj("segment", 0);
-        assertNotNull(segment1);
-        assertEquals("5000.111", segment1.getattrvalue("C3"));
-        assertEquals("480000.111", segment1.getattrvalue("C1"));
-        assertEquals("70000.111", segment1.getattrvalue("C2"));
+        IomObject coord1 = attr4.getattrobj("coord", 0);
+        assertNotNull(coord1);
+        assertEquals("5000.111", coord1.getattrvalue("C3"));
+        assertEquals("480000.111", coord1.getattrvalue("C1"));
+        assertEquals("70000.111", coord1.getattrvalue("C2"));
         
-        IomObject segment2 = attr4.getattrobj("segment", 1);
-        assertNotNull(segment2);
-        assertEquals("5000.222", segment2.getattrvalue("C3"));
-        assertEquals("480000.222", segment2.getattrvalue("C1"));
-        assertEquals("70000.222", segment2.getattrvalue("C2"));
+        IomObject coord2 = attr4.getattrobj("coord", 1);
+        assertNotNull(coord2);
+        assertEquals("5000.222", coord2.getattrvalue("C3"));
+        assertEquals("480000.222", coord2.getattrvalue("C1"));
+        assertEquals("70000.222", coord2.getattrvalue("C2"));
         
-        IomObject segment3 = attr4.getattrobj("segment", 2);
-        assertNotNull(segment3);
-        assertEquals("5000.333", segment3.getattrvalue("C3"));
-        assertEquals("480000.333", segment3.getattrvalue("C1"));
-        assertEquals("70000.333", segment3.getattrvalue("C2"));
+        IomObject coord3 = attr4.getattrobj("coord", 2);
+        assertNotNull(coord3);
+        assertEquals("5000.333", coord3.getattrvalue("C3"));
+        assertEquals("480000.333", coord3.getattrvalue("C1"));
+        assertEquals("70000.333", coord3.getattrvalue("C2"));
         
-        IomObject segment4 = attr4.getattrobj("segment", 3);
-        assertNotNull(segment4);
-        assertEquals("5000.444", segment4.getattrvalue("C3"));
-        assertEquals("480000.444", segment4.getattrvalue("C1"));
-        assertEquals("70000.444", segment4.getattrvalue("C2"));
+        IomObject coord4 = attr4.getattrobj("coord", 3);
+        assertNotNull(coord4);
+        assertEquals("5000.444", coord4.getattrvalue("C3"));
+        assertEquals("480000.444", coord4.getattrvalue("C1"));
+        assertEquals("70000.444", coord4.getattrvalue("C2"));
         
-        IomObject segment5 = attr4.getattrobj("segment", 4);
-        assertNotNull(segment5);
-        assertEquals("5000.555", segment5.getattrvalue("C3"));
-        assertEquals("480000.555", segment5.getattrvalue("C1"));
-        assertEquals("70000.555", segment5.getattrvalue("C2"));
+        IomObject coord5 = attr4.getattrobj("coord", 4);
+        assertNotNull(coord5);
+        assertEquals("5000.555", coord5.getattrvalue("C3"));
+        assertEquals("480000.555", coord5.getattrvalue("C1"));
+        assertEquals("70000.555", coord5.getattrvalue("C2"));
         
         assertTrue(reader.read() instanceof  EndBasketEvent);
         assertTrue(reader.read() instanceof  EndTransferEvent);
