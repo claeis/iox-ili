@@ -97,7 +97,7 @@ public class ReferenceType23Test {
 	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Referenz External true ist und die Klasse A gefunden wird.
 	@Test
-	public void referenceTypeBasketExternal_Ok(){
+	public void external_otherBasketTargetObj_Ok(){
 		String objTargetId=OID1;
 		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, objTargetId);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
@@ -123,9 +123,9 @@ public class ReferenceType23Test {
 		assertEquals(0,logger.getErrs().size());
 	}
 	
-	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Referenz External true ist.
+	// Es wird getestet, ob kein Fehler ausgegeben wird, wenn die Referenz External true ist.
 	@Test
-	public void referenceTypeFileExternal_Ok(){
+	public void external_externalTargetObj_Ok(){
 		String objTargetId=OID1;
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
 		o1Ref.setobjectrefoid(objTargetId);
@@ -146,6 +146,31 @@ public class ReferenceType23Test {
 		// Asserts
 		assertEquals(0,logger.getErrs().size());
 	}
+    // Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Referenz External ist und das Objekt fehlt.
+    @Test
+    public void external_allObjectsAccessible_externalTargetObj_Fail(){
+        String objTargetId=OID1;
+        Iom_jObject o1Ref=new Iom_jObject("REF", null);
+        o1Ref.setobjectrefoid(objTargetId);
+        Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTG, null);
+        iomStruct.addattrobj(ILI_STRUCTG_ATTRG2, o1Ref);
+        Iom_jObject iomObj=new Iom_jObject(ILI_CLASSH, OID2);
+        iomObj.addattrobj(ILI_CLASSH_ATTRH2, iomStruct);
+        ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObj));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1,logger.getErrs().size());
+        assertEquals("No object found with OID o1.", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Referenzierten Klassen nicht erstellt/gefunden wurden.
 	@Test
@@ -251,9 +276,9 @@ public class ReferenceType23Test {
 	// - ExtObjectFound=true;
 	// - AllObjectsAccessible ist true gesetzt.
 	@Test
-	public void allObjectsAccessible_external_TargetObjFound_Ok(){
+	public void external_allObjectsAccessible_ExtObjResolver_TargetObjFound_Ok(){
 		String objTargetId=ExternalObjResolverMock.OID1;
-		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, OID1);
+		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, objTargetId);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
 		o1Ref.setobjectrefoid(objTargetId);
 		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTG, null);
@@ -281,15 +306,10 @@ public class ReferenceType23Test {
 		assertEquals(0,logger.getErrs().size());
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die folgenden Einstellungen gemacht werden:
-	// - Das Zielobjekt: classA,o1 befindet sich in der Basket bid2 und wird durch den Resolver gefunden.
-	// - External ist true gesetzt.
-	// - ExtObjectFound=true.
-	// - AllObjectsAccessible ist false gesetzt.
 	@Test
-	public void external_TargetObjFound_Ok(){
-		String objTargetId=ExternalObjResolverMock.OID1;
-		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, OID1);
+	public void external_ExtObjResolver_Ok(){
+		String objTargetId=OID1;
+		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, objTargetId);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
 		o1Ref.setobjectrefoid(objTargetId);
 		Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTG, null);
@@ -322,8 +342,8 @@ public class ReferenceType23Test {
 	// - ExtObjectFound=false.
 	// - AllObjectsAccessible ist false gesetzt.
 	@Test
-	public void external_ExtObjResolver_TargetObjNotFound_Ok(){
-		String objTargetId=OID1;
+	public void external_ExtObjResolver_externalTargetObj_Ok(){
+		String objTargetId=ExternalObjResolverMock.OID1;
 		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, OID3);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
 		o1Ref.setobjectrefoid(objTargetId);
@@ -358,7 +378,7 @@ public class ReferenceType23Test {
 	// - Das Zielobjekt: classA,o1 existiert nicht
 	// - AllObjectsAccessible ist true.
 	@Test
-	public void allObjectsAccessible_external_ExtObjResolver_TargetObjNotFound_Fail(){
+	public void external_allObjectsAccessible_ExtObjResolver_TargetObjNotFound_Fail(){
 		String objTargetId=OID1;
 		Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, OID3);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
@@ -391,7 +411,7 @@ public class ReferenceType23Test {
     // - keine Referenz auf Zielobjekt vorhanden
     // - AllObjectsAccessible ist true.
     @Test
-    public void allObjectsAccessible_external_ExtObjResolver_optionalRefAttr_noref_Ok(){
+    public void external_allObjectsAccessible_ExtObjResolver_optionalRefAttr_noref_Ok(){
         Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, OID3);
         Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTI, null);
         Iom_jObject iomObj=new Iom_jObject(ILI_CLASSJ, OID2);
@@ -401,9 +421,9 @@ public class ReferenceType23Test {
         LogCollector logger=new LogCollector();
         LogEventFactory errFactory=new LogEventFactory();
         Settings settings=new Settings();
-        //List<Class> resolverClasses=new ArrayList<Class>();
-        //resolverClasses.add(ExternalObjResolverMock.class);
-        //settings.setTransientObject(Validator.CONFIG_OBJECT_RESOLVERS, resolverClasses);
+        List<Class> resolverClasses=new ArrayList<Class>();
+        resolverClasses.add(ExternalObjResolverMock.class);
+        settings.setTransientObject(Validator.CONFIG_OBJECT_RESOLVERS, resolverClasses);
         Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
         validator.validate(new StartTransferEvent());
         validator.validate(new StartBasketEvent(TOPIC,BID1));
@@ -417,7 +437,7 @@ public class ReferenceType23Test {
         assertEquals(0,logger.getErrs().size());
     }
     @Test
-    public void allObjectsAccessible_external_optionalRefAttr_noref_Ok(){
+    public void external_allObjectsAccessible_optionalRefAttr_noref_Ok(){
         Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, OID3);
         Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTI, null);
         Iom_jObject iomObj=new Iom_jObject(ILI_CLASSJ, OID2);
@@ -427,9 +447,6 @@ public class ReferenceType23Test {
         LogCollector logger=new LogCollector();
         LogEventFactory errFactory=new LogEventFactory();
         Settings settings=new Settings();
-        List<Class> resolverClasses=new ArrayList<Class>();
-        resolverClasses.add(ExternalObjResolverMock.class);
-        settings.setTransientObject(Validator.CONFIG_OBJECT_RESOLVERS, resolverClasses);
         Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
         validator.validate(new StartTransferEvent());
         validator.validate(new StartBasketEvent(TOPIC,BID1));
