@@ -34,6 +34,7 @@ public class ReferenceType23Test {
 	private static final String ILI_CLASSF_ATTRF2 = "attrF2";
 	private final static String ILI_CLASSH=TOPIC+".ClassH";
 	private static final String ILI_CLASSH_ATTRH2 = "attrH2";
+    private static final String ILI_CLASSH_ATTRH3 = "attrH3";
     private final static String ILI_CLASSJ=TOPIC+".ClassJ";
     private static final String ILI_CLASSJ_ATTRJ2 = "attrJ2";
 	// STRUCTS
@@ -45,6 +46,8 @@ public class ReferenceType23Test {
     private final static String ILI_STRUCTE_ATTRE2="attrE2";
 	private final static String ILI_STRUCTG=TOPIC+".StructG";
 	private static final String ILI_STRUCTG_ATTRG2 = "attrG2";
+    private final static String ILI_STRUCTG2=TOPIC+".StructG2";
+    private static final String ILI_STRUCTG2_SUBATTR = "subattr";
     private final static String ILI_STRUCTI=TOPIC+".StructI";
     private static final String ILI_STRUCTI_ATTRI2 = "attrI2";
 	// OID
@@ -156,6 +159,33 @@ public class ReferenceType23Test {
         iomStruct.addattrobj(ILI_STRUCTG_ATTRG2, o1Ref);
         Iom_jObject iomObj=new Iom_jObject(ILI_CLASSH, OID2);
         iomObj.addattrobj(ILI_CLASSH_ATTRH2, iomStruct);
+        ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObj));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1,logger.getErrs().size());
+        assertEquals("No object found with OID o1.", logger.getErrs().get(0).getEventMsg());
+    }
+    @Test
+    public void external_allObjectsAccessible_externalTargetObj_subStruct_Fail(){
+        String objTargetId=OID1;
+        Iom_jObject o1Ref=new Iom_jObject("REF", null);
+        o1Ref.setobjectrefoid(objTargetId);
+        Iom_jObject iomStruct=new Iom_jObject(ILI_STRUCTG, null);
+        iomStruct.addattrobj(ILI_STRUCTG_ATTRG2, o1Ref);
+        Iom_jObject iomStructG2=new Iom_jObject(ILI_STRUCTG2, null);
+        iomStructG2.addattrobj(ILI_STRUCTG2_SUBATTR, iomStruct);
+        
+        Iom_jObject iomObj=new Iom_jObject(ILI_CLASSH, OID2);
+        iomObj.addattrobj(ILI_CLASSH_ATTRH3, iomStructG2);
         ValidationConfig modelConfig=new ValidationConfig();
         modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
         LogCollector logger=new LogCollector();

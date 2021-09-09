@@ -2558,6 +2558,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							}
 						}
 					}
+				}else if(type instanceof CompositionType) {
+				    String attrName=refAttr.getName();
+                    int structc=iomStruct.getattrvaluecount(attrName);
+                    for(int structi=0;structi<structc;structi++){
+                       IomObject structValue=iomStruct.getattrobj(attrName, structi);
+                       if(structValue==null) {
+                           // invalid: structAttributeName element without a nested structure element
+                           // but already reported in validateAttrValue()
+                       }else {
+                           validateReferenceAttrs(refAttr.getScopedName(),structValue, ((CompositionType) type).getComponentType(), bidOfObj);
+                       }
+                   }
 				}
 			}
 		}

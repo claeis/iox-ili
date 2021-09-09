@@ -7,6 +7,7 @@ LATEST
 -----------------------------
 - TranslateToTranslation: fix mapping of struct at model level (ili2db#405)
 - ReduceToBaseModel: fix mapping of struct at model level (ili2db#405)
+- Validator: failed to validate reference attrs in sub-structures (ilivalidator#319) 
 
 iox-ili 1.21.6 (2021-04-30)
 -----------------------------
