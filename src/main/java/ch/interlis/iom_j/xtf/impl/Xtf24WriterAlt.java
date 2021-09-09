@@ -266,11 +266,20 @@ import java.util.Map;
 							{
 								// COORD
 								xout.writeStartElement(xmlns_attr,iliAttrName);
-								writeCoord("coord",child);
+								writeCoord(child);
 								xout.writeEndElement(/*attr*/);
 								if (valueCount > 1)
 								{
 									throw new IoxException("max one COORD value allowed ("+iliAttrName+")");
+								}
+							}
+							else if (child.getobjecttag().equals("MULTICOORD")) {
+								xout.writeStartElement(xmlns_attr, iliAttrName);
+								writeMultiCoord(child);
+								xout.writeEndElement(/*attr*/);
+								if (valueCount > 1)
+								{
+									throw new IoxException("max one MULTICOORD value allowed (" + iliAttrName + ")");
 								}
 							}
 							else if (child.getobjecttag().equals("POLYLINE"))
@@ -364,19 +373,18 @@ import java.util.Map;
         }
         /** writes a coord value or a coord segment.
          */
-        private void writeCoord(String localName,IomObject obj)
+        private void writeCoord(IomObject obj)
 		throws IoxException
         {
         /*
-             object: COORD
-               C1
-                 102.0
-               C2
-                 402.0
-	        <COORD><C1>102.0</C1><C2>402.0</C2></COORD>
+             <geom:coord>
+                 <geom:c1>NumericConst</geom:c1>
+                 <geom:c2>NumericConst</geom:c2>
+                 [ <geom:c3>NumericConst</geom:c3> ]
+             </geom:coord>
         */
 		try{
-			xout.writeStartElement(geomNs,localName);
+			xout.writeStartElement(geomNs, "coord");
 			String c1=obj.getattrprim("C1",0);
 			writeElementStringOptional(geomNs,"c1",c1);
 			String c2=obj.getattrprim("C2",0);
@@ -393,6 +401,27 @@ import java.util.Map;
 		}
 
         }
+
+        private void writeMultiCoord(IomObject obj)
+                throws IoxException
+        {
+        /*
+             <geom:multicoord>
+             (* CoordValue *)
+             </geom:multicoord>.
+        */
+            try {
+                xout.writeStartElement(geomNs,"multicoord");
+                for (int coordi = 0; coordi < obj.getattrvaluecount("coord"); coordi++) {
+                    IomObject coord = obj.getattrobj("coord", coordi);
+                    writeCoord(coord);
+                }
+                xout.writeEndElement();
+            }catch(XMLStreamException ex){
+                throw new IoxException(ex);
+            }
+        }
+
         /** writes a arc segment value.
          */
         private void writeArc(IomObject obj)
@@ -521,7 +550,7 @@ import java.util.Map;
 					IomObject segment=sequence.getattrobj("segment",segmenti);
 					if(segment.getobjecttag().equals("COORD")){
 						// COORD
-						writeCoord(segmenti==0?"start":"straight",segment); // FIXME localname
+						writeCoord(segment);
 					}else if(segment.getobjecttag().equals("ARC")){
 						// ARC
 						writeArc(segment);
