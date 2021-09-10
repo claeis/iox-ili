@@ -190,7 +190,7 @@ public class Datatypes23Test {
 	@Test
 	public void dateMinYearOk(){
 		Iom_jObject objMinYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objMinYear.setattrvalue("aDate", "1582-1-30");
+		objMinYear.setattrvalue("aDate", "1582-01-30");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -265,7 +265,7 @@ public class Datatypes23Test {
 	@Test
 	public void dateMaxYearOk(){
 		Iom_jObject objMaxYear=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objMaxYear.setattrvalue("aDate", "2999-1-30");
+		objMaxYear.setattrvalue("aDate", "2999-01-30");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -284,7 +284,7 @@ public class Datatypes23Test {
 	@Test
 	public void dateMinMonthOk(){
 		Iom_jObject objMinMonth=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objMinMonth.setattrvalue("aDate", "2016-1-30");
+		objMinMonth.setattrvalue("aDate", "2016-01-30");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -322,7 +322,7 @@ public class Datatypes23Test {
 	@Test
 	public void dateMinDayOk(){
 		Iom_jObject objMinDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objMinDay.setattrvalue("aDate", "2016-1-1");
+		objMinDay.setattrvalue("aDate", "2016-01-01");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -341,7 +341,7 @@ public class Datatypes23Test {
 	@Test
 	public void dateMaxDayOk(){
 		Iom_jObject objMaxDay=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objMaxDay.setattrvalue("aDate", "2016-1-31");
+		objMaxDay.setattrvalue("aDate", "2016-01-31");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1477,7 +1477,7 @@ public class Datatypes23Test {
 	@Test
 	public void dateYearToLowFail(){
 		Iom_jObject objYearToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objYearToLow.setattrvalue("aDate", "1580-2-15");
+		objYearToLow.setattrvalue("aDate", "1580-02-15");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1490,14 +1490,14 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <1580-2-15> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <1580-02-15> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die Eingabe des Jahres in einem gueltigen Bereich ist. Maximaler Test.
 	@Test
 	public void dateYearToHighFail(){
 		Iom_jObject objYearToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objYearToHigh.setattrvalue("aDate", "3000-2-15");
+		objYearToHigh.setattrvalue("aDate", "3000-02-15");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1510,14 +1510,14 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <3000-2-15> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <3000-02-15> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Monat von Datum zu klein.
 	@Test
 	public void dateMonthToLowFail(){
 		Iom_jObject objMonthToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objMonthToLow.setattrvalue("aDate", "2016-0-15");
+		objMonthToLow.setattrvalue("aDate", "2016-00-15");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1530,7 +1530,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <2016-0-15> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <2016-00-15> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Monat von Datum zu gross.
@@ -1557,7 +1557,7 @@ public class Datatypes23Test {
 	@Test
 	public void dateDayToLowFail(){
 		Iom_jObject objDayToLow=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objDayToLow.setattrvalue("aDate", "2016-2-0");
+		objDayToLow.setattrvalue("aDate", "2016-02-00");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1570,14 +1570,14 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <2016-2-0> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <2016-02-00> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Tag von Datum zu gross.
 	@Test
 	public void dateDayToHighFail(){
 		Iom_jObject objDayToHigh=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objDayToHigh.setattrvalue("aDate", "2016-2-32");
+		objDayToHigh.setattrvalue("aDate", "2016-02-32");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1590,14 +1590,14 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <2016-2-32> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
+		assertEquals("date value <2016-02-32> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Datenformat mit Punkten unzulaessig.
 	@Test
 	public void dateFormatWithDotsFail(){
 		Iom_jObject objFormatWithDots=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objFormatWithDots.setattrvalue("aDate", "2016.2.15");
+		objFormatWithDots.setattrvalue("aDate", "2016.02.15");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1610,14 +1610,14 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of date value <2016.2.15> in attribute aDate", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of date value <2016.02.15> in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Datenformat mit Slash unzulaessig.
 	@Test
 	public void dateFormatWithSlashFail(){
 		Iom_jObject objFormatSlash=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-		objFormatSlash.setattrvalue("aDate", "2016/2/15");
+		objFormatSlash.setattrvalue("aDate", "2016/02/15");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1630,7 +1630,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid format of date value <2016/2/15> in attribute aDate", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of date value <2016/02/15> in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Eingabe des Datum mit zu kleinem Jahresdatum (jjjj) unzulaessig.
@@ -1650,9 +1650,30 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <216-2-2> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of date value <216-2-2> in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
-	
+
+	// Eingabe des Datums zu kurz (jjjj-mm-dd). Eingabe unzulaessig.
+	@Test
+	public void dateWithinRangeLengthToShortFail(){
+		Iom_jObject objLengthToLong=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
+		// Set Attributes
+		objLengthToLong.setattrvalue("aDate", "2021-9-7");
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent("Datatypes23.Topic","b1"));
+		validator.validate(new ObjectEvent(objLengthToLong));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("invalid format of date value <2021-9-7> in attribute aDate", logger.getErrs().get(0).getEventMsg());
+	}
+
 	// Eingabe des Datum Jahres zu lang (jjjj). Eingabe unzulaessig.
 	@Test
 	public void dateLengthToLongFail(){
@@ -1671,7 +1692,7 @@ public class Datatypes23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("date value <20016-12-15> is not in range in attribute aDate", logger.getErrs().get(0).getEventMsg());
+		assertEquals("invalid format of date value <20016-12-15> in attribute aDate", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Zeitangabe Stunde zu lang. unzulaessig.

@@ -12,12 +12,14 @@ import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.CompositionType;
+import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.Enumeration;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.Model;
 import ch.interlis.ili2c.metamodel.ObjectType;
 import ch.interlis.ili2c.metamodel.RoleDef;
+import ch.interlis.ili2c.metamodel.Table;
 import ch.interlis.ili2c.metamodel.Topic;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.Type;
@@ -50,13 +52,7 @@ public class ReduceToBaseModel implements IoxFilter {
 	
 	public ReduceToBaseModel(List<Model> exportModels,TransferDescription td,Settings config)
 	{
-		setup(exportModels, td, config);
-	}
-    protected ReduceToBaseModel()
-    {
-        
-    }
-    protected void setup(List<Model> exportModels,TransferDescription td,Settings config) {
+		this.td=td;
 		this.destModels=exportModels;
         this.doItfLineTables = Validator.CONFIG_DO_ITF_LINETABLES_DO.equals(config.getValue(Validator.CONFIG_DO_ITF_LINETABLES));
         if(doItfLineTables){
@@ -84,7 +80,7 @@ public class ReduceToBaseModel implements IoxFilter {
 			}
 			
 		}
-    }
+	}
 	private void setupTranslation(Topic srcTopic){
 		Topic destTopic=srcTopic;
 		do{
@@ -95,7 +91,7 @@ public class ReduceToBaseModel implements IoxFilter {
 			}
 			// find dest topic
 			// translated topics, origin topics
-			Set<Topic> destTopics=getTranslationsOf(destTopic);
+			List<Topic> destTopics=getTranslationsOf(destTopic);
 			for(Topic d:destTopics) {
 	            if(destModels.contains(d.getContainer(Model.class))) {
 	                // setup mapping of topic content
@@ -109,8 +105,8 @@ public class ReduceToBaseModel implements IoxFilter {
 		return;
 	}
 	
-	private Set<Topic> getTranslationsOf(Topic start) {
-	    Set<Topic> ret=new HashSet<Topic>();
+	private List<Topic> getTranslationsOf(Topic start) {
+	    List<Topic> ret=new ArrayList<Topic>();
 	    ArrayList<Topic> queue=new ArrayList<Topic>();
 	    Topic topic=(Topic) start.getTranslationOfOrSame();
 	    queue.add(topic);
@@ -118,7 +114,11 @@ public class ReduceToBaseModel implements IoxFilter {
 	    while(queue.size()>0){
             topic=queue.remove(0);
 	        ArrayList<Topic> translatedBy=topicTranslatedBy.get(topic);
-	        ret.addAll(translatedBy);
+	        for(Topic t:translatedBy) {
+	            if(!ret.contains(t)) {
+	                ret.add(t);
+	            }
+	        }
 	        queue.addAll(translatedBy);
 	    }
 	    ret.remove(start);
@@ -218,13 +218,47 @@ public class ReduceToBaseModel implements IoxFilter {
 			}
 		}
 	}
+    private void setupStructMapping(Table srcStruct,Table destStruct) {
+        if(srctag2destElement.containsKey(srcStruct.getScopedName())) {
+            return;
+        }
+        Container destContainer=destStruct;
+        Container srcContainer=srcStruct;
+        {
+            destContainer=destContainer.getContainer();
+            srcContainer=srcContainer.getContainer();
+            if(!srctag2destElement.containsKey(srcContainer.getScopedName())) {
+                if(srcContainer instanceof Topic) {
+                    setupTopicTranslation((Topic)srcContainer, (Topic)destContainer);
+                }else {
+                    // Model
+                    Iterator it=destContainer.iterator();
+                    Iterator srcIt=srcContainer.iterator();
+                    while(it.hasNext() && srcIt.hasNext()){
+                        Element destEle=(Element)it.next();
+                        Element srcEle=(Element)srcIt.next();
+                        if(destEle instanceof Table && !((Table) destEle).isIdentifiable()) {
+                            if(!srctag2destElement.containsKey(srcEle.getScopedName())) {
+                                srctag2destElement.put(srcEle.getScopedName(), destEle);
+                                if(srcEle!=destEle) {
+                                    setupClassTranslation((Table)srcEle,(Table)destEle);
+                                }else {
+                                    // no object translation required
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }while(!(destContainer instanceof Model));
+    }
 	@Override
 	public IoxEvent filter(IoxEvent event) throws IoxException {
 		 if(event instanceof StartTransferEvent){
 		}else if(event instanceof StartBasketEvent){
 			String srcTopicName=((StartBasketEvent) event).getType();
 			srcTopic = tag2topic.get(srcTopicName);
-			srctag2destElement=new HashMap<String,Object>();			
+			resetMapping();
 			setupTranslation(srcTopic);
 			destTopic = (Topic)getTranslatedElement(srcTopic);
 			if(destTopic==srcTopic) {
@@ -253,6 +287,10 @@ public class ReduceToBaseModel implements IoxFilter {
 		}
 		return event;
 	}
+    private void resetMapping() {
+        srctag2destElement=new HashMap<String,Object>();            
+        src2destEles=new HashMap<EnumerationType,Map<String,String>>();
+    }
 
 	private void translateObject(IomObject iomObj) {
 		Element modelElement = (Element)tag2class.get(iomObj.getobjecttag());
@@ -260,11 +298,6 @@ public class ReduceToBaseModel implements IoxFilter {
 		if(destModelEle==modelElement){
 			// no translation required
 			return;
-		}
-		if(isForeignElement(modelElement)) {
-		    // STRUCTURE of a other model (such as a Catalog.Item)
-            // no translation required
-            return;
 		}
 		if(doItfLineTables && modelElement instanceof AttributeDef){
 			// TODO see TranslateToOrigin
@@ -312,12 +345,6 @@ public class ReduceToBaseModel implements IoxFilter {
 		Element destEle=(Element)srctag2destElement.get(modelElement.getScopedName());
 		return destEle;
 	}
-    private boolean isForeignElement(Element modelElement) {
-        // a mapping from a scopedName to null means: remove element
-        // therefore test if map contains scopedName as key to check if modelElement is from the current topic
-        return !srctag2destElement.containsKey(modelElement.getScopedName());
-    }
-
 	private void translateAttrValue(IomObject iomObj, AttributeDef srcAttr) {
 		String srcAttrName=srcAttr.getName();
 		int attrc=iomObj.getattrvaluecount(srcAttrName);
@@ -355,6 +382,7 @@ public class ReduceToBaseModel implements IoxFilter {
 				}else{
 					IomObject structValue=(IomObject)attrValue;
 					if(isCompType){
+					    setupStructMapping(((CompositionType)srcAttr.getDomain()).getComponentType(),((CompositionType)destAttr.getDomain()).getComponentType());
 						translateObject(structValue);
 					}
 					iomObj.addattrobj(destAttrName,structValue);

@@ -69,7 +69,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
     
     // segmentType
     private enum SegmentType {
-    	C1,C2,C3,A1,A2,R,MULTICOORD
+        C1,C2,C3,A1,A2,R
     }
     
     // enum
@@ -1005,24 +1005,13 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                             throw new IoxSyntaxException(event2msgtext(event));
                         }
                     }else if(event.asStartElement().getName().equals(QNAME_GEOM_MULTICOORD)){
-                        if(!event.isStartElement()){
-                            throw new IoxSyntaxException(event2msgtext(event));
-                        }
-                        event=xmlreader.nextEvent(); // <multicoord>
-                        event=skipSpacesAndGetNextEvent(event);
-                        if(!event.isStartElement()){
-                            throw new IoxSyntaxException(event2msgtext(event));
-                        }
-                        IomObject returnedObj=readSequence(event);
-                        if(returnedObj.getattrcount()==0){
-                            throw new IoxException("expected multicoord. unexpected event: "+event.asStartElement().getName().getLocalPart());
-                        }
-                        iomObj.addattrobj(attrName, returnedObj);
-                        event=xmlreader.nextEvent(); // <coord>
-                        event=skipSpacesAndGetNextEvent(event);
-                        if(event.isEndElement()){
-                            attrName=null;
-                        }else{
+                        IomObject multicoord = readMultiCoord(event);
+                        iomObj.addattrobj(attrName, multicoord);
+                        event = xmlreader.nextEvent(); // <multicoord>
+                        event = skipSpacesAndGetNextEvent(event);
+                        if (event.isEndElement()) { // </attribute>
+                            attrName = null;
+                        } else {
                             throw new IoxSyntaxException(event2msgtext(event));
                         }
                     }else if(event.asStartElement().getName().equals(QNAME_GEOM_POLYLINE)){
@@ -1306,6 +1295,28 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		}
 		return sequence;
 	}
+
+    private IomObject readMultiCoord(XMLEvent event) throws XMLStreamException, IoxException {
+        IomObject multicoord = createIomObject("MULTICOORD", null);
+        event=xmlreader.nextEvent();
+        event=skipSpacesAndGetNextEvent(event);
+
+        if (event.isStartElement()) {
+            while (event.isStartElement()) {
+                event = xmlreader.nextEvent();
+                event = skipSpacesAndGetNextEvent(event);
+                multicoord.addattrobj("coord", readSegment(event, SEGMENTTYPE_COORD));
+                event = xmlreader.nextEvent();
+                event = skipSpacesAndGetNextEvent(event);
+            }
+        }
+
+        if (multicoord.getattrcount() == 0) {
+            throw new IoxException("expected multicoord. unexpected event: " + event.asStartElement().getName().getLocalPart());
+        }
+
+        return multicoord;
+    }
     
 	/** Prepare segment
 	 * @param event
@@ -1341,8 +1352,6 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 					case A1: segment.setattrvalue("A1", event.asCharacters().getData());
 						break;
 					case A2: segment.setattrvalue("A2", event.asCharacters().getData());
-						break;
-					case MULTICOORD: segment.setattrvalue("multicoord", event.asCharacters().getData());
 						break;
 					case R: segment.setattrvalue("R", event.asCharacters().getData());
 						break;

@@ -50,9 +50,14 @@ MODEL ReferenceType23
 		   attrG2 : MANDATORY REFERENCE TO (EXTERNAL) ClassA;
 		END StructG;
 
+		STRUCTURE StructG2 =
+		   subattr : BAG {0..*} OF StructG;
+		END StructG2;
+		
 		CLASS ClassH =
 		   attrH1 : 0.0 .. 10.0;
 		   attrH2 : BAG {0..*} OF StructG;
+		   attrH3 : BAG {0..*} OF StructG2;
 		END ClassH;	
 
 		STRUCTURE StructI =
