@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- ReaderFactory: support CONFIG_CUSTOM_READERS
 
 iox-ili 1.21.7 (2021-09-10)
 -----------------------------
