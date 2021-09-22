@@ -63,31 +63,32 @@ public class ReaderFactory{
 	        throw new IoxException("unknown xml file");
 		}
 	    List<Class> customReaders=(List<Class>)settings.getTransientObject(CONFIG_CUSTOM_READERS);
-	    for(Class customReaderClass:customReaders) {
-	        try {
-	            Constructor<? extends IoxReader> cnstr=(Constructor<? extends IoxReader>) getConstructorForArgs(customReaderClass, new Class[]{ File.class,LogEventFactory.class,Settings.class });
-	            if(cnstr==null) {
-	                // ignore
-	                EhiLogger.logAdaption(customReaderClass.getName()+" ignored; no matching constructor");
-	                continue;
+	    if(customReaders!=null) {
+	        for(Class customReaderClass:customReaders) {
+	            try {
+	                Constructor<? extends IoxReader> cnstr=(Constructor<? extends IoxReader>) getConstructorForArgs(customReaderClass, new Class[]{ File.class,LogEventFactory.class,Settings.class });
+	                if(cnstr==null) {
+	                    // ignore
+	                    EhiLogger.logAdaption(customReaderClass.getName()+" ignored; no matching constructor");
+	                    continue;
+	                }
+	                reader=cnstr.newInstance(inputFile,errFact,settings);
+	            } catch (InstantiationException e) {
+	                throw new IoxException("failed to create reader "+customReaderClass.getName(),e);
+	            } catch (IllegalAccessException e) {
+	                throw new IoxException("failed to create reader "+customReaderClass.getName(),e);
+	            } catch (IllegalArgumentException e) {
+	                throw new IoxException("failed to create reader "+customReaderClass.getName(),e);
+	            } catch (InvocationTargetException e) {
+	                if(e.getTargetException() instanceof IoxException) {
+	                    // ignore
+	                }else {
+	                    throw new IoxException("failed to create reader "+customReaderClass.getName(),e.getTargetException());
+	                }
 	            }
-	            reader=cnstr.newInstance(inputFile,errFact,settings);
-            } catch (InstantiationException e) {
-                throw new IoxException("failed to create reader "+customReaderClass.getName(),e);
-            } catch (IllegalAccessException e) {
-                throw new IoxException("failed to create reader "+customReaderClass.getName(),e);
-            } catch (IllegalArgumentException e) {
-                throw new IoxException("failed to create reader "+customReaderClass.getName(),e);
-            } catch (InvocationTargetException e) {
-                if(e.getTargetException() instanceof IoxException) {
-                    // ignore
-                }else {
-                    throw new IoxException("failed to create reader "+customReaderClass.getName(),e.getTargetException());
-                }
-            }
-	        return reader;
+	            return reader;
+	        }
 	    }
-		
 		if(IoxUtility.isCsvFilename(inputFile.getName())) {
 	        reader=new CsvReader(inputFile);
 	        IoxEvent event5=null;

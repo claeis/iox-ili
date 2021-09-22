@@ -63,13 +63,19 @@ public class IoxUtility {
 	 * @return list of model names (list&lt;String modelname&gt;) 
 	 * @throws ch.interlis.iox.IoxException
 	 */
-	public static java.util.List<String> getModels(java.io.File xtffile)
+    @Deprecated
+    public static java.util.List<String> getModels(java.io.File xtffile)
+            throws ch.interlis.iox.IoxException
+        {
+            return getModels(xtffile,null, null);
+        }
+	public static java.util.List<String> getModels(java.io.File xtffile, LogEventFactory errFactory,Settings settings)
 		throws ch.interlis.iox.IoxException
 	{
 		ArrayList<String> ret=new ArrayList<String>();
 		IoxReader reader=null;
 		try{
-			reader=new ReaderFactory().createReader(xtffile, null);
+			reader=new ReaderFactory().createReader(xtffile,errFactory,settings);
 			IoxEvent event=null;
 			try{
 				while((event=reader.read())!=null){
