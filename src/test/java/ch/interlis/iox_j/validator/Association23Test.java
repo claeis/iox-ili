@@ -793,6 +793,50 @@ public class Association23Test {
         assertTrue(logger.getErrs().size()>0);
         assertEquals("Role Association23.Topic.ab1.a1 requires only one reference property", logger.getErrs().get(0).getEventMsg());
     }
+    @Test
+    public void embeddedAsso_NoRef_Fail(){
+        Iom_jObject iomObjG=new Iom_jObject(ILI_CLASSG, OBJ_OID1);
+        Iom_jObject iomObjH1=new Iom_jObject(ILI_CLASSH, OBJ_OID2);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+        validator.validate(new ObjectEvent(iomObjG));
+        validator.validate(new ObjectEvent(iomObjH1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==2);
+        assertEquals("h1 should associate 1 to 1 target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
+        assertEquals("g1 should associate 1 to 1 target objects (instead of 0)", logger.getErrs().get(1).getEventMsg());
+    }
+    @Test
+    public void embeddedAsso_EncodedAsStandalone_Fail(){
+        Iom_jObject iomObjG=new Iom_jObject(ILI_CLASSG, OBJ_OID1);
+        Iom_jObject iomObjH1=new Iom_jObject(ILI_CLASSH, OBJ_OID2);
+        Iom_jObject iomLinkGH1=new Iom_jObject(ILI_TOPIC+".gh1", null);
+        iomLinkGH1.addattrobj("g1", "REF").setobjectrefoid(iomObjG.getobjectoid());
+        iomLinkGH1.addattrobj("h1", "REF").setobjectrefoid(iomObjH1.getobjectoid());
+        
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BASKET_ID1));
+        validator.validate(new ObjectEvent(iomObjG));
+        validator.validate(new ObjectEvent(iomObjH1));
+        validator.validate(new ObjectEvent(iomLinkGH1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1,logger.getErrs().size());
+        assertEquals("Link Association23.Topic.gh1 must be embedded", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// Wenn von der KlasseB, welche ueber KlasseBP eine Beziehung zur KlasseA ueber die KlasseAP ueber den Rollennamen: a1,
 	// 1 Mal besteht soll keine Fehlermeldung ausgegeben werden.

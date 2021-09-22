@@ -3064,7 +3064,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             AssociationDef modelAssociationDef = (AssociationDef) aclass1;
             Domain oidType=((AbstractClassDef) modelAssociationDef).getOid();
             String oid = iomObj.getobjectoid();
-            if (modelAssociationDef.isIdentifiable() || oidType!=null){
+            if(isObject && modelAssociationDef.isLightweight()) {
+                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.linkMustBeEmbedded"), iomObj.getobjecttag()));
+                addToPool = false;
+            }else if (modelAssociationDef.isIdentifiable() || oidType!=null){
                 if (oid == null){
                     errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.AssociationHasToHaveAnOid"), iomObj.getobjecttag()));
                     addToPool = false;
