@@ -6,6 +6,7 @@ ideas/open issues
 LATEST
 -----------------------------
 - ReaderFactory: support CONFIG_CUSTOM_READERS
+- Validator: check uniqueness of TIDs across the whole file (ilivalidator#320)
 
 iox-ili 1.21.7 (2021-09-10)
 -----------------------------

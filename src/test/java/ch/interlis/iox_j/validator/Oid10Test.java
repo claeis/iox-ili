@@ -88,7 +88,7 @@ public class Oid10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("OID o1 of object Oid1.Topic.ClassB already exists in CLASS Oid1.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("OID o1 of object Oid1.Topic.ClassB already exists in Oid1.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob in unterschiedlichen Klassen die OIDs doppelt erstellt werden koennen.

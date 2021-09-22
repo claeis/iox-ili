@@ -180,6 +180,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private HashSet<String> seenModels=new HashSet<String>();
 	private HashSet<String> datatypesOutputReduction=new HashSet<String>();
 	private Map<String, String> uniquenessOfBid = new HashMap<String, String>();
+    private Map<String, String> stableBids = new HashMap<String, String>();
 	private String globalMultiplicity=null;
 	private ch.interlis.ilirepository.ReposManager repositoryManager = null;
 	private java.util.ResourceBundle rsrc=java.util.ResourceBundle.getBundle("ch.interlis.iox_j.validator.ValidatorMessages");
@@ -339,6 +340,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			errs.addEvent(errFact.logInfoMsg(rsrc.getString("validate.firstValidationPass")));
 			validateInconsistentIliAndXMLVersion(event);
 			uniquenessOfBid.clear();
+			uniquenessOfBid.putAll(stableBids);
+			objectPool.startNewTransfer();
 		} else if (event instanceof ch.interlis.iox.StartBasketEvent){
 			StartBasketEvent startBasketEvent = ((ch.interlis.iox.StartBasketEvent) event);
 			currentBasketId = ((ch.interlis.iox.StartBasketEvent) event).getBid();
@@ -431,19 +434,31 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             LogEventFactory factory = new LogEventFactory();
             errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.valueIsNotAValidBID"), event.getBid()==null?"":event.getBid()));
         }
+        Domain bidDomain=null;
         if(isValid) {
             Topic topic = (Topic)td.getElement(event.getType());
             Model model=(Model) topic.getContainer();
             seenModels.add(model.getName());
             collectSetConstraints(topic);
-            Domain bidDomain=topic.getBasketOid();
+            bidDomain=topic.getBasketOid();
             if (bidDomain!=null && !isAValidBasketOID(bidDomain, event.getBid())) {
                 isValid = false;
                 errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.valueIsNotAValidBID"), event.getBid()==null?"":event.getBid()));
             }
         }
         if(isValid) {
-            validateUniqueBasketId(event);
+            String bid=event.getBid();
+            // check if basket id is unique in transfer file
+            if(bid != null){
+            	if(uniquenessOfBid.containsKey(bid)){
+            		errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateUniqueBasketId.bidOfAlreadyExistIn"), bid, event.getType(), uniquenessOfBid.get(bid)));
+            	} else {
+            		uniquenessOfBid.put(bid, event.getType());
+                    if (bidDomain!=null) {
+                        stableBids.put(bid, event.getType());
+                    }
+            	}
+            }
         }
     }
 	
@@ -526,18 +541,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		iterateThroughAllObjects();
 		validateAllAreas();
 		validatePlausibilityConstraints();
-	}
-	
-	private void validateUniqueBasketId(StartBasketEvent startBasketEvent) {
-	    String bid=startBasketEvent.getBid();
-		// check if basket id is unique in transfer file
-		if(bid != null){
-			if(uniquenessOfBid.containsKey(bid)){
-				errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateUniqueBasketId.bidOfAlreadyExistIn"), bid, startBasketEvent.getType(), uniquenessOfBid.get(bid)));
-			} else {
-				uniquenessOfBid.put(bid, startBasketEvent.getType());
-			}
-		}
 	}
 	
 	private void iterateThroughAdditionalModels(String[] additionalModels){
@@ -2993,8 +2996,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return true;
 	}
 
-	// Declaration of the uniqueness of Oid's.
-	String uniquenessOfOid = null;
 	// HashMap of global unique constraints.
 	HashMap<UniquenessConstraint, HashMap<AttributeArray, String>> seenUniqueConstraintValues = new HashMap<UniquenessConstraint, HashMap<AttributeArray, String>>();
 	// List of all object Oid's and associated classPath's of uniqueness validate of Oid's.
@@ -3227,11 +3228,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(addToPool){
 				{
 					// check if object id is unique in transferfile
-					IomObject objectValue = objectPool.addObject(iomObj,currentBasketId);
-					if(objectValue!=null){
-						Object modelElement=tag2class.get(objectValue.getobjecttag());
-						Viewable classValueOfKey= (Viewable) modelElement;
-						errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.oidXOfObjectYAlreadyExistsInZ"), currentMainOid, iomObj.getobjecttag(), classValueOfKey.toString()));
+					IomObject duplicateObj = objectPool.addObject(iomObj,currentBasketId);
+					if(duplicateObj!=null){
+						Viewable aclass= (Viewable) tag2class.get(duplicateObj.getobjecttag());
+						errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.oidXOfObjectYAlreadyExistsInZ"), currentMainOid, iomObj.getobjecttag(), aclass.getScopedName()));
 					}
 				}
 			}

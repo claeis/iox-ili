@@ -77,7 +77,7 @@ public class ObjectPool {
 		if(oid==null){
 			oid=getAssociationId(iomObj, (AssociationDef)modelEle);
 			if(oid==null) {
-			    throw new IllegalStateException("Association with missin REF "+iomObj.getobjecttag());
+			    throw new IllegalStateException("Association with missing REF "+iomObj.getobjecttag());
 			}
 		}
 		if(doItfOidPerTable){
@@ -95,6 +95,15 @@ public class ObjectPool {
 		}
 		if(collectionOfObjects.containsKey(key)){
 			return collectionOfObjects.get(key);
+		}
+		{
+	        OutParam<String> bidOfTargetObj = new OutParam<String>();
+	        ArrayList<Viewable> destinationClasses=new ArrayList<Viewable>();
+	        destinationClasses.add((Viewable<?>)modelEle);
+	        IomObject existingObj = getObject(oid, destinationClasses, bidOfTargetObj);
+		    if(existingObj!=null) {
+		        return existingObj;
+		    }
 		}
 			collectionOfObjects.put(key,iomObj);
 		return null;
@@ -154,4 +163,7 @@ public class ObjectPool {
 		}
 		return null;
 	}
+    public void startNewTransfer() {
+        // TODO clear/remove transient TIDs
+    }
 }

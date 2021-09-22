@@ -381,7 +381,7 @@ public class Association23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1,logger.getErrs().size());
-        assertEquals("OID Association23.Topic.ef1:o1:o2 of object Association23.Topic.ef1 already exists in ASSOCIATION Association23.Topic.ef1.", logger.getErrs().get(0).getEventMsg());
+        assertEquals("OID Association23.Topic.ef1:o1:o2 of object Association23.Topic.ef1 already exists in Association23.Topic.ef1.", logger.getErrs().get(0).getEventMsg());
     }
     @Test
     public void standAloneAsso_NtoN_similarLink_Ok(){
