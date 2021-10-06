@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" xmlns:geom="http://www.interlis.ch/geometry/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:DataTest1="http://www.interlis.ch/xtf/2.4/DataTest1">
+<ili:headersection><ili:models><ili:model>DataTest1</ili:model></ili:models><ili:sender>IOX</ili:sender></ili:headersection>
+<ili:datasection>
+<DataTest1:TopicB ili:bid="bidB">
+<DataTest1:ClassPM ili:tid="mOid"><DataTest1:attrPM><geom:multipolyline><geom:polyline><geom:coord><geom:c1>480000.111</geom:c1><geom:c2>70000.111</geom:c2><geom:c3>5000.111</geom:c3></geom:coord><geom:coord><geom:c1>480000.222</geom:c1><geom:c2>70000.222</geom:c2><geom:c3>5000.222</geom:c3></geom:coord><geom:coord><geom:c1>480000.333</geom:c1><geom:c2>70000.333</geom:c2><geom:c3>5000.333</geom:c3></geom:coord></geom:polyline></geom:multipolyline></DataTest1:attrPM></DataTest1:ClassPM>
+</DataTest1:TopicB>
+</ili:datasection>
+</ili:transfer>

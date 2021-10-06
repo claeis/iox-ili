@@ -297,6 +297,18 @@ import java.util.Map;
 									throw new IoxException("max one POLYLINE value allowed ("+iliAttrName+")");
 								}
 							}
+							else if (child.getobjecttag().equals("MULTIPOLYLINE"))
+							{
+								String xmlAttrName=iliAttrName;
+
+								xout.writeStartElement(xmlns_attr,xmlAttrName);
+								writeMultiPolyline(child);
+								xout.writeEndElement();
+								if (valueCount > 1)
+								{
+									throw new IoxException("max one MULTIPOLYLINE value allowed ("+iliAttrName+")");
+								}
+							}
 							else if (child.getobjecttag().equals("MULTISURFACE"))
 							{
 								// MULTISURFACE
@@ -574,6 +586,23 @@ import java.util.Map;
 			throw new IoxException(ex);
 		}
         }
+
+		/** writes a mulipolyline value.
+		 */
+		private void writeMultiPolyline(IomObject obj)
+		throws IoxException
+		{
+			try {
+				xout.writeStartElement(geomNs,"multipolyline");
+				for(int polylinei=0;polylinei<obj.getattrvaluecount("polyline");polylinei++){
+					IomObject polyline=obj.getattrobj("polyline",polylinei);
+					writePolyline(polyline, false);
+				}
+				xout.writeEndElement();
+			}catch(XMLStreamException ex){
+				throw new IoxException(ex);
+			}
+		}
 
         /** writes a surface value.
          */
