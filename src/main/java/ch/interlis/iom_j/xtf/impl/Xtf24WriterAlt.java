@@ -301,7 +301,7 @@ import java.util.Map;
 							{
 								// MULTISURFACE
 								xout.writeStartElement(xmlns_attr,iliAttrName);
-								writeSurface(child);
+								writeSurface(child, attr.isMultiSurfaceOrAreaType());
 								xout.writeEndElement(/*attr*/);
 								if (valueCount > 1)
 								{
@@ -577,7 +577,7 @@ import java.util.Map;
 
         /** writes a surface value.
          */
-        private void writeSurface(IomObject obj)
+        private void writeSurface(IomObject obj, boolean isMultiSurfaceOrAreaType)
 		throws IoxException
         {
         /*
@@ -602,41 +602,36 @@ import java.util.Map;
 	        </SURFACE>
         */
 		try{
-			xout.writeStartElement(geomNs,"surface");
-			boolean clipped=obj.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
-			for(int surfacei=0;surfacei<obj.getattrvaluecount("surface");surfacei++){
-				if(clipped){
-					xout.writeStartElement(iliNs,"CLIPPED"); // FIXME use multi
-				}else{
-					// an unclipped surface should have only one surface element
-					if(surfacei>0){
-						throw new IllegalArgumentException("unclipped surface with multi 'surface' elements");
-					}
-				}
+			int surfaceCount = obj.getattrvaluecount("surface");
+			boolean isIncomplete=obj.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
+
+			if (surfaceCount > 1 && !(isMultiSurfaceOrAreaType || isIncomplete)){
+				throw new IllegalArgumentException("surface with multiple 'surface' elements");
+			}
+
+			boolean doMultisurface = isMultiSurfaceOrAreaType || surfaceCount > 1;
+			if (doMultisurface) {
+				xout.writeStartElement(geomNs, "multisurface");
+			}
+
+			for(int surfacei=0;surfacei<surfaceCount;surfacei++){
+				xout.writeStartElement(geomNs,"surface");
 				IomObject surface=obj.getattrobj("surface",surfacei);
 				for(int boundaryi=0;boundaryi<surface.getattrvaluecount("boundary");boundaryi++){
 					IomObject boundary=surface.getattrobj("boundary",boundaryi);
 					xout.writeStartElement(geomNs,boundaryi==0?"exterior":"interior");
 					for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
 						IomObject polyline=boundary.getattrobj("polyline",polylinei);
-						IomObject lineattr=polyline.getattrobj("lineattr",0);
-						if(lineattr!=null){
-							xout.writeStartElement(geomNs,"lineattr");
-							String structType=lineattr.getobjecttag();
-							//xout.writeStartElement(getXmlNs(structType),getXmlName(structType));
-							writeObjAttrs(lineattr);
-							//xout.writeEndElement(/*lineattrStruct*/);
-							xout.writeEndElement(/*lineattr*/);
-						}
-						writePolyline(polyline,true);
+						writePolyline(polyline,false);
 					}
 					xout.writeEndElement(/*BOUNDARY*/);
 				}
-				if(clipped){
-					xout.writeEndElement(/*CLIPPED*/);
-				}
+				xout.writeEndElement(/*SURFACE*/);
 			}
-			xout.writeEndElement(/*SURFACE*/);
+
+			if (doMultisurface) {
+				xout.writeEndElement();
+			}
 		}catch(XMLStreamException ex){
 			throw new IoxException(ex);
 		}
