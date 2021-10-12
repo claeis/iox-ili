@@ -183,6 +183,7 @@ public class Ili2cUtility {
 			if(baseAttr.getContainer()!=v){
 				prop.setBaseDefInClass(baseAttr.getContainer().getScopedName(null));
 			}
+			prop.setTypeMultiSurfaceOrArea(attr.getDomainResolvingAliases() instanceof ch.interlis.ili2c.metamodel.MultiSurfaceOrAreaType);
 		}
 		if(obj.obj instanceof RoleDef){
 			RoleDef role = (RoleDef) obj.obj;
