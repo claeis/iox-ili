@@ -15,6 +15,7 @@ import ch.interlis.iox_j.utility.ReaderFactory;
 @Deprecated
 public class IoxUtility {
 	private IoxUtility(){}
+    @Deprecated
 	public static boolean isItfFilename(String filename)
 	{
 		String xtfExt=ch.ehi.basics.view.GenericFileFilter.getFileExtension(new java.io.File(filename)).toLowerCase();
@@ -23,6 +24,7 @@ public class IoxUtility {
 		}
 		return false;
 	}
+    @Deprecated
 	public static boolean isXtfFilename(String filename)
 	{
 		String xtfExt=ch.ehi.basics.view.GenericFileFilter.getFileExtension(new java.io.File(filename)).toLowerCase();
@@ -31,6 +33,7 @@ public class IoxUtility {
 		}
 		return false;
 	}
+    @Deprecated
 	public static boolean isIliFilename(String filename)
 	{
 		String xtfExt=ch.ehi.basics.view.GenericFileFilter.getFileExtension(new java.io.File(filename)).toLowerCase();
@@ -44,6 +47,7 @@ public class IoxUtility {
 	 * @return list of model names (list&lt;String modelname&gt;) 
 	 * @throws ch.interlis.iox.IoxException
 	 */
+	@Deprecated
 	public static java.util.List<String> getModels(java.io.File xtffile)
 		throws ch.interlis.iox.IoxException
 	{
@@ -170,6 +174,7 @@ public class IoxUtility {
 
 	private static String version = null;
 
+    @Deprecated
 	public static String getVersion() {
 		if (version == null) {
 			java.util.ResourceBundle resVersion = java.util.ResourceBundle.getBundle("ch.interlis.iox_j.Version");

@@ -76,5 +76,16 @@ MODEL Oid23
 		   OID AS INTERLIS.STANDARDOID;
 		END ClassD3;
 	END Topic3;
+
+    DOMAIN 
+      Topic4Oid = OID TEXT*34;
+	TOPIC Topic4=
+		   BASKET OID AS Topic4Oid;
+		   OID AS Topic4Oid;
+
+        CLASS ClassA4 =
+        END ClassA4;
+
+	END Topic4;
 	
 END Oid23.

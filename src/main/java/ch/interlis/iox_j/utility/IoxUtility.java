@@ -3,6 +3,7 @@ package ch.interlis.iox_j.utility;
 import java.util.ArrayList;
 
 import ch.ehi.basics.logging.EhiLogger;
+import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.metamodel.Model;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.ItfReader;
@@ -62,13 +63,19 @@ public class IoxUtility {
 	 * @return list of model names (list&lt;String modelname&gt;) 
 	 * @throws ch.interlis.iox.IoxException
 	 */
-	public static java.util.List<String> getModels(java.io.File xtffile)
+    @Deprecated
+    public static java.util.List<String> getModels(java.io.File xtffile)
+            throws ch.interlis.iox.IoxException
+        {
+            return getModels(xtffile,null, null);
+        }
+	public static java.util.List<String> getModels(java.io.File xtffile, LogEventFactory errFactory,Settings settings)
 		throws ch.interlis.iox.IoxException
 	{
 		ArrayList<String> ret=new ArrayList<String>();
 		IoxReader reader=null;
 		try{
-			reader=new ReaderFactory().createReader(xtffile, null);
+			reader=new ReaderFactory().createReader(xtffile,errFactory,settings);
 			IoxEvent event=null;
 			try{
 				while((event=reader.read())!=null){
@@ -182,14 +189,20 @@ public class IoxUtility {
 		//EhiLogger.debug("model from xtf <"+model+">");
 		return model;
 	}
+    @Deprecated
     static public String getModelVersion(String[] dataFiles, LogEventFactory errFactory)
+            throws IoxException 
+    {
+        return getModelVersion(dataFiles,errFactory,null);
+    }
+    static public String getModelVersion(String[] dataFiles, LogEventFactory errFactory,Settings settings)
             throws IoxException 
     {
         String modelVersion=null;
         String dataFile=dataFiles[0];
         IoxReader ioxReader=null;
         try {
-            ioxReader=new ReaderFactory().createReader(new java.io.File(dataFile), errFactory);
+            ioxReader=new ReaderFactory().createReader(new java.io.File(dataFile), errFactory,settings);
             if(ioxReader instanceof Xtf24Reader) {
                 modelVersion=Model.ILI2_4;
             }else if(ioxReader instanceof XtfReader) {

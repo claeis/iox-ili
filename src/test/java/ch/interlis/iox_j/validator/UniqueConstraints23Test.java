@@ -739,13 +739,12 @@ public class UniqueConstraints23Test {
 	// Somit darf keine Fehlermeldung ausgegeben werden, da c1 nicht ueber 2 Mal angesprochen wird.
 	@Test
 	public void uniqueAttrValuesOfRoleC1_InStandAloneAssociationAreDifferent_Ok(){
-		Iom_jObject iomObjE=new Iom_jObject(CLASSC1,OID1);
-		Iom_jObject iomObjF=new Iom_jObject(CLASSD1,OID2);
-		Iom_jObject iomObjG=new Iom_jObject(CLASSC1,OID3);
-		Iom_jObject iomObjH=new Iom_jObject(CLASSD1,OID4);
-		Iom_jObject iomLinkEF=new Iom_jObject(ASSOCB, null);
-		iomLinkEF.addattrobj("c1", "REF").setobjectrefoid(OID1);
-		iomLinkEF.addattrobj("d1", "REF").setobjectrefoid(OID2);
+        Iom_jObject iomObjC1=new Iom_jObject(CLASSC1,OID1);
+        Iom_jObject iomObjC2=new Iom_jObject(CLASSC1,OID3);
+        Iom_jObject iomObjF=new Iom_jObject(CLASSD1,OID2);
+        Iom_jObject iomObjH=new Iom_jObject(CLASSD1,OID4);
+        iomObjF.addattrobj("c1", "REF").setobjectrefoid(iomObjC1.getobjectoid());
+        iomObjH.addattrobj("c1", "REF").setobjectrefoid(iomObjC2.getobjectoid());
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -753,11 +752,10 @@ public class UniqueConstraints23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObjE));
+		validator.validate(new ObjectEvent(iomObjC1));
+        validator.validate(new ObjectEvent(iomObjC2));
 		validator.validate(new ObjectEvent(iomObjF));
-		validator.validate(new ObjectEvent(iomObjG));
 		validator.validate(new ObjectEvent(iomObjH));
-		validator.validate(new ObjectEvent(iomLinkEF));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
@@ -1671,8 +1669,8 @@ public class UniqueConstraints23Test {
 		Iom_jObject iomObjE=new Iom_jObject(CLASSC1,OID1);
 		Iom_jObject iomObjF=new Iom_jObject(CLASSD1,OID2);
 		Iom_jObject iomObjH=new Iom_jObject(CLASSD1,OID4);
-		iomObjF.addattrobj("c1", "REF").setobjectrefoid(OID1);
-		iomObjH.addattrobj("c1", "REF").setobjectrefoid(OID1);
+		iomObjF.addattrobj("c1", "REF").setobjectrefoid(iomObjE.getobjectoid());
+		iomObjH.addattrobj("c1", "REF").setobjectrefoid(iomObjE.getobjectoid());
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
