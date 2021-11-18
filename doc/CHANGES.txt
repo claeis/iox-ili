@@ -5,6 +5,9 @@ ideas/open issues
 
 LATEST
 -----------------------------
+
+iox-ili 1.21.8 (2021-11-10)
+-----------------------------
 - ReaderFactory: support CONFIG_CUSTOM_READERS
 - Validator: check uniqueness of TIDs across the whole file (ilivalidator#320)
 - Validator: validate that an embedded association is not encoded as a standalone link object
