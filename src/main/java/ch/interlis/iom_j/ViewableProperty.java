@@ -115,7 +115,7 @@ public class ViewableProperty {
 	private boolean typeMultiSurfaceOrArea=false;
 
 	/**
-	 * Sets/clears weather a property is specified as MULTISURFACE or MULTIAREA type.
+	 * Sets/clears whether a property is specified as MULTISURFACE or MULTIAREA type.
 	 * @param isMultiSurfaceOrAreaType true if MULTISURFACE or MULTIAREA type.
 	 * false if this property is SURFACE or AREA type encapsulated in MULTISURFACE IomObject Structure.
 	 */
@@ -124,7 +124,7 @@ public class ViewableProperty {
 	}
 
 	/**
-	 * Gets weather a property is specified as MULTISURFACE or MULTIAREA type.\
+	 * Gets whether a property is specified as MULTISURFACE or MULTIAREA type.\
 	 */
 	public boolean isMultiSurfaceOrAreaType() {
 		return typeMultiSurfaceOrArea;
