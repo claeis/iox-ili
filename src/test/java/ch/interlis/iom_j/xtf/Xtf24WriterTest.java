@@ -144,6 +144,7 @@ public class Xtf24WriterTest {
 
         IomObject multipolyline = factory.createIomObject("MULTIPOLYLINE", null);
         multipolyline.addattrobj("polyline", polyline);
+        multipolyline.addattrobj("polyline", polyline);
 
         IomObject multipolylineClass = factory.createIomObject("DataTest1.TopicB.ClassPM", "mOid");
         multipolylineClass.addattrobj("attrPM", multipolyline);
