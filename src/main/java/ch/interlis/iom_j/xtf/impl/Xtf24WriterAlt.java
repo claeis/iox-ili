@@ -299,9 +299,7 @@ import java.util.Map;
 							}
 							else if (child.getobjecttag().equals("MULTIPOLYLINE"))
 							{
-								String xmlAttrName=iliAttrName;
-
-								xout.writeStartElement(xmlns_attr,xmlAttrName);
+								xout.writeStartElement(xmlns_attr, iliAttrName);
 								writeMultiPolyline(child);
 								xout.writeEndElement();
 								if (valueCount > 1)
