@@ -1245,15 +1245,20 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
      * @throws XMLStreamException
      */
     private IomObject readMultiPolyline(XMLEvent event) throws IoxException, XMLStreamException {
-    	IomObject multiPolyline=createIomObject("MULTIPOLYLINE", null);
-    	event=xmlreader.nextEvent();
-		event=skipSpacesAndGetNextEvent(event);
-    	while(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_POLYLINE)){
-	    	multiPolyline.addattrobj("polyline", readPolyline(event));
-	    	event=xmlreader.nextEvent();
-	    	event=skipSpacesAndGetNextEvent(event);
-    	}
-    	return multiPolyline;
+        IomObject multiPolyline=createIomObject("MULTIPOLYLINE", null);
+        event=xmlreader.nextEvent();
+        event=skipSpacesAndGetNextEvent(event);
+        while(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_POLYLINE)){
+            multiPolyline.addattrobj("polyline", readPolyline(event));
+            event=xmlreader.nextEvent();
+            event=skipSpacesAndGetNextEvent(event);
+        }
+
+        if (multiPolyline.getattrvaluecount("polyline") == 0) {
+            throw new IoxException("expected polyline. unexpected event: " + event.asStartElement().getName().getLocalPart());
+        }
+
+        return multiPolyline;
     }
     
     /** Prepare polyline
