@@ -498,12 +498,22 @@ public class Xtf24ReaderDataTest {
         // DataTest1.TopicA.ClassL oid oidS {attrL1 DataTest1.TopicA.StructA {attrS1 text}}
         assertEquals("DataTest1.TopicA.ClassL", iomObject.getobjecttag());
         assertEquals("oidS", iomObject.getobjectoid());
-        
+
         IomObject attrL1 = iomObject.getattrobj("attrL1", 0);
         assertNotNull(attrL1);
-        
         assertEquals("text", attrL1.getattrvalue("attrS1"));
-		
+
+        event = reader.read();
+        IomObject iomObject2 = ((ObjectEvent) event).getIomObject();
+        assertEquals("oidT", iomObject.getobjectoid());
+
+        IomObject attrLT1 = iomObject2.getattrobj("attrL1", 0);
+        assertNotNull(attrLT1);
+        assertEquals("texta", attrLT1.getattrvalue("attrS1"));
+        IomObject attrLT2 = iomObject2.getattrobj("attrL1", 1);
+        assertNotNull(attrLT2);
+        assertEquals("textb", attrLT2.getattrvalue("attrS1"));
+
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
 		reader.close();

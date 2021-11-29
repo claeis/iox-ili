@@ -1091,14 +1091,17 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                             if(!event.isEndElement()){
                                 throw new IoxSyntaxException(event2msgtext(event));
                             }
+                            event=xmlreader.nextEvent();
+                            event=skipSpacesAndGetNextEvent(event);
                         }else {
                             // structure
-                            IomObject structObj=readObject(event);
-                            iomObj.addattrobj(attrName, structObj);
+                            while (xmlreader.hasNext() && event.isStartElement()){
+                                IomObject structObj=readObject(event);
+                                iomObj.addattrobj(attrName, structObj);
+                                event=xmlreader.nextEvent();
+                                event=skipSpacesAndGetNextEvent(event);
+                            }
                         }
-                        // read attribute end element
-                        event=xmlreader.nextEvent();
-                        event=skipSpacesAndGetNextEvent(event);
                     }
                 }else if(event.isEndElement()) {
                     return;
