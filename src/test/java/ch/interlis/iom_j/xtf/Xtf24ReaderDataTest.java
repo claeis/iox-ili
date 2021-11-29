@@ -505,7 +505,7 @@ public class Xtf24ReaderDataTest {
 
         event = reader.read();
         IomObject iomObject2 = ((ObjectEvent) event).getIomObject();
-        assertEquals("oidT", iomObject.getobjectoid());
+        assertEquals("oidT", iomObject2.getobjectoid());
 
         IomObject attrLT1 = iomObject2.getattrobj("attrL1", 0);
         assertNotNull(attrLT1);
