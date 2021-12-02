@@ -18,8 +18,12 @@ import ch.interlis.iox.IoxFactoryCollection;
 import ch.interlis.iox.StartBasketEvent;
 import ch.interlis.iox_j.StartTransferEvent;
 import ch.interlis.iox_j.jts.Iox2jtsException;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.builder.Input;
+import org.xmlunit.diff.Diff;
 
 public class Xtf24WriterTest {
 
@@ -192,8 +196,12 @@ public class Xtf24WriterTest {
         xtfWriter.writeEndBasket();
         xtfWriter.writeEndTransfer();
 
-        String expected = new Scanner(new File(TEST_IN,"MultiSurfaceArea.xtf")).useDelimiter("\\Z").next();
-        assertEquals(expected, byteArrayOutputStream.toString());
-
+        Diff xmlboxDiff = DiffBuilder
+                .compare(Input.fromByteArray(byteArrayOutputStream.toByteArray()))
+                .withTest(Input.fromFile(new File(TEST_IN,"MultiSurfaceArea.xtf")))
+                .checkForSimilar()
+                .normalizeWhitespace()
+                .build();
+        Assert.assertFalse(xmlboxDiff.toString(), xmlboxDiff.hasDifferences());
     }
 }
