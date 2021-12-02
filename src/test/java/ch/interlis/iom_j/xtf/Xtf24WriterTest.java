@@ -179,15 +179,15 @@ public class Xtf24WriterTest {
         multisurface.addattrobj("surface", surface);
         multisurface.addattrobj("surface", surface);
 
-        IomObject multisufaceClass = factory.createIomObject("DataTest1.TopicB.ClassQM", "mOid1");
-        multisufaceClass.addattrobj("formQM", multisurface);
+        IomObject multisurfaceClass = factory.createIomObject("DataTest1.TopicB.ClassQM", "mOid1");
+        multisurfaceClass.addattrobj("formQM", multisurface);
         IomObject multiareaClass = factory.createIomObject("DataTest1.TopicB.ClassRM", "mOid2");
         multiareaClass.addattrobj("formRM", multisurface);
 
         Xtf24WriterAlt xtfWriter = new Xtf24WriterAlt(outputStreamWriter, Ili2cUtility.getIoxMappingTable(td));
         xtfWriter.writeStartTransfer(null, null, Ili2cUtility.buildModelList(td));
         xtfWriter.writeStartBasket("DataTest1.TopicB", "bidB");
-        xtfWriter.writeObject(multisufaceClass);
+        xtfWriter.writeObject(multisurfaceClass);
         xtfWriter.writeObject(multiareaClass);
         xtfWriter.writeEndBasket();
         xtfWriter.writeEndTransfer();
