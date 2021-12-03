@@ -111,5 +111,22 @@ public class ViewableProperty {
 	public void setTypeFinal(boolean typeFinal) {
 		this.typeFinal = typeFinal;
 	}
-	
+
+	private boolean typeMultiSurfaceOrArea=false;
+
+	/**
+	 * Sets/clears whether a property is specified as MULTISURFACE or MULTIAREA type.
+	 * @param isMultiSurfaceOrAreaType true if MULTISURFACE or MULTIAREA type.
+	 * false if this property is SURFACE or AREA type encapsulated in MULTISURFACE IomObject Structure.
+	 */
+	public void setTypeMultiSurfaceOrArea(boolean isMultiSurfaceOrAreaType) {
+		typeMultiSurfaceOrArea = isMultiSurfaceOrAreaType;
+	}
+
+	/**
+	 * Gets whether a property is specified as MULTISURFACE or MULTIAREA type.\
+	 */
+	public boolean isMultiSurfaceOrAreaType() {
+		return typeMultiSurfaceOrArea;
+	}
 }
