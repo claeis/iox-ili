@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- Xtf24: fixed MULTISURFACE/MULTIPOLYGON 
 
 iox-ili 1.21.8 (2021-11-10)
 -----------------------------
