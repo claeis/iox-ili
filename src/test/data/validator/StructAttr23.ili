@@ -24,4 +24,22 @@ MODEL StructAttr23
 		
 	END Topic;
 	
+	STRUCTURE StructAp EXTENDS StructAttr23.Topic.StructA =
+	END StructAp;
+	
 END StructAttr23.
+MODEL ModelB
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-04" =
+  IMPORTS StructAttr23;
+	TOPIC TopicB EXTENDS StructAttr23.Topic =
+	
+		STRUCTURE StructB EXTENDS StructA =
+		END StructB;
+
+		CLASS ClassB (EXTENDED) =
+		   attrB2 (EXTENDED) : BAG {1..*} OF StructB;
+		END ClassB;
+		
+	END TopicB;
+	
+END ModelB.
