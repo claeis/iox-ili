@@ -177,17 +177,7 @@ MODEL Function23
         
         STRUCTURE StructAp EXTENDS StructA =
         END StructAp;
-        
-        CLASS ClassU =
-           attrU1 : BAG {1..*} OF StructA;
-           MANDATORY CONSTRAINT INTERLIS.isOfClass(attrU1[1],>StructAp);
-        END ClassU;
-        
-        CLASS ClassUA =
-           attrU1 : BAG {1..*} OF StructA;
-           MANDATORY CONSTRAINT INTERLIS.isOfClass(INTERLIS.myClass(attrU1[1]),>StructAp);
-        END ClassUA;
-        
+                
         STRUCTURE StructB =
         END StructB;
         
@@ -196,11 +186,6 @@ MODEL Function23
         
         STRUCTURE StructBpp EXTENDS StructBp =
         END StructBpp;
-        
-        CLASS ClassV =
-           attrV1 : BAG {1..*} OF StructB;
-           MANDATORY CONSTRAINT INTERLIS.isOfClass(attrV1[1],>StructBp);
-        END ClassV;
         
         CLASS ClassW =
            MANDATORY CONSTRAINT INTERLIS.isSubClass(>StructB,>StructBp);
@@ -270,5 +255,53 @@ MODEL Function23
 		END ClassZH;
 		
 	END Topic;
+	
+	TOPIC IsOfClassTest =
+	
+		STRUCTURE StructA =
+        END StructA;
+        
+        STRUCTURE StructAp EXTENDS StructA =
+        END StructAp;
+        
+        CLASS ClassU =
+           attrU1 : BAG {1..*} OF StructA;
+           MANDATORY CONSTRAINT INTERLIS.isOfClass(attrU1[1],>StructAp);
+        END ClassU;
+        
+        CLASS ClassUA =
+           attrU1 : BAG {1..*} OF StructA;
+           MANDATORY CONSTRAINT INTERLIS.isOfClass(INTERLIS.myClass(attrU1[1]),>StructAp);
+        END ClassUA;
+        
+        STRUCTURE StructB =
+        END StructB;
+        
+        STRUCTURE StructBp EXTENDS StructB =
+        END StructBp;
+        
+        STRUCTURE StructBpp EXTENDS StructBp =
+        END StructBpp;
+        
+        CLASS ClassV =
+           attrV1 : BAG {1..*} OF StructB;
+           MANDATORY CONSTRAINT INTERLIS.isOfClass(attrV1[1],>StructBp);
+        END ClassV;
+        
+        CLASS ClassA =
+        END ClassA;
+        
+        CLASS ClassB =
+        END ClassB;
+        CLASS ClassBp EXTENDS ClassB =
+        END ClassBp;
+        
+        ASSOCIATION a2b =
+          a -- {0..1} ClassA;
+          b -- {0..*} ClassB;
+          MANDATORY CONSTRAINT INTERLIS.isOfClass(b,>ClassBp);
+        END a2b;
+	
+	END IsOfClassTest;
 	
 END Function23.

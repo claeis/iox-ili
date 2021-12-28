@@ -3468,6 +3468,34 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							Table requiredClass=((CompositionType)type).getComponentType();
 							if(!structEleClass.isExtending(requiredClass)){
 								 logMsg(validateType, rsrc.getString("validateAttrValue.attributeXRequiresAStructureY"), attrPath,requiredClass.getScopedName(null));
+							}else {
+							    // subType in valid context
+							    //same Model?
+							    Model structEleModel=(Model)structEleClass.getContainer(Model.class);
+							    Model requiredClassModel=(Model)requiredClass.getContainer(Model.class);
+							    if(structEleModel==requiredClassModel) {
+							        // ok, usable subtype
+							    }else {
+                                    Topic requiredClassTopic=(Topic)requiredClass.getContainer(Topic.class);
+                                    if(requiredClassTopic==null) {
+                                        // struct at model level, no base topics
+                                        logMsg(validateType, rsrc.getString("validateAttrValue.attributeXRequiresAStructureY"), attrPath,requiredClass.getScopedName(null));
+                                    }else {
+                                        // if extended topic
+                                        requiredClassTopic=(Topic)requiredClassTopic.getExtending();
+                                        while(requiredClassTopic!=null) {
+                                              // model of base topic
+                                            requiredClassModel=(Model)requiredClassTopic.getContainer(Model.class);
+                                            if(structEleModel==requiredClassModel) {
+                                                // valid subtype found
+                                                break;
+                                            }
+                                        }
+                                        if(structEleModel!=requiredClassModel) {
+                                            logMsg(validateType, rsrc.getString("validateAttrValue.attributeXRequiresAStructureY"), attrPath,requiredClass.getScopedName(null));
+                                        }
+                                    }
+							    }
 							}
 							if(structEleClass.isAbstract()){
 								// validate that object is instance of concrete class

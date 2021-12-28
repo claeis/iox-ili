@@ -15,6 +15,17 @@
 				</attrL1>
 				<attrL2>value</attrL2>
 			</ClassL>
+			<ClassL ili:tid="oidT">
+				<attrL1>
+					<StructA>
+						<attrS1>texta</attrS1>
+					</StructA>
+					<StructA>
+						<attrS1>textb</attrS1>
+					</StructA>
+				</attrL1>
+				<attrL2>value2</attrL2>
+			</ClassL>
 		</TopicA>
 	</ili:datasection>
 </ili:transfer>

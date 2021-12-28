@@ -98,6 +98,18 @@ public class Function23Test {
 	// START BASKET EVENT
 	private final static String BID1="b1";
 	private final static String BID2="b2";
+    private static final String ILI_ISOFCLASS_TOPIC = "Function23.IsOfClassTest";
+    private static final String ILI_ISOFCLASS_STRUCTA = ILI_ISOFCLASS_TOPIC+".StructA";
+    private static final String ILI_ISOFCLASS_STRUCTAP = ILI_ISOFCLASS_TOPIC+".StructAp";
+    private static final String ILI_ISOFCLASS_STRUCTB = ILI_ISOFCLASS_TOPIC+".StructB";
+    private static final String ILI_ISOFCLASS_STRUCTBP = ILI_ISOFCLASS_TOPIC+".StructBp";
+    private static final String ILI_ISOFCLASS_STRUCTBPP = ILI_ISOFCLASS_TOPIC+".StructBpp";
+    private static final String ILI_ISOFCLASS_CLASSV = ILI_ISOFCLASS_TOPIC+".ClassV";
+    private static final String ILI_ISOFCLASS_CLASSU = ILI_ISOFCLASS_TOPIC+".ClassU";
+    private static final String ILI_ISOFCLASS_CLASSUA = ILI_ISOFCLASS_TOPIC+".ClassUA";
+    private static final String ILI_ISOFCLASS_CLASSA = ILI_ISOFCLASS_TOPIC+".ClassA";
+    private static final String ILI_ISOFCLASS_CLASSB = ILI_ISOFCLASS_TOPIC+".ClassB";
+    private static final String ILI_ISOFCLASS_CLASSBp = ILI_ISOFCLASS_TOPIC+".ClassBp";
 	
 	@Before
 	public void setUp() throws Exception {
@@ -545,11 +557,11 @@ public class Function23Test {
 	@Test
 	public void isOfClassWithRef_Ok(){
 		String objTargetId=OBJ_OID1;
-		Iom_jObject iomObjS1=new Iom_jObject(ILI_STRUCTA, null);
-		Iom_jObject iomObjAP=new Iom_jObject(ILI_STRUCTAP, null);
+		Iom_jObject iomObjS1=new Iom_jObject(ILI_ISOFCLASS_STRUCTA, null);
+		Iom_jObject iomObjAP=new Iom_jObject(ILI_ISOFCLASS_STRUCTAP, null);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
 		o1Ref.setobjectrefoid(objTargetId);
-		Iom_jObject iomObjU=new Iom_jObject(ILI_CLASSU, OBJ_OID1);
+		Iom_jObject iomObjU=new Iom_jObject(ILI_ISOFCLASS_CLASSU, OBJ_OID1);
 		iomObjU.addattrobj("attrU1", iomObjAP);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -557,7 +569,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new StartBasketEvent(ILI_ISOFCLASS_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjU));
 		validator.validate(new ObjectEvent(iomObjS1));
 		validator.validate(new EndBasketEvent());
@@ -570,10 +582,10 @@ public class Function23Test {
 	@Test
 	public void isOfClassWithRefEqualToMyClass_Ok(){
 		String objTargetId=OBJ_OID1;
-		Iom_jObject iomObjAP=new Iom_jObject(ILI_STRUCTAP, null);
+		Iom_jObject iomObjAP=new Iom_jObject(ILI_ISOFCLASS_STRUCTAP, null);
 		Iom_jObject o1Ref=new Iom_jObject("REF", null);
 		o1Ref.setobjectrefoid(objTargetId);
-		Iom_jObject iomObjU=new Iom_jObject(ILI_CLASSUA, OBJ_OID1);
+		Iom_jObject iomObjU=new Iom_jObject(ILI_ISOFCLASS_CLASSUA, OBJ_OID1);
 		iomObjU.addattrobj("attrU1", iomObjAP);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -581,7 +593,7 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new StartBasketEvent(ILI_ISOFCLASS_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjU));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1453,8 +1465,8 @@ public class Function23Test {
 	
     @Test
     public void isOfClass_Ok(){
-        Iom_jObject iomStructBP=new Iom_jObject(ILI_STRUCTBP, null);
-        Iom_jObject iomObjV=new Iom_jObject(ILI_CLASSV, OBJ_OID1);
+        Iom_jObject iomStructBP=new Iom_jObject(ILI_ISOFCLASS_STRUCTBP, null);
+        Iom_jObject iomObjV=new Iom_jObject(ILI_ISOFCLASS_CLASSV, OBJ_OID1);
         iomObjV.addattrobj("attrV1", iomStructBP);
         ValidationConfig modelConfig=new ValidationConfig();
         LogCollector logger=new LogCollector();
@@ -1462,7 +1474,7 @@ public class Function23Test {
         Settings settings=new Settings();
         Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
         validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+        validator.validate(new StartBasketEvent(ILI_ISOFCLASS_TOPIC,BID1));
         validator.validate(new ObjectEvent(iomObjV));
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
@@ -1470,9 +1482,53 @@ public class Function23Test {
         assertEquals(0,logger.getErrs().size());
     }
     @Test
+    @Ignore("ilivalidator#336")
+    public void isOfClass_EmbeddedRole_Ok(){
+        Iom_jObject iomObjA=new Iom_jObject(ILI_ISOFCLASS_CLASSA, OBJ_OID1);
+        Iom_jObject iomObjB=new Iom_jObject(ILI_ISOFCLASS_CLASSB, OBJ_OID2);
+        Iom_jObject iomObjBp=new Iom_jObject(ILI_ISOFCLASS_CLASSBp, OBJ_OID3);
+        iomObjBp.addattrobj("a", "REF").setobjectrefoid(iomObjA.getobjectoid());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_ISOFCLASS_TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObjA));
+        validator.validate(new ObjectEvent(iomObjB));
+        validator.validate(new ObjectEvent(iomObjBp));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0,logger.getErrs().size());
+    }
+    @Test
+    @Ignore("ilivalidator#336")
+    public void isOfClass_EmbeddedRole_Fail(){
+        Iom_jObject iomObjA=new Iom_jObject(ILI_ISOFCLASS_CLASSA, OBJ_OID1);
+        Iom_jObject iomObjB=new Iom_jObject(ILI_ISOFCLASS_CLASSB, OBJ_OID2);
+        Iom_jObject iomObjBp=new Iom_jObject(ILI_ISOFCLASS_CLASSBp, OBJ_OID3);
+        iomObjB.addattrobj("a", "REF").setobjectrefoid(iomObjA.getobjectoid());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_ISOFCLASS_TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObjA));
+        validator.validate(new ObjectEvent(iomObjB));
+        validator.validate(new ObjectEvent(iomObjBp));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1,logger.getErrs().size());
+    }
+    @Test
     public void isOfClass_subClassOk(){
-        Iom_jObject iomStructBPP=new Iom_jObject(ILI_STRUCTBPP, null);
-        Iom_jObject iomObjV=new Iom_jObject(ILI_CLASSV, OBJ_OID1);
+        Iom_jObject iomStructBPP=new Iom_jObject(ILI_ISOFCLASS_STRUCTBPP, null);
+        Iom_jObject iomObjV=new Iom_jObject(ILI_ISOFCLASS_CLASSV, OBJ_OID1);
         iomObjV.addattrobj("attrV1", iomStructBPP);
         ValidationConfig modelConfig=new ValidationConfig();
         LogCollector logger=new LogCollector();
@@ -1480,7 +1536,7 @@ public class Function23Test {
         Settings settings=new Settings();
         Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
         validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+        validator.validate(new StartBasketEvent(ILI_ISOFCLASS_TOPIC,BID1));
         validator.validate(new ObjectEvent(iomObjV));
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
@@ -1489,8 +1545,8 @@ public class Function23Test {
     }
 	@Test
 	public void isOfClass_Object_Fail(){
-		Iom_jObject iomStructB=new Iom_jObject(ILI_STRUCTB, null);
-		Iom_jObject iomObjV=new Iom_jObject(ILI_CLASSV, OBJ_OID1);
+		Iom_jObject iomStructB=new Iom_jObject(ILI_ISOFCLASS_STRUCTB, null);
+		Iom_jObject iomObjV=new Iom_jObject(ILI_ISOFCLASS_CLASSV, OBJ_OID1);
 		iomObjV.addattrobj("attrV1", iomStructB);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -1498,13 +1554,13 @@ public class Function23Test {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new StartBasketEvent(ILI_ISOFCLASS_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjV));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("Mandatory Constraint Function23.Topic.ClassV.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Mandatory Constraint Function23.IsOfClassTest.ClassV.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isSubClass, die beiden Konstanten Klassen nicht uebereinstimmen.
@@ -1527,9 +1583,9 @@ public class Function23Test {
 	}
 	
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isOfClass die MyClass ueber eine falsche Referenz fuehrt.
+	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: isSubClass die MyClass ueber eine falsche Referenz fuehrt.
 	@Test
-	public void isOfClass_MyClassNotValid_Fail(){
+	public void isSubClass_MyClassNotValid_Fail(){
 		String objTargetId=OBJ_OID1;
 		Iom_jObject iomObjS1=new Iom_jObject(ILI_STRUCTA, null);
 		Iom_jObject iomObjAP=new Iom_jObject(ILI_STRUCTAP, null);
