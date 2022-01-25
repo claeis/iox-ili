@@ -191,6 +191,25 @@ public class Iox2wkb {
 		}
 		writeCoord(xCoord,yCoord,zCoord);
 	}
+
+	private static Coordinate arcSupportingCoord2JTS(IomObject value) throws Iox2wkbException {
+		String a1=value.getattrvalue("A1");
+		String a2=value.getattrvalue("A2");
+		double arcPt_re;
+			try{
+				arcPt_re = Double.parseDouble(a1);
+			}catch(Exception ex){
+				throw new Iox2wkbException("failed to read A1 <"+a1+">",ex);
+			}
+			double arcPt_ho;
+			try{
+				arcPt_ho = Double.parseDouble(a2);
+			}catch(Exception ex){
+				throw new Iox2wkbException("failed to read A2 <"+a2+">",ex);
+			}
+			return new Coordinate(arcPt_re, arcPt_ho);
+	}
+
 	private static void arc2JTS(com.vividsolutions.jts.geom.CoordinateList ret,IomObject value,double p)
 	throws Iox2wkbException
 	{
@@ -198,8 +217,7 @@ public class Iox2wkb {
 			String c1=value.getattrvalue("C1");
 			String c2=value.getattrvalue("C2");
 			String c3=value.getattrvalue("C3");
-			String a1=value.getattrvalue("A1");
-			String a2=value.getattrvalue("A2");
+
 			double pt2_re;
 			try{
 				pt2_re = Double.parseDouble(c1);
@@ -212,27 +230,16 @@ public class Iox2wkb {
 			}catch(Exception ex){
 				throw new Iox2wkbException("failed to read C2 <"+c2+">",ex);
 			}
-			double arcPt_re;
-			try{
-				arcPt_re = Double.parseDouble(a1);
-			}catch(Exception ex){
-				throw new Iox2wkbException("failed to read A1 <"+a1+">",ex);
-			}
-			double arcPt_ho;
-			try{
-				arcPt_ho = Double.parseDouble(a2);
-			}catch(Exception ex){
-				throw new Iox2wkbException("failed to read A2 <"+a2+">",ex);
-			}
+			Coordinate arcSupport = arcSupportingCoord2JTS(value);
 			if(p==0.0){
-				ret.add(new com.vividsolutions.jts.geom.Coordinate(arcPt_re, arcPt_ho));
+				ret.add(arcSupport);
 				ret.add(new com.vividsolutions.jts.geom.Coordinate(pt2_re, pt2_ho));
 				return;
 			}
 			int lastCoord=ret.size();
 			com.vividsolutions.jts.geom.Coordinate p1=null;
 			p1=ret.getCoordinate(lastCoord-1);
-			ArcSegment arc=new ArcSegment(p1, new Coordinate(arcPt_re, arcPt_ho),new Coordinate(pt2_re, pt2_ho),p);
+			ArcSegment arc=new ArcSegment(p1, arcSupport,new Coordinate(pt2_re, pt2_ho),p);
 			Coordinate[] coords = arc.getCoordinates();
 			for(int i=1;i<coords.length;i++) {
 	            ret.add(coords[i]);
