@@ -306,4 +306,45 @@ public class Iox2wkbTest {
         String ewkbText=DatatypeConverter.printHexBinary(ewkb);
         assertEquals("010600008001000000010300008001000000040000000000000018662D4100000000AA703041000000000000F03F0000000020662D4100000000A3703041000000000000F03F0000000028662D4100000000A57030410000000000000040000000001E662D4100000000AC7030410000000000000040",ewkbText);
     }
+
+    @Test
+    public void surfaceRepairTouchingRing_Ok() throws Exception {
+        IomObject multiSurface=getBananaPolygon();
+        Iox2wkb convWkb=new Iox2wkb(2, java.nio.ByteOrder.BIG_ENDIAN, false);
+        byte wkb[]=convWkb.surface2wkb(multiSurface, false, 0.0, true);
+        // verify
+
+        String wkbText=DatatypeConverter.printHexBinary(wkb);
+        assertEquals("00000000030000000200000006414434F80000000041330F7400000000414434F8000000004133057C0000000041443DB3000000004133057C0000000041443DB30000000041330A4D0000000041443DB30000000041330F7400000000414434F80000000041330F74000000000000000541443DB30000000041330A4D0000000041443C6A00000000413308EC0000000041443B408000000041330A4D0000000041443C6A0000000041330BDC0000000041443DB30000000041330A4D00000000",wkbText);
+    }
+
+        @Test
+    public void surfaceRepairTouchingRingDisabled_Ok() throws Exception {
+        IomObject multiSurface=getBananaPolygon();
+        Iox2wkb convWkb=new Iox2wkb(2, java.nio.ByteOrder.BIG_ENDIAN, false);
+        byte wkb[]=convWkb.surface2wkb(multiSurface, false, 0.0, false);
+        // verify
+
+        String wkbText=DatatypeConverter.printHexBinary(wkb);
+        assertEquals("0000000003000000010000000A414434F80000000041330F7400000000414434F8000000004133057C0000000041443DB3000000004133057C0000000041443DB30000000041330A4D0000000041443C6A00000000413308EC0000000041443B408000000041330A4D0000000041443C6A0000000041330BDC0000000041443DB30000000041330A4D0000000041443DB30000000041330F7400000000414434F80000000041330F7400000000",wkbText);
+    }
+
+    private IomObject getBananaPolygon() {
+        IomObject multiSurface=new Iom_jObject("MULTISURFACE", null);
+        IomObject surfaceValue = multiSurface.addattrobj("surface", "SURFACE");
+        // outer boundary
+        IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+        // polyline
+        IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+
+        IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+
+        double[] coords = new double[]{2648560, 1249140, 2648560, 1246588, 2653030, 1246588, 2653030, 1247821, 2652372, 1247468, 2651777, 1247821, 2652372, 1248220, 2653030, 1247821, 2653030, 1249140, 2648560, 1249140};
+        for (int i = 0; i < coords.length; i+=2) {
+            IomObject coord = segments.addattrobj("segment", "COORD");
+            coord.setattrvalue("C1", Double.toString(coords[i]));
+            coord.setattrvalue("C2", Double.toString(coords[i+1]));
+        }
+        return multiSurface;
+    }
 }
