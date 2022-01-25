@@ -559,86 +559,67 @@ public class Iox2wkb {
 	 * @return JTS Polygon
 	 * @throws Iox2wkbException
 	 */
-	public byte[] surface2wkb(IomObject obj,boolean asCurvePolygon,double strokeP) //SurfaceOrAreaType type)
+	public byte[] surface2wkb(IomObject obj,boolean asCurvePolygon,double strokeP)
+	throws Iox2wkbException
+	{
+		return surface2wkb(obj, asCurvePolygon, strokeP, true);
+	}
+
+	public byte[] surface2wkb(IomObject obj,boolean asCurvePolygon,double strokeP, boolean repairTouchingLine) //SurfaceOrAreaType type)
 	throws Iox2wkbException
 	{
 		if(obj==null){
 			return null;
 		}
+
+		if (obj.getobjectconsistency() == IomConstants.IOM_INCOMPLETE) {
+			throw new Iox2wkbException("clipped surface not supported");
+		}
+
+		List<IomObject> polylines = new ArrayList<IomObject>();
+		for (int surfacei = 0; surfacei < obj.getattrvaluecount("surface"); surfacei++) {
+			if (surfacei > 0) {
+				throw new Iox2wkbException("unclipped surface with multi 'surface' elements");
+			}
+			IomObject surface = obj.getattrobj("surface", surfacei);
+			int boundaryc = surface.getattrvaluecount("boundary");
+
+			for (int boundaryi = 0; boundaryi < boundaryc; boundaryi++) {
+				IomObject boundary = surface.getattrobj("boundary", boundaryi);
+				int polylinec = boundary.getattrvaluecount("polyline");
+				for (int polylinei = 0; polylinei < polylinec; polylinei++){
+					polylines.add(boundary.getattrobj("polyline", polylinei));
+				}
+			}
+		}
+
+		byte[][] wkbs = new Iox2wkb(outputDimension,os.order(),asEWKB).polyline2wkb(polylines.toArray(new IomObject[0]), true, asCurvePolygon, strokeP, repairTouchingLine);
+
 	    try {
+			os.reset();
 			writeByteOrder();
-			if(asCurvePolygon){
+			if (asCurvePolygon) {
 				writeGeometryType(WKBConstants.wkbCurvePolygon);
-			}else{
+			} else {
 				writeGeometryType(WKBConstants.wkbPolygon);
 			}
-
-			//IFMEFeatureVector bndries=session.createFeatureVector();
-			boolean clipped=obj.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
-			if(clipped){
-				throw new Iox2wkbException("clipped surface not supported");
-			}
-			for(int surfacei=0;surfacei<obj.getattrvaluecount("surface");surfacei++){
-				if(clipped){
-					//out.startElement("CLIPPED",0,0);
-				}else{
-					// an unclipped surface should have only one surface element
-					if(surfacei>0){
-						throw new Iox2wkbException("unclipped surface with multi 'surface' elements");
-					}
-				}
-				IomObject surface=obj.getattrobj("surface",surfacei);
-
-				int boundaryc=surface.getattrvaluecount("boundary");
-				
-			    os.writeInt(boundaryc);
-			    
-				for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
-					IomObject boundary=surface.getattrobj("boundary",boundaryi);
-					int polylinec = boundary.getattrvaluecount("polyline");
-                    if(asCurvePolygon){
-                        Iox2wkb helper=new Iox2wkb(outputDimension,os.order(),asEWKB);
-						if(polylinec==1) {
-                            IomObject polyline=boundary.getattrobj("polyline",0);
-                            os.write(helper.polyline2wkb(polyline,true,asCurvePolygon,strokeP));
-						}else {
-						    IomObject polylines[]=new IomObject[polylinec];
-	                        for(int polylinei=0;polylinei<polylinec;polylinei++){
-	                            IomObject polyline=boundary.getattrobj("polyline",polylinei);
-	                            polylines[polylinei]=polyline;
-	                        }
-                            os.write(helper.polyline2wkb(polylines,true,asCurvePolygon,strokeP));
-						}
-					}else{
-						//IFMEFeature fmeLine=session.createFeature();
-						com.vividsolutions.jts.geom.CoordinateList jtsLine=new com.vividsolutions.jts.geom.CoordinateList();
-						for(int polylinei=0;polylinei<polylinec;polylinei++){
-							IomObject polyline=boundary.getattrobj("polyline",polylinei);
-							jtsLine.addAll(polyline2coordlist(polyline,true,strokeP));
-						}
-						jtsLine.closeRing();
-						os.writeInt(jtsLine.size());
-						for(Iterator coordi=jtsLine.iterator();coordi.hasNext();){
-							com.vividsolutions.jts.geom.Coordinate coord=(com.vividsolutions.jts.geom.Coordinate)coordi.next();
-						    os.writeDouble(coord.x);
-						    os.writeDouble(coord.y);
-						    if (outputDimension==3) {
-						      os.writeDouble(coord.z);
-						    }
-						}
-					}
-
-				}
-				if(clipped){
-					//out.endElement(/*CLIPPED*/);
-				}
+			os.writeInt(wkbs.length);
+			for (byte[] wkb: wkbs) {
+				os.write(wkb);
 			}
 		} catch (IOException e) {
 	        throw new RuntimeException("Unexpected IO exception: " + e.getMessage());
 		}
 		return os.toByteArray();
 	}
-	public byte[] multisurface2wkb(IomObject obj,boolean asCurvePolygon,double strokeP) //SurfaceOrAreaType type)
+
+	public byte[] multisurface2wkb(IomObject obj,boolean asCurvePolygon,double strokeP)
+	throws Iox2wkbException
+	{
+		return multisurface2wkb(obj, asCurvePolygon, strokeP, true);
+	}
+
+	public byte[] multisurface2wkb(IomObject obj,boolean asCurvePolygon,double strokeP, boolean repairTouchingLine) //SurfaceOrAreaType type)
 	throws Iox2wkbException
 	{
 		if(obj==null){
@@ -659,7 +640,7 @@ public class Iox2wkb {
 				IomObject iomSurfaceClone=new ch.interlis.iom_j.Iom_jObject("MULTISURFACE",null);
 				iomSurfaceClone.addattrobj("surface",surface);
                 Iox2wkb helper=new Iox2wkb(outputDimension,os.order(),asEWKB);
-				os.write(helper.surface2wkb(iomSurfaceClone,asCurvePolygon,strokeP));
+				os.write(helper.surface2wkb(iomSurfaceClone,asCurvePolygon,strokeP, repairTouchingLine));
 			}
 		} catch (IOException e) {
 	        throw new RuntimeException("Unexpected IO exception: " + e.getMessage());
@@ -672,20 +653,28 @@ public class Iox2wkb {
 		if(obj==null){
 			return null;
 		}
-	    try {
+
+		List<IomObject> polylines = new ArrayList<IomObject>();
+		int polylinec=obj.getattrvaluecount(Wkb2iox.ATTR_POLYLINE);
+
+		for(int polylinei=0;polylinei<polylinec;polylinei++){
+			polylines.add(obj.getattrobj("polyline",polylinei));
+		}
+
+		byte[][] wkbs = new Iox2wkb(outputDimension,os.order(),asEWKB).polyline2wkb(polylines.toArray(new IomObject[0]), false, asCurve, strokeP, false);
+
+		try {
+			os.reset();
 			writeByteOrder();
 			if(asCurve){
 				writeGeometryType(WKBConstants.wkbMultiCurve);
 			}else{
 				writeGeometryType(WKBConstants.wkbMultiLineString);
 			}
-			int polylinec=obj.getattrvaluecount(Wkb2iox.ATTR_POLYLINE);
-			os.writeInt(polylinec);
 
-			for(int polylinei=0;polylinei<polylinec;polylinei++){
-				IomObject polyline=obj.getattrobj("polyline",polylinei);
-                Iox2wkb helper=new Iox2wkb(outputDimension,os.order(),asEWKB);
-				os.write(helper.polyline2wkb(polyline,false,asCurve,strokeP));
+			os.writeInt(wkbs.length);
+			for (byte[] wkb: wkbs) {
+				os.write(wkb);
 			}
 		} catch (IOException e) {
 	        throw new RuntimeException("Unexpected IO exception: " + e.getMessage());
