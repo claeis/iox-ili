@@ -266,14 +266,20 @@ public class Iox2wkb {
 	public byte[] polyline2wkb(IomObject polylineObjs[],boolean isSurfaceOrArea,boolean asCompoundCurve,double p)
 	throws Iox2wkbException
 	{
-		os.reset();
+
 		byte[][] lines = polyline2wkb(polylineObjs, isSurfaceOrArea, asCompoundCurve, p, false);
-		for (byte[] line : lines) {
-			try {
-				os.write(line);
-			} catch (IOException e) {
-				throw new RuntimeException("Unexpected IO exception: " + e.getMessage());
+		try {
+			os.reset();
+			if (asCompoundCurve) {
+				writeByteOrder();
+				writeGeometryType(WKBConstants.wkbCompoundCurve);
+				os.writeInt(lines.length);
 			}
+			for (byte[] line : lines) {
+				os.write(line);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Unexpected IO exception: " + e.getMessage());
 		}
 
 		return os.toByteArray();
@@ -311,8 +317,8 @@ public class Iox2wkb {
 					IomObject segment = sequence.getattrobj("segment", segmenti);
 					Coordinate segmentCoordinate = coord2JTS(segment);
 
-					if((segment.getobjecttag().equals("COORD") && !currentLine.trySetWkbType(WKBConstants.wkbLineString))
-							|| (segment.getobjecttag().equals("ARC") && !currentLine.trySetWkbType(WKBConstants.wkbCircularString)))
+					if(asCompoundCurve && ((segment.getobjecttag().equals("COORD") && !currentLine.trySetWkbType(WKBConstants.wkbLineString))
+							|| (segment.getobjecttag().equals("ARC") && !currentLine.trySetWkbType(WKBConstants.wkbCircularString))))
 					{
 						Coordinate lastPoint = currentLine.get(currentLine.size()-1);
 						currentLine = new PolylineCoordList();
