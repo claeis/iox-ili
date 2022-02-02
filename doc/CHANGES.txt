@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- ReaderFactory: fix/close a left open ItfReader2
 
 iox-ili 1.21.9 (2021-12-28)
 -----------------------------
