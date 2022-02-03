@@ -24,7 +24,9 @@ package ch.interlis.iox_j.wkb;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -267,16 +269,23 @@ public class Iox2wkb {
 	throws Iox2wkbException
 	{
 
-		byte[][] lines = polyline2wkb(polylineObjs, isSurfaceOrArea, asCompoundCurve, p, false);
+		List<PolylineCoordList> segments =  SegmentIoxPolylines(polylineObjs, asCompoundCurve, p, false);
 		try {
 			os.reset();
 			if (asCompoundCurve) {
 				writeByteOrder();
 				writeGeometryType(WKBConstants.wkbCompoundCurve);
-				os.writeInt(lines.length);
+				os.writeInt(segments.size());
 			}
-			for (byte[] line : lines) {
-				os.write(line);
+			for (PolylineCoordList segment : segments){
+				if (asCompoundCurve || !isSurfaceOrArea) {
+					writeByteOrder();
+					writeGeometryType(segment.getWkbType());
+				}
+				os.writeInt(segment.size());
+				for (Coordinate c : segment) {
+					writeCoord(c);
+				}
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("Unexpected IO exception: " + e.getMessage());
@@ -285,75 +294,70 @@ public class Iox2wkb {
 		return os.toByteArray();
 	}
 
-
-	private byte[][] polyline2wkb(IomObject polylineObjs[], boolean isSurfaceOrArea, boolean asCompoundCurve, double p, boolean repairTouchingLine)
+	private List<PolylineCoordList> SegmentIoxPolylines(IomObject polylineObjs[], boolean asCompoundCurve, double p, boolean repairTouchingLine)
 	throws Iox2wkbException {
-		if (polylineObjs == null) {
-			return new byte[0][0];
-		}
-
-		List<PolylineCoordList> lines = new ArrayList<PolylineCoordList>();
+		List<PolylineCoordList> resultSegments = new ArrayList<PolylineCoordList>();
+		int nextRingId = 0;
 
 		for (IomObject polylineObj : polylineObjs) {
 			if (polylineObj == null) {
 				continue;
-			}
-			// is POLYLINE?
-			if (isSurfaceOrArea && polylineObj.getattrobj("lineattr", 0) != null) {
-				throw new Iox2wkbException("Lineattributes not supported");
-			}
-			if (polylineObj.getobjectconsistency() == IomConstants.IOM_INCOMPLETE) {
-				throw new Iox2wkbException("clipped polyline not supported");
 			}
 
 			for(int sequencei=0; sequencei<polylineObj.getattrvaluecount("sequence"); sequencei++) {
 				IomObject sequence=polylineObj.getattrobj("sequence",sequencei);
 				int segmentc=sequence.getattrvaluecount("segment");
 
-				PolylineCoordList currentLine = new PolylineCoordList();
-				lines.add(currentLine);
+				PolylineCoordList currentSegment = new PolylineCoordList();
+				currentSegment.setRingId(nextRingId++);
+				resultSegments.add(currentSegment);
+
 
 				for(int segmenti=0; segmenti<segmentc; segmenti++){
 					IomObject segment = sequence.getattrobj("segment", segmenti);
 					Coordinate segmentCoordinate = coord2JTS(segment);
 
-					if(asCompoundCurve && ((segment.getobjecttag().equals("COORD") && !currentLine.trySetWkbType(WKBConstants.wkbLineString))
-							|| (segment.getobjecttag().equals("ARC") && !currentLine.trySetWkbType(WKBConstants.wkbCircularString))))
+					// Arc / Straight switch needed?
+					if(asCompoundCurve && ((segment.getobjecttag().equals("COORD") && !currentSegment.trySetWkbType(WKBConstants.wkbLineString))
+							|| (segment.getobjecttag().equals("ARC") && !currentSegment.trySetWkbType(WKBConstants.wkbCircularString))))
 					{
-						Coordinate lastPoint = currentLine.get(currentLine.size()-1);
-						currentLine = new PolylineCoordList();
-						currentLine.add(lastPoint);
-						lines.add(currentLine);
+						Coordinate lastPoint = currentSegment.get(currentSegment.size()-1);
+						PolylineCoordList nextSegment = new PolylineCoordList();
+						nextSegment.setRingId(currentSegment.getRingId());
+						nextSegment.add(lastPoint);
+						resultSegments.add(nextSegment);
+						currentSegment = nextSegment;
 					}
 
-					if (repairTouchingLine && currentLine.contains(segmentCoordinate) && !currentLine.get(0).equals(segmentCoordinate)){
-						PolylineCoordList splitLine = currentLine.splitTailAt(segmentCoordinate);
+					if (repairTouchingLine && currentSegment.contains(segmentCoordinate) && currentSegment.getPosition(segmentCoordinate) != 0){
+						PolylineCoordList splitLine = currentSegment.splitTailAt(segmentCoordinate);
+						splitLine.setRingId(nextRingId++);
 						if (splitLine.getWkbType() == WKBConstants.wkbCircularString){
 							splitLine.add(arcSupportingCoord2JTS(segment));
 						}
 						splitLine.add(segmentCoordinate);
-						lines.add(splitLine);
+						resultSegments.add(splitLine);
 					}
 
-					if(segment.getobjecttag().equals("COORD") && currentLine.trySetWkbType(WKBConstants.wkbLineString)) {
-						currentLine.add(segmentCoordinate);
+					if(segment.getobjecttag().equals("COORD") && currentSegment.trySetWkbType(WKBConstants.wkbLineString)) {
+						currentSegment.add(segmentCoordinate);
 					}
-					else if(segment.getobjecttag().equals("ARC") && !asCompoundCurve && currentLine.trySetWkbType(WKBConstants.wkbLineString)){
+					else if (segment.getobjecttag().equals("ARC") && asCompoundCurve && currentSegment.trySetWkbType(WKBConstants.wkbCircularString))
+					{
+						currentSegment.add(arcSupportingCoord2JTS(segment));
+						currentSegment.add(segmentCoordinate);
+					}
+					else if(segment.getobjecttag().equals("ARC") && currentSegment.trySetWkbType(WKBConstants.wkbLineString)){
 						if(p==0.0){
-							currentLine.add(arcSupportingCoord2JTS(segment));
-							currentLine.add(segmentCoordinate);
+							currentSegment.add(arcSupportingCoord2JTS(segment));
+							currentSegment.add(segmentCoordinate);
 						} else {
-							Coordinate lastCoordinate = currentLine.get(currentLine.size() - 1);
+							Coordinate lastCoordinate = currentSegment.get(currentSegment.size() - 1);
 							ArcSegment arc = new ArcSegment(lastCoordinate, arcSupportingCoord2JTS(segment), segmentCoordinate, p);
 							for (Coordinate c: arc.getCoordinates()) {
-								currentLine.add(c);
+								currentSegment.add(c);
 							}
 						}
-					}
-					else if (segment.getobjecttag().equals("ARC") && currentLine.trySetWkbType(WKBConstants.wkbCircularString))
-					{
-						currentLine.add(arcSupportingCoord2JTS(segment));
-						currentLine.add(segmentCoordinate);
 					}
 					else {
 						throw new Iox2wkbException("custom line form not supported");
@@ -362,26 +366,7 @@ public class Iox2wkb {
 			}
 		}
 
-		byte[][] result = new byte[lines.size()][];
-        try {
-			for (int linec = 0; linec < lines.size(); linec++) {
-				PolylineCoordList line = lines.get(linec);
-				os.reset();
-				if (asCompoundCurve || !isSurfaceOrArea)
-				{
-					writeByteOrder();
-					writeGeometryType(line.getWkbType());
-				}
-				os.writeInt(line.size());
-				for (int i = 0; i < line.size(); i++) {
-					writeCoord(line.get(i));
-				}
-				result[linec] = os.toByteArray();
-			}
-		} catch (IOException e) {
-	        throw new RuntimeException("Unexpected IO exception: " + e.getMessage());
-		}
-		return result;
+		return resultSegments;
 	}
 
 	/** Converts a SURFACE to a JTS Polygon.
@@ -420,29 +405,65 @@ public class Iox2wkb {
 				IomObject boundary = surface.getattrobj("boundary", boundaryi);
 				int polylinec = boundary.getattrvaluecount("polyline");
 				for (int polylinei = 0; polylinei < polylinec; polylinei++){
-					polylines.add(boundary.getattrobj("polyline", polylinei));
+					IomObject polyline = boundary.getattrobj("polyline", polylinei);
+					if (polyline.getattrobj("lineattr", 0) != null) {
+						throw new Iox2wkbException("Lineattributes not supported");
+					}
+					if (polyline.getobjectconsistency() == IomConstants.IOM_INCOMPLETE) {
+						throw new Iox2wkbException("clipped polyline not supported");
+					}
+					polylines.add(polyline);
 				}
 			}
 		}
 
-		byte[][] wkbs = new Iox2wkb(outputDimension,os.order(),asEWKB).polyline2wkb(polylines.toArray(new IomObject[0]), true, asCurvePolygon, strokeP, repairTouchingLine);
+		List<PolylineCoordList> segments = new Iox2wkb(outputDimension,os.order(),asEWKB)
+				.SegmentIoxPolylines(polylines.toArray(new IomObject[0]), asCurvePolygon, strokeP, repairTouchingLine);
 
+		Map<Integer, List<PolylineCoordList>> ringGroupes = groupSegmentsByRingId(segments);
 	    try {
 			os.reset();
 			writeByteOrder();
-			if (asCurvePolygon) {
-				writeGeometryType(WKBConstants.wkbCurvePolygon);
-			} else {
-				writeGeometryType(WKBConstants.wkbPolygon);
-			}
-			os.writeInt(wkbs.length);
-			for (byte[] wkb: wkbs) {
-				os.write(wkb);
+			writeGeometryType(asCurvePolygon ? WKBConstants.wkbCurvePolygon : WKBConstants.wkbPolygon);
+			os.writeInt(ringGroupes.keySet().size());
+
+			for (Map.Entry<Integer, List<PolylineCoordList>> entry: ringGroupes.entrySet()) {
+				if (asCurvePolygon){
+					writeByteOrder();
+					writeGeometryType(WKBConstants.wkbCompoundCurve);
+					os.writeInt(entry.getValue().size());
+				}
+				for (PolylineCoordList segment : entry.getValue()){
+					if (asCurvePolygon) {
+						writeByteOrder();
+						writeGeometryType(segment.getWkbType());
+					}
+					os.writeInt(segment.size());
+					for (Coordinate c : segment) {
+						writeCoord(c);
+					}
+				}
 			}
 		} catch (IOException e) {
 	        throw new RuntimeException("Unexpected IO exception: " + e.getMessage());
 		}
 		return os.toByteArray();
+	}
+
+	private HashMap<Integer, List<PolylineCoordList>> groupSegmentsByRingId(List<PolylineCoordList> segments) {
+		HashMap<Integer, List<PolylineCoordList>> result = new HashMap<Integer, List<PolylineCoordList>>();
+
+		for (PolylineCoordList segment : segments){
+			if (!result.containsKey(segment.getRingId())) {
+				List<PolylineCoordList> list = new ArrayList<PolylineCoordList>();
+				list.add(segment);
+
+				result.put(segment.getRingId(), list);
+			} else {
+				result.get(segment.getRingId()).add(segment);
+			}
+		}
+		return result;
 	}
 
 	@Deprecated
@@ -460,11 +481,8 @@ public class Iox2wkb {
 		}
 	    try {
 			writeByteOrder();
-			if(asCurvePolygon){
-				writeGeometryType(WKBConstants.wkbMultiSurface);
-			}else{
-				writeGeometryType(WKBConstants.wkbMultiPolygon);
-			}
+			writeGeometryType(asCurvePolygon ?  WKBConstants.wkbMultiSurface : WKBConstants.wkbMultiPolygon);
+
 			int surfacec=obj.getattrvaluecount("surface");
 			os.writeInt(surfacec);
 
@@ -480,6 +498,7 @@ public class Iox2wkb {
 		}
 		return os.toByteArray();
 	}
+
 	public byte[] multiline2wkb(IomObject obj,boolean asCurve,double strokeP)
 	throws Iox2wkbException
 	{
@@ -491,23 +510,37 @@ public class Iox2wkb {
 		int polylinec=obj.getattrvaluecount(Wkb2iox.ATTR_POLYLINE);
 
 		for(int polylinei=0;polylinei<polylinec;polylinei++){
-			polylines.add(obj.getattrobj("polyline",polylinei));
+			IomObject polyline = obj.getattrobj("polyline",polylinei);
+			if (polyline.getobjectconsistency() == IomConstants.IOM_INCOMPLETE) {
+				throw new Iox2wkbException("clipped polyline not supported");
+			}
+			polylines.add(polyline);
 		}
 
-		byte[][] wkbs = new Iox2wkb(outputDimension,os.order(),asEWKB).polyline2wkb(polylines.toArray(new IomObject[0]), false, asCurve, strokeP, false);
+		List<PolylineCoordList> segments = new Iox2wkb(outputDimension,os.order(),asEWKB)
+				.SegmentIoxPolylines(polylines.toArray(new IomObject[0]), asCurve, strokeP, false);
 
-		try {
+		Map<Integer, List<PolylineCoordList>> lineGroupes = groupSegmentsByRingId(segments);
+	    try {
 			os.reset();
 			writeByteOrder();
-			if(asCurve){
-				writeGeometryType(WKBConstants.wkbMultiCurve);
-			}else{
-				writeGeometryType(WKBConstants.wkbMultiLineString);
-			}
+			writeGeometryType(asCurve ? WKBConstants.wkbMultiCurve : WKBConstants.wkbMultiLineString);
+			os.writeInt(lineGroupes.keySet().size());
 
-			os.writeInt(wkbs.length);
-			for (byte[] wkb: wkbs) {
-				os.write(wkb);
+			for (Map.Entry<Integer, List<PolylineCoordList>> entry : lineGroupes.entrySet()) {
+				if (asCurve) {
+					writeByteOrder();
+					writeGeometryType(WKBConstants.wkbCompoundCurve);
+					os.writeInt(entry.getValue().size());
+				}
+				for (PolylineCoordList segment : entry.getValue()) {
+					writeByteOrder();
+					writeGeometryType(segment.getWkbType());
+					os.writeInt(segment.size());
+					for (Coordinate c : segment) {
+						writeCoord(c);
+					}
+				}
 			}
 		} catch (IOException e) {
 	        throw new RuntimeException("Unexpected IO exception: " + e.getMessage());
