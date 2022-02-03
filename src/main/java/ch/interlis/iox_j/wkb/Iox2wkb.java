@@ -265,6 +265,7 @@ public class Iox2wkb {
         IomObject polylineObjs[]=new IomObject[] {polylineObj};
         return polyline2wkb(polylineObjs, isSurfaceOrArea, asCompoundCurve, p);
     }
+
 	public byte[] polyline2wkb(IomObject polylineObjs[],boolean isSurfaceOrArea,boolean asCompoundCurve,double p)
 	throws Iox2wkbException
 	{
@@ -273,19 +274,13 @@ public class Iox2wkb {
 		try {
 			os.reset();
 			if (asCompoundCurve) {
-				writeByteOrder();
-				writeGeometryType(WKBConstants.wkbCompoundCurve);
-				os.writeInt(segments.size());
-			}
-			for (PolylineCoordList segment : segments){
-				if (asCompoundCurve || !isSurfaceOrArea) {
-					writeByteOrder();
-					writeGeometryType(segment.getWkbType());
-				}
-				os.writeInt(segment.size());
-				for (Coordinate c : segment) {
-					writeCoord(c);
-				}
+				writeCompoundCurve(segments);
+			} else if (isSurfaceOrArea){
+				if (segments.size() > 1)
+					throw new Iox2wkbException("Multiple segments in linearring not supported");
+				writeLinearRing(segments.get(0));
+			} else {
+				writeSegments(segments);
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("Unexpected IO exception: " + e.getMessage());
@@ -429,19 +424,11 @@ public class Iox2wkb {
 
 			for (Map.Entry<Integer, List<PolylineCoordList>> entry: ringGroupes.entrySet()) {
 				if (asCurvePolygon){
-					writeByteOrder();
-					writeGeometryType(WKBConstants.wkbCompoundCurve);
-					os.writeInt(entry.getValue().size());
-				}
-				for (PolylineCoordList segment : entry.getValue()){
-					if (asCurvePolygon) {
-						writeByteOrder();
-						writeGeometryType(segment.getWkbType());
-					}
-					os.writeInt(segment.size());
-					for (Coordinate c : segment) {
-						writeCoord(c);
-					}
+					writeCompoundCurve(entry.getValue());
+				} else {
+					if (entry.getValue().size() > 1)
+						throw new Iox2wkbException("Multiple polylines in linearring not supported");
+					writeLinearRing(entry.getValue().get(0));
 				}
 			}
 		} catch (IOException e) {
@@ -528,18 +515,10 @@ public class Iox2wkb {
 			os.writeInt(lineGroupes.keySet().size());
 
 			for (Map.Entry<Integer, List<PolylineCoordList>> entry : lineGroupes.entrySet()) {
-				if (asCurve) {
-					writeByteOrder();
-					writeGeometryType(WKBConstants.wkbCompoundCurve);
-					os.writeInt(entry.getValue().size());
-				}
-				for (PolylineCoordList segment : entry.getValue()) {
-					writeByteOrder();
-					writeGeometryType(segment.getWkbType());
-					os.writeInt(segment.size());
-					for (Coordinate c : segment) {
-						writeCoord(c);
-					}
+				if(asCurve){
+					writeCompoundCurve(entry.getValue());
+				} else {
+					writeSegments(entry.getValue());
 				}
 			}
 		} catch (IOException e) {
@@ -564,6 +543,33 @@ public class Iox2wkb {
         int flag3D = (outputDimension == 3) ? flagIncludeZ : 0;
         int typeInt = geometryType + flag3D;
 	    os.writeInt(typeInt);
+	  }
+
+	  private void writeLinearRing(PolylineCoordList line) throws IOException {
+		os.writeInt(line.size());
+		writeCoords(line);
+	  }
+
+	  private void writeCompoundCurve(List<PolylineCoordList> segments) throws IOException {
+		writeByteOrder();
+		writeGeometryType(WKBConstants.wkbCompoundCurve);
+		os.writeInt(segments.size());
+		writeSegments(segments);
+	  }
+
+	  private void writeSegments(Iterable<PolylineCoordList> segments) throws IOException {
+		for (PolylineCoordList segment : segments) {
+			writeByteOrder();
+			writeGeometryType(segment.getWkbType());
+			os.writeInt(segment.size());
+			writeCoords(segment);
+		}
+	  }
+
+	  private void writeCoords(Iterable<Coordinate> coordinates){
+		for (Coordinate c : coordinates){
+			writeCoord(c);
+		}
 	  }
 
 	  private void writeCoord(Coordinate coordinate){
