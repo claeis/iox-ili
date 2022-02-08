@@ -8,6 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ */
 public class RingCollector {
 
     private final boolean repairSelfTouchingRing;
@@ -116,6 +119,6 @@ public class RingCollector {
     public Coordinate getLastCooridnate() {
         List<LineSegment> ring = getCurrentRing();
         LineSegment segment = ring.get(ring.size() - 1);
-        return segment.get(segment.size() - 1);
+        return segment.getLast();
     }
 }

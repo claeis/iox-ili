@@ -8,6 +8,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ */
 public class LineSegment implements Iterable<Coordinate> {
     private int wkbType = WKBConstants.wkbLineString;
     private final List<Coordinate> coordinates;
@@ -35,14 +38,6 @@ public class LineSegment implements Iterable<Coordinate> {
             this.wkbType = wkbType;
             return true;
         }
-    }
-
-    public boolean contains(Coordinate coordinate){
-        return coordinatesMap.containsKey(coordinate);
-    }
-
-    public int getPosition(Coordinate coordinate){
-        return coordinatesMap.get(coordinate);
     }
 
     public void add(Coordinate coordinate){
