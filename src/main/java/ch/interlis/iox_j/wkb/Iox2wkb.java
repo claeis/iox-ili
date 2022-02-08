@@ -325,6 +325,7 @@ public class Iox2wkb {
 							Coordinate lastCoordinate = ringCollector.getLastCooridnate();
 							ArcSegment arc = new ArcSegment(lastCoordinate, arcSupportingCoord2JTS(segment), segmentCoordinate, p);
 							for (Coordinate c: arc.getCoordinates()) {
+								if (c.equals(lastCoordinate)) continue;
 								ringCollector.add(c,WKBConstants.wkbLineString);
 							}
 						}
