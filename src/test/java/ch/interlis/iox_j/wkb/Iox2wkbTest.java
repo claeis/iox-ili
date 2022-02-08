@@ -386,7 +386,7 @@ public class Iox2wkbTest {
         assertEquals("000000000A00000003000000000900000001000000000200000006414434F80000000041330F7400000000414434F8000000004133057C0000000041443DB3000000004133057C0000000041443DB30000000041330A4D0000000041443DB30000000041330F7400000000414434F80000000041330F740000000000000000090000000100000000020000000541443B408000000041330A4D0000000041443A2000000000413308C400000000414438FA8000000041330A870000000041443A238000000041330BF60000000041443B408000000041330A4D0000000000000000090000000100000000020000000541443DB30000000041330A4D0000000041443C6A00000000413308EC0000000041443B408000000041330A4D0000000041443C6A0000000041330BDC0000000041443DB30000000041330A4D00000000", wkbCurveText);
     }
 
-        @Test
+    @Test
     public void surfaceRepairTouchingRingDisabled_Ok() throws Exception {
         IomObject multiSurface=getBananaPolygon();
         Iox2wkb convWkb=new Iox2wkb(2, java.nio.ByteOrder.BIG_ENDIAN, false);
@@ -395,6 +395,17 @@ public class Iox2wkbTest {
 
         String wkbText=DatatypeConverter.printHexBinary(wkb);
         assertEquals("0000000003000000010000000A414434F80000000041330F7400000000414434F8000000004133057C0000000041443DB3000000004133057C0000000041443DB30000000041330A4D0000000041443C6A00000000413308EC0000000041443B408000000041330A4D0000000041443C6A0000000041330BDC0000000041443DB30000000041330A4D0000000041443DB30000000041330F7400000000414434F80000000041330F7400000000",wkbText);
+    }
+
+    @Test
+    public void surfaceReapirTouchingRingMultipleInnerRingSegments() throws Exception {
+        IomObject multiSurface=getBananaPolygonWithInnerArcs();
+        Iox2wkb convWkb=new Iox2wkb(2, java.nio.ByteOrder.BIG_ENDIAN, false);
+        byte wkb[]=convWkb.surface2wkb(multiSurface, true, 0.0, true);
+        // verify
+
+        String wkbText=DatatypeConverter.printHexBinary(wkb);
+        assertEquals("000000000A0000000200000000090000000100000000020000000641442E3E0000000041330A9F000000004144398800000000413301ED00000000414439948000000041330AAB00000000414439948000000041330AAB0000000041443994800000004133150C0000000041442E3E0000000041330A9F00000000000000000900000003000000000800000003414439948000000041330AAB000000004144377E8000000041330793000000004144352580000000413308060000000000000000020000000241443525800000004133080600000000414435150000000041330E9100000000000000000800000003414435150000000041330E9100000000414437268000000041330E7900000000414439948000000041330AAB00000000",wkbText);
     }
 
     private IomObject getBananaPolygon() {
@@ -417,7 +428,7 @@ public class Iox2wkbTest {
     }
 
     private IomObject getBananaPolygonStartOnOverlap(){
-                IomObject multiSurface=new Iom_jObject("MULTISURFACE", null);
+        IomObject multiSurface=new Iom_jObject("MULTISURFACE", null);
         IomObject surfaceValue = multiSurface.addattrobj("surface", "SURFACE");
         // outer boundary
         IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
@@ -485,5 +496,53 @@ public class Iox2wkbTest {
         c4.setattrvalue("C2", "1249764.000");
 
         return  polylineValue;
+    }
+
+    private IomObject getBananaPolygonWithInnerArcs() {
+        IomObject multiSurface=new Iom_jObject("MULTISURFACE", null);
+        IomObject surfaceValue = multiSurface.addattrobj("surface", "SURFACE");
+        // outer boundary
+        IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+        IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+
+        IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+        IomObject c1=segments.addattrobj("segment", "COORD");
+        IomObject c2=segments.addattrobj("segment", "COORD");
+        IomObject c3=segments.addattrobj("segment", "COORD");
+        IomObject a1=segments.addattrobj("segment", "ARC");
+        IomObject c4=segments.addattrobj("segment", "COORD");
+        IomObject a2=segments.addattrobj("segment", "ARC");
+        IomObject c5=segments.addattrobj("segment", "COORD");
+        IomObject c6=segments.addattrobj("segment", "COORD");
+
+        c1.setattrvalue("C1", "2645116.000");
+        c1.setattrvalue("C2", "1247903.000");
+
+        c2.setattrvalue("C1", "2650896.000");
+        c2.setattrvalue("C2", "1245677.000");
+
+        c3.setattrvalue("C1", "2650921.000");
+        c3.setattrvalue("C2", "1247915.000");
+
+        a1.setattrvalue("C1", "2648651.000");
+        a1.setattrvalue("C2", "1247238.000");
+        a1.setattrvalue("A1", "2649853.000");
+        a1.setattrvalue("A2", "1247123.000");
+
+        c4.setattrvalue("C1", "2648618.000");
+        c4.setattrvalue("C2", "1248913.000");
+
+        a2.setattrvalue("C1", "2650921.000");
+        a2.setattrvalue("C2", "1247915.000");
+        a2.setattrvalue("A1", "2649677.000");
+        a2.setattrvalue("A2", "1248889.000");
+
+        c5.setattrvalue("C1", "2650921.000");
+        c5.setattrvalue("C2", "1250572.000");
+
+        c6.setattrvalue("C1", "2645116.000");
+        c6.setattrvalue("C2", "1247903.000");
+
+        return multiSurface;
     }
 }

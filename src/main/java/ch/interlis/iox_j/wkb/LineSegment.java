@@ -59,8 +59,7 @@ public class LineSegment implements Iterable<Coordinate> {
 
     public LineSegment splitTailAt(Coordinate coordinate){
         Integer pos = coordinatesMap.get(coordinate);
-        if (pos == coordinates.size()) return null;
-        if (pos == 0) return this;
+        if (pos == coordinates.size() - 1) return null;
 
         List<Coordinate> tail = coordinates.subList(pos, coordinates.size());
         LineSegment result = new LineSegment(wkbType);

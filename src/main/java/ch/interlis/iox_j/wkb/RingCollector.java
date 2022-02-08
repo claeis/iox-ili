@@ -45,9 +45,7 @@ public class RingCollector {
     }
 
     public void add(Coordinate coordinate, int WkbType){
-        if (currentRingIndex < 0) {
-            startNewRing();
-        } else if (carryOverCoordinate != null && repairSelfTouchingRing){
+        if (carryOverCoordinate != null && repairSelfTouchingRing){
             Coordinate carry = carryOverCoordinate;
             startNewRing();
             getCurrentSegment().add(carry);
@@ -89,8 +87,6 @@ public class RingCollector {
         LineSegment tailSegment = containingSegment.splitTailAt(coordinate);
         if (tailSegment != null){
             extractedRing.add(tailSegment);
-        } else if (containingSegment == tailSegment){
-            ring.remove(tailSegment);
         }
 
         while (segmentIdx + 1 < ring.size()){
