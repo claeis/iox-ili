@@ -15,6 +15,7 @@ public class RingCollector {
     private final Map<Coordinate, Integer> coordinates2Segment;
     private int currentRingIndex = -1;
     private Coordinate start;
+    private Coordinate carryOverCoordinate;
 
     public RingCollector (boolean repairSelfTouchingRing){
         this.repairSelfTouchingRing = repairSelfTouchingRing;
@@ -26,25 +27,33 @@ public class RingCollector {
         return currentRingIndex >= 0 ? rings.get(currentRingIndex) : null;
     }
 
+    private LineSegment getCurrentSegment(){
+        List<LineSegment> currentRing = getCurrentRing();
+        return currentRing != null  ? currentRing.get(currentRing.size() - 1) : null;
+    }
+
     public void startNewRing() {
         rings.addLast(new ArrayList<LineSegment>());
         rings.getLast().add(new LineSegment());
         currentRingIndex = rings.size() - 1;
         coordinates2Segment.clear();
         start =  null;
+        carryOverCoordinate = null;
     }
 
     public void add(Coordinate coordinate, int WkbType){
         if (currentRingIndex < 0) {
             startNewRing();
-        }
-
-        if (start == null) {
-            start = coordinate;
+        } else if (carryOverCoordinate != null){
+            Coordinate carry = carryOverCoordinate;
+            startNewRing();
+            getCurrentSegment().add(carry);
+            start = carry;
+            coordinates2Segment.put(carry, 0);
         }
 
         List<LineSegment> ring = getCurrentRing();
-        LineSegment segment = ring.get(ring.size() - 1);
+        LineSegment segment = getCurrentSegment();
 
         if (!segment.trySetWkbType(WkbType)) {
             Coordinate lastCoord = segment.get(segment.size() - 1);
@@ -53,12 +62,19 @@ public class RingCollector {
             ring.add(segment);
         }
 
-        if (repairSelfTouchingRing && coordinates2Segment.containsKey(coordinate) && !start.equals(coordinate)){
+        if (start == null) {
+            start = coordinate;
+        }
+        else if (start.equals(coordinate)){
+            carryOverCoordinate = coordinate;
+        }
+        else if (repairSelfTouchingRing && coordinates2Segment.containsKey(coordinate) && !start.equals(coordinate)){
             extractInnerRing(coordinate);
         }
-        segment = ring.get(ring.size() - 1);
+
+        segment = getCurrentSegment();
         segment.add(coordinate);
-        coordinates2Segment.put(coordinate, ring.size() - 1);
+        coordinates2Segment.put(coordinate, getCurrentRing().size() - 1);
     }
 
     private void extractInnerRing(Coordinate coordinate) {

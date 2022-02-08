@@ -54,6 +54,10 @@ public class LineSegment implements Iterable<Coordinate> {
         return coordinates.get(index);
     }
 
+    public Coordinate getLast() {
+        return get(size() - 1);
+    }
+
     public int size(){
         return coordinates.size();
     }
