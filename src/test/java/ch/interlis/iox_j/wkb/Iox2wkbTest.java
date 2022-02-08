@@ -337,6 +337,17 @@ public class Iox2wkbTest {
     }
 
     @Test
+    public void surfaceRepairTouchingRingInStart_Ok() throws Exception {
+        IomObject multiSurface=getBananaPolygonStartOnOverlap();
+        Iox2wkb convWkb=new Iox2wkb(2, java.nio.ByteOrder.BIG_ENDIAN, false);
+        byte wkb[]=convWkb.surface2wkb(multiSurface, false, 0.0, true);
+        // verify
+
+        String wkbText=DatatypeConverter.printHexBinary(wkb);
+        assertEquals("0000000003000000020000000641443DB30000000041330A4D0000000041443DB30000000041330F7400000000414434F80000000041330F7400000000414434F8000000004133057C0000000041443DB3000000004133057C0000000041443DB30000000041330A4D000000000000000541443DB30000000041330A4D0000000041443C6A00000000413308EC0000000041443B408000000041330A4D0000000041443C6A0000000041330BDC0000000041443DB30000000041330A4D00000000",wkbText);
+    }
+
+    @Test
     public void surfaceRepairTouchingRingWithTwoInnerRings_Ok() throws Exception {
         IomObject multiSurface=new Iom_jObject("MULTISURFACE", null);
         IomObject surfaceValue = multiSurface.addattrobj("surface", "SURFACE");
@@ -386,6 +397,34 @@ public class Iox2wkbTest {
         IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
 
         double[] coords = new double[]{2648560, 1249140, 2648560, 1246588, 2653030, 1246588, 2653030, 1247821, 2652372, 1247468, 2651777, 1247821, 2652372, 1248220, 2653030, 1247821, 2653030, 1249140, 2648560, 1249140};
+        for (int i = 0; i < coords.length; i+=2) {
+            IomObject coord = segments.addattrobj("segment", "COORD");
+            coord.setattrvalue("C1", Double.toString(coords[i]));
+            coord.setattrvalue("C2", Double.toString(coords[i+1]));
+        }
+        return multiSurface;
+    }
+
+    private IomObject getBananaPolygonStartOnOverlap(){
+                IomObject multiSurface=new Iom_jObject("MULTISURFACE", null);
+        IomObject surfaceValue = multiSurface.addattrobj("surface", "SURFACE");
+        // outer boundary
+        IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
+        // polyline
+        IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+
+        IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+
+        double[] coords = new double[]{ 2653030, 1247821,
+                                        2653030, 1249140,
+                                        2648560, 1249140,
+                                        2648560, 1246588,
+                                        2653030, 1246588,
+                                        2653030, 1247821,
+                                        2652372, 1247468,
+                                        2651777, 1247821,
+                                        2652372, 1248220,
+                                        2653030, 1247821};
         for (int i = 0; i < coords.length; i+=2) {
             IomObject coord = segments.addattrobj("segment", "COORD");
             coord.setattrvalue("C1", Double.toString(coords[i]));
