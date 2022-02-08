@@ -44,7 +44,7 @@ public class RingCollector {
     public void add(Coordinate coordinate, int WkbType){
         if (currentRingIndex < 0) {
             startNewRing();
-        } else if (carryOverCoordinate != null){
+        } else if (carryOverCoordinate != null && repairSelfTouchingRing){
             Coordinate carry = carryOverCoordinate;
             startNewRing();
             getCurrentSegment().add(carry);

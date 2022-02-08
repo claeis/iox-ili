@@ -348,6 +348,17 @@ public class Iox2wkbTest {
     }
 
     @Test
+    public void surfaceTouchingRingInStartNoRepair_Ok() throws Exception {
+        IomObject multiSurface=getBananaPolygonStartOnOverlap();
+        Iox2wkb convWkb=new Iox2wkb(2, java.nio.ByteOrder.BIG_ENDIAN, false);
+        byte wkb[]=convWkb.surface2wkb(multiSurface, false, 0.0, false);
+        // verify
+
+        String wkbText=DatatypeConverter.printHexBinary(wkb);
+        assertEquals("0000000003000000010000000A41443DB30000000041330A4D0000000041443DB30000000041330F7400000000414434F80000000041330F7400000000414434F8000000004133057C0000000041443DB3000000004133057C0000000041443DB30000000041330A4D0000000041443C6A00000000413308EC0000000041443B408000000041330A4D0000000041443C6A0000000041330BDC0000000041443DB30000000041330A4D00000000",wkbText);
+    }
+
+    @Test
     public void surfaceRepairTouchingRingWithTwoInnerRings_Ok() throws Exception {
         IomObject multiSurface=new Iom_jObject("MULTISURFACE", null);
         IomObject surfaceValue = multiSurface.addattrobj("surface", "SURFACE");
