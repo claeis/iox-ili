@@ -8,18 +8,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class PolylineCoordList implements Iterable<Coordinate> {
-    private int ringId = -1;
+public class LineSegment implements Iterable<Coordinate> {
     private int wkbType = WKBConstants.wkbLineString;
     private final List<Coordinate> coordinates;
     private final Map<Coordinate, Integer> coordinatesMap;
 
-    public PolylineCoordList() {
+    public LineSegment() {
         this.coordinates = new ArrayList<Coordinate>();
         this.coordinatesMap = new HashMap<Coordinate, Integer>();
     }
 
-    public PolylineCoordList(int wkbType) {
+    public LineSegment(int wkbType) {
         this();
         this.wkbType = wkbType;
     }
@@ -59,10 +58,13 @@ public class PolylineCoordList implements Iterable<Coordinate> {
         return coordinates.size();
     }
 
-    public PolylineCoordList splitTailAt(Coordinate coordinate){
+    public LineSegment splitTailAt(Coordinate coordinate){
         Integer pos = coordinatesMap.get(coordinate);
+        if (pos == coordinates.size()) return null;
+        if (pos == 0) return this;
+
         List<Coordinate> tail = coordinates.subList(pos, coordinates.size());
-        PolylineCoordList result = new PolylineCoordList(wkbType);
+        LineSegment result = new LineSegment(wkbType);
 
         for (Coordinate coord: tail) {
             coordinatesMap.remove(coord);
@@ -70,15 +72,8 @@ public class PolylineCoordList implements Iterable<Coordinate> {
         }
 
         tail.clear();
+
         return result;
-    }
-
-    public int getRingId() {
-        return ringId;
-    }
-
-    public void setRingId(int ringId) {
-        this.ringId = ringId;
     }
 
     @Override
