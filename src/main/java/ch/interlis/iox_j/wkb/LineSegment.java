@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * A LineSegment represents a List of Coordinates representing a Segment of a Polyline with matching WKB type.
+ * The class supports splitting the Segment in two parts.
  */
 public class LineSegment implements Iterable<Coordinate> {
     private int wkbType = WKBConstants.wkbLineString;
@@ -57,8 +58,13 @@ public class LineSegment implements Iterable<Coordinate> {
         return coordinates.size();
     }
 
+    /**
+     * Splits & returns the tail of this segment after the provided Coorinate.
+     * @param coordinate Coordinate to split the tail.
+     * @return New LineSegment inclusive coordinate or null if only coorinate in tail.
+     */
     public LineSegment splitTailAt(Coordinate coordinate){
-        Integer pos = coordinatesMap.get(coordinate);
+        int pos = coordinatesMap.get(coordinate);
         if (pos == coordinates.size() - 1) return null;
 
         List<Coordinate> tail = coordinates.subList(pos, coordinates.size());

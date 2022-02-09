@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * RingCollector is used to collect & repair rings or lines in iox format. If repairSelfTouchingRing flag is set the
+ * RingCollector extracts inner rings into separate rings to fulfill OCG validity criteria "Rings may not self-intersect".
+ * Inner ring extraction may only work, if the first added coordinate is on the outer ring.
+ * RingCollector does create LineSegments with matching WKB type automatically.
  */
 public class RingCollector {
 
@@ -35,6 +38,9 @@ public class RingCollector {
         return currentRing != null  ? currentRing.get(currentRing.size() - 1) : null;
     }
 
+    /**
+     * Initiates switch to new ring / line.
+     */
     public void startNewRing() {
         rings.addLast(new ArrayList<LineSegment>());
         rings.getLast().add(new LineSegment());
@@ -44,6 +50,11 @@ public class RingCollector {
         carryOverCoordinate = null;
     }
 
+    /**
+     * Adds coordinate to current ring / line. Ensures segment with matching WKB type.
+     * @param coordinate Coordinate to add to current ring.
+     * @param WkbType Required type for the LineSegment the coordinate is added to.
+     */
     public void add(Coordinate coordinate, int WkbType){
         if (carryOverCoordinate != null && repairSelfTouchingRing){
             Coordinate carry = carryOverCoordinate;
@@ -57,7 +68,7 @@ public class RingCollector {
         LineSegment segment = getCurrentSegment();
 
         if (!segment.trySetWkbType(WkbType)) {
-            Coordinate lastCoord = segment.get(segment.size() - 1);
+            Coordinate lastCoord = segment.getLast();
             segment = new LineSegment(WkbType);
             segment.add(lastCoord);
             ring.add(segment);
