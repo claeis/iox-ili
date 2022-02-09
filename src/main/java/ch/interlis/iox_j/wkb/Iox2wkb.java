@@ -89,7 +89,7 @@ public class Iox2wkb {
         this.outputDimension = outputDimension;
         this.asEWKB=asEWKB;
         os = new ByteArrayOutputStream(byteOrder);
-
+        
         if (outputDimension < 2 || outputDimension > 3)
           throw new IllegalArgumentException("Output dimension must be 2 or 3");
     }
