@@ -112,7 +112,7 @@ public class RingCollector {
         return rings;
     }
 
-    public Coordinate getLastCooridnate() {
+    public Coordinate getLastCoordinate() {
         List<LineSegment> ring = getCurrentRing();
         LineSegment segment = ring.get(ring.size() - 1);
         return segment.getLast();
