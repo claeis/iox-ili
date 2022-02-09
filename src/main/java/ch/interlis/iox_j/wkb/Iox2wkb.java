@@ -305,18 +305,16 @@ public class Iox2wkb {
 				for(int segmenti=0; segmenti<segmentc; segmenti++){
 					IomObject segment = sequence.getattrobj("segment", segmenti);
 					Coordinate segmentCoordinate = coord2JTS(segment);
-
-
+					
 					if (segment.getobjecttag().equals("COORD")){
 						ringCollector.add(segmentCoordinate, WKBConstants.wkbLineString);
 					}
-					else if (segment.getobjecttag().equals("ARC") && asCompoundCurve)
+					else if (segment.getobjecttag().equals("ARC"))
 					{
-						ringCollector.add(arcSupportingCoord2JTS(segment),WKBConstants.wkbCircularString);
-						ringCollector.add(segmentCoordinate,WKBConstants.wkbCircularString);
-					}
-					else if(segment.getobjecttag().equals("ARC")){
-						if(p==0.0){
+						if (asCompoundCurve){
+							ringCollector.add(arcSupportingCoord2JTS(segment),WKBConstants.wkbCircularString);
+							ringCollector.add(segmentCoordinate,WKBConstants.wkbCircularString);
+						}else if(p==0.0){
 							ringCollector.add(arcSupportingCoord2JTS(segment),WKBConstants.wkbLineString);
 							ringCollector.add(segmentCoordinate,WKBConstants.wkbLineString);
 						} else {
