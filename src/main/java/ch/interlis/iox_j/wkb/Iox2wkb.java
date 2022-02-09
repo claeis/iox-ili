@@ -24,9 +24,7 @@ package ch.interlis.iox_j.wkb;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
