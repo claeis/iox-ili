@@ -687,7 +687,7 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	//Es wird getestet, ob keine Fehlermeldung ausgegeben wird, wenn bei der Funktion objectCount(Role) die Anzahl der Objekte, welche von S zu T via Role referenzieren, 1 ist.
+	//Es wird getestet, ob keine Fehlermeldung ausgegeben wird, wenn bei der Funktion objectCount(Role) die Anzahl der Objekte, welche von SA zu TA via Role referenzieren, 1 ist.
 	@Test
 	public void objectCount_1Object_Ok() {
 		Iom_jObject iomObjS1 = new Iom_jObject(ILI_CLASSSA, OBJ_OID1);
