@@ -19,6 +19,8 @@ import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurveRing;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
+import ch.interlis.iox.IoxException;
+import ch.interlis.iox.IoxFactoryCollection;
 
 public abstract class AbstractIomObjectSerializer {
     protected static final int MAGIC=342;
@@ -39,7 +41,9 @@ public abstract class AbstractIomObjectSerializer {
     private HashMap<String,Integer> name2idx=new HashMap<String,Integer>();
     private HashMap<Integer,String> idx2name=new HashMap<Integer,String>();
     private int nameIdx=1;
-    protected JtsextGeometryFactory factory=new JtsextGeometryFactory();
+    protected JtsextGeometryFactory jtsFactory=new JtsextGeometryFactory();
+    protected IoxFactoryCollection ioxFactory=null;
+
     private Map<Integer,IomObject> id2obj=null;
     private Map<IomObject,Integer> obj2id=null;
     private int nextId=0;
@@ -262,7 +266,16 @@ public abstract class AbstractIomObjectSerializer {
         }
         
         
-        IomObject ret=new Iom_jObject(tag, oid);
+        IomObject ret=null;
+        if(ioxFactory!=null) {
+            try {
+                ret= ioxFactory.createIomObject(tag, oid);
+            } catch (IoxException e) {
+                throw new IllegalStateException(e);
+            }
+        }else {
+            ret=new Iom_jObject(tag, oid);
+        }
         id2obj.put(id, ret);
         if(col!=0) {
             ret.setobjectcol(col);
@@ -397,7 +410,7 @@ public abstract class AbstractIomObjectSerializer {
                  CompoundCurve curve=readCompoundCurve(in);
                  lines.add(curve);
              }
-             ret=new CompoundCurveRing(lines,factory);
+             ret=new CompoundCurveRing(lines,jtsFactory);
          }else if(type==COMPOUND_CURVE) {
              ret=readCompoundCurve(in);
          }else if(type==LINE_STRING){
@@ -406,7 +419,7 @@ public abstract class AbstractIomObjectSerializer {
              for(int i=0;i<coords.length;i++) {
                  coords[i]=readCoord(in);
              }
-             ret=factory.createLineString(coords);
+             ret=jtsFactory.createLineString(coords);
          }else {
              throw new IllegalStateException();
          }
@@ -456,7 +469,7 @@ public abstract class AbstractIomObjectSerializer {
             segs.add(seg);
         }
         String userData=readString(in);
-        CompoundCurve ret=new CompoundCurve(segs, factory);
+        CompoundCurve ret=new CompoundCurve(segs, jtsFactory);
         ret.setUserData(userData);
         return ret;
     }

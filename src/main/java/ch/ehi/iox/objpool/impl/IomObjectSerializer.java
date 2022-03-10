@@ -5,9 +5,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import ch.interlis.iom.IomObject;
+import ch.interlis.iox.IoxFactoryCollection;
 
 public class IomObjectSerializer extends AbstractIomObjectSerializer implements Serializer<IomObject> {
-	@Override
+    public IomObjectSerializer() {
+    }
+	public IomObjectSerializer(IoxFactoryCollection ioxFactory) {
+        this.ioxFactory=ioxFactory;
+    }
+
+
+    @Override
 	public byte[] getBytes(IomObject iomObj) throws IOException {
         ByteArrayOutputStream  byteStream = new ByteArrayOutputStream();
         startObject();

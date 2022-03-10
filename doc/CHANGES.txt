@@ -6,6 +6,7 @@ ideas/open issues
 LATEST
 -----------------------------
 - ReaderFactory: fix/close a left open ItfReader2
+- ItfReader2: use ioxFactory to create objects read back from objPool to keep custom types
 
 iox-ili 1.21.9 (2021-12-28)
 -----------------------------
