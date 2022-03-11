@@ -3,7 +3,13 @@ package ch.interlis.iox_j.validator;
 import java.util.Collection;
 import java.util.List;
 
-import ch.interlis.ili2c.metamodel.*;
+import ch.interlis.ili2c.metamodel.EnumerationType;
+import ch.interlis.ili2c.metamodel.FormattedType;
+import ch.interlis.ili2c.metamodel.NumericType;
+import ch.interlis.ili2c.metamodel.RoleDef;
+import ch.interlis.ili2c.metamodel.TextType;
+import ch.interlis.ili2c.metamodel.Type;
+import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.iom.IomObject;
 
 public class Value {
