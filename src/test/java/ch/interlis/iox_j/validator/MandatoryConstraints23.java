@@ -34,9 +34,7 @@ public class MandatoryConstraints23 {
 	private final static String ILI_CLASSCONSTANTG=TOPIC+".ClassConstantG";
 	private final static String ILI_CLASSCONSTANTJ=TOPIC+".ClassConstantJ";
 	private final static String ILI_CLASSCONSTANTJA=TOPIC+".ClassConstantJA";
-
 	private final static String ILI_CLASSCONSTANTJB=TOPIC+".ClassConstantJB";
-
 	private final static String ILI_CLASSCONSTANTJP=TOPIC+".ClassConstantJp";
 	private final static String ILI_CLASSCONSTANTJP3=TOPIC+".ClassConstantJp3";
 	// ATTRIBUTES EQUALATION (==) SUCCESS AND FAIL
