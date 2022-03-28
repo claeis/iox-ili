@@ -302,11 +302,9 @@ public class Interlis {
             } catch (Ili2cException e) {
                 EhiLogger.logError(e);
             }
-            for(FunctionCall aFunction:functions.keySet()) {
-                if(aFunction==functionCall) {
-                    Value isArea=functions.get(functionCall);
-                    return isArea;
-                }
+
+            if (functions.containsKey(functionCall)) {
+                return functions.get(functionCall);
             }
             Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction);
             functions.put(functionCall, isArea);
