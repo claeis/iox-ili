@@ -1655,6 +1655,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 //throw new IllegalStateException(rsrc.getString("evaluateExpression.argumentAllRequiresASetConstraint"));
                 return Value.createSkipEvaluation();
            }
+
+            // return cached value if available
+            if (functions.containsKey(expression)) {
+                return functions.get(expression);
+            }
+
 			Iterator<String> objectIterator = allObjIterator;
 			List<IomObject> listOfIomObjects = new ArrayList<IomObject>();
 			while(objectIterator.hasNext()){
@@ -1664,7 +1670,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					listOfIomObjects.add(aIomObj);
 				}
 			}
-			return new Value(listOfIomObjects);
+            Value listOfIomObjectsValue = new Value(listOfIomObjects);
+            functions.put(expression, listOfIomObjectsValue);
+            return listOfIomObjectsValue;
         } else if(expression instanceof ParameterValue) {
             ParameterValue paramValue=(ParameterValue)expression;
             String paramName=paramValue.getParameter().getScopedName();
