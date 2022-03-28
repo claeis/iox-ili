@@ -1893,6 +1893,43 @@ public class Function23Test {
 		Assert.assertEquals("Set Constraint Function23.Topic.ClassZA.Constraint1 is not true.", logger.getErrs().get(2).getEventMsg());
 	}
 
+	// Es wird getestet ob die areAreas Funktion bei vielen Objekten genug schnell berechnet wird.
+	@Test(timeout = 10000)
+	public void areAreas_Caching_Performance() {
+		// create test objects that satisfy the areAreas constraint
+		Iom_jObject[] testObjects = new Iom_jObject[1000];
+		for (int i = 0; i < testObjects.length; i++) {
+			int x = (i % 20) + 500000;
+			int y = (i / 20) + 70000;
+
+			Iom_jObject objectZA = new Iom_jObject(ILI_CLASSZA, String.format("o%d", i));
+			objectZA.setattrvalue("Art", "a");
+			objectZA.addattrobj("Geometrie", createRectangleGeometry(String.valueOf(x), String.valueOf(y), String.valueOf(x + 1), String.valueOf(y + 1)));
+			testObjects[i] = objectZA;
+		}
+
+		// setup validation
+		ValidationConfig modelConfig = new ValidationConfig();
+		LogCollector logger = new LogCollector();
+		LogEventFactory errFactory = new LogEventFactory();
+		Settings settings = new Settings();
+
+		// run validation
+		Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC, BID1));
+
+		for (Iom_jObject testObject : testObjects) {
+			validator.validate(new ObjectEvent(testObject));
+		}
+
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+
+		// assert logged errors
+		Assert.assertEquals(0, logger.getErrs().size());
+	}
+
 	private static IomObject createRectangleGeometry(String x1, String y1, String x2, String y2) {
 		IomObject startSegment = new Iom_jObject("COORD", null);
 		startSegment.setattrvalue("C1", x1);
