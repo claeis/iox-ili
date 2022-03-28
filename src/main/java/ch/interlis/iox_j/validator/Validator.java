@@ -141,7 +141,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_OBJECT_RESOLVERS="ch.interlis.iox_j.validator.objectResolvers";
     public static final String CONFIG_DEBUG_XTFOUT = "ch.interlis.iox_j.validator.debugXtfOutput";
 	// the object count result as value in map with the appropriate function as key.
-	private Map<Function, Value> functions=new HashMap<Function, Value>();
+	private Map<Evaluable, Value> functions=new HashMap<Evaluable, Value>();
 	private ObjectPoolManager objPoolManager=null;
 	private ObjectPool objectPool = null;
 	private LinkPool linkPool;
