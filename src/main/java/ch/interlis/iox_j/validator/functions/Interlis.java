@@ -308,7 +308,7 @@ public class Interlis {
                     return isArea;
                 }
             }
-            Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction);
+            Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction, validationKind);
             functions.put(currentFunction, isArea);
             return isArea;
         }

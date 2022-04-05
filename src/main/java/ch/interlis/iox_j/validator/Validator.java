@@ -2091,7 +2091,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return new Value(counter);
 	}
 	
-	public Value evaluateAreArea(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction) {
+	public Value evaluateAreArea(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction, String validationKind) {
 		String mainObjTag=mainIomObj.getobjecttag();
 		if(pathToStructEle == null){
 			ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(mainObjTag, objPoolManager); // create new pool of polygons
@@ -2115,7 +2115,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
             for (IomObject polygon : listOfPolygons) {
                 try {
-                    polygonPool.addLines(null, polygon.getobjectoid(), polygonPool.getLinesFromPolygon(polygon));
+                    polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, errFact);
                 } catch (IoxException e) {
                     EhiLogger.logError(e);  
                 }
@@ -2172,7 +2172,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         }                               
                         for (IomObject polygon : listOfPolygons) {
                             try {
-                                polygonPool.addLines(null, polygon.getobjectoid(), polygonPool.getLinesFromPolygon(polygon));
+                                polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, errFact);
                             } catch (IoxException e) {
                                 EhiLogger.logError(e);  
                             }

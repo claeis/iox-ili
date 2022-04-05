@@ -124,7 +124,7 @@ public class Interlis_ext {
                     return isArea;
                 }
             }
-            Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction);
+            Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction, validationKind);
             functions.put(currentFunction, isArea);
             return isArea;
         }
