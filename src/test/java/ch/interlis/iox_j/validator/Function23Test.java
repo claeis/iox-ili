@@ -1,5 +1,9 @@
 package ch.interlis.iox_j.validator;
 
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
@@ -7,14 +11,12 @@ import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
-import ch.interlis.iox_j.*;
+import ch.interlis.iox_j.EndBasketEvent;
+import ch.interlis.iox_j.EndTransferEvent;
+import ch.interlis.iox_j.ObjectEvent;
+import ch.interlis.iox_j.StartBasketEvent;
+import ch.interlis.iox_j.StartTransferEvent;
 import ch.interlis.iox_j.logging.LogEventFactory;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class Function23Test {
 	private TransferDescription td=null;
@@ -1887,10 +1889,10 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 
 		// assert logged errors
-		Assert.assertEquals(3, logger.getErrs().size());
-		Assert.assertEquals("Intersection coord1 (550000.000, 80000.000), tids o1/Geometrie[1], o1/Geometrie[2]", logger.getErrs().get(0).getEventMsg());
-		Assert.assertEquals("Intersection coord1 (600000.000, 75000.000), tids o1/Geometrie[1], o1/Geometrie[2]", logger.getErrs().get(1).getEventMsg());
-		Assert.assertEquals("Set Constraint Function23.Topic.ClassZA.Constraint1 is not true.", logger.getErrs().get(2).getEventMsg());
+		assertEquals(3, logger.getErrs().size());
+		assertEquals("Intersection coord1 (550000.000, 80000.000), tids o1/Geometrie[1], o1/Geometrie[2]", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (600000.000, 75000.000), tids o1/Geometrie[1], o1/Geometrie[2]", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Set Constraint Function23.Topic.ClassZA.Constraint1 is not true.", logger.getErrs().get(2).getEventMsg());
 	}
 
 	// Es wird getestet ob die areAreas Funktion bei vielen Objekten genug schnell berechnet wird.
@@ -1927,7 +1929,7 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 
 		// assert logged errors
-		Assert.assertEquals(0, logger.getErrs().size());
+		assertEquals(0, logger.getErrs().size());
 	}
 
 	private static IomObject createRectangleGeometry(String x1, String y1, String x2, String y2) {
