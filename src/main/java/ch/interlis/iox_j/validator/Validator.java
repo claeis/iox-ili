@@ -2165,48 +2165,45 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     //Value currentValue = getValueFromObjectPath(null, iomObj, pathToStructEle, null);
                     if (complexObjects.size()>0) {
                         //Collection<IomObject> complexObjects = currentValue.getComplexObjects();
-                        Iterator<IomObject> iterator = complexObjects.iterator();
-                        while (iterator.hasNext()) {
-                            IomObject currentObj=iterator.next();
-                            getStructElesFromAttrPath(pathToSurfaceAttr, currentObj.getobjectoid(),listOfPolygons, currentObj, 0);
-                        }                               
-                        for (IomObject polygon : listOfPolygons) {
-                            try {
-                                polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, errFact);
-                            } catch (IoxException e) {
-                                EhiLogger.logError(e);  
-                            }
+                        for (IomObject currentObj : complexObjects) {
+                            getStructElesFromAttrPath(pathToSurfaceAttr, currentObj.getobjectoid(), listOfPolygons, currentObj, 0);
                         }
-                        List<IoxInvalidDataException> intersections=polygonPool.validate();
-                        if(intersections!=null) {
-                            if(!disableAreAreasMessages && intersections.size()>0){
-                                for(IoxInvalidDataException ex:intersections){ // iterate through non-overlay intersections
-                                    String tid1=ex.getTid();
-                                    String iliqname=ex.getIliqname();
-                                    errFact.setTid(tid1);
-                                    errFact.setIliqname(iliqname);
-                                    if(ex instanceof IoxIntersectionException) {
-                                        logMsg(areaOverlapValidation, ((IoxIntersectionException) ex).getIntersection().toShortString());
-                                        EhiLogger.traceState(ex.toString());
-                                    }else {
-                                        logMsg(areaOverlapValidation, ex.getMessage());
-                                    }
-                                }
-                                setCurrentMainObj(null);
-                            }
-                            returnValue = returnValue && false;
-                            if(disableAreAreasMessages && !returnValue) {
-                                // short circuit; no need to further evaluate
-                                break;
-                            }
-                        }                   
                     }
                 }
             }
-            if(!returnValue) {
-                EhiLogger.traceState(mainObjTag+ ":" + currentFunction.getScopedName(null) + " returned false"); 
+
+            for (IomObject polygon : listOfPolygons) {
+                try {
+                    polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, errFact);
+                } catch (IoxException e) {
+                    EhiLogger.logError(e);
+                }
             }
-            return new Value(returnValue);
+
+            List<IoxInvalidDataException> intersections=polygonPool.validate();
+            if(intersections!=null) {
+                if(!disableAreAreasMessages && intersections.size()>0){
+                    for(IoxInvalidDataException ex:intersections){ // iterate through non-overlay intersections
+                        String tid1=ex.getTid();
+                        String iliqname=ex.getIliqname();
+                        errFact.setTid(tid1);
+                        errFact.setIliqname(iliqname);
+                        if(ex instanceof IoxIntersectionException) {
+                            logMsg(areaOverlapValidation, ((IoxIntersectionException) ex).getIntersection().toShortString());
+                            EhiLogger.traceState(ex.toString());
+                        }else {
+                            logMsg(areaOverlapValidation, ex.getMessage());
+                        }
+                    }
+                    setCurrentMainObj(null);
+                }
+
+                // short circuit; no need to further evaluate
+                EhiLogger.traceState(mainObjTag+ ":" + currentFunction.getScopedName(null) + " returned false");
+                return new Value(false);
+            }
+
+            return new Value(true);
 		}
 	}
 	
