@@ -552,6 +552,74 @@ public class AreAreas23Test {
         assertEquals("Intersection coord1 (490000.000, 78000.000), tids o1/flaeche[1], o2/flaeche[1]",errs.get(1).trim());
         assertEquals("Set Constraint AreAreas23.Topic.ClassE.Constraint1 is not true.",errs.get(2));
     }
+
+    @Test
+    public void classE_allObjectE_TwoIdenticalObjects_Overlap_Fail() {
+        String x1 = "486000.000";
+        String y1 = "75000.000";
+        String x2 = "490000.000";
+        String y2 = "80000.000";
+
+        IomObject attrFlaeche = createRectangle(x1, y1, x2, y2);
+        Iom_jObject classE1 = new Iom_jObject(CLASSE, OID1);
+        classE1.setattrvalue("art", "a");
+        classE1.addattrobj("flaeche", attrFlaeche);
+
+        IomObject attrFlaeche2 = createRectangle(x1, y1, x2, y2); // equal to attrFlaeche
+        Iom_jObject classE2 = new Iom_jObject(CLASSE, OID2);
+        classE2.setattrvalue("art", "a");
+        classE2.addattrobj("flaeche", attrFlaeche2);
+
+        // Create and run validator.
+        ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(classE1));
+        validator.validate(new ObjectEvent(classE2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts.
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Set Constraint AreAreas23.Topic.ClassE.Constraint1 is not true.",
+                logger.getErrs().get(0).getEventMsg());
+    }
+
+    @Test
+    public void classE_allObjectE_ObjectWithinObject_Overlap_Fail() {
+        IomObject attrFlaeche = createRectangle("490000.000", "70000.000", "500000.000", "80000.000");
+        Iom_jObject classE1 = new Iom_jObject(CLASSE, OID1);
+        classE1.setattrvalue("art", "a");
+        classE1.addattrobj("flaeche", attrFlaeche);
+
+        IomObject attrFlaeche2 = createRectangle("492000.000", "72000.000", "498000.000", "78000.000"); // completely within attrFlaeche
+        Iom_jObject classE2 = new Iom_jObject(CLASSE, OID2);
+        classE2.setattrvalue("art", "a");
+        classE2.addattrobj("flaeche", attrFlaeche2);
+
+        // Create and run validator.
+        ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(classE1));
+        validator.validate(new ObjectEvent(classE2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts.
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Set Constraint AreAreas23.Topic.ClassE.Constraint1 is not true.",
+                logger.getErrs().get(0).getEventMsg());
+    }
+
     @Test
     public void classF_allObjectF_TwoObject_Overlap_Fail() {
 
@@ -561,6 +629,73 @@ public class AreAreas23Test {
         classF1.addattrobj("attr2", structA);
 
         IomObject structA2 = createStructA("488000.000", "75000.000", "494000.000", "80000.000"); // overlaps structA
+        Iom_jObject classF2 = new Iom_jObject(CLASSF, OID2);
+        classF2.setattrvalue("art", "a");
+        classF2.addattrobj("attr2", structA2);
+
+        // Create and run validator.
+        ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(classF1));
+        validator.validate(new ObjectEvent(classF2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts.
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Set Constraint AreAreas23.Topic.ClassF.Constraint1 is not true.",
+                logger.getErrs().get(0).getEventMsg());
+    }
+
+    @Test
+    public void classF_allObjectF_TwoIdenticalObjects_Overlap_Fail() {
+         String x1 = "486000.000";
+         String y1 = "75000.000";
+         String x2 = "490000.000";
+         String y2 = "80000.000";
+
+        IomObject structA = createStructA(x1, y1, x2, y2);
+        Iom_jObject classF1 = new Iom_jObject(CLASSF, OID1);
+        classF1.setattrvalue("art", "a");
+        classF1.addattrobj("attr2", structA);
+
+        IomObject structA2 = createStructA(x1, y1, x2, y2); // equal to structA
+        Iom_jObject classF2 = new Iom_jObject(CLASSF, OID2);
+        classF2.setattrvalue("art", "a");
+        classF2.addattrobj("attr2", structA2);
+
+        // Create and run validator.
+        ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(classF1));
+        validator.validate(new ObjectEvent(classF2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts.
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Set Constraint AreAreas23.Topic.ClassF.Constraint1 is not true.",
+                     logger.getErrs().get(0).getEventMsg());
+    }
+
+    @Test
+    public void classF_allObjectF_ObjectWithinObject_Overlap_Fail() {
+        IomObject structA = createStructA("490000.000", "70000.000", "500000.000", "80000.000");
+        Iom_jObject classF1 = new Iom_jObject(CLASSF, OID1);
+        classF1.setattrvalue("art", "a");
+        classF1.addattrobj("attr2", structA);
+
+        IomObject structA2 = createStructA("492000.000", "72000.000", "498000.000", "78000.000"); // completely within structA
         Iom_jObject classF2 = new Iom_jObject(CLASSF, OID2);
         classF2.setattrvalue("art", "a");
         classF2.addattrobj("attr2", structA2);
