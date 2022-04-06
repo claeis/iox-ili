@@ -139,7 +139,7 @@ public class AreAreas23Test {
     @Test
     public void classD2_perStructC_TwoObjectNoOverlap_Ok() {
 
-        Iom_jObject structA1_1 = createStructA("410000.000", "75000.000", "420000.000", "80000.000");
+        Iom_jObject structA1_1 = createStructA("480000.000", "75000.000", "482000.000", "80000.000");
 
         Iom_jObject structA1_2 = createStructA("483000.000", "75000.000", "486000.000", "80000.000");
 
@@ -150,7 +150,7 @@ public class AreAreas23Test {
         Iom_jObject structC1 = new Iom_jObject(STRUCTC, null);
         structC1.addattrobj("attr3", structB1);
 
-        Iom_jObject structA2 = createStructA("484000.000", "75000.000", "488000.000", "80000.000"); // overlaps structA1_2, but ok, because different structC
+        Iom_jObject structA2 = createStructA("488000.000", "75000.000", "490000.000", "80000.000");
 
         Iom_jObject structB2 = new Iom_jObject(STRUCTB, null);
         structB2.addattrobj("attr2", structA2);
@@ -158,7 +158,7 @@ public class AreAreas23Test {
         Iom_jObject structC2 = new Iom_jObject(STRUCTC, null);
         structC2.addattrobj("attr3", structB2);
 
-        Iom_jObject classD1 = new Iom_jObject(CLASSD2, OID2);
+        Iom_jObject classD1 = new Iom_jObject(CLASSD2, OID1);
         classD1.addattrobj("attr4", structC1);
         classD1.addattrobj("attr4", structC2);
 
@@ -176,12 +176,14 @@ public class AreAreas23Test {
 
         // Create and run validator.
         ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
         Settings settings = new Settings();
         Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
         validator.validate(new StartTransferEvent());
         validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(classD1));
         validator.validate(new ObjectEvent(classD2));
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
