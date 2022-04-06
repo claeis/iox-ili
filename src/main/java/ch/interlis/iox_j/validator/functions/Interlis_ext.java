@@ -118,12 +118,10 @@ public class Interlis_ext {
                 EhiLogger.logError(e);
             }                    
 
-            for(Evaluable aFunction:functions.keySet()) {
-                if(aFunction==functionCall) {
-                    Value isArea=functions.get(functionCall);
-                    return isArea;
-                }
+            if (functions.containsKey(functionCall)) {
+                return functions.get(functionCall);
             }
+
             Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction);
             functions.put(functionCall, isArea);
             return isArea;

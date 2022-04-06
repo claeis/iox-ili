@@ -137,13 +137,10 @@ public class Interlis {
             if(value.getComplexObjects()!=null){
                 return new Value(value.getComplexObjects().size());
             }else if(value.getViewable()!=null) {
-                for(Evaluable aFunction:functions.keySet()) {
-                    // contains/equal would not work here, because it is an object compare.
-                    if(aFunction==functionCall) {
-                        Value objCount=functions.get(functionCall);
-                        return objCount;
-                    }
+                if (functions.containsKey(functionCall)) {
+                    return functions.get(functionCall);
                 }
+
                 Value objectCount=null;
                 objectCount = validator.evaluateObjectCount(value);
                 // put the result of object count as value to the function call.
