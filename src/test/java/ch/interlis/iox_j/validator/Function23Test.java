@@ -14,6 +14,7 @@ import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
+import ch.interlis.iox_j.PipelinePool;
 import ch.interlis.iox_j.StartBasketEvent;
 import ch.interlis.iox_j.StartTransferEvent;
 import ch.interlis.iox_j.logging.LogEventFactory;
@@ -1897,10 +1898,10 @@ public class Function23Test {
 	}
 
 	// Es wird getestet ob die areAreas Funktion bei vielen Objekten genug schnell berechnet wird.
-	@Test(timeout = 10000)
+	@Test
 	public void areAreas_Caching_Performance() {
 		// create test objects that satisfy the areAreas constraint
-		Iom_jObject[] testObjects = new Iom_jObject[1000];
+		Iom_jObject[] testObjects = new Iom_jObject[10000];
 		for (int i = 0; i < testObjects.length; i++) {
 			int x = (i % 20) + 500000;
 			int y = (i / 20) + 70000;
@@ -1915,10 +1916,12 @@ public class Function23Test {
 		ValidationConfig modelConfig = new ValidationConfig();
 		LogCollector logger = new LogCollector();
 		LogEventFactory errFactory = new LogEventFactory();
+		PipelinePool pipelinePool = new PipelinePool();
 		Settings settings = new Settings();
+		Validator validator = new Validator(td, modelConfig, logger, errFactory, pipelinePool, settings);
+		validator.setAutoSecondPass(false);
 
 		// run validation
-		Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC, BID1));
 
@@ -1929,8 +1932,13 @@ public class Function23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 
-		// assert logged errors
+		long startTime = System.nanoTime();
+		validator.doSecondPass();
+		long elapsedTime = System.nanoTime() - startTime;
+
+		// asserts
 		assertEquals(0, logger.getErrs().size());
+		assertTrue(elapsedTime < 30000000000L); // 30 seconds
 	}
 
 	private static IomObject createRectangleGeometry(String x1, String y1, String x2, String y2) {
