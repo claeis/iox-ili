@@ -71,6 +71,7 @@ public class Function23Test {
 	private final static String ILI_CLASSZG=ILI_TOPIC+".ClassZG";
 	private final static String ILI_CLASSZH=ILI_TOPIC+".ClassZH";
 	private final static String ILI_CLASSZI=ILI_TOPIC+".ClassZI";
+	private final static String ILI_CLASSZK=ILI_TOPIC+".ClassZK";
 	private final static String ILI_CLASSZZ=ILI_TOPIC+".ClassZZ";
 	private final static String ILI_CLASSXA=ILI_TOPIC+".ClassXA";
 	private final static String ILI_CLASSXB=ILI_TOPIC+".ClassXB";
@@ -1910,6 +1911,49 @@ public class Function23Test {
 			objectZA.setattrvalue("Art", "a");
 			objectZA.addattrobj("Geometrie", createRectangleGeometry(String.valueOf(x), String.valueOf(y), String.valueOf(x + 1), String.valueOf(y + 1)));
 			testObjects[i] = objectZA;
+		}
+
+		// setup validation
+		ValidationConfig modelConfig = new ValidationConfig();
+		LogCollector logger = new LogCollector();
+		LogEventFactory errFactory = new LogEventFactory();
+		PipelinePool pipelinePool = new PipelinePool();
+		Settings settings = new Settings();
+		Validator validator = new Validator(td, modelConfig, logger, errFactory, pipelinePool, settings);
+		validator.setAutoSecondPass(false);
+
+		// run validation
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC, BID1));
+
+		for (Iom_jObject testObject : testObjects) {
+			validator.validate(new ObjectEvent(testObject));
+		}
+
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+
+		long startTime = System.nanoTime();
+		validator.doSecondPass();
+		long elapsedTime = System.nanoTime() - startTime;
+
+		// asserts
+		assertEquals(0, logger.getErrs().size());
+		assertTrue(elapsedTime < 30000000000L); // 30 seconds
+	}
+
+	// Es wird getestet ob AREA bei vielen Objekten genug schnell berechnet wird.
+	@Test
+	public void area_Performance() {
+		// create test objects that satisfy the areAreas constraint
+		Iom_jObject[] testObjects = new Iom_jObject[10000];
+		for (int i = 0; i < testObjects.length; i++) {
+			int x = (i % 20) + 500000;
+			int y = (i / 20) + 70000;
+
+			Iom_jObject objectZK = new Iom_jObject(ILI_CLASSZK, String.format("zk_area_o%d", i));
+			objectZK.addattrobj("Geometrie", createRectangleGeometry(String.valueOf(x), String.valueOf(y), String.valueOf(x + 1), String.valueOf(y + 1)));
+			testObjects[i] = objectZK;
 		}
 
 		// setup validation
