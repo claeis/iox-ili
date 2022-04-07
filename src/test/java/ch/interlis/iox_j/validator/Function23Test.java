@@ -1856,7 +1856,8 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es wird getestet, dass die erwarteten Fehler ausgegeben werden, wenn es Objekte von verschiedenen areAreas Constraints hat.
+	// Separate areArea-Constraints duerfen sich gegenseitig nicht beeinflussen. Hat es mehrere areArea-Constraints muss jeder separat
+	// ausgewertet werden und Regelverletzung fuer jedes involvierte Objekt sowie fehlgeschlagene Bidingungen als Fehlermeldung loggen.
 	@Test
 	public void areAreas_Caching() {
 		// two instances of ClassZA with overlapping geometries (violate areArea constraint)
