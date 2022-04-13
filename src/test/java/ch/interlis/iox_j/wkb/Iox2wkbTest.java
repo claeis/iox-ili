@@ -165,6 +165,19 @@ public class Iox2wkbTest {
         String ewkbText=Base64.encodeBytes(ewkb);
         assertEquals("AQoAAAABAAAAAQkAAAADAAAAAQIAAAACAAAAAAAAgI5NREEAAAAA5BEzQQAAAICOTURBAAAAAOwEM0EBCAAAAAUAAAAAAACAjk1EQQAAAADsBDNBAAAAgC9TREEAAAAA7AQzQQAAAICCUkRBAAAAACESM0EAAACATlNEQQAAAAD0FDNBAAAAALBPREEAAAAAmBczQQECAAAAAgAAAAAAAACwT0RBAAAAAJgXM0EAAACAjk1EQQAAAADkETNB",ewkbText);
     }
+
+    @Test
+    public void surfaceWithArcToWkbWithoutCurvePolygon() throws Exception {
+        IomObject multiSurface=getSurfaceWithArc();
+        Iox2wkb convEwkb=new Iox2wkb(2,java.nio.ByteOrder.LITTLE_ENDIAN, true);
+        byte ewkb[]=convEwkb.surface2wkb(multiSurface, false, 0.0, false);
+        // verify
+        String ewkbText=Base64.encodeBytes(ewkb);
+        assertEquals("AQMAAAABAAAABwAAAAAAAICOTURBAAAAAOQRM0EAAACAjk1EQQAAAADsBDNBAAAAgC9TREEAAAAA7AQzQQAAAICCUkRBAAAAACESM0EAAACATlNEQQAAAAD0FDNBAAAAALBPREEAAAAAmBczQQAAAICOTURBAAAAAOQRM0E=",ewkbText);
+
+        String wktText = new WKBReader().read(ewkb).toText();
+        assertEquals("POLYGON ((2661149 1249764, 2661149 1246444, 2664031 1246444, 2663685 1249825, 2664093 1250548, 2662240 1251224, 2661149 1249764))", wktText);
+    }
     
     private IomObject getMultiCoordZ() {
         IomObject multiPoint=new Iom_jObject("MULTIPOINT", null);
