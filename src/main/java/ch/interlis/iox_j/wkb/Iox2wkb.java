@@ -268,7 +268,7 @@ public class Iox2wkb {
 	throws Iox2wkbException
 	{
 
-		List<List<LineSegment>> lines =  CollectSegments(polylineObjs, asCompoundCurve, p, false);
+		List<List<LineSegment>> lines =  collectSegments(polylineObjs, asCompoundCurve, p, false);
 		try {
 			os.reset();
 			for (List<LineSegment> line : lines){
@@ -289,7 +289,7 @@ public class Iox2wkb {
 		return os.toByteArray();
 	}
 
-	private List<List<LineSegment>> CollectSegments(IomObject[] polylineObjs, boolean asCompoundCurve, double p, boolean repairTouchingLine)
+	private List<List<LineSegment>> collectSegments(IomObject[] polylineObjs, boolean asCompoundCurve, double p, boolean repairTouchingLine)
 	throws Iox2wkbException {
 		RingCollector ringCollector = new RingCollector(repairTouchingLine);
 		for (IomObject polylineObj : polylineObjs) {
@@ -384,7 +384,7 @@ public class Iox2wkb {
 			}
 		}
 
-		List<List<LineSegment>> rings = CollectSegments(polylines.toArray(new IomObject[0]), asCurvePolygon, strokeP, repairTouchingLine);
+		List<List<LineSegment>> rings = collectSegments(polylines.toArray(new IomObject[0]), asCurvePolygon, strokeP, repairTouchingLine);
 		try {
 			os.reset();
 			writeByteOrder();
@@ -457,7 +457,7 @@ public class Iox2wkb {
 			polylines.add(polyline);
 		}
 
-		List<List<LineSegment>> lines = CollectSegments(polylines.toArray(new IomObject[0]), asCurve, strokeP, false);
+		List<List<LineSegment>> lines = collectSegments(polylines.toArray(new IomObject[0]), asCurve, strokeP, false);
 
 	    try {
 			os.reset();
