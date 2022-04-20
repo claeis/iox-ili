@@ -269,6 +269,10 @@ MODEL Function23
 			MANDATORY CONSTRAINT
 				INTERLIS.convertUnit(attr1)==attr2;
 		END ClassZH;
+
+		CLASS ClassZK =
+		    Geometrie : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END ClassZK;
 		
 	END Topic;
 	

@@ -31,7 +31,7 @@ public class Interlis_ext {
     
     public Value evaluateFunction(Function currentFunction, IomObject parentObject,
             String validationKind, String usageScope, IomObject iomObj,
-            Evaluable expression, Map<Function, Value> functions, TransferDescription td, RoleDef firstRole) {
+            Evaluable expression, Map<Evaluable, Value> functions, TransferDescription td, RoleDef firstRole) {
 
         
         if (currentFunction.getScopedName(null).equals("INTERLIS_ext.areAreas2") || currentFunction.getScopedName(null).equals("INTERLIS_ext.areAreas3")){
@@ -118,14 +118,12 @@ public class Interlis_ext {
                 EhiLogger.logError(e);
             }                    
 
-            for(Function aFunction:functions.keySet()) {
-                if(aFunction==currentFunction) {
-                    Value isArea=functions.get(currentFunction);
-                    return isArea;
-                }
+            if (functions.containsKey(functionCall)) {
+                return functions.get(functionCall);
             }
+
             Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction);
-            functions.put(currentFunction, isArea);
+            functions.put(functionCall, isArea);
             return isArea;
         }
         

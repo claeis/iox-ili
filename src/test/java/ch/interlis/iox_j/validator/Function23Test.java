@@ -14,6 +14,7 @@ import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
+import ch.interlis.iox_j.PipelinePool;
 import ch.interlis.iox_j.StartBasketEvent;
 import ch.interlis.iox_j.StartTransferEvent;
 import ch.interlis.iox_j.logging.LogEventFactory;
@@ -72,6 +73,7 @@ public class Function23Test {
 	private final static String ILI_CLASSZG=ILI_TOPIC+".ClassZG";
 	private final static String ILI_CLASSZH=ILI_TOPIC+".ClassZH";
 	private final static String ILI_CLASSZI=ILI_TOPIC+".ClassZI";
+	private final static String ILI_CLASSZK=ILI_TOPIC+".ClassZK";
 	private final static String ILI_CLASSZZ=ILI_TOPIC+".ClassZZ";
 	private final static String ILI_CLASSXA=ILI_TOPIC+".ClassXA";
 	private final static String ILI_CLASSXB=ILI_TOPIC+".ClassXB";
@@ -1880,5 +1882,175 @@ public class Function23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
+	}
+
+	// Separate areArea-Constraints duerfen sich gegenseitig nicht beeinflussen. Hat es mehrere areArea-Constraints muss jeder separat
+	// ausgewertet werden und Regelverletzung fuer jedes involvierte Objekt sowie fehlgeschlagene Bidingungen als Fehlermeldung loggen.
+	@Test
+	public void areAreas_Caching() {
+		// two instances of ClassZA with overlapping geometries (violate areArea constraint)
+		// and an instance of ClassZB that satisfies its areArea constraint
+		Iom_jObject objectZA1 = new Iom_jObject(ILI_CLASSZA, OBJ_OID1);
+		objectZA1.setattrvalue("Art", "a");
+		objectZA1.addattrobj("Geometrie", createRectangleGeometry("500000", "70000", "600000", "80000"));
+
+		Iom_jObject objectZA2 = new Iom_jObject(ILI_CLASSZA, OBJ_OID2);
+		objectZA1.setattrvalue("Art", "a");
+		objectZA1.addattrobj("Geometrie", createRectangleGeometry("550000", "75000", "650000", "85000"));
+
+		Iom_jObject objectZB = new Iom_jObject(ILI_CLASSZB, OBJ_OID3);
+		objectZB.addattrobj("Geometrie", createRectangleGeometry("700000", "70000", "800000", "80000"));
+
+		// setup validation
+		ValidationConfig modelConfig = new ValidationConfig();
+		LogCollector logger = new LogCollector();
+		LogEventFactory errFactory = new LogEventFactory();
+		Settings settings = new Settings();
+
+		// run validation
+		Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC, BID1));
+		validator.validate(new ObjectEvent(objectZA1));
+		validator.validate(new ObjectEvent(objectZA2));
+		validator.validate(new ObjectEvent(objectZB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+
+		// assert logged errors
+		assertEquals(3, logger.getErrs().size());
+		assertEquals("Intersection coord1 (550000.000, 80000.000), tids o1/Geometrie[1], o1/Geometrie[2]", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (600000.000, 75000.000), tids o1/Geometrie[1], o1/Geometrie[2]", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Set Constraint Function23.Topic.ClassZA.Constraint1 is not true.", logger.getErrs().get(2).getEventMsg());
+	}
+
+	// Es wird getestet ob die areAreas Funktion bei vielen Objekten genug schnell berechnet wird.
+	@Test
+	public void areAreas_Caching_Performance() {
+		// create test objects that satisfy the areAreas constraint
+		Iom_jObject[] testObjects = new Iom_jObject[10000];
+		for (int i = 0; i < testObjects.length; i++) {
+			int x = (i % 20) + 500000;
+			int y = (i / 20) + 70000;
+
+			Iom_jObject objectZA = new Iom_jObject(ILI_CLASSZA, String.format("o%d", i));
+			objectZA.setattrvalue("Art", "a");
+			objectZA.addattrobj("Geometrie", createRectangleGeometry(String.valueOf(x), String.valueOf(y), String.valueOf(x + 1), String.valueOf(y + 1)));
+			testObjects[i] = objectZA;
+		}
+
+		// setup validation
+		ValidationConfig modelConfig = new ValidationConfig();
+		LogCollector logger = new LogCollector();
+		LogEventFactory errFactory = new LogEventFactory();
+		PipelinePool pipelinePool = new PipelinePool();
+		Settings settings = new Settings();
+		Validator validator = new Validator(td, modelConfig, logger, errFactory, pipelinePool, settings);
+		validator.setAutoSecondPass(false);
+
+		// run validation
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC, BID1));
+
+		for (Iom_jObject testObject : testObjects) {
+			validator.validate(new ObjectEvent(testObject));
+		}
+
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+
+		long startTime = System.nanoTime();
+		validator.doSecondPass();
+		long elapsedTime = System.nanoTime() - startTime;
+
+		// asserts
+		assertEquals(0, logger.getErrs().size());
+		assertTrue(elapsedTime < 30000000000L); // 30 seconds
+	}
+
+	// Es wird getestet ob AREA bei vielen Objekten genug schnell berechnet wird.
+	@Test
+	public void area_Performance() {
+		// create test objects that satisfy the areAreas constraint
+		Iom_jObject[] testObjects = new Iom_jObject[10000];
+		for (int i = 0; i < testObjects.length; i++) {
+			int x = (i % 20) + 500000;
+			int y = (i / 20) + 70000;
+
+			Iom_jObject objectZK = new Iom_jObject(ILI_CLASSZK, String.format("zk_area_o%d", i));
+			objectZK.addattrobj("Geometrie", createRectangleGeometry(String.valueOf(x), String.valueOf(y), String.valueOf(x + 1), String.valueOf(y + 1)));
+			testObjects[i] = objectZK;
+		}
+
+		// setup validation
+		ValidationConfig modelConfig = new ValidationConfig();
+		LogCollector logger = new LogCollector();
+		LogEventFactory errFactory = new LogEventFactory();
+		PipelinePool pipelinePool = new PipelinePool();
+		Settings settings = new Settings();
+		Validator validator = new Validator(td, modelConfig, logger, errFactory, pipelinePool, settings);
+		validator.setAutoSecondPass(false);
+
+		// run validation
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC, BID1));
+
+		for (Iom_jObject testObject : testObjects) {
+			validator.validate(new ObjectEvent(testObject));
+		}
+
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+
+		long startTime = System.nanoTime();
+		validator.doSecondPass();
+		long elapsedTime = System.nanoTime() - startTime;
+
+		// asserts
+		assertEquals(0, logger.getErrs().size());
+		assertTrue(elapsedTime < 30000000000L); // 30 seconds
+	}
+
+	private static IomObject createRectangleGeometry(String x1, String y1, String x2, String y2) {
+		IomObject startSegment = new Iom_jObject("COORD", null);
+		startSegment.setattrvalue("C1", x1);
+		startSegment.setattrvalue("C2", y1);
+
+		IomObject straightSegment1 = new Iom_jObject("COORD", null);
+		straightSegment1.setattrvalue("C1", x1);
+		straightSegment1.setattrvalue("C2", y2);
+
+		IomObject straightSegment2 = new Iom_jObject("COORD", null);
+		straightSegment2.setattrvalue("C1", x2);
+		straightSegment2.setattrvalue("C2", y2);
+
+		IomObject straightSegment3 = new Iom_jObject("COORD", null);
+		straightSegment3.setattrvalue("C1", x2);
+		straightSegment3.setattrvalue("C2", y1);
+
+		IomObject straightSegment4 = new Iom_jObject("COORD", null);
+		straightSegment4.setattrvalue("C1", x1);
+		straightSegment4.setattrvalue("C2", y1);
+
+		IomObject segment = new Iom_jObject("SEGMENTS", null);
+		segment.addattrobj("segment", startSegment);
+		segment.addattrobj("segment", straightSegment1);
+		segment.addattrobj("segment", straightSegment2);
+		segment.addattrobj("segment", straightSegment3);
+		segment.addattrobj("segment", straightSegment4);
+
+		IomObject polyline = new Iom_jObject("POLYLINE", null);
+		polyline.addattrobj("sequence", segment);
+
+		IomObject outerBoundary = new Iom_jObject("BOUNDARY", null);
+		outerBoundary.addattrobj("polyline", polyline);
+
+		IomObject surfaceValue = new Iom_jObject("SURFACE", null);
+		surfaceValue.addattrobj("boundary", outerBoundary);
+
+		IomObject multisurface = new Iom_jObject("MULTISURFACE", null);
+		multisurface.addattrobj("surface", surfaceValue);
+
+		return multisurface;
 	}
 }
