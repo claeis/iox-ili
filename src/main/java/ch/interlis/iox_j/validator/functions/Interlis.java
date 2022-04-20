@@ -149,6 +149,8 @@ public class Interlis {
                 // put the result of object count as value to the current function.
                 functions.put(currentFunction, objectCount);
                 return objectCount;
+            } else if (value.getOid() != null) {
+                return new Value(1);
             }
         } else if (currentFunction.getScopedName(null).equals("INTERLIS.elementCount")){
             FunctionCall functionCall = (FunctionCall) expression;

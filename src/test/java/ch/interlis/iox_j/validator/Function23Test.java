@@ -54,6 +54,8 @@ public class Function23Test {
 	private final static String ILI_CLASSR=ILI_TOPIC+".ClassR";
 	private final static String ILI_CLASSS=ILI_TOPIC+".ClassS";
 	private final static String ILI_CLASST=ILI_TOPIC+".ClassT";
+	private final static String ILI_CLASSSA=ILI_TOPIC+".ClassSA";
+	private final static String ILI_CLASSTA=ILI_TOPIC+".ClassTA";
 	private final static String ILI_CLASSU=ILI_TOPIC+".ClassU";
 	private final static String ILI_CLASSUA=ILI_TOPIC+".ClassUA";
 	private final static String ILI_CLASSV=ILI_TOPIC+".ClassV";
@@ -85,6 +87,8 @@ public class Function23Test {
 	private final static String ILI_ASSOC_QR1_R1="r1";
 	private final static String ILI_ASSOC_ST1_S1="s1";
 	private final static String ILI_ASSOC_ST1_T1="t1";
+	private final static String ILI_ASSOC_SATA1_S2="s2";
+	private final static String ILI_ASSOC_SATA1_T2="t2";
 	// ASSOCIATION CLASS
 	private final static String ILI_ASSOC_QR1=ILI_TOPIC+".QR1";
 	private final static String ILI_ASSOC_ST1=ILI_TOPIC+".ST1";
@@ -682,7 +686,29 @@ public class Function23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
+
+	//Es wird getestet, ob keine Fehlermeldung ausgegeben wird, wenn bei der Funktion objectCount(Role) die Anzahl der Objekte, welche von SA zu TA via Role referenzieren, 1 ist.
+	@Test
+	public void objectCount_1Object_Ok() {
+		Iom_jObject iomObjS1 = new Iom_jObject(ILI_CLASSSA, OBJ_OID1);
+		Iom_jObject iomObjT1 = new Iom_jObject(ILI_CLASSTA, OBJ_OID2);
+		iomObjS1.addattrobj(ILI_ASSOC_SATA1_T2, "REF").setobjectrefoid(iomObjT1.getobjectoid());
+
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+		validator.validate(new ObjectEvent(iomObjS1));
+		validator.validate(new ObjectEvent(iomObjT1));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+
+		assertTrue(logger.getErrs().size()==0);
+	}
+
 	// Es wird getestet ob keine Fehlermeldung ausgegeben wird, wenn bei der Funktion: objectCount(Role) die Anzahl der Objekte welche von S zu T via Role referenzieren, 2 ist.
 	@Test
 	public void objectCount_2Object_Ok(){
