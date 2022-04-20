@@ -33,6 +33,8 @@ public class MandatoryConstraints23 {
 	private final static String ILI_CLASSCONSTANTF=TOPIC+".ClassConstantF";
 	private final static String ILI_CLASSCONSTANTG=TOPIC+".ClassConstantG";
 	private final static String ILI_CLASSCONSTANTJ=TOPIC+".ClassConstantJ";
+	private final static String ILI_CLASSCONSTANTJA=TOPIC+".ClassConstantJA";
+	private final static String ILI_CLASSCONSTANTJB=TOPIC+".ClassConstantJB";
 	private final static String ILI_CLASSCONSTANTJP=TOPIC+".ClassConstantJp";
 	private final static String ILI_CLASSCONSTANTJP3=TOPIC+".ClassConstantJp3";
 	// ATTRIBUTES EQUALATION (==) SUCCESS AND FAIL
@@ -126,8 +128,51 @@ public class MandatoryConstraints23 {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
-	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die aufzaehlung1 auf mehr.vier gesetzt wird
+
+	// Prueft, ob Knoten und Blaetter einer ALL OF Enumeration in einem Constraint verwendet werden koennen.
+	@Test
+	public void constantEnumerationAll_Ok() {
+		Iom_jObject objClassConstantJA=new Iom_jObject(ILI_CLASSCONSTANTJA, OID1);
+		objClassConstantJA.setattrvalue("aufzaehlung1", "mehr");
+		objClassConstantJA.setattrvalue("aufzaehlung2", "mehr.vier");
+		objClassConstantJA.setattrvalue("aufzaehlung3", "mehr");
+
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(objClassConstantJA));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+
+		assertTrue(logger.getErrs().size()==0);
+	}
+
+	// Prueft, ob Knoten und Blaetter einer ALL OF Enumeration in einem Constraint verwendet werden koennen.
+	@Test
+	public void constantEnumerationAll_Fail() {
+		Iom_jObject objClassConstantJB=new Iom_jObject(ILI_CLASSCONSTANTJB, OID1);
+		objClassConstantJB.setattrvalue("aufzaehlung1", "mehr.vier");
+		objClassConstantJB.setattrvalue("aufzaehlung2", "mehr");
+
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(TOPIC,BID));
+		validator.validate(new ObjectEvent(objClassConstantJB));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+
+		assertTrue(logger.getErrs().size()==2);
+	}
+
+		// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn die aufzaehlung1 auf mehr.vier gesetzt wird
 	// und die Klasse: ClassConstantJP die Klasse: ClassConstant erweitert.
 	@Test
 	public void constantEnumerationSub_Ok(){

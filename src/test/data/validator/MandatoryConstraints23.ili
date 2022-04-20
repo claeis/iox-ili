@@ -14,6 +14,8 @@ MODEL MandatoryConstraints23
 					              0.000 .. 5000.000 [INTERLIS.m];
 			enumeration = (null, eins, zwei, drei, mehr (vier));
 			enumerationOrdered = (null, eins, zwei, drei, mehr (vier)) ORDERED;
+			enumerationAll = ALL OF enumeration;
+			enumerationOrderedAll = ALL OF enumerationOrdered;
 			attrRef1 = TEXT*12;	
 			NumType  = 1..10;
 		
@@ -62,7 +64,23 @@ MODEL MandatoryConstraints23
 			MANDATORY CONSTRAINT
 			aufzaehlung1 == #mehr.vier;
 		END ClassConstantJ;
-		
+
+		CLASS ClassConstantJA =
+			aufzaehlung1 : enumerationAll;
+			aufzaehlung2 : enumerationAll;
+			aufzaehlung3 : enumerationOrderedAll;
+			MANDATORY CONSTRAINT aufzaehlung1 == #mehr;
+			MANDATORY CONSTRAINT aufzaehlung2 == #mehr.vier;
+			MANDATORY CONSTRAINT aufzaehlung3 == #mehr;
+		END ClassConstantJA;
+
+		CLASS ClassConstantJB =
+		    aufzaehlung1 : enumerationAll;
+		    aufzaehlung2 : enumerationAll;
+		    MANDATORY CONSTRAINT aufzaehlung1 != #mehr.vier;
+		    MANDATORY CONSTRAINT aufzaehlung2 != #mehr;
+		END ClassConstantJB;
+
 		CLASS ClassConstantJp EXTENDS ClassConstantJ=
 		END ClassConstantJp;
 		
