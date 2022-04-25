@@ -11,6 +11,7 @@ LATEST
 - iox2wkb: split self-touching lines of polygon boundaries (ili2db#437)
 - ReaderFactory: fix/close a left open ItfReader2
 - ItfReader2: use ioxFactory to create objects read back from objPool to keep custom types
+- Validator: INTERLIS.areAreas() does not find overlap (ilivalidator#284)
 
 iox-ili 1.21.9 (2021-12-28)
 -----------------------------
