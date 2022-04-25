@@ -305,7 +305,7 @@ public class Interlis {
             if (functions.containsKey(functionCall)) {
                 return functions.get(functionCall);
             }
-            Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction);
+            Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction, validationKind);
             functions.put(functionCall, isArea);
             return isArea;
         }
