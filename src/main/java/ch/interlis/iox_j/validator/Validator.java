@@ -2098,7 +2098,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		return new Value(counter);
 	}
-	
+
+	/**
+	 * @deprecated
+	 * Use {@link #evaluateAreArea(IomObject, Value, PathEl[], PathEl[], Function, String)} instead.
+	 */
+	@Deprecated
+	public Value evaluateAreArea(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction) {
+		return evaluateAreArea(mainIomObj, value, pathToStructEle, pathToSurfaceAttr, currentFunction, null);
+	}
+
 	public Value evaluateAreArea(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction, String validationKind) {
 		String mainObjTag=mainIomObj.getobjecttag();
 		if(pathToStructEle == null){
