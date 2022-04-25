@@ -2,7 +2,9 @@ package ch.interlis.iox_j.validator;
 
 import java.util.Collection;
 import java.util.List;
+
 import ch.interlis.ili2c.metamodel.EnumerationType;
+import ch.interlis.ili2c.metamodel.EnumTreeValueType;
 import ch.interlis.ili2c.metamodel.FormattedType;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.RoleDef;
@@ -260,6 +262,17 @@ public class Value {
 					return compareDouble(thisIndex, otherIndex);
 				} else {
 					// if ordered = false (==, !=, <>)
+					return this.value.compareTo(other.value);
+				}
+			} else if(type instanceof EnumTreeValueType) {
+				EnumTreeValueType enumerationTree = (EnumTreeValueType) type;
+				EnumerationType enumeration = (EnumerationType) enumerationTree.getEnumType().getType();
+
+				if (enumeration.isOrdered() && !enumeration.isCircular()) {
+					int thisIndex = enumeration.getValues().indexOf(this.value);
+					int otherIndex = enumeration.getValues().indexOf(other.value);
+					return compareDouble(thisIndex, otherIndex);
+				} else {
 					return this.value.compareTo(other.value);
 				}
 			}
