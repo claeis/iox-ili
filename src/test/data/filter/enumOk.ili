@@ -2,10 +2,14 @@ INTERLIS 2.3;
 
 MODEL EnumOkA (de) AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
 
+	DOMAIN
+			EnumA = (a1,a2(a21,a22));
+	
 	TOPIC TopicA =
-
+		
 		CLASS ClassA =
 			attrA : (a1,a2(a21,a22));
+			attrA2 : ALL OF EnumA;
 		END ClassA;
 
 	END TopicA;
@@ -16,10 +20,14 @@ MODEL EnumOkB (fr) AT "http://www.interlis.ch/ili2c/tests/" VERSION "1"
 TRANSLATION OF EnumOkA [ "1"]
 =
 
+	DOMAIN
+			EnumB = (b1,b2(b21,b22));
+	
 	TOPIC TopicB =
 
 		CLASS ClassB =
 			attrB : (b1,b2(b21,b22));
+			attrB2 : ALL OF EnumB;
 		END ClassB;
 
 	END TopicB;

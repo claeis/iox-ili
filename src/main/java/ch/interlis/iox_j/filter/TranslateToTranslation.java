@@ -13,6 +13,7 @@ import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.Element;
+import ch.interlis.ili2c.metamodel.EnumTreeValueType;
 import ch.interlis.ili2c.metamodel.Enumeration;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.ExtendableContainer;
@@ -126,7 +127,7 @@ public class TranslateToTranslation implements IoxFilter {
 	}
     private void resetMapping() {
         srctag2destElement=new HashMap<String,Element>();
-        src2destEles=new HashMap<EnumerationType,Map<String,String>>();
+        src2destEles=new HashMap<Type,Map<String,String>>();
     }
 
 	private void translateObject(IomObject iomObj) {
@@ -219,10 +220,15 @@ public class TranslateToTranslation implements IoxFilter {
 		}
 		boolean isCompType=attr.getDomain() instanceof CompositionType ? true :false;
 		boolean isEnumType=attr.getDomainResolvingAliases() instanceof EnumerationType ? true : false;
+        boolean isEnumAllType=attr.getDomainResolvingAliases() instanceof EnumTreeValueType ? true : false;
 		EnumerationType enumType=null;
+        EnumTreeValueType enumAllType=null;
 		if(isEnumType){
 			enumType=(EnumerationType)attr.getDomainResolvingAliases();
 		}
+        if(isEnumAllType){
+            enumAllType=(EnumTreeValueType)attr.getDomainResolvingAliases();
+        }
 		AttributeDef destAttr=(AttributeDef)getTranslatedElement(attr);
 		String destAttrName=destAttr.getName();
 		ArrayList<Object> values=new ArrayList<Object>();
@@ -242,7 +248,9 @@ public class TranslateToTranslation implements IoxFilter {
 				if(attrValue instanceof String){
 					if(isEnumType){
 						attrValue=translateEnumValue((String)attrValue,enumType,(EnumerationType)destAttr.getDomainResolvingAliases());
-					}
+					}else if(isEnumAllType){
+                        attrValue=translateEnumAllValue((String)attrValue,enumAllType,(EnumTreeValueType)destAttr.getDomainResolvingAliases());
+                    }
 					iomObj.setattrvalue(destAttrName, (String)attrValue);
 				}else{
 					IomObject structValue=(IomObject)attrValue;
@@ -261,9 +269,14 @@ public class TranslateToTranslation implements IoxFilter {
 		String destValue=src2dest.get(attrValue);
 		return destValue;
 	}
+    private String translateEnumAllValue(String attrValue, EnumTreeValueType enumType,EnumTreeValueType destEnumType) {
+        Map<String,String> src2dest=getEnumAllMapping(enumType,destEnumType);
+        String destValue=src2dest.get(attrValue);
+        return destValue;
+    }
 
 
-	Map<EnumerationType,Map<String,String>> src2destEles=null;
+	Map<Type,Map<String,String>> src2destEles=null;
 	private Map<String, String> getEnumMapping(
 			EnumerationType enumType,EnumerationType destEnumType) {
 		Map<String,String> src2dest=src2destEles.get(enumType);
@@ -279,6 +292,21 @@ public class TranslateToTranslation implements IoxFilter {
 		}
 		return src2dest;
 	}
+    private Map<String, String> getEnumAllMapping(
+            EnumTreeValueType enumType,EnumTreeValueType destEnumType) {
+        Map<String,String> src2dest=src2destEles.get(enumType);
+        if(src2dest==null){
+            Enumeration eles=enumType.getConsolidatedEnumeration();
+            src2dest=new HashMap<String,String>(); 
+            List<String> srcVals=enumType.getValues();
+            List<String> destVals=destEnumType.getValues();
+            for(int i=0;i<srcVals.size();i++){
+                src2dest.put(srcVals.get(i),destVals.get(i));
+            }
+            src2destEles.put(enumType,src2dest);
+        }
+        return src2dest;
+    }
 	
 
 	@Override
