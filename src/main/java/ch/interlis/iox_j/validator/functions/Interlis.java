@@ -302,9 +302,6 @@ public class Interlis {
                 EhiLogger.logError(e);
             }
 
-            if (functions.containsKey(functionCall)) {
-                return functions.get(functionCall);
-            }
             Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction, validationKind);
             functions.put(functionCall, isArea);
             return isArea;
