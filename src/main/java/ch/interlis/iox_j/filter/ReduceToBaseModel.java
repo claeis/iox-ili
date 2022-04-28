@@ -14,6 +14,7 @@ import ch.interlis.ili2c.metamodel.AttributeDef;
 import ch.interlis.ili2c.metamodel.CompositionType;
 import ch.interlis.ili2c.metamodel.Container;
 import ch.interlis.ili2c.metamodel.Element;
+import ch.interlis.ili2c.metamodel.EnumTreeValueType;
 import ch.interlis.ili2c.metamodel.Enumeration;
 import ch.interlis.ili2c.metamodel.EnumerationType;
 import ch.interlis.ili2c.metamodel.Model;
@@ -289,7 +290,7 @@ public class ReduceToBaseModel implements IoxFilter {
 	}
     private void resetMapping() {
         srctag2destElement=new HashMap<String,Object>();            
-        src2destEles=new HashMap<EnumerationType,Map<String,String>>();
+        src2destEles=new HashMap<Type,Map<String,String>>();
     }
 
 	private void translateObject(IomObject iomObj) {
@@ -353,9 +354,13 @@ public class ReduceToBaseModel implements IoxFilter {
 		}
 		boolean isCompType=srcAttr.getDomain() instanceof CompositionType ? true :false;
 		boolean isEnumType=srcAttr.getDomainResolvingAliases() instanceof EnumerationType ? true : false;
+        boolean isEnumAllType=srcAttr.getDomainResolvingAliases() instanceof EnumTreeValueType ? true : false;
 		EnumerationType srcEnumType=null;
+        EnumTreeValueType srcEnumAllType=null;
 		if(isEnumType){
 			srcEnumType=(EnumerationType)srcAttr.getDomainResolvingAliases();
+		}else if(isEnumAllType) {
+            srcEnumAllType=(EnumTreeValueType)srcAttr.getDomainResolvingAliases();
 		}
 		AttributeDef destAttr=(AttributeDef)srctag2destElement.get(srcAttr.getScopedName());
         String destAttrName=destAttr.getName();
@@ -377,6 +382,8 @@ public class ReduceToBaseModel implements IoxFilter {
 				if(attrValue instanceof String){
 					if(isEnumType){
 						attrValue=translateEnumValue((String)attrValue,srcEnumType,(EnumerationType)destAttr.getDomainResolvingAliases());
+					}else if(isEnumAllType) {
+                        attrValue=translateEnumAllValue((String)attrValue,srcEnumAllType,(EnumTreeValueType)destAttr.getDomainResolvingAliases());
 					}
 					iomObj.setattrvalue(destAttrName, (String)attrValue);
 				}else{
@@ -396,9 +403,14 @@ public class ReduceToBaseModel implements IoxFilter {
 		String destValue=src2dest.get(attrValue);
 		return destValue;
 	}
+    private String translateEnumAllValue(String attrValue, EnumTreeValueType srcEnumType,EnumTreeValueType destEnumType) {
+        Map<String,String> src2dest=getEnumAllMapping(srcEnumType,destEnumType);
+        String destValue=src2dest.get(attrValue);
+        return destValue;
+    }
 
 
-	Map<EnumerationType,Map<String,String>> src2destEles=new HashMap<EnumerationType,Map<String,String>>();
+	Map<Type,Map<String,String>> src2destEles=new HashMap<Type,Map<String,String>>();
 	private Topic srcTopic;
 	private Topic destTopic;
 	private Map<String, String> getEnumMapping(
@@ -412,6 +424,17 @@ public class ReduceToBaseModel implements IoxFilter {
         }
         return src2dest;
 	}
+    private Map<String, String> getEnumAllMapping(
+            EnumTreeValueType srcEnumType,EnumTreeValueType destEnumType) {
+        Map<String, String> src2dest = src2destEles.get(srcEnumType);
+        if (src2dest == null) {
+            src2dest = new HashMap<String, String>();
+            buildEnumAllList(src2dest, "", srcEnumType.getConsolidatedEnumeration(), "",
+                    destEnumType.getConsolidatedEnumeration(), null);
+            src2destEles.put(srcEnumType, src2dest);
+        }
+        return src2dest;
+    }
 	  public static void buildEnumList(java.util.Map<String,String> accu,String srcPrefix1,Enumeration srcEnumer,String destPrefix1,Enumeration destEnumer,String destEeName){
         String srcPrefix = "";
         String destPrefix = "";
@@ -452,6 +475,45 @@ public class ReduceToBaseModel implements IoxFilter {
             }
         }
 	  }
+      public static void buildEnumAllList(java.util.Map<String,String> accu,String srcPrefix1,Enumeration srcEnumer,String destPrefix1,Enumeration destEnumer,String destEeName){
+          String srcPrefix = "";
+          String destPrefix = "";
+          if (srcPrefix1.length() > 0) {
+              srcPrefix = srcPrefix1 + ".";
+          }
+          if (destPrefix1!=null && destPrefix1.length() > 0) {
+              destPrefix = destPrefix1 + ".";
+          }
+          Iterator srcIter = srcEnumer.getElements();
+          Iterator destIter = null;
+          if (destEnumer != null) {
+              destIter = destEnumer.getElements();
+          }
+          while (srcIter.hasNext()) {
+              Enumeration.Element srcEe = (Enumeration.Element) srcIter.next();
+              Enumeration srcSubEnum = srcEe.getSubEnumeration();
+              Enumeration destSubEnum = null;
+              Enumeration.Element destEe = null;
+              if (destIter != null) {
+                  destEe = (Enumeration.Element) destIter.next();
+                  destSubEnum = destEe.getSubEnumeration();
+                  if (destSubEnum == null) {
+                      destEeName = destPrefix + destEe.getName();
+                  }
+              }
+              // add ee to accu
+              accu.put(srcPrefix + srcEe.getName(), destEeName);
+              if (srcSubEnum != null) {
+                  if(destSubEnum!=null) {
+                      // ee is not leaf, add its name to prefix and add sub elements to accu
+                      buildEnumList(accu, srcPrefix + srcEe.getName(), srcSubEnum, destPrefix+destEe.getName(), destSubEnum, null);
+                  }else {
+                      // ee is not leaf, add its name to prefix and add sub elements to accu
+                      buildEnumList(accu, srcPrefix + srcEe.getName(), srcSubEnum, null, null, destEeName);
+                  }
+              }
+          }
+        }
 	
 
 	@Override
