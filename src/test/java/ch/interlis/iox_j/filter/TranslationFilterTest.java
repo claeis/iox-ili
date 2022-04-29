@@ -36,6 +36,7 @@ public class TranslationFilterTest {
 		setUp("src/test/data/filter/enumOk.ili");
 		Iom_jObject iomObj=new Iom_jObject("EnumOkB.TopicB.ClassB", "o1");
 		iomObj.setattrvalue("attrB", "b2.b21");
+        iomObj.setattrvalue("attrB2", "b2");
 		Settings config=new Settings();
 		TranslateToOrigin filter=new TranslateToOrigin(td, config);
 		filter.filter(new StartTransferEvent());
@@ -48,12 +49,14 @@ public class TranslationFilterTest {
 		IomObject destObj = destObjEvent.getIomObject();
 		assertEquals("EnumOkA.TopicA.ClassA",destObj.getobjecttag());
 		assertEquals("a2.a21",destObj.getattrvalue("attrA"));
+        assertEquals("a2",destObj.getattrvalue("attrA2"));
 	}
 	@Test
 	public void simpleEnumToTranslation() throws Exception {
 		setUp("src/test/data/filter/enumOk.ili");
 		Iom_jObject iomObj=new Iom_jObject("EnumOkA.TopicA.ClassA", "o1");
 		iomObj.setattrvalue("attrA", "a2.a21");
+        iomObj.setattrvalue("attrA2", "a2");
 		Settings config=new Settings();
 		TranslateToTranslation filter=new TranslateToTranslation(td, config);
 		filter.filter(new StartTransferEvent());
@@ -66,6 +69,7 @@ public class TranslationFilterTest {
 		IomObject destObj = destObjEvent.getIomObject();
 		assertEquals("EnumOkB.TopicB.ClassB",destObj.getobjecttag());
 		assertEquals("b2.b21",destObj.getattrvalue("attrB"));
+        assertEquals("b2",destObj.getattrvalue("attrB2"));
 	}
 
 }

@@ -50,9 +50,9 @@ public class PolygonSerializer extends AbstractIomObjectSerializer implements Se
         }
         Polygon ret=null;
         if(shell instanceof CompoundCurveRing) {
-            ret=factory.createCurvePolygon(shell, holes);
+            ret=jtsFactory.createCurvePolygon(shell, holes);
         }else {
-            ret=factory.createPolygon(shell, holes);
+            ret=jtsFactory.createPolygon(shell, holes);
         }
 		if(readInt(in)!=MAGIC){
 			throw new IllegalArgumentException();

@@ -36,15 +36,22 @@ public class ReaderFactory{
 	        settings=new Settings();
 	    }
 		IoxReader reader=null;
-		reader=new ItfReader2(inputFile, null, false);
-		IoxEvent event=null;
-		try{
-			event=reader.read();
-			if(event!=null){
-				reader=new ItfReader2(inputFile, null, false);
-				return reader;
-			}
-		}catch(IoxException ex){
+		try {
+	        reader=new ItfReader2(inputFile, null, false);
+	        IoxEvent event=null;
+	        try{
+	            event=reader.read();
+	            if(event!=null){
+	                ItfReader2 reader2=new ItfReader2(inputFile, null, false);
+	                return reader2;
+	            }
+	        }catch(IoxException ex){
+	        }
+		}finally {
+		    if(reader!=null) {
+		        reader.close();
+		        reader=null;
+		    }
 		}
 		
 		
@@ -90,16 +97,23 @@ public class ReaderFactory{
 	        }
 	    }
 		if(IoxUtility.isCsvFilename(inputFile.getName())) {
-	        reader=new CsvReader(inputFile);
-	        IoxEvent event5=null;
-	        try{
-	            event5=reader.read();
-	            if(event5!=null){
-	                reader=new CsvReader(inputFile);
-	                return reader;
+		    try {
+	            reader=new CsvReader(inputFile);
+	            IoxEvent event5=null;
+	            try{
+	                event5=reader.read();
+	                if(event5!=null){
+	                    CsvReader reader2=new CsvReader(inputFile);
+	                    return reader2;
+	                }
+	            }catch(IoxException ex){
 	            }
-	        }catch(IoxException ex){
-	        }
+		    }finally {
+		        if(reader!=null) {
+		            reader.close();
+		            reader=null;
+		        }
+		    }
 		}
 		
 		// no appropriate reader found

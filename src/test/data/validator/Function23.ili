@@ -166,12 +166,28 @@ MODEL Function23
 		  s1 -- {0..*} ClassS;
 		  t1 -- {0..*} ClassT;
 		END ST1;
-		
+
 		CONSTRAINTS OF ClassS =
 			MANDATORY CONSTRAINT
 		   		(INTERLIS.objectCount(t1)) == 2;
 		END;
-		
+
+		CLASS ClassSA =
+		END ClassSA;
+
+		CLASS ClassTA =
+		END ClassTA;
+
+		ASSOCIATION ST2 =
+		  s2 -- {0..*} ClassSA;
+		  t2 -- {0..1} ClassTA;
+		END ST2;
+
+		CONSTRAINTS OF ClassSA =
+            MANDATORY CONSTRAINT
+                (INTERLIS.objectCount(t2)) == 1;
+		END;
+
 		STRUCTURE StructA =
         END StructA;
         
@@ -253,6 +269,10 @@ MODEL Function23
 			MANDATORY CONSTRAINT
 				INTERLIS.convertUnit(attr1)==attr2;
 		END ClassZH;
+
+		CLASS ClassZK =
+		    Geometrie : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END ClassZK;
 		
 	END Topic;
 	

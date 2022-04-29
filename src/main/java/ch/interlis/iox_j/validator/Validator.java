@@ -141,7 +141,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_OBJECT_RESOLVERS="ch.interlis.iox_j.validator.objectResolvers";
     public static final String CONFIG_DEBUG_XTFOUT = "ch.interlis.iox_j.validator.debugXtfOutput";
 	// the object count result as value in map with the appropriate function as key.
-	private Map<Function, Value> functions=new HashMap<Function, Value>();
+	private Map<Evaluable, Value> functions=new HashMap<Evaluable, Value>();
 	private ObjectPoolManager objPoolManager=null;
 	private ObjectPool objectPool = null;
 	private LinkPool linkPool;
@@ -1655,6 +1655,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 //throw new IllegalStateException(rsrc.getString("evaluateExpression.argumentAllRequiresASetConstraint"));
                 return Value.createSkipEvaluation();
            }
+
+            // return cached value if available
+            if (functions.containsKey(expression)) {
+                return functions.get(expression);
+            }
+
 			Iterator<String> objectIterator = allObjIterator;
 			List<IomObject> listOfIomObjects = new ArrayList<IomObject>();
 			while(objectIterator.hasNext()){
@@ -1664,7 +1670,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					listOfIomObjects.add(aIomObj);
 				}
 			}
-			return new Value(listOfIomObjects);
+            Value listOfIomObjectsValue = new Value(listOfIomObjects);
+            functions.put(expression, listOfIomObjectsValue);
+            return listOfIomObjectsValue;
         } else if(expression instanceof ParameterValue) {
             ParameterValue paramValue=(ParameterValue)expression;
             String paramName=paramValue.getParameter().getScopedName();
@@ -2090,8 +2098,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		return new Value(counter);
 	}
-	
+
+	/**
+	 * @deprecated
+	 * Use {@link #evaluateAreArea(IomObject, Value, PathEl[], PathEl[], Function, String)} instead.
+	 */
+	@Deprecated
 	public Value evaluateAreArea(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction) {
+		return evaluateAreArea(mainIomObj, value, pathToStructEle, pathToSurfaceAttr, currentFunction, null);
+	}
+
+	public Value evaluateAreArea(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction, String validationKind) {
 		String mainObjTag=mainIomObj.getobjecttag();
 		if(pathToStructEle == null){
 			ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(mainObjTag, objPoolManager); // create new pool of polygons
@@ -2115,7 +2132,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
             for (IomObject polygon : listOfPolygons) {
                 try {
-                    polygonPool.addLines(null, polygon.getobjectoid(), polygonPool.getLinesFromPolygon(polygon));
+                    polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, errFact);
                 } catch (IoxException e) {
                     EhiLogger.logError(e);  
                 }
@@ -2165,48 +2182,45 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     //Value currentValue = getValueFromObjectPath(null, iomObj, pathToStructEle, null);
                     if (complexObjects.size()>0) {
                         //Collection<IomObject> complexObjects = currentValue.getComplexObjects();
-                        Iterator<IomObject> iterator = complexObjects.iterator();
-                        while (iterator.hasNext()) {
-                            IomObject currentObj=iterator.next();
-                            getStructElesFromAttrPath(pathToSurfaceAttr, currentObj.getobjectoid(),listOfPolygons, currentObj, 0);
-                        }                               
-                        for (IomObject polygon : listOfPolygons) {
-                            try {
-                                polygonPool.addLines(null, polygon.getobjectoid(), polygonPool.getLinesFromPolygon(polygon));
-                            } catch (IoxException e) {
-                                EhiLogger.logError(e);  
-                            }
+                        for (IomObject currentObj : complexObjects) {
+                            getStructElesFromAttrPath(pathToSurfaceAttr, currentObj.getobjectoid(), listOfPolygons, currentObj, 0);
                         }
-                        List<IoxInvalidDataException> intersections=polygonPool.validate();
-                        if(intersections!=null) {
-                            if(!disableAreAreasMessages && intersections.size()>0){
-                                for(IoxInvalidDataException ex:intersections){ // iterate through non-overlay intersections
-                                    String tid1=ex.getTid();
-                                    String iliqname=ex.getIliqname();
-                                    errFact.setTid(tid1);
-                                    errFact.setIliqname(iliqname);
-                                    if(ex instanceof IoxIntersectionException) {
-                                        logMsg(areaOverlapValidation, ((IoxIntersectionException) ex).getIntersection().toShortString());
-                                        EhiLogger.traceState(ex.toString());
-                                    }else {
-                                        logMsg(areaOverlapValidation, ex.getMessage());
-                                    }
-                                }
-                                setCurrentMainObj(null);
-                            }
-                            returnValue = returnValue && false;
-                            if(disableAreAreasMessages && !returnValue) {
-                                // short circuit; no need to further evaluate
-                                break;
-                            }
-                        }                   
                     }
                 }
             }
-            if(!returnValue) {
-                EhiLogger.traceState(mainObjTag+ ":" + currentFunction.getScopedName(null) + " returned false"); 
+
+            for (IomObject polygon : listOfPolygons) {
+                try {
+                    polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, errFact);
+                } catch (IoxException e) {
+                    EhiLogger.logError(e);
+                }
             }
-            return new Value(returnValue);
+
+            List<IoxInvalidDataException> intersections=polygonPool.validate();
+            if(intersections!=null) {
+                if(!disableAreAreasMessages && intersections.size()>0){
+                    for(IoxInvalidDataException ex:intersections){ // iterate through non-overlay intersections
+                        String tid1=ex.getTid();
+                        String iliqname=ex.getIliqname();
+                        errFact.setTid(tid1);
+                        errFact.setIliqname(iliqname);
+                        if(ex instanceof IoxIntersectionException) {
+                            logMsg(areaOverlapValidation, ((IoxIntersectionException) ex).getIntersection().toShortString());
+                            EhiLogger.traceState(ex.toString());
+                        }else {
+                            logMsg(areaOverlapValidation, ex.getMessage());
+                        }
+                    }
+                    setCurrentMainObj(null);
+                }
+
+                // short circuit; no need to further evaluate
+                EhiLogger.traceState(mainObjTag+ ":" + currentFunction.getScopedName(null) + " returned false");
+                return new Value(false);
+            }
+
+            return new Value(true);
 		}
 	}
 	

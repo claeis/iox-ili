@@ -33,7 +33,7 @@ public class Interlis {
     
     public Value evaluateFunction(Function currentFunction, FunctionCall functionCallObj, IomObject parentObject,
             String validationKind, String usageScope, IomObject iomObj, TextType texttype, 
-            Evaluable expression, Map<Function, Value> functions, TransferDescription td, RoleDef firstRole) {
+            Evaluable expression, Map<Evaluable, Value> functions, TransferDescription td, RoleDef firstRole) {
         
         if(currentFunction.getScopedName(null).equals("INTERLIS.len") || currentFunction.getScopedName(null).equals("INTERLIS.lenM")){
             Evaluable[] arguments = functionCallObj.getArguments();
@@ -137,18 +137,17 @@ public class Interlis {
             if(value.getComplexObjects()!=null){
                 return new Value(value.getComplexObjects().size());
             }else if(value.getViewable()!=null) {
-                for(Function aFunction:functions.keySet()) {
-                    // contains/equal would not work here, because it is an object compare.
-                    if(aFunction==currentFunction) {
-                        Value objCount=functions.get(currentFunction);
-                        return objCount;
-                    }
+                if (functions.containsKey(functionCall)) {
+                    return functions.get(functionCall);
                 }
+
                 Value objectCount=null;
                 objectCount = validator.evaluateObjectCount(value);
-                // put the result of object count as value to the current function.
-                functions.put(currentFunction, objectCount);
+                // put the result of object count as value to the function call.
+                functions.put(functionCall, objectCount);
                 return objectCount;
+            } else if (value.getOid() != null) {
+                return new Value(1);
             }
         } else if (currentFunction.getScopedName(null).equals("INTERLIS.elementCount")){
             FunctionCall functionCall = (FunctionCall) expression;
@@ -302,14 +301,9 @@ public class Interlis {
             } catch (Ili2cException e) {
                 EhiLogger.logError(e);
             }
-            for(Function aFunction:functions.keySet()) {
-                if(aFunction==currentFunction) {
-                    Value isArea=functions.get(currentFunction);
-                    return isArea;
-                }
-            }
-            Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction);
-            functions.put(currentFunction, isArea);
+
+            Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction, validationKind);
+            functions.put(functionCall, isArea);
             return isArea;
         }
         

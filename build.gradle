@@ -1,5 +1,5 @@
 group 'ch.interlis'
-version '1.21.9'+System.getProperty('release','-SNAPSHOT')
+version '1.21.10'+System.getProperty('release','-SNAPSHOT')
 
 apply plugin: "java"
 apply plugin: "maven"
@@ -35,8 +35,8 @@ dependencies {
         exclude group: 'ch.interlis', module: 'iox-ili'
     }
     testImplementation group: 'ch.interlis', name: 'ili2c-core', version: '5.2.1'
-    deployerJars "org.apache.maven.wagon:wagon-ftp:3.3.3"
-    deployerJars "org.apache.maven.wagon:wagon-ssh:3.3.3"
+    deployerJars "org.apache.maven.wagon:wagon-ftp:3.5.1"
+    deployerJars "org.apache.maven.wagon:wagon-ssh:3.5.1"
 }
 
 repositories {
