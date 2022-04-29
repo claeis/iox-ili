@@ -5,6 +5,9 @@ ideas/open issues
 
 LATEST
 -----------------------------
+
+iox-ili 1.21.10 (2022-04-29)
+-----------------------------
 - Validator: evaluate EnumTreeValueType in Value.compareTo() method (ilivalidator#300)
 - Validator: objectCount() throws NPE (ilivalidator#337) 
 - Validator: Speed of AREA-Constraint vs areAreas() (ilivalidator#308)
