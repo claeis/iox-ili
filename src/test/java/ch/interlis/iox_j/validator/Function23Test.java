@@ -1926,7 +1926,6 @@ public class Function23Test {
 
 	// Es wird getestet ob die areAreas Funktion bei vielen Objekten genug schnell berechnet wird.
 	@Test
-	@Ignore("requires #107")
 	public void areAreas_Caching_Performance() {
 		// create test objects that satisfy the areAreas constraint
 		Iom_jObject[] testObjects = new Iom_jObject[10000];
@@ -1971,7 +1970,6 @@ public class Function23Test {
 
 	// Es wird getestet ob AREA bei vielen Objekten genug schnell berechnet wird.
 	@Test
-    @Ignore("requires #107")
 	public void area_Performance() {
 		// create test objects that satisfy the areAreas constraint
 		Iom_jObject[] testObjects = new Iom_jObject[10000];

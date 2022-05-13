@@ -519,7 +519,6 @@ public class AreAreas23Test {
                 logger.getErrs().get(0).getEventMsg());
     }
     @Test
-    @Ignore("requires #107")
     public void classE_allObjectE_TwoObject_Overlap_DetailMsgs_Fail() {
 
         IomObject structA = createRectangle("486000.000", "75000.000", "490000.000", "80000.000");
