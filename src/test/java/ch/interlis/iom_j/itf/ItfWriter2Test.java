@@ -34,7 +34,7 @@ public class ItfWriter2Test extends AbstractItfWriterTest {
         writer.write(new EndTransferEvent());
         writer.close();
         writer=null;
-        assertTrue(fileEqual(in, out));
+        assertTrue(itfFileEqual(in, out));
     }
     @Test
     public void testSurfaceNull() throws Iox2jtsException, IoxException {
@@ -49,7 +49,7 @@ public class ItfWriter2Test extends AbstractItfWriterTest {
         writer.write(new EndTransferEvent());
         writer.close();
         writer=null;
-        assertTrue(fileEqual(in, out));
+        assertTrue(itfFileEqual(in, out));
     }
     @Test
     public void testSurface() throws Iox2jtsException, IoxException {
@@ -84,7 +84,7 @@ public class ItfWriter2Test extends AbstractItfWriterTest {
         writer.write(new EndTransferEvent());
         writer.close();
         writer=null;
-        assertTrue(fileEqual(in, out));
+        assertTrue(itfFileEqual(in, out));
     }
     @Test
     public void testAreaEmpty() throws Iox2jtsException, IoxException {
@@ -99,7 +99,7 @@ public class ItfWriter2Test extends AbstractItfWriterTest {
         writer.write(new EndTransferEvent());
         writer.close();
         writer=null;
-        assertTrue(fileEqual(in, out));
+        assertTrue(itfFileEqual(in, out));
     }
     @Test
     public void testAreaSimple() throws Iox2jtsException, IoxException {
@@ -123,7 +123,7 @@ public class ItfWriter2Test extends AbstractItfWriterTest {
         writer.write(new EndTransferEvent());
         writer.close();
         writer=null;
-        assertTrue(fileEqual(in, out));
+        assertTrue(itfFileEqual(in, out));
     }
     @Test
     public void testAreaWithArc() throws Iox2jtsException, IoxException {
@@ -147,7 +147,7 @@ public class ItfWriter2Test extends AbstractItfWriterTest {
         writer.write(new EndTransferEvent());
         writer.close();
         writer=null;
-        assertTrue(fileEqual(in, out));
+        assertTrue(itfFileEqual(in, out));
     }
     @Test
     public void testAreaWithHole() throws Iox2jtsException, IoxException {
@@ -193,7 +193,7 @@ public class ItfWriter2Test extends AbstractItfWriterTest {
         writer.write(new EndTransferEvent());
         writer.close();
         writer=null;
-        assertTrue(fileEqual(in, out));
+        assertTrue(itfFileEqual(in, out));
     }
 	
 }
