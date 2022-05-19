@@ -103,11 +103,11 @@ public abstract class AbstractItfWriterTest {
         }
     }   
     public boolean itfFileEqual(File path1, File path2) throws IoxException {
-        ItfReader reader1=null;
-        ItfReader reader2=null;
+        ItfReader2 reader1=null;
+        ItfReader2 reader2=null;
         try {
-            reader1=new ItfReader(path1);
-            reader2=new ItfReader(path2);
+            reader1=new ItfReader2(path1,false);
+            reader2=new ItfReader2(path2,false);
             reader1.setModel(td);
             reader2.setModel(td);
             ch.interlis.iox.IoxEvent event1=null;
