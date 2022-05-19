@@ -21,7 +21,7 @@ public class ItfWriter2Test extends AbstractItfWriterTest {
     }
     @Test
     public void testSimple() throws Iox2jtsException, IoxException {
-        File in=new File(TEST_OUT,"TestSimple.itf");
+        File in=new File(TEST_IN,"TestSimple.itf");
         File out=new File(TEST_OUT,"TestSimple-out.itf");
         IoxWriter writer=createItfWriter(out,td);
         writer.write(new StartTransferEvent());
