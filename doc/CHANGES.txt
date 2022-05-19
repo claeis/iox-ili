@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- ItfWriter: add mandatory but empty tables (ili2fme#24)
 
 iox-ili 1.21.10 (2022-04-29)
 -----------------------------
