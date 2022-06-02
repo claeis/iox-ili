@@ -11,6 +11,7 @@ branches:
 install: true
   
 script: 
+  - jdk_switcher use openjdk8
   - gradle build 
 after_failure:
   - cat  build/junitreport/TEST-*.txt
