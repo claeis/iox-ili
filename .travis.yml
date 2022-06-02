@@ -1,8 +1,5 @@
 language: java
 
-jdk:
-  - openjdk8
-
 branches:
   only:
     - master
@@ -11,7 +8,6 @@ branches:
 install: true
   
 script: 
-  - jdk_switcher use openjdk8
   - gradle build 
 after_failure:
   - cat  build/junitreport/TEST-*.txt
