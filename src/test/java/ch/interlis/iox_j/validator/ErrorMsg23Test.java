@@ -293,10 +293,10 @@ public class ErrorMsg23Test {
 	@Test
 	public void geometryAreaIntersectionErrorMessage_Fail() {
 		Iom_jObject object_1 = new Iom_jObject(ILI_CLASSF_WITH_AREA, OID);
-		object_1.addattrobj("Geometry", createRectangleGeometry("500000", "70000", "600000", "80000"));
+		object_1.addattrobj("Geometry", IomObjectHelper.createRectangleGeometry("500000", "70000", "600000", "80000"));
 
 		Iom_jObject object_2 = new Iom_jObject(ILI_CLASSF_WITH_AREA, OID_2);
-		object_2.addattrobj("Geometry", createRectangleGeometry("550000", "75000", "650000", "85000"));
+		object_2.addattrobj("Geometry", IomObjectHelper.createRectangleGeometry("550000", "75000", "650000", "85000"));
 
 		validateObjects(object_1, object_2);
 
@@ -313,10 +313,10 @@ public class ErrorMsg23Test {
 	@Test
 	public void geometryAreAreasConstraintIntersectionErrorMessage_Fail() {
 		Iom_jObject object_1 = new Iom_jObject(ILI_CLASSG_WITH_AREAREAS_CONSTRAINT, OID);
-		object_1.addattrobj("Geometry", createRectangleGeometry("500000", "70000", "600000", "80000"));
+		object_1.addattrobj("Geometry", IomObjectHelper.createRectangleGeometry("500000", "70000", "600000", "80000"));
 
 		Iom_jObject object_2 = new Iom_jObject(ILI_CLASSG_WITH_AREAREAS_CONSTRAINT, OID_2);
-		object_2.addattrobj("Geometry", createRectangleGeometry("550000", "75000", "650000", "85000"));
+		object_2.addattrobj("Geometry", IomObjectHelper.createRectangleGeometry("550000", "75000", "650000", "85000"));
 
 		validateObjects(object_1, object_2);
 
@@ -332,49 +332,6 @@ public class ErrorMsg23Test {
 		assertEquals((Double)expectedC1, logEvent.getGeomC1());
 		assertEquals((Double)expectedC2, logEvent.getGeomC2());
 		assertEquals((Double)Double.NaN, logEvent.getGeomC3());
-	}
-
-	private static IomObject createRectangleGeometry(String x1, String y1, String x2, String y2) {
-		IomObject startSegment = new Iom_jObject("COORD", null);
-		startSegment.setattrvalue("C1", x1);
-		startSegment.setattrvalue("C2", y1);
-
-		IomObject straightSegment1 = new Iom_jObject("COORD", null);
-		straightSegment1.setattrvalue("C1", x1);
-		straightSegment1.setattrvalue("C2", y2);
-
-		IomObject straightSegment2 = new Iom_jObject("COORD", null);
-		straightSegment2.setattrvalue("C1", x2);
-		straightSegment2.setattrvalue("C2", y2);
-
-		IomObject straightSegment3 = new Iom_jObject("COORD", null);
-		straightSegment3.setattrvalue("C1", x2);
-		straightSegment3.setattrvalue("C2", y1);
-
-		IomObject straightSegment4 = new Iom_jObject("COORD", null);
-		straightSegment4.setattrvalue("C1", x1);
-		straightSegment4.setattrvalue("C2", y1);
-
-		IomObject segment = new Iom_jObject("SEGMENTS", null);
-		segment.addattrobj("segment", startSegment);
-		segment.addattrobj("segment", straightSegment1);
-		segment.addattrobj("segment", straightSegment2);
-		segment.addattrobj("segment", straightSegment3);
-		segment.addattrobj("segment", straightSegment4);
-
-		IomObject polyline = new Iom_jObject("POLYLINE", null);
-		polyline.addattrobj("sequence", segment);
-
-		IomObject outerBoundary = new Iom_jObject("BOUNDARY", null);
-		outerBoundary.addattrobj("polyline", polyline);
-
-		IomObject surfaceValue = new Iom_jObject("SURFACE", null);
-		surfaceValue.addattrobj("boundary", outerBoundary);
-
-		IomObject multisurface = new Iom_jObject("MULTISURFACE", null);
-		multisurface.addattrobj("surface", surfaceValue);
-
-		return multisurface;
 	}
 
 	private void validateObjects(IomObject... iomObjects) {
