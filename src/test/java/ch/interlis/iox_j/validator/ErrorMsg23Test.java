@@ -45,11 +45,14 @@ public class ErrorMsg23Test {
 	private static final String ILI_CLASSD_ATTRA2 = "attrA2";
 	private static final String ILI_CLASSD_CONSTRA = ILI_CLASSD+".constrA";
 	private static final String ILI_CLASSE = "ErrorMsgTest23.Topic.ClassE";
+	private static final String ILI_CLASSF = "ErrorMsgTest23.Topic.ClassF";
+	private static final String ILI_CLASSG = "ErrorMsgTest23.Topic.ClassG";
 	// STRUCTS
 	private static final String ILI_STRUCTB = "ErrorMsgTest23.Topic.StructB";
 	private static final String ILI_STRUCTB_POINT = "point";
 	// OID
 	private final static String OID="o1";
+	private final static String OID_2 = "o2";
 	// START BASKET EVENT
 	private final static String BID="b1";
 	
@@ -338,5 +341,119 @@ public class ErrorMsg23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals(new Double(510000.000),logger.getErrs().get(0).getGeomC1());
 		assertEquals(new Double(80000.000),logger.getErrs().get(0).getGeomC2());
-	}	
+	}
+
+	/**
+	 * Tests that the error message coordinate fields (C1, C2, C3) are set when two features of an AREA intersect
+	 */
+	@Test
+	public void geometryAreaIntersectionErrorMessage_Fail() {
+		Iom_jObject object_1 = new Iom_jObject(ILI_CLASSF, OID);
+		object_1.addattrobj("Geometry", createRectangleGeometry("500000", "70000", "600000", "80000"));
+
+		Iom_jObject object_2 = new Iom_jObject(ILI_CLASSF, OID_2);
+		object_2.addattrobj("Geometry", createRectangleGeometry("550000", "75000", "650000", "85000"));
+
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Map<String,Class> newFunctions=new HashMap<String,Class>();
+		newFunctions.put("FunctionsExt23.subText",SubText.class);
+		settings.setTransientObject(Validator.CONFIG_CUSTOM_FUNCTIONS, newFunctions);
+		Validator validator = new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(object_1));
+		validator.validate(new ObjectEvent(object_2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(3, logger.getErrs().size());
+		assertErrorLogWithGeometry("Intersection coord1 (550000.000, 80000.000), tids o1, o2", 550000.0, 80000.0, logger.getErrs().get(0));
+		assertErrorLogWithGeometry("Intersection coord1 (600000.000, 75000.000), tids o1, o2", 600000.0, 75000.0, logger.getErrs().get(1));
+		assertEquals("failed to validate AREA ErrorMsgTest23.Topic.ClassF.Geometry", logger.getErrs().get(2).getEventMsg());
+	}
+
+	/**
+	 * Tests that the error message coordinate fields (C1, C2, C3) are set when two features in an areAreas constraint intersect.
+	 */
+	@Test
+	public void geometryAreAreasConstraintIntersectionErrorMessage_Fail() {
+		Iom_jObject object_1 = new Iom_jObject(ILI_CLASSG, OID);
+		object_1.addattrobj("Geometry", createRectangleGeometry("500000", "70000", "600000", "80000"));
+
+		Iom_jObject object_2 = new Iom_jObject(ILI_CLASSG, OID_2);
+		object_2.addattrobj("Geometry", createRectangleGeometry("550000", "75000", "650000", "85000"));
+
+		ValidationConfig modelConfig=new ValidationConfig();
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Map<String,Class> newFunctions=new HashMap<String,Class>();
+		newFunctions.put("FunctionsExt23.subText",SubText.class);
+		settings.setTransientObject(Validator.CONFIG_CUSTOM_FUNCTIONS, newFunctions);
+		Validator validator = new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		validator.validate(new ObjectEvent(object_1));
+		validator.validate(new ObjectEvent(object_2));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertEquals(3, logger.getErrs().size());
+		assertErrorLogWithGeometry("Intersection coord1 (550000.000, 80000.000), tids o1/Geometry[1], o2/Geometry[1]", 550000.0, 80000.0, logger.getErrs().get(0));
+		assertErrorLogWithGeometry("Intersection coord1 (600000.000, 75000.000), tids o1/Geometry[1], o2/Geometry[1]", 600000.0, 75000.0, logger.getErrs().get(1));
+		assertEquals("Set Constraint ErrorMsgTest23.Topic.ClassG.Constraint1 is not true.", logger.getErrs().get(2).getEventMsg());
+	}
+
+	private void assertErrorLogWithGeometry(String expectedMessage, double expectedC1, double expectedC2, IoxLogEvent logEvent) {
+		assertEquals(expectedMessage, logEvent.getEventMsg());
+		assertEquals((Double)expectedC1, logEvent.getGeomC1());
+		assertEquals((Double)expectedC2, logEvent.getGeomC2());
+		assertEquals((Double)Double.NaN, logEvent.getGeomC3());
+	}
+
+	private static IomObject createRectangleGeometry(String x1, String y1, String x2, String y2) {
+		IomObject startSegment = new Iom_jObject("COORD", null);
+		startSegment.setattrvalue("C1", x1);
+		startSegment.setattrvalue("C2", y1);
+
+		IomObject straightSegment1 = new Iom_jObject("COORD", null);
+		straightSegment1.setattrvalue("C1", x1);
+		straightSegment1.setattrvalue("C2", y2);
+
+		IomObject straightSegment2 = new Iom_jObject("COORD", null);
+		straightSegment2.setattrvalue("C1", x2);
+		straightSegment2.setattrvalue("C2", y2);
+
+		IomObject straightSegment3 = new Iom_jObject("COORD", null);
+		straightSegment3.setattrvalue("C1", x2);
+		straightSegment3.setattrvalue("C2", y1);
+
+		IomObject straightSegment4 = new Iom_jObject("COORD", null);
+		straightSegment4.setattrvalue("C1", x1);
+		straightSegment4.setattrvalue("C2", y1);
+
+		IomObject segment = new Iom_jObject("SEGMENTS", null);
+		segment.addattrobj("segment", startSegment);
+		segment.addattrobj("segment", straightSegment1);
+		segment.addattrobj("segment", straightSegment2);
+		segment.addattrobj("segment", straightSegment3);
+		segment.addattrobj("segment", straightSegment4);
+
+		IomObject polyline = new Iom_jObject("POLYLINE", null);
+		polyline.addattrobj("sequence", segment);
+
+		IomObject outerBoundary = new Iom_jObject("BOUNDARY", null);
+		outerBoundary.addattrobj("polyline", polyline);
+
+		IomObject surfaceValue = new Iom_jObject("SURFACE", null);
+		surfaceValue.addattrobj("boundary", outerBoundary);
+
+		IomObject multisurface = new Iom_jObject("MULTISURFACE", null);
+		multisurface.addattrobj("surface", surfaceValue);
+
+		return multisurface;
+	}
 }

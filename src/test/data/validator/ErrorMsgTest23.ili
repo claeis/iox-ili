@@ -44,6 +44,15 @@ MODEL ErrorMsgTest23
 			Geometry : Lkoord;
 			MANDATORY CONSTRAINT "aText" == "aDifferentText";
 		END ClassE;
+
+		CLASS ClassF =
+			Geometry : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END ClassF;
+
+		CLASS ClassG =
+			Geometry : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			SET CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >>Geometry);
+		END ClassG;
 		
 	END Topic;
 END ErrorMsgTest23.
