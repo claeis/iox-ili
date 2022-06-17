@@ -45,8 +45,8 @@ public class ErrorMsg23Test {
 	private static final String ILI_CLASSD_ATTRA2 = "attrA2";
 	private static final String ILI_CLASSD_CONSTRA = ILI_CLASSD+".constrA";
 	private static final String ILI_CLASSE = "ErrorMsgTest23.Topic.ClassE";
-	private static final String ILI_CLASSF = "ErrorMsgTest23.Topic.ClassF";
-	private static final String ILI_CLASSG = "ErrorMsgTest23.Topic.ClassG";
+	private static final String ILI_CLASSF_WITH_AREA = "ErrorMsgTest23.Topic.ClassF";
+	private static final String ILI_CLASSG_WITH_AREAREAS_CONSTRAINT = "ErrorMsgTest23.Topic.ClassG";
 	// STRUCTS
 	private static final String ILI_STRUCTB = "ErrorMsgTest23.Topic.StructB";
 	private static final String ILI_STRUCTB_POINT = "point";
@@ -348,10 +348,10 @@ public class ErrorMsg23Test {
 	 */
 	@Test
 	public void geometryAreaIntersectionErrorMessage_Fail() {
-		Iom_jObject object_1 = new Iom_jObject(ILI_CLASSF, OID);
+		Iom_jObject object_1 = new Iom_jObject(ILI_CLASSF_WITH_AREA, OID);
 		object_1.addattrobj("Geometry", createRectangleGeometry("500000", "70000", "600000", "80000"));
 
-		Iom_jObject object_2 = new Iom_jObject(ILI_CLASSF, OID_2);
+		Iom_jObject object_2 = new Iom_jObject(ILI_CLASSF_WITH_AREA, OID_2);
 		object_2.addattrobj("Geometry", createRectangleGeometry("550000", "75000", "650000", "85000"));
 
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -380,10 +380,10 @@ public class ErrorMsg23Test {
 	 */
 	@Test
 	public void geometryAreAreasConstraintIntersectionErrorMessage_Fail() {
-		Iom_jObject object_1 = new Iom_jObject(ILI_CLASSG, OID);
+		Iom_jObject object_1 = new Iom_jObject(ILI_CLASSG_WITH_AREAREAS_CONSTRAINT, OID);
 		object_1.addattrobj("Geometry", createRectangleGeometry("500000", "70000", "600000", "80000"));
 
-		Iom_jObject object_2 = new Iom_jObject(ILI_CLASSG, OID_2);
+		Iom_jObject object_2 = new Iom_jObject(ILI_CLASSG_WITH_AREAREAS_CONSTRAINT, OID_2);
 		object_2.addattrobj("Geometry", createRectangleGeometry("550000", "75000", "650000", "85000"));
 
 		ValidationConfig modelConfig=new ValidationConfig();
