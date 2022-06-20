@@ -137,6 +137,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_DO_ITF_OIDPERTABLE_DO="doItfOidPerTable";
 	public static final String CONFIG_DO_XTF_VERIFYMODEL="ch.interlis.iox_j.validator.doXtfVersionControl";
 	public static final String CONFIG_DO_XTF_VERIFYMODEL_DO="doXtfVersionControl";
+    public static final String CONFIG_DO_SINGLE_PASS="ch.interlis.iox_j.validator.doSinglePass";
+    public static final String CONFIG_DO_SINGLE_PASS_DO="doSinglePass";
 	public static final String CONFIG_CUSTOM_FUNCTIONS="ch.interlis.iox_j.validator.customFunctions";
 	public static final String CONFIG_OBJECT_RESOLVERS="ch.interlis.iox_j.validator.objectResolvers";
     public static final String CONFIG_DEBUG_XTFOUT = "ch.interlis.iox_j.validator.debugXtfOutput";
@@ -144,7 +146,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private Map<Evaluable, Value> functions=new HashMap<Evaluable, Value>();
 	private ObjectPoolManager objPoolManager=null;
 	private ObjectPool objectPool = null;
-	private LinkPool linkPool;
+	private LinkPool linkPool=null;
 	private ch.interlis.iox.IoxValidationConfig validationConfig=null;
 	//private ch.interlis.iox.IoxDataPool pipelinePool=null;
 	private PipelinePool pipelinePool=null;
@@ -155,6 +157,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private boolean doItfOidPerTable=false;
 	private Settings settings=null;
 	private boolean validationOff=false;
+	private boolean singlePass=false;
 	private String areaOverlapValidation=null;
 	private String constraintValidation=null;
 	private String defaultGeometryTypeValidation=null;
@@ -185,7 +188,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private ch.interlis.ilirepository.ReposManager repositoryManager = null;
 	private java.util.ResourceBundle rsrc=java.util.ResourceBundle.getBundle("ch.interlis.iox_j.validator.ValidatorMessages");
     private IoxWriter writer=null;
-	
+    private long objectCount=0l;
+    private long structCount=0l;
+    
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
 			IoxLogging errs, LogEventFactory errFact, Settings config) {
@@ -234,6 +239,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         repositoryManager = (ch.interlis.ilirepository.ReposManager) settings
                 .getTransientObject(UserSettings.CUSTOM_ILI_MANAGER);
 		
+        this.singlePass = CONFIG_DO_SINGLE_PASS_DO.equals(settings.getValue(CONFIG_DO_SINGLE_PASS));
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(settings.getValue(CONFIG_DO_ITF_LINETABLES));
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(settings.getValue(CONFIG_DO_ITF_OIDPERTABLE));
 		allObjectsAccessible=ValidationConfig.TRUE.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE));
@@ -269,8 +275,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		areaOverlapValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.AREA_OVERLAP_VALIDATION);
 		constraintValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.CONSTRAINT_VALIDATION);
 		defaultGeometryTypeValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION);
-		objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class,objPoolManager);
-		linkPool=new LinkPool(objPoolManager);
+		if(!singlePass) {
+	        objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class,objPoolManager);
+	        linkPool=new LinkPool(objPoolManager);
+		}
         if(resolverClasses!=null){
             extObjResolvers=new ArrayList<ExternalObjectResolver>();
             for(Class resolverClass:resolverClasses){
@@ -342,7 +350,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			validateInconsistentIliAndXMLVersion(event);
 			uniquenessOfBid.clear();
 			uniquenessOfBid.putAll(stableBids);
-			objectPool.startNewTransfer();
+			if(!singlePass) {
+	            objectPool.startNewTransfer();
+			}
 		} else if (event instanceof ch.interlis.iox.StartBasketEvent){
 			StartBasketEvent startBasketEvent = ((ch.interlis.iox.StartBasketEvent) event);
 			currentBasketId = ((ch.interlis.iox.StartBasketEvent) event).getBid();
@@ -538,10 +548,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     }
 
     public void doSecondPass() {
-		errs.addEvent(errFact.logInfoMsg(rsrc.getString("doSecondPass.secondValidationPass")));
-		iterateThroughAllObjects();
-		validateAllAreas();
-		validatePlausibilityConstraints();
+        if(!singlePass) {
+            errs.addEvent(errFact.logInfoMsg(rsrc.getString("doSecondPass.secondValidationPass")));
+            iterateThroughAllObjects();
+            validateAllAreas();
+            validatePlausibilityConstraints();
+        }
 	}
 	
 	private void iterateThroughAdditionalModels(String[] additionalModels){
@@ -3029,6 +3041,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		boolean isObject = attrPath==null;
 		if(isObject){
 			setCurrentMainObj(iomObj);
+			objectCount++;
+		}else {
+		    structCount++;
 		}
 		
 		// validate that OID is not a BID
@@ -3236,7 +3251,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         }
                     }
                     if (refoid != null) {
-                        linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
+                        if(!singlePass) {
+                            linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
+                        }
                     }
 				}
 			 }
@@ -3244,7 +3261,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 		if(isObject){
 			if(addToPool){
-				{
+				if(!singlePass){
 					// check if object id is unique in transferfile
 					IomObject duplicateObj = objectPool.addObject(iomObj,currentBasketId);
 					if(duplicateObj!=null){
@@ -3712,20 +3729,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 									    boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
 									}else{
 										boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
-										if(!ValidationConfig.OFF.equals(areaOverlapValidation)){
-											
-											if(surfaceTopologyValid) {
-											
-												ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
-												if(allLines==null){
-													allLines=new ItfAreaPolygon2Linetable(iliClassQName, objPoolManager); 
-													areaAttrs.put(attr,allLines);
-												}
-												validateAreaTopology(validateGeometryType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
-											}else {
-												// surface topology not valid
-												errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAttrValue.areaTopologyNoValidatedValidationOfSurfaceTopologyFailedInAttributeY"), attrPath));
-											}
+										if(!singlePass) {
+	                                        if(!ValidationConfig.OFF.equals(areaOverlapValidation)){
+	                                            
+	                                            if(surfaceTopologyValid) {
+	                                            
+	                                                ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
+	                                                if(allLines==null){
+	                                                    allLines=new ItfAreaPolygon2Linetable(iliClassQName, objPoolManager); 
+	                                                    areaAttrs.put(attr,allLines);
+	                                                }
+	                                                validateAreaTopology(validateGeometryType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
+	                                            }else {
+	                                                // surface topology not valid
+	                                                errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAttrValue.areaTopologyNoValidatedValidationOfSurfaceTopologyFailedInAttributeY"), attrPath));
+	                                            }
+	                                        }
 										}
 									}
 								}
@@ -4299,4 +4318,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	{
         settings.setValue(CONFIG_DO_ITF_OIDPERTABLE, CONFIG_DO_ITF_OIDPERTABLE_DO);
 	}
+	public long getObjectCount() {
+	    return objectCount;
+	}
+    public long getStructCount() {
+        return structCount;
+    }
 }
