@@ -288,6 +288,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
 		String filename=settings.getValue(CONFIG_DEBUG_XTFOUT);
 		if(filename!=null) {
+		    EhiLogger.traceState("xtfout <"+filename+">");
 		    try {
                 writer=new XtfWriter(new File(filename),td);
             } catch (IoxException e) {
