@@ -27,33 +27,41 @@ public class ObjectPoolManager {
 
 	@Deprecated
 	public <K,V> java.util.Map<K, V> newObjectPool() {
+		return newObjectPool(null,new JavaSerializer());
+	}
+    @Deprecated
+    public <K,V> java.util.Map<K, V> newObjectPool(Serializer<V> serializer) {
+        return newObjectPool(null,serializer);
+    }
+	public <K,V> java.util.Map<K, V> newObjectPool(String poolName,Serializer<V> serializer) {
 		flushWriteQueues();
 		ObjPoolImpl m=null;
-		m = new ObjPoolImpl(this,new JavaSerializer());
+		m = new ObjPoolImpl(this,poolName,serializer);
 		maps.add(m);
 		return m;
 	}
-	public <K,V> java.util.Map<K, V> newObjectPool(Serializer<V> serializer) {
-		flushWriteQueues();
-		ObjPoolImpl m=null;
-		m = new ObjPoolImpl(this,serializer);
-		maps.add(m);
-		return m;
-	}
-	public <K,V> java.util.Map<K, V> newObjectPoolImpl2(Serializer<V> serializer) {
+    @Deprecated
+    public <K,V> java.util.Map<K, V> newObjectPoolImpl2(Serializer<V> serializer) {
+        return newObjectPoolImpl2(null,serializer);
+    }
+	public <K,V> java.util.Map<K, V> newObjectPoolImpl2(String poolName,Serializer<V> serializer) {
 		flushWriteQueues();
 		ObjPoolImpl2 m=null;
-		m = new ObjPoolImpl2(this,serializer);
+		m = new ObjPoolImpl2(this,poolName,serializer);
 		if(!doCacheing){
 			m.disableCache();
 		}
 		maps3.add(m);
 		return m;
 	}
-	public <K,V> java.util.Map<K, V> newObjectPool2(Serializer keySerializer,Serializer valueSerializer) {
+    @Deprecated
+    public <K,V> java.util.Map<K, V> newObjectPool2(Serializer keySerializer,Serializer valueSerializer) {
+        return newObjectPool2(null,keySerializer,valueSerializer);
+    }
+	public <K,V> java.util.Map<K, V> newObjectPool2(String poolName,Serializer keySerializer,Serializer valueSerializer) {
 		flushWriteQueues();
 		BTreeImpl<K,V> m=null;
-		m = new BTreeImpl<K,V>(this,keySerializer,valueSerializer);
+		m = new BTreeImpl<K,V>(this,poolName,keySerializer,valueSerializer);
 		if(!doCacheing){
 			m.disableCache();
 		}

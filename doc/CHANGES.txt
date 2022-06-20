@@ -8,6 +8,7 @@ LATEST
 - ItfWriter: add mandatory but empty tables (ili2fme#24)
 - FileLogger: enable optional timeStamp
 - Validator: add single pass option
+- ObjectPool: report file size in trace log (ilivalidator#335)
 
 iox-ili 1.21.10 (2022-04-29)
 -----------------------------

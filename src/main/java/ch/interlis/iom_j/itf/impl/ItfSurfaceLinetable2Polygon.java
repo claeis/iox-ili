@@ -143,21 +143,21 @@ public class ItfSurfaceLinetable2Polygon implements Linetable2Polygon {
 		helperTableMainTableRef=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableMainTableRef(surfaceAttr);
 		helperTableGeomAttrName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableGeomAttrName(surfaceAttr);
 		objPool=new ObjectPoolManager();
-		polygons=objPool.newObjectPoolImpl2(new PolygonSerializer());
+		polygons=objPool.newObjectPoolImpl2(this.getClass().getSimpleName(),new PolygonSerializer());
 	}
 	public ItfSurfaceLinetable2Polygon(String tableRef, String geomAttr)
 	{
 		helperTableMainTableRef=tableRef;
 		helperTableGeomAttrName=geomAttr;
 		objPool=new ObjectPoolManager();
-		polygons=objPool.newObjectPoolImpl2(new PolygonSerializer());
+		polygons=objPool.newObjectPoolImpl2(this.getClass().getSimpleName(),new PolygonSerializer());
 	}
 	public ItfSurfaceLinetable2Polygon(String tableRef, String geomAttr,double maxOverlaps,double accuracy)
 	{
 		helperTableMainTableRef=tableRef;
 		helperTableGeomAttrName=geomAttr;
 		objPool=new ObjectPoolManager();
-		polygons=objPool.newObjectPoolImpl2(new PolygonSerializer());
+		polygons=objPool.newObjectPoolImpl2(this.getClass().getSimpleName(),new PolygonSerializer());
 		this.maxOverlaps=maxOverlaps;
 		if(accuracy>0){
 			newVertexOffset=2*Math.pow(10, -accuracy);
@@ -179,7 +179,7 @@ public class ItfSurfaceLinetable2Polygon implements Linetable2Polygon {
 	public void addItfLinetableObject(IomObject iomObj)
 	{
 		if(linepool==null){
-			linepool=objPool.newObjectPoolImpl2(new IomObjectArraySerializer());
+			linepool=objPool.newObjectPoolImpl2(this.getClass().getSimpleName(),new IomObjectArraySerializer());
 		}
 		IomObject structvalue=iomObj.getattrobj(helperTableMainTableRef,0);
 		String mainTid=null;

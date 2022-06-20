@@ -11,7 +11,11 @@ public class ArrayPoolImpl<V> implements Iterable<V> {
     private long key=0;
     public ArrayPoolImpl(ObjectPoolManager objectPoolManager,Serializer<V> valueSerializer)
     {
-        impl=objectPoolManager.newObjectPool2(new LongSerializer(), valueSerializer);
+        this(objectPoolManager,null,valueSerializer);
+    }
+    public ArrayPoolImpl(ObjectPoolManager objectPoolManager,String poolName,Serializer<V> valueSerializer)
+    {
+        impl=objectPoolManager.newObjectPool2(poolName,new LongSerializer(), valueSerializer);
     }
     public void add(V value) {
         impl.put(key, value);

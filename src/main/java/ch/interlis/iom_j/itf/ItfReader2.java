@@ -304,7 +304,7 @@ public class ItfReader2 implements ch.interlis.iox.IoxReader,IoxIliReader{
 			// maintable
 			surfaceOrAreaAttr=null;
 			//mainObjs=new HashMap<String,IomObject>();
-			currentMainObjs=objPool.newObjectPoolImpl2(new IomObjectSerializer(getFactory()));
+			currentMainObjs=objPool.newObjectPoolImpl2(this.getClass().getSimpleName(),new IomObjectSerializer(getFactory()));
 			iliQName=aclass.getScopedName(null);
 			while(true){
 				  // collect objects

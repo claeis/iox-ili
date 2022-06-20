@@ -48,8 +48,8 @@ public class CompoundCurveNoder
   {
     this.segStrings = segStrings;
     this.validateOnly=validateOnly;
-    nodes=objPoolManager.newObjectPool2(new CompoundCurveSerializer(),new SortedSetIntegerSerializer());
-	nodedStrings=new FileBasedCollection<CompoundCurve>(objPoolManager,new CompoundCurveSerializer());
+    nodes=objPoolManager.newObjectPool2(this.getClass().getSimpleName(),new CompoundCurveSerializer(),new SortedSetIntegerSerializer());
+	nodedStrings=new FileBasedCollection<CompoundCurve>(objPoolManager,this.getClass().getSimpleName(),new CompoundCurveSerializer());
   }
   
   public List<Intersection> getIntersections()

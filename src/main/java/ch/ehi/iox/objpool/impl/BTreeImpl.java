@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.btree.BTree;
 import ch.ehi.iox.objpool.impl.btree.BTreeCursor;
@@ -25,6 +26,7 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 	private java.io.File outFilename=null;
 	private Serializer valueSerializer=null;
     private static int MAX_CACHE=32;
+    private String poolName=null;
     private LinkedHashMap<Long,SoftReference<V>> cache = new LinkedHashMap<Long,SoftReference<V>>(MAX_CACHE,0.75f,true){
     	@Override
     	protected boolean removeEldestEntry(Map.Entry<Long, SoftReference<V>> eldest) {
@@ -40,12 +42,17 @@ public class BTreeImpl<K,V> implements Map<K, V> {
     };
 
 	
-	public BTreeImpl( ObjectPoolManager objectPoolManager1,Serializer keySerializer,Serializer valueSerializer1)
+    public BTreeImpl( ObjectPoolManager objectPoolManager1,Serializer keySerializer,Serializer valueSerializer1) {
+        this(objectPoolManager1,null,keySerializer,valueSerializer1);
+    }
+
+	public BTreeImpl( ObjectPoolManager objectPoolManager1,String poolName,Serializer keySerializer,Serializer valueSerializer1)
 	{
 		try{
+		    this.poolName=poolName;
 			objectPoolManager=objectPoolManager1;
 			valueSerializer=valueSerializer1;
-			tree= new BTree<K, Long>( ObjectPoolManager.getCacheTmpFilename() , new JavaComparator<K>(),keySerializer,new LongSerializer());
+			tree= new BTree<K, Long>( poolName,ObjectPoolManager.getCacheTmpFilename() , new JavaComparator<K>(),keySerializer,new LongSerializer());
 			outFilename=ObjectPoolManager.getCacheTmpFilename();
 			outFile=new RandomAccessFile(outFilename, "rw");
 		}catch(IOException e){
@@ -64,6 +71,7 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 		}
 		if(outFile!=null){
 			try {
+                EhiLogger.traceState((poolName!=null?poolName:this.getClass().getSimpleName())+": size "+outFile.length()+" <"+outFilename.getPath()+">");
 				outFile.close();
 			} catch (IOException e) {
 				throw new IllegalStateException(e);

@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.impl.LongSerializer;
 import ch.ehi.iox.objpool.impl.Serializer;
 
@@ -35,6 +36,7 @@ public class BTree<Key, Value>  {
     public final static int BLOCK_SIZE=8192;
     private int pageCount=0;
     private static int MAX_CACHE=32;
+    private String poolName=null;
     private final LinkedHashMap<NodeId,Node> cache = new LinkedHashMap<NodeId,Node>(MAX_CACHE,0.75f,true){
     	@Override
     	protected boolean removeEldestEntry(Map.Entry<NodeId, Node> eldest) {
@@ -125,8 +127,14 @@ public class BTree<Key, Value>  {
      * Initializes an empty B-tree.
      */
     public BTree(java.io.File path,java.util.Comparator<Key> keyComparator,Serializer keySerializer,Serializer valueSerializer) 
+            throws java.io.IOException 
+    {
+        this(null,path,keyComparator,keySerializer,valueSerializer);
+    }
+    public BTree(String poolName,java.io.File path,java.util.Comparator<Key> keyComparator,Serializer keySerializer,Serializer valueSerializer) 
     		throws java.io.IOException 
     {
+        this.poolName=poolName;
     	this.keyComparator=keyComparator;
     	this.keySerializer=keySerializer;
     	this.valueSerializer=valueSerializer;
@@ -375,6 +383,7 @@ public class BTree<Key, Value>  {
 	}
 	public void close() throws IOException {
 		if(file!=null){
+            EhiLogger.traceState((poolName!=null?poolName:this.getClass().getSimpleName())+": size "+file.length()+" <"+fileName.getPath()+">");
 			file.close();
 			file=null;
 		}

@@ -999,7 +999,7 @@ import java.util.Map;
     		java.util.Map<String, IomObject> m=null;
     		m=pools.get(classQName);
     		if(m==null){
-        		m = recman.newObjectPool(new IomObjectSerializer());
+        		m = recman.newObjectPool(this.getClass().getSimpleName(),new IomObjectSerializer());
     			pools.put(classQName,m);
     		}
     		return m;

@@ -89,7 +89,7 @@ public class ObjectPool {
 		if(collectionOfBaskets.containsKey(currentBasketId)){
 			collectionOfObjects=collectionOfBaskets.get(currentBasketId);
 		} else {
-			collectionOfObjects=objPoolManager.newObjectPoolImpl2(new IomObjectSerializer()); // new HashMap<ObjectPoolKey, IomObject>();
+			collectionOfObjects=objPoolManager.newObjectPoolImpl2(this.getClass().getSimpleName(),new IomObjectSerializer()); // new HashMap<ObjectPoolKey, IomObject>();
 			collectionOfBaskets.put(currentBasketId, collectionOfObjects);
 			bids.add(currentBasketId);
 		}
