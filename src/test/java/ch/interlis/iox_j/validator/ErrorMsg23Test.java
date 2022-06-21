@@ -344,8 +344,8 @@ public class ErrorMsg23Test {
 
 		assertEquals(8, logger.getErrs().size());
 		assertLogContainsMessage(logger.getErrs(), "Mandatory Constraint ErrorMsgTest23.Topic.ClassH.Constraint2 is not true.");
-		assertLogContainsMessage(logger.getErrs(), "The value of the attribute Attr of ErrorMsgTest23.Topic.ClassH was not found in the condition class.");
-		assertLogContainsMessage(logger.getErrs(), "Unique is violated! Values OLOGBENS already exist in Object: o1");
+		assertLogContainsMessage(logger.getErrs(), "Existence constraint ErrorMsgTest23.Topic.ClassH.Constraint6 is violated! The value of the attribute Attr of ErrorMsgTest23.Topic.ClassH was not found in the condition class.");
+		assertLogContainsMessage(logger.getErrs(), "Unique constraint ErrorMsgTest23.Topic.ClassH.Constraint3 is violated! Values OLOGBENS already exist in Object: o1");
 		assertLogContainsMessage(logger.getErrs(), "Set Constraint ErrorMsgTest23.Topic.ClassH.Constraint1 is not true.");
 		assertLogContainsMessage(logger.getErrs(), "Plausibility Constraint ErrorMsgTest23.Topic.ClassH.Constraint4 is not true.");
 		assertLogContainsMessage(logger.getErrs(), "Plausibility Constraint ErrorMsgTest23.Topic.ClassH.Constraint5 is not true.");
@@ -403,8 +403,8 @@ public class ErrorMsg23Test {
 
 		// Asserts
 		assertLogContainsMessage(logger.getInfo(), "validate mandatory constraint ErrorMsgTest23.Topic.ClassI.ENSINEPR...");
-		assertLogContainsMessage(logger.getInfo(), "validate unique constraint ErrorMsgTest23.Topic.ClassI.UPENDESA (!!@ ilivalid.msg=\"This is the custom message for object with Attr {Attr} and unique.\" !!@ name=UPENDESA UNIQUE Attr;)...");
-		assertLogContainsMessage(logger.getInfo(), "validate existence constraint ErrorMsgTest23.Topic.ClassI.ORTERINE (EXISTENCE CONSTRAINT Attr REQUIRED IN ClassA:attrA2;)...");
+		assertLogContainsMessage(logger.getInfo(), "validate unique constraint ErrorMsgTest23.Topic.ClassI.UPENDESA...");
+		assertLogContainsMessage(logger.getInfo(), "validate existence constraint ErrorMsgTest23.Topic.ClassI.ORTERINE...");
 		assertLogContainsMessage(logger.getInfo(), "validate set constraint ErrorMsgTest23.Topic.ClassI.DOROHIGE...");
 		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassI.BROLETON...");
 		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassI.LDESCREF...");
