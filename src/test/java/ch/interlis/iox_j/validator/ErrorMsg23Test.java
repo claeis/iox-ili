@@ -2,6 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -47,6 +48,8 @@ public class ErrorMsg23Test {
 	private static final String ILI_CLASSE = "ErrorMsgTest23.Topic.ClassE";
 	private static final String ILI_CLASSF_WITH_AREA = "ErrorMsgTest23.Topic.ClassF";
 	private static final String ILI_CLASSG_WITH_AREAREAS_CONSTRAINT = "ErrorMsgTest23.Topic.ClassG";
+	private static final String ILI_CLASSH_WITH_ALL_FAILING_CONSTRAINTS = "ErrorMsgTest23.Topic.ClassH";
+	private static final String ILI_CLASSI_WITH_ALL_FAILING_CONSTRAINTS_ILIVALID_MSG = "ErrorMsgTest23.Topic.ClassI";
 	// STRUCTS
 	private static final String ILI_STRUCTB = "ErrorMsgTest23.Topic.StructB";
 	private static final String ILI_STRUCTB_POINT = "point";
@@ -214,7 +217,7 @@ public class ErrorMsg23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
 	}
-	
+
 	// Es wird getestet ob der erstellte Key, mit dem Attribute Wert: TestKey in der Fehlermeldung ausgegeben wird.
 	// zweitens wird getestet ob dieser Wert innerhalb der BenutzerID abgelegt wird.
 	@Test
@@ -327,11 +330,77 @@ public class ErrorMsg23Test {
 		assertEquals("Set Constraint ErrorMsgTest23.Topic.ClassG.Constraint1 is not true.", logger.getErrs().get(2).getEventMsg());
 	}
 
+	@Test
+	public void constraintMessage_Fail() {
+		fillAndValidateClassWithConstraints(ILI_CLASSH_WITH_ALL_FAILING_CONSTRAINTS);
+
+		// Asserts
+		assertLogContainsMessage(logger.getInfo(), "validate mandatory constraint ErrorMsgTest23.Topic.ClassH.Constraint2...");
+		assertLogContainsMessage(logger.getInfo(), "validate unique constraint ErrorMsgTest23.Topic.ClassH.Constraint3...");
+		assertLogContainsMessage(logger.getInfo(), "validate existence constraint ErrorMsgTest23.Topic.ClassH.Constraint6...");
+		assertLogContainsMessage(logger.getInfo(), "validate set constraint ErrorMsgTest23.Topic.ClassH.Constraint1...");
+		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassH.Constraint4...");
+		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassH.Constraint5...");
+
+		assertEquals(8, logger.getErrs().size());
+		assertLogContainsMessage(logger.getErrs(), "Mandatory Constraint ErrorMsgTest23.Topic.ClassH.Constraint2 is not true.");
+		assertLogContainsMessage(logger.getErrs(), "The value of the attribute Attr of ErrorMsgTest23.Topic.ClassH was not found in the condition class.");
+		assertLogContainsMessage(logger.getErrs(), "Unique is violated! Values OLOGBENS already exist in Object: o1");
+		assertLogContainsMessage(logger.getErrs(), "Set Constraint ErrorMsgTest23.Topic.ClassH.Constraint1 is not true.");
+		assertLogContainsMessage(logger.getErrs(), "Plausibility Constraint ErrorMsgTest23.Topic.ClassH.Constraint4 is not true.");
+		assertLogContainsMessage(logger.getErrs(), "Plausibility Constraint ErrorMsgTest23.Topic.ClassH.Constraint5 is not true.");
+	}
+
+	@Test
+	public void constraintMessageIlivalidMsg_Fail() {
+		modelConfig.mergeIliMetaAttrs(td);
+		fillAndValidateClassWithConstraints(ILI_CLASSI_WITH_ALL_FAILING_CONSTRAINTS_ILIVALID_MSG);
+
+		// Asserts
+		assertLogContainsMessage(logger.getInfo(), "validate mandatory constraint ErrorMsgTest23.Topic.ClassI.ENSINEPR...");
+		assertLogContainsMessage(logger.getInfo(), "validate unique constraint ErrorMsgTest23.Topic.ClassI.UPENDESA...");
+		assertLogContainsMessage(logger.getInfo(), "validate existence constraint ErrorMsgTest23.Topic.ClassI.ORTERINE...");
+		assertLogContainsMessage(logger.getInfo(), "validate set constraint ErrorMsgTest23.Topic.ClassI.DOROHIGE...");
+		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassI.BROLETON...");
+		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassI.LDESCREF...");
+
+		assertEquals(9, logger.getErrs().size());
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and mandatory constraint.");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and existence constraint.");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and unique.");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and set constraint.");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message and plausibility constraint (<=).");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message and plausibility constraint (>=).");
+	}
+
+	private void fillAndValidateClassWithConstraints(String clsssId) {
+		// attribute value is always the same that the unique constraint fails.
+		String attrValue = "OLOGBENS";
+
+		Iom_jObject object_1 = new Iom_jObject(clsssId, OID);
+		object_1.setattrvalue("Attr", attrValue);
+
+		Iom_jObject object_2 = new Iom_jObject(clsssId, OID_2);
+		object_2.setattrvalue("Attr", attrValue);
+
+		validateObjects(object_1, object_2);
+	}
+
 	private void assertErrorLogWithGeometry(String expectedMessage, double expectedC1, double expectedC2, IoxLogEvent logEvent) {
 		assertEquals(expectedMessage, logEvent.getEventMsg());
 		assertEquals((Double)expectedC1, logEvent.getGeomC1());
 		assertEquals((Double)expectedC2, logEvent.getGeomC2());
 		assertEquals((Double)Double.NaN, logEvent.getGeomC3());
+	}
+
+	private void assertLogContainsMessage(ArrayList<IoxLogEvent> logEvents, String expectedMessage) {
+		for(IoxLogEvent logEvent : logEvents) {
+			if(expectedMessage.equals(logEvent.getEventMsg())) {
+				return;
+			}
+		}
+
+		fail(String.format("Log events did not contain the expected message <%s>", expectedMessage));
 	}
 
 	private void validateObjects(IomObject... iomObjects) {
