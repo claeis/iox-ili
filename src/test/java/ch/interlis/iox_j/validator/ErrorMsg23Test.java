@@ -352,6 +352,28 @@ public class ErrorMsg23Test {
 	}
 
 	@Test
+	public void constraintMessageVerbose_Fail() {
+		settings.setValue(Validator.CONFIG_VERBOSE, ValidationConfig.TRUE);
+		fillAndValidateClassWithConstraints(ILI_CLASSH_WITH_ALL_FAILING_CONSTRAINTS);
+
+		// Asserts
+		assertLogContainsMessage(logger.getInfo(), "validate mandatory constraint ErrorMsgTest23.Topic.ClassH.Constraint2...");
+		assertLogContainsMessage(logger.getInfo(), "validate unique constraint ErrorMsgTest23.Topic.ClassH.Constraint3...");
+		assertLogContainsMessage(logger.getInfo(), "validate existence constraint ErrorMsgTest23.Topic.ClassH.Constraint6...");
+		assertLogContainsMessage(logger.getInfo(), "validate set constraint ErrorMsgTest23.Topic.ClassH.Constraint1...");
+		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassH.Constraint4...");
+		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassH.Constraint5...");
+
+		assertEquals(8, logger.getErrs().size());
+		assertLogContainsMessage(logger.getErrs(), "Mandatory Constraint ErrorMsgTest23.Topic.ClassH.Constraint2 (MANDATORY CONSTRAINT Attr <> Attr;) is not true.");
+		assertLogContainsMessage(logger.getErrs(), "Unique constraint ErrorMsgTest23.Topic.ClassH.Constraint3 (UNIQUE Attr;) is violated! Values OLOGBENS already exist in Object: o1");
+		assertLogContainsMessage(logger.getErrs(), "Existence constraint ErrorMsgTest23.Topic.ClassH.Constraint6 (EXISTENCE CONSTRAINT Attr REQUIRED IN ErrorMsgTest23.Topic.ClassA:attrA2;) is violated! The value of the attribute Attr of ErrorMsgTest23.Topic.ClassH was not found in the condition class.");
+		assertLogContainsMessage(logger.getErrs(), "Set Constraint ErrorMsgTest23.Topic.ClassH.Constraint1 (SET CONSTRAINT Attr <> Attr;) is not true.");
+		assertLogContainsMessage(logger.getErrs(), "Plausibility Constraint ErrorMsgTest23.Topic.ClassH.Constraint4 (CONSTRAINT <= 50.0% Attr == Attr;) is not true.");
+		assertLogContainsMessage(logger.getErrs(), "Plausibility Constraint ErrorMsgTest23.Topic.ClassH.Constraint5 (CONSTRAINT >= 50.0% Attr <> Attr;) is not true.");
+	}
+
+	@Test
 	public void constraintMessageIlivalidMsg_Fail() {
 		modelConfig.mergeIliMetaAttrs(td);
 		fillAndValidateClassWithConstraints(ILI_CLASSI_WITH_ALL_FAILING_CONSTRAINTS_ILIVALID_MSG);
@@ -371,6 +393,29 @@ public class ErrorMsg23Test {
 		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and set constraint.");
 		assertLogContainsMessage(logger.getErrs(), "This is the custom message and plausibility constraint (<=).");
 		assertLogContainsMessage(logger.getErrs(), "This is the custom message and plausibility constraint (>=).");
+	}
+
+	@Test
+	public void constraintMessageIlivalidMsgVerbose_Fail() {
+		settings.setValue(Validator.CONFIG_VERBOSE, ValidationConfig.TRUE);
+		modelConfig.mergeIliMetaAttrs(td);
+		fillAndValidateClassWithConstraints(ILI_CLASSI_WITH_ALL_FAILING_CONSTRAINTS_ILIVALID_MSG);
+
+		// Asserts
+		assertLogContainsMessage(logger.getInfo(), "validate mandatory constraint ErrorMsgTest23.Topic.ClassI.ENSINEPR...");
+		assertLogContainsMessage(logger.getInfo(), "validate unique constraint ErrorMsgTest23.Topic.ClassI.UPENDESA (!!@ ilivalid.msg=\"This is the custom message for object with Attr {Attr} and unique.\" !!@ name=UPENDESA UNIQUE Attr;)...");
+		assertLogContainsMessage(logger.getInfo(), "validate existence constraint ErrorMsgTest23.Topic.ClassI.ORTERINE (EXISTENCE CONSTRAINT Attr REQUIRED IN ClassA:attrA2;)...");
+		assertLogContainsMessage(logger.getInfo(), "validate set constraint ErrorMsgTest23.Topic.ClassI.DOROHIGE...");
+		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassI.BROLETON...");
+		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassI.LDESCREF...");
+
+		assertEquals(9, logger.getErrs().size());
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and mandatory constraint. ErrorMsgTest23.Topic.ClassI.ENSINEPR (MANDATORY CONSTRAINT Attr <> Attr;)");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and existence constraint. ErrorMsgTest23.Topic.ClassI.ORTERINE (EXISTENCE CONSTRAINT Attr REQUIRED IN ErrorMsgTest23.Topic.ClassA:attrA2;)");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and unique. ErrorMsgTest23.Topic.ClassI.UPENDESA (!!@ ilivalid.msg=\"This is the custom message for object with Attr OLOGBENS and unique.\" !!@ name=UPENDESA UNIQUE Attr;)");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and set constraint. ErrorMsgTest23.Topic.ClassI.DOROHIGE (SET CONSTRAINT Attr <> Attr;)");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message and plausibility constraint (<=). ErrorMsgTest23.Topic.ClassI.BROLETON (CONSTRAINT <= 50.0% Attr == Attr;)");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message and plausibility constraint (>=). ErrorMsgTest23.Topic.ClassI.LDESCREF (CONSTRAINT >= 50.0% Attr <> Attr;)");
 	}
 
 	private void fillAndValidateClassWithConstraints(String clsssId) {
