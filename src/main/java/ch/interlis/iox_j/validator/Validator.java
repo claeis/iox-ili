@@ -1122,7 +1122,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     }
                     logMsg(checkUniqueConstraint,msg);
                 } else {
-                    logMsg(checkUniqueConstraint,rsrc.getString("visitStructEle.uniqueIsViolatedValuesAlreadyExistInObject"), values.value.valuesAsString(), formatObjectId(oidOfObjectWithDuplicateValue,iomObjClass));
+                    logMsg(checkUniqueConstraint,rsrc.getString("visitStructEle.uniqueIsViolatedValuesAlreadyExistInObject"), getDisplayName(uniquenessConstraint), values.value.valuesAsString(), formatObjectId(oidOfObjectWithDuplicateValue,iomObjClass));
                 }
             }
 	        return;
@@ -2757,7 +2757,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}
 						logMsg(checkConstraint,msg);
 					} else {
-						logMsg(checkConstraint, rsrc.getString("validateExistenceConstraint.valueOfTheAttributeWasNotFoundInTheConditionClass"), restrictedAttrName.toString(), iomObj.getobjecttag().toString());
+						logMsg(checkConstraint, rsrc.getString("validateExistenceConstraint.valueOfTheAttributeWasNotFoundInTheConditionClass"), getDisplayName(existenceConstraint), restrictedAttrName.toString(), iomObj.getobjecttag().toString());
 					}
 				}
 			}
