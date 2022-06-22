@@ -11,9 +11,12 @@ public class FileBasedCollection<E> implements List<E> {
 	private int size=0;
 	private ObjectPoolManager recman=null;
 	private ObjPoolImpl2 pool=null;
-	public FileBasedCollection(ObjectPoolManager objectPoolManager,Serializer<E> serializer) {
+    public FileBasedCollection(ObjectPoolManager objectPoolManager,Serializer<E> serializer) {
+        this(objectPoolManager,null,serializer);
+    }
+	public FileBasedCollection(ObjectPoolManager objectPoolManager,String poolName,Serializer<E> serializer) {
 		recman=objectPoolManager;
-		pool=(ObjPoolImpl2) recman.newObjectPoolImpl2(serializer);
+		pool=(ObjPoolImpl2) recman.newObjectPoolImpl2(poolName,serializer);
 	}
 
 	@Override

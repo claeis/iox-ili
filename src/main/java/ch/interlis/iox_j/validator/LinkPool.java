@@ -13,7 +13,7 @@ public class LinkPool {
 	Map<LinkPoolKey, Long> collectionOfReferenceObj = null;;
 	
 	public LinkPool(ObjectPoolManager objPoolManager) {
-	    collectionOfReferenceObj=objPoolManager.newObjectPool2(new LinkPoolKeySerializer(), new LongSerializer());
+	    collectionOfReferenceObj=objPoolManager.newObjectPool2(this.getClass().getSimpleName(),new LinkPoolKeySerializer(), new LongSerializer());
     }
 
     // returns the number of referenced objects consisting of OID and role-name.

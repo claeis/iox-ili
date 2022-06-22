@@ -323,7 +323,7 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 		java.util.Map<String, IomObject> m=null;
 		m=pools.get(classQName);
 		if(m==null){
-    		m = recman.newObjectPool(new IomObjectSerializer());
+    		m = recman.newObjectPool(this.getClass().getSimpleName(),new IomObjectSerializer());
 			pools.put(classQName,m);
 		}
 		return m;

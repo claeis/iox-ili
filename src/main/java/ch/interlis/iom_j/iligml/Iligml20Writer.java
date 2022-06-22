@@ -290,7 +290,7 @@ import java.util.Map;
         private void writeStartBasket(String type,String bid,int consistency, int kind,String startstate,String endstate, String[] topicv)
 		throws IoxException
         {
-        	pool=recman.newObjectPool(new IomObjectSerializer());
+        	pool=recman.newObjectPool(this.getClass().getSimpleName(),new IomObjectSerializer());
         	fixrefs=new HashMap<String,FixRefs>();
         	currentTopic=type;
 			try{

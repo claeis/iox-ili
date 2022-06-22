@@ -136,8 +136,8 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 	public void addItfLinetableObject(IomObject iomObj)
 	{
 		if(lines==null){
-			lines=objPool.newObjectPoolImpl2(new IomObjectSerializer());
-            lineattrs=objPool.newObjectPoolImpl2(new IomObjectSerializer());
+			lines=objPool.newObjectPoolImpl2(this.getClass().getSimpleName(),new IomObjectSerializer());
+            lineattrs=objPool.newObjectPoolImpl2(this.getClass().getSimpleName(),new IomObjectSerializer());
 		}
 		IomObject polyline=iomObj.getattrobj(helperTableGeomAttrName, 0);
 		if(polyline==null){
@@ -259,7 +259,7 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 			IoxPolygonizer polygonizer=new IoxPolygonizer(newVertexOffset);
 			//for(CompoundCurve boundary:segv){
 			if(keepLinetables) {
-	            lines=objPool.newObjectPoolImpl2(new IomObjectSerializer());
+	            lines=objPool.newObjectPoolImpl2(this.getClass().getSimpleName(),new IomObjectSerializer());
 			}
             try {
                 HashMap<String,Integer> tidCount=new HashMap<String,Integer>();

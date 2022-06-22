@@ -41,7 +41,7 @@ public class ItfAreaPolygon2Linetable {
 	private ObjectPoolManager recman=null;
 	private String iliqname=null;
 	public ItfAreaPolygon2Linetable(String iliqname1, ObjectPoolManager recman1){
-		lines=new FileBasedCollection<CompoundCurve>(recman1,new CompoundCurveSerializer());
+		lines=new FileBasedCollection<CompoundCurve>(recman1,this.getClass().getSimpleName(),new CompoundCurveSerializer());
 		polygons=new java.util.ArrayList<Polygon>();
 		recman=recman1;
 		iliqname=iliqname1;
@@ -176,7 +176,7 @@ public class ItfAreaPolygon2Linetable {
 			dissolver.dissolve(lines);
 			lines=dissolver.getDissolved();
 			//ioxlines=new ArrayList<IomObject>();
-			ioxlines=new FileBasedCollection<IomObject>(recman,new IomObjectSerializer());
+			ioxlines=new FileBasedCollection<IomObject>(recman,this.getClass().getSimpleName(),new IomObjectSerializer());
 			for(CompoundCurve line:lines){
 				IomObject ioxline;
 				try {
