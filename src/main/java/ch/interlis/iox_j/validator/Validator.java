@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import ch.interlis.iox_j.statistics.Stopwatch;
 import com.vividsolutions.jts.geom.Coordinate;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
@@ -192,8 +191,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private long objectCount=0l;
     private long structCount=0l;
     
-	private Stopwatch stopwatch = new Stopwatch();
-
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
 			IoxLogging errs, LogEventFactory errFact, Settings config) {
@@ -350,8 +347,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		if (event instanceof ch.interlis.iox.StartTransferEvent){
 			errs.addEvent(errFact.logInfoMsg(rsrc.getString("validate.firstValidationPass")));
-			stopwatch.Reset();
-			stopwatch.Start();
 			validateInconsistentIliAndXMLVersion(event);
 			uniquenessOfBid.clear();
 			uniquenessOfBid.putAll(stableBids);
@@ -380,8 +375,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	            String[] additionalModelv = additionalModels.split(";");
 	            iterateThroughAdditionalModels(additionalModelv);
 	        }
-			stopwatch.Stop();
-			errs.addEvent(errFact.logInfoMsg(rsrc.getString("validate.firstValidationPassCompleted"), stopwatch.toString()));
 			if(autoSecondPass){
 				doSecondPass();
 			}
@@ -557,13 +550,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     public void doSecondPass() {
         if(!singlePass) {
             errs.addEvent(errFact.logInfoMsg(rsrc.getString("doSecondPass.secondValidationPass")));
-			stopwatch.Reset();
-			stopwatch.Start();
             iterateThroughAllObjects();
             validateAllAreas();
             validatePlausibilityConstraints();
-			stopwatch.Stop();
-			errs.addEvent(errFact.logInfoMsg(rsrc.getString("doSecondPass.secondValidationPassComplete"), stopwatch.toString()));
         }
 	}
 	
