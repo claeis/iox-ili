@@ -76,25 +76,13 @@ public class LogEventFactory {
 		this.coordZ=c3;
 	}
 	public IoxLogEvent logErrorMsg(String msg,String... args){
-		String eventId="codeInternal";
-		if(dataObj!=null){
-			return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessage(msg,dataObj,args),null,dataObj.getobjectline(),dataObj.getobjecttag(),getObjectTechId(dataObj),getObjectUsrId(dataObj),dataObj.getobjectoid(),null,coordX,coordY,coordZ,getCallerOrigin());
-		}
-		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessage(msg,null,args),null,null,iliqname,null,null,tid,null,coordX,coordY,coordZ,getCallerOrigin());
+		return logMsg(IoxLogEvent.ERROR, "codeInternal", null, coordX, coordY, coordZ, msg, args);
 	}
 	public IoxLogEvent logErrorMsg(Throwable ex,String msg,String... args){
-		String eventId="codeInternal";
-		if(dataObj!=null){
-			return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessage(msg,dataObj,args),ex,dataObj.getobjectline(),dataObj.getobjecttag(),getObjectTechId(dataObj),getObjectUsrId(dataObj),dataObj.getobjectoid(),null,coordX,coordY,coordZ,getCallerOrigin());
-		}
-		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessage(msg,null,args),ex,null,iliqname,null,null,tid,null,coordX,coordY,coordZ,getCallerOrigin());
+		return logMsg(IoxLogEvent.ERROR, "codeInternal", ex, coordX, coordY, coordZ, msg, args);
 	}
 	public IoxLogEvent logWarningMsg(String msg,String... args){
-		String eventId="codeInternal";
-		if(dataObj!=null){
-			return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.WARNING,formatMessage(msg,dataObj,args),null,dataObj.getobjectline(),dataObj.getobjecttag(),getObjectTechId(dataObj),getObjectUsrId(dataObj),dataObj.getobjectoid(),null,coordX,coordY,coordZ,getCallerOrigin());
-		}
-		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.WARNING,formatMessage(msg,null,args),null,null,iliqname,null,null,tid,null,coordX,coordY,coordZ,getCallerOrigin());
+		return logMsg(IoxLogEvent.WARNING, "codeInternal", null, coordX, coordY, coordZ, msg, args);
 	}
 	public IoxLogEvent logInfoMsg(String msg,String... args){
 		String eventId="codeInternal";
@@ -105,10 +93,7 @@ public class LogEventFactory {
 		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.DETAIL_INFO,formatMessage(msg,null,args),null,null,null,null,null,null,null,null,null,null,getCallerOrigin());
 	}
 	public IoxLogEvent logErrorById(String eventId,String... args){
-		if(dataObj!=null){
-			return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessageId(eventId,dataObj,args),null,dataObj.getobjectline(),dataObj.getobjecttag(),getObjectTechId(dataObj),getObjectUsrId(dataObj),dataObj.getobjectoid(),null,coordX,coordY,coordZ,getCallerOrigin());
-		}
-		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.ERROR,formatMessageId(eventId,null,args),null,null,iliqname,null,null,tid,null,coordX,coordY,coordZ,getCallerOrigin());
+		return logMsg(IoxLogEvent.ERROR, eventId, null, coordX, coordY, coordZ, eventId, args);
 	}
 	public IoxLogEvent logError(IoxInvalidDataException ex) {
 		return logError(IoxLogEvent.ERROR,ex);
@@ -145,6 +130,12 @@ public class LogEventFactory {
 		String iliqName=ex.getIliqname();
 		
 		return new LogEventImpl(dataSource,new Date(),eventId,eventKind,msg,ex.getCause(),lineNumber,iliqName,null,null,tid,null,coordX,coordY,coordZ,getCallerOrigin());
+	}
+	private IoxLogEvent logMsg(int eventKind, String eventId, Throwable ex, Double coordX, Double coordY, Double coordZ, String msg, String... args) {
+		if (dataObj != null) {
+			return new LogEventImpl(dataSource, new Date(), eventId, eventKind, formatMessage(msg, dataObj, args), ex, dataObj.getobjectline(), dataObj.getobjecttag(), getObjectTechId(dataObj), getObjectUsrId(dataObj), dataObj.getobjectoid(), null, coordX, coordY, coordZ, getCallerOrigin());
+		}
+		return new LogEventImpl(dataSource, new Date(), eventId, eventKind, formatMessage(msg, null, args), ex, null, iliqname, null, null, tid, null, coordX, coordY, coordZ, getCallerOrigin());
 	}
 	private String getObjectUsrId(IomObject iomObj) {
 		String keymsg=null;
