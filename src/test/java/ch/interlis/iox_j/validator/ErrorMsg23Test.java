@@ -353,7 +353,7 @@ public class ErrorMsg23Test {
 
 	@Test
 	public void constraintMessageVerbose_Fail() {
-		settings.setValue(Validator.CONFIG_VERBOSE, ValidationConfig.TRUE);
+		settings.setTransientValue(Validator.CONFIG_VERBOSE, ValidationConfig.TRUE);
 		fillAndValidateClassWithConstraints(ILI_CLASSH_WITH_ALL_FAILING_CONSTRAINTS);
 
 		// Asserts
@@ -397,7 +397,7 @@ public class ErrorMsg23Test {
 
 	@Test
 	public void constraintMessageIlivalidMsgVerbose_Fail() {
-		settings.setValue(Validator.CONFIG_VERBOSE, ValidationConfig.TRUE);
+		settings.setTransientValue(Validator.CONFIG_VERBOSE, ValidationConfig.TRUE);
 		modelConfig.mergeIliMetaAttrs(td);
 		fillAndValidateClassWithConstraints(ILI_CLASSI_WITH_ALL_FAILING_CONSTRAINTS_ILIVALID_MSG);
 

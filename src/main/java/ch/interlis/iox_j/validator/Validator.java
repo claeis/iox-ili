@@ -175,6 +175,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String currentMainOid=null;
 	private boolean autoSecondPass=true;
 	private boolean allObjectsAccessible=false;
+	private boolean isVerbose = false;
 	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
 	private Map<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	private List<ExternalObjectResolver> extObjResolvers=null; // java class that implements ExternalObjectResolver
@@ -245,6 +246,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         this.singlePass = CONFIG_DO_SINGLE_PASS_DO.equals(settings.getValue(CONFIG_DO_SINGLE_PASS));
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(settings.getValue(CONFIG_DO_ITF_LINETABLES));
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(settings.getValue(CONFIG_DO_ITF_OIDPERTABLE));
+		this.isVerbose = ValidationConfig.TRUE.equals(settings.getTransientValue(CONFIG_VERBOSE));
 		allObjectsAccessible=ValidationConfig.TRUE.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE));
 		if(!allObjectsAccessible){
 			errs.addEvent(errFact.logInfoMsg("assume unknown external objects"));
@@ -694,7 +696,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		String scopedContainerName = cnstr.getContainer().getScopedName(null);
 		String constraintName = cnstr.getName();
 
-		if (ValidationConfig.TRUE.equals(settings.getValue(CONFIG_VERBOSE))) {
+		if (isVerbose) {
 			return String.format("%s.%s (%s)", scopedContainerName, constraintName, getConditionString(cnstr));
 		} else {
 			return String.format("%s.%s", scopedContainerName, constraintName);
@@ -1023,7 +1025,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         msg=validationConfig.getConfigValue(getScopedName(constraintEntry.getKey()), ValidationConfig.MSG);
                     }
 
-					if (msg != null && ValidationConfig.TRUE.equals(settings.getValue(CONFIG_VERBOSE))) {
+					if (msg != null && isVerbose) {
 						msg = String.format("%s %s", msg, getDisplayName(constraint));
 					}
 
@@ -1117,7 +1119,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     msg=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.MSG);
                 }
                 if(msg!=null && msg.length()>0){
-                    if (ValidationConfig.TRUE.equals(settings.getValue(CONFIG_VERBOSE))) {
+                    if (isVerbose) {
                         msg = String.format("%s %s", msg, getDisplayName(uniquenessConstraint));
                     }
                     logMsg(checkUniqueConstraint,msg);
@@ -1270,7 +1272,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             msg=validationConfig.getConfigValue(getScopedName(setConstraint), ValidationConfig.MSG);
                         }
                         if(msg!=null && msg.length()>0){
-                            if (ValidationConfig.TRUE.equals(settings.getValue(CONFIG_VERBOSE))) {
+                            if (isVerbose) {
                                 msg = String.format("%s %s", msg, getDisplayName(setConstraint));
                             }
                             logMsg(checkConstraint,msg);
@@ -1319,7 +1321,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						        msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
 						    }
 							if(msg!=null && msg.length()>0){
-								if (ValidationConfig.TRUE.equals(settings.getValue(CONFIG_VERBOSE))) {
+								if (isVerbose) {
 									msg = String.format("%s %s", msg, getDisplayName(mandatoryConstraintObj));
 								}
 								logMsg(checkConstraint,msg);
@@ -2752,7 +2754,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
                     }
 					if(msg!=null && msg.length()>0){
-						if (ValidationConfig.TRUE.equals(settings.getValue(CONFIG_VERBOSE))) {
+						if (isVerbose) {
 							msg = String.format("%s %s", msg, getDisplayName(existenceConstraint));
 						}
 						logMsg(checkConstraint,msg);
