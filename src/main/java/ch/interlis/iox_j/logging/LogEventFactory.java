@@ -7,8 +7,10 @@ import ch.interlis.iom.IomObject;
 import ch.interlis.iox.IoxLogEvent;
 import ch.interlis.iox.IoxLogging;
 import ch.interlis.iox.IoxValidationConfig;
+import ch.interlis.iox_j.IoxIntersectionException;
 import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.validator.ValidationConfig;
+import com.vividsolutions.jts.geom.Coordinate;
 
 public class LogEventFactory {
 	private String dataSource=null;
@@ -136,6 +138,24 @@ public class LogEventFactory {
 			return new LogEventImpl(dataSource, new Date(), eventId, eventKind, formatMessage(msg, dataObj, args), ex, dataObj.getobjectline(), dataObj.getobjecttag(), getObjectTechId(dataObj), getObjectUsrId(dataObj), dataObj.getobjectoid(), null, coordX, coordY, coordZ, getCallerOrigin());
 		}
 		return new LogEventImpl(dataSource, new Date(), eventId, eventKind, formatMessage(msg, null, args), ex, null, iliqname, null, null, tid, null, coordX, coordY, coordZ, getCallerOrigin());
+	}
+	public IoxLogEvent logErrorMsg(IoxIntersectionException intersectionException) {
+		return logError(IoxLogEvent.ERROR, intersectionException);
+	}
+	public IoxLogEvent logWarningMsg(IoxIntersectionException intersectionException) {
+		return logError(IoxLogEvent.WARNING, intersectionException);
+	}
+	private IoxLogEvent logError(int eventKind, IoxIntersectionException intersectionException) {
+		Double coordX = null;
+		Double coordY = null;
+		Double coordZ = null;
+		Coordinate[] pt = intersectionException.getIntersection().getPt();
+		if (pt != null && pt.length > 0) {
+			coordX = pt[0].x;
+			coordY = pt[0].y;
+			coordZ = pt[0].z;
+		}
+		return logMsg(eventKind,"codeInternal", null, coordX, coordY, coordZ, intersectionException.getIntersection().toShortString());
 	}
 	private String getObjectUsrId(IomObject iomObj) {
 		String keymsg=null;

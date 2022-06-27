@@ -4289,12 +4289,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	private void logMsg(String validateKind, IoxIntersectionException intersectionException) {
-		Coordinate[] pt = intersectionException.getIntersection().getPt();
-		if (pt != null && pt.length > 0) {
-			errFact.setDefaultCoord(pt[0].x, pt[0].y, pt[0].z);
+		if(ValidationConfig.OFF.equals(validateKind)){
+			// skip it
+		}else if(ValidationConfig.WARNING.equals(validateKind)){
+			errs.addEvent(errFact.logWarningMsg(intersectionException));
+		}else{
+			errs.addEvent(errFact.logErrorMsg(intersectionException));
 		}
-		logMsg(validateKind, intersectionException.getIntersection().toShortString());
-		errFact.setDefaultCoord(null, null, null);
 	}
 		
 	private void validateItfLineTableObject(IomObject iomObj, AttributeDef modelele) {
