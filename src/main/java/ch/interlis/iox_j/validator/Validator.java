@@ -2,6 +2,7 @@ package ch.interlis.iox_j.validator;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import ch.interlis.ili2c.generator.Interlis2Generator;
 import com.vividsolutions.jts.geom.Coordinate;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
@@ -145,6 +147,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public static final String CONFIG_CUSTOM_FUNCTIONS="ch.interlis.iox_j.validator.customFunctions";
 	public static final String CONFIG_OBJECT_RESOLVERS="ch.interlis.iox_j.validator.objectResolvers";
     public static final String CONFIG_DEBUG_XTFOUT = "ch.interlis.iox_j.validator.debugXtfOutput";
+	public static final String CONFIG_VERBOSE = "ch.interlis.iox_j.validator.verbose";
 	// the object count result as value in map with the appropriate function as key.
 	private Map<Evaluable, Value> functions=new HashMap<Evaluable, Value>();
 	private ObjectPoolManager objPoolManager=null;
@@ -175,6 +178,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String currentMainOid=null;
 	private boolean autoSecondPass=true;
 	private boolean allObjectsAccessible=false;
+	private boolean isVerbose = false;
 	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
 	private Map<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	private List<ExternalObjectResolver> extObjResolvers=null; // java class that implements ExternalObjectResolver
@@ -245,6 +249,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         this.singlePass = CONFIG_DO_SINGLE_PASS_DO.equals(settings.getValue(CONFIG_DO_SINGLE_PASS));
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(settings.getValue(CONFIG_DO_ITF_LINETABLES));
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(settings.getValue(CONFIG_DO_ITF_OIDPERTABLE));
+		this.isVerbose = ValidationConfig.TRUE.equals(settings.getTransientValue(CONFIG_VERBOSE));
 		allObjectsAccessible=ValidationConfig.TRUE.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE));
         if(singlePass){
             errs.addEvent(errFact.logInfoMsg("do single pass validation"));
@@ -689,7 +694,30 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String getScopedName(Viewable viewable) {
 		return viewable.getContainer().getScopedName(null)+"."+viewable.getName();
 	}
-	
+
+	/**
+	 * Get the string that represents/identifies the specified constraint in log messages.
+	 */
+	private String getDisplayName(Constraint cnstr) {
+		String scopedContainerName = cnstr.getContainer().getScopedName(null);
+		String constraintName = cnstr.getName();
+
+		if (isVerbose) {
+			return String.format("%s.%s (%s)", scopedContainerName, constraintName, getConditionString(cnstr));
+		} else {
+			return String.format("%s.%s", scopedContainerName, constraintName);
+		}
+	}
+
+	private String getConditionString(Constraint constraint) {
+		StringWriter stringWriter = new StringWriter();
+		Interlis2Generator generator = Interlis2Generator.generateElements(stringWriter, td);
+		generator.printConstraint(constraint, true);
+		String constraintDefinition = stringWriter.toString();
+
+		return constraintDefinition.replaceAll("\\s+", " ").trim();
+	}
+
 	private boolean isBasketSame(String bidOfTargetObject, IomObject iomObj){
 		if(iomObj==null){
 			return false;
@@ -1002,6 +1030,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     if (msg == null) {
                         msg=validationConfig.getConfigValue(getScopedName(constraintEntry.getKey()), ValidationConfig.MSG);
                     }
+
+					if (msg != null && isVerbose) {
+						msg = String.format("%s %s", msg, getDisplayName(constraint));
+					}
+
 					if(constraintEntry.getKey().getDirection()==0){ // >=
 						if(((constraintEntry.getValue().getSuccessfulResults()/constraintEntry.getValue().getTotalSumOfConstraints())*100) >= constraintEntry.getKey().getPercentage()){
 							// ok
@@ -1009,7 +1042,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							if(msg!=null && msg.length()>0){
 								logMsg(checkConstraint,msg);
 							} else {
-								logMsg(checkConstraint, rsrc.getString("validatePlausibilityConstraints.plausibilityConstraintIsNotTrue"), getScopedName(constraintEntry.getKey()));
+								logMsg(checkConstraint, rsrc.getString("validatePlausibilityConstraints.plausibilityConstraintIsNotTrue"), getDisplayName(constraintEntry.getKey()));
 							}
 						}
 					} else if(constraintEntry.getKey().getDirection()==1){ // <=
@@ -1019,7 +1052,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							if(msg!=null && msg.length()>0){
 								logMsg(checkConstraint,msg);
 							} else {
-								logMsg(checkConstraint,rsrc.getString("validatePlausibilityConstraints.plausibilityConstraintIsNotTrue"), getScopedName(constraintEntry.getKey()));
+								logMsg(checkConstraint,rsrc.getString("validatePlausibilityConstraints.plausibilityConstraintIsNotTrue"), getDisplayName(constraintEntry.getKey()));
 							}
 						}
 					}
@@ -1092,9 +1125,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     msg=validationConfig.getConfigValue(getScopedName(uniquenessConstraint), ValidationConfig.MSG);
                 }
                 if(msg!=null && msg.length()>0){
+                    if (isVerbose) {
+                        msg = String.format("%s %s", msg, getDisplayName(uniquenessConstraint));
+                    }
                     logMsg(checkUniqueConstraint,msg);
                 } else {
-                    logMsg(checkUniqueConstraint,rsrc.getString("visitStructEle.uniqueIsViolatedValuesAlreadyExistInObject"), values.value.valuesAsString(), formatObjectId(oidOfObjectWithDuplicateValue,iomObjClass));
+                    logMsg(checkUniqueConstraint,rsrc.getString("visitStructEle.uniqueIsViolatedValuesAlreadyExistInObject"), getDisplayName(uniquenessConstraint), values.value.valuesAsString(), formatObjectId(oidOfObjectWithDuplicateValue,iomObjClass));
                 }
             }
 	        return;
@@ -1242,11 +1278,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             msg=validationConfig.getConfigValue(getScopedName(setConstraint), ValidationConfig.MSG);
                         }
                         if(msg!=null && msg.length()>0){
+                            if (isVerbose) {
+                                msg = String.format("%s %s", msg, getDisplayName(setConstraint));
+                            }
                             logMsg(checkConstraint,msg);
                         } else {
                             if(!setConstraintOufputReduction.contains(setConstraint+":"+constraintName)){
                                 setConstraintOufputReduction.add(setConstraint+":"+constraintName);
-                                logMsg(checkConstraint,rsrc.getString("validateSetConstraint.setConstraintIsNotTrue"), constraintName);
+                                logMsg(checkConstraint,rsrc.getString("validateSetConstraint.setConstraintIsNotTrue"), getDisplayName(setConstraint));
                             }
                         }
                     }
@@ -1288,9 +1327,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						        msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
 						    }
 							if(msg!=null && msg.length()>0){
+								if (isVerbose) {
+									msg = String.format("%s %s", msg, getDisplayName(mandatoryConstraintObj));
+								}
 								logMsg(checkConstraint,msg);
 							} else {
-								logMsg(checkConstraint,rsrc.getString("validateMandatoryConstraint.mandatoryConstraintIsNotTrue"), constraintName);
+								logMsg(checkConstraint,rsrc.getString("validateMandatoryConstraint.mandatoryConstraintIsNotTrue"), getDisplayName(mandatoryConstraintObj));
 							}
 						}
 					}
@@ -2718,9 +2760,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
                     }
 					if(msg!=null && msg.length()>0){
+						if (isVerbose) {
+							msg = String.format("%s %s", msg, getDisplayName(existenceConstraint));
+						}
 						logMsg(checkConstraint,msg);
 					} else {
-						logMsg(checkConstraint, rsrc.getString("validateExistenceConstraint.valueOfTheAttributeWasNotFoundInTheConditionClass"), restrictedAttrName.toString(), iomObj.getobjecttag().toString());
+						logMsg(checkConstraint, rsrc.getString("validateExistenceConstraint.valueOfTheAttributeWasNotFoundInTheConditionClass"), getDisplayName(existenceConstraint), restrictedAttrName.toString(), iomObj.getobjecttag().toString());
 					}
 				}
 			}

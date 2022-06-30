@@ -482,6 +482,7 @@ public class AreAreas23Test {
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
         Settings settings = new Settings();
+        settings.setValue(Validator.CONFIG_DEBUG_XTFOUT, "build/areAreas.xtf");
         Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
         validator.validate(new StartTransferEvent());
         validator.validate(new StartBasketEvent(TOPIC, BID));
@@ -489,6 +490,7 @@ public class AreAreas23Test {
         validator.validate(new ObjectEvent(classD2));
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
+        validator.close();
         // Asserts.
         assertEquals(1, logger.getErrs().size());
         assertEquals("Mandatory Constraint AreAreas23.Topic.ClassD2.Constraint1 is not true.",

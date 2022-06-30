@@ -173,7 +173,7 @@ public class UniqueConstraints10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Anna already exist in Object: o1",logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints10.Topic.TableA.Constraint1 is violated! Values Anna already exist in Object: o1",logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die Referenz auf ein bereits existierendes unique Attribute verweist.
@@ -205,7 +205,7 @@ public class UniqueConstraints10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("Unique is violated! Values o1 already exist in Object: o3",logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints10.Topic.TableB.Constraint1 is violated! Values o1 already exist in Object: o3",logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
 	public void ref_Ok(){
