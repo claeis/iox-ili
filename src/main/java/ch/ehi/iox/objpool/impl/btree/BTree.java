@@ -348,15 +348,24 @@ public class BTree<Key, Value>  {
         outFile.read(bytes);
         return LongSerializer.bytesToInteger(bytes, 0);
     }
+    private long maxKeySize=0L;
+    private long minKeySize=0L;
+    private long maxValueSize=0L;
+    private long minValueSize=0L;
+    
 	public void serialzeKey(ByteArrayOutputStream outFile, Key key) throws IOException {
         byte[] bytes=keySerializer.getBytes(key);
         writeInt(outFile, bytes.length);
         outFile.write(bytes);
+        maxKeySize=Math.max(maxKeySize,bytes.length);
+        minKeySize=Math.min(minKeySize,bytes.length);
 	}
 	public void serialzeValue(ByteArrayOutputStream outFile, Value val) throws IOException {
         byte[] bytes=valueSerializer.getBytes(val);
         writeInt(outFile, bytes.length);
         outFile.write(bytes);
+        maxValueSize=Math.max(maxValueSize,bytes.length);
+        minValueSize=Math.min(minValueSize,bytes.length);
 	}
 	public Key deserialzeKey(ByteArrayInputStream outFile) throws IOException {
         int size=readInt(outFile);
@@ -383,7 +392,10 @@ public class BTree<Key, Value>  {
 	}
 	public void close() throws IOException {
 		if(file!=null){
-            EhiLogger.traceState((poolName!=null?poolName:this.getClass().getSimpleName())+": size "+file.length()+" <"+fileName.getPath()+">");
+		    String tag=(poolName!=null?poolName:this.getClass().getSimpleName());
+            EhiLogger.traceState(tag+": size "+size()+", filesize "+file.length()+" <"+fileName.getPath()+">");
+            EhiLogger.traceState(tag+": keySize "+minKeySize+", "+maxKeySize);
+            EhiLogger.traceState(tag+": valueSize "+minValueSize+", "+maxValueSize);
 			file.close();
 			file=null;
 		}

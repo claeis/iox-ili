@@ -1,6 +1,7 @@
 package ch.interlis.iox_j.validator;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,6 +20,8 @@ import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.ehi.basics.types.OutParam;
 import ch.ehi.iox.objpool.ObjectPoolManager;
+import ch.ehi.iox.objpool.impl.IomObjectSerializer;
+import ch.ehi.iox.objpool.impl.LongSerializer;
 import ch.interlis.ili2c.Ili2cException;
 import ch.interlis.ili2c.gui.UserSettings;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
@@ -243,6 +246,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		this.doItfLineTables = CONFIG_DO_ITF_LINETABLES_DO.equals(settings.getValue(CONFIG_DO_ITF_LINETABLES));
 		this.doItfOidPerTable = CONFIG_DO_ITF_OIDPERTABLE_DO.equals(settings.getValue(CONFIG_DO_ITF_OIDPERTABLE));
 		allObjectsAccessible=ValidationConfig.TRUE.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE));
+        if(singlePass){
+            errs.addEvent(errFact.logInfoMsg("do single pass validation"));
+        }
 		if(!allObjectsAccessible){
 			errs.addEvent(errFact.logInfoMsg("assume unknown external objects"));
 		}
@@ -3253,11 +3259,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     if (refoid != null) {
                         if(!singlePass) {
                             linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
+                            }
                         }
                     }
 				}
 			 }
-		}
 		
 		if(isObject){
 			if(addToPool){
@@ -3268,9 +3274,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						Viewable aclass= (Viewable) tag2class.get(duplicateObj.getobjecttag());
 						errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.oidXOfObjectYAlreadyExistsInZ"), currentMainOid, iomObj.getobjecttag(), aclass.getScopedName()));
 					}
+                    }
 				}
 			}
-		}
 		
 		// validate if no superfluous properties
 		int propc=iomObj.getattrcount();

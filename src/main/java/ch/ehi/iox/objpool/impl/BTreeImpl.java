@@ -40,6 +40,8 @@ public class BTreeImpl<K,V> implements Map<K, V> {
         }
 
     };
+    private long maxValueSize=0L;
+    private long minValueSize=0L;
 
 	
     public BTreeImpl( ObjectPoolManager objectPoolManager1,Serializer keySerializer,Serializer valueSerializer1) {
@@ -52,7 +54,7 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 		    this.poolName=poolName;
 			objectPoolManager=objectPoolManager1;
 			valueSerializer=valueSerializer1;
-			tree= new BTree<K, Long>( poolName,ObjectPoolManager.getCacheTmpFilename() , new JavaComparator<K>(),keySerializer,new LongSerializer());
+			tree= new BTree<K, Long>( poolName==null?null:poolName+" KEY",ObjectPoolManager.getCacheTmpFilename() , new JavaComparator<K>(),keySerializer,new LongSerializer());
 			outFilename=ObjectPoolManager.getCacheTmpFilename();
 			outFile=new RandomAccessFile(outFilename, "rw");
 		}catch(IOException e){
@@ -71,7 +73,9 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 		}
 		if(outFile!=null){
 			try {
-                EhiLogger.traceState((poolName!=null?poolName:this.getClass().getSimpleName())+": size "+outFile.length()+" <"+outFilename.getPath()+">");
+			    String tag=(poolName!=null?poolName:this.getClass().getSimpleName())+" VAL";
+                EhiLogger.traceState(tag+": size "+outFile.length()+" <"+outFilename.getPath()+">");
+                EhiLogger.traceState(tag+": valueSize "+minValueSize+", "+maxValueSize);
 				outFile.close();
 			} catch (IOException e) {
 				throw new IllegalStateException(e);
@@ -148,6 +152,8 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 	private void writeValue(long pos, V value) throws IOException {
 		outFile.seek(pos);
 		byte[] bytes=valueSerializer.getBytes(value);
+		maxValueSize=Math.max(maxValueSize,bytes.length);
+        minValueSize=Math.min(minValueSize,bytes.length);
 		outFile.writeInt(bytes.length);
 		outFile.write(bytes);
 	}
