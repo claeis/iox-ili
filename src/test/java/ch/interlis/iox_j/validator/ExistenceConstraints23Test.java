@@ -1127,7 +1127,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23.Topic.ClassA.Constraint1 is violated! The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn das Attr5 der KlasseA ueber die
@@ -1154,7 +1154,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassAp was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23.Topic.ClassA.Constraint1 is violated! The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassAp was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute, welche in 2 unterschiedlichen Model sich befinden nicht uebereinstimmen.
@@ -1180,7 +1180,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23.Topic.ClassB.Constraint1 is violated! The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht uebereinstimmen.
@@ -1204,7 +1204,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23.Topic.ClassA.Constraint1 is violated! The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Condition Attributes welche ueber eine weitere Klasse extended wird, mit dem Attribute in ClassA uebereinstimmt.
@@ -1228,7 +1228,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23.Topic.ClassA.Constraint1 is violated! The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 1d Coord constraint Attribute nicht uebereinstimmen.
@@ -1255,7 +1255,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord1d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23Coords.Topic.ClassCoord1d.Constraint1 is violated! The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord1d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Coords constraint Attribute nicht uebereinstimmen. 
@@ -1284,7 +1284,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23Coords.Topic.ClassCoord2d.Constraint1 is violated! The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Coord constraint Attribute nicht uebereinstimmen.
@@ -1315,7 +1315,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23Coords.Topic.ClassCoord3d.Constraint1 is violated! The value of the attribute attr1 of ExistenceConstraints23Coords.Topic.ClassCoord3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline constraint Attribute nicht uebereinstimmen.
@@ -1356,7 +1356,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute straights2d of ExistenceConstraints23Coords.Topic.ClassLine2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23Coords.Topic.ClassLine2d.Constraint1 is violated! The value of the attribute straights2d of ExistenceConstraints23Coords.Topic.ClassLine2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline constraint Attribute nicht uebereinstimmen.
@@ -1401,7 +1401,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute straights3d of ExistenceConstraints23Coords.Topic.ClassLine3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23Coords.Topic.ClassLine3d.Constraint1 is violated! The value of the attribute straights3d of ExistenceConstraints23Coords.Topic.ClassLine3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline mit Arcs constraint Attributes nicht uebereinstimmen.
@@ -1444,7 +1444,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute arcs2d of ExistenceConstraints23Coords.Topic.ClassLine2dArcs was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23Coords.Topic.ClassLine2dArcs.Constraint1 is violated! The value of the attribute arcs2d of ExistenceConstraints23Coords.Topic.ClassLine2dArcs was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline mit Arcs constraint Attributes nicht uebereinstimmen.
@@ -1491,7 +1491,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute arcs3d of ExistenceConstraints23Coords.Topic.ClassLine3dArcs was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23Coords.Topic.ClassLine3dArcs.Constraint1 is violated! The value of the attribute arcs3d of ExistenceConstraints23Coords.Topic.ClassLine3dArcs was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Polyline mit Straights und Arcs constraint Attributes nicht uebereinstimmen.
@@ -1546,7 +1546,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute arcsstraights3d of ExistenceConstraints23Coords.Topic.ClassLine3dArcsStraights was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23Coords.Topic.ClassLine3dArcsStraights.Constraint1 is violated! The value of the attribute arcsstraights3d of ExistenceConstraints23Coords.Topic.ClassLine3dArcsStraights was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polyline mit Straights und Arcs constraint Attributes nicht uebereinstimmen.
@@ -1595,7 +1595,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute arcsstraights2d of ExistenceConstraints23Coords.Topic.ClassLine2dArcsStraights was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23Coords.Topic.ClassLine2dArcsStraights.Constraint1 is violated! The value of the attribute arcsstraights2d of ExistenceConstraints23Coords.Topic.ClassLine2dArcsStraights was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Oberflaechen constraint Attributes nicht uebereinstimmen.
@@ -1682,7 +1682,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute surface2d of ExistenceConstraints23Coords.Topic.ClassSurface2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23Coords.Topic.ClassSurface2d.Constraint1 is violated! The value of the attribute surface2d of ExistenceConstraints23Coords.Topic.ClassSurface2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Oberflaechen constraint Attribute nicht uebereinstimmen.
@@ -1781,7 +1781,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute surface3d of ExistenceConstraints23Coords.Topic.ClassSurface3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23Coords.Topic.ClassSurface3d.Constraint1 is violated! The value of the attribute surface3d of ExistenceConstraints23Coords.Topic.ClassSurface3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 2d Polygone constraint Attribute nicht uebereinstimmen.
@@ -1868,7 +1868,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute area2d of ExistenceConstraints23Coords.Topic.ClassArea2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23Coords.Topic.ClassArea2d.Constraint1 is violated! The value of the attribute area2d of ExistenceConstraints23Coords.Topic.ClassArea2d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden 3d Area constraint Attribute nicht uebereinstimmen.
@@ -1967,7 +1967,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute area3d of ExistenceConstraints23Coords.Topic.ClassArea3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23Coords.Topic.ClassArea3d.Constraint1 is violated! The value of the attribute area3d of ExistenceConstraints23Coords.Topic.ClassArea3d was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet, ob innerhalb einer Struktur eine Existence Constraint erstellt werden kann.
@@ -1993,7 +1993,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.structureBase was not found in the condition class.",logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23.Topic.structureBase.Constraint1 is violated! The value of the attribute attr1 of ExistenceConstraints23.Topic.structureBase was not found in the condition class.",logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn
@@ -2025,7 +2025,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassStructureOtherModel was not found in the condition class.",logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23.Topic.ClassStructureOtherModel.Constraint1 is violated! The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassStructureOtherModel was not found in the condition class.",logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn
@@ -2062,7 +2062,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassStructureOtherModel2 was not found in the condition class.",logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23.Topic.ClassStructureOtherModel2.Constraint1 is violated! The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassStructureOtherModel2 was not found in the condition class.",logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Prueft die Konfiguration: constraint validation.
@@ -2088,7 +2088,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23.Topic.ClassA.Constraint1 is violated! The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Prueft die Konfiguration: constraint validation.
@@ -2115,7 +2115,7 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint ExistenceConstraints23.Topic.ClassA.Constraint1 is violated! The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Prueft die Konfiguration: constraint validation.
