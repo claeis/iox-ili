@@ -665,8 +665,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					errFact.setIliqname(iliqname);
 					//logMsg(areaOverlapValidation,"intersection tid1 "+is.getCurve1().getUserData()+", tid2 "+is.getCurve2().getUserData()+", coord "+is.getPt()[0].toString()+(is.getPt().length==2?(", coord2 "+is.getPt()[1].toString()):""));
 					if(ex instanceof IoxIntersectionException) {
-						logMsg(areaOverlapValidation, ((IoxIntersectionException) ex).getIntersection().toShortString());
-						EhiLogger.traceState(ex.toString());
+						IoxIntersectionException intersectionEx = ((IoxIntersectionException) ex);
+						logMsg(areaOverlapValidation, intersectionEx);
+						EhiLogger.traceState(intersectionEx.toString());
 					}else {
 						logMsg(areaOverlapValidation, ex.getMessage());
 					}
@@ -2165,8 +2166,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	                    errFact.setTid(tid1);
 	                    errFact.setIliqname(iliqname);
 	                    if(ex instanceof IoxIntersectionException) {
-	                        logMsg(areaOverlapValidation, ((IoxIntersectionException) ex).getIntersection().toShortString());
-	                        EhiLogger.traceState(ex.toString());
+	                        IoxIntersectionException intersectionEx = ((IoxIntersectionException) ex);
+	                        logMsg(areaOverlapValidation, intersectionEx);
+	                        EhiLogger.traceState(intersectionEx.toString());
 	                    }else {
 	                        logMsg(areaOverlapValidation, ex.getMessage());
 	                    }
@@ -2225,8 +2227,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         errFact.setTid(tid1);
                         errFact.setIliqname(iliqname);
                         if(ex instanceof IoxIntersectionException) {
-                            logMsg(areaOverlapValidation, ((IoxIntersectionException) ex).getIntersection().toShortString());
-                            EhiLogger.traceState(ex.toString());
+                            IoxIntersectionException intersectionEx = ((IoxIntersectionException) ex);
+                            logMsg(areaOverlapValidation, intersectionEx);
+                            EhiLogger.traceState(intersectionEx.toString());
                         }else {
                             logMsg(areaOverlapValidation, ex.getMessage());
                         }
@@ -4309,6 +4312,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		 }else{
 			 errs.addEvent(errFact.logErrorMsg(msg, args));
 		 }
+	}
+
+	private void logMsg(String validateKind, IoxIntersectionException intersectionException) {
+		if(ValidationConfig.OFF.equals(validateKind)){
+			// skip it
+		}else if(ValidationConfig.WARNING.equals(validateKind)){
+			errs.addEvent(errFact.logWarningMsg(intersectionException));
+		}else{
+			errs.addEvent(errFact.logErrorMsg(intersectionException));
+		}
 	}
 		
 	private void validateItfLineTableObject(IomObject iomObj, AttributeDef modelele) {

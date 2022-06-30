@@ -45,14 +45,22 @@ public class ErrorMsg23Test {
 	private static final String ILI_CLASSD_ATTRA2 = "attrA2";
 	private static final String ILI_CLASSD_CONSTRA = ILI_CLASSD+".constrA";
 	private static final String ILI_CLASSE = "ErrorMsgTest23.Topic.ClassE";
+	private static final String ILI_CLASSF_WITH_AREA = "ErrorMsgTest23.Topic.ClassF";
+	private static final String ILI_CLASSG_WITH_AREAREAS_CONSTRAINT = "ErrorMsgTest23.Topic.ClassG";
 	// STRUCTS
 	private static final String ILI_STRUCTB = "ErrorMsgTest23.Topic.StructB";
 	private static final String ILI_STRUCTB_POINT = "point";
 	// OID
 	private final static String OID="o1";
+	private final static String OID_2 = "o2";
 	// START BASKET EVENT
 	private final static String BID="b1";
-	
+
+	private LogCollector logger;
+	private LogEventFactory errFactory;
+	private Settings settings;
+	private ValidationConfig modelConfig;
+
 	@Before
 	public void setUp() throws Exception {
 		// ili-datei lesen
@@ -63,6 +71,16 @@ public class ErrorMsg23Test {
 		ili2cConfig.addFileEntry(fileEntry2);
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
+
+		// setup
+		logger = new LogCollector();
+		errFactory = new LogEventFactory();
+		settings = new Settings();
+		modelConfig = new ValidationConfig();
+
+		Map<String,Class> newFunctions=new HashMap<String,Class>();
+		newFunctions.put("FunctionsExt23.subText",SubText.class);
+		settings.setTransientObject(Validator.CONFIG_CUSTOM_FUNCTIONS, newFunctions);
 	}
 	
 	// Hier wird getestet ob die beiden Koordinaten: C1 und C2 in der Fehlermeldung vorkommen,
@@ -71,16 +89,9 @@ public class ErrorMsg23Test {
 	public void noCoord_Fail(){
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
 		iomObj.setattrvalue(ILI_CLASSA_ATTRA, "true");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		validateObjects(iomObj);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals(null,logger.getErrs().get(0).getGeomC1());
@@ -97,16 +108,9 @@ public class ErrorMsg23Test {
 		iomCoord.setattrvalue("C1", "480001.000");
 		iomCoord.setattrvalue("C2", "70001.000");
 		iomObj.addattrobj(ILI_CLASSA_POINT, iomCoord);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		validateObjects(iomObj);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals(new Double(480001.000),logger.getErrs().get(0).getGeomC1());
@@ -132,16 +136,9 @@ public class ErrorMsg23Test {
 		Iom_jObject iomPolyline=new Iom_jObject("POLYLINE", null);
 		iomPolyline.addattrobj("sequence", iomSequence);
 		iomObj.addattrobj(ILI_CLASSA_LINE, iomPolyline);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		validateObjects(iomObj);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals(new Double(480001.000),logger.getErrs().get(0).getGeomC1());
@@ -177,16 +174,9 @@ public class ErrorMsg23Test {
 		IomObject iomSurface=new Iom_jObject("MULTISURFACE",null);
 		iomSurface.addattrobj("surface", "SURFACE").addattrobj("boundary", "BOUNDARY").addattrobj("polyline", iomPolyline);
 		iomObj.addattrobj(ILI_CLASSA_SURFACE, iomSurface);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		validateObjects(iomObj);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals(new Double(480001.000),logger.getErrs().get(0).getGeomC1());
@@ -204,16 +194,9 @@ public class ErrorMsg23Test {
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSC, OID);
 		iomObj.setattrvalue(ILI_CLASSC_ATTRC1, "true");
 		iomObj.addattrobj(ILI_CLASSC_ATTRC2, iomStruct);
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		validateObjects(iomObj);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals(new Double(480001.000),logger.getErrs().get(0).getGeomC1());
@@ -225,16 +208,9 @@ public class ErrorMsg23Test {
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSC, OID);
 		iomObj.setattrvalue(ILI_CLASSC_ATTRC1, "true");
 		iomObj.setattrvalue(ILI_CLASSC_ATTRC2, "true"); // waere eigentlich ein Strukturattribut
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		validateObjects(iomObj);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
 	}
@@ -246,17 +222,11 @@ public class ErrorMsg23Test {
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSA, OID);
 		iomObj.setattrvalue(ILI_CLASSA_ATTRA, "true");
 		iomObj.setattrvalue(ILI_CLASSA_ATTRA2, "TestKey");
-		ValidationConfig modelConfig=new ValidationConfig();
+
 		modelConfig.setConfigValue(ILI_CLASSA, ValidationConfig.KEYMSG, "Key {"+ILI_CLASSA_ATTRA2+"}");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		validateObjects(iomObj);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		IoxLogEvent err = logger.getErrs().get(0);
@@ -270,17 +240,11 @@ public class ErrorMsg23Test {
 		Iom_jObject iomObj=new Iom_jObject(ILI_CLASSD, OID);
 		iomObj.setattrvalue(ILI_CLASSD_ATTRA, "0");
 		iomObj.setattrvalue(ILI_CLASSD_ATTRA2, "TestKey");
-		ValidationConfig modelConfig=new ValidationConfig();
+
 		modelConfig.setConfigValue(ILI_CLASSD_CONSTRA, ValidationConfig.MSG, "Msg {"+ILI_CLASSD_ATTRA2+"}");
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(iomObj));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		validateObjects(iomObj);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		IoxLogEvent err = logger.getErrs().get(0);
@@ -292,22 +256,15 @@ public class ErrorMsg23Test {
         Iom_jObject iomObj=new Iom_jObject(ILI_CLASSD, OID);
         iomObj.setattrvalue(ILI_CLASSD_ATTRA, "0");
         iomObj.setattrvalue(ILI_CLASSD_ATTRA2, "TestKey");
-        ValidationConfig modelConfig=new ValidationConfig();
+
         String actualLanguage = Locale.getDefault().getLanguage();
         // default message
         modelConfig.setConfigValue(ILI_CLASSD_CONSTRA, ValidationConfig.MSG, "Msg {"+ILI_CLASSD_ATTRA2+"}");
         // de spezifische message
         modelConfig.setConfigValue(ILI_CLASSD_CONSTRA, ValidationConfig.MSG+"_"+actualLanguage, "Msg_lang {"+ILI_CLASSD_ATTRA2+"}");
         
-        LogCollector logger=new LogCollector();
-        LogEventFactory errFactory=new LogEventFactory();
-        Settings settings=new Settings();
-        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-        validator.validate(new ObjectEvent(iomObj));
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
+        validateObjects(iomObj);
+
         // Asserts
         assertTrue(logger.getErrs().size()==1);
         IoxLogEvent err = logger.getErrs().get(0);
@@ -321,22 +278,70 @@ public class ErrorMsg23Test {
 		IomObject coord=objSurfaceSuccess.addattrobj("Geometry", "COORD");
 		coord.setattrvalue("C1", "510000.000");
 		coord.setattrvalue("C2", "80000.000");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Map<String,Class> newFunctions=new HashMap<String,Class>();
-		newFunctions.put("FunctionsExt23.subText",SubText.class);
-		settings.setTransientObject(Validator.CONFIG_CUSTOM_FUNCTIONS, newFunctions);
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals(new Double(510000.000),logger.getErrs().get(0).getGeomC1());
 		assertEquals(new Double(80000.000),logger.getErrs().get(0).getGeomC2());
-	}	
+	}
+
+	/**
+	 * Tests that the error message coordinate fields (C1, C2, C3) are set when two features of an AREA intersect
+	 */
+	@Test
+	public void geometryAreaIntersectionErrorMessage_Fail() {
+		Iom_jObject object_1 = new Iom_jObject(ILI_CLASSF_WITH_AREA, OID);
+		object_1.addattrobj("Geometry", IomObjectHelper.createRectangleGeometry("500000", "70000", "600000", "80000"));
+
+		Iom_jObject object_2 = new Iom_jObject(ILI_CLASSF_WITH_AREA, OID_2);
+		object_2.addattrobj("Geometry", IomObjectHelper.createRectangleGeometry("550000", "75000", "650000", "85000"));
+
+		validateObjects(object_1, object_2);
+
+		// Asserts
+		assertEquals(3, logger.getErrs().size());
+		assertErrorLogWithGeometry("Intersection coord1 (550000.000, 80000.000), tids o1, o2", 550000.0, 80000.0, logger.getErrs().get(0));
+		assertErrorLogWithGeometry("Intersection coord1 (600000.000, 75000.000), tids o1, o2", 600000.0, 75000.0, logger.getErrs().get(1));
+		assertEquals("failed to validate AREA ErrorMsgTest23.Topic.ClassF.Geometry", logger.getErrs().get(2).getEventMsg());
+	}
+
+	/**
+	 * Tests that the error message coordinate fields (C1, C2, C3) are set when two features in an areAreas constraint intersect.
+	 */
+	@Test
+	public void geometryAreAreasConstraintIntersectionErrorMessage_Fail() {
+		Iom_jObject object_1 = new Iom_jObject(ILI_CLASSG_WITH_AREAREAS_CONSTRAINT, OID);
+		object_1.addattrobj("Geometry", IomObjectHelper.createRectangleGeometry("500000", "70000", "600000", "80000"));
+
+		Iom_jObject object_2 = new Iom_jObject(ILI_CLASSG_WITH_AREAREAS_CONSTRAINT, OID_2);
+		object_2.addattrobj("Geometry", IomObjectHelper.createRectangleGeometry("550000", "75000", "650000", "85000"));
+
+		validateObjects(object_1, object_2);
+
+		// Asserts
+		assertEquals(3, logger.getErrs().size());
+		assertErrorLogWithGeometry("Intersection coord1 (550000.000, 80000.000), tids o1/Geometry[1], o2/Geometry[1]", 550000.0, 80000.0, logger.getErrs().get(0));
+		assertErrorLogWithGeometry("Intersection coord1 (600000.000, 75000.000), tids o1/Geometry[1], o2/Geometry[1]", 600000.0, 75000.0, logger.getErrs().get(1));
+		assertEquals("Set Constraint ErrorMsgTest23.Topic.ClassG.Constraint1 is not true.", logger.getErrs().get(2).getEventMsg());
+	}
+
+	private void assertErrorLogWithGeometry(String expectedMessage, double expectedC1, double expectedC2, IoxLogEvent logEvent) {
+		assertEquals(expectedMessage, logEvent.getEventMsg());
+		assertEquals((Double)expectedC1, logEvent.getGeomC1());
+		assertEquals((Double)expectedC2, logEvent.getGeomC2());
+		assertEquals((Double)Double.NaN, logEvent.getGeomC3());
+	}
+
+	private void validateObjects(IomObject... iomObjects) {
+		Validator validator = new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+		for(IomObject iomObject : iomObjects) {
+			validator.validate(new ObjectEvent(iomObject));
+		}
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+	}
 }
