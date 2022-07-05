@@ -10,6 +10,7 @@ LATEST
 - Validator: add single pass option
 - ObjectPool: report file size in trace log (ilivalidator#335)
 - Validator: Add feature geometry intersection coordinates to log (#109)
+- fix JRE 1.6 compatibility
 - ili2c-5.2.6
 
 iox-ili 1.21.10 (2022-04-29)

@@ -13,9 +13,17 @@ configurations {
 //    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 //}
 
-sourceCompatibility = JavaVersion.VERSION_1_6 
-targetCompatibility = JavaVersion.VERSION_1_6
+//System.out.println JavaVersion.current()
+
 compileJava.options.encoding = 'US-ASCII'
+if(!JavaVersion.current().isJava8()){
+  compileJava.options.compilerArgs.addAll(['--release', '6'])
+}else{
+  sourceCompatibility = JavaVersion.VERSION_1_6 
+  targetCompatibility = JavaVersion.VERSION_1_6
+}
+
+
 //compileJava.options.compilerArgs << '-Xlint:unchecked'
 //compileJava.options.deprecation = true
 
