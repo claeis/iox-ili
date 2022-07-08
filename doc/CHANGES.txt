@@ -5,13 +5,16 @@ ideas/open issues
 
 LATEST
 -----------------------------
+
+iox-ili 1.21.11 (2022-07-08)
+-----------------------------
 - ItfWriter: add mandatory but empty tables (ili2fme#24)
 - FileLogger: enable optional timeStamp
 - Validator: add single pass option
 - ObjectPool: report file size in trace log (ilivalidator#335)
 - Validator: Add feature geometry intersection coordinates to log (#109)
 - fix JRE 1.6 compatibility
-- ili2c-5.2.6
+- ili2c-5.2.7
 
 iox-ili 1.21.10 (2022-04-29)
 -----------------------------
