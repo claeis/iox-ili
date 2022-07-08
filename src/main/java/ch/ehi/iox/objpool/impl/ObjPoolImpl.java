@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 
 public class ObjPoolImpl implements Map {
@@ -23,9 +24,14 @@ public class ObjPoolImpl implements Map {
 	private java.io.File outFilename=null;
 	private ObjectPoolManager recman=null;
 	private Serializer serializer=null;
-	public ObjPoolImpl(ObjectPoolManager objectPoolManager,Serializer serializer) {
+	private String poolName=null;
+    public ObjPoolImpl(ObjectPoolManager objectPoolManager,Serializer serializer) {
+        this(objectPoolManager,null,serializer);
+    }
+	public ObjPoolImpl(ObjectPoolManager objectPoolManager,String poolName,Serializer serializer) {
 		recman=objectPoolManager;
 		this.serializer=serializer;
+		this.poolName=poolName;
 	}
 
 	@Override
@@ -33,6 +39,7 @@ public class ObjPoolImpl implements Map {
 		pool.clear();
 		if(outFile!=null){
 			try {
+                EhiLogger.traceState((poolName!=null?poolName:this.getClass().getSimpleName())+": size "+outFile.length()+" <"+outFilename.getPath()+">");
 				outFile.close();
 				outFile=null;
 				outFilename.delete();

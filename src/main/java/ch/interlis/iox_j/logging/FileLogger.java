@@ -13,6 +13,9 @@ public class FileLogger extends FileListener {
 	public FileLogger(File arg0) {
 		super(arg0,false);
 	}
+    public FileLogger(File arg0,boolean doTimeStamp1) {
+        super(arg0,doTimeStamp1);
+    }
 
 	@Override
 	public void outputEvent(LogEvent event,ArrayList msgv)

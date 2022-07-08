@@ -9,6 +9,7 @@ import ch.interlis.ili2c.metamodel.Evaluable;
 import ch.interlis.ili2c.metamodel.Function;
 import ch.interlis.ili2c.metamodel.FunctionCall;
 import ch.interlis.ili2c.metamodel.ObjectPath;
+import ch.interlis.ili2c.metamodel.Objects;
 import ch.interlis.ili2c.metamodel.PathEl;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.TransferDescription;
@@ -117,6 +118,11 @@ public class Interlis_ext {
             } catch (Ili2cException e) {
                 EhiLogger.logError(e);
             }                    
+
+            // use cached value if it exists and first argument (Objects) is 'ALL'
+            if (functions.containsKey(functionCall) && arguments[0] instanceof Objects) {
+                return functions.get(functionCall);
+            }
 
             Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction, validationKind);
             functions.put(functionCall, isArea);

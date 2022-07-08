@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.btree.BTree;
 import ch.ehi.iox.objpool.impl.btree.BTreeCursor;
@@ -26,7 +27,12 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 	private java.io.File outFilename=null;
 	private Serializer valueSerializer=null;
 	private ObjectPoolManager objectPoolManager=null;
-	public ObjPoolImpl2( ObjectPoolManager objectPoolManager1, Serializer valueSerializer1)
+    private String poolName=null;
+    public ObjPoolImpl2( ObjectPoolManager objectPoolManager1, Serializer valueSerializer1)
+    {
+        this(objectPoolManager1,null,valueSerializer1);
+    }
+	public ObjPoolImpl2( ObjectPoolManager objectPoolManager1, String poolName,Serializer valueSerializer1)
 	{
 		try{
 			objectPoolManager=objectPoolManager1;
@@ -34,6 +40,7 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 			tree= new TreeMap<K, Long>();
 			outFilename=ObjectPoolManager.getCacheTmpFilename();
 			outFile=new RandomAccessFile(outFilename, "rw");
+			this.poolName=poolName;
 		}catch(IOException e){
 			throw new IllegalStateException(e);
 		}
@@ -59,6 +66,7 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 		}
 		if(outFile!=null){
 			try {
+                EhiLogger.traceState((poolName!=null?poolName:this.getClass().getSimpleName())+": size "+outFile.length()+" <"+outFilename.getPath()+">");
 				outFile.close();
 			} catch (IOException e) {
 				throw new IllegalStateException(e);

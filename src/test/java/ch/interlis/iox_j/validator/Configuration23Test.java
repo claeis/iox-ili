@@ -130,7 +130,7 @@ public class Configuration23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("The value of the attribute attrText of Configuration23.Topic.ClassA was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
+		assertEquals("Existence constraint Configuration23.Topic.ClassA.Constraint1 is violated! The value of the attribute attrText of Configuration23.Topic.ClassA was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht uebereinstimmen und validationConfig msg nicht leer ist.
@@ -202,7 +202,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute attrText of Configuration23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint Configuration23.Topic.ClassA.Constraint1 is violated! The value of the attribute attrText of Configuration23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird,
@@ -254,7 +254,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("The value of the attribute attrText of Configuration23.Topic.ClassA was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
+		assertEquals("Existence constraint Configuration23.Topic.ClassA.Constraint1 is violated! The value of the attribute attrText of Configuration23.Topic.ClassA was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Config CHECK=warning. Es darf keine Fehlermeldung ausgegeben werden. Es sollen 4 Warnungen: Constraint 1-4 ausgegeben werden.
@@ -285,10 +285,10 @@ public class Configuration23Test {
 		// Asserts
 		assertTrue(logger.getWarn().size()==4);
 		assertTrue(logger.getErrs().size()==0);
-		assertEquals("The value of the attribute attrText1 of Configuration23.Topic.ClassB was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
-		assertEquals("The value of the attribute attrText2 of Configuration23.Topic.ClassB was not found in the condition class.", logger.getWarn().get(1).getEventMsg());
-		assertEquals("The value of the attribute attrText3 of Configuration23.Topic.ClassB was not found in the condition class.", logger.getWarn().get(2).getEventMsg());
-		assertEquals("The value of the attribute attrText4 of Configuration23.Topic.ClassB was not found in the condition class.", logger.getWarn().get(3).getEventMsg());
+		assertEquals("Existence constraint Configuration23.Topic.ClassB.Constraint1 is violated! The value of the attribute attrText1 of Configuration23.Topic.ClassB was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
+		assertEquals("Existence constraint Configuration23.Topic.ClassB.Constraint2 is violated! The value of the attribute attrText2 of Configuration23.Topic.ClassB was not found in the condition class.", logger.getWarn().get(1).getEventMsg());
+		assertEquals("Existence constraint Configuration23.Topic.ClassB.Constraint3 is violated! The value of the attribute attrText3 of Configuration23.Topic.ClassB was not found in the condition class.", logger.getWarn().get(2).getEventMsg());
+		assertEquals("Existence constraint Configuration23.Topic.ClassB.Constraint4 is violated! The value of the attribute attrText4 of Configuration23.Topic.ClassB was not found in the condition class.", logger.getWarn().get(3).getEventMsg());
 	}
 	
 	// Config Target=warning. Eine Warnung muss ausgegeben werden.
@@ -901,7 +901,7 @@ public class Configuration23Test {
         // Asserts
         assertTrue(logger.getErrs().size()==1);
         IoxLogEvent err = logger.getErrs().get(0);
-        assertEquals("Unique is violated! Values Key, 20 already exist in Object: KEYMsg_lang 20",err.getEventMsg());
+        assertEquals("Unique constraint Configuration23.Topic.ClassH.Constraint1 is violated! Values Key, 20 already exist in Object: KEYMsg_lang 20",err.getEventMsg());
         assertEquals("KEYMsg_lang 20",err.getSourceObjectUsrId());
     }
 	
@@ -930,7 +930,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint Configuration23.Topic.ClassH.Constraint1 is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigens erstellte Fehlermeldung ausgegeben wird,
@@ -991,7 +991,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
+		assertEquals("Unique constraint Configuration23.Topic.ClassH.Constraint1 is violated! Values Ralf, 20 already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Warning anstelle einer Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist und validationConfig check auf off geschalten ist.
@@ -1077,7 +1077,7 @@ public class Configuration23Test {
 		// Asserts.
 		assertTrue(logger.getErrs().size()==0);
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
+		assertEquals("Unique constraint Configuration23.Topic.ClassH.Constraint1 is violated! Values Ralf, 20 already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
@@ -1285,7 +1285,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("The value of the attribute subAttr of Configuration23.Topic.ClassL was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Existence constraint AddExConModel.AddExConTopic.AddExConView.Constraint1 is violated! The value of the attribute subAttr of Configuration23.Topic.ClassL was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg nicht leer ist.
@@ -1340,7 +1340,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("The value of the attribute subAttr of Configuration23.Topic.ClassL was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
+		assertEquals("Existence constraint AddExConModel.AddExConTopic.AddExConView.Constraint1 is violated! The value of the attribute subAttr of Configuration23.Topic.ClassL was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird,
@@ -1424,7 +1424,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint AddUnConModel.AddUnConTopic.AddUnConView.Constraint1 is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der hoeheren Hierarchie nicht uebereinstimmt und validationConfig.MSG nicht leer ist.
@@ -1476,7 +1476,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
+		assertEquals("Unique constraint AddUnConModel.AddUnConTopic.AddUnConView.Constraint1 is violated! Values Ralf already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird

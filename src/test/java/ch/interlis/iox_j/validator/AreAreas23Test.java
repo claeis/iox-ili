@@ -444,6 +444,60 @@ public class AreAreas23Test {
     }
 
     @Test
+    public void classD2_perStructC_TwoObject_OneStructValid_OneStructOverlap_Fail() {
+
+        // valid object
+        Iom_jObject structA1 = createStructA("500000.000", "75000.000", "510000.000", "80000.000");
+
+        Iom_jObject structB1 = new Iom_jObject(STRUCTB, null);
+        structB1.addattrobj("attr2", structA1);
+
+        Iom_jObject structC1 = new Iom_jObject(STRUCTC, null);
+        structC1.addattrobj("attr3", structB1);
+
+        Iom_jObject classD1 = new Iom_jObject(CLASSD2, OID1);
+        classD1.addattrobj("attr4", structC1);
+
+        // object with overlap
+        Iom_jObject structA2_1 = createStructA("486000.000", "75000.000", "490000.000", "80000.000");
+
+        Iom_jObject structA2_2 = createStructA("488000.000", "75000.000", "494000.000", "80000.000"); // overlaps structA2_1
+
+        Iom_jObject structB2_1 = new Iom_jObject(STRUCTB, null);
+        structB2_1.addattrobj("attr2", structA2_1);
+
+        Iom_jObject structB2_2 = new Iom_jObject(STRUCTB, null);
+        structB2_2.addattrobj("attr2", structA2_2);
+
+        Iom_jObject structC2 = new Iom_jObject(STRUCTC, null);
+        structC2.addattrobj("attr3", structB2_1);
+        structC2.addattrobj("attr3", structB2_2);
+
+        Iom_jObject classD2 = new Iom_jObject(CLASSD2, OID2);
+        classD2.addattrobj("attr4", structC2);
+
+        // Create and run validator.
+        ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES, ValidationConfig.TRUE);
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        settings.setValue(Validator.CONFIG_DEBUG_XTFOUT, "build/areAreas.xtf");
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(classD1));
+        validator.validate(new ObjectEvent(classD2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        validator.close();
+        // Asserts.
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Mandatory Constraint AreAreas23.Topic.ClassD2.Constraint1 is not true.",
+                logger.getErrs().get(0).getEventMsg());
+    }
+
+    @Test
     public void classD3_allObjectD3_TwoObject_Overlap_Fail() {
 
         Iom_jObject structA = createStructA("486000.000", "75000.000", "490000.000", "80000.000");
@@ -519,7 +573,6 @@ public class AreAreas23Test {
                 logger.getErrs().get(0).getEventMsg());
     }
     @Test
-    @Ignore("requires #107")
     public void classE_allObjectE_TwoObject_Overlap_DetailMsgs_Fail() {
 
         IomObject structA = createRectangle("486000.000", "75000.000", "490000.000", "80000.000");

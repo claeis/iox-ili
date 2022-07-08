@@ -174,7 +174,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassC.Constraint1 is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Dieser Test soll eine Fehlermeldung ausgeben,
@@ -202,7 +202,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassC.Constraint1 is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn kein Unique definiert wurde, jedoch das attr2 der beiden Objekte die gleichen Werte enthaelt.
@@ -1209,7 +1209,7 @@ public class UniqueConstraints23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("Unique is violated! Values ValueA1, ValueB1 already exist in Object: UniqueConstraints23.LinkObjUnique.assocAB:o1:o2",
+        assertEquals("Unique constraint UniqueConstraints23.LinkObjUnique.assocAB.Constraint1 is violated! Values ValueA1, ValueB1 already exist in Object: UniqueConstraints23.LinkObjUnique.assocAB:o1:o2",
                 logger.getErrs().get(0).getEventMsg());
     }
 	
@@ -1238,7 +1238,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Anna, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassB.Constraint1 is violated! Values Anna, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die Nummer Unique und identisch ist.
@@ -1265,7 +1265,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassB.Constraint1 is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn der Text Unique und identisch ist.
@@ -1292,7 +1292,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassB0.Constraint1 is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn Number Unique ist und beide Values identisch sind.
@@ -1319,7 +1319,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassC.Constraint1 is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn Text Unique und Nummber Unique ist. Dabei die Nummer identisch ist.
@@ -1346,7 +1346,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassD.Constraint2 is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn der Text Unique und die Nummer Unique ist. Dabei ist der Text identisch und die Nummer verschieden.
@@ -1373,7 +1373,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassD.Constraint1 is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn der Text Unique ist und die Nummer Unique ist. Dabei beide Values identisch sind.
@@ -1400,8 +1400,8 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassD.Constraint1 is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassD.Constraint2 is violated! Values 20 already exist in Object: o1", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn der Text und die Nummer Unique sind und die Nummer Unique ist. Dabei sind die Values der Nummer identisch.
@@ -1428,7 +1428,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassE.Constraint2 is violated! Values 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn der Text Unique ist und die Nummer Unique ist. Dabei beide Values identisch sind.
@@ -1455,8 +1455,8 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==2);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Unique is violated! Values 20 already exist in Object: o1", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassD.Constraint1 is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassD.Constraint2 is violated! Values 20 already exist in Object: o1", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
@@ -1488,7 +1488,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("Unique is violated! Values 1 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassG.Constraint1 is violated! Values 1 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
     // Es handelt sich hierbei um einen LOCAL Uniqueness Constraint.
     // In beiden Objekten ist ein Strukturattribut mit dem selben Wert (was bei einem LOCAL Unique zulaessig ist).
@@ -1547,7 +1547,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("Unique is violated! Values 1, 2 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassH.Constraint1 is violated! Values 1, 2 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 		
 	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint und einen GLOBAL Uniqueness Constraint.
@@ -1581,8 +1581,8 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertEquals(2,logger.getErrs().size());
-        assertEquals("Unique is violated! Values 1 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Unique is violated! Values 8 already exist in Object: o1", logger.getErrs().get(1).getEventMsg());
+        assertEquals("Unique constraint UniqueConstraints23.Topic.ClassK.Constraint1 is violated! Values 1 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassK.Constraint2 is violated! Values 8 already exist in Object: o1", logger.getErrs().get(1).getEventMsg());
 	}
 	
 	// Es handelt sich hierbei um einen LOCAL Uniqueness Constraint und einen GLOBAL Uniqueness Constraint.
@@ -1659,7 +1659,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("Unique is violated! Values 5 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassM.Constraint1 is violated! Values 5 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// In beiden Objekten einer Association werden auf die Rolle: c1 verwiesen. Beide Objekte verweisen 2 Mal ueber die Rolle c1 auf die Klasse C.
@@ -1719,7 +1719,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values text already exist in Object: UniqueConstraints23.Topic.assoA:o1:o2", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.assoA.Constraint1 is violated! Values text already exist in Object: UniqueConstraints23.Topic.assoA:o1:o2", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// In beiden Objekten wird je ueber eine Structure auf ein attribute einer SURFACE verwiesen, Beide Attribute wurden mit den Selben Values erstellt.
@@ -1809,7 +1809,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("Unique is violated! Values MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.000, C2 70000.000}, COORD {C1 500000.000, C2 80000.000}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 500000.000, C2 80000.000}, COORD {C1 550000.000, C2 90000.000}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 550000.000, C2 90000.000}, COORD {C1 480000.000, C2 70000.000}]}}]}}} already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassO2.Constraint1 is violated! Values MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.000, C2 70000.000}, COORD {C1 500000.000, C2 80000.000}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 500000.000, C2 80000.000}, COORD {C1 550000.000, C2 90000.000}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 550000.000, C2 90000.000}, COORD {C1 480000.000, C2 70000.000}]}}]}}} already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// In beiden Objekten wird je auf ein attribute einer SURFACE verwiesen, Beide Attribute wurden mit den Selben Values erstellt.
@@ -1897,7 +1897,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.000, C2 70000.000}, COORD {C1 500000.000, C2 80000.000}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 500000.000, C2 80000.000}, COORD {C1 550000.000, C2 90000.000}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 550000.000, C2 90000.000}, COORD {C1 480000.000, C2 70000.000}]}}]}}} already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassO.Constraint1 is violated! Values MULTISURFACE {surface SURFACE {boundary BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.000, C2 70000.000}, COORD {C1 500000.000, C2 80000.000}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 500000.000, C2 80000.000}, COORD {C1 550000.000, C2 90000.000}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 550000.000, C2 90000.000}, COORD {C1 480000.000, C2 70000.000}]}}]}}} already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: inEnumRange das ZielAttribute zwischen min und max enum in der Enumeration sich befindet.
@@ -1927,7 +1927,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values gleich already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassN3.Constraint1 is violated! Values gleich already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird,
@@ -1958,7 +1958,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values 1 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassN.Constraint1 is violated! Values 1 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Prueft, ob das eingebettete Unique-Constraint innerhalb der Association funktioniert.
@@ -2023,7 +2023,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// asserts
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("Unique is violated! Values o1 already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.EmbeddedUnique.assocAB.Constraint1 is violated! Values o1 already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
 	
 	}
 	
@@ -2092,7 +2092,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// asserts
 		assertEquals(1, logger.getErrs().size());
-		assertEquals("Unique is violated! Values text1 already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.EmbeddedUnique.assocCD.Constraint1 is violated! Values text1 already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Prueft, ob das eingebettete Unique-Constraint innerhalb der Association funktioniert.
@@ -2224,7 +2224,7 @@ public class UniqueConstraints23Test {
         validator.validate(new EndTransferEvent());
         // asserts
         assertEquals(1, logger.getErrs().size());
-        assertEquals("Unique is violated! Values text1 already exist in Object: o3",
+        assertEquals("Unique constraint UniqueConstraints23.EmbeddedUnique.assocIK.Constraint1 is violated! Values text1 already exist in Object: o3",
                 logger.getErrs().get(0).getEventMsg());
     }
 	
@@ -2330,7 +2330,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// asserts
 		assertEquals(1, logger.getErrs().size());
-		assertEquals("Unique is violated! Values o1, text1 already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.EmbeddedUnique.assocEF.Constraint1 is violated! Values o1, text1 already exist in Object: o3", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Prueft die Konfiguration: constraint validation.
@@ -2358,7 +2358,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassB.Constraint1 is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Prueft die Konfiguration: constraint validation.
@@ -2387,7 +2387,7 @@ public class UniqueConstraints23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertEquals("Unique is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.Topic.ClassB.Constraint1 is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Prueft die Konfiguration: constraint validation.

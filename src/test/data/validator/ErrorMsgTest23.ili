@@ -44,6 +44,54 @@ MODEL ErrorMsgTest23
 			Geometry : Lkoord;
 			MANDATORY CONSTRAINT "aText" == "aDifferentText";
 		END ClassE;
+
+		CLASS ClassF =
+			Geometry : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END ClassF;
+
+		CLASS ClassG =
+			Geometry : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+			SET CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >>Geometry);
+		END ClassG;
+
+		CLASS ClassH =
+			Attr : TEXT;
+
+			SET CONSTRAINT Attr <> Attr;
+			MANDATORY CONSTRAINT Attr <> Attr;
+			UNIQUE Attr;
+			CONSTRAINT <= 50% Attr == Attr;
+			CONSTRAINT >= 50% Attr <> Attr;
+			EXISTENCE CONSTRAINT Attr REQUIRED IN ErrorMsgTest23.Topic.ClassA : attrA2;
+		END ClassH;
+
+		CLASS ClassI =
+			Attr : TEXT;
+
+			!!@ name = "DOROHIGE"
+			!!@ ilivalid.msg = "This is the custom message for object with Attr {Attr} and set constraint."
+			SET CONSTRAINT Attr <> Attr;
+
+			!!@ name = "ENSINEPR"
+			!!@ ilivalid.msg = "This is the custom message for object with Attr {Attr} and mandatory constraint."
+			MANDATORY CONSTRAINT Attr <> Attr;
+
+			!!@ name = "UPENDESA"
+			!!@ ilivalid.msg = "This is the custom message for object with Attr {Attr} and unique."
+			UNIQUE Attr;
+
+			!!@ name = "BROLETON"
+			!!@ ilivalid.msg = "This is the custom message and plausibility constraint (<=)."
+			CONSTRAINT <= 50% Attr == Attr;
+
+			!!@ name = "LDESCREF"
+			!!@ ilivalid.msg = "This is the custom message and plausibility constraint (>=)."
+			CONSTRAINT >= 50% Attr <> Attr;
+
+			!!@ name = "ORTERINE"
+			!!@ ilivalid.msg = "This is the custom message for object with Attr {Attr} and existence constraint."
+			EXISTENCE CONSTRAINT Attr REQUIRED IN ErrorMsgTest23.Topic.ClassA : attrA2;
+		END ClassI;
 		
 	END Topic;
 END ErrorMsgTest23.

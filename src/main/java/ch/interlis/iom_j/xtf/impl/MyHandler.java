@@ -134,8 +134,8 @@ public class MyHandler
 	private StringBuilder propertyValue=null;
 	private XMLEventWriter propertyXml=null;
 	private java.io.StringWriter propertyXmlString=null;
-	private XMLOutputFactory xmlOf=XMLOutputFactory.newFactory();
-	private XMLEventFactory eventOf=XMLEventFactory.newFactory();
+	private XMLOutputFactory xmlOf=XMLOutputFactory.newInstance();
+	private XMLEventFactory eventOf=XMLEventFactory.newInstance();
 	private int state=BEFORE_TRANSFER;
 	private int skip=0;
 	private int collectXml=0;

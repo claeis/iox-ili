@@ -338,26 +338,29 @@ public class ItfWriter implements ch.interlis.iox.IoxWriter {
 					throw new IoxException("failed to write ETAB line",ex);
 				}
 				currentItfTable++;
-				// write empty tables before ETOP
-				while(currentItfTable<itftablev.size()){
-					// write empty tables
-					Element tabo=(Element)itftablev.get(currentItfTable);
-					if(tabo instanceof AttributeDef){
-						AttributeDef geomattr=(AttributeDef)tabo;
-						Viewable aclass=(Viewable)geomattr.getContainer();
-						if((aclass instanceof Table) && ((Table)aclass).isIli1Optional()){
-							// skip it
-						}else{
-							writeEmptyTable(geomattr);
-						}
-					}else if((tabo instanceof Table) && ((Table)tabo).isIli1Optional()){
-						// skip it
-					}else{
-						writeEmptyTable(tabo);
-					}
-					currentItfTable++;
-				}
 			}
+            // write empty tables before ETOP
+            while(currentItfTable<itftablev.size()){
+                if(currentItfTable==-1) {
+                    currentItfTable=0;
+                }
+                // write empty tables
+                Element tabo=(Element)itftablev.get(currentItfTable);
+                if(tabo instanceof AttributeDef){
+                    AttributeDef geomattr=(AttributeDef)tabo;
+                    Viewable aclass=(Viewable)geomattr.getContainer();
+                    if((aclass instanceof Table) && ((Table)aclass).isIli1Optional()){
+                        // skip it
+                    }else{
+                        writeEmptyTable(geomattr);
+                    }
+                }else if((tabo instanceof Table) && ((Table)tabo).isIli1Optional()){
+                    // skip it
+                }else{
+                    writeEmptyTable(tabo);
+                }
+                currentItfTable++;
+            }
 			// ETOP
 			try{
 				out.writeRawText("ETOP");

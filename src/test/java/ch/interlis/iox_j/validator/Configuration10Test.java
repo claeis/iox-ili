@@ -259,7 +259,7 @@ public class Configuration10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique is violated! Values Anna already exist in Object: o1",logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint Configuration10.Topic.ClassF.Constraint1 is violated! Values Anna already exist in Object: o1",logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Warning anstelle einer Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist und validationConfig check auf off geschalten ist.
@@ -314,7 +314,7 @@ public class Configuration10Test {
 		// Asserts.
 		assertTrue(logger.getErrs().size()==0);
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Unique is violated! Values Ralf already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
+		assertEquals("Unique constraint Configuration10.Topic.ClassF.Constraint1 is violated! Values Ralf already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob der eigens erstellte Fehler ausgegeben wird,
@@ -372,6 +372,6 @@ public class Configuration10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Unique is violated! Values Anna already exist in Object: o1",logger.getWarn().get(0).getEventMsg());
+		assertEquals("Unique constraint Configuration10.Topic.ClassF.Constraint1 is violated! Values Anna already exist in Object: o1",logger.getWarn().get(0).getEventMsg());
 	}
 }
