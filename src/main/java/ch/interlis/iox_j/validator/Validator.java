@@ -101,6 +101,7 @@ import ch.interlis.ilirepository.impl.RepositoryAccessException;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iom_j.itf.ModelUtilities;
 import ch.interlis.iom_j.itf.impl.ItfAreaPolygon2Linetable;
 import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
@@ -3848,9 +3849,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 				}else if(type instanceof EnumTreeValueType){
 				    String actualValue=iomObj.getattrvalue(attrName);
-					if (isValidEnumTreeValue(actualValue, attrPath, type)) {
-					    logMsg(validateType,rsrc.getString("validateAttrValue.valueXIsNotAMemberOfTheEnumerationInAttributeY"), actualValue, attrPath);
-					}
+				    if(actualValue!=null) {
+	                    if (isValidEnumTreeValue(actualValue, attrPath,(EnumTreeValueType) type)) {
+	                        logMsg(validateType,rsrc.getString("validateAttrValue.valueXIsNotAMemberOfTheEnumerationInAttributeY"), actualValue, attrPath);
+	                    }
+				    }
 				}else if(type instanceof ReferenceType){
 				}else if(type instanceof TextType){
 					String value=iomObj.getattrvalue(attrName);
@@ -3905,33 +3908,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
         return value.substring(0,MAX_LEN)+"...";
     }
-    private boolean isValidEnumTreeValue(String actualValue, String attrPath, Type type) {
-        EnumTreeValueType enumTreeValueType = (EnumTreeValueType) type;
-        if (actualValue != null) {
-            HashMap<String, String> trueValueFormat=(HashMap<String, String>) enumTreeValueType.getTransientMetaValue(ENUM_TREE_VALUES);
-            if(trueValueFormat==null) {
-                trueValueFormat = new HashMap<String, String>();
-                Domain enumType = enumTreeValueType.getEnumType();
-                EnumerationType enumerationType = (EnumerationType) enumType.getType();
-                List<String> values = enumerationType.getValues();
-                for (String value : values) {
-                    String[] tmpValues = value.split("\\.");
-                    String tmpValue = "";
-                    for (int i = 0; i < tmpValues.length; i++) {
-                        if (i == 0) {
-                            trueValueFormat.put(tmpValues[i], tmpValues[i]);
-                            tmpValue = tmpValues[i];
-                        } else {
-                            tmpValue = tmpValue + "." + tmpValues[i];
-                            trueValueFormat.put(tmpValue, tmpValue);
-                        }
-                    }
-                }
-                enumTreeValueType.setTransientMetaValue(ENUM_TREE_VALUES,trueValueFormat);
-            }
-            if (trueValueFormat != null && !trueValueFormat.containsKey(actualValue)) {
-                return true;
-            }
+    private boolean isValidEnumTreeValue(String actualValue, String attrPath, EnumTreeValueType enumTreeValueType) {
+        HashSet<String> trueValueFormat=(HashSet<String>) enumTreeValueType.getTransientMetaValue(ENUM_TREE_VALUES);
+        if(trueValueFormat==null) {
+            List<String> values = new ArrayList<String>();
+            ModelUtilities.buildEnumListAll(values, "", enumTreeValueType.getConsolidatedEnumeration());
+            trueValueFormat = new HashSet<String>(values);
+            enumTreeValueType.setTransientMetaValue(ENUM_TREE_VALUES,trueValueFormat);
+        }
+        if (!trueValueFormat.contains(actualValue)) {
+            return true;
         }
         return false;
     }

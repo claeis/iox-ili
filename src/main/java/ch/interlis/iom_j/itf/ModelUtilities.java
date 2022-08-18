@@ -426,7 +426,7 @@ public class ModelUtilities {
           if (subEnum != null)
           {
             // ee is not leaf, add its name to prefix and add sub elements to accu
-            buildEnumList(accu,prefix+ee.getName(),subEnum);
+            buildEnumListAll(accu,prefix+ee.getName(),subEnum);
           }
         }
     }
@@ -473,7 +473,7 @@ public class ModelUtilities {
           if (subEnum != null)
           {
             // ee is not leaf, add its name to prefix and add sub elements to accu
-            buildEnumElementList(accu,prefix+ee.getName(),subEnum);
+            buildEnumElementListAll(accu,prefix+ee.getName(),subEnum);
           }
         }
     }
