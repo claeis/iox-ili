@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- ModelUtilities.buildEnumElementListAll() added
 
 iox-ili 1.21.11 (2022-07-08)
 -----------------------------

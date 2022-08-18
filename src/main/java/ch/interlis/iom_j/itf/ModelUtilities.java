@@ -413,6 +413,23 @@ public class ModelUtilities {
 		  }
 		}
 	}
+    public static void buildEnumListAll(java.util.List accu,String prefix1,ch.interlis.ili2c.metamodel.Enumeration enumer){
+        Iterator iter = enumer.getElements();
+        String prefix="";
+        if(prefix1.length()>0){
+          prefix=prefix1+".";
+        }
+        while (iter.hasNext()) {
+          ch.interlis.ili2c.metamodel.Enumeration.Element ee=(ch.interlis.ili2c.metamodel.Enumeration.Element) iter.next();
+          ch.interlis.ili2c.metamodel.Enumeration subEnum = ee.getSubEnumeration();
+          accu.add(prefix+ee.getName());
+          if (subEnum != null)
+          {
+            // ee is not leaf, add its name to prefix and add sub elements to accu
+            buildEnumList(accu,prefix+ee.getName(),subEnum);
+          }
+        }
+    }
 	/** Builds a list of elements of an enumeration.
 	 * 	<pre><code>
 	 *    java.util.List<java.util.Map.Entry<String,ch.interlis.ili2c.metamodel.Enumeration.Element>> ev=new java.util.ArrayList<java.util.Map.Entry<String,ch.interlis.ili2c.metamodel.Enumeration.Element>>();
@@ -443,6 +460,23 @@ public class ModelUtilities {
 		  }
 		}
 	}
+    public static void buildEnumElementListAll(java.util.List<java.util.Map.Entry<String,ch.interlis.ili2c.metamodel.Enumeration.Element>> accu,String prefix1,ch.interlis.ili2c.metamodel.Enumeration enumer){
+        Iterator iter = enumer.getElements();
+        String prefix="";
+        if(prefix1.length()>0){
+          prefix=prefix1+".";
+        }
+        while (iter.hasNext()) {
+          ch.interlis.ili2c.metamodel.Enumeration.Element ee=(ch.interlis.ili2c.metamodel.Enumeration.Element) iter.next();
+          ch.interlis.ili2c.metamodel.Enumeration subEnum = ee.getSubEnumeration();
+          accu.add(new java.util.AbstractMap.SimpleEntry<String,ch.interlis.ili2c.metamodel.Enumeration.Element>(prefix+ee.getName(),ee));
+          if (subEnum != null)
+          {
+            // ee is not leaf, add its name to prefix and add sub elements to accu
+            buildEnumElementList(accu,prefix+ee.getName(),subEnum);
+          }
+        }
+    }
 	public static String getHelperTableMainTableRef(AttributeDef attr)
 	{
 		return HELPER_TABLE_MAIN_TABLE_REF_PREFIX+attr.getContainer().getName();
