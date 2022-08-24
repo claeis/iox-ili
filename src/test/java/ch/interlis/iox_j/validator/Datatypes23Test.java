@@ -395,7 +395,7 @@ public class Datatypes23Test {
 	}
 	
     @Test
-    public void enumerationTypeAllOffTest_OnlyNodeWihtoutSubEnumerationOk(){
+    public void enumerationTypeAllOffTest_RootNodeOk(){
         Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
         objMaxLength.setattrvalue("aufzaehlungAll", "Werktage");
         ValidationConfig modelConfig=new ValidationConfig();
@@ -413,7 +413,7 @@ public class Datatypes23Test {
     }
     
     @Test
-    public void enumerationTypeAllOffTest_SubSubSubEnumerationOK(){
+    public void enumerationTypeAllOffTest_LeafNodeOK(){
         Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
         objMaxLength.setattrvalue("aufzaehlungAll", "Werktage.Montag.Busy.FullDay");
         ValidationConfig modelConfig=new ValidationConfig();
@@ -659,9 +659,9 @@ public class Datatypes23Test {
 	}
 	
     @Test
-    public void enumerationTypeAllOffTest_SubSubEnumerationOK(){
+    public void enumerationTypeAllOffTest_Intermediate1OK(){
         Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
-        objMaxLength.setattrvalue("aufzaehlungAll", "Werktage.Montag.Frei");
+        objMaxLength.setattrvalue("aufzaehlungAll", "Werktage.Montag.Busy");
         ValidationConfig modelConfig=new ValidationConfig();
         LogCollector logger=new LogCollector();
         LogEventFactory errFactory=new LogEventFactory();
@@ -945,7 +945,7 @@ public class Datatypes23Test {
 	}
 	
     @Test
-    public void enumerationTypeAllOffTest_SubEnumerationOK(){
+    public void enumerationTypeAllOffTest_Intermediate2OK(){
         Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
         objMaxLength.setattrvalue("aufzaehlungAll", "Werktage.Montag");
         ValidationConfig modelConfig=new ValidationConfig();
@@ -2603,7 +2603,7 @@ public class Datatypes23Test {
     }
         
     @Test
-    public void enumerationTypeAllOffTest_SubSubSubEnumerationFail(){
+    public void enumerationTypeAllOffTest_IncompleteValue2Fail(){
         Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
         objMaxLength.setattrvalue("aufzaehlungAll", "Montag.Busy.FullDay");
         ValidationConfig modelConfig=new ValidationConfig();
@@ -2622,7 +2622,7 @@ public class Datatypes23Test {
     }
         
     @Test
-    public void enumerationTypeAllOffTest_SubSubEnumerationFail(){
+    public void enumerationTypeAllOffTest_IncompleteValue1Fail(){
         Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
         objMaxLength.setattrvalue("aufzaehlungAll", "Frei");
         ValidationConfig modelConfig=new ValidationConfig();
@@ -2641,7 +2641,7 @@ public class Datatypes23Test {
     }
     
     @Test
-    public void enumerationTypeAllOffTest_SubEnumerationFail(){
+    public void enumerationTypeAllOffTest_IncompleteValue3Fail(){
         Iom_jObject objMaxLength=new Iom_jObject("Datatypes23.Topic.ClassA", "o1");
         objMaxLength.setattrvalue("aufzaehlungAll", "Montag");
         ValidationConfig modelConfig=new ValidationConfig();

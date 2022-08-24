@@ -26,9 +26,11 @@ public class Polyline23Test {
 	private final static String OBJ_OID1 ="o1";
 	// MODEL.TOPIC
 	private final static String ILI_TOPIC="Datatypes23.Topic";
+    private final static String ILI_TOPICA="Polyline23.TopicA";
 	// CLASS
 	private final static String ILI_CLASSBDIRECTED=ILI_TOPIC+".ClassBDirected";
 	private final static String ILI_CLASSB=ILI_TOPIC+".ClassB";
+    private final static String ILI_CLASSA=ILI_TOPICA+".ClassA";
 	// START BASKET EVENT
 	private final static String BID="b1";
 	
@@ -36,8 +38,8 @@ public class Polyline23Test {
 	public void setUp() throws Exception {
 		// ili-datei lesen
 		Configuration ili2cConfig=new Configuration();
-		FileEntry fileEntry=new FileEntry("src/test/data/validator/Datatypes23.ili", FileEntryKind.ILIMODELFILE);
-		ili2cConfig.addFileEntry(fileEntry);
+		ili2cConfig.addFileEntry(new FileEntry("src/test/data/validator/Datatypes23.ili", FileEntryKind.ILIMODELFILE));
+        ili2cConfig.addFileEntry(new FileEntry("src/test/data/validator/Polyline23.ili", FileEntryKind.ILIMODELFILE));
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
 	}
@@ -71,6 +73,30 @@ public class Polyline23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    public void directed2dPolyline_Ok(){
+        Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSA, OBJ_OID1);
+        IomObject polylineValue=objStraightsSuccess.addattrobj("attrA", "POLYLINE");
+        IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+        IomObject coordStart=segments.addattrobj("segment", "COORD");
+        IomObject coordEnd=segments.addattrobj("segment", "COORD");
+        coordStart.setattrvalue("C1", "2480000.000");
+        coordStart.setattrvalue("C2", "1070000.000");
+        coordEnd.setattrvalue("C1",   "2480001.000");
+        coordEnd.setattrvalue("C2",   "1070001.000");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPICA,BID));
+        validator.validate(new ObjectEvent(objStraightsSuccess));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
     @Test
     public void oneSegment_Fail(){
         Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);

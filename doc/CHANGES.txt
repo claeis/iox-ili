@@ -6,6 +6,10 @@ ideas/open issues
 LATEST
 -----------------------------
 
+iox-ili 1.21.12 (2022-08-24)
+-----------------------------
+- ModelUtilities.buildEnumElementListAll() added
+
 iox-ili 1.21.11 (2022-07-08)
 -----------------------------
 - ItfWriter: add mandatory but empty tables (ili2fme#24)
