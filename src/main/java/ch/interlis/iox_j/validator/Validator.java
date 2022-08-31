@@ -78,6 +78,7 @@ import ch.interlis.ili2c.metamodel.PathElThis;
 import ch.interlis.ili2c.metamodel.PlausibilityConstraint;
 import ch.interlis.ili2c.metamodel.PolylineType;
 import ch.interlis.ili2c.metamodel.PrecisionDecimal;
+import ch.interlis.ili2c.metamodel.PredefinedModel;
 import ch.interlis.ili2c.metamodel.Projection;
 import ch.interlis.ili2c.metamodel.ReferenceType;
 import ch.interlis.ili2c.metamodel.RoleDef;
@@ -4281,33 +4282,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
 	private static boolean isDomainName(AttributeDef attr){
-		TransferDescription td=(TransferDescription) attr.getContainer(TransferDescription.class);
-		Type type=attr.getDomain();
-		while(type instanceof TypeAlias) {
-			if (((TypeAlias) type).getAliasing() == td.INTERLIS.NAME) {
-				return true;
-			}
-			type=((TypeAlias) type).getAliasing().getType();
-		}
-		return false;
+	    return attr.isDomainName();
 	}
 	
     private static boolean isDomainUri(AttributeDef attr){
-        TransferDescription td=(TransferDescription) attr.getContainer(TransferDescription.class);
-        Type type=attr.getDomain();
-        while(type instanceof TypeAlias) {
-            if (((TypeAlias) type).getAliasing() == td.INTERLIS.URI) {
-                return true;
-            }
-            type=((TypeAlias) type).getAliasing().getType();
-        }
-        return false;
+        return attr.isDomainUri();
     }
     private static boolean isDomainAnnexOid(AttributeDef attr){
-        TransferDescription td=(TransferDescription) attr.getContainer(TransferDescription.class);
         Type type=attr.getDomain();
         while(type instanceof TypeAlias) {
-            if (((TypeAlias) type).getAliasing() == td.INTERLIS.STANDARDOID) {
+            if (((TypeAlias) type).getAliasing() == PredefinedModel.getInstance().STANDARDOID) {
                 return true;
             }
             type=((TypeAlias) type).getAliasing().getType();
@@ -4315,19 +4299,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         return false;
     }
     private static boolean isDomainUuid(AttributeDef attr){
-        TransferDescription td=(TransferDescription) attr.getContainer(TransferDescription.class);
-        Type type=attr.getDomain();
-        while(type instanceof TypeAlias) {
-            if (((TypeAlias) type).getAliasing() == td.INTERLIS.UUIDOID) {
-                return true;
-            }
-            type=((TypeAlias) type).getAliasing().getType();
-        }
-        return false;
+        return attr.isDomainIliUuid();
     }
     
     private static boolean isDomainTextOid(AttributeDef attr){
-        TransferDescription td=(TransferDescription) attr.getContainer(TransferDescription.class);
         Type type=attr.getDomain();
         while(type instanceof TextOIDType) {
             return true;

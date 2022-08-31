@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- fix use of ch.interlis.ili2c.metamodel.Element.getContainer() (ili2c#76)
 
 iox-ili 1.21.12 (2022-08-24)
 -----------------------------
