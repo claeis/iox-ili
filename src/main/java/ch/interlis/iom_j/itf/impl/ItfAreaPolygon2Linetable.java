@@ -40,6 +40,7 @@ public class ItfAreaPolygon2Linetable {
 	private Collection<IomObject> ioxlines=null;
 	private ObjectPoolManager recman=null;
 	private String iliqname=null;
+	public boolean HasAttributeInvalidSurfaceTopology = false;
 	public ItfAreaPolygon2Linetable(String iliqname1, ObjectPoolManager recman1){
 		lines=new FileBasedCollection<CompoundCurve>(recman1,this.getClass().getSimpleName(),new CompoundCurveSerializer());
 		polygons=new java.util.ArrayList<Polygon>();

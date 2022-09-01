@@ -4768,18 +4768,14 @@ public class Area23Test {
         validator.validate(new EndTransferEvent());
 
         // Asserts
-        assertEquals(5, logger.getErrs().size());
+        assertEquals(2, logger.getErrs().size());
         assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
         assertEquals("no polygon", logger.getErrs().get(1).getEventMsg());
-        assertEquals("Intersection coord1 (550000.000, 80000.000), tids o2, o3", logger.getErrs().get(2).getEventMsg());
-        assertEquals("Intersection coord1 (600000.000, 75000.000), tids o2, o3", logger.getErrs().get(3).getEventMsg());
-        assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(4).getEventMsg());
 
-        assertEquals(5, logger.getInfo().size());
+        assertEquals(4, logger.getInfo().size());
         assertEquals("assume unknown external objects", logger.getInfo().get(0).getEventMsg());
         assertEquals("first validation pass...", logger.getInfo().get(1).getEventMsg());
-        assertEquals("AREA topology not validated, validation of SURFACE topology failed in attribute area2d", logger.getInfo().get(2).getEventMsg());
+        assertEquals("AREA topology of attribute area2d not validated, validation of SURFACE topology failed in attribute area2d", logger.getInfo().get(2).getEventMsg());
         assertEquals("second validation pass...", logger.getInfo().get(3).getEventMsg());
-        assertEquals("validate AREA Datatypes23.Topic.ClassD.area2d...", logger.getInfo().get(4).getEventMsg());
     }
 }
