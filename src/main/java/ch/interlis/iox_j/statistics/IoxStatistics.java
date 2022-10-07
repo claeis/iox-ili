@@ -74,7 +74,7 @@ public class IoxStatistics {
 			}else{
 				EhiLogger.logState(prefix+sep+basketStat.getTopic()+" BID="+basketStat.getBasketId());
 			}
-			HashMap<String, ClassStat> objStat=basketStat.getObjStat();
+			java.util.Map<String, ClassStat> objStat=basketStat.getObjStat();
 			ArrayList<String> classv=new ArrayList<String>(objStat.keySet());
 			java.util.Collections.sort(classv,new java.util.Comparator<String>(){
 				@Override
