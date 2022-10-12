@@ -20,7 +20,7 @@ public class BasketStat{
 		this.topic = topic;
 		this.basketId = iliBasketId;
 	}
-	public HashMap<String, ClassStat> getObjStat() {
+	public java.util.Map<String, ClassStat> getObjStat() {
 		return objStat;
 	}
 	public String getFile() {
