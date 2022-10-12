@@ -182,6 +182,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private boolean allObjectsAccessible=false;
 	private boolean isVerbose = false;
 	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
+	private Map<AttributeDef, Boolean> areaAttrsAreSurfaceTopologiesValid = new HashMap<AttributeDef, Boolean>();
 	private Map<String,Class> customFunctions=new HashMap<String,Class>(); // qualified Interlis function name -> java class that implements that function
 	private List<ExternalObjectResolver> extObjResolvers=null; // java class that implements ExternalObjectResolver
 	private HashMap<Constraint,Viewable> additionalConstraints=new HashMap<Constraint,Viewable>();
@@ -662,7 +663,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		setCurrentMainObj(null);
 		for(AttributeDef attr:areaAttrs.keySet()){
 			ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
-			if (!allLines.HasAttributeInvalidSurfaceTopology) {
+			Boolean surfaceTopologiesValid = areaAttrsAreSurfaceTopologiesValid.get(attr);
+			if (surfaceTopologiesValid == null || surfaceTopologiesValid) {
 				errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAllAreas.validateAREA"), getScopedName(attr)));
 				List<IoxInvalidDataException> intersections=allLines.validate();
 				if(intersections!=null && intersections.size()>0){
@@ -3800,7 +3802,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	                                                validateAreaTopology(validateGeometryType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
 	                                            }else {
 	                                                // surface topology not valid
-	                                                allLines.HasAttributeInvalidSurfaceTopology = true;
+	                                                areaAttrsAreSurfaceTopologiesValid.put(attr, false);
 	                                                errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAttrValue.areaTopologyNoValidatedValidationOfSurfaceTopologyFailedInAttributeY"), attrPath));
 	                                            }
 	                                        }
