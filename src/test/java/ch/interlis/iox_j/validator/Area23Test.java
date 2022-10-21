@@ -4718,4 +4718,64 @@ public class Area23Test {
         assertEquals(1, logger.getErrs().size());
         assertEquals("The value <3> is not a Polygon in attribute area2d", logger.getErrs().get(0).getEventMsg());
     }
+
+    @Test
+    public void checkWithSurfaceTopologyInvalid() {
+        IomObject startSegment = new Iom_jObject("COORD", null);
+        startSegment.setattrvalue("C1", "700000");
+        startSegment.setattrvalue("C2", "90000");
+
+        IomObject straightSegment1 = new Iom_jObject("COORD", null);
+        straightSegment1.setattrvalue("C1", "750000");
+        straightSegment1.setattrvalue("C2", "90000");
+
+        IomObject segment = new Iom_jObject("SEGMENTS", null);
+        segment.addattrobj("segment", startSegment);
+        segment.addattrobj("segment", straightSegment1);
+
+        IomObject polyline = new Iom_jObject("POLYLINE", null);
+        polyline.addattrobj("sequence", segment);
+
+        IomObject outerBoundary = new Iom_jObject("BOUNDARY", null);
+        outerBoundary.addattrobj("polyline", polyline);
+
+        IomObject surfaceValue = new Iom_jObject("SURFACE", null);
+        surfaceValue.addattrobj("boundary", outerBoundary);
+
+        IomObject invalidPolygon = new Iom_jObject("MULTISURFACE", null);
+        invalidPolygon.addattrobj("surface", surfaceValue);
+
+        Iom_jObject objectD1InvalidPolygon = new Iom_jObject(ILI_CLASSD, OID1);
+        objectD1InvalidPolygon.addattrobj("area2d", invalidPolygon);
+
+        Iom_jObject objectD2 = new Iom_jObject(ILI_CLASSD, OID2);
+        objectD2.addattrobj("area2d", IomObjectHelper.createRectangleGeometry("500000", "70000", "600000", "80000"));
+
+        Iom_jObject objectD3 = new Iom_jObject(ILI_CLASSD, OID3);
+        objectD3.addattrobj("area2d", IomObjectHelper.createRectangleGeometry("550000", "75000", "650000", "85000"));
+
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+        validator.validate(new ObjectEvent(objectD1InvalidPolygon));
+        validator.validate(new ObjectEvent(objectD2));
+        validator.validate(new ObjectEvent(objectD3));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+
+        // Asserts
+        assertEquals(2, logger.getErrs().size());
+        assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
+        assertEquals("no polygon", logger.getErrs().get(1).getEventMsg());
+
+        assertEquals(4, logger.getInfo().size());
+        assertEquals("assume unknown external objects", logger.getInfo().get(0).getEventMsg());
+        assertEquals("first validation pass...", logger.getInfo().get(1).getEventMsg());
+        assertEquals("AREA topology of attribute area2d not validated, validation of SURFACE topology failed in attribute area2d", logger.getInfo().get(2).getEventMsg());
+        assertEquals("second validation pass...", logger.getInfo().get(3).getEventMsg());
+    }
 }

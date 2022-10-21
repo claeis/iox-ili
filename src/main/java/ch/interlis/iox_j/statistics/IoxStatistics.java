@@ -32,26 +32,29 @@ public class IoxStatistics {
 	protected BasketStat createBasketStat(ch.interlis.iox.IoxEvent event) {
 		return new BasketStat(this,dataset,filename,((ch.interlis.iox.StartBasketEvent) event).getType(),((ch.interlis.iox.StartBasketEvent) event).getBid());
 	}
+	public java.util.List<BasketStat> getBaskets(){
+        java.util.List<BasketStat> statv=baskets;
+        java.util.Collections.sort(statv,new java.util.Comparator<BasketStat>(){
+            @Override
+            public int compare(BasketStat b0, BasketStat b1) {
+                int ret=compareStringOrNull(b0.getDataset(),b1.getDataset());
+                if(ret==0) {
+                    ret=compareStringOrNull(b0.getFile(),b1.getFile());
+                }
+                if(ret==0){
+                    ret=b0.getTopic().compareTo(b1.getTopic());
+                    if(ret==0){
+                        ret=b0.getBasketId().compareTo(b1.getBasketId());
+                    }
+                }
+                return ret;
+            }
+            
+        });
+        return statv;
+	}
 	public void write2logger() {
-		ArrayList<BasketStat> statv=baskets;
-		java.util.Collections.sort(statv,new java.util.Comparator<BasketStat>(){
-			@Override
-			public int compare(BasketStat b0, BasketStat b1) {
-				int ret=compareStringOrNull(b0.getDataset(),b1.getDataset());
-				if(ret==0) {
-					ret=compareStringOrNull(b0.getFile(),b1.getFile());
-				}
-				if(ret==0){
-					ret=b0.getTopic().compareTo(b1.getTopic());
-					if(ret==0){
-						ret=b0.getBasketId().compareTo(b1.getBasketId());
-					}
-				}
-				return ret;
-			}
-			
-		});
-		for(BasketStat basketStat:statv){
+		for(BasketStat basketStat:getBaskets()){
 			String file=basketStat.getFile();
 			String dataset=basketStat.getDataset();
 			StringBuffer prefix=new StringBuffer();
@@ -71,7 +74,7 @@ public class IoxStatistics {
 			}else{
 				EhiLogger.logState(prefix+sep+basketStat.getTopic()+" BID="+basketStat.getBasketId());
 			}
-			HashMap<String, ClassStat> objStat=basketStat.getObjStat();
+			java.util.Map<String, ClassStat> objStat=basketStat.getObjStat();
 			ArrayList<String> classv=new ArrayList<String>(objStat.keySet());
 			java.util.Collections.sort(classv,new java.util.Comparator<String>(){
 				@Override
