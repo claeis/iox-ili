@@ -5,8 +5,12 @@ ideas/open issues
 
 LATEST
 -----------------------------
+
+iox-ili 1.21.13 (2022-10-21)
+-----------------------------
 - API: IoxStatistics.getBaskets() added
 - fix use of ch.interlis.ili2c.metamodel.Element.getContainer() (ili2c#76)
+- skip attribute AREA validation if surface invalid (ilivalidator#296)
 
 iox-ili 1.21.12 (2022-08-24)
 -----------------------------
