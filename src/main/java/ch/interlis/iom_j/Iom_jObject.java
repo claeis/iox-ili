@@ -117,7 +117,7 @@ import java.util.ArrayList;
 					attrv.put(attrName, valuev);
 				}
 		}
-        private void addattrvalue(
+        public void addattrvalue(
             String attrName,
             String attrValue) {
                 if(attrValue==null){
