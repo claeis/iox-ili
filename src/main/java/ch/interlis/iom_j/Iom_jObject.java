@@ -263,16 +263,7 @@ import java.util.ArrayList;
 
 		@Override
 		public String getattrvalue(String attrName) {
-			if (attrv.containsKey(attrName))
-			{
-				ArrayList valuev = attrv.get(attrName);
-				Object val = valuev.get(0);
-				if (val instanceof String)
-				{
-					return (String)val;
-				}
-			}
-			return null;
+			return getattrprim(attrName, 0);
 		}
 
 		@Override
