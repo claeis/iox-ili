@@ -403,6 +403,19 @@ import java.util.ArrayList;
 		    }
 		}
 
+		public void setattrvalue(String attrName, int index, String value) {
+			if (value == null) {
+				throw new IllegalArgumentException("Illegal value null for " + attrName);
+			} else {
+				if (attrv.containsKey(attrName)) {
+					ArrayList arrayList = attrv.get(attrName);
+					arrayList.set(index, value);
+				} else {
+					throw new IllegalArgumentException("Could not find attribute with name " + attrName);
+				}
+			}
+		}
+
 		private int consistency;
 		@Override
 		public int getobjectconsistency() {
