@@ -50,6 +50,22 @@ public class Jts2iox {
 			throw new Iox2jtsException(ex);
 		}
 	}
+	/** Converts from a hex WKB to an INTERLIS MULTICOORD.
+	 * @param value hex encoded OGC WKB
+	 * @return MULTICOORD structure
+	 * @throws Iox2jtsException
+	 */
+	static public IomObject hexwkb2multicoord(String value)
+	throws Iox2jtsException
+	{
+		try{
+			byte bv[]=com.vividsolutions.jts.io.WKBReader.hexToBytes(value);
+			com.vividsolutions.jts.geom.Geometry geom =new com.vividsolutions.jts.io.WKBReader().read(bv);
+			return JTS2multicoord(geom.getCoordinates());
+		}catch(com.vividsolutions.jts.io.ParseException ex){
+			throw new Iox2jtsException(ex);
+		}
+	}
 	/** Converts from a hex WKB to an INTERLIS POLYLINE.
 	 * @param value hex encoded OGC WKB
 	 * @return POLYLINE structure
@@ -62,6 +78,22 @@ public class Jts2iox {
 			byte bv[]=com.vividsolutions.jts.io.WKBReader.hexToBytes(value);
 			com.vividsolutions.jts.geom.Geometry geom =new com.vividsolutions.jts.io.WKBReader().read(bv);
 			return JTS2polyline((com.vividsolutions.jts.geom.LineString)geom);
+		}catch(com.vividsolutions.jts.io.ParseException ex){
+			throw new Iox2jtsException(ex);
+		}
+	}
+	/** Converts from a hex WKB to an INTERLIS MULTIPOLYLINE.
+	 * @param value hex encoded OGC WKB
+	 * @return MULTIPOLYLINE structure
+	 * @throws Iox2jtsException
+	 */
+	public static IomObject hexwkb2multipolyline(String value)
+	throws Iox2jtsException
+	{
+		try{
+			byte bv[]=com.vividsolutions.jts.io.WKBReader.hexToBytes(value);
+			com.vividsolutions.jts.geom.Geometry geom =new com.vividsolutions.jts.io.WKBReader().read(bv);
+			return JTS2multipolyline((com.vividsolutions.jts.geom.MultiLineString)geom);
 		}catch(com.vividsolutions.jts.io.ParseException ex){
 			throw new Iox2jtsException(ex);
 		}
@@ -82,6 +114,23 @@ public class Jts2iox {
 			throw new Iox2jtsException(ex);
 		}
 	}
+	/** Converts from a hex WKB to an INTERLIS MULTISURFACE.
+	 * @param value hex encoded OGC WKB
+	 * @return MULTISURFACE structure
+	 * @throws Iox2jtsException
+	 */
+	static public IomObject hexwkb2multisurface(String value)
+	throws Iox2jtsException
+	{
+		try{
+			byte bv[]=com.vividsolutions.jts.io.WKBReader.hexToBytes(value);
+			com.vividsolutions.jts.geom.Geometry geom =new com.vividsolutions.jts.io.WKBReader().read(bv);
+			return JTS2multisurface((com.vividsolutions.jts.geom.MultiPolygon)geom);
+		}catch(com.vividsolutions.jts.io.ParseException ex){
+			throw new Iox2jtsException(ex);
+		}
+	}
+
 	/** Converts from a Coordinate to a INTERLIS COORD.
 	 * @param value JTS Coordinate.
 	 * @return INTERLIS COORD structure

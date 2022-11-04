@@ -88,6 +88,48 @@ public class Iox2jts {
 		}
 		return null;
 	}
+	/** Converts a MULTIPOLYLINE to a OGC WKB hex string.
+	 * @param value INTERLIS MULTIPOLYLINE structure.
+	 * @param strokeP maximum stroke to use when removing ARCs
+	 * @return WKB as hex encoded string.
+	 * @throws Iox2jtsException
+	 */
+	public static String multipolyline2hexwkb(IomObject value, double strokeP)
+	throws Iox2jtsException
+	{
+		if(value == null) return null;
+		com.vividsolutions.jts.geom.Geometry geom = multipolyline2JTS(value, strokeP);
+		byte bv[]=new com.vividsolutions.jts.io.WKBWriter().write(geom);
+		return com.vividsolutions.jts.io.WKBWriter.bytesToHex(bv);
+	}
+	/** Converts a MULTISURFACE/AREA to a OGC WKB hex string.
+	 * @param value INTERLIS MULTISURFACE/AREA structure.
+	 * @param strokeP maximum stroke to use when removing ARCs
+	 * @return WKB as hex encoded string.
+	 * @throws Iox2jtsException
+	 */
+	public static String multisurface2hexwkb(IomObject value, double strokeP)
+	throws Iox2jtsException
+	{
+		if(value == null) return null;
+		com.vividsolutions.jts.geom.Geometry geom = multisurface2JTS(value, strokeP, 0);
+		byte bv[]=new com.vividsolutions.jts.io.WKBWriter().write(geom);
+		return com.vividsolutions.jts.io.WKBWriter.bytesToHex(bv);
+	}
+	/** Converts a MULTICOORD to a OGC WKB hex string.
+	 * @param value INTERLIS MULTICOORD structure.
+	 * @return WKB as hex encoded string.
+	 * @throws Iox2jtsException
+	 */
+	public static String multicoord2hexwkb(IomObject value)
+	throws Iox2jtsException
+	{
+		if(value == null) return null;
+		com.vividsolutions.jts.geom.Geometry geom = multicoord2JTS(value);
+		byte bv[]=new com.vividsolutions.jts.io.WKBWriter().write(geom);
+		return com.vividsolutions.jts.io.WKBWriter.bytesToHex(bv);
+	}
+
 	/** Converts a COORD to a JTS Coordinate.
 	 * @param value INTERLIS COORD structure.
 	 * @return JTS Coordinate.
