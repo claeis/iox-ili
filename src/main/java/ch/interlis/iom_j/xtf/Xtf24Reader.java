@@ -1088,7 +1088,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                             // blackBox
                             java.io.StringWriter strw=new java.io.StringWriter();
                             event=collectXMLElement(xmlreader,event, strw); // <blackbox></blackbox>
-                            iomObj.setattrvalue(attrName, strw.toString());
+                            ((Iom_jObject)iomObj).addattrvalue(attrName, strw.toString());
                             if(!event.isEndElement()){
                                 throw new IoxSyntaxException(event2msgtext(event));
                             }
