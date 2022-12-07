@@ -36,6 +36,7 @@ import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.xtf.impl.XtfWriterAlt;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
@@ -979,7 +980,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                 if(event.isCharacters()){ // primitive attribute
                     event=readSimpleContent(event, characterValue);
                     if(event.isEndElement()) {
-                        iomObj.setattrvalue(attrName, characterValue.toString());
+						((Iom_jObject)iomObj).addattrvalue(attrName, characterValue.toString());
                     }else {
                         // TODO check that only whitespace
                         characterValue=null;
@@ -1087,7 +1088,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                             // blackBox
                             java.io.StringWriter strw=new java.io.StringWriter();
                             event=collectXMLElement(xmlreader,event, strw); // <blackbox></blackbox>
-                            iomObj.setattrvalue(attrName, strw.toString());
+                            ((Iom_jObject)iomObj).addattrvalue(attrName, strw.toString());
                             if(!event.isEndElement()){
                                 throw new IoxSyntaxException(event2msgtext(event));
                             }

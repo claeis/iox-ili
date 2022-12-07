@@ -371,9 +371,9 @@ import java.util.Map;
 						}
 
 					}else{
-						writeElementStringOptional(xmlns_attr,iliAttrName,val);
-						if(valueCount>1){
-							throw new IoxException("max one primitive-type value allowed ("+iliAttrName+")");
+						for (int i = 0; i < obj.getattrvaluecount(iliAttrName); i++) {
+							val = obj.getattrprim(iliAttrName, i);
+							writeElementStringOptional(xmlns_attr,iliAttrName,val);
 						}
 					}
 				}

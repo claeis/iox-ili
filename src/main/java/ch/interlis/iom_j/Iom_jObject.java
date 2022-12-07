@@ -117,7 +117,7 @@ import java.util.ArrayList;
 					attrv.put(attrName, valuev);
 				}
 		}
-        private void addattrvalue(
+        public void addattrvalue(
             String attrName,
             String attrValue) {
                 if(attrValue==null){
@@ -263,16 +263,7 @@ import java.util.ArrayList;
 
 		@Override
 		public String getattrvalue(String attrName) {
-			if (attrv.containsKey(attrName))
-			{
-				ArrayList valuev = attrv.get(attrName);
-				Object val = valuev.get(0);
-				if (val instanceof String)
-				{
-					return (String)val;
-				}
-			}
-			return null;
+			return getattrprim(attrName, 0);
 		}
 
 		@Override
@@ -401,6 +392,19 @@ import java.util.ArrayList;
 	                attrv.put(attrName, valuev);
 	            }
 		    }
+		}
+
+		public void setattrvalue(String attrName, int index, String value) {
+			if (value == null) {
+				throw new IllegalArgumentException("Illegal value null for " + attrName);
+			} else {
+				if (attrv.containsKey(attrName)) {
+					ArrayList arrayList = attrv.get(attrName);
+					arrayList.set(index, value);
+				} else {
+					throw new IllegalArgumentException("Could not find attribute with name " + attrName);
+				}
+			}
 		}
 
 		private int consistency;
