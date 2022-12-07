@@ -5,6 +5,8 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- API: add jts/iox converters used for multigeometries
+- XTF 2.4: support LIST OF / BAG OF primitive type
 
 iox-ili 1.21.13 (2022-10-21)
 -----------------------------
