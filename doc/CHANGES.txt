@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- API: add MetaConfig
 
 iox-ili 1.21.14 (2022-12-07)
 -----------------------------
