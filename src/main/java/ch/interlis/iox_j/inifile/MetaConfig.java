@@ -36,16 +36,18 @@ public class MetaConfig {
         }
     }
     public static void removeNullFromSettings(Settings settings) {
-        for(String key:settings.getValues()) {
+        // iterate over a copy of the key set, so that we can remove values
+        for(String key:new java.util.HashSet<String>(settings.getValues())) {
             String value=settings.getValue(key);
             if(value.equals(NULL)) {
-                settings.setValue(key, null);
+                settings.setValue(key, null); // remove the value
             }
         }
-        for(String key:settings.getTransientValues()) {
+        // iterate over a copy of the key set, so that we can remove values
+        for(String key:new java.util.HashSet<String>(settings.getTransientValues())) {
             Object value=settings.getTransientObject(key);
             if(value.equals(NULL)) {
-                settings.setTransientObject(key, null);
+                settings.setTransientObject(key, null); // remove the value
             }
         }
     }
