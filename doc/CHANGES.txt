@@ -6,6 +6,10 @@ ideas/open issues
 LATEST
 -----------------------------
 
+iox-ili 1.21.15 (2022-12-30)
+-----------------------------
+- API: add MetaConfig
+
 iox-ili 1.21.14 (2022-12-07)
 -----------------------------
 - API: add jts/iox converters used for multigeometries
