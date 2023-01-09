@@ -38,23 +38,23 @@ MODEL AttributeDef23
 		
 	END AttrMultiplicity;
 	
-	TOPIC AttrIndirectType =
+	TOPIC ViewTopic =
 		CLASS ClassA =
 			attrOptional : TEXT*10;
 		END ClassA;
 		
-        VIEW ClassV1
-    		PROJECTION OF Base~AttributeDef23.AttrIndirectType.ClassA;
+        VIEW View1
+    		PROJECTION OF Base~AttributeDef23.ViewTopic.ClassA;
     		=
       	 	ALL OF Base;
-    	END ClassV1;
+    	END View1;
     	
-    	VIEW ClassV2
-    		PROJECTION OF Base~AttributeDef23.AttrIndirectType.ClassA;
+    	VIEW View2
+    		PROJECTION OF Base~AttributeDef23.ViewTopic.ClassA;
     		=
       	 	attrOptionalZusatz := Base->attrOptional;
-    	END ClassV2;
+    	END View2;
     	
-	END AttrIndirectType;
+	END ViewTopic;
 		
 END AttributeDef23.

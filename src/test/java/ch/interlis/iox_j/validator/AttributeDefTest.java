@@ -25,7 +25,7 @@ public class AttributeDefTest {
 	private final static String OID1 ="o1";
 	// MODEL TOPIC
 	private final static String TOPIC_ATTRMULTIPLICITY="AttributeDef23.AttrMultiplicity";
-	private final static String TOPIC_ATTRINDIRECTTYPE="AttributeDef23.AttrIndirectType";
+	private final static String TOPIC_VIEWTOPIC="AttributeDef23.ViewTopic";
 	// CLASS EXTENDED
 	private final static String DIRECT_CLASSAP=TOPIC_ATTRMULTIPLICITY+".ClassAp";
 	// ATTRMULTIPLICITY CLASSES
@@ -35,9 +35,9 @@ public class AttributeDefTest {
 	private final static String DIRECT_CLASSD=TOPIC_ATTRMULTIPLICITY+".ClassD";
 	private final static String DIRECT_CLASSE=TOPIC_ATTRMULTIPLICITY+".ClassE";
 	private final static String DIRECT_CLASSF=TOPIC_ATTRMULTIPLICITY+".ClassF";
-	// ATTRINDIRECTTYPE CLASSES
-	private final static String INDIRECT_CLASSV1=TOPIC_ATTRINDIRECTTYPE+".ClassV1";
-	private final static String INDIRECT_CLASSV2=TOPIC_ATTRINDIRECTTYPE+".ClassV2";
+	// ATTRs in VIEWs
+	private final static String VIEWTOPIC_VIEW1=TOPIC_VIEWTOPIC+".View1";
+	private final static String VIEWTOPIC_VIEW2=TOPIC_VIEWTOPIC+".View2";
 	// BID
 	private final static String BID1="b1";
 	
@@ -54,7 +54,7 @@ public class AttributeDefTest {
 	// wenn ein optionaler Wert gesetzt wird,
 	// soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void implicitType_attrOptional_WithValue_Ok() {
+	public void class_attrOptional_WithValue_Ok() {
 		Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSA, OID1);
 		iomObj1.setattrvalue("attrOptional", "test");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -74,7 +74,7 @@ public class AttributeDefTest {
 	// wenn ein optionaler Wert nicht gesetzt wird,
 	// soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void implicitType_attrOptional_WithoutValue_Ok() {
+	public void class_attrOptional_WithoutValue_Ok() {
 		Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSA, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -95,7 +95,7 @@ public class AttributeDefTest {
 	// ein MANDATORY zugewiesen wird, soll bei einer Definition eines Wertes,
 	// keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void implicitType_attrMandatory_ExtendedOptional_WithValue_Ok() {
+	public void class_attrMandatory_ExtendedOptional_WithValue_Ok() {
 		Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSAP, OID1);
 		iomObj1.setattrvalue("attrOptional", "test");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -117,7 +117,7 @@ public class AttributeDefTest {
 	// ein MANDATORY zugewiesen wird, soll eine Fehlermeldung ausgegeben werden,
 	// wenn kein Attributewert erstellt wird.
 	@Test
-	public void implicitType_attrMandatory_ExtendedOptional_WithoutValue_Fail() {
+	public void class_attrMandatory_ExtendedOptional_WithoutValue_Fail() {
 		Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSAP, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -137,7 +137,7 @@ public class AttributeDefTest {
 	// wenn ein MANDATORY Wert gesetzt wird,
 	// soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void implicitType_attrMandatory_WithValue_Ok() {
+	public void class_attrMandatory_WithValue_Ok() {
 		Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSB, OID1);
 		iomObj1.setattrvalue("attrMandatory", "test");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -157,7 +157,7 @@ public class AttributeDefTest {
 	// wenn bei einem MANDATORY Wert, kein Wert erstellt wird,
 	// soll eine Fehlermeldung ausgegeben werden.
 	@Test
-	public void implicitType_attrMandatory_WithoutValue_Fail() {
+	public void class_attrMandatory_WithoutValue_Fail() {
 		Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSB, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -177,7 +177,7 @@ public class AttributeDefTest {
 	// zu einem OPTIONALEN Wert, der erstellt wird,
 	// soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void implicitType_attrOptional_DomainRef_WithValue_Ok() {
+	public void class_attrOptional_DomainOptional_WithValue_Ok() {
 		Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSC, OID1);
 		iomObj1.setattrvalue("attrOptional", "test");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -198,7 +198,7 @@ public class AttributeDefTest {
 	// zu einem OPTIONALEN Wert, der nicht erstellt wird,
 	// soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void implicitType_attrOptional_DomainRef_WithoutValue_Fail() {
+	public void class_attrOptional_DomainOptional_WithoutValue_Ok() {
 		Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSC, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -217,7 +217,7 @@ public class AttributeDefTest {
 	// dieser auf eine DOMAIN referenziert, darin auf einen OPTIONALEN Wert,
 	// welcher gesetzt wird, soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void implicitType_attrMandatory_DomainRefOptional_WithValue_Ok() {
+	public void class_attrMandatory_DomainOptional_WithValue_Ok() {
 		Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSD, OID1);
 		iomObj1.setattrvalue("attrMandatory", "test");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -238,7 +238,7 @@ public class AttributeDefTest {
 	// dieser auf eine DOMAIN referenziert, darin auf einen OPTIONALEN Wert,
 	// welcher nicht gesetzt wird, soll eine Fehlermeldung ausgegeben werden.
 	@Test
-	public void implicitType_attrMandatory_DomainRefOptional_WithoutValue_Fail() {
+	public void class_attrMandatory_DomainOptional_WithoutValue_Fail() {
 		Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSD, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -258,7 +258,7 @@ public class AttributeDefTest {
 	// zu einem MANDATORY Wert, der erstellt wird,
 	// soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void implicitType_DomainRefMandatory_WithValue_Ok() {
+	public void class_attrOptional_DomainMandatory_WithValue_Ok() {
 		Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSE, OID1);
 		iomObj1.setattrvalue("attrMandatory", "test");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -280,7 +280,7 @@ public class AttributeDefTest {
 	// soll eine Fehlermeldung ausgegeben werden.
 	@Ignore("Mandatory inside Domain is not yet implemented.")
 	@Test
-	public void implicitType_DomainRefMandatory_WithoutValue_Fail() {
+	public void class_attrOptional_DomainMandatory_WithoutValue_Fail() {
 		Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSE, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -301,7 +301,7 @@ public class AttributeDefTest {
 	// zudem an MANDATORY zugewiesen wird und der Wert gesetzt wird,
 	// soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void implicitType_DomainRefOptionalToMandatory__WithValue_Ok() {
+	public void class_attrOptional_ExtendedDomainMandatory__WithValue_Ok() {
 		Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSF, OID1);
 		iomObj1.setattrvalue("attrMandatory", "test");
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -324,7 +324,7 @@ public class AttributeDefTest {
 	// soll eine Fehlermeldung ausgegeben werden.
 	@Ignore("Mandatory inside Domain is not yet implemented.")
 	@Test
-	public void implicitType_DomainRefOptionalToMandatory__WithValue_Fail() {
+	public void class_attrOptional_ExtendeDomainMandatory_WithoutValue_Fail() {
 		Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSF, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -345,8 +345,8 @@ public class AttributeDefTest {
 	// auf einen OPTIONALEN Wert erstellt wird und dieser gesetzt wird,
 	// soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void mandatoryValue_Optional_WithValue_Ok() {
-		Iom_jObject iomObj1=new Iom_jObject(INDIRECT_CLASSV1, OID1);
+	public void view_allOfOptional_WithValue_Ok() {
+		Iom_jObject iomObj1=new Iom_jObject(VIEWTOPIC_VIEW1, OID1);
 		iomObj1.setattrvalue("attrOptional", "test");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -354,7 +354,7 @@ public class AttributeDefTest {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC_ATTRINDIRECTTYPE,BID1));
+		validator.validate(new StartBasketEvent(TOPIC_VIEWTOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObj1));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -366,15 +366,15 @@ public class AttributeDefTest {
 	// auf einen OPTIONALEN Wert erstellt wird und dieser nicht gesetzt wird,
 	// soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void mandatoryValue_Optional_WithoutValue_Ok() {
-		Iom_jObject iomObj1=new Iom_jObject(INDIRECT_CLASSV1, OID1);
+	public void view_allOfOptional_WithoutValue_Ok() {
+		Iom_jObject iomObj1=new Iom_jObject(VIEWTOPIC_VIEW1, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC_ATTRINDIRECTTYPE,BID1));
+		validator.validate(new StartBasketEvent(TOPIC_VIEWTOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObj1));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -386,8 +386,8 @@ public class AttributeDefTest {
 	// auf einen OPTIONALEN Wert via Base-> erstellt wird und dieser gesetzt wird,
 	// soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void mandatoryValue_Optional_BaseAttrRef_WithValue_Ok() {
-		Iom_jObject iomObj1=new Iom_jObject(INDIRECT_CLASSV2, OID1);
+	public void view_attrOptional_WithValue_Ok() {
+		Iom_jObject iomObj1=new Iom_jObject(VIEWTOPIC_VIEW2, OID1);
 		iomObj1.setattrvalue("attrOptionalZusatz", "test");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -395,7 +395,7 @@ public class AttributeDefTest {
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC_ATTRINDIRECTTYPE,BID1));
+		validator.validate(new StartBasketEvent(TOPIC_VIEWTOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObj1));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -407,15 +407,15 @@ public class AttributeDefTest {
 	// auf einen OPTIONALEN Wert via Base-> erstellt wird und dieser nicht gesetzt wird,
 	// soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void mandatoryValue_Optional_BaseAttrRef_WithoutValue_Ok() {
-		Iom_jObject iomObj1=new Iom_jObject(INDIRECT_CLASSV2, OID1);
+	public void view_attrOptional_WithoutValue_Ok() {
+		Iom_jObject iomObj1=new Iom_jObject(VIEWTOPIC_VIEW2, OID1);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(TOPIC_ATTRINDIRECTTYPE,BID1));
+		validator.validate(new StartBasketEvent(TOPIC_VIEWTOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObj1));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
