@@ -19,18 +19,21 @@ import ch.interlis.iox_j.StartBasketEvent;
 import ch.interlis.iox_j.StartTransferEvent;
 import ch.interlis.iox_j.logging.LogEventFactory;
 
-public class AttributeDefTest {
+public class AttributeDef24Test {
 	private TransferDescription td=null;
 	// OID
 	private final static String OID1 ="o1";
 	// MODEL TOPIC
-	private final static String TOPIC_ATTRMULTIPLICITY="AttributeDef23.AttrMultiplicity";
-	private final static String TOPIC_VIEWTOPIC="AttributeDef23.ViewTopic";
+	private final static String TOPIC_ATTRMULTIPLICITY="AttributeDef24.AttrMultiplicity";
+	private final static String TOPIC_VIEWTOPIC="AttributeDef24.ViewTopic";
 	// CLASS EXTENDED
-	private final static String DIRECT_CLASSAP=TOPIC_ATTRMULTIPLICITY+".ClassAp";
 	// ATTRMULTIPLICITY CLASSES
 	private final static String DIRECT_CLASSA=TOPIC_ATTRMULTIPLICITY+".ClassA";
+    private final static String DIRECT_CLASSA2=TOPIC_ATTRMULTIPLICITY+".ClassA2";
+    private final static String DIRECT_CLASSAP=TOPIC_ATTRMULTIPLICITY+".ClassAp";
+    private final static String DIRECT_CLASSAP2=TOPIC_ATTRMULTIPLICITY+".ClassAp2";
 	private final static String DIRECT_CLASSB=TOPIC_ATTRMULTIPLICITY+".ClassB";
+    private final static String DIRECT_CLASSB2=TOPIC_ATTRMULTIPLICITY+".ClassB2";
 	private final static String DIRECT_CLASSC=TOPIC_ATTRMULTIPLICITY+".ClassC";
 	private final static String DIRECT_CLASSD=TOPIC_ATTRMULTIPLICITY+".ClassD";
 	private final static String DIRECT_CLASSE=TOPIC_ATTRMULTIPLICITY+".ClassE";
@@ -45,7 +48,7 @@ public class AttributeDefTest {
 	public void setUp() throws Exception {
 		// ili-datei lesen
 		Configuration ili2cConfig=new Configuration();
-		FileEntry fileEntry=new FileEntry("src/test/data/validator/AttributeDef23.ili", FileEntryKind.ILIMODELFILE);
+		FileEntry fileEntry=new FileEntry("src/test/data/validator/AttributeDef24.ili", FileEntryKind.ILIMODELFILE);
 		ili2cConfig.addFileEntry(fileEntry);
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
@@ -70,6 +73,44 @@ public class AttributeDefTest {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    public void class_attr0_2_With2Value_Ok() {
+        Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSA2, OID1);
+        iomObj1.addattrvalue("attrOptional", "test");
+        iomObj1.addattrvalue("attrOptional", "test");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC_ATTRMULTIPLICITY,BID1));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
+    public void class_attr0_2_With3Value_Fail() {
+        Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSA2, OID1);
+        iomObj1.addattrvalue("attrOptional", "test");
+        iomObj1.addattrvalue("attrOptional", "test");
+        iomObj1.addattrvalue("attrOptional", "test");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC_ATTRMULTIPLICITY,BID1));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Attribute attrOptional has wrong number of values", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// wenn ein optionaler Wert nicht gesetzt wird,
 	// soll keine Fehlermeldung ausgegeben werden.
@@ -89,6 +130,24 @@ public class AttributeDefTest {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    // wenn ein optionaler Wert nicht gesetzt wird,
+    // soll keine Fehlermeldung ausgegeben werden.
+    @Test
+    public void class_attr0_2_WithoutValue_Ok() {
+        Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSA2, OID1);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC_ATTRMULTIPLICITY,BID1));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
 	
 	// wenn einem Wert eines Attributes innerhalb einer Klasse,
 	// welche auf eine Klasse EXTENDED die einen OPTIONALEN Attributewert enthaelt,
@@ -111,6 +170,23 @@ public class AttributeDefTest {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    public void class_attr0_2_Extended1_1_With1Value_Ok() {
+        Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSAP2, OID1);
+        iomObj1.addattrvalue("attrOptional", "test");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC_ATTRMULTIPLICITY,BID1));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
 	
 	// wenn einem Wert eines Attributes innerhalb einer Klasse,
 	// welche auf eine Klasse EXTENDED die einen OPTIONALEN Attributewert enthaelt,
@@ -133,6 +209,42 @@ public class AttributeDefTest {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Attribute attrOptional requires a value", logger.getErrs().get(0).getEventMsg());
 	}
+    @Test
+    public void class_attr0_2_Extended1_1_With2Value_Fail() {
+        Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSAP2, OID1);
+        iomObj1.addattrvalue("attrOptional", "test");
+        iomObj1.addattrvalue("attrOptional", "test");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC_ATTRMULTIPLICITY,BID1));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Attribute attrOptional requires a value", logger.getErrs().get(0).getEventMsg());
+    }
+    @Test
+    public void class_attr0_2_Extended1_1_WithoutValue_Fail() {
+        Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSAP2, OID1);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC_ATTRMULTIPLICITY,BID1));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Attribute attrOptional requires a value", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// wenn ein MANDATORY Wert gesetzt wird,
 	// soll keine Fehlermeldung ausgegeben werden.
@@ -153,6 +265,23 @@ public class AttributeDefTest {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    public void class_attr1_2_WithValue_Ok() {
+        Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSB2, OID1);
+        iomObj1.setattrvalue("attrMandatory", "test");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC_ATTRMULTIPLICITY,BID1));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
 	
 	// wenn bei einem MANDATORY Wert, kein Wert erstellt wird,
 	// soll eine Fehlermeldung ausgegeben werden.
@@ -172,6 +301,22 @@ public class AttributeDefTest {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Attribute attrMandatory requires a value", logger.getErrs().get(0).getEventMsg());
 	}
+    @Test
+    public void class_attr1_2_WithoutValue_Fail() {
+        Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSB2, OID1);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC_ATTRMULTIPLICITY,BID1));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Attribute attrMandatory has wrong number of values", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// besteht innerhalb einer Klasse eine referenz auf eine DOMAIN,
 	// zu einem OPTIONALEN Wert, der erstellt wird,

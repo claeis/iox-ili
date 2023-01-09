@@ -5,6 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
+- Validator: support LIST OF / BAG OF primitive type (ilivalidator#348)
 
 iox-ili 1.21.15 (2022-12-30)
 -----------------------------
