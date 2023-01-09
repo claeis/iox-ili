@@ -226,7 +226,7 @@ public class AttributeDef24Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertTrue(logger.getErrs().size()==1);
-        assertEquals("Attribute attrOptional requires a value", logger.getErrs().get(0).getEventMsg());
+        assertEquals("Attribute attrOptional has wrong number of values", logger.getErrs().get(0).getEventMsg());
     }
     @Test
     public void class_attr0_2_Extended1_1_WithoutValue_Fail() {

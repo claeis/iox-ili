@@ -3617,7 +3617,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                      }else{
                          Cardinality card = getCardinality(attr);
                          if(structc<card.getMinimum() || structc>card.getMaximum()){
-                             if(card.getMaximum()>1) {
+                             if(card.getMaximum()>1 || structc>1) {
                                  logMsg(validateMultiplicity, rsrc.getString("validateAttrValue.attributeXHasWrongNumberOfValues"), attrPath);
                              }else {
                                  logMsg(validateMultiplicity, rsrc.getString("validateAttrValue.attributeXRequiresAValue"), attrPath);
