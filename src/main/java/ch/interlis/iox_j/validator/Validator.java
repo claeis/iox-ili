@@ -3523,7 +3523,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				 validateGeometryType=defaultGeometryTypeValidation;
 			 }
 		 }
-		
+		Type type0=attr.getDomain();
 		Type type = attr.getDomainResolvingAll();
 		if (type instanceof CompositionType){
 			 int structc=iomObj.getattrvaluecount(attrName);
