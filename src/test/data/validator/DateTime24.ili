@@ -1,0 +1,25 @@
+INTERLIS 2.4;
+
+MODEL DateTime24 AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
+	DOMAIN
+		DomainDate = DATE;
+		DomainDateTime = DATETIME;
+		DomainTimeOfDay = TIMEOFDAY;
+		
+	TOPIC TopicA =
+	
+		CLASS ClassInline =
+			attrDate : DATE;
+			attrDateTime : DATETIME;
+			attrTimeOfDay : TIMEOFDAY;
+		END ClassInline;
+		
+		CLASS ClassDomain =
+			attrDate : DomainDate;
+			attrDateTime : DomainDateTime;
+			attrTimeOfDay : DomainTimeOfDay;
+		END ClassDomain;
+		
+	END TopicA;
+	
+END DateTime24.

@@ -5,7 +5,7 @@ ideas/open issues
 
 LATEST
 -----------------------------
-- Validator: support LIST OF / BAG OF primitive type (ilivalidator#348)
+- Validator: ILI2.4 support LIST OF / BAG OF primitive type (ilivalidator#348)
 - Validator:  ILI2.4 Vereinfachung des Umgangs mit Zeit (ilivalidator#349)
 - ili2c-5.3.2
 
