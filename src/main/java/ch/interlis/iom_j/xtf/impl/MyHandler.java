@@ -37,6 +37,7 @@ import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.Topic;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.xtf.OidSpace;
 import ch.interlis.iom_j.xtf.XtfStartTransferEvent;
 import ch.interlis.iox.IoxException;
@@ -469,7 +470,7 @@ public class MyHandler
 			pushReturnState(SS_AFTER_COORD);
 			if(name.equals("COORD")){
 				state=CV_COORD;
-				object=newIomObject("COORD",null);
+				object=newIomObject(Iom_jObject.COORD,null);
 			}else{
 				state=ST_BEFORE_PROPERTY;
 				object=newIomObject(name,null);
@@ -506,13 +507,13 @@ public class MyHandler
 				|| state==PV_AFTER_LINEATTR)
 				&& name.equals("COORD")){
 			pushReturnState(SS_AFTER_COORD);
-			object=newIomObject("SEGMENTS",null);
+			object=newIomObject(Iom_jObject.SEGMENTS,null);
 			Element ele=new Element();
 			ele.object=object;
-			ele.propertyName="segment";
+			ele.propertyName=Iom_jObject.SEGMENTS_SEGMENT;
 			objStack.add(0,ele);
 			state=CV_COORD;
-			object=newIomObject("COORD",null);
+			object=newIomObject(Iom_jObject.COORD,null);
 			return;
 		}
 		
@@ -526,18 +527,18 @@ public class MyHandler
 		if(state==SV_AFTER_CLIPPED && name.equals("CLIPPED")){
 			pushReturnState(SV_AFTER_CLIPPED);
 			state=SV_CLIPPED;
-			object=newIomObject("SURFACE",null);
+			object=newIomObject(Iom_jObject.SURFACE,null);
 			Element ele=new Element();
 			ele.object=object;
-			ele.propertyName="boundary";
+			ele.propertyName=Iom_jObject.SURFACE_BOUNDARY;
 			objStack.add(0,ele);
 			return;
 		}
 		if((state==SV_SURFACE || state==SV_CLIPPED || state==BD_AFTER_BOUNDARY)&& name.equals("BOUNDARY")){
-			object=newIomObject("BOUNDARY",null);
+			object=newIomObject(Iom_jObject.BOUNDARY,null);
 			Element ele=new Element();
 			ele.object=object;
-			ele.propertyName="polyline";
+			ele.propertyName=Iom_jObject.BOUNDARY_POLYLINE;
 			objStack.add(0,ele);
 			state=BD_BOUNDARY;
 			return;
@@ -545,10 +546,10 @@ public class MyHandler
 		if((state==BD_BOUNDARY || state==BD_AFTER_POLYLINE)&& name.equals("POLYLINE")){
 			pushReturnState(BD_AFTER_POLYLINE);
 			state=PV_POLYLINE;
-			object=newIomObject("POLYLINE",null);
+			object=newIomObject(Iom_jObject.POLYLINE,null);
 			Element ele=new Element();
 			ele.object=object;
-			ele.propertyName="sequence";
+			ele.propertyName=Iom_jObject.POLYLINE_SEQUENCE;
 			objStack.add(0,ele);
 			return;
 		}
@@ -575,32 +576,32 @@ public class MyHandler
 		if(state==ST_BEFORE_CHARACTERS && name.equals("SURFACE")){
 			pushReturnState(ST_AFTER_SURFACE);
 			state=SV_SURFACE;
-			object=newIomObject("MULTISURFACE",null);
+			object=newIomObject(Iom_jObject.MULTISURFACE,null);
 			Element ele=new Element();
 			ele.object=object;
-			ele.propertyName="surface";
+			ele.propertyName=Iom_jObject.MULTISURFACE_SURFACE;
 			objStack.add(0,ele);
-			object=newIomObject("SURFACE",null);
+			object=newIomObject(Iom_jObject.SURFACE,null);
 			ele=new Element();
 			ele.object=object;
-			ele.propertyName="boundary";
+			ele.propertyName=Iom_jObject.SURFACE_BOUNDARY;
 			objStack.add(0,ele);
 			return;
 		}
 		if(state==ST_BEFORE_CHARACTERS && name.equals("POLYLINE")){
 			pushReturnState(ST_AFTER_POLYLINE);
 			state=PV_POLYLINE;
-			object=newIomObject("POLYLINE",null);
+			object=newIomObject(Iom_jObject.POLYLINE,null);
 			Element ele=new Element();
 			ele.object=object;
-			ele.propertyName="sequence";
+			ele.propertyName=Iom_jObject.POLYLINE_SEQUENCE;
 			objStack.add(0,ele);
 			return;
 		}
 		if(state==ST_BEFORE_CHARACTERS && name.equals("COORD")){
 			pushReturnState(ST_AFTER_COORD);
 			state=CV_COORD;
-			object=newIomObject("COORD",null);
+			object=newIomObject(Iom_jObject.COORD,null);
 			return;
 		}
 		
@@ -843,15 +844,15 @@ public class MyHandler
 				throw new IllegalStateException();
 			}			
 		}else if(state==CV_C1){
-			parser_addAttrValue(object,"C1",propertyValue.toString());
+			parser_addAttrValue(object,Iom_jObject.COORD_C1,propertyValue.toString());
 			propertyValue=null;
 			state=CV_AFTER_C1;
 		}else if(state==CV_C2){
-			parser_addAttrValue(object,"C2",propertyValue.toString());
+			parser_addAttrValue(object,Iom_jObject.COORD_C2,propertyValue.toString());
 			propertyValue=null;
 			state=CV_AFTER_C2;
 		}else if(state==CV_C3){
-			parser_addAttrValue(object,"C3",propertyValue.toString());
+			parser_addAttrValue(object,Iom_jObject.COORD_C3,propertyValue.toString());
 			propertyValue=null;
 			state=CV_AFTER_C3;
 		// BlackboxValue
@@ -915,7 +916,7 @@ public class MyHandler
 					// ref (refattr)
 					// ref (role)
 					// ref (embedded assoc) without assocattrs
-					object=newIomObject("REF",null);
+					object=newIomObject(Iom_jObject.REF,null);
 				}else{
 					// ref (embedded assoc) with assocattrs
 				}
@@ -961,7 +962,7 @@ public class MyHandler
 					object=null;
 				}else if(state==PV_AFTER_LINEATTRSTRUCT){
 					Element ele=objStack.get(0);
-					parser_addAttrValue(ele.object,"lineattr",object);
+					parser_addAttrValue(ele.object,Iom_jObject.POLYLINE_LINEATTR,object);
 					object=null;
 				}else if(state==SS_AFTER_COORD){
 					// part of SEGMENTS

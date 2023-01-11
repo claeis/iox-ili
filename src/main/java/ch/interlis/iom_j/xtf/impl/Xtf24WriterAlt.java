@@ -29,6 +29,7 @@ import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.ili2c.generator.XSD24Generator;
 import ch.interlis.iom.*;
 import ch.interlis.iox.IoxException;
+import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.ViewableProperties;
 import ch.interlis.iom_j.ViewableProperty;
 import ch.interlis.iom_j.xtf.OidSpace;
@@ -262,7 +263,7 @@ import java.util.Map;
 						if (child != null)
 						{
 							// some special cases
-							if (child.getobjecttag().equals("COORD"))
+							if (child.getobjecttag().equals(Iom_jObject.COORD))
 							{
 								// COORD
 								xout.writeStartElement(xmlns_attr,iliAttrName);
@@ -273,7 +274,7 @@ import java.util.Map;
 									throw new IoxException("max one COORD value allowed ("+iliAttrName+")");
 								}
 							}
-							else if (child.getobjecttag().equals("MULTICOORD")) {
+							else if (child.getobjecttag().equals(Iom_jObject.MULTICOORD)) {
 								xout.writeStartElement(xmlns_attr, iliAttrName);
 								writeMultiCoord(child);
 								xout.writeEndElement(/*attr*/);
@@ -282,7 +283,7 @@ import java.util.Map;
 									throw new IoxException("max one MULTICOORD value allowed (" + iliAttrName + ")");
 								}
 							}
-							else if (child.getobjecttag().equals("POLYLINE"))
+							else if (child.getobjecttag().equals(Iom_jObject.POLYLINE))
 							{
 								// POLYLINE
 								String xmlAttrName=iliAttrName;
@@ -297,7 +298,7 @@ import java.util.Map;
 									throw new IoxException("max one POLYLINE value allowed ("+iliAttrName+")");
 								}
 							}
-							else if (child.getobjecttag().equals("MULTIPOLYLINE"))
+							else if (child.getobjecttag().equals(Iom_jObject.MULTIPOLYLINE))
 							{
 								xout.writeStartElement(xmlns_attr, iliAttrName);
 								writeMultiPolyline(child);
@@ -307,7 +308,7 @@ import java.util.Map;
 									throw new IoxException("max one MULTIPOLYLINE value allowed ("+iliAttrName+")");
 								}
 							}
-							else if (child.getobjecttag().equals("MULTISURFACE"))
+							else if (child.getobjecttag().equals(Iom_jObject.MULTISURFACE))
 							{
 								// MULTISURFACE
 								xout.writeStartElement(xmlns_attr,iliAttrName);
@@ -395,12 +396,12 @@ import java.util.Map;
         */
 		try{
 			xout.writeStartElement(geomNs, "coord");
-			String c1=obj.getattrprim("C1",0);
+			String c1=obj.getattrprim(Iom_jObject.COORD_C1,0);
 			writeElementStringOptional(geomNs,"c1",c1);
-			String c2=obj.getattrprim("C2",0);
+			String c2=obj.getattrprim(Iom_jObject.COORD_C2,0);
 			if(c2!=null){
 				writeElementStringOptional(geomNs,"c2",c2);
-				String c3=obj.getattrprim("C3",0);
+				String c3=obj.getattrprim(Iom_jObject.COORD_C3,0);
 				if(c3!=null){
 					writeElementStringOptional(geomNs,"c3",c3);
 				}
@@ -422,8 +423,8 @@ import java.util.Map;
         */
             try {
                 xout.writeStartElement(geomNs,"multicoord");
-                for (int coordi = 0; coordi < obj.getattrvaluecount("coord"); coordi++) {
-                    IomObject coord = obj.getattrobj("coord", coordi);
+                for (int coordi = 0; coordi < obj.getattrvaluecount(Iom_jObject.MULTICOORD_COORD); coordi++) {
+                    IomObject coord = obj.getattrobj(Iom_jObject.MULTICOORD_COORD, coordi);
                     writeCoord(coord);
                 }
                 xout.writeEndElement();
@@ -451,19 +452,19 @@ import java.util.Map;
         */
 		try{
 			xout.writeStartElement(geomNs,"arc");
-			String a1=obj.getattrprim("A1",0);
+			String a1=obj.getattrprim(Iom_jObject.ARC_A1,0);
 			writeElementStringOptional(geomNs,"a1",a1);
-			String a2=obj.getattrprim("A2",0);
+			String a2=obj.getattrprim(Iom_jObject.ARC_A2,0);
 			writeElementStringOptional(geomNs,"a2",a2);
-			String c1=obj.getattrprim("C1",0);
+			String c1=obj.getattrprim(Iom_jObject.COORD_C1,0);
 			writeElementStringOptional(geomNs,"c1",c1);
-			String c2=obj.getattrprim("C2",0);
+			String c2=obj.getattrprim(Iom_jObject.COORD_C2,0);
 			writeElementStringOptional(geomNs,"c2",c2);
-			String c3=obj.getattrprim("C3",0);
+			String c3=obj.getattrprim(Iom_jObject.COORD_C3,0);
 			if(c3!=null){
 				writeElementStringOptional(geomNs,"c3",c3);
 			}
-			String r=obj.getattrprim("R",0);
+			String r=obj.getattrprim(Iom_jObject.ARC_R,0);
 			if(r!=null){
 				writeElementStringOptional(geomNs,"a",r);
 			}
@@ -546,7 +547,7 @@ import java.util.Map;
 				xout.writeStartElement(geomNs,"polyline");
 			}
 			boolean clipped=obj.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
-			for(int sequencei=0;sequencei<obj.getattrvaluecount("sequence");sequencei++){
+			for(int sequencei=0;sequencei<obj.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE);sequencei++){
 				if(clipped){
 					xout.writeStartElement(iliNs,"CLIPPED"); // FIXME use multi type
 				}else{
@@ -555,13 +556,13 @@ import java.util.Map;
 						throw new IllegalArgumentException("unclipped polyline with multi 'sequence' elements");
 					}
 				}
-				IomObject sequence=obj.getattrobj("sequence",sequencei);
-				for(int segmenti=0;segmenti<sequence.getattrvaluecount("segment");segmenti++){
-					IomObject segment=sequence.getattrobj("segment",segmenti);
-					if(segment.getobjecttag().equals("COORD")){
+				IomObject sequence=obj.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequencei);
+				for(int segmenti=0;segmenti<sequence.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT);segmenti++){
+					IomObject segment=sequence.getattrobj(Iom_jObject.SEGMENTS_SEGMENT,segmenti);
+					if(segment.getobjecttag().equals(Iom_jObject.COORD)){
 						// COORD
 						writeCoord(segment);
-					}else if(segment.getobjecttag().equals("ARC")){
+					}else if(segment.getobjecttag().equals(Iom_jObject.ARC)){
 						// ARC
 						writeArc(segment);
 					}else{
@@ -592,8 +593,8 @@ import java.util.Map;
 		{
 			try {
 				xout.writeStartElement(geomNs,"multipolyline");
-				for(int polylinei=0;polylinei<obj.getattrvaluecount("polyline");polylinei++){
-					IomObject polyline=obj.getattrobj("polyline",polylinei);
+				for(int polylinei=0;polylinei<obj.getattrvaluecount(Iom_jObject.MULTIPOLYLINE_POLYLINE);polylinei++){
+					IomObject polyline=obj.getattrobj(Iom_jObject.MULTIPOLYLINE_POLYLINE,polylinei);
 					writePolyline(polyline, false);
 				}
 				xout.writeEndElement();
@@ -629,7 +630,7 @@ import java.util.Map;
 	        </SURFACE>
         */
 		try{
-			int surfaceCount = obj.getattrvaluecount("surface");
+			int surfaceCount = obj.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE);
 			boolean isIncomplete=obj.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
 
 			if (surfaceCount > 1 && !(isMultiSurfaceOrAreaType || isIncomplete)){
@@ -643,12 +644,12 @@ import java.util.Map;
 
 			for(int surfacei=0;surfacei<surfaceCount;surfacei++){
 				xout.writeStartElement(geomNs,"surface");
-				IomObject surface=obj.getattrobj("surface",surfacei);
-				for(int boundaryi=0;boundaryi<surface.getattrvaluecount("boundary");boundaryi++){
-					IomObject boundary=surface.getattrobj("boundary",boundaryi);
+				IomObject surface=obj.getattrobj(Iom_jObject.MULTISURFACE_SURFACE,surfacei);
+				for(int boundaryi=0;boundaryi<surface.getattrvaluecount(Iom_jObject.SURFACE_BOUNDARY);boundaryi++){
+					IomObject boundary=surface.getattrobj(Iom_jObject.SURFACE_BOUNDARY,boundaryi);
 					xout.writeStartElement(geomNs,boundaryi==0?"exterior":"interior");
-					for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
-						IomObject polyline=boundary.getattrobj("polyline",polylinei);
+					for(int polylinei=0;polylinei<boundary.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE);polylinei++){
+						IomObject polyline=boundary.getattrobj(Iom_jObject.BOUNDARY_POLYLINE,polylinei);
 						writePolyline(polyline,false);
 					}
 					xout.writeEndElement(/*BOUNDARY*/);

@@ -30,6 +30,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 
@@ -145,11 +146,11 @@ public class Iox2wkb {
 	    try {
 			writeByteOrder();
 			writeGeometryType(WKBConstants.wkbMultiPoint);
-			int coordc=obj.getattrvaluecount(Wkb2iox.ATTR_COORD);
+			int coordc=obj.getattrvaluecount(Iom_jObject.MULTICOORD_COORD);
 			os.writeInt(coordc);
 
 			for(int coordi=0;coordi<coordc;coordi++){
-				IomObject coord=obj.getattrobj(Wkb2iox.ATTR_COORD,coordi);
+				IomObject coord=obj.getattrobj(Iom_jObject.MULTICOORD_COORD,coordi);
                 Iox2wkb helper=new Iox2wkb(outputDimension,os.order(),asEWKB);
 				os.write(helper.coord2wkb(coord));
 			}
@@ -159,9 +160,9 @@ public class Iox2wkb {
 		return os.toByteArray();
 	}
 	private void writeCoord(IomObject value) throws Iox2wkbException {
-		String c1=value.getattrvalue("C1");
-		String c2=value.getattrvalue("C2");
-		String c3=value.getattrvalue("C3");
+		String c1=value.getattrvalue(Iom_jObject.COORD_C1);
+		String c2=value.getattrvalue(Iom_jObject.COORD_C2);
+		String c3=value.getattrvalue(Iom_jObject.COORD_C3);
 		double xCoord;
 		try{
 			xCoord = Double.parseDouble(c1);
@@ -190,8 +191,8 @@ public class Iox2wkb {
 	}
 
 	private static Coordinate arcSupportingCoord2JTS(IomObject value) throws Iox2wkbException {
-		String a1=value.getattrvalue("A1");
-		String a2=value.getattrvalue("A2");
+		String a1=value.getattrvalue(Iom_jObject.ARC_A1);
+		String a2=value.getattrvalue(Iom_jObject.ARC_A2);
 		double arcPt_re;
 			try{
 				arcPt_re = Double.parseDouble(a1);
@@ -218,9 +219,9 @@ public class Iox2wkb {
 		if(value==null){
 			return null;
 		}
-		String c1=value.getattrvalue("C1");
-		String c2=value.getattrvalue("C2");
-		String c3=value.getattrvalue("C3");
+		String c1=value.getattrvalue(Iom_jObject.COORD_C1);
+		String c2=value.getattrvalue(Iom_jObject.COORD_C2);
+		String c3=value.getattrvalue(Iom_jObject.COORD_C3);
 		double xCoord;
 		try{
 			xCoord = Double.parseDouble(c1);
@@ -298,18 +299,18 @@ public class Iox2wkb {
 			}
 
 			ringCollector.startNewRing();
-			for(int sequencei=0; sequencei<polylineObj.getattrvaluecount("sequence"); sequencei++) {
-				IomObject sequence=polylineObj.getattrobj("sequence",sequencei);
-				int segmentc=sequence.getattrvaluecount("segment");
+			for(int sequencei=0; sequencei<polylineObj.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE); sequencei++) {
+				IomObject sequence=polylineObj.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequencei);
+				int segmentc=sequence.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT);
 
 				for(int segmenti=0; segmenti<segmentc; segmenti++){
-					IomObject segment = sequence.getattrobj("segment", segmenti);
+					IomObject segment = sequence.getattrobj(Iom_jObject.SEGMENTS_SEGMENT, segmenti);
 					Coordinate segmentCoordinate = coord2JTS(segment);
 					
-					if (segment.getobjecttag().equals("COORD")){
+					if (segment.getobjecttag().equals(Iom_jObject.COORD)){
 						ringCollector.add(segmentCoordinate, WKBConstants.wkbLineString);
 					}
-					else if (segment.getobjecttag().equals("ARC"))
+					else if (segment.getobjecttag().equals(Iom_jObject.ARC))
 					{
 						if (asCompoundCurve){
 							ringCollector.add(arcSupportingCoord2JTS(segment),WKBConstants.wkbCircularString);
@@ -361,19 +362,19 @@ public class Iox2wkb {
 		}
 
 		List<IomObject> polylines = new ArrayList<IomObject>();
-		for (int surfacei = 0; surfacei < obj.getattrvaluecount("surface"); surfacei++) {
+		for (int surfacei = 0; surfacei < obj.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE); surfacei++) {
 			if (surfacei > 0) {
 				throw new Iox2wkbException("unclipped surface with multi 'surface' elements");
 			}
-			IomObject surface = obj.getattrobj("surface", surfacei);
-			int boundaryc = surface.getattrvaluecount("boundary");
+			IomObject surface = obj.getattrobj(Iom_jObject.MULTISURFACE_SURFACE, surfacei);
+			int boundaryc = surface.getattrvaluecount(Iom_jObject.SURFACE_BOUNDARY);
 
 			for (int boundaryi = 0; boundaryi < boundaryc; boundaryi++) {
-				IomObject boundary = surface.getattrobj("boundary", boundaryi);
-				int polylinec = boundary.getattrvaluecount("polyline");
+				IomObject boundary = surface.getattrobj(Iom_jObject.SURFACE_BOUNDARY, boundaryi);
+				int polylinec = boundary.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE);
 				for (int polylinei = 0; polylinei < polylinec; polylinei++){
-					IomObject polyline = boundary.getattrobj("polyline", polylinei);
-					if (polyline.getattrobj("lineattr", 0) != null) {
+					IomObject polyline = boundary.getattrobj(Iom_jObject.BOUNDARY_POLYLINE, polylinei);
+					if (polyline.getattrobj(Iom_jObject.POLYLINE_LINEATTR, 0) != null) {
 						throw new Iox2wkbException("Lineattributes not supported");
 					}
 					if (polyline.getobjectconsistency() == IomConstants.IOM_INCOMPLETE) {
@@ -423,13 +424,13 @@ public class Iox2wkb {
 			writeByteOrder();
 			writeGeometryType(asCurvePolygon ?  WKBConstants.wkbMultiSurface : WKBConstants.wkbMultiPolygon);
 
-			int surfacec=obj.getattrvaluecount("surface");
+			int surfacec=obj.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE);
 			os.writeInt(surfacec);
 
 			for(int surfacei=0;surfacei<surfacec;surfacei++){
-				IomObject surface=obj.getattrobj("surface",surfacei);
-				IomObject iomSurfaceClone=new ch.interlis.iom_j.Iom_jObject("MULTISURFACE",null);
-				iomSurfaceClone.addattrobj("surface",surface);
+				IomObject surface=obj.getattrobj(Iom_jObject.MULTISURFACE_SURFACE,surfacei);
+				IomObject iomSurfaceClone=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.MULTISURFACE,null);
+				iomSurfaceClone.addattrobj(Iom_jObject.MULTISURFACE_SURFACE,surface);
                 Iox2wkb helper=new Iox2wkb(outputDimension,os.order(),asEWKB);
 				os.write(helper.surface2wkb(iomSurfaceClone,asCurvePolygon,strokeP, repairTouchingLine));
 			}
@@ -447,10 +448,10 @@ public class Iox2wkb {
 		}
 
 		List<IomObject> polylines = new ArrayList<IomObject>();
-		int polylinec=obj.getattrvaluecount(Wkb2iox.ATTR_POLYLINE);
+		int polylinec=obj.getattrvaluecount(Iom_jObject.MULTIPOLYLINE_POLYLINE);
 
 		for(int polylinei=0;polylinei<polylinec;polylinei++){
-			IomObject polyline = obj.getattrobj("polyline",polylinei);
+			IomObject polyline = obj.getattrobj(Iom_jObject.MULTIPOLYLINE_POLYLINE,polylinei);
 			if (polyline.getobjectconsistency() == IomConstants.IOM_INCOMPLETE) {
 				throw new Iox2wkbException("clipped polyline not supported");
 			}

@@ -57,7 +57,8 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 	private HashMap tag2class=null;
 	private HashSet topics=null;
 	private long maxOid=0;
-	public static final String INTERNAL_T_ID="_t_id";
+	@Deprecated
+	public static final String INTERNAL_T_ID=Iom_jObject.INTERNAL_T_ID;
 
 	/*
 	private String modelName=null;
@@ -242,7 +243,7 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 											IomObject iomObj=pool.get(mainObjTid);
 											IomObject iomPolygon=iomObj.getattrobj(attrName, 0);
 											if(iomPolygon!=null){
-												String internalTid=iomObj.getattrvalue(INTERNAL_T_ID);
+												String internalTid=iomObj.getattrvalue(Iom_jObject.INTERNAL_T_ID);
 												// get lines
 												ArrayList<IomObject> lines=ItfAreaPolygon2Linetable.getLinesFromPolygon(iomPolygon);
 												allLines.addLines(mainObjTid,internalTid,lines);
@@ -299,7 +300,7 @@ public class ItfWriter2 implements ch.interlis.iox.IoxWriter {
 													String iomAttrName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableGeomAttrName(attr);
 													String fkName=ch.interlis.iom_j.itf.ModelUtilities.getHelperTableMainTableRef(attr);
 													lineTableObj.addattrobj(iomAttrName, line);
-													IomObject refvalue=lineTableObj.addattrobj(fkName,"REF");
+													IomObject refvalue=lineTableObj.addattrobj(fkName,Iom_jObject.REF);
 													refvalue.setobjectrefoid(iomObj.getobjectoid());
 													out.write(new ObjectEvent(lineTableObj));
 												}

@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.Iom_jObject;
 
 import com.vividsolutions.jts.io.ByteOrderDataInStream;
 import com.vividsolutions.jts.io.ByteArrayInStream;
@@ -46,11 +47,16 @@ import com.vividsolutions.jts.io.ByteOrderValues;
 
 public class Wkb2iox
 {
-	static final public String ATTR_POLYLINE="polyline";
-	static final public String ATTR_COORD="coord";
-	static final public String OBJ_MULTIPOLYLINE="MULTIPOLYLINE";
-	static final public String OBJ_MULTIPOINT="MULTIPOINT";
-	static final public String OBJ_MULTICOORD="MULTICOORD";
+    @Deprecated
+	static final public String ATTR_POLYLINE=Iom_jObject.MULTIPOLYLINE_POLYLINE;
+	@Deprecated
+	static final public String ATTR_COORD=Iom_jObject.MULTICOORD_COORD;
+    @Deprecated
+	static final public String OBJ_MULTIPOLYLINE=Iom_jObject.MULTIPOLYLINE;
+    @Deprecated
+	static final public String OBJ_MULTIPOINT=Iom_jObject.MULTICOORD;
+    @Deprecated
+	static final public String OBJ_MULTICOORD=Iom_jObject.MULTICOORD;
 	
   /**
    * Converts a hexadecimal string to a byte array.
@@ -223,11 +229,11 @@ private int extractGeometryType(int typeInt) {
         }
         throw new IOException("unexpected NaN in WKB");
     }
-	IomObject ret=new ch.interlis.iom_j.Iom_jObject("COORD",null);
-	ret.setattrvalue("C1", Double.toString(ordValues[0]));
-	ret.setattrvalue("C2", Double.toString(ordValues[1]));
+	IomObject ret=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.COORD,null);
+	ret.setattrvalue(Iom_jObject.COORD_C1, Double.toString(ordValues[0]));
+	ret.setattrvalue(Iom_jObject.COORD_C2, Double.toString(ordValues[1]));
 	if(inputDimension==3){
-		ret.setattrvalue("C3", Double.toString(ordValues[2]));
+		ret.setattrvalue(Iom_jObject.COORD_C3, Double.toString(ordValues[2]));
 	}
 	return ret;
   }
@@ -238,7 +244,7 @@ private int extractGeometryType(int typeInt) {
           // MULTIPOINT EMPTY
           return null;
       }
-		IomObject ret=new ch.interlis.iom_j.Iom_jObject(OBJ_MULTICOORD,null);
+		IomObject ret=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.MULTICOORD,null);
 	    for(int coordi=0;coordi<coordc;coordi++){
 	        byte byteOrder = dis.readByte();
 	        int typeInt = dis.readInt();
@@ -249,7 +255,7 @@ private int extractGeometryType(int typeInt) {
 	        }
         	IomObject coord=null;
         	coord=readPoint();
-	    	ret.addattrobj(ATTR_COORD,coord);
+	    	ret.addattrobj(Iom_jObject.MULTICOORD_COORD,coord);
 	    }
 	    return ret;
   }
@@ -266,11 +272,11 @@ private int extractGeometryType(int typeInt) {
           // LINESTRING EMPTY
           return null;
       }
-	    IomObject ret=new ch.interlis.iom_j.Iom_jObject("POLYLINE",null);
-		IomObject sequence=new ch.interlis.iom_j.Iom_jObject("SEGMENTS",null);
-		ret.addattrobj("sequence",sequence);
+	    IomObject ret=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.POLYLINE,null);
+		IomObject sequence=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.SEGMENTS,null);
+		ret.addattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequence);
 	for(int coordi=0;coordi<coordc;coordi++){
-		sequence.addattrobj("segment", readPoint());
+		sequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, readPoint());
 	}
 	return ret;
   }
@@ -281,9 +287,9 @@ private int extractGeometryType(int typeInt) {
         // EMPTY
         return null;
     }
-	IomObject ret=new ch.interlis.iom_j.Iom_jObject("POLYLINE",null);
-	IomObject sequence=new ch.interlis.iom_j.Iom_jObject("SEGMENTS",null);
-	ret.addattrobj("sequence",sequence);
+	IomObject ret=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.POLYLINE,null);
+	IomObject sequence=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.SEGMENTS,null);
+	ret.addattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequence);
 	for(int compi=0;compi<compc;compi++){
 	    byte byteOrder = dis.readByte();
 	    int typeInt = dis.readInt();
@@ -298,7 +304,7 @@ private int extractGeometryType(int typeInt) {
 	    				// skip start point
 		    			readPoint();
 	    			}else{
-		    			sequence.addattrobj("segment", readPoint());
+		    			sequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, readPoint());
 	    			}
 	    		}
 	    		break;
@@ -310,7 +316,7 @@ private int extractGeometryType(int typeInt) {
 	    			// first component and start point?
 	    			if(compi==0 && coordi==0){
 	    				// add start point
-		    			sequence.addattrobj("segment", readPoint());
+		    			sequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, readPoint());
 	    			}else if(compi>0 && coordi==0){
 		    			// not first component and start point?
 	    				// skip start point
@@ -321,10 +327,10 @@ private int extractGeometryType(int typeInt) {
 		    				throw new IllegalStateException("missing coord");
 		    			}
 		    			IomObject endPt=readPoint();
-		    			endPt.setobjecttag("ARC");
-		    			endPt.setattrvalue("A1", arcPt.getattrvalue("C1"));
-		    			endPt.setattrvalue("A2", arcPt.getattrvalue("C2"));
-		    			sequence.addattrobj("segment", endPt);
+		    			endPt.setobjecttag(Iom_jObject.ARC);
+		    			endPt.setattrvalue(Iom_jObject.ARC_A1, arcPt.getattrvalue(Iom_jObject.COORD_C1));
+		    			endPt.setattrvalue(Iom_jObject.ARC_A2, arcPt.getattrvalue(Iom_jObject.COORD_C2));
+		    			sequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, endPt);
 	    			}
 	    		}
 	    		break;
@@ -347,14 +353,14 @@ private int extractGeometryType(int typeInt) {
         // POLYGON EMPTY
         return null;
     }
-	IomObject ret=new ch.interlis.iom_j.Iom_jObject("MULTISURFACE",null);
-	IomObject surface=new ch.interlis.iom_j.Iom_jObject("SURFACE",null);
-	ret.addattrobj("surface",surface);
+	IomObject ret=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.MULTISURFACE,null);
+	IomObject surface=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.SURFACE,null);
+	ret.addattrobj(Iom_jObject.MULTISURFACE_SURFACE,surface);
 
 	for(int holei=0;holei<holec;holei++){
-		IomObject boundary=new ch.interlis.iom_j.Iom_jObject("BOUNDARY",null);
-		surface.addattrobj("boundary",boundary);
-		boundary.addattrobj("polyline", readLineString());
+		IomObject boundary=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.BOUNDARY,null);
+		surface.addattrobj(Iom_jObject.SURFACE_BOUNDARY,boundary);
+		boundary.addattrobj(Iom_jObject.BOUNDARY_POLYLINE, readLineString());
 	}
 	
 	return ret;
@@ -378,14 +384,14 @@ private int extractGeometryType(int typeInt) {
         // EMPTY
         return null;
     }
-	IomObject ret=new ch.interlis.iom_j.Iom_jObject("MULTISURFACE",null);
-	IomObject surface=new ch.interlis.iom_j.Iom_jObject("SURFACE",null);
-	ret.addattrobj("surface",surface);
+	IomObject ret=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.MULTISURFACE,null);
+	IomObject surface=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.SURFACE,null);
+	ret.addattrobj(Iom_jObject.MULTISURFACE_SURFACE,surface);
 
 	for(int holei=0;holei<ringc;holei++){
-		IomObject boundary=new ch.interlis.iom_j.Iom_jObject("BOUNDARY",null);
-		surface.addattrobj("boundary",boundary);
-		boundary.addattrobj("polyline", readGeometry());
+		IomObject boundary=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.BOUNDARY,null);
+		surface.addattrobj(Iom_jObject.SURFACE_BOUNDARY,boundary);
+		boundary.addattrobj(Iom_jObject.BOUNDARY_POLYLINE, readGeometry());
 	}
 	
 	return ret;
@@ -421,8 +427,8 @@ private int extractGeometryType(int typeInt) {
 	        	ret=readPolygon();
 	        }else{
 	        	IomObject poly=readPolygon();
-	        	IomObject surface=poly.getattrobj("surface", 0);
-		    	ret.addattrobj("surface",surface);
+	        	IomObject surface=poly.getattrobj(Iom_jObject.MULTISURFACE_SURFACE, 0);
+		    	ret.addattrobj(Iom_jObject.MULTISURFACE_SURFACE,surface);
 	        }
 	    }
 	    return ret;
@@ -470,8 +476,8 @@ private int extractGeometryType(int typeInt) {
                 }else {
                     poly=readCurvePolygon();
                 }
-	        	IomObject surface=poly.getattrobj("surface", 0);
-		    	ret.addattrobj("surface",surface);
+	        	IomObject surface=poly.getattrobj(Iom_jObject.MULTISURFACE_SURFACE, 0);
+		    	ret.addattrobj(Iom_jObject.MULTISURFACE_SURFACE,surface);
 	        }
 	    }
 	    return ret;
@@ -494,7 +500,7 @@ private int extractGeometryType(int typeInt) {
       if(curvec==0) {
           return null;
       }
-		IomObject ret=new ch.interlis.iom_j.Iom_jObject(OBJ_MULTIPOLYLINE,null);
+		IomObject ret=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.MULTIPOLYLINE,null);
 	    for(int curvei=0;curvei<curvec;curvei++){
 	        byte byteOrder = dis.readByte();
 	        int typeInt = dis.readInt();
@@ -510,7 +516,7 @@ private int extractGeometryType(int typeInt) {
 	        }else{
 	        	polyline=readCompoundCurve();
 	        }
-	    	ret.addattrobj(ATTR_POLYLINE,polyline);
+	    	ret.addattrobj(Iom_jObject.MULTIPOLYLINE_POLYLINE,polyline);
 	    }
 	    return ret;
   }
@@ -525,23 +531,23 @@ private int extractGeometryType(int typeInt) {
       if(coordc==0) {
           return null;
       }
-	    IomObject ret=new ch.interlis.iom_j.Iom_jObject("POLYLINE",null);
-		IomObject sequence=new ch.interlis.iom_j.Iom_jObject("SEGMENTS",null);
-		ret.addattrobj("sequence",sequence);
+	    IomObject ret=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.POLYLINE,null);
+		IomObject sequence=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.SEGMENTS,null);
+		ret.addattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequence);
 		for(int coordi=0;coordi<coordc;coordi++){
 			if( coordi==0){
 				// add start point
-				sequence.addattrobj("segment", readPoint());
+				sequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, readPoint());
 			}else{
 				IomObject arcPt=readPoint();coordi++;
 				if(coordi>=coordc){
 					throw new IllegalStateException("missing coord");
 				}
 				IomObject endPt=readPoint();
-				endPt.setobjecttag("ARC");
-				endPt.setattrvalue("A1", arcPt.getattrvalue("C1"));
-				endPt.setattrvalue("A2", arcPt.getattrvalue("C2"));
-				sequence.addattrobj("segment", endPt);
+				endPt.setobjecttag(Iom_jObject.ARC);
+				endPt.setattrvalue(Iom_jObject.ARC_A1, arcPt.getattrvalue(Iom_jObject.COORD_C1));
+				endPt.setattrvalue(Iom_jObject.ARC_A2, arcPt.getattrvalue(Iom_jObject.COORD_C2));
+				sequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, endPt);
 			}
 		}
 	return ret;

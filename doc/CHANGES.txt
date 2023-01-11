@@ -10,6 +10,7 @@ LATEST
 - Validator: ILI2.4 MULTI-Geometrien (ilivalidator#347)
 - Validator: ILI2.4 validate MultiArea/MultiSurface topology (ilivalidator#347)
 - Validator: skip polygon topology validation if basic checks fail 
+- API: added IomObject geometry constants
 - ili2c-5.3.2
 
 iox-ili 1.21.15 (2022-12-30)

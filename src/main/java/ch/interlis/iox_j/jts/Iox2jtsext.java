@@ -29,6 +29,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import ch.ehi.basics.types.OutParam;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurveRing;
@@ -102,9 +103,9 @@ public class Iox2jtsext {
 		if(value==null){
 			return null;
 		}
-		String c1=value.getattrvalue("C1");
-		String c2=value.getattrvalue("C2");
-		String c3=value.getattrvalue("C3");
+		String c1=value.getattrvalue(Iom_jObject.COORD_C1);
+		String c2=value.getattrvalue(Iom_jObject.COORD_C2);
+		String c3=value.getattrvalue(Iom_jObject.COORD_C3);
 		double xCoord;
 		try{
 			xCoord = Double.parseDouble(c1);
@@ -135,8 +136,8 @@ public class Iox2jtsext {
 		return coord2JTS(segment);
 	}
 	public static Coordinate getArcMidPt(IomObject segment) throws IoxException {
-		String a1=segment.getattrvalue("A1");
-		String a2=segment.getattrvalue("A2");
+		String a1=segment.getattrvalue(Iom_jObject.ARC_A1);
+		String a2=segment.getattrvalue(Iom_jObject.ARC_A2);
 		double arcPt_re;
 		try{
 			arcPt_re = Double.parseDouble(a1);
@@ -194,7 +195,7 @@ public class Iox2jtsext {
 		if(clipped){
 			throw new IoxException("clipped polyline not supported");
 		}
-		for(int sequencei=0;sequencei<polylineObj.getattrvaluecount("sequence");sequencei++){
+		for(int sequencei=0;sequencei<polylineObj.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE);sequencei++){
 			if(clipped){
 				//out.startElement(tags::get_CLIPPED(),0,0);
 			}else{
@@ -204,12 +205,12 @@ public class Iox2jtsext {
 				}
 			}
 			com.vividsolutions.jts.geom.Coordinate lastSegmentEndpoint=null;
-			IomObject sequence=polylineObj.getattrobj("sequence",sequencei);
-			for(int segmenti=0;segmenti<sequence.getattrvaluecount("segment");segmenti++){
-				IomObject segment=sequence.getattrobj("segment",segmenti);
+			IomObject sequence=polylineObj.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequencei);
+			for(int segmenti=0;segmenti<sequence.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT);segmenti++){
+				IomObject segment=sequence.getattrobj(Iom_jObject.SEGMENTS_SEGMENT,segmenti);
 				//EhiLogger.debug("segmenttag "+segment.getobjecttag());
 				CurveSegment curve=null;
-				if(segment.getobjecttag().equals("COORD")){
+				if(segment.getobjecttag().equals(Iom_jObject.COORD)){
 					// COORD
 					if(lastSegmentEndpoint==null){
 						lastSegmentEndpoint=coord2JTS(segment);
@@ -223,7 +224,7 @@ public class Iox2jtsext {
 							lastSegmentEndpoint=curve.getEndPoint();
 						}
 					}
-				}else if(segment.getobjecttag().equals("ARC")){
+				}else if(segment.getobjecttag().equals(Iom_jObject.ARC)){
 					// ARC
 					//arc2JTS(ret,segment,p);
 					Coordinate newSegMidPt=getArcMidPt(segment);
@@ -319,10 +320,10 @@ public class Iox2jtsext {
 			throw new IoxException("clipped surface not supported");
 		}
 		String tag=obj.getobjecttag();
-		if(!"MULTISURFACE".equals(tag)){
+		if(!Iom_jObject.MULTISURFACE.equals(tag)){
 			throw new IoxException("unexpected Type "+tag+"; MULTISURFACE expected");
 		}
-		int surfacec=obj.getattrvaluecount("surface");
+		int surfacec=obj.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE);
 		if(surfacec==0){
 			throw new IoxException("at least one element surface expected");
 		}
@@ -334,18 +335,18 @@ public class Iox2jtsext {
 			if(clipped){
 				//out.startElement("CLIPPED",0,0);
 			}
-			IomObject surface=obj.getattrobj("surface",surfacei);
+			IomObject surface=obj.getattrobj(Iom_jObject.MULTISURFACE_SURFACE,surfacei);
 			CompoundCurveRing shell=null;
 			CompoundCurveRing holes[]=null;
-			int boundaryc=surface.getattrvaluecount("boundary");
+			int boundaryc=surface.getattrvaluecount(Iom_jObject.SURFACE_BOUNDARY);
 			if(boundaryc>1){
 				holes=new CompoundCurveRing[boundaryc-1];				
 			}
 			for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
-				IomObject boundary=surface.getattrobj("boundary",boundaryi);
+				IomObject boundary=surface.getattrobj(Iom_jObject.SURFACE_BOUNDARY,boundaryi);
 				ArrayList<CompoundCurve> jtsLines=new ArrayList<CompoundCurve>();
-				for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
-					IomObject polyline=boundary.getattrobj("polyline",polylinei);
+				for(int polylinei=0;polylinei<boundary.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE);polylinei++){
+					IomObject polyline=boundary.getattrobj(Iom_jObject.BOUNDARY_POLYLINE,polylinei);
 					OutParam<Boolean> lineErrs=new OutParam<Boolean>();
 					CompoundCurve jtsLine=polyline2JTS(polyline,true,strokeP,lineErrs,errs,tolerance,validationType,ValidationConfig.WARNING);
 					if(lineErrs.value){
@@ -387,10 +388,10 @@ public class Iox2jtsext {
 			throw new IoxException("clipped surface not supported");
 		}
 		String tag=obj.getobjecttag();
-		if(!"MULTISURFACE".equals(tag)){
+		if(!Iom_jObject.MULTISURFACE.equals(tag)){
 			throw new IoxException("unexpected Type "+tag+"; MULTISURFACE expected");
 		}
-		int surfacec=obj.getattrvaluecount("surface");
+		int surfacec=obj.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE);
 		if(surfacec==0){
 			throw new IoxException("at least one element surface expected");
 		}
@@ -400,11 +401,11 @@ public class Iox2jtsext {
         }
 		ArrayList<CompoundCurve> jtsLines=new ArrayList<CompoundCurve>();
 		for(int surfacei=0;surfacei<surfacec;surfacei++){
-			IomObject surface=obj.getattrobj("surface",surfacei);
-			for(int boundaryi=0;boundaryi<surface.getattrvaluecount("boundary");boundaryi++){
-				IomObject boundary=surface.getattrobj("boundary",boundaryi);
-				for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
-					IomObject polyline=boundary.getattrobj("polyline",polylinei);
+			IomObject surface=obj.getattrobj(Iom_jObject.MULTISURFACE_SURFACE,surfacei);
+			for(int boundaryi=0;boundaryi<surface.getattrvaluecount(Iom_jObject.SURFACE_BOUNDARY);boundaryi++){
+				IomObject boundary=surface.getattrobj(Iom_jObject.SURFACE_BOUNDARY,boundaryi);
+				for(int polylinei=0;polylinei<boundary.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE);polylinei++){
+					IomObject polyline=boundary.getattrobj(Iom_jObject.BOUNDARY_POLYLINE,polylinei);
 					CompoundCurve jtsLine=Iox2jtsext.polyline2JTS(polyline, false, 0.0,new OutParam<Boolean>(),errFact,tolerance,validationType, ValidationConfig.WARNING);
 					jtsLines.add(jtsLine);
 				}
