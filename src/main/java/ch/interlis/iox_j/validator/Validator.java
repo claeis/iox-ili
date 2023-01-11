@@ -27,6 +27,8 @@ import ch.ehi.iox.objpool.impl.LongSerializer;
 import ch.interlis.ili2c.Ili2cException;
 import ch.interlis.ili2c.gui.UserSettings;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
+import ch.interlis.ili2c.metamodel.AbstractCoordType;
+import ch.interlis.ili2c.metamodel.AbstractSurfaceOrAreaType;
 import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.AssociationPath;
@@ -64,6 +66,9 @@ import ch.interlis.ili2c.metamodel.LineType;
 import ch.interlis.ili2c.metamodel.LocalAttribute;
 import ch.interlis.ili2c.metamodel.MandatoryConstraint;
 import ch.interlis.ili2c.metamodel.Model;
+import ch.interlis.ili2c.metamodel.MultiCoordType;
+import ch.interlis.ili2c.metamodel.MultiPolylineType;
+import ch.interlis.ili2c.metamodel.MultiSurfaceOrAreaType;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.ObjectPath;
@@ -3765,6 +3770,32 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                 logMsg(validateType, rsrc.getString("validateAttrValue.theValueXIsNotAPolylineInAttributeY"), attrValue, attrPath);
                             }                       
                         }
+                    } else if (type instanceof MultiPolylineType){
+                        MultiPolylineType polylineType=(MultiPolylineType)type;
+                        IomObject multipolylineValue=iomObj.getattrobj(attrName, structi);
+                        if (multipolylineValue != null){
+                            if(multipolylineValue.getobjecttag().equals("MULTIPOLYLINE")) {
+                                int polylinec=multipolylineValue.getattrvaluecount("polyline");
+                                if(polylinec>0) {
+                                    for(int polylinei=0;polylinei<polylinec;polylinei++) {
+                                        IomObject polylineValue=multipolylineValue.getattrobj("polyline", polylinei);
+                                        boolean isValid=validatePolyline(validateGeometryType, polylineType, polylineValue, attrName);
+                                        if(isValid){
+                                            validatePolylineTopology(attrPath,validateGeometryType, polylineType, polylineValue);
+                                        }
+                                    }
+                                }else {
+                                    logMsg(validateType, rsrc.getString("validateMultiPolyline.invalidNumberOfPolylines"));
+                                }
+                            }else {
+                                logMsg(validateType, "unexpected Type "+multipolylineValue.getobjecttag()+"; MULTIPOLYLINE expected");
+                            }
+                        } else {
+                            String attrValue = iomObj.getattrvalue(attrName);
+                            if (attrValue != null) {
+                                logMsg(validateType, rsrc.getString("validateAttrValue.theValueXIsNotAPolylineInAttributeY"), attrValue, attrPath);
+                            }                       
+                        }
                     }else if(type instanceof SurfaceOrAreaType){
                          if(doItfLineTables){
                              if(type instanceof SurfaceType){
@@ -3818,10 +3849,81 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                 }
                             }
                          }
+                    }else if(type instanceof MultiSurfaceOrAreaType){
+                        // validate polygon
+                        MultiSurfaceOrAreaType surfaceOrAreaType=(MultiSurfaceOrAreaType)type;
+                       IomObject surfaceValue=iomObj.getattrobj(attrName,structi);
+                       if (surfaceValue != null){
+                           boolean isValid = validatePolygon(validateGeometryType,surfaceOrAreaType, surfaceValue, iomObj, attrName);
+                           if(isValid){
+                               Object attrValidator=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
+                               if(attrValidator==null){
+                                   attrValidator=this;
+                                   pipelinePool.setIntermediateValue(attr, ValidationConfig.TOPOLOGY,this);
+                               }
+                               if(attrValidator==this){
+                                   /*
+                                   if(surfaceOrAreaType instanceof SurfaceType){
+                                       boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
+                                   }else{
+                                       boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
+                                       if(!singlePass) {
+                                           if(!ValidationConfig.OFF.equals(areaOverlapValidation)){
+
+                                               ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
+                                               if(allLines==null){
+                                                   allLines=new ItfAreaPolygon2Linetable(iliClassQName, objPoolManager);
+                                                   areaAttrs.put(attr,allLines);
+                                               }
+
+                                               if(surfaceTopologyValid) {
+                                                   validateAreaTopology(validateGeometryType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
+                                               }else {
+                                                   // surface topology not valid
+                                                   areaAttrsAreSurfaceTopologiesValid.put(attr, false);
+                                                   errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAttrValue.areaTopologyNoValidatedValidationOfSurfaceTopologyFailedInAttributeY"), attrPath));
+                                               }
+                                           }
+                                       }
+                                   } */
+                               }
+                           }
+                       } else {
+                           String attrValue=iomObj.getattrprim(attrName, structi);
+                           if (attrValue != null) {
+                               logMsg(validateType,rsrc.getString("validateAttrValue.theValueXIsNotAPolygonInAttributeY"), attrValue, attrPath);
+                           }
+                       }
                     }else if(type instanceof CoordType){
                         IomObject coord=iomObj.getattrobj(attrName, structi);
                         if (coord!=null){
                             validateCoordType(validateGeometryType, (CoordType)type, coord, attrName);
+                        } else {
+                            String attrValue=iomObj.getattrprim(attrName, structi);
+                            if (attrValue != null) {
+                                logMsg(validateType, rsrc.getString("validateAttrValue.theValueXIsNotCoordInAttributeY"), attrValue, attrPath);
+                            }
+                        }
+                    }else if(type instanceof MultiCoordType){
+                        IomObject multicoordValue=iomObj.getattrobj(attrName, structi);
+                        if (multicoordValue!=null){
+                            if(multicoordValue.getobjecttag().equals("MULTICOORD")) {
+                                int coordc=multicoordValue.getattrvaluecount("coord");
+                                if(coordc>0) {
+                                    for(int coordi=0;coordi<coordc;coordi++) {
+                                        IomObject coordValue=multicoordValue.getattrobj("coord", coordi);
+                                        if(coordValue.getobjecttag().equals("COORD")) {
+                                            validateCoordType(validateGeometryType, (MultiCoordType)type, coordValue, attrName);
+                                        }else {
+                                            logMsg(validateType, "unexpected Type "+coordValue.getobjecttag()+"; COORD expected");
+                                        }
+                                    }
+                                }else {
+                                    logMsg(validateType, rsrc.getString("validateMultiCoord.invalidNumberOfCoords"));
+                                }
+                            }else {
+                                logMsg(validateType, "unexpected Type "+multicoordValue.getobjecttag()+"; MULTICOORD expected");
+                            }
                         } else {
                             String attrValue=iomObj.getattrprim(attrName, structi);
                             if (attrValue != null) {
@@ -3996,7 +4098,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return surfaceTopologyValid;
 	}
 	
-	private void validatePolylineTopology(String attrPath,String validateType, PolylineType type, IomObject iomValue) {
+	private void validatePolylineTopology(String attrPath,String validateType, LineType type, IomObject iomValue) {
 		CompoundCurve seg=null;
 		try {
 		    OutParam<Boolean> foundErrs=new OutParam<Boolean>();
@@ -4039,15 +4141,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	/* returns true, if polygon is valid
 	 * 
 	 */
-	private boolean validatePolygon(String validateType, SurfaceOrAreaType surfaceOrAreaType, IomObject surfaceValue, IomObject currentIomObj, String attrName) {
+	private boolean validatePolygon(String validateType, AbstractSurfaceOrAreaType surfaceOrAreaType, IomObject surfaceValue, IomObject currentIomObj, String attrName) {
 		if (surfaceValue.getobjecttag().equals("MULTISURFACE")){
+		    int surfacec=surfaceValue.getattrvaluecount("surface");
+            if(surfacec==0){
+                logMsg(validateType, rsrc.getString("validateMultiPolygon.invalidNumberOfSurfaces"));
+                return false;
+            }
 			boolean clipped = surfaceValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
-			for(int surfacei=0;surfacei< surfaceValue.getattrvaluecount("surface");surfacei++){
-				if(!clipped && surfacei>0){
-					// unclipped surface with multi 'surface' elements
-					logMsg(validateType, rsrc.getString("validatePolygon.invalidNumberOfSurfaceInCompleteBasket"));
-					return false;
-				}
+            if((surfaceOrAreaType instanceof SurfaceOrAreaType) && !clipped && surfacec>1){
+                // unclipped surface with multi 'surface' elements
+                logMsg(validateType, rsrc.getString("validatePolygon.invalidNumberOfSurfaceInCompleteBasket"));
+                return false;
+            }
+			for(int surfacei=0;surfacei< surfacec;surfacei++){
 				IomObject surface= surfaceValue.getattrobj("surface",surfacei);
 				int boundaryc=surface.getattrvaluecount("boundary");
 				// a multisurface consists of at least one boundary.
@@ -4138,7 +4245,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return !foundErrs;
 	}
 
-	private void validateCoordType(String validateType, CoordType coordType, IomObject coordValue, String attrName) {
+	private void validateCoordType(String validateType, AbstractCoordType coordType, IomObject coordValue, String attrName) {
 		if (coordType.getDimensions().length >= 1){
 			if (coordValue.getattrvalue("C1") != null){
 				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"), attrName));
