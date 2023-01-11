@@ -66,9 +66,11 @@ import ch.interlis.ili2c.metamodel.LineType;
 import ch.interlis.ili2c.metamodel.LocalAttribute;
 import ch.interlis.ili2c.metamodel.MandatoryConstraint;
 import ch.interlis.ili2c.metamodel.Model;
+import ch.interlis.ili2c.metamodel.MultiAreaType;
 import ch.interlis.ili2c.metamodel.MultiCoordType;
 import ch.interlis.ili2c.metamodel.MultiPolylineType;
 import ch.interlis.ili2c.metamodel.MultiSurfaceOrAreaType;
+import ch.interlis.ili2c.metamodel.MultiSurfaceType;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.ObjectPath;
@@ -3862,11 +3864,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                    pipelinePool.setIntermediateValue(attr, ValidationConfig.TOPOLOGY,this);
                                }
                                if(attrValidator==this){
-                                   /*
-                                   if(surfaceOrAreaType instanceof SurfaceType){
-                                       boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
+                                   if(surfaceOrAreaType instanceof MultiSurfaceType){
+                                       boolean surfaceTopologyValid=validateMultiSurfaceTopology(validateGeometryType,attr,(MultiSurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
                                    }else{
-                                       boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
+                                       boolean surfaceTopologyValid=validateMultiSurfaceTopology(validateGeometryType,attr,(MultiAreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
                                        if(!singlePass) {
                                            if(!ValidationConfig.OFF.equals(areaOverlapValidation)){
 
@@ -3877,7 +3878,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                                }
 
                                                if(surfaceTopologyValid) {
-                                                   validateAreaTopology(validateGeometryType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
+                                                   validateMultiAreaTopology(validateGeometryType,allLines,(MultiAreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
                                                }else {
                                                    // surface topology not valid
                                                    areaAttrsAreSurfaceTopologiesValid.put(attr, false);
@@ -3885,7 +3886,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                                }
                                            }
                                        }
-                                   } */
+                                   }
                                }
                            }
                        } else {
@@ -3933,7 +3934,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     }else if(type instanceof NumericType){
                         String valueStr=iomObj.getattrprim(attrName, structi);
                         if(valueStr!=null){
-                            String newValueStr=validateNumericType(validateType, (NumericType)type, valueStr, attrName);
+                            OutParam<Boolean> isNumValid=new OutParam<Boolean>(true);
+                            String newValueStr=validateNumericType(validateType, (NumericType)type, valueStr, attrName,isNumValid);
                             if(newValueStr!=null) {
                                 iomObj.setattrvalue(attrName, newValueStr);
                             }
@@ -4086,6 +4088,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		// get lines
 		allLines.addPolygon(mainObjTid,internalTid,iomPolygon,validateType,errFact);
 	}
+    private void validateMultiAreaTopology(String validateType, ItfAreaPolygon2Linetable allLines,MultiAreaType type, String mainObjTid,String internalTid,IomObject iomPolygon) throws IoxException {
+        // get lines
+        //allLines.addMultiPolygon(mainObjTid,internalTid,iomPolygon,validateType,errFact);
+    }
 
 	private boolean validateSurfaceTopology(String validateType, AttributeDef attr,SurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
 		boolean surfaceTopologyValid=true;
@@ -4097,6 +4103,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		return surfaceTopologyValid;
 	}
+    private boolean validateMultiSurfaceTopology(String validateType, AttributeDef attr,MultiSurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
+        boolean surfaceTopologyValid=true;
+        //try {
+            //surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validateMultiPolygon(mainObjTid, attr, iomValue, errFact,validateType);
+        //} catch (IoxException e) {
+        //    surfaceTopologyValid=false;
+        //    errs.addEvent(errFact.logErrorMsg(e, rsrc.getString("validateSurfaceTopology.failedToValidatePolygon")));
+        //}
+        return surfaceTopologyValid;
+    }
 	
 	private void validatePolylineTopology(String attrPath,String validateType, LineType type, IomObject iomValue) {
 		CompoundCurve seg=null;
@@ -4142,6 +4158,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	 * 
 	 */
 	private boolean validatePolygon(String validateType, AbstractSurfaceOrAreaType surfaceOrAreaType, IomObject surfaceValue, IomObject currentIomObj, String attrName) {
+        boolean foundErrs=false;
 		if (surfaceValue.getobjecttag().equals("MULTISURFACE")){
 		    int surfacec=surfaceValue.getattrvaluecount("surface");
             if(surfacec==0){
@@ -4175,7 +4192,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}    
 						for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
 							IomObject polyline=boundary.getattrobj("polyline",polylinei);
-							validatePolyline(validateType, surfaceOrAreaType, polyline, attrName);
+					        foundErrs = foundErrs || !validatePolyline(validateType, surfaceOrAreaType, polyline, attrName);
 							// add line to shell or hole
 						}
 					    // add shell or hole to surface
@@ -4186,7 +4203,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			logMsg(validateType, "unexpected Type "+surfaceValue.getobjecttag()+"; MULTISURFACE expected");
 			return false;
 		}
-		return true;
+		return !foundErrs;
 	}
 
 	// returns true if valid
@@ -4216,14 +4233,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						IomObject segment=sequence.getattrobj("segment",segmenti);
 						if(segment.getobjecttag().equals("COORD")){
 							if(lineformNames.contains("STRAIGHTS") || segmenti==0){
-								validateCoordType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment, attrName);
+							    foundErrs = foundErrs || !validateCoordType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment, attrName);
 							}else{
 								logMsg(validateType, "unexpected COORD");
 								foundErrs = foundErrs || true;
 							}
 						} else if (segment.getobjecttag().equals("ARC")){
 							if(lineformNames.contains("ARCS") && segmenti>0){
-								validateARCSType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment, attrName);
+							    foundErrs = foundErrs || !validateARCSType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment, attrName);
 							}else{
 								logMsg(validateType, "unexpected ARC");
 								foundErrs = foundErrs || true;
@@ -4245,35 +4262,44 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return !foundErrs;
 	}
 
-	private void validateCoordType(String validateType, AbstractCoordType coordType, IomObject coordValue, String attrName) {
+    // returns true if valid
+	private boolean validateCoordType(String validateType, AbstractCoordType coordType, IomObject coordValue, String attrName) {
+        boolean foundErrs=false;
+        OutParam<Boolean> isNumValid=new OutParam<Boolean>(true);
 		if (coordType.getDimensions().length >= 1){
 			if (coordValue.getattrvalue("C1") != null){
-				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"), attrName));
+				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"), attrName,isNumValid));
 			} else if (coordValue.getattrvalue("A1") != null) {
 				logMsg(validateType, rsrc.getString("validateCoordType.notATypeOfCoord"));
+	            foundErrs = foundErrs || true;
 			} else {
 				logMsg(validateType, rsrc.getString("validateCoordType.wrongCoordStructureC1Expected"));
+	            foundErrs = foundErrs || true;
 			}
 		}
 		if (coordType.getDimensions().length == 2){
 			if (coordValue.getattrvalue("C3") != null){
 				logMsg(validateType, rsrc.getString("validateCoordType.wrongCoordStructureC3NotExpected"));
+	            foundErrs = foundErrs || true;
 			}
 		}
 		if (coordType.getDimensions().length >= 2){
 			if (coordValue.getattrvalue("C2") != null){
-				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"), attrName));
+				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"), attrName,isNumValid));
 			} else if (coordValue.getattrvalue("A2") != null) {
 				logMsg(validateType, rsrc.getString("validateCoordType.notATypeOfCoord"));
+	            foundErrs = foundErrs || true;
 			} else {
 				logMsg(validateType, rsrc.getString("validateCoordType.wrongCoordStructureC2Expected"));
+	            foundErrs = foundErrs || true;
 			}
 		}
 		if (coordType.getDimensions().length == 3){
 			if (coordValue.getattrvalue("C3") != null){
-				coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"), attrName));
+				coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"), attrName,isNumValid));
 			} else {
 				logMsg(validateType, rsrc.getString("validateCoordType.wrongCoordStructureC3Expected"));
+	            foundErrs = foundErrs || true;
 			}
 		}
 		// validate if no superfluous properties
@@ -4285,12 +4311,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}else{
 				if(!propName.equals("C1") && !propName.equals("C2") && !propName.equals("C3")){
 					errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateCoordType.wrongCoordStructureUnknownPropertyX"),propName));
+		            foundErrs = foundErrs || true;
 				}
 			}
 		}
+        return !foundErrs && isNumValid.value;
 	}
 
-	private void validateARCSType(String validateType, CoordType coordType, IomObject coordValue, String attrName) {
+    // returns true if valid
+	private boolean validateARCSType(String validateType, CoordType coordType, IomObject coordValue, String attrName) {
+        boolean foundErrs=false;
 		int dimLength=coordType.getDimensions().length;
 		String c1=coordValue.getattrvalue("C1");
 		String c2=coordValue.getattrvalue("C2");
@@ -4299,22 +4329,25 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		String a2=coordValue.getattrvalue("A2");
 		
 		boolean wrongArcStructure=false;
+		OutParam<Boolean> isNumValid=new OutParam<Boolean>(true);
 		int c1Count=coordValue.getattrvaluecount("C1");
 		if (dimLength>=2 && dimLength<=3){
 			if(a1!=null && a2!=null && c1!=null && c2!=null){
-				coordValue.setattrvalue("A1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], a1, attrName));
-				coordValue.setattrvalue("A2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], a2, attrName));
-				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], c1, attrName));
-				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], c2, attrName));
+				coordValue.setattrvalue("A1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], a1, attrName,isNumValid));
+				coordValue.setattrvalue("A2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], a2, attrName,isNumValid));
+				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], c1, attrName,isNumValid));
+				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], c2, attrName,isNumValid));
 				if(dimLength==2) {
 					if(c3!=null) {
 						logMsg(validateType, rsrc.getString("validateARCSType.wrongArcStructureC3NotExpected"));
+	                    foundErrs = foundErrs || true;
 					}
 				}else if(dimLength==3) {
 					if(c3!=null) {
-						coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], c3, attrName));
+						coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], c3, attrName,isNumValid));
 					}else {
 						logMsg(validateType, rsrc.getString("validateARCSType.wrongArcStructureC3Expected"));
+	                    foundErrs = foundErrs || true;
 					}
 				}
 			}else {
@@ -4325,6 +4358,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		if(wrongArcStructure) {
 			logMsg(validateType, rsrc.getString("validateARCSType.wrongArcStructure"));
+            foundErrs = foundErrs || true;
 		}
 		
 		// validate if no superfluous properties
@@ -4338,17 +4372,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					// ok.
 				} else {
 					errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateARCSType.wrongArcStructureUnknownPropertyX"),propName));
+                    foundErrs = foundErrs || true;
 				}
 			}
 		}
+        return !foundErrs && isNumValid.value;
 	}
 
-	private String validateNumericType(String validateType, NumericType type, String valueStr, String attrName) {
+	private String validateNumericType(String validateType, NumericType type, String valueStr, String attrName,OutParam<Boolean> isValid) {
 		PrecisionDecimal value=null;
 		try {
 			value=new PrecisionDecimal(valueStr);
 		} catch (NumberFormatException e) {
 			 logMsg(validateType, rsrc.getString("validateNumericType.valueXIsNotANumber"), valueStr);
+			 isValid.value=false;
 		}
 		BigDecimal rounded=null;
 		if(value!=null){
@@ -4365,6 +4402,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			if (rounded!=null && (rounded.compareTo(min_general)==-1 || rounded.compareTo(max_general)==+1)){
 				logMsg(validateType, rsrc.getString("validateNumericType.valueXIsOutOfRangeInAttributeY"), rounded.toString(), attrName);
+	             isValid.value=false;
 			}
 		}
 		if(rounded==null) {

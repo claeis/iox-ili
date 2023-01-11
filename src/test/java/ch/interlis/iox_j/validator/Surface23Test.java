@@ -1545,7 +1545,7 @@ public class Surface23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==6);
+		assertTrue(logger.getErrs().size()==3);
 		assertEquals("value 4800000.000 is out of range in attribute surface3d", logger.getErrs().get(0).getEventMsg());
 		assertEquals("value 700000.000 is out of range in attribute surface3d", logger.getErrs().get(1).getEventMsg());
 		assertEquals("value 10000.000 is out of range in attribute surface3d", logger.getErrs().get(2).getEventMsg());
