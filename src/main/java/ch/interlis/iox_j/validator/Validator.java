@@ -4090,7 +4090,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
     private void validateMultiAreaTopology(String validateType, ItfAreaPolygon2Linetable allLines,MultiAreaType type, String mainObjTid,String internalTid,IomObject iomPolygon) throws IoxException {
         // get lines
-        //allLines.addMultiPolygon(mainObjTid,internalTid,iomPolygon,validateType,errFact);
+        allLines.addMultiPolygon(mainObjTid,internalTid,iomPolygon,validateType,errFact);
     }
 
 	private boolean validateSurfaceTopology(String validateType, AttributeDef attr,SurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
@@ -4105,12 +4105,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
     private boolean validateMultiSurfaceTopology(String validateType, AttributeDef attr,MultiSurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
         boolean surfaceTopologyValid=true;
-        //try {
-            //surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validateMultiPolygon(mainObjTid, attr, iomValue, errFact,validateType);
-        //} catch (IoxException e) {
-        //    surfaceTopologyValid=false;
-        //    errs.addEvent(errFact.logErrorMsg(e, rsrc.getString("validateSurfaceTopology.failedToValidatePolygon")));
-        //}
+        try {
+            surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validateMultiPolygon(mainObjTid, attr, iomValue, errFact,validateType);
+        } catch (IoxException e) {
+            surfaceTopologyValid=false;
+            errs.addEvent(errFact.logErrorMsg(e, rsrc.getString("validateSurfaceTopology.failedToValidatePolygon")));
+        }
         return surfaceTopologyValid;
     }
 	

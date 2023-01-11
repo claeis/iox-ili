@@ -294,7 +294,17 @@ public class Iox2jtsext {
 		OutParam<Boolean> foundErrs=new OutParam<Boolean>();
 		return surface2JTS(obj,strokeP,foundErrs,errs,0.0,ValidationConfig.WARNING);
 	}
-	public static com.vividsolutions.jts.geom.Polygon surface2JTS(IomObject obj,double strokeP, OutParam<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType) //SurfaceOrAreaType type)
+    public static com.vividsolutions.jts.geom.Polygon surface2JTS(IomObject obj,double strokeP, OutParam<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType) //SurfaceOrAreaType type)
+    throws IoxException
+    {
+        return (com.vividsolutions.jts.geom.Polygon)surface2JTS_(obj,strokeP,foundErrs,errs,tolerance,validationType,false);
+    }
+    public static com.vividsolutions.jts.geom.MultiPolygon multisurface2JTS(IomObject obj,double strokeP, OutParam<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType) //SurfaceOrAreaType type)
+    throws IoxException
+    {
+        return (com.vividsolutions.jts.geom.MultiPolygon)surface2JTS_(obj,strokeP,foundErrs,errs,tolerance,validationType,true);
+    }
+	private static com.vividsolutions.jts.geom.Geometry surface2JTS_(IomObject obj,double strokeP, OutParam<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType,boolean isMultiSurface) //SurfaceOrAreaType type)
 	throws IoxException
 	{
 		foundErrs.value=false;
@@ -302,6 +312,7 @@ public class Iox2jtsext {
 			return null;
 		}
 		com.vividsolutions.jts.geom.Polygon ret=null;
+        ArrayList<com.vividsolutions.jts.geom.Polygon> polys=new ArrayList<com.vividsolutions.jts.geom.Polygon>();
 		//IFMEFeatureVector bndries=session.createFeatureVector();
 		boolean clipped=obj.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
 		if(clipped){
@@ -315,14 +326,13 @@ public class Iox2jtsext {
 		if(surfacec==0){
 			throw new IoxException("at least one element surface expected");
 		}
+        // an unclipped surface should have only one surface element
+        if(!isMultiSurface && !clipped && surfacec>1){
+            throw new IoxException("unclipped surface with multi 'surface' elements");
+        }
 		for(int surfacei=0;surfacei<surfacec;surfacei++){
 			if(clipped){
 				//out.startElement("CLIPPED",0,0);
-			}else{
-				// an unclipped surface should have only one surface element
-				if(surfacei>0){
-					throw new IoxException("unclipped surface with multi 'surface' elements");
-				}
 			}
 			IomObject surface=obj.getattrobj("surface",surfacei);
 			CompoundCurveRing shell=null;
@@ -354,11 +364,21 @@ public class Iox2jtsext {
 			if(clipped){
 				//out.endElement(/*CLIPPED*/);
 			}
+			polys.add(ret);
+		}
+		if(isMultiSurface) {
+            return new JtsextGeometryFactory().createMultiPolygon(polys.toArray(new com.vividsolutions.jts.geom.Polygon[polys.size()]));
 		}
 		return ret;
 	}
 	
-	public static ArrayList<CompoundCurve> surface2JTSCompoundCurves(IomObject obj,String validationType,double tolerance,LogEventFactory errFact) throws IoxException {
+    public static ArrayList<CompoundCurve> surface2JTSCompoundCurves(IomObject obj,String validationType,double tolerance,LogEventFactory errFact) throws IoxException {
+        return surface2JTSCompoundCurves_(obj,validationType,tolerance,errFact,false);
+    }
+    public static ArrayList<CompoundCurve> multisurface2JTSCompoundCurves(IomObject obj,String validationType,double tolerance,LogEventFactory errFact) throws IoxException {
+        return surface2JTSCompoundCurves_(obj,validationType,tolerance,errFact,true);
+    }
+	private static ArrayList<CompoundCurve> surface2JTSCompoundCurves_(IomObject obj,String validationType,double tolerance,LogEventFactory errFact,boolean isMultiSurface) throws IoxException {
 		if(obj==null){
 			return null;
 		}
@@ -374,16 +394,12 @@ public class Iox2jtsext {
 		if(surfacec==0){
 			throw new IoxException("at least one element surface expected");
 		}
+        // an unclipped surface should have only one surface element
+        if(!isMultiSurface && !clipped && surfacec>1){
+            throw new IoxException("unclipped surface with multi 'surface' elements");
+        }
 		ArrayList<CompoundCurve> jtsLines=new ArrayList<CompoundCurve>();
 		for(int surfacei=0;surfacei<surfacec;surfacei++){
-			if(clipped){
-				//out.startElement("CLIPPED",0,0);
-			}else{
-				// an unclipped surface should have only one surface element
-				if(surfacei>0){
-					throw new IoxException("unclipped surface with multi 'surface' elements");
-				}
-			}
 			IomObject surface=obj.getattrobj("surface",surfacei);
 			for(int boundaryi=0;boundaryi<surface.getattrvaluecount("boundary");boundaryi++){
 				IomObject boundary=surface.getattrobj("boundary",boundaryi);

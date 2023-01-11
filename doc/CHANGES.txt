@@ -8,6 +8,7 @@ LATEST
 - Validator: ILI2.4 support LIST OF / BAG OF primitive type (ilivalidator#348)
 - Validator: ILI2.4 Vereinfachung des Umgangs mit Zeit (ilivalidator#349)
 - Validator: ILI2.4 MULTI-Geometrien (ilivalidator#347)
+- Validator: ILI2.4 validate MultiArea/MultiSurface topology (ilivalidator#347)
 - Validator: skip polygon topology validation if basic checks fail 
 - ili2c-5.3.2
 

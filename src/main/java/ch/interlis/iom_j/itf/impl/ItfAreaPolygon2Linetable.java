@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
@@ -96,6 +97,35 @@ public class ItfAreaPolygon2Linetable {
 			}
 		}
 	}
+    public void addMultiPolygon(String mainObjTid,String internalTid,IomObject iomPolygon,String validationType,LogEventFactory errs) throws IoxException {
+        ArrayList<IomObject> ioxlines=ItfAreaPolygon2Linetable.getLinesFromMultiPolygon(iomPolygon);
+        OutParam<Boolean> foundErrs=new OutParam<Boolean>();
+        MultiPolygon multipolygon=Iox2jtsext.multisurface2JTS(iomPolygon, 0.0,foundErrs,errs,0.0,validationType);
+        if(multipolygon!=null){
+            int polyc=multipolygon.getNumGeometries();
+            for(int polyi=0;polyi<polyc;polyi++) {
+                Polygon polygon=(Polygon) multipolygon.getGeometryN(polyi);
+                if(internalTid!=null){
+                    polygon.setUserData(internalTid);
+                }else{
+                    polygon.setUserData(mainObjTid);
+                }
+                polygons.add(polygon);
+            }
+        }
+        
+        for(IomObject ioxline:ioxlines){
+            CompoundCurve line=Iox2jtsext.polyline2JTS(ioxline, false, 0.0,foundErrs,errs,0.0,validationType,ValidationConfig.WARNING);
+            if(line!=null){
+                if(internalTid!=null){
+                    line.setUserData(internalTid);
+                }else{
+                    line.setUserData(mainObjTid);
+                }
+                ((Collection)lines).add(line);
+            }
+        }
+    }
 	
 	public List<IoxInvalidDataException> validate()  {
 		CompoundCurveNoder noder=new CompoundCurveNoder(recman,(java.util.List)lines,false);
@@ -190,19 +220,28 @@ public class ItfAreaPolygon2Linetable {
 		return (List<IomObject>) ioxlines;
 	}
 
-	public static ArrayList<IomObject> getLinesFromPolygon(IomObject polygon)
+    public static ArrayList<IomObject> getLinesFromPolygon(IomObject polygon)
+    {
+        return getLinesFromPolygon_(polygon,false);
+    }
+    public static ArrayList<IomObject> getLinesFromMultiPolygon(IomObject polygon)
+    {
+        return getLinesFromPolygon_(polygon,true);
+    }
+	private static ArrayList<IomObject> getLinesFromPolygon_(IomObject polygon,boolean isMultiPolygon)
 	{
 		ArrayList<IomObject> ret=new ArrayList<IomObject>();
+		int surfacec=polygon.getattrvaluecount("surface");
 		boolean clipped=polygon.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
-		for(int surfacei=0;surfacei<polygon.getattrvaluecount("surface");surfacei++){
-			if(clipped){
-				throw new IllegalArgumentException("clipped surface not supported");
-			}else{
-				// an unclipped surface should have only one surface element
-				if(surfacei>0){
-					throw new IllegalArgumentException("unclipped surface with multi 'surface' elements");
-				}
-			}
+        if(clipped){
+            throw new IllegalArgumentException("clipped surface not supported");
+        }else{
+            // an unclipped surface should have only one surface element
+            if(!isMultiPolygon && surfacec>1){
+                throw new IllegalArgumentException("unclipped surface with multi 'surface' elements");
+            }
+        }
+		for(int surfacei=0;surfacei<surfacec;surfacei++){
 			IomObject surface=polygon.getattrobj("surface",surfacei);
 			for(int boundaryi=0;boundaryi<surface.getattrvaluecount("boundary");boundaryi++){
 				IomObject boundary=surface.getattrobj("boundary",boundaryi);
