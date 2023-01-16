@@ -1,4 +1,4 @@
-INTERLIS 2.4;
+INTERLIS 2.3;
 
 MODEL Translation23_de (de)
     AT "mailto:noreply@localhost" VERSION "2021-09-07" =
