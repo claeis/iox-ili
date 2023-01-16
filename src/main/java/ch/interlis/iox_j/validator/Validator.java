@@ -2408,11 +2408,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			String sep="";
 			// find target classes.
 			while(targetClassIterator.hasNext()){
-				Viewable roleDestinationClass = (Viewable) targetClassIterator.next();
-				destinationClasses.add(roleDestinationClass);
-				possibleTargetClasses.append(sep);
-				sep=",";
-				possibleTargetClasses.append(roleDestinationClass.getScopedName(null));
+				for(Viewable roleDestinationClass : getTranslations((Viewable) targetClassIterator.next())) {
+	                destinationClasses.add(roleDestinationClass);
+	                possibleTargetClasses.append(sep);
+	                possibleTargetClasses.append(roleDestinationClass.getScopedName(null));
+	                sep=",";
+				}
 			}
 			OutParam<String> bidOfTargetObj = new OutParam<String>();
 			IomObject targetObj = (IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
@@ -2484,7 +2485,52 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 	
-	private IomObject findExternalObject(String targetBid,String targetOid, ArrayList<Viewable> destinationClasses, OutParam<String> bidOfTargetObj) {
+	private List<Viewable> getTranslations(Viewable aclass0) {
+        Viewable rootClass=(Viewable)getRootTranslation(aclass0);
+	    List<Viewable> ret=new ArrayList<Viewable>();
+	    ret.add(rootClass);
+	    Model rootModel=(Model)getRootTranslation(rootClass.getContainer(Model.class));
+        Topic rootTopic=(Topic)getRootTranslation(rootClass.getContainer(Topic.class));
+	    for(Iterator<Model> it=td.iterator();it.hasNext();) {
+	        Model destModel=it.next();
+	        if(isTranslatedBy(rootModel,destModel)) {
+	            for(Iterator<Element> eleIt=destModel.iterator();eleIt.hasNext();) {
+	                Element destEle=eleIt.next();
+	                if(destEle instanceof Viewable && isTranslatedBy(rootClass,destEle)) {
+	                    if(destEle!=rootClass)ret.add((Viewable)destEle); // one candidate found
+	                }else if(destEle instanceof Topic && rootTopic!=null && isTranslatedBy(destEle,rootTopic)){
+	                    for(Iterator<Element> classIt=((Topic)destEle).iterator();classIt.hasNext();) {
+	                        Element destClass=classIt.next();
+	                        if(destClass instanceof Viewable && isTranslatedBy(destClass,rootClass)) {
+	                            if(destClass!=rootClass)ret.add((Viewable)destClass);
+	                            break; // one candidate found
+	                        }
+	                    }
+	                }
+	            }
+	        }
+	    }
+        return ret;
+    }
+	private boolean isTranslatedBy(Element ele1,Element ele2) {
+	    
+        Element root1=getRootTranslation(ele1);
+        Element root2=getRootTranslation(ele2);
+        return root1.equals(root2);
+	}
+    private Element getRootTranslation(Element ele0) {
+        if(ele0==null) {
+            return null;
+        }
+        while(true) {
+            Element ele1=ele0.getTranslationOf();
+            if(ele1==null) {
+                return ele0;
+            }
+            ele0=ele1;
+        }
+    }
+    private IomObject findExternalObject(String targetBid,String targetOid, ArrayList<Viewable> destinationClasses, OutParam<String> bidOfTargetObj) {
 	        if(!objectPool.getBasketIds().contains(targetBid)) {
 	            List<Dataset> dataset = null;
 	            File[] datasetFiles = null;
@@ -2561,9 +2607,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             targetOid=refAttrStruct.getobjectrefoid();
                         }
 
-						AbstractClassDef targetClass = refAttrType.getReferred();
-						ArrayList<Viewable> destinationClasses = new ArrayList<Viewable>();
-						destinationClasses.add(targetClass);
+			            Iterator<AbstractClassDef> targetClassIterator = refAttrType.iteratorRestrictedTo();
+			            if(!targetClassIterator.hasNext()) {
+	                        AbstractClassDef targetClass = refAttrType.getReferred();
+			                List<AbstractClassDef> refs=new ArrayList<AbstractClassDef>();
+			                refs.add(targetClass);
+			                targetClassIterator=refs.iterator();
+			            }
+			            ArrayList<Viewable> destinationClasses = new ArrayList<Viewable>();
+			            StringBuffer possibleTargetClasses=new StringBuffer();
+			            // find target classes.
+			            while(targetClassIterator.hasNext()){
+			                for(Viewable roleDestinationClass : getTranslations((Viewable) targetClassIterator.next())) {
+			                    destinationClasses.add(roleDestinationClass);
+			                }
+			            }
 						String targetObjClassStr = null;
 						OutParam<String> bidOfTargetObj = new OutParam<String>();
 						IomObject targetObject = null;
@@ -2582,7 +2640,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                 targetObject = findExternalObject(bid, targetOid, destinationClasses, bidOfTargetObj);
                             }
 						}
-						// EXTERNAL
+						// not EXTERNAL?
 						if(!refAttrType.isExternal()){
 							if(targetOid!=null){
 								if(targetObject!=null){
@@ -2629,10 +2687,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							// if refAttrIter restricted to class
 							StringBuffer classNames=new StringBuffer();
 							String sep="";
-							Iterator refAttrRestrictionIter = refAttrType.iteratorRestrictedTo();
+							Iterator<Viewable> refAttrRestrictionIter = destinationClasses.iterator();
 							while (refAttrRestrictionIter.hasNext()){
-								Object refAttrRestriction = refAttrRestrictionIter.next();
-								targetClass = (Table) refAttrRestriction;
+								Viewable targetClass = refAttrRestrictionIter.next();;
 								// compare class
 								if (targetObjClass.isExtending(targetClass)){
 									// ok
@@ -2644,12 +2701,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								classNames.append(targetClass.getScopedName(null));
 								sep=", ";
 							}
-							// compare class
-							if (targetObjClass.isExtending(targetClass) || targetObjClass.equals(targetClass)){
-								// ok
-							} else {
-								logMsg(validateTarget, rsrc.getString("validateReferenceAttrs.wrongClassOfTargetObjectForReferenceAttr"), getScopedName(targetObjClass),targetOid, getScopedName(refAttr));
-							}
+                            logMsg(validateTarget, rsrc.getString("validateReferenceAttrs.wrongClassOfTargetObjectForReferenceAttr"), getScopedName(targetObjClass),targetOid, getScopedName(refAttr));
 						}
 					}
 				}else if(type instanceof CompositionType) {

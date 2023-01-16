@@ -135,11 +135,11 @@ public class ObjectPool {
 		return null;
 	}
 	
-	public IomObject getObject(String oid, ArrayList<Viewable> classes, OutParam<String> retBasketId) {
+	public IomObject getObject(String oid, ArrayList<Viewable> ili1Tables, OutParam<String> retBasketId) {
 		for(String basketId : bids){
 			Map<ObjectPoolKey, IomObject> collectionOfObjects = collectionOfBaskets.get(basketId);
 			if(doItfOidPerTable){
-				for(Viewable aClass : classes){
+				for(Viewable aClass : ili1Tables){
 					IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, aClass, basketId));
 					if(object != null){
 						if(retBasketId!=null){
