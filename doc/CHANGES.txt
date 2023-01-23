@@ -5,6 +5,9 @@ ideas/open issues
 
 LATEST
 -----------------------------
+
+iox-ili 1.21.16 (2023-01-23)
+-----------------------------
 - Validator: ILI2.4 support LIST OF / BAG OF primitive type (ilivalidator#348)
 - Validator: ILI2.4 Vereinfachung des Umgangs mit Zeit (ilivalidator#349)
 - Validator: ILI2.4 MULTI-Geometrien (ilivalidator#347)
