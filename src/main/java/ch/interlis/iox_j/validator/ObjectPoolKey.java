@@ -10,9 +10,9 @@ public class ObjectPoolKey implements java.lang.Comparable {
 	
 	private ObjectPoolKey(){}
 	
-	public ObjectPoolKey(String oid, Viewable classValue, String basketId){
+	public ObjectPoolKey(String oid, Viewable ili1Table, String basketId){
 		this.setOid(oid);
-		this.setClassValue(classValue);
+		this.setClassValue(ili1Table);
 		this.setBasketId(basketId);
 	}
 

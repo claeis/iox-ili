@@ -563,16 +563,16 @@ public class ItfWriter implements ch.interlis.iox.IoxWriter {
 			  CoordType coordType=(CoordType) Type.findReal (controlPointDomain.getType());
 			  IomObject coord=iomObj.getattrobj(attr.getName(),0);
 				// always 2D even if domain of control points is 3D
-				writeNum(iomObj,attr.getName(),coord!=null ? coord.getattrvalue("C1") : null,coordType.getDimensions()[0]);
-				writeNum(iomObj,attr.getName(),coord!=null ? coord.getattrvalue("C2") : null,coordType.getDimensions()[1]);
+				writeNum(iomObj,attr.getName(),coord!=null ? coord.getattrvalue(Iom_jObject.COORD_C1) : null,coordType.getDimensions()[0]);
+				writeNum(iomObj,attr.getName(),coord!=null ? coord.getattrvalue(Iom_jObject.COORD_C2) : null,coordType.getDimensions()[1]);
 		  }else if(type instanceof CoordType){
 		  CoordType coordType=(CoordType)type;
 			  boolean is3D=coordType.getDimensions().length==3;
 			IomObject coord=iomObj.getattrobj(attr.getName(),0);
-			writeNum(iomObj,attr.getName(),coord!=null ? coord.getattrvalue("C1") : null,coordType.getDimensions()[0]);
-			writeNum(iomObj,attr.getName(),coord!=null ? coord.getattrvalue("C2") : null,coordType.getDimensions()[1]);
+			writeNum(iomObj,attr.getName(),coord!=null ? coord.getattrvalue(Iom_jObject.COORD_C1) : null,coordType.getDimensions()[0]);
+			writeNum(iomObj,attr.getName(),coord!=null ? coord.getattrvalue(Iom_jObject.COORD_C2) : null,coordType.getDimensions()[1]);
 			if(is3D){
-				writeNum(iomObj,attr.getName(),coord!=null ? coord.getattrvalue("C3") : null,coordType.getDimensions()[2]);
+				writeNum(iomObj,attr.getName(),coord!=null ? coord.getattrvalue(Iom_jObject.COORD_C3) : null,coordType.getDimensions()[2]);
 			}
 		  }else if(type instanceof EnumerationType){
 			String enumQName=iomObj.getattrvalue(attr.getName());
@@ -683,7 +683,7 @@ public class ItfWriter implements ch.interlis.iox.IoxWriter {
 		if(clipped){
 			throw new IllegalArgumentException("IOM_INCOMPLETE not supported by ITF file format");
 		}
-		for(int sequencei=0;sequencei<obj.getattrvaluecount("sequence");sequencei++){
+		for(int sequencei=0;sequencei<obj.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE);sequencei++){
 			if(clipped){
 				//out.startElement(tags::get_CLIPPED(),0,0);
 			}else{
@@ -693,36 +693,36 @@ public class ItfWriter implements ch.interlis.iox.IoxWriter {
 					break;
 				}
 			}
-			IomObject sequence=obj.getattrobj("sequence",sequencei);
-			for(int segmenti=0;segmenti<sequence.getattrvaluecount("segment");segmenti++){
-				IomObject segment=sequence.getattrobj("segment",segmenti);
-				if(segment.getobjecttag().equals("COORD")){
+			IomObject sequence=obj.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequencei);
+			for(int segmenti=0;segmenti<sequence.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT);segmenti++){
+				IomObject segment=sequence.getattrobj(Iom_jObject.SEGMENTS_SEGMENT,segmenti);
+				if(segment.getobjecttag().equals(Iom_jObject.COORD)){
 					// COORD
 					if(segmenti==0){
 						out.writeRawText("STPT");
 					}else{
 						out.writeRawText("LIPT");
 					}
-					writeNum(obj,errMsgAttrName,segment.getattrvalue("C1") ,coordType.getDimensions()[0]);
-					writeNum(obj,errMsgAttrName,segment.getattrvalue("C2") ,coordType.getDimensions()[1]);
+					writeNum(obj,errMsgAttrName,segment.getattrvalue(Iom_jObject.COORD_C1) ,coordType.getDimensions()[0]);
+					writeNum(obj,errMsgAttrName,segment.getattrvalue(Iom_jObject.COORD_C2) ,coordType.getDimensions()[1]);
 					if(is3D){
-						writeNum(obj,errMsgAttrName,segment.getattrvalue("C3") ,coordType.getDimensions()[2]);
+						writeNum(obj,errMsgAttrName,segment.getattrvalue(Iom_jObject.COORD_C3) ,coordType.getDimensions()[2]);
 					}
 					out.writeNewline();
-				}else if(segment.getobjecttag().equals("ARC")){
+				}else if(segment.getobjecttag().equals(Iom_jObject.ARC)){
 					// ARC
 					out.writeRawText("ARCP");
-					writeNum(obj,errMsgAttrName,segment.getattrvalue("A1") ,coordType.getDimensions()[0]);
-					writeNum(obj,errMsgAttrName,segment.getattrvalue("A2") ,coordType.getDimensions()[1]);
+					writeNum(obj,errMsgAttrName,segment.getattrvalue(Iom_jObject.ARC_A1) ,coordType.getDimensions()[0]);
+					writeNum(obj,errMsgAttrName,segment.getattrvalue(Iom_jObject.ARC_A2) ,coordType.getDimensions()[1]);
 					//if(is3D){
 					//	writeNum(segment.getattrvalue("A3") ,coordType.getDimensions()[2]);
 					//}
 					out.writeNewline();
 					out.writeRawText("LIPT");
-					writeNum(obj,errMsgAttrName,segment.getattrvalue("C1") ,coordType.getDimensions()[0]);
-					writeNum(obj,errMsgAttrName,segment.getattrvalue("C2") ,coordType.getDimensions()[1]);
+					writeNum(obj,errMsgAttrName,segment.getattrvalue(Iom_jObject.COORD_C1) ,coordType.getDimensions()[0]);
+					writeNum(obj,errMsgAttrName,segment.getattrvalue(Iom_jObject.COORD_C2) ,coordType.getDimensions()[1]);
 					if(is3D){
-						writeNum(obj,errMsgAttrName,segment.getattrvalue("C3") ,coordType.getDimensions()[2]);
+						writeNum(obj,errMsgAttrName,segment.getattrvalue(Iom_jObject.COORD_C3) ,coordType.getDimensions()[2]);
 					}
 					out.writeNewline();
 				}else{

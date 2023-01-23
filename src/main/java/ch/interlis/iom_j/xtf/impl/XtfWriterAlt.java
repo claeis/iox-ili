@@ -296,7 +296,7 @@ import java.util.Iterator;
 						if (child != null)
 						{
 							// some special cases
-							if (child.getobjecttag().equals("COORD"))
+							if (child.getobjecttag().equals(Iom_jObject.COORD))
 							{
 								// COORD
 								xout.writeStartElement(iliNs,attrName);
@@ -307,7 +307,7 @@ import java.util.Iterator;
 									throw new IoxException("max one COORD value allowed ("+attrName+")");
 								}
 							}
-							else if (child.getobjecttag().equals("POLYLINE"))
+							else if (child.getobjecttag().equals(Iom_jObject.POLYLINE))
 							{
 								// POLYLINE
 								xout.writeStartElement(iliNs,attrName);
@@ -318,7 +318,7 @@ import java.util.Iterator;
 									throw new IoxException("max one POLYLINE value allowed ("+attrName+")");
 								}
 							}
-							else if (child.getobjecttag().equals("MULTISURFACE"))
+							else if (child.getobjecttag().equals(Iom_jObject.MULTISURFACE))
 							{
 								// MULTISURFACE
 								xout.writeStartElement(iliNs,attrName);
@@ -465,12 +465,12 @@ import java.util.Iterator;
         */
 		try{
 			xout.writeStartElement(iliNs,"COORD");
-			String c1=obj.getattrprim("C1",0);
+			String c1=obj.getattrprim(Iom_jObject.COORD_C1,0);
 			writeElementStringOptional("C1",c1);
-			String c2=obj.getattrprim("C2",0);
+			String c2=obj.getattrprim(Iom_jObject.COORD_C2,0);
 			if(c2!=null){
 				writeElementStringOptional("C2",c2);
-				String c3=obj.getattrprim("C3",0);
+				String c3=obj.getattrprim(Iom_jObject.COORD_C3,0);
 				if(c3!=null){
 					writeElementStringOptional("C3",c3);
 				}
@@ -500,19 +500,19 @@ import java.util.Iterator;
         */
 		try{
 			xout.writeStartElement(iliNs,"ARC");
-			String c1=obj.getattrprim("C1",0);
+			String c1=obj.getattrprim(Iom_jObject.COORD_C1,0);
 			writeElementStringOptional("C1",c1);
-			String c2=obj.getattrprim("C2",0);
+			String c2=obj.getattrprim(Iom_jObject.COORD_C2,0);
 			writeElementStringOptional("C2",c2);
-			String c3=obj.getattrprim("C3",0);
+			String c3=obj.getattrprim(Iom_jObject.COORD_C3,0);
 			if(c3!=null){
 				writeElementStringOptional("C3",c3);
 			}
-			String a1=obj.getattrprim("A1",0);
+			String a1=obj.getattrprim(Iom_jObject.ARC_A1,0);
 			writeElementStringOptional("A1",a1);
-			String a2=obj.getattrprim("A2",0);
+			String a2=obj.getattrprim(Iom_jObject.ARC_A2,0);
 			writeElementStringOptional("A2",a2);
-			String r=obj.getattrprim("R",0);
+			String r=obj.getattrprim(Iom_jObject.ARC_R,0);
 			if(r!=null){
 				writeElementStringOptional("R",r);
 			}
@@ -593,7 +593,7 @@ import java.util.Iterator;
 		try{
 			xout.writeStartElement(iliNs,"POLYLINE");
 			if(hasLineAttr){
-				IomObject lineattr=obj.getattrobj("lineattr",0);
+				IomObject lineattr=obj.getattrobj(Iom_jObject.POLYLINE_LINEATTR,0);
 				if(lineattr!=null){
 					xout.writeStartElement(iliNs,"LINEATTR");
 					xout.writeStartElement(iliNs,lineattr.getobjecttag());
@@ -603,7 +603,7 @@ import java.util.Iterator;
 				}
 			}
 			boolean clipped=obj.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
-			for(int sequencei=0;sequencei<obj.getattrvaluecount("sequence");sequencei++){
+			for(int sequencei=0;sequencei<obj.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE);sequencei++){
 				if(clipped){
 					xout.writeStartElement(iliNs,"CLIPPED");
 				}else{
@@ -612,13 +612,13 @@ import java.util.Iterator;
 						throw new IllegalArgumentException("unclipped polyline with multi 'sequence' elements");
 					}
 				}
-				IomObject sequence=obj.getattrobj("sequence",sequencei);
-				for(int segmenti=0;segmenti<sequence.getattrvaluecount("segment");segmenti++){
-					IomObject segment=sequence.getattrobj("segment",segmenti);
-					if(segment.getobjecttag().equals("COORD")){
+				IomObject sequence=obj.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequencei);
+				for(int segmenti=0;segmenti<sequence.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT);segmenti++){
+					IomObject segment=sequence.getattrobj(Iom_jObject.SEGMENTS_SEGMENT,segmenti);
+					if(segment.getobjecttag().equals(Iom_jObject.COORD)){
 						// COORD
 						writeCoord(segment);
-					}else if(segment.getobjecttag().equals("ARC")){
+					}else if(segment.getobjecttag().equals(Iom_jObject.ARC)){
 						// ARC
 						writeArc(segment);
 					}else{
@@ -668,7 +668,7 @@ import java.util.Iterator;
 		try{
 			xout.writeStartElement(iliNs,"SURFACE");
 			boolean clipped=obj.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
-			for(int surfacei=0;surfacei<obj.getattrvaluecount("surface");surfacei++){
+			for(int surfacei=0;surfacei<obj.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE);surfacei++){
 				if(clipped){
 					xout.writeStartElement(iliNs,"CLIPPED");
 				}else{
@@ -677,12 +677,12 @@ import java.util.Iterator;
 						throw new IllegalArgumentException("unclipped surface with multi 'surface' elements");
 					}
 				}
-				IomObject surface=obj.getattrobj("surface",surfacei);
-				for(int boundaryi=0;boundaryi<surface.getattrvaluecount("boundary");boundaryi++){
-					IomObject boundary=surface.getattrobj("boundary",boundaryi);
+				IomObject surface=obj.getattrobj(Iom_jObject.MULTISURFACE_SURFACE,surfacei);
+				for(int boundaryi=0;boundaryi<surface.getattrvaluecount(Iom_jObject.SURFACE_BOUNDARY);boundaryi++){
+					IomObject boundary=surface.getattrobj(Iom_jObject.SURFACE_BOUNDARY,boundaryi);
 					xout.writeStartElement(iliNs,"BOUNDARY");
-					for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
-						IomObject polyline=boundary.getattrobj("polyline",polylinei);
+					for(int polylinei=0;polylinei<boundary.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE);polylinei++){
+						IomObject polyline=boundary.getattrobj(Iom_jObject.BOUNDARY_POLYLINE,polylinei);
 						writePolyline(polyline,true);
 					}
 					xout.writeEndElement(/*BOUNDARY*/);

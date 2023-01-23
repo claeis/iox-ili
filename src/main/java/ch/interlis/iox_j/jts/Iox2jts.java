@@ -29,6 +29,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox_j.wkb.Wkb2iox;
 
 /** Utility to convert from INTERLIS to JTS geometry types.
@@ -141,9 +142,9 @@ public class Iox2jts {
 		if(value==null){
 			return null;
 		}
-		String c1=value.getattrvalue("C1");
-		String c2=value.getattrvalue("C2");
-		String c3=value.getattrvalue("C3");
+		String c1=value.getattrvalue(Iom_jObject.COORD_C1);
+		String c2=value.getattrvalue(Iom_jObject.COORD_C2);
+		String c3=value.getattrvalue(Iom_jObject.COORD_C3);
 		double xCoord;
 		try{
 			xCoord = Double.parseDouble(c1);
@@ -178,10 +179,10 @@ public class Iox2jts {
 	public static com.vividsolutions.jts.geom.MultiPoint multicoord2JTS(IomObject obj)
 	throws Iox2jtsException 
 	{
-		int segmentCount=obj.getattrvaluecount(Wkb2iox.ATTR_COORD);
+		int segmentCount=obj.getattrvaluecount(Iom_jObject.MULTICOORD_COORD);
 		com.vividsolutions.jts.geom.Point[] jtsPointArray=new com.vividsolutions.jts.geom.Point[segmentCount];
 		for(int i=0;i<segmentCount;i++) {
-			IomObject segment=obj.getattrobj(Wkb2iox.ATTR_COORD, i);
+			IomObject segment=obj.getattrobj(Iom_jObject.MULTICOORD_COORD, i);
 			Coordinate jtsCoordinate=coord2JTS(segment);
 			com.vividsolutions.jts.geom.Point jtsPoint=new com.vividsolutions.jts.geom.Point(jtsCoordinate, new PrecisionModel(), 0);
 			jtsPointArray[i]=jtsPoint;
@@ -193,11 +194,11 @@ public class Iox2jts {
 	throws Iox2jtsException
 	{
 		if(value!=null){
-			String c1=value.getattrvalue("C1");
-			String c2=value.getattrvalue("C2");
-			String c3=value.getattrvalue("C3");
-			String a1=value.getattrvalue("A1");
-			String a2=value.getattrvalue("A2");
+			String c1=value.getattrvalue(Iom_jObject.COORD_C1);
+			String c2=value.getattrvalue(Iom_jObject.COORD_C2);
+			String c3=value.getattrvalue(Iom_jObject.COORD_C3);
+			String a1=value.getattrvalue(Iom_jObject.ARC_A1);
+			String a2=value.getattrvalue(Iom_jObject.ARC_A2);
 			double pt2_re;
 			try{
 				pt2_re = Double.parseDouble(c1);
@@ -323,7 +324,7 @@ public class Iox2jts {
 		com.vividsolutions.jts.geom.CoordinateList ret=new com.vividsolutions.jts.geom.CoordinateList();
 		// is POLYLINE?
 		if(isSurfaceOrArea){
-			IomObject lineattr=polylineObj.getattrobj("lineattr",0);
+			IomObject lineattr=polylineObj.getattrobj(Iom_jObject.POLYLINE_LINEATTR,0);
 			if(lineattr!=null){
 				//writeAttrs(out,lineattr);
 				throw new Iox2jtsException("Lineattributes not supported");							
@@ -333,7 +334,7 @@ public class Iox2jts {
 		if(clipped){
 			throw new Iox2jtsException("clipped polyline not supported");
 		}
-		for(int sequencei=0;sequencei<polylineObj.getattrvaluecount("sequence");sequencei++){
+		for(int sequencei=0;sequencei<polylineObj.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE);sequencei++){
 			if(clipped){
 				//out.startElement(tags::get_CLIPPED(),0,0);
 			}else{
@@ -342,14 +343,14 @@ public class Iox2jts {
 					throw new Iox2jtsException("unclipped polyline with multi 'sequence' elements");
 				}
 			}
-			IomObject sequence=polylineObj.getattrobj("sequence",sequencei);
-			for(int segmenti=0;segmenti<sequence.getattrvaluecount("segment");segmenti++){
-				IomObject segment=sequence.getattrobj("segment",segmenti);
+			IomObject sequence=polylineObj.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequencei);
+			for(int segmenti=0;segmenti<sequence.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT);segmenti++){
+				IomObject segment=sequence.getattrobj(Iom_jObject.SEGMENTS_SEGMENT,segmenti);
 				//EhiLogger.debug("segmenttag "+segment.getobjecttag());
-				if(segment.getobjecttag().equals("COORD")){
+				if(segment.getobjecttag().equals(Iom_jObject.COORD)){
 					// COORD
 					ret.add(coord2JTS(segment));
-				}else if(segment.getobjecttag().equals("ARC")){
+				}else if(segment.getobjecttag().equals(Iom_jObject.ARC)){
 					// ARC
 					arc2JTS(ret,segment,p);
 				}else{
@@ -386,10 +387,10 @@ public class Iox2jts {
 	public static com.vividsolutions.jts.geom.MultiLineString multipolyline2JTS(IomObject obj,double strokeP)
 	throws Iox2jtsException
 	{
-		int polylineCount=obj.getattrvaluecount("polyline");
+		int polylineCount=obj.getattrvaluecount(Iom_jObject.MULTIPOLYLINE_POLYLINE);
 		com.vividsolutions.jts.geom.LineString[] jtsLineStringArray=new com.vividsolutions.jts.geom.LineString[polylineCount];
 		for(int polylinei=0;polylinei<polylineCount;polylinei++) {
-			IomObject polyline=obj.getattrobj("polyline", polylinei);
+			IomObject polyline=obj.getattrobj(Iom_jObject.MULTIPOLYLINE_POLYLINE, polylinei);
 			CoordinateList jtsCoordinateList=polyline2JTS(polyline, false, strokeP);
 			com.vividsolutions.jts.geom.LineString jtsLineString=new com.vividsolutions.jts.geom.LineString(jtsCoordinateList.toCoordinateArray(), new PrecisionModel(), 0);
 			jtsLineStringArray[polylinei]=jtsLineString;
@@ -415,7 +416,7 @@ public class Iox2jts {
 		if(clipped){
 			throw new Iox2jtsException("clipped surface not supported");
 		}
-		for(int surfacei=0;surfacei<obj.getattrvaluecount("surface");surfacei++){
+		for(int surfacei=0;surfacei<obj.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE);surfacei++){
 			if(clipped){
 				//out.startElement("CLIPPED",0,0);
 			}else{
@@ -424,19 +425,19 @@ public class Iox2jts {
 					throw new Iox2jtsException("unclipped surface with multi 'surface' elements");
 				}
 			}
-			IomObject surface=obj.getattrobj("surface",surfacei);
+			IomObject surface=obj.getattrobj(Iom_jObject.MULTISURFACE_SURFACE,surfacei);
 			com.vividsolutions.jts.geom.LinearRing shell=null;
 			com.vividsolutions.jts.geom.LinearRing holes[]=null;
-			int boundaryc=surface.getattrvaluecount("boundary");
+			int boundaryc=surface.getattrvaluecount(Iom_jObject.SURFACE_BOUNDARY);
 			if(boundaryc>1){
 				holes=new com.vividsolutions.jts.geom.LinearRing[boundaryc-1];				
 			}
 			for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
-				IomObject boundary=surface.getattrobj("boundary",boundaryi);
+				IomObject boundary=surface.getattrobj(Iom_jObject.SURFACE_BOUNDARY,boundaryi);
 				//IFMEFeature fmeLine=session.createFeature();
 				com.vividsolutions.jts.geom.CoordinateList jtsLine=new com.vividsolutions.jts.geom.CoordinateList();
-				for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
-					IomObject polyline=boundary.getattrobj("polyline",polylinei);
+				for(int polylinei=0;polylinei<boundary.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE);polylinei++){
+					IomObject polyline=boundary.getattrobj(Iom_jObject.BOUNDARY_POLYLINE,polylinei);
 					jtsLine.addAll(polyline2JTS(polyline,true,strokeP));
 				}
 				jtsLine.closeRing();
@@ -465,21 +466,21 @@ public class Iox2jts {
 	{
 		com.vividsolutions.jts.geom.Polygon[] jtsPolygons=null;
 		com.vividsolutions.jts.geom.Polygon jtsPolygon=null;
-		int surfaceCount=obj.getattrvaluecount("surface");
+		int surfaceCount=obj.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE);
 		jtsPolygons=new com.vividsolutions.jts.geom.Polygon[surfaceCount];
 		for(int surfacei=0;surfacei<surfaceCount;surfacei++){
-			IomObject surface=obj.getattrobj("surface",surfacei);
+			IomObject surface=obj.getattrobj(Iom_jObject.MULTISURFACE_SURFACE,surfacei);
 			com.vividsolutions.jts.geom.LinearRing jtsShell=null;
 			com.vividsolutions.jts.geom.LinearRing jtsHoles[]=null;
-			int boundarycount=surface.getattrvaluecount("boundary");
+			int boundarycount=surface.getattrvaluecount(Iom_jObject.SURFACE_BOUNDARY);
 			if(boundarycount>1){
 				jtsHoles=new com.vividsolutions.jts.geom.LinearRing[boundarycount-1];				
 			}
 			for(int boundaryi=0;boundaryi<boundarycount;boundaryi++){
-				IomObject boundary=surface.getattrobj("boundary",boundaryi);
+				IomObject boundary=surface.getattrobj(Iom_jObject.SURFACE_BOUNDARY,boundaryi);
 				com.vividsolutions.jts.geom.CoordinateList jtsLine=new com.vividsolutions.jts.geom.CoordinateList();
-				for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
-					IomObject polyline=boundary.getattrobj("polyline",polylinei);
+				for(int polylinei=0;polylinei<boundary.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE);polylinei++){
+					IomObject polyline=boundary.getattrobj(Iom_jObject.BOUNDARY_POLYLINE,polylinei);
 					jtsLine.addAll(polyline2JTS(polyline,true,strokeP));
 				}
 				jtsLine.closeRing();

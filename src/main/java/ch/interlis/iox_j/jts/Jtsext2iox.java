@@ -25,6 +25,7 @@ package ch.interlis.iox_j.jts;
 import com.vividsolutions.jts.geom.Coordinate;
 
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurveRing;
@@ -91,11 +92,11 @@ public class Jtsext2iox {
 	 */
 	static public  IomObject JTS2coord(com.vividsolutions.jts.geom.Coordinate value) 
 	{
-		IomObject ret=new ch.interlis.iom_j.Iom_jObject("COORD",null);
-		ret.setattrvalue("C1", Double.toString(value.x));
-		ret.setattrvalue("C2", Double.toString(value.y));
+		IomObject ret=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.COORD,null);
+		ret.setattrvalue(Iom_jObject.COORD_C1, Double.toString(value.x));
+		ret.setattrvalue(Iom_jObject.COORD_C2, Double.toString(value.y));
 		if(!Double.isNaN(value.z)){
-			ret.setattrvalue("C3", Double.toString(value.z));
+			ret.setattrvalue(Iom_jObject.COORD_C3, Double.toString(value.z));
 		}
 		return ret;
 	}
@@ -108,25 +109,25 @@ public class Jtsext2iox {
 	{
 		IomObject ret=null;
 		if(value instanceof ArcSegment){
-			ret=new ch.interlis.iom_j.Iom_jObject("ARC",null);
+			ret=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.ARC,null);
 			Coordinate ep;
 			ep = value.getEndPoint();
-			ret.setattrvalue("C1", Double.toString(ep.x));
-			ret.setattrvalue("C2", Double.toString(ep.y));
+			ret.setattrvalue(Iom_jObject.COORD_C1, Double.toString(ep.x));
+			ret.setattrvalue(Iom_jObject.COORD_C2, Double.toString(ep.y));
 			if(!Double.isNaN(ep.z)){
-				ret.setattrvalue("C3", Double.toString(ep.z));
+				ret.setattrvalue(Iom_jObject.COORD_C3, Double.toString(ep.z));
 			}
 			Coordinate mp = ((ArcSegment) value).getMidPoint();
-			ret.setattrvalue("A1", Double.toString(mp.x));
-			ret.setattrvalue("A2", Double.toString(mp.y));
+			ret.setattrvalue(Iom_jObject.ARC_A1, Double.toString(mp.x));
+			ret.setattrvalue(Iom_jObject.ARC_A2, Double.toString(mp.y));
 		}else if(value instanceof StraightSegment){
-			ret=new ch.interlis.iom_j.Iom_jObject("COORD",null);
+			ret=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.COORD,null);
 			Coordinate ep;
 			ep = value.getEndPoint();
-			ret.setattrvalue("C1", Double.toString(ep.x));
-			ret.setattrvalue("C2", Double.toString(ep.y));
+			ret.setattrvalue(Iom_jObject.COORD_C1, Double.toString(ep.x));
+			ret.setattrvalue(Iom_jObject.COORD_C2, Double.toString(ep.y));
 			if(!Double.isNaN(ep.z)){
-				ret.setattrvalue("C3", Double.toString(ep.z));
+				ret.setattrvalue(Iom_jObject.COORD_C3, Double.toString(ep.z));
 			}
 		}else{
 			throw new IllegalArgumentException(value.getClass().getName());
@@ -141,20 +142,20 @@ public class Jtsext2iox {
 	static public  IomObject JTS2polyline(com.vividsolutions.jts.geom.LineString value) throws Iox2jtsException 
 	{
 		// TODO handle CompoundCurve, CompoundCurveRing
-		IomObject ret=new ch.interlis.iom_j.Iom_jObject("POLYLINE",null);
-		IomObject sequence=new ch.interlis.iom_j.Iom_jObject("SEGMENTS",null);
-		ret.addattrobj("sequence",sequence);
+		IomObject ret=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.POLYLINE,null);
+		IomObject sequence=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.SEGMENTS,null);
+		ret.addattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequence);
 		
 		if(value instanceof CompoundCurve){
-			sequence.addattrobj("segment", JTS2coord(value.getStartPoint().getCoordinate()));
+			sequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, JTS2coord(value.getStartPoint().getCoordinate()));
 			for(CurveSegment seg:((CompoundCurve) value).getSegments()){
-				sequence.addattrobj("segment", JTS2segment(seg));
+				sequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, JTS2segment(seg));
 			}
 		}else if(value instanceof CompoundCurveRing){
-			sequence.addattrobj("segment", JTS2coord(value.getStartPoint().getCoordinate()));
+			sequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, JTS2coord(value.getStartPoint().getCoordinate()));
 			for(CompoundCurve line:((CompoundCurveRing) value).getLines()){
 				for(CurveSegment seg:line.getSegments()){
-					sequence.addattrobj("segment", JTS2segment(seg));
+					sequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, JTS2segment(seg));
 				}
 			}
 			
@@ -162,7 +163,7 @@ public class Jtsext2iox {
 			// LineString
 			int coordc=value.getNumPoints();
 			for(int coordi=0;coordi<coordc;coordi++){
-				sequence.addattrobj("segment", JTS2coord(value.getCoordinateN(coordi)));
+				sequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, JTS2coord(value.getCoordinateN(coordi)));
 			}
 		}
 		return ret;
@@ -175,25 +176,25 @@ public class Jtsext2iox {
 	static public  IomObject JTS2surface(com.vividsolutions.jts.geom.Polygon value) throws Iox2jtsException 
 	{
 		// TODO handle
-		IomObject ret=new ch.interlis.iom_j.Iom_jObject("MULTISURFACE",null);
-		IomObject surface=new ch.interlis.iom_j.Iom_jObject("SURFACE",null);
-		ret.addattrobj("surface",surface);
+		IomObject ret=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.MULTISURFACE,null);
+		IomObject surface=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.SURFACE,null);
+		ret.addattrobj(Iom_jObject.MULTISURFACE_SURFACE,surface);
 
 		// shell
 		{
 			com.vividsolutions.jts.geom.LineString shell=value.getExteriorRing();
-			IomObject boundary=new ch.interlis.iom_j.Iom_jObject("BOUNDARY",null);
-			surface.addattrobj("boundary",boundary);
-			boundary.addattrobj("polyline", JTS2polyline(shell));
+			IomObject boundary=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.BOUNDARY,null);
+			surface.addattrobj(Iom_jObject.SURFACE_BOUNDARY,boundary);
+			boundary.addattrobj(Iom_jObject.BOUNDARY_POLYLINE, JTS2polyline(shell));
 		}
 		
 		// holes
 		int holec=value.getNumInteriorRing();
 		for(int holei=0;holei<holec;holei++){
 			com.vividsolutions.jts.geom.LineString hole=value.getInteriorRingN(holei);
-			IomObject boundary=new ch.interlis.iom_j.Iom_jObject("BOUNDARY",null);
-			surface.addattrobj("boundary",boundary);
-			boundary.addattrobj("polyline", JTS2polyline(hole));
+			IomObject boundary=new ch.interlis.iom_j.Iom_jObject(Iom_jObject.BOUNDARY,null);
+			surface.addattrobj(Iom_jObject.SURFACE_BOUNDARY,boundary);
+			boundary.addattrobj(Iom_jObject.BOUNDARY_POLYLINE, JTS2polyline(hole));
 		}
 		
 		return ret;

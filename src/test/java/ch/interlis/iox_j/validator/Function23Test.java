@@ -1895,8 +1895,8 @@ public class Function23Test {
 		objectZA1.addattrobj("Geometrie", IomObjectHelper.createRectangleGeometry("500000", "70000", "600000", "80000"));
 
 		Iom_jObject objectZA2 = new Iom_jObject(ILI_CLASSZA, OBJ_OID2);
-		objectZA1.setattrvalue("Art", "a");
-		objectZA1.addattrobj("Geometrie", IomObjectHelper.createRectangleGeometry("550000", "75000", "650000", "85000"));
+		objectZA2.setattrvalue("Art", "a");
+		objectZA2.addattrobj("Geometrie", IomObjectHelper.createRectangleGeometry("550000", "75000", "650000", "85000"));
 
 		Iom_jObject objectZB = new Iom_jObject(ILI_CLASSZB, OBJ_OID3);
 		objectZB.addattrobj("Geometrie", IomObjectHelper.createRectangleGeometry("700000", "70000", "800000", "80000"));
@@ -1919,8 +1919,8 @@ public class Function23Test {
 
 		// assert logged errors
 		assertEquals(3, logger.getErrs().size());
-		assertEquals("Intersection coord1 (550000.000, 80000.000), tids o1/Geometrie[1], o1/Geometrie[2]", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection coord1 (600000.000, 75000.000), tids o1/Geometrie[1], o1/Geometrie[2]", logger.getErrs().get(1).getEventMsg());
+		assertEquals("Intersection coord1 (550000.000, 80000.000), tids o1/Geometrie[1], o2/Geometrie[1]", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Intersection coord1 (600000.000, 75000.000), tids o1/Geometrie[1], o2/Geometrie[1]", logger.getErrs().get(1).getEventMsg());
 		assertEquals("Set Constraint Function23.Topic.ClassZA.Constraint1 is not true.", logger.getErrs().get(2).getEventMsg());
 	}
 

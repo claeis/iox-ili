@@ -27,6 +27,8 @@ import ch.ehi.iox.objpool.impl.LongSerializer;
 import ch.interlis.ili2c.Ili2cException;
 import ch.interlis.ili2c.gui.UserSettings;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
+import ch.interlis.ili2c.metamodel.AbstractCoordType;
+import ch.interlis.ili2c.metamodel.AbstractSurfaceOrAreaType;
 import ch.interlis.ili2c.metamodel.AreaType;
 import ch.interlis.ili2c.metamodel.AssociationDef;
 import ch.interlis.ili2c.metamodel.AssociationPath;
@@ -64,6 +66,11 @@ import ch.interlis.ili2c.metamodel.LineType;
 import ch.interlis.ili2c.metamodel.LocalAttribute;
 import ch.interlis.ili2c.metamodel.MandatoryConstraint;
 import ch.interlis.ili2c.metamodel.Model;
+import ch.interlis.ili2c.metamodel.MultiAreaType;
+import ch.interlis.ili2c.metamodel.MultiCoordType;
+import ch.interlis.ili2c.metamodel.MultiPolylineType;
+import ch.interlis.ili2c.metamodel.MultiSurfaceOrAreaType;
+import ch.interlis.ili2c.metamodel.MultiSurfaceType;
 import ch.interlis.ili2c.metamodel.NumericType;
 import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.ObjectPath;
@@ -2401,11 +2408,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			String sep="";
 			// find target classes.
 			while(targetClassIterator.hasNext()){
-				Viewable roleDestinationClass = (Viewable) targetClassIterator.next();
-				destinationClasses.add(roleDestinationClass);
-				possibleTargetClasses.append(sep);
-				sep=",";
-				possibleTargetClasses.append(roleDestinationClass.getScopedName(null));
+				for(Viewable roleDestinationClass : getTranslations((Viewable) targetClassIterator.next())) {
+	                destinationClasses.add(roleDestinationClass);
+	                possibleTargetClasses.append(sep);
+	                possibleTargetClasses.append(roleDestinationClass.getScopedName(null));
+	                sep=",";
+				}
 			}
 			OutParam<String> bidOfTargetObj = new OutParam<String>();
 			IomObject targetObj = (IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
@@ -2477,7 +2485,52 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 	
-	private IomObject findExternalObject(String targetBid,String targetOid, ArrayList<Viewable> destinationClasses, OutParam<String> bidOfTargetObj) {
+	private List<Viewable> getTranslations(Viewable aclass0) {
+        Viewable rootClass=(Viewable)getRootTranslation(aclass0);
+	    List<Viewable> ret=new ArrayList<Viewable>();
+	    ret.add(rootClass);
+	    Model rootModel=(Model)getRootTranslation(rootClass.getContainer(Model.class));
+        Topic rootTopic=(Topic)getRootTranslation(rootClass.getContainer(Topic.class));
+	    for(Iterator<Model> it=td.iterator();it.hasNext();) {
+	        Model destModel=it.next();
+	        if(isTranslatedBy(rootModel,destModel)) {
+	            for(Iterator<Element> eleIt=destModel.iterator();eleIt.hasNext();) {
+	                Element destEle=eleIt.next();
+	                if(destEle instanceof Viewable && isTranslatedBy(rootClass,destEle)) {
+	                    if(destEle!=rootClass)ret.add((Viewable)destEle); // one candidate found
+	                }else if(destEle instanceof Topic && rootTopic!=null && isTranslatedBy(destEle,rootTopic)){
+	                    for(Iterator<Element> classIt=((Topic)destEle).iterator();classIt.hasNext();) {
+	                        Element destClass=classIt.next();
+	                        if(destClass instanceof Viewable && isTranslatedBy(destClass,rootClass)) {
+	                            if(destClass!=rootClass)ret.add((Viewable)destClass);
+	                            break; // one candidate found
+	                        }
+	                    }
+	                }
+	            }
+	        }
+	    }
+        return ret;
+    }
+	private boolean isTranslatedBy(Element ele1,Element ele2) {
+	    
+        Element root1=getRootTranslation(ele1);
+        Element root2=getRootTranslation(ele2);
+        return root1.equals(root2);
+	}
+    private Element getRootTranslation(Element ele0) {
+        if(ele0==null) {
+            return null;
+        }
+        while(true) {
+            Element ele1=ele0.getTranslationOf();
+            if(ele1==null) {
+                return ele0;
+            }
+            ele0=ele1;
+        }
+    }
+    private IomObject findExternalObject(String targetBid,String targetOid, ArrayList<Viewable> destinationClasses, OutParam<String> bidOfTargetObj) {
 	        if(!objectPool.getBasketIds().contains(targetBid)) {
 	            List<Dataset> dataset = null;
 	            File[] datasetFiles = null;
@@ -2554,9 +2607,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             targetOid=refAttrStruct.getobjectrefoid();
                         }
 
-						AbstractClassDef targetClass = refAttrType.getReferred();
-						ArrayList<Viewable> destinationClasses = new ArrayList<Viewable>();
-						destinationClasses.add(targetClass);
+			            Iterator<AbstractClassDef> targetClassIterator = refAttrType.iteratorRestrictedTo();
+			            if(!targetClassIterator.hasNext()) {
+	                        AbstractClassDef targetClass = refAttrType.getReferred();
+			                List<AbstractClassDef> refs=new ArrayList<AbstractClassDef>();
+			                refs.add(targetClass);
+			                targetClassIterator=refs.iterator();
+			            }
+			            ArrayList<Viewable> destinationClasses = new ArrayList<Viewable>();
+			            StringBuffer possibleTargetClasses=new StringBuffer();
+			            // find target classes.
+			            while(targetClassIterator.hasNext()){
+			                for(Viewable roleDestinationClass : getTranslations((Viewable) targetClassIterator.next())) {
+			                    destinationClasses.add(roleDestinationClass);
+			                }
+			            }
 						String targetObjClassStr = null;
 						OutParam<String> bidOfTargetObj = new OutParam<String>();
 						IomObject targetObject = null;
@@ -2575,7 +2640,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                 targetObject = findExternalObject(bid, targetOid, destinationClasses, bidOfTargetObj);
                             }
 						}
-						// EXTERNAL
+						// not EXTERNAL?
 						if(!refAttrType.isExternal()){
 							if(targetOid!=null){
 								if(targetObject!=null){
@@ -2622,10 +2687,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							// if refAttrIter restricted to class
 							StringBuffer classNames=new StringBuffer();
 							String sep="";
-							Iterator refAttrRestrictionIter = refAttrType.iteratorRestrictedTo();
+							Iterator<Viewable> refAttrRestrictionIter = destinationClasses.iterator();
 							while (refAttrRestrictionIter.hasNext()){
-								Object refAttrRestriction = refAttrRestrictionIter.next();
-								targetClass = (Table) refAttrRestriction;
+								Viewable targetClass = refAttrRestrictionIter.next();;
 								// compare class
 								if (targetObjClass.isExtending(targetClass)){
 									// ok
@@ -2637,12 +2701,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								classNames.append(targetClass.getScopedName(null));
 								sep=", ";
 							}
-							// compare class
-							if (targetObjClass.isExtending(targetClass) || targetObjClass.equals(targetClass)){
-								// ok
-							} else {
-								logMsg(validateTarget, rsrc.getString("validateReferenceAttrs.wrongClassOfTargetObjectForReferenceAttr"), getScopedName(targetObjClass),targetOid, getScopedName(refAttr));
-							}
+                            logMsg(validateTarget, rsrc.getString("validateReferenceAttrs.wrongClassOfTargetObjectForReferenceAttr"), getScopedName(targetObjClass),targetOid, getScopedName(refAttr));
 						}
 					}
 				}else if(type instanceof CompositionType) {
@@ -3523,8 +3582,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				 validateGeometryType=defaultGeometryTypeValidation;
 			 }
 		 }
-		
-		Type type0 = attr.getDomain();
+		Type type0=attr.getDomain();
 		Type type = attr.getDomainResolvingAll();
 		if (type instanceof CompositionType){
 			 int structc=iomObj.getattrvaluecount(attrName);
@@ -3598,6 +3656,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 			 }
 		}else{
+            int structc=iomObj.getattrvaluecount(attrName);
 			if(ValidationConfig.OFF.equals(validateMultiplicity)){
 				if(!configOffOufputReduction.contains(ValidationConfig.MULTIPLICITY+":"+attrQName)){
 					configOffOufputReduction.add(ValidationConfig.MULTIPLICITY+":"+attrQName);
@@ -3605,28 +3664,28 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}else{
 				Object topologyDone=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
-				if(type0==null) {
-					 type0=attr.getDomainResolvingAll();
-				}
 				if(topologyDone==null){
-					 int structc=iomObj.getattrvaluecount(attrName);
 					 if(structc==1 && type instanceof ReferenceType) {
 					     IomObject refObj=iomObj.getattrobj(attrName, 0);
 					     if(refObj==null || refObj.getobjectrefoid()==null) {
 					         structc=0;
 					     }
 					 }
-					 if(structc==0 && isAttributeMandatory(attr)) {
-						 if(doItfLineTables && type instanceof SurfaceType){
-							 // SURFACE; no attrValue in maintable
-						 }else{
-							 logMsg(validateMultiplicity, rsrc.getString("validateAttrValue.attributeXRequiresAValue"), attrPath);
-						 }
-					 }
+                     if(doItfLineTables && type instanceof SurfaceType){
+                         // SURFACE; no attrValue in maintable
+                     }else{
+                         Cardinality card = getCardinality(attr);
+                         if(structc<card.getMinimum() || structc>card.getMaximum()){
+                             if(card.getMaximum()>1 || structc>1) {
+                                 logMsg(validateMultiplicity, rsrc.getString("validateAttrValue.attributeXHasWrongNumberOfValues"), attrPath);
+                             }else {
+                                 logMsg(validateMultiplicity, rsrc.getString("validateAttrValue.attributeXRequiresAValue"), attrPath);
+                             }
+                         }
+                     }
 				}else{
 					Boolean topologyValidationOk=(Boolean)pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY_VALIDATION_OK);
 					if(topologyValidationOk==null || topologyValidationOk){
-						 int structc=iomObj.getattrvaluecount(attrName);
 						 if(structc==0 && isAttributeMandatory(attr)) {
 							 logMsg(validateMultiplicity,rsrc.getString("validateAttrValue.attributeXRequiresAValue"), attrPath);
 						 }
@@ -3636,277 +3695,390 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 				}
 			}
-			if(ValidationConfig.OFF.equals(validateType)){
-				if(!configOffOufputReduction.contains(ValidationConfig.TYPE+":"+attrQName)){
-					configOffOufputReduction.add(ValidationConfig.TYPE+":"+attrQName);
-					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAttrValue.XNotValidatedValidationConfigurationTypeOffInAttributeY"), attrQName, attrPath, iomObj.getobjecttag(), iomObj.getobjectoid()));
-				}
-			}else{
-				if (attr.isDomainIli1Date()) {
-					String valueStr = iomObj.getattrvalue(attrName);
-					// Value has to be not null and exactly 8 numbers long
-					if (valueStr == null){
-						// no value, skip test
-					}else if(valueStr.length() == 8) {
-						// Value has to be a number
-						try {
-							int year = Integer.parseInt(valueStr.substring(0, 4));
-							int month = Integer.parseInt(valueStr.substring(4, 6));
-							int day = Integer.parseInt(valueStr.substring(6, 8));
-							// Substring value: year, month and day has to be in valid range
-							if (year >= 1582 && year <= 2999 && month >= 01 && month <= 12
-									&& day >= 01 && day <= 31) {
-							} else {
-								logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotInRangeInAttributeY"), valueStr, attrPath);
-							}
-						} catch (NumberFormatException numberformatexception) {
-							logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotAValidDateInAttributeY"), valueStr, attrPath);
-						}
-					} else {
-						logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotAValidDateInAttributeY"), valueStr, attrPath);
-					}
-				} else if (attr.isDomainBoolean()) {
-					// Value has to be not null and ("true" or "false")
-					String valueStr = iomObj.getattrvalue(attrName);
-					if (valueStr == null || valueStr.equals("true") || valueStr.equals("false")){
-						// Value okay, skip it
-					} else {
-						logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotABooleanInAttributeY"), valueStr, attrPath);
-					}
-				} else if (attr.isDomainIliUuid()) {
-					// Value is exactly 36 chars long and matches the regex
-					String valueStr = iomObj.getattrvalue(attrName);
-					if (valueStr == null || isValidUuid(valueStr)) {
-							// Value ok, Skip it
-					} else {
-						logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotAValidUUIDInAttributeY"), valueStr, attrPath);
-					}
-				} else if (attr.isDomainIli2Date()) {
-					// Value matches regex and is not null and is in range of type.
-					String valueStr = iomObj.getattrvalue(attrName);
-					FormattedType subType = (FormattedType) type;
-					// The length is explicitly tested because the generated regular expression does not test the length of the value.
-					if (valueStr != null){
-						if (!valueStr.matches(subType.getRegExp()) || valueStr.length() != 10) {
-							logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfDateValueXInAttributeY"), valueStr, attrPath);
-						} else if(!subType.isValueInRange(valueStr)){
-							logMsg(validateType, rsrc.getString("validateAttrValue.dateValueXIsNotInRangeInAttributeY"), valueStr, attrPath);
-						}
-					}
-				} else if (attr.isDomainIli2Time()) {
-					// Value is not null and matches 0:0:0.000-23:59:59.999
-					String valueStr = iomObj.getattrvalue(attrName);
-					FormattedType subType = (FormattedType) type;
-					// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
-					if (valueStr != null){
-						if (!valueStr.matches(subType.getRegExp()) || valueStr.length() < 9 || valueStr.length() > 12){
-							logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfTimeValueXInAttributeY"), valueStr, attrPath);
-						} else if(!subType.isValueInRange(valueStr)){
-							logMsg(validateType, rsrc.getString("validateAttrValue.timeValueXIsNotInRangeInAttributeY"), valueStr, attrPath);
-						}
-					}
-				} else if (attr.isDomainIli2DateTime()) {
-					// Value is not null
-					String valueStr = iomObj.getattrvalue(attrName);
-					FormattedType subType = (FormattedType) type;
-					// Min length and max length is added, because of the defined regular expression which does not test the length of the value.
-					if (valueStr != null){
-						if (!valueStr.matches(subType.getRegExp()) || valueStr.length() < 18 || valueStr.length() > 23) {
-							logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfDatetimeValueXInAttributeY"), valueStr, attrPath);
-						} else if(!subType.isValueInRange(valueStr)){
-							logMsg(validateType, rsrc.getString("validateAttrValue.datetimeValueXIsNotInRangeInAttributeY"), valueStr, attrPath);
-						}
-					}
-				} else if(isDomainName(attr)) {
-					// Value is not null
-					String valueStr = iomObj.getattrvalue(attrName);
-					if (valueStr!=null) {
-						validateTextType(iomObj, attrPath, attrName, validateType, type, valueStr);
-						if (isAKeyword(valueStr)) {
-							logMsg(validateType,rsrc.getString("validateAttrValue.valueXIsAKeywordInAttributeY"), valueStr, attrPath);
-						}else{
-							// value is not a keyword
-						}
-						Pattern pattern=Pattern.compile("[a-zA-Z]{1}([a-zA-Z0-9\\_]{1,})");
-						Matcher matcher=pattern.matcher(valueStr);
-						if(matcher!=null && matcher.matches()){
-							// value matched pattern
-						}else {
-							logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfInterlisNameValueXInAttributeY"), valueStr, attrPath);
-						}
-					}
-				}else if (isDomainUri(attr)) { 
-                    // Value is not null
-                    String valueStr = iomObj.getattrvalue(attrName);
-                    if (valueStr!=null) {
-                        validateTextType(iomObj, attrPath, attrName, validateType, type, valueStr);
-                        
-                        // see http://blog.dieweltistgarnichtso.net/constructing-a-regular-expression-that-matches-uris
-                        Pattern pattern = Pattern.compile("((?<=\\()[A-Za-z][A-Za-z0-9\\+\\.\\-]*:([A-Za-z0-9\\.\\-_~:/\\?#\\[\\]@!\\$&'\\(\\)\\*\\+,;=]|%[A-Fa-f0-9]{2})+(?=\\)))|([A-Za-z][A-Za-z0-9\\+\\.\\-]*:([A-Za-z0-9\\.\\-_~:/\\?#\\[\\]@!\\$&'\\(\\)\\*\\+,;=]|%[A-Fa-f0-9]{2})+)");
-                        Matcher matcher=pattern.matcher(valueStr);
-                        if(matcher!=null && matcher.matches()){
-                         // value matched pattern
-                        }else {
-                            logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfInterlisUriValueXInAttributeY"), valueStr, attrPath);
-                        }
+            for(int structi=0;structi<structc;structi++){
+                if(ValidationConfig.OFF.equals(validateType)){
+                    if(!configOffOufputReduction.contains(ValidationConfig.TYPE+":"+attrQName)){
+                        configOffOufputReduction.add(ValidationConfig.TYPE+":"+attrQName);
+                        errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAttrValue.XNotValidatedValidationConfigurationTypeOffInAttributeY"), attrQName, attrPath, iomObj.getobjecttag(), iomObj.getobjectoid()));
                     }
-				} else if (type instanceof PolylineType){
-					PolylineType polylineType=(PolylineType)type;
-					IomObject polylineValue=iomObj.getattrobj(attrName, 0);
-					if (polylineValue != null){
-						boolean isValid=validatePolyline(validateGeometryType, polylineType, polylineValue, attrName);
-						if(isValid){
-							validatePolylineTopology(attrPath,validateGeometryType, polylineType, polylineValue);
-						}
-					} else {
-                        String attrValue = iomObj.getattrvalue(attrName);
-                        if (attrValue != null) {
-                            logMsg(validateType, rsrc.getString("validateAttrValue.theValueXIsNotAPolylineInAttributeY"), attrValue, attrPath);
-                        }					    
-					}
-				}else if(type instanceof SurfaceOrAreaType){
-					 if(doItfLineTables){
-						 if(type instanceof SurfaceType){
-							 // SURFACE; no attributeValue in mainTable
-						 }else{
-							 // AREA
-							 // validate coord
-						 }
-					 }else{
-						 // validate polygon
-						SurfaceOrAreaType surfaceOrAreaType=(SurfaceOrAreaType)type;
-						IomObject surfaceValue=iomObj.getattrobj(attrName,0);
-						if (surfaceValue != null){
-							boolean isValid = validatePolygon(validateGeometryType,surfaceOrAreaType, surfaceValue, iomObj, attrName);
-							if(isValid){
-								Object attrValidator=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
-								if(attrValidator==null){
-									attrValidator=this;
-									pipelinePool.setIntermediateValue(attr, ValidationConfig.TOPOLOGY,this);
-								}
-								if(attrValidator==this){
-									if(surfaceOrAreaType instanceof SurfaceType){
-									    boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
-									}else{
-										boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
-										if(!singlePass) {
-	                                        if(!ValidationConfig.OFF.equals(areaOverlapValidation)){
-
-	                                            ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
-	                                            if(allLines==null){
-	                                                allLines=new ItfAreaPolygon2Linetable(iliClassQName, objPoolManager);
-	                                                areaAttrs.put(attr,allLines);
-	                                            }
-
-	                                            if(surfaceTopologyValid) {
-	                                                validateAreaTopology(validateGeometryType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
-	                                            }else {
-	                                                // surface topology not valid
-	                                                areaAttrsAreSurfaceTopologiesValid.put(attr, false);
-	                                                errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAttrValue.areaTopologyNoValidatedValidationOfSurfaceTopologyFailedInAttributeY"), attrPath));
-	                                            }
-	                                        }
-										}
-									}
-								}
-							}
-						} else {
-						    String attrValue = iomObj.getattrvalue(attrName);
-						    if (attrValue != null) {
-						        logMsg(validateType,rsrc.getString("validateAttrValue.theValueXIsNotAPolygonInAttributeY"), attrValue, attrPath);
-						    }
-						}
-					 }
-				}else if(type instanceof CoordType){
-					IomObject coord=iomObj.getattrobj(attrName, 0);
-					if (coord!=null){
-						validateCoordType(validateGeometryType, (CoordType)type, coord, attrName);
-					} else {
-					    String attrValue = iomObj.getattrvalue(attrName);
-					    if (attrValue != null) {
-					        logMsg(validateType, rsrc.getString("validateAttrValue.theValueXIsNotCoordInAttributeY"), attrValue, attrPath);
-					    }
-					}
-				}else if(type instanceof NumericType){
-					String valueStr=iomObj.getattrvalue(attrName);
-					if(valueStr!=null){
-						String newValueStr=validateNumericType(validateType, (NumericType)type, valueStr, attrName);
-						if(newValueStr!=null) {
-							iomObj.setattrvalue(attrName, newValueStr);
-						}
-					}else{
-						IomObject structValue=iomObj.getattrobj(attrName, 0);
-						if(structValue!=null){
-							logMsg(validateType, rsrc.getString("validateAttrValue.attributeXHasAnUnexpectedTypeY"),attrPath,structValue.getobjecttag());
-						}
-					}
-				}else if(type instanceof EnumerationType){
-				    EnumerationType enumType = (EnumerationType) type;
-					String value=iomObj.getattrvalue(attrName);
-					if(value!=null){
-						if(!((EnumerationType) type).getValues().contains(value)){
-						    logMsg(validateType,rsrc.getString("validateAttrValue.valueXIsNotAMemberOfTheEnumerationInAttributeY"), value, attrPath);   
-						}
-					}else{
-						IomObject structValue=iomObj.getattrobj(attrName, 0);
-						if(structValue!=null){
-							logMsg(validateType, rsrc.getString("validateAttrValue.attributeXHasAnUnexpectedTypeY"),attrPath,structValue.getobjecttag());
-						}
-					}
-				}else if(type instanceof EnumTreeValueType){
-				    String actualValue=iomObj.getattrvalue(attrName);
-				    if(actualValue!=null) {
-	                    if (isValidEnumTreeValue(actualValue, attrPath,(EnumTreeValueType) type)) {
-	                        logMsg(validateType,rsrc.getString("validateAttrValue.valueXIsNotAMemberOfTheEnumerationInAttributeY"), actualValue, attrPath);
-	                    }
-				    }
-				}else if(type instanceof ReferenceType){
-				}else if(type instanceof TextType){
-					String value=iomObj.getattrvalue(attrName);
-					validateTextType(iomObj, attrPath, attrName, validateType, type, value);
-                }else if(type instanceof TextOIDType){
-                    String value=iomObj.getattrvalue(attrName);
-                    if (value != null && isDomainAnnexOid(attr)) {
-                        if (!isValidAnnexOid(value)) {
-                            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.valueXIsNotAValidOidInAttributeY"), value, attrPath));
-                        }                        
-                    } else if (value != null && isDomainUuid(attr)) {
-                        if (!isValidUuid(value)) {
-                            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.valueXIsNotAValidOidInAttributeY"), value, attrPath));
-                        }                        
-                    } else if (value != null && isDomainTextOid(attr)) {
-                        if (!isValidTextOid(value,((TextType)((TextOIDType)type).getOIDType()).getMaxLength())) {
-                            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.valueXIsNotAValidOidInAttributeY"), value, attrPath));
-                        }                        
-                    }
-				} else if (type instanceof FormattedType) {
-				    String regExp = ((FormattedType) type).getRegExp();
-                    String actualValue = iomObj.getattrvalue(attrName);
-                    if (actualValue != null) {
-                        if (!actualValue.matches(regExp)) {
-                            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.attributeXHasAInvalidValueY"), attrPath, actualValue));
+                }else{
+                    if (attr.isDomainIli1Date()) {
+                        String valueStr=iomObj.getattrprim(attrName, structi);
+                        // Value has to be not null and exactly 8 numbers long
+                        if (valueStr == null){
+                            // no value, skip test
+                        }else if(valueStr.length() == 8) {
+                            // Value has to be a number
+                            try {
+                                int year = Integer.parseInt(valueStr.substring(0, 4));
+                                int month = Integer.parseInt(valueStr.substring(4, 6));
+                                int day = Integer.parseInt(valueStr.substring(6, 8));
+                                // Substring value: year, month and day has to be in valid range
+                                if (year >= 1582 && year <= 2999 && month >= 01 && month <= 12
+                                        && day >= 01 && day <= 31) {
+                                } else {
+                                    logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotInRangeInAttributeY"), valueStr, attrPath);
+                                }
+                            } catch (NumberFormatException numberformatexception) {
+                                logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotAValidDateInAttributeY"), valueStr, attrPath);
+                            }
                         } else {
-                            boolean hasAValidValue = ((FormattedType) type).isValueInRange(actualValue);
-                            if (!hasAValidValue) {
-                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.valueXIsAOutOfRangeInAttributeY"), actualValue, attrPath));
+                            logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotAValidDateInAttributeY"), valueStr, attrPath);
+                        }
+                    } else if (attr.isDomainBoolean()) {
+                        // Value has to be not null and ("true" or "false")
+                        String valueStr=iomObj.getattrprim(attrName, structi);
+                        if (valueStr == null || valueStr.equals("true") || valueStr.equals("false")){
+                            // Value okay, skip it
+                        } else {
+                            logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotABooleanInAttributeY"), valueStr, attrPath);
+                        }
+                    } else if (attr.isDomainIliUuid()) {
+                        // Value is exactly 36 chars long and matches the regex
+                        String valueStr=iomObj.getattrprim(attrName, structi);
+                        if (valueStr == null || isValidUuid(valueStr)) {
+                                // Value ok, Skip it
+                        } else {
+                            logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotAValidUUIDInAttributeY"), valueStr, attrPath);
+                        }
+                    } else if (attr.isDomainIli2Date()) {
+                        // Value matches regex and is not null and is in range of type.
+                        String valueStr=iomObj.getattrprim(attrName, structi);
+                        FormattedType subType = (FormattedType) type;
+                        // The length is explicitly tested because the generated regular expression does not test the length of the value.
+                        if (valueStr != null){
+                            if (!valueStr.matches(subType.getRegExp()) || valueStr.length() != 10) {
+                                logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfDateValueXInAttributeY"), valueStr, attrPath);
+                            } else if(!subType.isValueInRange(valueStr)){
+                                logMsg(validateType, rsrc.getString("validateAttrValue.dateValueXIsNotInRangeInAttributeY"), valueStr, attrPath);
                             }
                         }
-                    }				    
-                } else if (type instanceof BlackboxType) {
-                    if(((BlackboxType) type).getKind()==BlackboxType.eBINARY) {
-                        String actualValue = iomObj.getattrvalue(attrName);
+                    } else if (attr.isDomainIli2Time()) {
+                        // Value is not null and matches 0:0:0.000-23:59:59.999
+                        String valueStr=iomObj.getattrprim(attrName, structi);
+                        FormattedType subType = (FormattedType) type;
+                        // Min length and max length is added, because of the defined regular expression which does not test the length of the value.
+                        if (valueStr != null){
+                            if (!valueStr.matches(subType.getRegExp()) || valueStr.length() < 9 || valueStr.length() > 12){
+                                logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfTimeValueXInAttributeY"), valueStr, attrPath);
+                            } else if(!subType.isValueInRange(valueStr)){
+                                logMsg(validateType, rsrc.getString("validateAttrValue.timeValueXIsNotInRangeInAttributeY"), valueStr, attrPath);
+                            }
+                        }
+                    } else if (attr.isDomainIli2DateTime()) {
+                        // Value is not null
+                        String valueStr=iomObj.getattrprim(attrName, structi);
+                        FormattedType subType = (FormattedType) type;
+                        // Min length and max length is added, because of the defined regular expression which does not test the length of the value.
+                        if (valueStr != null){
+                            if (!valueStr.matches(subType.getRegExp()) || valueStr.length() < 18 || valueStr.length() > 23) {
+                                logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfDatetimeValueXInAttributeY"), valueStr, attrPath);
+                            } else if(!subType.isValueInRange(valueStr)){
+                                logMsg(validateType, rsrc.getString("validateAttrValue.datetimeValueXIsNotInRangeInAttributeY"), valueStr, attrPath);
+                            }
+                        }
+                    } else if(isDomainName(attr)) {
+                        // Value is not null
+                        String valueStr=iomObj.getattrprim(attrName, structi);
+                        if (valueStr!=null) {
+                            validateTextType(iomObj, attrPath, attrName, validateType, type, valueStr);
+                            if (isAKeyword(valueStr)) {
+                                logMsg(validateType,rsrc.getString("validateAttrValue.valueXIsAKeywordInAttributeY"), valueStr, attrPath);
+                            }else{
+                                // value is not a keyword
+                            }
+                            Pattern pattern=Pattern.compile("[a-zA-Z]{1}([a-zA-Z0-9\\_]{1,})");
+                            Matcher matcher=pattern.matcher(valueStr);
+                            if(matcher!=null && matcher.matches()){
+                                // value matched pattern
+                            }else {
+                                logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfInterlisNameValueXInAttributeY"), valueStr, attrPath);
+                            }
+                        }
+                    }else if (isDomainUri(attr)) { 
+                        // Value is not null
+                        String valueStr=iomObj.getattrprim(attrName, structi);
+                        if (valueStr!=null) {
+                            validateTextType(iomObj, attrPath, attrName, validateType, type, valueStr);
+                            
+                            // see http://blog.dieweltistgarnichtso.net/constructing-a-regular-expression-that-matches-uris
+                            Pattern pattern = Pattern.compile("((?<=\\()[A-Za-z][A-Za-z0-9\\+\\.\\-]*:([A-Za-z0-9\\.\\-_~:/\\?#\\[\\]@!\\$&'\\(\\)\\*\\+,;=]|%[A-Fa-f0-9]{2})+(?=\\)))|([A-Za-z][A-Za-z0-9\\+\\.\\-]*:([A-Za-z0-9\\.\\-_~:/\\?#\\[\\]@!\\$&'\\(\\)\\*\\+,;=]|%[A-Fa-f0-9]{2})+)");
+                            Matcher matcher=pattern.matcher(valueStr);
+                            if(matcher!=null && matcher.matches()){
+                             // value matched pattern
+                            }else {
+                                logMsg(validateType, rsrc.getString("validateAttrValue.invalidFormatOfInterlisUriValueXInAttributeY"), valueStr, attrPath);
+                            }
+                        }
+                    } else if (type instanceof PolylineType){
+                        PolylineType polylineType=(PolylineType)type;
+                        IomObject polylineValue=iomObj.getattrobj(attrName, structi);
+                        if (polylineValue != null){
+                            boolean isValid=validatePolyline(validateGeometryType, polylineType, polylineValue, attrName);
+                            if(isValid){
+                                validatePolylineTopology(attrPath,validateGeometryType, polylineType, polylineValue);
+                            }
+                        } else {
+                            String attrValue = iomObj.getattrvalue(attrName);
+                            if (attrValue != null) {
+                                logMsg(validateType, rsrc.getString("validateAttrValue.theValueXIsNotAPolylineInAttributeY"), attrValue, attrPath);
+                            }                       
+                        }
+                    } else if (type instanceof MultiPolylineType){
+                        MultiPolylineType polylineType=(MultiPolylineType)type;
+                        IomObject multipolylineValue=iomObj.getattrobj(attrName, structi);
+                        if (multipolylineValue != null){
+                            if(multipolylineValue.getobjecttag().equals("MULTIPOLYLINE")) {
+                                int polylinec=multipolylineValue.getattrvaluecount("polyline");
+                                if(polylinec>0) {
+                                    for(int polylinei=0;polylinei<polylinec;polylinei++) {
+                                        IomObject polylineValue=multipolylineValue.getattrobj("polyline", polylinei);
+                                        boolean isValid=validatePolyline(validateGeometryType, polylineType, polylineValue, attrName);
+                                        if(isValid){
+                                            validatePolylineTopology(attrPath,validateGeometryType, polylineType, polylineValue);
+                                        }
+                                    }
+                                }else {
+                                    logMsg(validateType, rsrc.getString("validateMultiPolyline.invalidNumberOfPolylines"));
+                                }
+                            }else {
+                                logMsg(validateType, "unexpected Type "+multipolylineValue.getobjecttag()+"; MULTIPOLYLINE expected");
+                            }
+                        } else {
+                            String attrValue = iomObj.getattrvalue(attrName);
+                            if (attrValue != null) {
+                                logMsg(validateType, rsrc.getString("validateAttrValue.theValueXIsNotAPolylineInAttributeY"), attrValue, attrPath);
+                            }                       
+                        }
+                    }else if(type instanceof SurfaceOrAreaType){
+                         if(doItfLineTables){
+                             if(type instanceof SurfaceType){
+                                 // SURFACE; no attributeValue in mainTable
+                             }else{
+                                 // AREA
+                                 // validate coord
+                             }
+                         }else{
+                             // validate polygon
+                            SurfaceOrAreaType surfaceOrAreaType=(SurfaceOrAreaType)type;
+                            IomObject surfaceValue=iomObj.getattrobj(attrName,structi);
+                            if (surfaceValue != null){
+                                boolean isValid = validatePolygon(validateGeometryType,surfaceOrAreaType, surfaceValue, iomObj, attrName);
+                                if(isValid){
+                                    Object attrValidator=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
+                                    if(attrValidator==null){
+                                        attrValidator=this;
+                                        pipelinePool.setIntermediateValue(attr, ValidationConfig.TOPOLOGY,this);
+                                    }
+                                    if(attrValidator==this){
+                                        if(surfaceOrAreaType instanceof SurfaceType){
+                                            boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
+                                        }else{
+                                            boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
+                                            if(!singlePass) {
+                                                if(!ValidationConfig.OFF.equals(areaOverlapValidation)){
+
+                                                    ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
+                                                    if(allLines==null){
+                                                        allLines=new ItfAreaPolygon2Linetable(iliClassQName, objPoolManager);
+                                                        areaAttrs.put(attr,allLines);
+                                                    }
+
+                                                    if(surfaceTopologyValid) {
+                                                        validateAreaTopology(validateGeometryType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
+                                                    }else {
+                                                        // surface topology not valid
+                                                        areaAttrsAreSurfaceTopologiesValid.put(attr, false);
+                                                        errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAttrValue.areaTopologyNoValidatedValidationOfSurfaceTopologyFailedInAttributeY"), attrPath));
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                String attrValue=iomObj.getattrprim(attrName, structi);
+                                if (attrValue != null) {
+                                    logMsg(validateType,rsrc.getString("validateAttrValue.theValueXIsNotAPolygonInAttributeY"), attrValue, attrPath);
+                                }
+                            }
+                         }
+                    }else if(type instanceof MultiSurfaceOrAreaType){
+                        // validate polygon
+                        MultiSurfaceOrAreaType surfaceOrAreaType=(MultiSurfaceOrAreaType)type;
+                       IomObject surfaceValue=iomObj.getattrobj(attrName,structi);
+                       if (surfaceValue != null){
+                           boolean isValid = validatePolygon(validateGeometryType,surfaceOrAreaType, surfaceValue, iomObj, attrName);
+                           if(isValid){
+                               Object attrValidator=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
+                               if(attrValidator==null){
+                                   attrValidator=this;
+                                   pipelinePool.setIntermediateValue(attr, ValidationConfig.TOPOLOGY,this);
+                               }
+                               if(attrValidator==this){
+                                   if(surfaceOrAreaType instanceof MultiSurfaceType){
+                                       boolean surfaceTopologyValid=validateMultiSurfaceTopology(validateGeometryType,attr,(MultiSurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
+                                   }else{
+                                       boolean surfaceTopologyValid=validateMultiSurfaceTopology(validateGeometryType,attr,(MultiAreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
+                                       if(!singlePass) {
+                                           if(!ValidationConfig.OFF.equals(areaOverlapValidation)){
+
+                                               ItfAreaPolygon2Linetable allLines=areaAttrs.get(attr);
+                                               if(allLines==null){
+                                                   allLines=new ItfAreaPolygon2Linetable(iliClassQName, objPoolManager);
+                                                   areaAttrs.put(attr,allLines);
+                                               }
+
+                                               if(surfaceTopologyValid) {
+                                                   validateMultiAreaTopology(validateGeometryType,allLines,(MultiAreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
+                                               }else {
+                                                   // surface topology not valid
+                                                   areaAttrsAreSurfaceTopologiesValid.put(attr, false);
+                                                   errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAttrValue.areaTopologyNoValidatedValidationOfSurfaceTopologyFailedInAttributeY"), attrPath));
+                                               }
+                                           }
+                                       }
+                                   }
+                               }
+                           }
+                       } else {
+                           String attrValue=iomObj.getattrprim(attrName, structi);
+                           if (attrValue != null) {
+                               logMsg(validateType,rsrc.getString("validateAttrValue.theValueXIsNotAPolygonInAttributeY"), attrValue, attrPath);
+                           }
+                       }
+                    }else if(type instanceof CoordType){
+                        IomObject coord=iomObj.getattrobj(attrName, structi);
+                        if (coord!=null){
+                            validateCoordType(validateGeometryType, (CoordType)type, coord, attrName);
+                        } else {
+                            String attrValue=iomObj.getattrprim(attrName, structi);
+                            if (attrValue != null) {
+                                logMsg(validateType, rsrc.getString("validateAttrValue.theValueXIsNotCoordInAttributeY"), attrValue, attrPath);
+                            }
+                        }
+                    }else if(type instanceof MultiCoordType){
+                        IomObject multicoordValue=iomObj.getattrobj(attrName, structi);
+                        if (multicoordValue!=null){
+                            if(multicoordValue.getobjecttag().equals("MULTICOORD")) {
+                                int coordc=multicoordValue.getattrvaluecount("coord");
+                                if(coordc>0) {
+                                    for(int coordi=0;coordi<coordc;coordi++) {
+                                        IomObject coordValue=multicoordValue.getattrobj("coord", coordi);
+                                        if(coordValue.getobjecttag().equals("COORD")) {
+                                            validateCoordType(validateGeometryType, (MultiCoordType)type, coordValue, attrName);
+                                        }else {
+                                            logMsg(validateType, "unexpected Type "+coordValue.getobjecttag()+"; COORD expected");
+                                        }
+                                    }
+                                }else {
+                                    logMsg(validateType, rsrc.getString("validateMultiCoord.invalidNumberOfCoords"));
+                                }
+                            }else {
+                                logMsg(validateType, "unexpected Type "+multicoordValue.getobjecttag()+"; MULTICOORD expected");
+                            }
+                        } else {
+                            String attrValue=iomObj.getattrprim(attrName, structi);
+                            if (attrValue != null) {
+                                logMsg(validateType, rsrc.getString("validateAttrValue.theValueXIsNotCoordInAttributeY"), attrValue, attrPath);
+                            }
+                        }
+                    }else if(type instanceof NumericType){
+                        String valueStr=iomObj.getattrprim(attrName, structi);
+                        if(valueStr!=null){
+                            OutParam<Boolean> isNumValid=new OutParam<Boolean>(true);
+                            String newValueStr=validateNumericType(validateType, (NumericType)type, valueStr, attrName,isNumValid);
+                            if(newValueStr!=null) {
+                                iomObj.setattrvalue(attrName, newValueStr);
+                            }
+                        }else{
+                            IomObject structValue=iomObj.getattrobj(attrName, structi);
+                            if(structValue!=null){
+                                logMsg(validateType, rsrc.getString("validateAttrValue.attributeXHasAnUnexpectedTypeY"),attrPath,structValue.getobjecttag());
+                            }
+                        }
+                    }else if(type instanceof EnumerationType){
+                        EnumerationType enumType = (EnumerationType) type;
+                        String value=iomObj.getattrprim(attrName, structi);
+                        if(value!=null){
+                            if(!((EnumerationType) type).getValues().contains(value)){
+                                logMsg(validateType,rsrc.getString("validateAttrValue.valueXIsNotAMemberOfTheEnumerationInAttributeY"), value, attrPath);   
+                            }
+                        }else{
+                            IomObject structValue=iomObj.getattrobj(attrName, structi);
+                            if(structValue!=null){
+                                logMsg(validateType, rsrc.getString("validateAttrValue.attributeXHasAnUnexpectedTypeY"),attrPath,structValue.getobjecttag());
+                            }
+                        }
+                    }else if(type instanceof EnumTreeValueType){
+                        String actualValue=iomObj.getattrprim(attrName, structi);
+                        if(actualValue!=null) {
+                            if (isValidEnumTreeValue(actualValue, attrPath,(EnumTreeValueType) type)) {
+                                logMsg(validateType,rsrc.getString("validateAttrValue.valueXIsNotAMemberOfTheEnumerationInAttributeY"), actualValue, attrPath);
+                            }
+                        }
+                    }else if(type instanceof ReferenceType){
+                    }else if(type instanceof TextType){
+                        String value=iomObj.getattrprim(attrName, structi);
+                        validateTextType(iomObj, attrPath, attrName, validateType, type, value);
+                    }else if(type instanceof TextOIDType){
+                        String value=iomObj.getattrprim(attrName, structi);
+                        if (value != null && isDomainAnnexOid(attr)) {
+                            if (!isValidAnnexOid(value)) {
+                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.valueXIsNotAValidOidInAttributeY"), value, attrPath));
+                            }                        
+                        } else if (value != null && isDomainUuid(attr)) {
+                            if (!isValidUuid(value)) {
+                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.valueXIsNotAValidOidInAttributeY"), value, attrPath));
+                            }                        
+                        } else if (value != null && isDomainTextOid(attr)) {
+                            if (!isValidTextOid(value,((TextType)((TextOIDType)type).getOIDType()).getMaxLength())) {
+                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.valueXIsNotAValidOidInAttributeY"), value, attrPath));
+                            }                        
+                        }
+                    } else if (type instanceof FormattedType) {
+                        String regExp = ((FormattedType) type).getRegExp();
+                        String actualValue=iomObj.getattrprim(attrName, structi);
                         if (actualValue != null) {
-                            Matcher matcher = patternForBase64Validation.matcher(actualValue);
-                            if (!matcher.matches()) {
-                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.attributeXHasAInvalidValueY"), attrPath, shortcutValue(actualValue)));
+                            if (!actualValue.matches(regExp)) {
+                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.attributeXHasAInvalidValueY"), attrPath, actualValue));
+                            } else {
+                                boolean hasAValidValue = ((FormattedType) type).isValueInRange(actualValue);
+                                if (!hasAValidValue) {
+                                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.valueXIsAOutOfRangeInAttributeY"), actualValue, attrPath));
+                                }
                             }
                         }                   
+                    } else if (type instanceof BlackboxType) {
+                        if(((BlackboxType) type).getKind()==BlackboxType.eBINARY) {
+                            String actualValue=iomObj.getattrprim(attrName, structi);
+                            if (actualValue != null) {
+                                Matcher matcher = patternForBase64Validation.matcher(actualValue);
+                                if (!matcher.matches()) {
+                                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateAttrValue.attributeXHasAInvalidValueY"), attrPath, shortcutValue(actualValue)));
+                                }
+                            }                   
+                        }
                     }
-				}
-			}
+                }
+            }
 		}
 	}
 
+    static private Cardinality getCardinality(AttributeDef attr) { // move to ili2c
+        Type type=attr.getDomainOrDerivedDomain();
+        Cardinality card=type.getCardinality();
+        if(card.getMinimum()==0){
+            if(false) { // attr.isDefinedMandatory()) { // fix in compiler
+                card=new Cardinality(1,card.getMaximum());
+            }else if(type instanceof TypeAlias) {
+                if(((TypeAlias)type).getAliasing().isDefinedMandatory()){
+                    card=new Cardinality(1,card.getMaximum());
+                }
+            }
+        }
+        return card;
+    }
     private static String shortcutValue(String value) {
         int MAX_LEN=20;
         if(value==null || value.length()<=MAX_LEN) {
@@ -3968,6 +4140,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		// get lines
 		allLines.addPolygon(mainObjTid,internalTid,iomPolygon,validateType,errFact);
 	}
+    private void validateMultiAreaTopology(String validateType, ItfAreaPolygon2Linetable allLines,MultiAreaType type, String mainObjTid,String internalTid,IomObject iomPolygon) throws IoxException {
+        // get lines
+        allLines.addMultiPolygon(mainObjTid,internalTid,iomPolygon,validateType,errFact);
+    }
 
 	private boolean validateSurfaceTopology(String validateType, AttributeDef attr,SurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
 		boolean surfaceTopologyValid=true;
@@ -3979,8 +4155,18 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		return surfaceTopologyValid;
 	}
+    private boolean validateMultiSurfaceTopology(String validateType, AttributeDef attr,MultiSurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
+        boolean surfaceTopologyValid=true;
+        try {
+            surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validateMultiPolygon(mainObjTid, attr, iomValue, errFact,validateType);
+        } catch (IoxException e) {
+            surfaceTopologyValid=false;
+            errs.addEvent(errFact.logErrorMsg(e, rsrc.getString("validateSurfaceTopology.failedToValidatePolygon")));
+        }
+        return surfaceTopologyValid;
+    }
 	
-	private void validatePolylineTopology(String attrPath,String validateType, PolylineType type, IomObject iomValue) {
+	private void validatePolylineTopology(String attrPath,String validateType, LineType type, IomObject iomValue) {
 		CompoundCurve seg=null;
 		try {
 		    OutParam<Boolean> foundErrs=new OutParam<Boolean>();
@@ -4023,15 +4209,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	/* returns true, if polygon is valid
 	 * 
 	 */
-	private boolean validatePolygon(String validateType, SurfaceOrAreaType surfaceOrAreaType, IomObject surfaceValue, IomObject currentIomObj, String attrName) {
+	private boolean validatePolygon(String validateType, AbstractSurfaceOrAreaType surfaceOrAreaType, IomObject surfaceValue, IomObject currentIomObj, String attrName) {
+        boolean foundErrs=false;
 		if (surfaceValue.getobjecttag().equals("MULTISURFACE")){
+		    int surfacec=surfaceValue.getattrvaluecount("surface");
+            if(surfacec==0){
+                logMsg(validateType, rsrc.getString("validateMultiPolygon.invalidNumberOfSurfaces"));
+                return false;
+            }
 			boolean clipped = surfaceValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
-			for(int surfacei=0;surfacei< surfaceValue.getattrvaluecount("surface");surfacei++){
-				if(!clipped && surfacei>0){
-					// unclipped surface with multi 'surface' elements
-					logMsg(validateType, rsrc.getString("validatePolygon.invalidNumberOfSurfaceInCompleteBasket"));
-					return false;
-				}
+            if((surfaceOrAreaType instanceof SurfaceOrAreaType) && !clipped && surfacec>1){
+                // unclipped surface with multi 'surface' elements
+                logMsg(validateType, rsrc.getString("validatePolygon.invalidNumberOfSurfaceInCompleteBasket"));
+                return false;
+            }
+			for(int surfacei=0;surfacei< surfacec;surfacei++){
 				IomObject surface= surfaceValue.getattrobj("surface",surfacei);
 				int boundaryc=surface.getattrvaluecount("boundary");
 				// a multisurface consists of at least one boundary.
@@ -4052,7 +4244,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}    
 						for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
 							IomObject polyline=boundary.getattrobj("polyline",polylinei);
-							validatePolyline(validateType, surfaceOrAreaType, polyline, attrName);
+					        foundErrs = foundErrs || !validatePolyline(validateType, surfaceOrAreaType, polyline, attrName);
 							// add line to shell or hole
 						}
 					    // add shell or hole to surface
@@ -4063,7 +4255,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			logMsg(validateType, "unexpected Type "+surfaceValue.getobjecttag()+"; MULTISURFACE expected");
 			return false;
 		}
-		return true;
+		return !foundErrs;
 	}
 
 	// returns true if valid
@@ -4093,14 +4285,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						IomObject segment=sequence.getattrobj("segment",segmenti);
 						if(segment.getobjecttag().equals("COORD")){
 							if(lineformNames.contains("STRAIGHTS") || segmenti==0){
-								validateCoordType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment, attrName);
+							    foundErrs = foundErrs || !validateCoordType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment, attrName);
 							}else{
 								logMsg(validateType, "unexpected COORD");
 								foundErrs = foundErrs || true;
 							}
 						} else if (segment.getobjecttag().equals("ARC")){
 							if(lineformNames.contains("ARCS") && segmenti>0){
-								validateARCSType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment, attrName);
+							    foundErrs = foundErrs || !validateARCSType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment, attrName);
 							}else{
 								logMsg(validateType, "unexpected ARC");
 								foundErrs = foundErrs || true;
@@ -4122,35 +4314,44 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return !foundErrs;
 	}
 
-	private void validateCoordType(String validateType, CoordType coordType, IomObject coordValue, String attrName) {
+    // returns true if valid
+	private boolean validateCoordType(String validateType, AbstractCoordType coordType, IomObject coordValue, String attrName) {
+        boolean foundErrs=false;
+        OutParam<Boolean> isNumValid=new OutParam<Boolean>(true);
 		if (coordType.getDimensions().length >= 1){
 			if (coordValue.getattrvalue("C1") != null){
-				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"), attrName));
+				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"), attrName,isNumValid));
 			} else if (coordValue.getattrvalue("A1") != null) {
 				logMsg(validateType, rsrc.getString("validateCoordType.notATypeOfCoord"));
+	            foundErrs = foundErrs || true;
 			} else {
 				logMsg(validateType, rsrc.getString("validateCoordType.wrongCoordStructureC1Expected"));
+	            foundErrs = foundErrs || true;
 			}
 		}
 		if (coordType.getDimensions().length == 2){
 			if (coordValue.getattrvalue("C3") != null){
 				logMsg(validateType, rsrc.getString("validateCoordType.wrongCoordStructureC3NotExpected"));
+	            foundErrs = foundErrs || true;
 			}
 		}
 		if (coordType.getDimensions().length >= 2){
 			if (coordValue.getattrvalue("C2") != null){
-				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"), attrName));
+				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"), attrName,isNumValid));
 			} else if (coordValue.getattrvalue("A2") != null) {
 				logMsg(validateType, rsrc.getString("validateCoordType.notATypeOfCoord"));
+	            foundErrs = foundErrs || true;
 			} else {
 				logMsg(validateType, rsrc.getString("validateCoordType.wrongCoordStructureC2Expected"));
+	            foundErrs = foundErrs || true;
 			}
 		}
 		if (coordType.getDimensions().length == 3){
 			if (coordValue.getattrvalue("C3") != null){
-				coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"), attrName));
+				coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"), attrName,isNumValid));
 			} else {
 				logMsg(validateType, rsrc.getString("validateCoordType.wrongCoordStructureC3Expected"));
+	            foundErrs = foundErrs || true;
 			}
 		}
 		// validate if no superfluous properties
@@ -4162,12 +4363,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}else{
 				if(!propName.equals("C1") && !propName.equals("C2") && !propName.equals("C3")){
 					errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateCoordType.wrongCoordStructureUnknownPropertyX"),propName));
+		            foundErrs = foundErrs || true;
 				}
 			}
 		}
+        return !foundErrs && isNumValid.value;
 	}
 
-	private void validateARCSType(String validateType, CoordType coordType, IomObject coordValue, String attrName) {
+    // returns true if valid
+	private boolean validateARCSType(String validateType, CoordType coordType, IomObject coordValue, String attrName) {
+        boolean foundErrs=false;
 		int dimLength=coordType.getDimensions().length;
 		String c1=coordValue.getattrvalue("C1");
 		String c2=coordValue.getattrvalue("C2");
@@ -4176,22 +4381,25 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		String a2=coordValue.getattrvalue("A2");
 		
 		boolean wrongArcStructure=false;
+		OutParam<Boolean> isNumValid=new OutParam<Boolean>(true);
 		int c1Count=coordValue.getattrvaluecount("C1");
 		if (dimLength>=2 && dimLength<=3){
 			if(a1!=null && a2!=null && c1!=null && c2!=null){
-				coordValue.setattrvalue("A1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], a1, attrName));
-				coordValue.setattrvalue("A2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], a2, attrName));
-				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], c1, attrName));
-				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], c2, attrName));
+				coordValue.setattrvalue("A1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], a1, attrName,isNumValid));
+				coordValue.setattrvalue("A2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], a2, attrName,isNumValid));
+				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], c1, attrName,isNumValid));
+				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], c2, attrName,isNumValid));
 				if(dimLength==2) {
 					if(c3!=null) {
 						logMsg(validateType, rsrc.getString("validateARCSType.wrongArcStructureC3NotExpected"));
+	                    foundErrs = foundErrs || true;
 					}
 				}else if(dimLength==3) {
 					if(c3!=null) {
-						coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], c3, attrName));
+						coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], c3, attrName,isNumValid));
 					}else {
 						logMsg(validateType, rsrc.getString("validateARCSType.wrongArcStructureC3Expected"));
+	                    foundErrs = foundErrs || true;
 					}
 				}
 			}else {
@@ -4202,6 +4410,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		if(wrongArcStructure) {
 			logMsg(validateType, rsrc.getString("validateARCSType.wrongArcStructure"));
+            foundErrs = foundErrs || true;
 		}
 		
 		// validate if no superfluous properties
@@ -4215,17 +4424,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					// ok.
 				} else {
 					errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateARCSType.wrongArcStructureUnknownPropertyX"),propName));
+                    foundErrs = foundErrs || true;
 				}
 			}
 		}
+        return !foundErrs && isNumValid.value;
 	}
 
-	private String validateNumericType(String validateType, NumericType type, String valueStr, String attrName) {
+	private String validateNumericType(String validateType, NumericType type, String valueStr, String attrName,OutParam<Boolean> isValid) {
 		PrecisionDecimal value=null;
 		try {
 			value=new PrecisionDecimal(valueStr);
 		} catch (NumberFormatException e) {
 			 logMsg(validateType, rsrc.getString("validateNumericType.valueXIsNotANumber"), valueStr);
+			 isValid.value=false;
 		}
 		BigDecimal rounded=null;
 		if(value!=null){
@@ -4242,6 +4454,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			if (rounded!=null && (rounded.compareTo(min_general)==-1 || rounded.compareTo(max_general)==+1)){
 				logMsg(validateType, rsrc.getString("validateNumericType.valueXIsOutOfRangeInAttributeY"), rounded.toString(), attrName);
+	             isValid.value=false;
 			}
 		}
 		if(rounded==null) {

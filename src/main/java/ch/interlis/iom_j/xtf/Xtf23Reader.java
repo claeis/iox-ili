@@ -21,6 +21,7 @@ import ch.interlis.ili2c.metamodel.Model;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
@@ -1022,9 +1023,9 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 	                if(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_XML_COORD) || event.asStartElement().getName().equals(QNAME_XML_ARC))){
 	                	String segmentType=null;
 	                	if(event.asStartElement().getName().equals(QNAME_XML_COORD)) {
-	                    	segmentType=QNAME_XML_SEGMENTS_COORD.getLocalPart();
+	                    	segmentType=Iom_jObject.COORD;
 	                    }else if(event.asStartElement().getName().equals(QNAME_XML_ARC)) {
-	                    	segmentType=QNAME_XML_SEGMENTS_ARC.getLocalPart();
+	                    	segmentType=Iom_jObject.ARC;
 	                    }
 	                	event=reader.nextEvent(); // COORD
 	                	event=skipSpacesAndGetNextEvent(event);
@@ -1044,12 +1045,12 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 	                    iomObj.addattrobj(attrName, polyline);
 	                }else if(event.isStartElement() && event.asStartElement().getName().equals(QNAME_XML_SURFACE)){
 	                    // SURFACE (surface/area)
-	                	IomObject multiSurface=createIomObject(QNAME_XML_MULTISURFACE.getLocalPart(), null);
+	                	IomObject multiSurface=createIomObject(Iom_jObject.MULTISURFACE, null);
 	                	IomObject surface=readSurface(event);
 	                	if(surface.getattrcount()==0){
 	                    	throw new IoxException("expected surface. unexpected event: "+event.asStartElement().getName().getLocalPart());
 	                    }
-	                	multiSurface.addattrobj("surface", surface);
+	                	multiSurface.addattrobj(Iom_jObject.MULTISURFACE_SURFACE, surface);
 	                	if(!event.isStartElement()){
 	                		throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
 	                	}
@@ -1159,11 +1160,11 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
      * @throws XMLStreamException
      */
     private IomObject readSurface(XMLEvent event) throws IoxException, XMLStreamException {
-    	IomObject surface=createIomObject(QNAME_XML_SURFACE.getLocalPart(), null);
+    	IomObject surface=createIomObject(Iom_jObject.SURFACE, null);
     	event=reader.nextEvent();
 		event=skipSpacesAndGetNextEvent(event);
     	while(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_XML_BOUNDARY))){
-	    	surface.addattrobj("boundary", readBoundary(event));
+	    	surface.addattrobj(Iom_jObject.SURFACE_BOUNDARY, readBoundary(event));
 	    	event=reader.nextEvent();
 	    	event=skipSpacesAndGetNextEvent(event);
     	}
@@ -1177,11 +1178,11 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
      * @throws XMLStreamException
      */
     private IomObject readBoundary(XMLEvent event) throws IoxException, XMLStreamException {
-    	IomObject boundary=createIomObject(QNAME_XML_BOUNDARY.getLocalPart(), null);
+    	IomObject boundary=createIomObject(Iom_jObject.BOUNDARY, null);
     	event=reader.nextEvent();
 		event=skipSpacesAndGetNextEvent(event);
     	while(event.isStartElement() && event.asStartElement().getName().equals(QNAME_XML_POLYLINE)){
-	    	boundary.addattrobj("polyline", readPolyline(event));
+	    	boundary.addattrobj(Iom_jObject.BOUNDARY_POLYLINE, readPolyline(event));
 	    	event=reader.nextEvent();
 	    	event=skipSpacesAndGetNextEvent(event);
     	}
@@ -1195,10 +1196,10 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
      * @throws XMLStreamException
      */
     private IomObject readPolyline(XMLEvent event) throws IoxException, XMLStreamException {
-    	IomObject polyline=createIomObject(QNAME_XML_POLYLINE.getLocalPart(), null);
+    	IomObject polyline=createIomObject(Iom_jObject.POLYLINE, null);
 		event=reader.nextEvent();
 		event=skipSpacesAndGetNextEvent(event);
-		polyline.addattrobj("sequence", readSequence(event));
+		polyline.addattrobj(Iom_jObject.POLYLINE_SEQUENCE, readSequence(event));
     	return polyline;
     }
     
@@ -1209,18 +1210,18 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
      * @throws IoxException
      */
 	private IomObject readSequence(XMLEvent event) throws XMLStreamException, IoxException {
-		IomObject sequence=createIomObject(QNAME_XML_SEGMENTS.getLocalPart(), null);
+		IomObject sequence=createIomObject(Iom_jObject.SEGMENTS, null);
 		if(event.isStartElement()){
 			while(event.isStartElement()){
 				String segmentType=null;
 				if(event.asStartElement().getName().equals(QNAME_XML_COORD)){
-					segmentType=QNAME_XML_SEGMENTS_COORD.getLocalPart();
+					segmentType=Iom_jObject.COORD;
 				}else if(event.asStartElement().getName().equals(QNAME_XML_ARC)){
-					segmentType=QNAME_XML_SEGMENTS_ARC.getLocalPart();
+					segmentType=Iom_jObject.ARC;
 				}
 				event=reader.nextEvent();
 				event=skipSpacesAndGetNextEvent(event);
-				sequence.addattrobj("segment", readSegment(event, segmentType));
+				sequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, readSegment(event, segmentType));
 				event=reader.nextEvent();
 				event=skipSpacesAndGetNextEvent(event);
 			}
@@ -1254,17 +1255,17 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 				segTypeName = SegmentType.valueOf(segmentTypeName);
 				switch(segTypeName){
 					// could have an 1-n events of chars.
-					case C1: segment.setattrvalue(QNAME_XML_SEGMENT_C1.getLocalPart(), event.asCharacters().getData());
+					case C1: segment.setattrvalue(Iom_jObject.COORD_C1, event.asCharacters().getData());
 						break;
-					case C2: segment.setattrvalue(QNAME_XML_SEGMENT_C2.getLocalPart(), event.asCharacters().getData());
+					case C2: segment.setattrvalue(Iom_jObject.COORD_C2, event.asCharacters().getData());
 						break;
-					case C3: segment.setattrvalue(QNAME_XML_SEGMENT_C3.getLocalPart(), event.asCharacters().getData());
+					case C3: segment.setattrvalue(Iom_jObject.COORD_C3, event.asCharacters().getData());
 						break;
-					case A1: segment.setattrvalue(QNAME_XML_SEGMENT_A1.getLocalPart(), event.asCharacters().getData());
+					case A1: segment.setattrvalue(Iom_jObject.ARC_A1, event.asCharacters().getData());
 						break;
-					case A2: segment.setattrvalue(QNAME_XML_SEGMENT_A2.getLocalPart(), event.asCharacters().getData());
+					case A2: segment.setattrvalue(Iom_jObject.ARC_A2, event.asCharacters().getData());
 						break;
-					case R: segment.setattrvalue(QNAME_XML_SEGMENT_R.getLocalPart(), event.asCharacters().getData());
+					case R: segment.setattrvalue(Iom_jObject.ARC_R, event.asCharacters().getData());
 						break;
 					default: throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
 				}

@@ -73,9 +73,6 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
         C1,C2,C3,A1,A2,R
     }
     
-    // enum
-    private static final String SEGMENTTYPE_COORD="COORD";
-    private static final String SEGMENTTYPE_ARC="ARC";
     // namespace
     private static final String NAMESPACE_ILIXMLBASE="http://www.interlis.ch/xtf/2.4/";
     private static final String NAMESPACE_ILIXMLBASE_INTERLIS=NAMESPACE_ILIXMLBASE+"INTERLIS";
@@ -993,7 +990,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                         if(!event.isStartElement()){
                             throw new IoxSyntaxException(event2msgtext(event));
                         }
-                        IomObject returnedSegment=readSegment(event, SEGMENTTYPE_COORD);
+                        IomObject returnedSegment=readSegment(event, Iom_jObject.COORD);
                         if(returnedSegment.getattrcount()==0){
                             throw new IoxException("expected coord. unexpected event: "+event.asStartElement().getName().getLocalPart());
                         }
@@ -1047,12 +1044,12 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                         throw new IoxException("unsupported geometry "+event.asStartElement().getName().getLocalPart());
                     }else if(event.asStartElement().getName().equals(QNAME_GEOM_SURFACE)){
                         // SURFACE (surface/area)
-                        IomObject multiSurface=createIomObject("MULTISURFACE", null);
+                        IomObject multiSurface=createIomObject(Iom_jObject.MULTISURFACE, null);
                         IomObject surface=readSurface(event);
                         if(surface.getattrcount()==0){
                             throw new IoxException("expected surface. unexpected event: "+event.asStartElement().getName().getLocalPart());
                         }
-                        multiSurface.addattrobj("surface", surface);
+                        multiSurface.addattrobj(Iom_jObject.MULTISURFACE_SURFACE, surface);
                         if(!event.isStartElement()){
                             throw new IoxSyntaxException(event2msgtext(event));
                         }
@@ -1144,9 +1141,9 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
         }
 		if(aclass.isExtending(association)){
 			// role of a standalone association
-			iomObj.addattrobj(role.getName(),"REF").setobjectrefoid(refOid);
+			iomObj.addattrobj(role.getName(),Iom_jObject.REF).setobjectrefoid(refOid);
 			if(refBid!=null) {
-				iomObj.addattrobj(role.getName(),"REF").setobjectrefbid(refBid); // set reference
+				iomObj.addattrobj(role.getName(),Iom_jObject.REF).setobjectrefbid(refBid); // set reference
 			}
 			IomObject anObject=iomObj.getattrobj(role.getName(), 0);
 			if(orderPos!=null){
@@ -1172,7 +1169,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 	            iomObj.addattrobj(role.getName(), readObject(event));
                 aObject=iomObj.getattrobj(role.getName(), 0);
 	        } else {
-	            iomObj.addattrobj(role.getName(),"REF");
+	            iomObj.addattrobj(role.getName(),Iom_jObject.REF);
 	            aObject=iomObj.getattrobj(role.getName(), 0);
 	        }
 	        if(aObject!=null) {
@@ -1195,11 +1192,11 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
      * @throws XMLStreamException
      */
     private IomObject readMultiSurface(XMLEvent event) throws IoxException, XMLStreamException {
-    	IomObject multiSurface=createIomObject("MULTISURFACE", null);
+    	IomObject multiSurface=createIomObject(Iom_jObject.MULTISURFACE, null);
     	event=xmlreader.nextEvent();
 		event=skipSpacesAndGetNextEvent(event);
     	while(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_GEOM_SURFACE) || event.asStartElement().getName().equals(QNAME_GEOM_AREA))){
-    		multiSurface.addattrobj("surface", readSurface(event));
+    		multiSurface.addattrobj(Iom_jObject.MULTISURFACE_SURFACE, readSurface(event));
 	    	event=xmlreader.nextEvent();
 	    	event=skipSpacesAndGetNextEvent(event);
     	}
@@ -1213,11 +1210,11 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
      * @throws XMLStreamException
      */
     private IomObject readSurface(XMLEvent event) throws IoxException, XMLStreamException {
-    	IomObject surface=createIomObject("SURFACE", null);
+    	IomObject surface=createIomObject(Iom_jObject.SURFACE, null);
     	event=xmlreader.nextEvent();
 		event=skipSpacesAndGetNextEvent(event);
     	while(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_GEOM_INTERIOR) || event.asStartElement().getName().equals(QNAME_GEOM_EXTERIOR))){
-	    	surface.addattrobj("boundary", readBoundary(event));
+	    	surface.addattrobj(Iom_jObject.SURFACE_BOUNDARY, readBoundary(event));
 	    	event=xmlreader.nextEvent();
 	    	event=skipSpacesAndGetNextEvent(event);
     	}
@@ -1231,11 +1228,11 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
      * @throws XMLStreamException
      */
     private IomObject readBoundary(XMLEvent event) throws IoxException, XMLStreamException {
-    	IomObject boundary=createIomObject("BOUNDARY", null);
+    	IomObject boundary=createIomObject(Iom_jObject.BOUNDARY, null);
     	event=xmlreader.nextEvent();
 		event=skipSpacesAndGetNextEvent(event);
     	while(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_POLYLINE)){
-	    	boundary.addattrobj("polyline", readPolyline(event));
+	    	boundary.addattrobj(Iom_jObject.BOUNDARY_POLYLINE, readPolyline(event));
 	    	event=xmlreader.nextEvent();
 	    	event=skipSpacesAndGetNextEvent(event);
     	}
@@ -1249,16 +1246,16 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
      * @throws XMLStreamException
      */
     private IomObject readMultiPolyline(XMLEvent event) throws IoxException, XMLStreamException {
-        IomObject multiPolyline=createIomObject("MULTIPOLYLINE", null);
+        IomObject multiPolyline=createIomObject(Iom_jObject.MULTIPOLYLINE, null);
         event=xmlreader.nextEvent();
         event=skipSpacesAndGetNextEvent(event);
         while(event.isStartElement() && event.asStartElement().getName().equals(QNAME_GEOM_POLYLINE)){
-            multiPolyline.addattrobj("polyline", readPolyline(event));
+            multiPolyline.addattrobj(Iom_jObject.MULTIPOLYLINE_POLYLINE, readPolyline(event));
             event=xmlreader.nextEvent();
             event=skipSpacesAndGetNextEvent(event);
         }
 
-        if (multiPolyline.getattrvaluecount("polyline") == 0) {
+        if (multiPolyline.getattrvaluecount(Iom_jObject.MULTIPOLYLINE_POLYLINE) == 0) {
             throw new IoxException("expected polyline. unexpected event: " + event.asStartElement().getName().getLocalPart());
         }
 
@@ -1272,10 +1269,10 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
      * @throws XMLStreamException
      */
     private IomObject readPolyline(XMLEvent event) throws IoxException, XMLStreamException {
-    	IomObject polyline=createIomObject("POLYLINE", null);
+    	IomObject polyline=createIomObject(Iom_jObject.POLYLINE, null);
 		event=xmlreader.nextEvent();
 		event=skipSpacesAndGetNextEvent(event);
-		polyline.addattrobj("sequence", readSequence(event));
+		polyline.addattrobj(Iom_jObject.POLYLINE_SEQUENCE, readSequence(event));
     	return polyline;
     }
     
@@ -1286,18 +1283,18 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
      * @throws IoxException
      */
 	private IomObject readSequence(XMLEvent event) throws XMLStreamException, IoxException {
-		IomObject sequence=createIomObject("SEGMENTS", null);
+		IomObject sequence=createIomObject(Iom_jObject.SEGMENTS, null);
 		if(event.isStartElement()){
 			while(event.isStartElement()){
 				String segmentType=null;
 				if(event.asStartElement().getName().equals(QNAME_GEOM_COORD)){
-					segmentType=SEGMENTTYPE_COORD;
+					segmentType=Iom_jObject.COORD;
 				}else if(event.asStartElement().getName().equals(QNAME_GEOM_ARC)){
-					segmentType=SEGMENTTYPE_ARC;
+					segmentType=Iom_jObject.ARC;
 				}
 				event=xmlreader.nextEvent();
 				event=skipSpacesAndGetNextEvent(event);
-				sequence.addattrobj("segment", readSegment(event, segmentType));
+				sequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, readSegment(event, segmentType));
 				event=xmlreader.nextEvent();
 				event=skipSpacesAndGetNextEvent(event);
 			}
@@ -1306,7 +1303,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 	}
 
     private IomObject readMultiCoord(XMLEvent event) throws XMLStreamException, IoxException {
-        IomObject multicoord = createIomObject("MULTICOORD", null);
+        IomObject multicoord = createIomObject(Iom_jObject.MULTICOORD, null);
         event=xmlreader.nextEvent();
         event=skipSpacesAndGetNextEvent(event);
 
@@ -1314,7 +1311,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
             while (event.isStartElement()) {
                 event = xmlreader.nextEvent();
                 event = skipSpacesAndGetNextEvent(event);
-                multicoord.addattrobj("coord", readSegment(event, SEGMENTTYPE_COORD));
+                multicoord.addattrobj(Iom_jObject.MULTICOORD_COORD, readSegment(event, Iom_jObject.COORD));
                 event = xmlreader.nextEvent();
                 event = skipSpacesAndGetNextEvent(event);
             }

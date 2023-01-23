@@ -29,6 +29,7 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 import ch.interlis.iox.IoxDataPool;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxFactoryCollection;
+import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.itf.impl.ItfLineCursor;
 import ch.interlis.iom_j.itf.impl.ItfLineKind;
 import ch.interlis.iom_j.itf.impl.ItfScanner;
@@ -328,7 +329,7 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 	                                        ref=(String)tid2tid.get(oldRef);
 	                                    }
 	                                    if(ref!=null) {
-	                                        IomObject structvalue = createIomObject("REF", null);
+	                                        IomObject structvalue = createIomObject(Iom_jObject.REF, null);
 	                                        structvalue.setobjectrefoid(ref);
 	                                        iomObj.addattrobj(maintableref,structvalue);
 	                                    }
@@ -392,29 +393,29 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 	                                }else{
 	                                    polyAttrName=polyAttr.getName();
 	                                }
-	                                                    IomObject polylineValue = createIomObject("POLYLINE", null);
+	                                IomObject polylineValue = createIomObject(Iom_jObject.POLYLINE, null);
 	                                iomObj.addattrobj(polyAttrName,polylineValue);
 
 	                                // unclipped polyline, add one sequence
-	                                polyAttrSequence = createIomObject("SEGMENTS", null);
-	                                polylineValue.addattrobj("sequence", polyAttrSequence);
+	                                polyAttrSequence = createIomObject(Iom_jObject.SEGMENTS, null);
+	                                polylineValue.addattrobj(Iom_jObject.POLYLINE_SEQUENCE, polyAttrSequence);
 
 	                                //int segc=obj.numCoords();
 	                                //for(int segi=0;segi<segc;segi++){
 	                                    // add control point
-	                                                                        IomObject coordValue = createIomObject("COORD", null);
+	                                    IomObject coordValue = createIomObject(Iom_jObject.COORD, null);
 
-	                                    coordValue.setattrvalue("C1",propv[0]);
-	                                    coordValue.setattrvalue("C2",propv[1]);
+	                                    coordValue.setattrvalue(Iom_jObject.COORD_C1,propv[0]);
+	                                    coordValue.setattrvalue(Iom_jObject.COORD_C2,propv[1]);
 	                                    if(polyAttrIs3D && propv.length>=3){
-	                                        coordValue.setattrvalue("C3",propv[2]);
+	                                        coordValue.setattrvalue(Iom_jObject.COORD_C3,propv[2]);
 	                                    }
 	                                    //coordValue.setattrvalue("A1",Double.toString(ordv[i]));
 	                                    //coordValue.setattrvalue("A2",Double.toString(ordv[i+1]));
 	                                    //if(is3D){
 	                                    //  // no A3 in XTF!
 	                                    //}
-	                                    polyAttrSequence.addattrobj("segment", coordValue); // This line moved
+	                                    polyAttrSequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, coordValue); // This line moved
 	                                //}
 	                            }
 	                        }
@@ -426,14 +427,14 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 					    if(!skipBasket) {
 	                        if(td!=null){
 	                            String propv[]=splitItfLine(itfLine.getContent());
-	                                                        IomObject coordValue = createIomObject("COORD", null);
+	                            IomObject coordValue = createIomObject(Iom_jObject.COORD, null);
 
-	                            coordValue.setattrvalue("C1",propv[0]);
-	                            coordValue.setattrvalue("C2",propv[1]);
+	                            coordValue.setattrvalue(Iom_jObject.COORD_C1,propv[0]);
+	                            coordValue.setattrvalue(Iom_jObject.COORD_C2,propv[1]);
 	                            if(polyAttrIs3D && propv.length>=3){
-	                                coordValue.setattrvalue("C3",propv[2]);
+	                                coordValue.setattrvalue(Iom_jObject.COORD_C3,propv[2]);
 	                            }
-	                                                        polyAttrSequence.addattrobj("segment", coordValue); // This line moved
+	                            polyAttrSequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, coordValue); // This line moved
 	                        }
 					    }
 						state=100;
@@ -442,10 +443,10 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 	                        // get coord
 	                        if(td!=null){
 	                            String propv[]=splitItfLine(itfLine.getContent());
-	                                                        IomObject coordValue = createIomObject("ARC", null);
-	                            coordValue.setattrvalue("A1",propv[0]);
-	                            coordValue.setattrvalue("A2",propv[1]);
-	                                                        polyAttrSequence.addattrobj("segment", coordValue); // This line moved
+	                            IomObject coordValue = createIomObject(Iom_jObject.ARC, null);
+	                            coordValue.setattrvalue(Iom_jObject.ARC_A1,propv[0]);
+	                            coordValue.setattrvalue(Iom_jObject.ARC_A2,propv[1]);
+	                            polyAttrSequence.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, coordValue); // This line moved
 	                        }
 					    }
 						state=101;
@@ -482,12 +483,12 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 	                    if(td!=null){
 	                        String propv[]=splitItfLine(itfLine.getContent());
 	                        IomObject coordValue=null;
-	                        int last=polyAttrSequence.getattrvaluecount("segment")-1;
-	                        coordValue=polyAttrSequence.getattrobj("segment",last);
-	                        coordValue.setattrvalue("C1",propv[0]);
-	                        coordValue.setattrvalue("C2",propv[1]);
+	                        int last=polyAttrSequence.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT)-1;
+	                        coordValue=polyAttrSequence.getattrobj(Iom_jObject.SEGMENTS_SEGMENT,last);
+	                        coordValue.setattrvalue(Iom_jObject.COORD_C1,propv[0]);
+	                        coordValue.setattrvalue(Iom_jObject.COORD_C2,propv[1]);
 	                        if(polyAttrIs3D && propv.length>=3){
-	                            coordValue.setattrvalue("C3",propv[2]);
+	                            coordValue.setattrvalue(Iom_jObject.COORD_C3,propv[2]);
 	                        }
 	                    }
 					}
@@ -544,10 +545,10 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 					if(prop.length>propStartIdx+1){
 						// always 2D even if domain of control points is 3D
 						if(prop[propStartIdx]!=null && prop[propStartIdx+1]!=null){
-                                                        IomObject coord = createIomObject("COORD", null);
-							coord.setattrvalue("C1",prop[propStartIdx++]);
-							coord.setattrvalue("C2",prop[propStartIdx++]);
-                                                        iomObj.addattrobj(attr.getName(), coord); // This line moved
+                            IomObject coord = createIomObject(Iom_jObject.COORD, null);
+							coord.setattrvalue(Iom_jObject.COORD_C1,prop[propStartIdx++]);
+							coord.setattrvalue(Iom_jObject.COORD_C2,prop[propStartIdx++]);
+                            iomObj.addattrobj(attr.getName(), coord); // This line moved
 						}else{
 							propStartIdx+=2;
 						}
@@ -558,13 +559,13 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 					boolean is3D=((CoordType)type).getDimensions().length==3;
 					if(prop.length>propStartIdx+(is3D?2:1)){
 						if(prop[propStartIdx]!=null && prop[propStartIdx+1]!=null && (!is3D || prop[propStartIdx+2]!=null)){
-                                                        IomObject coord = createIomObject("COORD", null);
-							coord.setattrvalue("C1",prop[propStartIdx++]);
-							coord.setattrvalue("C2",prop[propStartIdx++]);
+                            IomObject coord = createIomObject(Iom_jObject.COORD, null);
+							coord.setattrvalue(Iom_jObject.COORD_C1,prop[propStartIdx++]);
+							coord.setattrvalue(Iom_jObject.COORD_C2,prop[propStartIdx++]);
 							if(is3D && prop.length>=propStartIdx+1){
-								coord.setattrvalue("C3",prop[propStartIdx++]);
+								coord.setattrvalue(Iom_jObject.COORD_C3,prop[propStartIdx++]);
 							}
-                                                        iomObj.addattrobj(attr.getName(), coord); // This line moved
+                            iomObj.addattrobj(attr.getName(), coord); // This line moved
 						}else{
 							propStartIdx+=(is3D?3:2);
 						}
@@ -621,7 +622,7 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 			}else if(obj.obj instanceof RoleDef){
 				RoleDef role = (RoleDef) obj.obj;
 				if(!obj.embedded){
-                                  IomObject structvalue = createIomObject("REF", null);
+                                  IomObject structvalue = createIomObject(Iom_jObject.REF, null);
 				  String ref=prop[propStartIdx++];
 					if(tid2tid!=null){
 						String oldRef=role.getDestination().getName()+":"+ref;
@@ -635,7 +636,7 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 				}else{
 				  // +oppend.getName()+" ->"+oppend.getDestination().getName());
 				  if(prop.length>propStartIdx && prop[propStartIdx]!=null){
-	                                IomObject structvalue = createIomObject("REF", null);
+	                IomObject structvalue = createIomObject(Iom_jObject.REF, null);
 					String ref=prop[propStartIdx++];
 					if(tid2tid!=null){
 						String oldRef=role.getDestination().getName()+":"+ref;
@@ -645,7 +646,7 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
 						ref=(String)tid2tid.get(oldRef);
 					}
 					structvalue.setobjectrefoid(ref);
-                                        iomObj.addattrobj(role.getName(), structvalue); // This line moved
+                    iomObj.addattrobj(role.getName(), structvalue); // This line moved
 				  }else{
 					  propStartIdx++;
 				  }

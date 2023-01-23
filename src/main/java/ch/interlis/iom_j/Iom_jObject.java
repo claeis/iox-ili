@@ -32,6 +32,32 @@ import java.util.ArrayList;
 	 */
 	public class Iom_jObject implements ch.interlis.iom.IomObject, java.io.Serializable
 	{
+        public static final String COORD_C1 = "C1";
+        public static final String COORD_C2 = "C2";
+        public static final String COORD_C3 = "C3";
+        public static final String ARC_A1 = "A1";
+        public static final String ARC_A2 = "A2";
+        public static final String ARC_R = "R";
+        public static final String MULTICOORD="MULTICOORD";
+        public static final String MULTICOORD_COORD="coord";
+        public static final String MULTIPOLYLINE="MULTIPOLYLINE";
+        public static final String MULTIPOLYLINE_POLYLINE="polyline";
+        public static final String POLYLINE = "POLYLINE";
+        public static final String POLYLINE_SEQUENCE = "sequence";
+        public static final String POLYLINE_LINEATTR = "lineattr";
+        public static final String SEGMENTS="SEGMENTS";
+        public static final String SEGMENTS_SEGMENT = "segment";
+        public static final String COORD = "COORD";
+        public static final String ARC = "ARC";
+        public static final String MULTISURFACE = "MULTISURFACE";
+        public static final String MULTISURFACE_SURFACE = "surface";
+        public static final String SURFACE = "SURFACE";
+        public static final String SURFACE_BOUNDARY = "boundary";
+        public static final String BOUNDARY = "BOUNDARY";
+        public static final String BOUNDARY_POLYLINE = "polyline";
+        public static final String INTERNAL_T_ID="_t_id";
+        public static final String REF="REF";
+        
 		// HashMap<string attrname,ArrayList<string|iomObject>>
 	    private final HashMap<String, ArrayList> attrv = new HashMap<String, ArrayList>();
 

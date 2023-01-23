@@ -1,6 +1,6 @@
-INTERLIS 2.3;
+INTERLIS 2.4;
 
-MODEL AttributeDef23
+MODEL AttributeDef24
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" =
 	TOPIC AttrMultiplicity =
 		DOMAIN
@@ -35,6 +35,19 @@ MODEL AttributeDef23
 		CLASS ClassF =
 		   attrMandatory : Label;
 		END ClassF;
+
+		CLASS ClassA2 =
+		   attrOptional : LIST {0..2} OF TEXT*10;
+		END ClassA2;
+
+		CLASS ClassAp2 EXTENDS ClassA2 =
+		   attrOptional (EXTENDED) : LIST {1} OF TEXT*10; !! attrOptional is now mandatory
+		END ClassAp2;
+		
+		CLASS ClassB2 =
+		   attrMandatory : LIST {1..2} OF TEXT*10;
+		END ClassB2;
+		
 		
 	END AttrMultiplicity;
 	
@@ -44,17 +57,17 @@ MODEL AttributeDef23
 		END ClassA;
 		
         VIEW View1
-    		PROJECTION OF Base~AttributeDef23.ViewTopic.ClassA;
+    		PROJECTION OF Base~AttributeDef24.ViewTopic.ClassA;
     		=
       	 	ALL OF Base;
     	END View1;
     	
     	VIEW View2
-    		PROJECTION OF Base~AttributeDef23.ViewTopic.ClassA;
+    		PROJECTION OF Base~AttributeDef24.ViewTopic.ClassA;
     		=
       	 	attrOptionalZusatz := Base->attrOptional;
     	END View2;
     	
 	END ViewTopic;
 		
-END AttributeDef23.
+END AttributeDef24.
