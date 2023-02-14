@@ -30,6 +30,7 @@ public class AttributeDef24Test {
 	// ATTRMULTIPLICITY CLASSES
 	private final static String DIRECT_CLASSA=TOPIC_ATTRMULTIPLICITY+".ClassA";
     private final static String DIRECT_CLASSA2=TOPIC_ATTRMULTIPLICITY+".ClassA2";
+    private final static String DIRECT_CLASSA3=TOPIC_ATTRMULTIPLICITY+".ClassA3";
     private final static String DIRECT_CLASSAP=TOPIC_ATTRMULTIPLICITY+".ClassAp";
     private final static String DIRECT_CLASSAP2=TOPIC_ATTRMULTIPLICITY+".ClassAp2";
 	private final static String DIRECT_CLASSB=TOPIC_ATTRMULTIPLICITY+".ClassB";
@@ -78,6 +79,24 @@ public class AttributeDef24Test {
         Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSA2, OID1);
         iomObj1.addattrvalue("attrOptional", "test");
         iomObj1.addattrvalue("attrOptional", "test");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC_ATTRMULTIPLICITY,BID1));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
+    public void class_attr0_2_With2NumValue_Ok() {
+        Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSA3, OID1);
+        iomObj1.addattrvalue("attrOptional", "1");
+        iomObj1.addattrvalue("attrOptional", "1.2");
         ValidationConfig modelConfig=new ValidationConfig();
         LogCollector logger=new LogCollector();
         LogEventFactory errFactory=new LogEventFactory();

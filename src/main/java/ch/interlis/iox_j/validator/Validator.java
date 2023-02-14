@@ -3991,7 +3991,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             OutParam<Boolean> isNumValid=new OutParam<Boolean>(true);
                             String newValueStr=validateNumericType(validateType, (NumericType)type, valueStr, attrName,isNumValid);
                             if(newValueStr!=null) {
-                                iomObj.setattrvalue(attrName, newValueStr);
+                                ((Iom_jObject)iomObj).setattrvalue(attrName, structi,newValueStr);
                             }
                         }else{
                             IomObject structValue=iomObj.getattrobj(attrName, structi);
