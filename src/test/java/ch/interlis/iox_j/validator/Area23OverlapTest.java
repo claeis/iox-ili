@@ -82,6 +82,17 @@ public class Area23OverlapTest {
 		// asserts
 		assertEquals(0, logger.getErrs().size());
 	}
+    // Es darf keine Fehlermeldung ausgegeben werden,
+    // da der Overlap 0.0006 ist
+    // und somit der maximal zulaessige Overlap von: 0.05 nicht ueberschritten wird.
+    @Ignore("Es wird eine Fehlermeldung ausgegeben, obwohl kein Fehler vorliegt. ilivalidator#366")
+    @Test
+    public void area1Boundary_PermissibleOverlap_GH366_Ok() throws IoxException {
+        LogCollector logger=new LogCollector();
+        runValidation(new File(TEST_IN+"Area_1Boundary_PermissibleOverlap_GH366.xtf"), logger);
+        // asserts
+        assertEquals(0, logger.getErrs().size());
+    }
 	
 	// Es soll eine Fehlermeldung ausgegeben werden,
 	// da die Innerboundary, die Outerboundary um den Wert: 0.10 ueberschneidet.

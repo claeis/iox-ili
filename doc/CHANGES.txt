@@ -3,8 +3,11 @@ ideas/open issues
 - add xml validation
 - add Xtf23Reader
 
-LATEST
+iox-ili 1.21.17 (2023-02-22)
 -----------------------------
+- Validator: PlausibilityConstraint: add calculated value to log (ilivalidator#367)
+- Validator: fix LIST OF / BAG OF NumericType
+- Validator: fix  xtflog duplicate coord shows different coordinates in <message> and <geometry> (ilivalidator#353)
 
 iox-ili 1.21.16 (2023-01-23)
 -----------------------------

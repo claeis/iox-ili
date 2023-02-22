@@ -44,6 +44,10 @@ MODEL AttributeDef24
 		   attrOptional (EXTENDED) : LIST {1} OF TEXT*10; !! attrOptional is now mandatory
 		END ClassAp2;
 		
+		CLASS ClassA3 =
+		   attrOptional : LIST {0..2} OF 0 .. 100;
+		END ClassA3;
+		
 		CLASS ClassB2 =
 		   attrMandatory : LIST {1..2} OF TEXT*10;
 		END ClassB2;

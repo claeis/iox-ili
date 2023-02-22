@@ -12,6 +12,7 @@ import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iox.IoxLogEvent;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
@@ -33,6 +34,7 @@ public class Polyline23Test {
     private final static String ILI_CLASSA=ILI_TOPICA+".ClassA";
 	// START BASKET EVENT
 	private final static String BID="b1";
+	private final double E=0.0000001;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -118,6 +120,38 @@ public class Polyline23Test {
         // Asserts
         assertEquals(1, logger.getErrs().size());
         assertEquals("invalid number of segments in POLYLINE", logger.getErrs().get(0).getEventMsg());
+    }
+    @Test
+    public void duplicateCoord_Fail(){
+        Iom_jObject objStraightsSuccess=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
+        IomObject polylineValue=objStraightsSuccess.addattrobj("straights2d", "POLYLINE");
+        IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
+        IomObject coord=null;
+        coord=segments.addattrobj("segment", "COORD");
+        coord.setattrvalue("C1", "480001.000");
+        coord.setattrvalue("C2", "70000.000");
+        coord=segments.addattrobj("segment", "COORD");
+        coord.setattrvalue("C1", "480000.000");
+        coord.setattrvalue("C2", "70000.000");
+        coord=segments.addattrobj("segment", "COORD");
+        coord.setattrvalue("C1", "480000.000");
+        coord.setattrvalue("C2", "70000.000");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
+        validator.validate(new ObjectEvent(objStraightsSuccess));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        final IoxLogEvent ioxLogEvent = logger.getErrs().get(0);
+        assertEquals("duplicate coord at (480000.0, 70000.0, NaN)", ioxLogEvent.getEventMsg());
+        assertEquals(480000.0,(double)ioxLogEvent.getGeomC1(),E);
+        assertEquals(70000.0,(double)ioxLogEvent.getGeomC2(),E);
     }
 	
 	// Es wird getestet ob eine 3d Linie erstellt werden kann.

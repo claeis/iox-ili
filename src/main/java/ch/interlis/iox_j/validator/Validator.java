@@ -1048,7 +1048,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						msg = String.format("%s %s", msg, getDisplayName(constraint));
 					}
 
-					if(constraintEntry.getKey().getDirection()==0){ // >=
+					if(constraintEntry.getKey().getDirection()==PlausibilityConstraint.DIRECTION_AT_LEAST){ // >=
+                        errs.addEvent(errFact.logInfoMsg(rsrc.getString("validatePlausibilityConstraints.calculatedValue"),">=",Double.toString(((constraintEntry.getValue().getSuccessfulResults()/constraintEntry.getValue().getTotalSumOfConstraints())*100)),Double.toString(constraintEntry.getKey().getPercentage())));                        
 						if(((constraintEntry.getValue().getSuccessfulResults()/constraintEntry.getValue().getTotalSumOfConstraints())*100) >= constraintEntry.getKey().getPercentage()){
 							// ok
 						} else {
@@ -1058,7 +1059,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								logMsg(checkConstraint, rsrc.getString("validatePlausibilityConstraints.plausibilityConstraintIsNotTrue"), getDisplayName(constraintEntry.getKey()));
 							}
 						}
-					} else if(constraintEntry.getKey().getDirection()==1){ // <=
+					} else if(constraintEntry.getKey().getDirection()==PlausibilityConstraint.DIRECTION_AT_MOST){ // <=
+                        errs.addEvent(errFact.logInfoMsg(rsrc.getString("validatePlausibilityConstraints.calculatedValue"),"<=",Double.toString(((constraintEntry.getValue().getSuccessfulResults()/constraintEntry.getValue().getTotalSumOfConstraints())*100)),Double.toString(constraintEntry.getKey().getPercentage())));                        
 						if(((constraintEntry.getValue().getSuccessfulResults()/constraintEntry.getValue().getTotalSumOfConstraints())*100) <= constraintEntry.getKey().getPercentage()){
 							// ok
 						} else {
@@ -3989,7 +3991,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             OutParam<Boolean> isNumValid=new OutParam<Boolean>(true);
                             String newValueStr=validateNumericType(validateType, (NumericType)type, valueStr, attrName,isNumValid);
                             if(newValueStr!=null) {
-                                iomObj.setattrvalue(attrName, newValueStr);
+                                ((Iom_jObject)iomObj).setattrvalue(attrName, structi,newValueStr);
                             }
                         }else{
                             IomObject structValue=iomObj.getattrobj(attrName, structi);
