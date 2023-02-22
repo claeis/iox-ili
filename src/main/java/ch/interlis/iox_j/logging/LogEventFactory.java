@@ -80,12 +80,18 @@ public class LogEventFactory {
 	public IoxLogEvent logErrorMsg(String msg,String... args){
 		return logMsg(IoxLogEvent.ERROR, "codeInternal", null, coordX, coordY, coordZ, msg, args);
 	}
+    public IoxLogEvent logErrorMsg(String msg,Double coordX,Double coordY,Double coordZ,String... args){
+        return logMsg(IoxLogEvent.ERROR, "codeInternal", null, coordX, coordY, coordZ, msg, args);
+    }
 	public IoxLogEvent logErrorMsg(Throwable ex,String msg,String... args){
 		return logMsg(IoxLogEvent.ERROR, "codeInternal", ex, coordX, coordY, coordZ, msg, args);
 	}
 	public IoxLogEvent logWarningMsg(String msg,String... args){
 		return logMsg(IoxLogEvent.WARNING, "codeInternal", null, coordX, coordY, coordZ, msg, args);
 	}
+    public IoxLogEvent logWarningMsg(String msg,Double coordX,Double coordY, Double coordZ,String... args){
+        return logMsg(IoxLogEvent.WARNING, "codeInternal", null, coordX, coordY, coordZ, msg, args);
+    }
 	public IoxLogEvent logInfoMsg(String msg,String... args){
 		String eventId="codeInternal";
 		return new LogEventImpl(dataSource,new Date(),eventId,IoxLogEvent.INFO,formatMessage(msg,null,args),null,null,null,null,null,null,null,null,null,null,getCallerOrigin());

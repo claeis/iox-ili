@@ -23,6 +23,7 @@
 package ch.interlis.iox_j.jts;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -217,7 +218,7 @@ public class Iox2jtsext {
 					}else{
 						Coordinate newSegEndPt=coord2JTS(segment);
 						if(lastSegmentEndpoint.equals2D(newSegEndPt, tolerance)){
-							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegEndPt.toString());
+							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegEndPt);
 						}else{
 							curve=new StraightSegment(lastSegmentEndpoint,newSegEndPt);
 							ret.add(curve);
@@ -234,22 +235,22 @@ public class Iox2jtsext {
 					}
 					if(lastSegmentEndpoint.equals2D(newSegMidPt, tolerance)){
 						if(newSegMidPt.equals2D(newSegEndPt, tolerance)){
-							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegEndPt.toString());
+							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegEndPt);
 						}else{
-							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegMidPt.toString());
+							foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegMidPt);
 							curve=new StraightSegment(lastSegmentEndpoint,newSegEndPt);
 							ret.add(curve);
 							lastSegmentEndpoint=curve.getEndPoint();
 						}
 					}else if(newSegMidPt.equals2D(newSegEndPt, tolerance)){
-						foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegMidPt.toString());
+						foundErrs.value = foundErrs.value || logMsg(errs,validationType,"duplicate coord at {0}",newSegMidPt);
 						curve=new StraightSegment(lastSegmentEndpoint,newSegMidPt);
 						ret.add(curve);
 						lastSegmentEndpoint=curve.getEndPoint();
 					}else{
 						curve=new ArcSegment(lastSegmentEndpoint,newSegMidPt,newSegEndPt);
 						if(((ArcSegment) curve).isStraight()){
-							foundErrs.value = foundErrs.value || logMsg(errs,degeneratedArcValidationType,"arc is straight at {0}",((ArcSegment) curve).getMidPoint().toString());
+							foundErrs.value = foundErrs.value || logMsg(errs,degeneratedArcValidationType,"arc is straight at {0}",((ArcSegment) curve).getMidPoint());
 							curve=new StraightSegment(curve.getStartPoint(),curve.getEndPoint());
 						}
 						ret.add(curve);
@@ -280,6 +281,27 @@ public class Iox2jtsext {
 			 return true;
 		 }
 	}
+    private static boolean logMsg(LogEventFactory errs,String validateKind,String msg,Coordinate coord,String... args){
+        if(ValidationConfig.OFF.equals(validateKind)){
+            return false;
+        }else if(ValidationConfig.WARNING.equals(validateKind)){
+            String args2[]=new String[args.length+1];
+            args2[0]=coord.toString();
+            for(int i=0;i<args.length;i++) {
+                args2[i+1]=args[i];
+            }
+             errs.addEvent(errs.logWarningMsg(msg, coord.x,coord.y,coord.z,args2));
+             return false;
+         }else{
+             String args2[]=new String[args.length+1];
+             args2[0]=coord.toString();
+             for(int i=0;i<args.length;i++) {
+                 args2[i+1]=args[i];
+             }
+             errs.addEvent(errs.logErrorMsg(msg, coord.x,coord.y,coord.z,args2));
+             return true;
+         }
+    }
 	/** Converts a SURFACE to a JTS Polygon.
 	 * @param obj INTERLIS SURFACE structure
 	 * @param strokeP not used any more
