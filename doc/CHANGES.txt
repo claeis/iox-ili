@@ -3,6 +3,9 @@ ideas/open issues
 - add xml validation
 - add Xtf23Reader
 
+iox-ili 1.21.18 (SNAPSHOT)
+-----------------------------
+
 iox-ili 1.21.17 (2023-02-22)
 -----------------------------
 - Validator: PlausibilityConstraint: add calculated value to log (ilivalidator#367)
