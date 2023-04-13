@@ -269,7 +269,12 @@ public class Iox2wkb {
 	throws Iox2wkbException
 	{
 
-		List<List<LineSegment>> lines =  collectSegments(polylineObjs, asCompoundCurve, p, false);
+        List<List<LineSegment>> lines = new ArrayList<List<LineSegment>>();
+        for(int polylinei=0;polylinei<polylineObjs.length;polylinei++){
+            IomObject polyline = polylineObjs[polylinei];
+            lines.addAll(collectSegments(new IomObject[] {polyline}, asCompoundCurve, p, false));
+        }
+	    
 		try {
 			os.reset();
 			for (List<LineSegment> line : lines){
@@ -290,53 +295,68 @@ public class Iox2wkb {
 		return os.toByteArray();
 	}
 
-	private List<List<LineSegment>> collectSegments(IomObject[] polylineObjs, boolean asCompoundCurve, double p, boolean repairTouchingLine)
-	throws Iox2wkbException {
-		RingCollector ringCollector = new RingCollector(repairTouchingLine);
-		for (IomObject polylineObj : polylineObjs) {
-			if (polylineObj == null) {
-				continue;
-			}
+    private List<List<LineSegment>> collectSegments(IomObject[] polylineObjs, boolean asCompoundCurve, double p, boolean repairTouchingLine)
+    throws Iox2wkbException {
+        RingCollector ringCollector = new RingCollector(repairTouchingLine);
+        ringCollector.startNewRing();
+        Coordinate lastCoordinate = null;
+        for (IomObject polylineObj : polylineObjs) {
+            if (polylineObj == null) {
+                continue;
+            }
 
-			ringCollector.startNewRing();
-			for(int sequencei=0; sequencei<polylineObj.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE); sequencei++) {
-				IomObject sequence=polylineObj.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequencei);
-				int segmentc=sequence.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT);
+            for(int sequencei=0; sequencei<polylineObj.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE); sequencei++) {
+                IomObject sequence=polylineObj.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequencei);
+                int segmentc=sequence.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT);
 
-				for(int segmenti=0; segmenti<segmentc; segmenti++){
-					IomObject segment = sequence.getattrobj(Iom_jObject.SEGMENTS_SEGMENT, segmenti);
-					Coordinate segmentCoordinate = coord2JTS(segment);
-					
-					if (segment.getobjecttag().equals(Iom_jObject.COORD)){
-						ringCollector.add(segmentCoordinate, WKBConstants.wkbLineString);
-					}
-					else if (segment.getobjecttag().equals(Iom_jObject.ARC))
-					{
-						if (asCompoundCurve){
-							ringCollector.add(arcSupportingCoord2JTS(segment),WKBConstants.wkbCircularString);
-							ringCollector.add(segmentCoordinate,WKBConstants.wkbCircularString);
-						}else if(p==0.0){
-							ringCollector.add(arcSupportingCoord2JTS(segment),WKBConstants.wkbLineString);
-							ringCollector.add(segmentCoordinate,WKBConstants.wkbLineString);
-						} else {
-							Coordinate lastCoordinate = ringCollector.getLastCoordinate();
-							ArcSegment arc = new ArcSegment(lastCoordinate, arcSupportingCoord2JTS(segment), segmentCoordinate, p);
-							for (Coordinate c: arc.getCoordinates()) {
-								if (c.equals(lastCoordinate)) continue;
-								ringCollector.add(c,WKBConstants.wkbLineString);
-							}
-						}
-					}
-					else {
-						throw new Iox2wkbException("custom line form not supported");
-					}
-				}
-			}
-		}
+                for(int segmenti=0; segmenti<segmentc; segmenti++){
+                    IomObject segment = sequence.getattrobj(Iom_jObject.SEGMENTS_SEGMENT, segmenti);
+                    Coordinate segmentCoordinate = coord2JTS(segment);
+                    lastCoordinate = ringCollector.getLastCoordinate();
+                    
+                    if (segment.getobjecttag().equals(Iom_jObject.COORD)){
+                        if(lastCoordinate==null || !lastCoordinate.equals(segmentCoordinate)) {
+                            ringCollector.addStraight(segmentCoordinate);
+                        }
+                    }
+                    else if (segment.getobjecttag().equals(Iom_jObject.ARC))
+                    {
+                        Coordinate midPt = arcSupportingCoord2JTS(segment);
+                        if(lastCoordinate!=null && lastCoordinate.equals(midPt)) {
+                            if(!lastCoordinate.equals(segmentCoordinate)) {
+                                ringCollector.addStraight(segmentCoordinate);
+                            }
+                        }else if(midPt.equals(segmentCoordinate)){
+                            if(lastCoordinate==null || !lastCoordinate.equals(segmentCoordinate)) {
+                                ringCollector.addStraight(segmentCoordinate);
+                            }
+                        }else {
+                            if (asCompoundCurve){
+                                ringCollector.addArc(midPt,segmentCoordinate);
+                            }else if(p==0.0){
+                                ringCollector.addStraight(midPt);
+                                ringCollector.addStraight(segmentCoordinate);
+                            } else {
+                                ArcSegment arc = new ArcSegment(lastCoordinate,midPt, segmentCoordinate, p);
+                                for (Coordinate c: arc.getCoordinates()) {
+                                    if(lastCoordinate!=null && !lastCoordinate.equals(c)) {
+                                        ringCollector.addStraight(c);
+                                        lastCoordinate=c;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        throw new Iox2wkbException("custom line form not supported");
+                    }
+                }
+            }
+        }
 
-		return ringCollector.getRings();
-	}
-
+        return ringCollector.getRings();
+    }
+	
 	/** Converts a SURFACE to a JTS Polygon.
 	 * @param obj INTERLIS SURFACE structure
 	 * @param strokeP maximum stroke to use when removing ARCs
@@ -361,7 +381,7 @@ public class Iox2wkb {
 			throw new Iox2wkbException("clipped surface not supported");
 		}
 
-		List<IomObject> polylines = new ArrayList<IomObject>();
+        List<List<LineSegment>> rings = new ArrayList<List<LineSegment>>();
 		for (int surfacei = 0; surfacei < obj.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE); surfacei++) {
 			if (surfacei > 0) {
 				throw new Iox2wkbException("unclipped surface with multi 'surface' elements");
@@ -372,6 +392,7 @@ public class Iox2wkb {
 			for (int boundaryi = 0; boundaryi < boundaryc; boundaryi++) {
 				IomObject boundary = surface.getattrobj(Iom_jObject.SURFACE_BOUNDARY, boundaryi);
 				int polylinec = boundary.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE);
+		        List<IomObject> polylines = new ArrayList<IomObject>();
 				for (int polylinei = 0; polylinei < polylinec; polylinei++){
 					IomObject polyline = boundary.getattrobj(Iom_jObject.BOUNDARY_POLYLINE, polylinei);
 					if (polyline.getattrobj(Iom_jObject.POLYLINE_LINEATTR, 0) != null) {
@@ -382,10 +403,10 @@ public class Iox2wkb {
 					}
 					polylines.add(polyline);
 				}
+		        rings.addAll(collectSegments(polylines.toArray(new IomObject[polylines.size()]), asCurvePolygon, strokeP, repairTouchingLine));
 			}
 		}
 
-		List<List<LineSegment>> rings = collectSegments(polylines.toArray(new IomObject[0]), asCurvePolygon, strokeP, repairTouchingLine);
 		try {
 			os.reset();
 			writeByteOrder();
@@ -447,18 +468,17 @@ public class Iox2wkb {
 			return null;
 		}
 
-		List<IomObject> polylines = new ArrayList<IomObject>();
 		int polylinec=obj.getattrvaluecount(Iom_jObject.MULTIPOLYLINE_POLYLINE);
 
+        List<List<LineSegment>> lines = new ArrayList<List<LineSegment>>();
 		for(int polylinei=0;polylinei<polylinec;polylinei++){
 			IomObject polyline = obj.getattrobj(Iom_jObject.MULTIPOLYLINE_POLYLINE,polylinei);
 			if (polyline.getobjectconsistency() == IomConstants.IOM_INCOMPLETE) {
 				throw new Iox2wkbException("clipped polyline not supported");
 			}
-			polylines.add(polyline);
+	        lines.addAll(collectSegments(new IomObject[] {polyline}, asCurve, strokeP, false));
 		}
 
-		List<List<LineSegment>> lines = collectSegments(polylines.toArray(new IomObject[0]), asCurve, strokeP, false);
 
 	    try {
 			os.reset();

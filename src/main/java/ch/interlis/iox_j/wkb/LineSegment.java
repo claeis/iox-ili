@@ -84,4 +84,8 @@ public class LineSegment implements Iterable<Coordinate> {
     public Iterator<Coordinate> iterator() {
         return coordinates.iterator();
     }
+
+    public boolean contains(Coordinate coordinate) {
+        return coordinatesMap.containsKey(coordinate);
+    }
 }

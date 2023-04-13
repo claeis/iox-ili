@@ -5,6 +5,7 @@ ideas/open issues
 
 iox-ili 1.21.18 (SNAPSHOT)
 -----------------------------
+- Iox2wkb/RingCollector: fix issues with duplicate coordinates (ili2db#510)
 
 iox-ili 1.21.17 (2023-02-22)
 -----------------------------
