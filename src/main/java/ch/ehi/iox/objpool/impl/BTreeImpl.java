@@ -74,8 +74,8 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 		if(outFile!=null){
 			try {
 			    String tag=(poolName!=null?poolName:this.getClass().getSimpleName())+" VAL";
-                EhiLogger.traceState(tag+": size "+outFile.length()+" <"+outFilename.getPath()+">");
-                EhiLogger.traceState(tag+": valueSize "+minValueSize+", "+maxValueSize);
+                EhiLogger.traceState(tag+": filesize "+outFile.length()+" <"+outFilename.getPath()+">");
+                EhiLogger.traceState(tag+": valueSize min "+minValueSize+", max "+maxValueSize);
 				outFile.close();
 			} catch (IOException e) {
 				throw new IllegalStateException(e);

@@ -66,7 +66,7 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 		}
 		if(outFile!=null){
 			try {
-                EhiLogger.traceState((poolName!=null?poolName:this.getClass().getSimpleName())+": size "+outFile.length()+" <"+outFilename.getPath()+">");
+                EhiLogger.traceState((poolName!=null?poolName:this.getClass().getSimpleName())+": filesize "+outFile.length()+" <"+outFilename.getPath()+">");
 				outFile.close();
 			} catch (IOException e) {
 				throw new IllegalStateException(e);
