@@ -324,7 +324,7 @@ private int extractGeometryType(int typeInt) {
 	    			}else{
 		    			IomObject arcPt=readPoint();coordi++;
 		    			if(coordi>=coordc){
-		    				throw new IllegalStateException("missing coord");
+		    				throw new IllegalStateException("missing coord (arcPt "+arcPt.toString()+")");
 		    			}
 		    			IomObject endPt=readPoint();
 		    			endPt.setobjecttag(Iom_jObject.ARC);

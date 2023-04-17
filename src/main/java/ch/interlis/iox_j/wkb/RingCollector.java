@@ -86,7 +86,15 @@ public class RingCollector {
         }
 
         segment = getCurrentSegment();
-        segment.add(coordinate);
+        // different/new segment required?
+        if (!segment.trySetWkbType(WkbType)) {
+            Coordinate lastCoord = segment.getLast();
+            segment = new LineSegment(WkbType);
+            segment.add(lastCoord);
+            ring.add(segment);
+        }else {
+            segment.add(coordinate);
+        }
     }
 
     private void extractInnerRing(Coordinate coordinate) {
@@ -106,7 +114,6 @@ public class RingCollector {
         }
 
         extractedRing.get(extractedRing.size() - 1).add(coordinate);
-
         rings.add(extractedRing);
     }
 
