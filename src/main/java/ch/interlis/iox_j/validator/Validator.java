@@ -1932,7 +1932,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         }else {
                             String attrValue = iomObj.getattrvalue(currentAttrName);
                             if (attrValue != null) {
-                                if (attrValue.equals("true")) {
+                                if(attrRef.getAttr().isDomainIliUuid()) {
+                                    Type aliasedType = ((TypeAlias) type).getAliasing().getType();
+                                    return new Value(aliasedType, normalizeUUID(attrValue));
+                                }else if (attrValue.equals("true")) {
                                     return new Value(true);
                                 } else if (attrValue.equals("false")) {
                                     return new Value(false);
@@ -2029,6 +2032,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
  
         }
         return Value.createUndefined();
+    }
+    public static String normalizeUUID(String attrValue) {
+        if(attrValue==null) {
+            return null;
+        }
+        return attrValue.toLowerCase();
     }
     private boolean isBackward(Viewable srcObjClass, RoleDef role) {
         AssociationDef assoc=(AssociationDef) role.getContainer();
