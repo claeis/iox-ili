@@ -10,7 +10,10 @@ import ch.ehi.basics.types.OutParam;
 import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.IomObjectSerializer;
 import ch.ehi.iox.objpool.impl.JavaSerializer;
+import ch.interlis.ili2c.metamodel.AbstractClassDef;
 import ch.interlis.ili2c.metamodel.AssociationDef;
+import ch.interlis.ili2c.metamodel.Domain;
+import ch.interlis.ili2c.metamodel.PredefinedModel;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.ili2c.metamodel.ViewableTransferElement;
@@ -79,6 +82,13 @@ public class ObjectPool {
 			if(oid==null) {
 			    throw new IllegalStateException("Association with missing REF "+iomObj.getobjecttag());
 			}
+		}else {
+		    if(modelEle instanceof AbstractClassDef) {
+	            Domain oidType=((AbstractClassDef) modelEle).getOid();
+	            if(oidType==PredefinedModel.getInstance().UUIDOID) {
+	                oid=Validator.normalizeUUID(oid);
+	            }
+		    }
 		}
 		if(doItfOidPerTable){
 			key=new ObjectPoolKey(oid, (Viewable<?>)modelEle, currentBasketId);
@@ -150,6 +160,16 @@ public class ObjectPool {
 				}
 			} else {
 				IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, null, basketId));
+				if(object==null) {
+	                object = collectionOfObjects.get(new ObjectPoolKey(Validator.normalizeUUID(oid), null, basketId));
+				    if(object!=null) {
+				        Object modelEle = tag2class.get(object.getobjecttag());
+                        Domain oidType=((AbstractClassDef) modelEle).getOid();
+                        if(oidType!=PredefinedModel.getInstance().UUIDOID) {
+                            object=null; // oid is not an uuid; wrong to normalize it
+                        }
+				    }
+				}
 				if(object != null){
 					if(retBasketId!=null){
 						retBasketId.value=basketId;

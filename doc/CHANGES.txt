@@ -6,6 +6,7 @@ ideas/open issues
 iox-ili 1.21.18 (SNAPSHOT)
 -----------------------------
 - Validator: fix UNIQUE mixed case INTERLIS.UUIDOID (ilivalidator#371)
+- Validator: fix references with mixed case INTERLIS.UUIDOID (ilivalidator#370)
 - Iox2wkb/RingCollector: fix issues with duplicate coordinates (ili2db#510)
 - Iox2wkb/RingCollector: fix issue with inner boundary with arcs continued by outer boundary with straights (ili2db#510)
 

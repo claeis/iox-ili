@@ -29,6 +29,7 @@ public class Oid23Test {
 	private final static String TOPIC="Oid23.Topic";
 	private final static String TOPIC3="Oid23.Topic3";
     private final static String TOPIC4="Oid23.Topic4";
+    private final static String TOPIC5="Oid23.Topic5";
 	// CLASSES
 	private final static String CLASSA=TOPIC3+".ClassA";
 	private final static String CLASSB3=TOPIC3+".ClassB3";
@@ -39,6 +40,7 @@ public class Oid23Test {
 	private final static String CLASSC=TOPIC+".ClassC";
     private final static String CLASSD=TOPIC+".ClassD";
     private final static String CLASSA4=TOPIC4+".ClassA4";
+    private final static String CLASSB5=TOPIC5+".ClassB5";
 	// ASSOCIATION
 	private final static String ASSOCIATIONB2=TOPIC+".bc2";
 	private final static String ASSOCIATIONB3=TOPIC+".bc3";
@@ -395,6 +397,25 @@ public class Oid23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("OID o_b1 of object Oid23.Topic.ClassB already exists in Oid23.Topic.ClassB.", logger.getErrs().get(0).getEventMsg());
 	}
+    @Test
+    public void duplicateOidsOfSameTable_UUID_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB5, "Fd3babc5-7a05-4177-85ed-92b02a624d8e");
+        Iom_jObject objB2=new Iom_jObject(CLASSB5, "fd3babc5-7a05-4177-85ed-92b02a624d8e");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC5,"25681d61-1333-46b8-a255-689478248013"));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new ObjectEvent(objB2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("OID fd3babc5-7a05-4177-85ed-92b02a624d8e of object Oid23.Topic5.ClassB5 already exists in Oid23.Topic5.ClassB5.", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	@Test
 	public void duplicateOidDifferentTableSameBasket_Fail() throws Exception {

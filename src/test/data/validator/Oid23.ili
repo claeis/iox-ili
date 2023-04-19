@@ -87,5 +87,14 @@ MODEL Oid23
         END ClassA4;
 
 	END Topic4;
+
+	TOPIC Topic5=
+		   BASKET OID AS INTERLIS.UUIDOID;
+		   OID AS INTERLIS.UUIDOID;
+
+        CLASS ClassB5 =
+        END ClassB5;
+
+	END Topic5;
 	
 END Oid23.
