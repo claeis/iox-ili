@@ -42,6 +42,7 @@ public class BTreeImpl<K,V> implements Map<K, V> {
     };
     private long maxValueSize=0L;
     private long minValueSize=0L;
+    private long updateCount=0L;
 
 	
     public BTreeImpl( ObjectPoolManager objectPoolManager1,Serializer keySerializer,Serializer valueSerializer1) {
@@ -75,7 +76,7 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 			try {
 			    String tag=(poolName!=null?poolName:this.getClass().getSimpleName())+" VAL";
                 EhiLogger.traceState(tag+": filesize "+outFile.length()+" <"+outFilename.getPath()+">");
-                EhiLogger.traceState(tag+": valueSize min "+minValueSize+", max "+maxValueSize);
+                EhiLogger.traceState(tag+": valueSize min "+minValueSize+", max "+maxValueSize+", updates "+updateCount);
 				outFile.close();
 			} catch (IOException e) {
 				throw new IllegalStateException(e);
@@ -181,6 +182,9 @@ public class BTreeImpl<K,V> implements Map<K, V> {
 				}
 			}
 			Long retPos=tree.get((K)key);
+			if(retPos!=null) {
+			    updateCount++;
+			}
 			tree.put(key, pos);
 			return null;
 		} catch (IOException e) {
