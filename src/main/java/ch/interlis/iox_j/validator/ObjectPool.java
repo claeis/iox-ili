@@ -128,6 +128,12 @@ public class ObjectPool {
 	}
 	
 	public String getBidOfObject(String oid, Viewable classObj){
+	    if(classObj instanceof AbstractClassDef) {
+	        Domain oidType=((AbstractClassDef) classObj).getOid();
+	        if(oidType==PredefinedModel.getInstance().UUIDOID) {
+	            oid=Validator.normalizeUUID(oid);
+	        }
+	    }
 		for(String basketId : bids){
 			Map<ObjectPoolKey, IomObject> collectionOfObjects = collectionOfBaskets.get(basketId);
 			if(doItfOidPerTable){
