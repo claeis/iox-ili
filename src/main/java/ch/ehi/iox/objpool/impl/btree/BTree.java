@@ -394,8 +394,8 @@ public class BTree<Key, Value>  {
 		if(file!=null){
 		    String tag=(poolName!=null?poolName:this.getClass().getSimpleName());
             EhiLogger.traceState(tag+": size "+size()+", filesize "+file.length()+" <"+fileName.getPath()+">");
-            EhiLogger.traceState(tag+": keySize "+minKeySize+", "+maxKeySize);
-            EhiLogger.traceState(tag+": valueSize "+minValueSize+", "+maxValueSize);
+            EhiLogger.traceState(tag+": keySize min "+minKeySize+", max "+maxKeySize);
+            EhiLogger.traceState(tag+": valueSize min "+minValueSize+", max "+maxValueSize);
 			file.close();
 			file=null;
 		}

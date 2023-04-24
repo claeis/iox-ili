@@ -21,8 +21,9 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 public class ReferenceType23Test {
 	
 	private TransferDescription td=null;
+    private final static String MODEL="ReferenceType23";
 	// TOPIC
-	private final static String TOPIC="ReferenceType23.Topic";
+	private final static String TOPIC=MODEL+".Topic";
 	// CLASSES
 	private final static String ILI_CLASSA=TOPIC+".ClassA";
 	private final static String ILI_CLASSAP=TOPIC+".ClassAp";
@@ -58,6 +59,12 @@ public class ReferenceType23Test {
 	// BID
 	private static final String BID1 = "b1";
 	private static final String BID2 = "b2";
+    private static final String TOPIC_B = MODEL+".TopicB";
+    private static final String ILI_B_CLASSA = TOPIC_B+".ClassA";
+    private static final String ILI_B_STRUCTC = TOPIC_B+".StructC";
+    private static final String ILI_B_STRUCTC_ATTRC = "attrC";
+    private static final String ILI_B_CLASSD = TOPIC_B+".ClassD";
+    private static final String ILI_B_CLASSD_ATTRD = "attrD";
 	
 	@Before
 	public void setUp() throws Exception {
@@ -97,6 +104,29 @@ public class ReferenceType23Test {
 		// Asserts
 		assertEquals(0,logger.getErrs().size());
 	}
+    @Test
+    public void referenceType_UUID_Ok(){
+        Iom_jObject iomObjtarget=new Iom_jObject(ILI_B_CLASSA, "25681d61-1333-46b8-a255-689478248013");
+        Iom_jObject o1Ref=new Iom_jObject("REF", null);
+        o1Ref.setobjectrefoid(iomObjtarget.getobjectoid().toUpperCase());
+        Iom_jObject iomStruct=new Iom_jObject(ILI_B_STRUCTC, null);
+        iomStruct.addattrobj(ILI_B_STRUCTC_ATTRC, o1Ref);
+        Iom_jObject iomObj=new Iom_jObject(ILI_B_CLASSD, "c5a72db8-9b9b-455c-ac5e-58916fb9db41");
+        iomObj.addattrobj(ILI_B_CLASSD_ATTRD, iomStruct);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC_B,"fd3babc5-7a05-4177-85ed-92b02a624d8e"));
+        validator.validate(new ObjectEvent(iomObj));
+        validator.validate(new ObjectEvent(iomObjtarget));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0,logger.getErrs().size());
+    }
 	
 	// Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Referenz External true ist und die Klasse A gefunden wird.
 	@Test

@@ -193,4 +193,32 @@ MODEL Association23
 		END oo1;
 		
 	END TopicB;
+	
+	TOPIC TopicC=
+		   BASKET OID AS INTERLIS.UUIDOID;
+		   OID AS INTERLIS.UUIDOID;
+
+        CLASS ClassA =
+        END ClassA;
+
+        STRUCTURE Struct =
+          ref : REFERENCE TO ClassA;
+        END Struct;
+        
+        CLASS ClassB =
+          b : Struct;
+        END ClassB;
+        
+        ASSOCIATION ab1 =
+		  a1 -- {0..*} ClassA;
+		  b1 -- {0..1} ClassB;
+		END ab1;
+
+        ASSOCIATION ab2 =
+		  a2 -- {0..*} ClassA;
+		  b2 -- {0..*} ClassB;
+		END ab2;
+		
+	END TopicC;
+	
 END Association23.

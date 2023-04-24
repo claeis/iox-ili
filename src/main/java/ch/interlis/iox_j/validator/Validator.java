@@ -482,6 +482,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             String bid=event.getBid();
             // check if basket id is unique in transfer file
             if(bid != null){
+                if(bidDomain==td.INTERLIS.UUIDOID) {
+                    bid=normalizeUUID(bid);
+                }
             	if(uniquenessOfBid.containsKey(bid)){
             		errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateUniqueBasketId.bidOfAlreadyExistIn"), bid, event.getType(), uniquenessOfBid.get(bid)));
             	} else {
@@ -1827,14 +1830,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                 //has a linkObj?
                                 List<IomObject> objects=null;
                                 if (((AssociationDef) role.getContainer()).isLightweight()) {
-                                    objects = getTargetObjectsOfReverseRole(role, iomObj.getobjectoid());
+                                    objects = getTargetObjectsOfReverseRole(role, normalizeOid(srcObjClass,iomObj.getobjectoid()));
                                     if (objects != null) {
                                         nextCurrentObjects.addAll(objects);
                                     } 
                                     continue;
                                     
                                 }else {
-                                    objects = getLinkObjects(role, iomObj.getobjectoid());
+                                    objects = getLinkObjects(role, normalizeOid(srcObjClass,iomObj.getobjectoid()));
                                     if (objects != null) {
                                         if(currentPathEl instanceof PathElAssocRole || currentPathEl instanceof PathElAbstractClassRole) {
                                             for (IomObject obj : objects) {
@@ -1932,7 +1935,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         }else {
                             String attrValue = iomObj.getattrvalue(currentAttrName);
                             if (attrValue != null) {
-                                if (attrValue.equals("true")) {
+                                if(attrRef.getAttr().isDomainIliUuid()) {
+                                    Type aliasedType = ((TypeAlias) type).getAliasing().getType();
+                                    return new Value(aliasedType, normalizeUUID(attrValue));
+                                }else if (attrValue.equals("true")) {
                                     return new Value(true);
                                 } else if (attrValue.equals("false")) {
                                     return new Value(false);
@@ -2029,6 +2035,24 @@ public class Validator implements ch.interlis.iox.IoxValidator {
  
         }
         return Value.createUndefined();
+    }
+    private String normalizeOid(Viewable modelEle, String oid) {
+        if(oid==null) {
+            return null;
+        }
+        if(modelEle instanceof AbstractClassDef) {
+            Domain oidType=((AbstractClassDef) modelEle).getOid();
+            if(oidType==PredefinedModel.getInstance().UUIDOID) {
+                oid=Validator.normalizeUUID(oid);
+            }
+        }
+        return oid;
+    }
+    public static String normalizeUUID(String attrValue) {
+        if(attrValue==null) {
+            return null;
+        }
+        return attrValue.toLowerCase();
     }
     private boolean isBackward(Viewable srcObjClass, RoleDef role) {
         AssociationDef assoc=(AssociationDef) role.getContainer();
@@ -3167,16 +3191,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		    structCount++;
 		}
 		
-		// validate that OID is not a BID
-		if(isObject) {
-	        String objectoid=iomObj.getobjectoid();
-	        if (objectoid != null && !objectoid.equals("")) {
-	            if (uniquenessOfBid.containsKey(objectoid)) {
-	                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.oidIsEqualToABid"), objectoid));
-	            }           
-	        }
-		}
-
 		String tag=iomObj.getobjecttag();
         Object modelele=null;
 		if(assocClass!=null && "REF".equals(tag)) {
@@ -3190,6 +3204,23 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 			return;
 		}
+		
+        // validate that OID is not a BID
+        if(isObject) {
+            String objectoid=iomObj.getobjectoid();
+            if (objectoid != null && !objectoid.equals("")) {
+                if(modelele instanceof AbstractClassDef) {
+                    Domain oidType=((AbstractClassDef) modelele).getOid();
+                    if(oidType==td.INTERLIS.UUIDOID) {
+                        objectoid=normalizeUUID(objectoid);
+                    }
+                }
+                if (uniquenessOfBid.containsKey(objectoid)) {
+                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.oidIsEqualToABid"), objectoid));
+                }           
+            }
+        }
+
 		if(isObject){
 			// is it a SURFACE or AREA line table?
 			if(doItfLineTables && modelele instanceof AttributeDef){
@@ -3374,11 +3405,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     if (refoid != null) {
                         if(!singlePass) {
                             linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
-                            }
                         }
                     }
-				}
-			 }
+                }
+			}
+		}
 		
 		if(isObject){
 			if(addToPool){

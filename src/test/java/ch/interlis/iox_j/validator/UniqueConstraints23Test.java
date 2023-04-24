@@ -53,6 +53,7 @@ public class UniqueConstraints23Test {
 	private final static String CLASSM=TOPIC+".ClassM";
 	private final static String CLASSN=TOPIC+".ClassN";
 	private final static String CLASSN3=TOPIC+".ClassN3";
+    private final static String CLASSL=TOPIC+".ClassL";
 	private final static String CLASSO=TOPIC+".ClassO";
 	private final static String CLASSO2=TOPIC+".ClassO2";
 	private final static String CLASSP=TOPIC+".ClassP";
@@ -465,6 +466,80 @@ public class UniqueConstraints23Test {
 		// Asserts.
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    public void uniqueAttrValueUuidDifferent_Ok(){
+        // Set object.
+        Iom_jObject obj1=new Iom_jObject(CLASSL,OID1);
+        obj1.setattrvalue("attr1", "960a3aed-ff1a-41ba-b177-34480efb2a6d");
+        obj1.setattrvalue("attr2", "15");
+        Iom_jObject obj2=new Iom_jObject(CLASSL,OID2);
+        obj2.setattrvalue("attr1", "9d16a51e-15fd-40c6-9a50-ac715c75a2a0");
+        obj2.setattrvalue("attr2", "20");
+        // Create and run validator.
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(obj1));
+        validator.validate(new ObjectEvent(obj2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts.
+        assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
+    public void uniqueAttrValueUuidSame_Fail(){
+        // Set object.
+        Iom_jObject obj1=new Iom_jObject(CLASSL,OID1);
+        obj1.setattrvalue("attr1", "960a3aed-ff1a-41ba-b177-34480efb2a6d");
+        obj1.setattrvalue("attr2", "15");
+        Iom_jObject obj2=new Iom_jObject(CLASSL,OID2);
+        obj2.setattrvalue("attr1", "960a3aed-ff1a-41ba-b177-34480efb2a6d");
+        obj2.setattrvalue("attr2", "20");
+        // Create and run validator.
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(obj1));
+        validator.validate(new ObjectEvent(obj2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts.
+        assertEquals(1,logger.getErrs().size());
+        assertEquals("Unique constraint UniqueConstraints23.Topic.ClassL.Constraint1 is violated! Values 960a3aed-ff1a-41ba-b177-34480efb2a6d already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+    }
+    @Test
+    public void uniqueAttrValueUuidSameDifferentCase_Fail(){
+        // Set object.
+        Iom_jObject obj1=new Iom_jObject(CLASSL,OID1);
+        obj1.setattrvalue("attr1", "960A3aed-ff1a-41ba-b177-34480efb2a6d");
+        obj1.setattrvalue("attr2", "15");
+        Iom_jObject obj2=new Iom_jObject(CLASSL,OID2);
+        obj2.setattrvalue("attr1", "960a3aed-ff1a-41ba-b177-34480efb2a6d");
+        obj2.setattrvalue("attr2", "20");
+        // Create and run validator.
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(obj1));
+        validator.validate(new ObjectEvent(obj2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts.
+        assertEquals(1,logger.getErrs().size());
+        assertEquals("Unique constraint UniqueConstraints23.Topic.ClassL.Constraint1 is violated! Values 960a3aed-ff1a-41ba-b177-34480efb2a6d already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+    }
 
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn Text Unique und Nummer Unique separat sind und nicht identisch ist.
 	@Test

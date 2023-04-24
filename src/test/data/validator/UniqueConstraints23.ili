@@ -233,6 +233,13 @@ MODEL UniqueConstraints23
 			attr04 : TEXT*10;
 			UNIQUE WHERE INTERLIS.inEnumRange(attr01, attr02, attr03) : attr04;
 		END ClassN3;
+
+		CLASS ClassL =
+		  attr1 : INTERLIS.UUIDOID;
+		  attr2 : TEXT*10;
+		  UNIQUE attr1;
+		END ClassL;
+		
 		
 	END Topic;
 
@@ -309,7 +316,7 @@ MODEL UniqueConstraints23
 		  k1 -- {0..2} ClassK;
 		  UNIQUE i1->attrI;
 		END assocIK;
-		
+
 	END EmbeddedUnique;
 
 	TOPIC LinkObjUnique=

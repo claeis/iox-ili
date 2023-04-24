@@ -29,9 +29,11 @@ public class Bid23Test {
 	private final static String TOPIC="Oid23.Topic";
 	private final static String TOPIC2="Oid23.Topic2";
     private final static String TOPIC4="Oid23.Topic4";
+    private final static String TOPIC5="Oid23.Topic5";
 	// CLASSES
 	private final static String CLASSB=TOPIC+".ClassB";
 	private final static String CLASSBEXT=TOPIC2+".ClassB";
+    private final static String CLASSB5=TOPIC5+".ClassB5";
 	// TD
 	private TransferDescription td=null;
 	// START EVENT BASKET
@@ -193,6 +195,23 @@ public class Bid23Test {
         assertEquals(1,logger.getErrs().size());
         assertEquals("OID <o1> is equal to a BID", logger.getErrs().get(0).getEventMsg());
     }
+    @Test
+    public void validateBIDequalsOID_UUID_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB5, "Fd3babc5-7a05-4177-85ed-92b02a624d8e");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC5,"fd3babc5-7a05-4177-85ed-92b02a624d8e"));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(1,logger.getErrs().size());
+        assertEquals("OID <fd3babc5-7a05-4177-85ed-92b02a624d8e> is equal to a BID", logger.getErrs().get(0).getEventMsg());
+    }
 	
     @Test
     public void validateBid_Fail() throws Exception {
@@ -255,6 +274,27 @@ public class Bid23Test {
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("BID b1 of Oid23.Topic already exists in Oid23.Topic", logger.getErrs().get(0).getEventMsg());
 	}
+    @Test
+    public void sameBid_UUID_Fail() throws Exception {
+        Iom_jObject objB1=new Iom_jObject(CLASSB5, "25681d61-1333-46b8-a255-689478248013");
+        Iom_jObject objB2=new Iom_jObject(CLASSB5, "c5a72db8-9b9b-455c-ac5e-58916fb9db41");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC5,"fd3babc5-7a05-4177-85ed-92b02a624d8e"));
+        validator.validate(new ObjectEvent(objB1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new StartBasketEvent(TOPIC5,"Fd3babc5-7a05-4177-85ed-92b02a624d8e"));
+        validator.validate(new ObjectEvent(objB2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("BID fd3babc5-7a05-4177-85ed-92b02a624d8e of Oid23.Topic5 already exists in Oid23.Topic5", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// Die  BID b1 wird zwei Mal innerhalb unterschiedlicher Baskets erstellt.
 	// Es muss eine Fehlermeldung ausgegeben werden, weil die BID innerhalb des Transferfiles, unique sein muss.

@@ -66,7 +66,10 @@ public class LineSegment implements Iterable<Coordinate> {
     public LineSegment splitTailAt(Coordinate coordinate){
         int pos = coordinatesMap.get(coordinate);
         if (pos == coordinates.size() - 1) return null;
-
+        if(pos!=0 && pos%2==0 && wkbType==WKBConstants.wkbCircularString) {
+            throw new IllegalArgumentException("A mid-point of an ARC can not start a ring "+coordinate.toString());
+        }
+        
         List<Coordinate> tail = coordinates.subList(pos, coordinates.size());
         LineSegment result = new LineSegment(wkbType);
 
@@ -83,5 +86,9 @@ public class LineSegment implements Iterable<Coordinate> {
     @Override
     public Iterator<Coordinate> iterator() {
         return coordinates.iterator();
+    }
+
+    public boolean contains(Coordinate coordinate) {
+        return coordinatesMap.containsKey(coordinate);
     }
 }

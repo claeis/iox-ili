@@ -72,4 +72,22 @@ MODEL ReferenceType23
 		
 	END Topic;
 	
+	TOPIC TopicB=
+		   BASKET OID AS INTERLIS.UUIDOID;
+		   OID AS INTERLIS.UUIDOID;
+
+		CLASS ClassA =
+		END ClassA;
+		
+		STRUCTURE StructC =
+		   attrC : REFERENCE TO ClassA;
+		END StructC;
+
+		CLASS ClassD =
+		   attrD : StructC;
+		END ClassD;
+		   
+	END TopicB;
+	
+	
 END ReferenceType23.

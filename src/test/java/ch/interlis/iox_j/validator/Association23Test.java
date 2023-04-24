@@ -32,8 +32,9 @@ public class Association23Test {
 	private final static String OBJ_OID6 ="o6";
 	private final static String OBJ_OID7 ="o7";
 	// MODEL.TOPIC
-	private final static String ILI_TOPIC="Association23.Topic";
-	private final static String ILI_TOPICB="Association23.TopicB";
+    private final static String ILI_MODEL="Association23";
+	private final static String ILI_TOPIC=ILI_MODEL+".Topic";
+	private final static String ILI_TOPICB=ILI_MODEL+".TopicB";
 	// CLASS
 	private final static String ILI_CLASSA=ILI_TOPIC+".ClassA";
 	private final static String ILI_CLASSB=ILI_TOPIC+".ClassB";
@@ -114,6 +115,13 @@ public class Association23Test {
 	// SETTING PARAMETER
 	private final static String TRUE="true";
 	private final static String FALSE="false";
+    private static final String ILI_TOPIC_C = ILI_MODEL+".TopicC";
+    private static final String ILI_C_CLASSA = ILI_TOPIC_C+".ClassA";
+    private static final String ILI_C_CLASSB = ILI_TOPIC_C+".ClassB";
+    private static final String ILI_C_ASSOC_AB2 = ILI_TOPIC_C+".ab2";
+    private static final String ILI_C_ASSOC_AB2_A2 = "a2";
+    private static final String ILI_C_ASSOC_AB2_B2 = "b2";
+    private static final String ILI_C_ASSOC_AB1_B1 = "b1";
 	
 	@Before
 	public void setUp() throws Exception {
@@ -150,6 +158,44 @@ public class Association23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    public void embeddedAsso_UUID_refUC_Ok(){
+        Iom_jObject iomObjA=new Iom_jObject(ILI_C_CLASSA, "25681d61-1333-46b8-a255-689478248013");
+        Iom_jObject iomObjB=new Iom_jObject(ILI_C_CLASSB, "c5a72db8-9b9b-455c-ac5e-58916fb9db41");
+        iomObjA.addattrobj(ILI_C_ASSOC_AB1_B1, "REF").setobjectrefoid(iomObjB.getobjectoid().toUpperCase());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC_C,"fd3babc5-7a05-4177-85ed-92b02a624d8e"));
+        validator.validate(new ObjectEvent(iomObjA));
+        validator.validate(new ObjectEvent(iomObjB));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0,logger.getErrs().size());
+    }
+    @Test
+    public void embeddedAsso_UUID_tidUC_Ok(){
+        Iom_jObject iomObjA=new Iom_jObject(ILI_C_CLASSA, "25681d61-1333-46b8-a255-689478248013".toUpperCase());
+        Iom_jObject iomObjB=new Iom_jObject(ILI_C_CLASSB, "c5a72db8-9b9b-455c-ac5e-58916fb9db41".toUpperCase());
+        iomObjA.addattrobj(ILI_C_ASSOC_AB1_B1, "REF").setobjectrefoid(iomObjB.getobjectoid().toLowerCase());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC_C,"fd3babc5-7a05-4177-85ed-92b02a624d8e"));
+        validator.validate(new ObjectEvent(iomObjA));
+        validator.validate(new ObjectEvent(iomObjB));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0,logger.getErrs().size());
+    }
     @Test
     public void embeddedAssoHugeMultiplicity_Ok(){
 
@@ -356,6 +402,50 @@ public class Association23Test {
 		// Asserts
 		assertEquals(0,logger.getErrs().size());
 	}
+    @Test
+    public void standAloneAsso_NtoN_UUID_refUC_Ok(){
+        Iom_jObject iomObjA=new Iom_jObject(ILI_C_CLASSA, "25681d61-1333-46b8-a255-689478248013");
+        Iom_jObject iomObjB=new Iom_jObject(ILI_C_CLASSB, "c5a72db8-9b9b-455c-ac5e-58916fb9db41");
+        Iom_jObject iomLinkAB2=new Iom_jObject(ILI_C_ASSOC_AB2, null);
+        iomLinkAB2.addattrobj(ILI_C_ASSOC_AB2_A2, "REF").setobjectrefoid(iomObjA.getobjectoid());
+        iomLinkAB2.addattrobj(ILI_C_ASSOC_AB2_B2, "REF").setobjectrefoid(iomObjB.getobjectoid().toUpperCase());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC_C,"fd3babc5-7a05-4177-85ed-92b02a624d8e"));
+        validator.validate(new ObjectEvent(iomObjA));
+        validator.validate(new ObjectEvent(iomObjB));
+        validator.validate(new ObjectEvent(iomLinkAB2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0,logger.getErrs().size());
+    }
+    @Test
+    public void standAloneAsso_NtoN_UUID_tidUC_Ok(){
+        Iom_jObject iomObjA=new Iom_jObject(ILI_C_CLASSA, "25681d61-1333-46b8-a255-689478248013".toUpperCase());
+        Iom_jObject iomObjB=new Iom_jObject(ILI_C_CLASSB, "c5a72db8-9b9b-455c-ac5e-58916fb9db41".toUpperCase());
+        Iom_jObject iomLinkAB2=new Iom_jObject(ILI_C_ASSOC_AB2, null);
+        iomLinkAB2.addattrobj(ILI_C_ASSOC_AB2_A2, "REF").setobjectrefoid(iomObjA.getobjectoid().toLowerCase());
+        iomLinkAB2.addattrobj(ILI_C_ASSOC_AB2_B2, "REF").setobjectrefoid(iomObjB.getobjectoid().toLowerCase());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC_C,"fd3babc5-7a05-4177-85ed-92b02a624d8e"));
+        validator.validate(new ObjectEvent(iomObjA));
+        validator.validate(new ObjectEvent(iomObjB));
+        validator.validate(new ObjectEvent(iomLinkAB2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0,logger.getErrs().size());
+    }
     @Test
     public void standAloneAsso_NtoN_duplicateLink_Fail(){
         Iom_jObject iomObjE=new Iom_jObject(ILI_CLASSE, OBJ_OID1);

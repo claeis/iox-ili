@@ -66,7 +66,7 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 		}
 		if(outFile!=null){
 			try {
-                EhiLogger.traceState((poolName!=null?poolName:this.getClass().getSimpleName())+": size "+outFile.length()+" <"+outFilename.getPath()+">");
+                EhiLogger.traceState((poolName!=null?poolName:this.getClass().getSimpleName())+": filesize "+outFile.length()+", updates "+updateCount+", <"+outFilename.getPath()+">");
 				outFile.close();
 			} catch (IOException e) {
 				throw new IllegalStateException(e);
@@ -159,6 +159,7 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 		return tree.keySet();
 	}
 
+	private long updateCount=0L;
 	@Override
 	public V put(K key, V value) {
 		try {
@@ -172,6 +173,9 @@ public class ObjPoolImpl2<K,V> implements Map<K, V> {
 				}
 			}
 			Long retPos=tree.get((K)key);
+			if(retPos!=null) {
+			    updateCount++;
+			}
 			tree.put(key, pos);
 			return null;
 		} catch (IOException e) {
