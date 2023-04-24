@@ -3,7 +3,7 @@ ideas/open issues
 - add xml validation
 - add Xtf23Reader
 
-iox-ili 1.21.18 (SNAPSHOT)
+iox-ili 1.21.18 (2023-04-24)
 -----------------------------
 - Validator: fix UNIQUE mixed case INTERLIS.UUIDOID (ilivalidator#371)
 - Validator: fix references with mixed case INTERLIS.UUIDOID (ilivalidator#370)
