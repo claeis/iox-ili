@@ -1622,6 +1622,46 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				return Value.createUndefined();
 			}
 			return new Value(!leftValue.isTrue() || (leftValue.isTrue() && rightValue.isTrue()));
+		} else if (expression instanceof Expression.Addition) {
+			Expression.Addition addition = (Expression.Addition) expression;
+			Value leftValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, addition.getLeft(), firstRole);
+			Value rightValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, addition.getRight(), firstRole);
+			if (leftValue.skipEvaluation() || rightValue.skipEvaluation())
+				return Value.createSkipEvaluation();
+			if (leftValue.isUndefined() || rightValue.isUndefined())
+				return Value.createUndefined();
+
+			return new Value(leftValue.getNumeric() + rightValue.getNumeric());
+		} else if (expression instanceof Expression.Subtraction) {
+			Expression.Subtraction subtraction = (Expression.Subtraction) expression;
+			Value leftValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, subtraction.getLeft(), firstRole);
+			Value rightValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, subtraction.getRight(), firstRole);
+			if (leftValue.skipEvaluation() || rightValue.skipEvaluation())
+				return Value.createSkipEvaluation();
+			if (leftValue.isUndefined() || rightValue.isUndefined())
+				return Value.createUndefined();
+
+			return new Value(leftValue.getNumeric() - rightValue.getNumeric());
+		} else if (expression instanceof Expression.Multiplication) {
+			Expression.Multiplication multiplication = (Expression.Multiplication) expression;
+			Value leftValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, multiplication.getLeft(), firstRole);
+			Value rightValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, multiplication.getRight(), firstRole);
+			if (leftValue.skipEvaluation() || rightValue.skipEvaluation())
+				return Value.createSkipEvaluation();
+			if (leftValue.isUndefined() || rightValue.isUndefined())
+				return Value.createUndefined();
+
+			return new Value(leftValue.getNumeric() * rightValue.getNumeric());
+		} else if (expression instanceof Expression.Division) {
+			Expression.Division division = (Expression.Division) expression;
+			Value leftValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, division.getLeft(), firstRole);
+			Value rightValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, division.getRight(), firstRole);
+			if (leftValue.skipEvaluation() || rightValue.skipEvaluation())
+				return Value.createSkipEvaluation();
+			if (leftValue.isUndefined() || rightValue.isUndefined())
+				return Value.createUndefined();
+
+			return new Value(leftValue.getNumeric() / rightValue.getNumeric());
 		} else if(expression instanceof Constant){
 			// constant
 			Constant constantObj = (Constant) expression;
