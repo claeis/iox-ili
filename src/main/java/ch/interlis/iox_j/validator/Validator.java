@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import ch.interlis.ili2c.generator.Interlis2Generator;
+import ch.interlis.ili2c.metamodel.Expression;
 import com.vividsolutions.jts.geom.Coordinate;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
@@ -1606,6 +1607,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 			return new Value(false);
+		} else if(expression instanceof Expression.Implication) {
+			Expression.Implication implication = (Expression.Implication) expression;
+			Value leftValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, implication.getLeft(), firstRole);
+			Value rightValue = Value.createSkipEvaluation();
+			if (!leftValue.skipEvaluation() && !leftValue.isUndefined() && leftValue.isTrue()) {
+				rightValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, implication.getRight(), firstRole);
+			}
+
+			if (leftValue.skipEvaluation() || rightValue.skipEvaluation()) {
+				return rightValue;
+			}
+			if (leftValue.isUndefined() || rightValue.isUndefined()) {
+				return Value.createUndefined();
+			}
+			return new Value(!leftValue.isTrue() || (leftValue.isTrue() && rightValue.isTrue()));
 		} else if(expression instanceof Constant){
 			// constant
 			Constant constantObj = (Constant) expression;
