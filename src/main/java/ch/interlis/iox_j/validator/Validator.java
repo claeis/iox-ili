@@ -870,9 +870,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 				}
 			}
+			for(SetConstraint setConstraint:setConstraints.keySet()){
+				if(setConstraint.getBasket()){
+					validateSetConstraint(setConstraint);
+				}
+			}
 		}
 		for(SetConstraint setConstraint:setConstraints.keySet()){
-			validateSetConstraint(setConstraint);
+			if(!setConstraint.getBasket()) {
+				validateSetConstraint(setConstraint);
+			}
 		}
 	}
 
@@ -881,6 +888,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		for (UniquenessConstraint uniquenessConstraint: seenUniqueConstraintValues.keySet()) {
 			if (uniquenessConstraint.getBasket()){
 				seenUniqueConstraintValues.get(uniquenessConstraint).clear();
+			}
+		}
+
+		for (SetConstraint setConstraint: setConstraints.keySet()){
+			if(setConstraint.getBasket()){
+				setConstraints.get(setConstraint).clear();
 			}
 		}
 	}
@@ -1311,8 +1324,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             }
                             logMsg(checkConstraint,msg);
                         } else {
-                            if(!setConstraintOufputReduction.contains(setConstraint+":"+constraintName)){
-                                setConstraintOufputReduction.add(setConstraint+":"+constraintName);
+							String constraintIdentifier = setConstraint+":"+constraintName+(setConstraint.getBasket() ? ":Basket("+currentBasketId+")" : "");
+                            if(!setConstraintOufputReduction.contains(constraintIdentifier)){
+                                setConstraintOufputReduction.add(constraintIdentifier);
                                 logMsg(checkConstraint,rsrc.getString("validateSetConstraint.setConstraintIsNotTrue"), getDisplayName(setConstraint));
                             }
                         }
