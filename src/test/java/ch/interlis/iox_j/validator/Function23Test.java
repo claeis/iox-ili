@@ -1,6 +1,7 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+import static ch.interlis.iox_j.validator.LogCollectorAssertions.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -551,8 +552,6 @@ public class Function23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjQ1));
-		validator.validate(new ObjectEvent(iomObjQ2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
@@ -1422,13 +1421,13 @@ public class Function23Test {
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: objectCount(All), die Anzahl der Objekte nicht stimmt.
 	@Test
-	public void objectCountALL_ObjectCountNotEqual_Fail(){
+	public void objectCountALL_ObjectCountALL_Fail(){
 		Iom_jObject iomObjQ1=new Iom_jObject(ILI_CLASSQ, OBJ_OID1);
 		iomObjQ1.setattrvalue("Art", "a");
 		Iom_jObject iomObjQ2=new Iom_jObject(ILI_CLASSQ, OBJ_OID2);
-		iomObjQ2.setattrvalue("Art", "b");
-		Iom_jObject iomObjR1=new Iom_jObject(ILI_CLASSR, OBJ_OID3);
-		Iom_jObject iomObjR2=new Iom_jObject(ILI_CLASSR, OBJ_OID4);
+		iomObjQ2.setattrvalue("Art", "a");
+		Iom_jObject iomObjQ3=new Iom_jObject(ILI_CLASSR, OBJ_OID3);
+		iomObjQ3.setattrvalue("Art", "b");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1437,12 +1436,12 @@ public class Function23Test {
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
 		validator.validate(new ObjectEvent(iomObjQ1));
-		validator.validate(new ObjectEvent(iomObjR1));
+		validator.validate(new ObjectEvent(iomObjQ2));
+		validator.validate(new ObjectEvent(iomObjQ3));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Set Constraint Function23.Topic.ClassQ.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("Set Constraint Function23.Topic.ClassQ.Constraint1 is not true.", 1, logger);
 	}
 	
     // Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: objectCount(Role) die Anzahl der Objekte welche von S zu T via Role referenzieren 1!=2 ist.

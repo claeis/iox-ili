@@ -1,5 +1,6 @@
 package ch.interlis.iox_j.validator;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -8,6 +9,7 @@ import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import static org.junit.Assert.*;
+import static ch.interlis.iox_j.validator.LogCollectorAssertions.*;
 
 import java.util.Iterator;
 import java.util.Locale;
@@ -105,7 +107,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("Configuration23.Topic.ClassA.Constraint1", 0, logger);
 	}
 
 	// Config CHECK=warning. Es darf keine Fehlermeldung ausgegeben werden. Es soll eine Warnung  ausgegeben werden.
@@ -128,9 +130,9 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Existence constraint Configuration23.Topic.ClassA.Constraint1 is violated! The value of the attribute attrText of Configuration23.Topic.ClassA was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
+
+		AssertContainsWarning("Existence constraint Configuration23.Topic.ClassA.Constraint1 is violated! The value of the attribute attrText of Configuration23.Topic.ClassA was not found in the condition class.", 1, logger);
+		AssertContainsError("Existence constraint Configuration23.Topic.ClassA.Constraint1 is violated! The value of the attribute attrText of Configuration23.Topic.ClassA was not found in the condition class.", 0, logger);
 	}
 	
 	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht uebereinstimmen und validationConfig msg nicht leer ist.
@@ -153,8 +155,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("My own error message.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("My own error message.", 1, logger);
 	}
 	
 	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht uebereinstimmen, check=OFF und msg=NotEmpty.
@@ -178,7 +179,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("Configuration23.Topic.ConditionTextClass", 0, logger);
 	}
 
 	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht uebereinstimmen und validationConfig msg leer ist.
@@ -201,8 +202,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Existence constraint Configuration23.Topic.ClassA.Constraint1 is violated! The value of the attribute attrText of Configuration23.Topic.ClassA was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("Existence constraint Configuration23.Topic.ClassA.Constraint1 is violated! The value of the attribute attrText of Configuration23.Topic.ClassA was not found in the condition class.", 1, logger);
 	}
 	
 	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird,
@@ -227,8 +227,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("My own error message.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("My own error message.", 1, logger);
 	}
 
 	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird
@@ -253,8 +252,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Existence constraint Configuration23.Topic.ClassA.Constraint1 is violated! The value of the attribute attrText of Configuration23.Topic.ClassA was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("Existence constraint Configuration23.Topic.ClassA.Constraint1 is violated! The value of the attribute attrText of Configuration23.Topic.ClassA was not found in the condition class.", 1, logger);
 	}
 	
 	// Config CHECK=warning. Es darf keine Fehlermeldung ausgegeben werden. Es sollen 4 Warnungen: Constraint 1-4 ausgegeben werden.
@@ -283,12 +281,10 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getWarn().size()==4);
-		assertTrue(logger.getErrs().size()==0);
-		assertEquals("Existence constraint Configuration23.Topic.ClassB.Constraint1 is violated! The value of the attribute attrText1 of Configuration23.Topic.ClassB was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
-		assertEquals("Existence constraint Configuration23.Topic.ClassB.Constraint2 is violated! The value of the attribute attrText2 of Configuration23.Topic.ClassB was not found in the condition class.", logger.getWarn().get(1).getEventMsg());
-		assertEquals("Existence constraint Configuration23.Topic.ClassB.Constraint3 is violated! The value of the attribute attrText3 of Configuration23.Topic.ClassB was not found in the condition class.", logger.getWarn().get(2).getEventMsg());
-		assertEquals("Existence constraint Configuration23.Topic.ClassB.Constraint4 is violated! The value of the attribute attrText4 of Configuration23.Topic.ClassB was not found in the condition class.", logger.getWarn().get(3).getEventMsg());
+		AssertContainsWarning("Existence constraint Configuration23.Topic.ClassB.Constraint1 is violated! The value of the attribute attrText1 of Configuration23.Topic.ClassB was not found in the condition class.", 1, logger);
+		AssertContainsWarning("Existence constraint Configuration23.Topic.ClassB.Constraint2 is violated! The value of the attribute attrText2 of Configuration23.Topic.ClassB was not found in the condition class.", 1, logger);
+		AssertContainsWarning("Existence constraint Configuration23.Topic.ClassB.Constraint3 is violated! The value of the attribute attrText3 of Configuration23.Topic.ClassB was not found in the condition class.", 1, logger);
+		AssertContainsWarning("Existence constraint Configuration23.Topic.ClassB.Constraint4 is violated! The value of the attribute attrText4 of Configuration23.Topic.ClassB was not found in the condition class.", 1, logger);
 	}
 	
 	// Config Target=warning. Eine Warnung muss ausgegeben werden.
@@ -312,9 +308,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("wrong class Configuration23.Topic.ClassA of target object o3 for role Configuration23.Topic.cd1.c1.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsError("wrong class Configuration23.Topic.ClassA of target object o3 for role Configuration23.Topic.cd1.c1.", 0, logger);
+		AssertContainsWarning("wrong class Configuration23.Topic.ClassA of target object o3 for role Configuration23.Topic.cd1.c1.", 1, logger);
 	}
 	
 	// Config MULTIPLICITY=warning. Es soll eine Warnung ausgegeben werden.
@@ -339,9 +334,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("d1 should associate 0 to 1 target objects (instead of 2)", logger.getWarn().get(0).getEventMsg());
+		AssertContainsError("d1 should associate 0 to 1 target objects (instead of 2)", 0, logger);
+		AssertContainsWarning("d1 should associate 0 to 1 target objects (instead of 2)", 1, logger);
 	}
 	
 	// Config MULTIPLICITY=off. Es darf keine Fehlermeldung geworfen werden.
@@ -363,7 +357,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("Configuration23.Topic..c1", 0, logger);
 	}
 	
 	// Config Target=off. Es darf keine Fehlermeldung geworfen werden.
@@ -387,7 +381,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("Configuration23.Topic.cd1.c1", 0, logger);
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn config auf off gestellt wurde und die Booleans nicht uebereinstimmen.
@@ -408,7 +402,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("Configuration23.Topic.ClassE.Constraint1", 0,logger);
+		AssertContainsWarning("Configuration23.Topic.ClassE.Constraint1", 0,logger);
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird wenn:
@@ -433,7 +428,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("Configuration23.Topic.ClassE.Constraint1", 0, logger);
+		AssertContainsError("This is my own error message!", 0, logger);
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn config auf Warning eingestellt ist und die boolean nicht uebereinstimmen.
@@ -454,9 +450,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Mandatory Constraint Configuration23.Topic.ClassE.Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("Mandatory Constraint Configuration23.Topic.ClassE.Constraint1 is not true.", 1, logger);
+		AssertContainsError("Mandatory Constraint Configuration23.Topic.ClassE.Constraint1 is not true.", 0, logger);
 	}
 	
 	// Es wird getestet, ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn ValidationConfig.MSG nicht leer ist.
@@ -477,8 +472,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This is my own error message!", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("This is my own error message!", 1, logger);
 	}
 	
 	// Es wird getestet, ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn ValidationConfig.MSG leer ist.
@@ -499,8 +493,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Configuration23.Topic.ClassE.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("Mandatory Constraint Configuration23.Topic.ClassE.Constraint1 is not true.", 1, logger);
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und >= 50% erreicht werden muss und ValidationConfig WARNING eingeschalten ist.
@@ -521,9 +514,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Plausibility Constraint Configuration23.Topic.ClassF.Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsError("Plausibility Constraint Configuration23.Topic.ClassF.Constraint1 is not true.", 0, logger);
+		AssertContainsWarning("Plausibility Constraint Configuration23.Topic.ClassF.Constraint1 is not true.", 1, logger);
 	}
 	
 	// Es wird getestet, ob die eigen erstellte Fehlermeldung ausgegeben wird,
@@ -546,8 +538,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Mandatory Constraint Configuration23.Topic.ClassE.Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("Mandatory Constraint Configuration23.Topic.ClassE.Constraint1 is not true.", 1, logger);
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird,
@@ -571,9 +562,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Plausibility Constraint Configuration23.Topic.ClassF.Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("Plausibility Constraint Configuration23.Topic.ClassF.Constraint1 is not true.", 1, logger);
+		AssertContainsError("Plausibility Constraint Configuration23.Topic.ClassF.Constraint1 is not true.", 0, logger);
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und >= 50% erreicht werden muss und ValidationConfig MSG nicht leer ist.
@@ -594,8 +584,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This is my own error message!", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("This is my own error message!", 1, logger);
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und >= 50% erreicht werden muss, check=off, msg=notEmpty.
@@ -617,7 +606,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("This is my own error message!", 0, logger);
+		AssertContainsError("Configuration23.Topic.ClassF.Constraint1", 0, logger);
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und >= 50% erreicht werden muss und ValidationConfig MSG definiert ist, jedoch nicht leer ist.
@@ -638,8 +628,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Plausibility Constraint Configuration23.Topic.ClassF.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("Plausibility Constraint Configuration23.Topic.ClassF.Constraint1 is not true.", 1, logger);
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und >= 50% erreicht werden muss und ValidationConfig auf OFF steht.
@@ -660,14 +649,16 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("Configuration23.Topic.ClassF.Constraint1", 0, logger);
 	}
 	
 	// Es wird getestet die eigens erstellte Fehlermeldung ausgegeben wird, wenn der Pre-Constraint true ist und die Funktion: ObjectCount(ALL) false ist und die Config msg nicht leer ist.
 	@Test
 	public void setConstraint_SecondConstraintFalse_MSGNotEmpty(){
-		Iom_jObject iomObj=new Iom_jObject(CLASSG, OID1);
-		iomObj.setattrvalue("Art", "a");
+		Iom_jObject iomObj1=new Iom_jObject(CLASSG, OID1);
+		Iom_jObject iomObj2=new Iom_jObject(CLASSG, OID2);
+		iomObj1.setattrvalue("Art", "a");
+		iomObj2.setattrvalue("Art", "a");
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue(CLASSG+".Constraint1", ValidationConfig.MSG, "My own Set Constraint.");
 		LogCollector logger=new LogCollector();
@@ -676,19 +667,21 @@ public class Configuration23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new ObjectEvent(iomObj1));
+		validator.validate(new ObjectEvent(iomObj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("My own Set Constraint.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("My own Set Constraint.", 1, logger);
 	}
 	
 	// Es wird getestet die eigens erstellte Fehlermeldung ausgegeben wird, wenn der Pre-Constraint true ist und die Funktion: ObjectCount(ALL) false ist und die Config msg definiert, jedoch leer ist.
 	@Test
 	public void setConstraint_SecondConstraintFalse_MSGEmpty(){
-		Iom_jObject iomObj=new Iom_jObject(CLASSG, OID1);
-		iomObj.setattrvalue("Art", "a");
+		Iom_jObject iomObj1=new Iom_jObject(CLASSG, OID1);
+		Iom_jObject iomObj2=new Iom_jObject(CLASSG, OID2);
+		iomObj1.setattrvalue("Art", "a");
+		iomObj2.setattrvalue("Art", "a");
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue(CLASSG+".Constraint1", ValidationConfig.MSG, "");
 		LogCollector logger=new LogCollector();
@@ -697,12 +690,12 @@ public class Configuration23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new ObjectEvent(iomObj1));
+		validator.validate(new ObjectEvent(iomObj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Set Constraint Configuration23.Topic.ClassG.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("Set Constraint Configuration23.Topic.ClassG.Constraint1 is not true.", 1, logger);
 	}
 	
 	// Es wird getestet die eigens erstellte Fehlermeldung ausgegeben wird,
@@ -710,8 +703,10 @@ public class Configuration23Test {
 	// die Config msg nicht leer ist und die Config Check auf warning konfiguriert ist.
 	@Test
 	public void setConstraint_MSGNotEmptyAndWarning_False(){
-		Iom_jObject iomObj=new Iom_jObject(CLASSG, OID1);
-		iomObj.setattrvalue("Art", "a");
+		Iom_jObject iomObj1=new Iom_jObject(CLASSG, OID1);
+		Iom_jObject iomObj2=new Iom_jObject(CLASSG, OID2);
+		iomObj1.setattrvalue("Art", "a");
+		iomObj2.setattrvalue("Art", "a");
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue(CLASSG+".Constraint1", ValidationConfig.CHECK, ValidationConfig.WARNING);
 		modelConfig.setConfigValue(CLASSG+".Constraint1", ValidationConfig.MSG, "My own Set Constraint.");
@@ -721,12 +716,12 @@ public class Configuration23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new ObjectEvent(iomObj1));
+		validator.validate(new ObjectEvent(iomObj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("My own Set Constraint.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("My own Set Constraint.", 1, logger);
 	}
 	
 	// Es wird getestet die eigens erstellte Fehlermeldung ausgegeben wird,
@@ -734,8 +729,12 @@ public class Configuration23Test {
 	// die Config msg definiert, jedoch leer ist und die Config check auf Warning konfiguriert ist.
 	@Test
 	public void setConstraint_MSGEmptyAndWarning(){
-		Iom_jObject iomObj=new Iom_jObject(CLASSG, OID1);
-		iomObj.setattrvalue("Art", "a");
+		Iom_jObject iomObj1=new Iom_jObject(CLASSG, OID1);
+		Iom_jObject iomObj2=new Iom_jObject(CLASSG, OID2);
+		Iom_jObject iomObj3=new Iom_jObject(CLASSG, OID3);
+		iomObj1.setattrvalue("Art", "a");
+		iomObj2.setattrvalue("Art", "a");
+		iomObj3.setattrvalue("Art", "a");
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue(CLASSG+".Constraint1", ValidationConfig.CHECK, ValidationConfig.WARNING);
 		modelConfig.setConfigValue(CLASSG+".Constraint1", ValidationConfig.MSG, "");
@@ -745,12 +744,13 @@ public class Configuration23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new ObjectEvent(iomObj1));
+		validator.validate(new ObjectEvent(iomObj2));
+		validator.validate(new ObjectEvent(iomObj3));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Set Constraint Configuration23.Topic.ClassG.Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("Set Constraint Configuration23.Topic.ClassG.Constraint1 is not true.", 1, logger);
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn der Pre-Constraint true ist und die Funktion: ObjectCount(ALL) false ist und die Config check=off definiert ist.
@@ -770,7 +770,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("Configuration23.Topic.ClassG.Constraint1", 0, logger);
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn der Pre-Constraint true ist und die Funktion: ObjectCount(ALL) false ist und die Config check=off und msgNotEmpty definiert ist.
@@ -791,14 +791,17 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("Configuration23.Topic.ClassG.Constraint1",0, logger);
+		AssertContainsError("My own Set Constraint.",0, logger);
 	}
 	
 	// Es wird getestet eine Fehlermeldung ausgegeben wird, wenn der Pre-Constraint true ist und die Funktion: ObjectCount(ALL) false ist und die Config check=warning definiert ist.
 	@Test
 	public void setConstraint_SecondConstraintFalse_CheckWarn(){
-		Iom_jObject iomObj=new Iom_jObject(CLASSG, OID1);
-		iomObj.setattrvalue("Art", "a");
+		Iom_jObject iomObj1=new Iom_jObject(CLASSG, OID1);
+		Iom_jObject iomObj2=new Iom_jObject(CLASSG, OID2);
+		iomObj1.setattrvalue("Art", "a");
+		iomObj2.setattrvalue("Art", "a");
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue(CLASSG+".Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
 		LogCollector logger=new LogCollector();
@@ -807,13 +810,13 @@ public class Configuration23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new ObjectEvent(iomObj1));
+		validator.validate(new ObjectEvent(iomObj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Set Constraint Configuration23.Topic.ClassG.Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("Set Constraint Configuration23.Topic.ClassG.Constraint1 is not true.", 1, logger);
+		AssertContainsError("Set Constraint Configuration23.Topic.ClassG.Constraint1 is not true.", 0, logger);
 	}
 	
 	// Es wird getestet ob die eigens erstellte Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist, wenn validationConfig msg nicht leer ist.
@@ -840,8 +843,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("My own Set Constraint.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("My own Set Constraint.", 1, logger);
 	}
 	
     @Test
@@ -867,7 +869,7 @@ public class Configuration23Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertTrue(logger.getErrs().size()==1);
+        AssertContainsError("Configuration23.Topic.ClassH", 1, logger);
         IoxLogEvent err = logger.getErrs().get(0);
         assertEquals("Key 20",err.getSourceObjectUsrId());
     }
@@ -899,9 +901,8 @@ public class Configuration23Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertTrue(logger.getErrs().size()==1);
+        AssertContainsError("Unique constraint Configuration23.Topic.ClassH.Constraint1 is violated! Values Key, 20 already exist in Object: KEYMsg_lang 20", 1, logger);
         IoxLogEvent err = logger.getErrs().get(0);
-        assertEquals("Unique constraint Configuration23.Topic.ClassH.Constraint1 is violated! Values Key, 20 already exist in Object: KEYMsg_lang 20",err.getEventMsg());
         assertEquals("KEYMsg_lang 20",err.getSourceObjectUsrId());
     }
 	
@@ -929,8 +930,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique constraint Configuration23.Topic.ClassH.Constraint1 is violated! Values Ralf, 20 already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("Unique constraint Configuration23.Topic.ClassH.Constraint1 is violated! Values Ralf, 20 already exist in Object: o1", 1, logger);
 	}
 	
 	// Es wird getestet ob die eigens erstellte Fehlermeldung ausgegeben wird,
@@ -960,8 +960,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("My own Set Constraint.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("My own Set Constraint.", 1, logger);
+		AssertContainsError("My own Set Constraint.", 0, logger);
 	}
 	
 	// Es wird getestet ob die eigens erstellte Fehlermeldung ausgegeben wird,
@@ -990,8 +990,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Unique constraint Configuration23.Topic.ClassH.Constraint1 is violated! Values Ralf, 20 already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("Unique constraint Configuration23.Topic.ClassH.Constraint1 is violated! Values Ralf, 20 already exist in Object: o1", 1, logger);
 	}
 	
 	// Es wird getestet ob eine Warning anstelle einer Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist und validationConfig check auf off geschalten ist.
@@ -1018,8 +1017,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==0);
+		AssertContainsWarning("Configuration23.Topic.ClassH.Constraint1", 0, logger);
+		AssertContainsError("Configuration23.Topic.ClassH.Constraint1", 0, logger);
 	}
 	
 	// Es wird getestet ob eine Warning anstelle einer Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist und validationConfig check=off und msgNotEmpty geschalten ist.
@@ -1047,8 +1046,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==0);
+		AssertContainsWarning("Configuration23.Topic.ClassH.Constraint1", 0, logger);
+		AssertContainsError("Configuration23.Topic.ClassH.Constraint1", 0, logger);
 	}
 	
 	// Es wird getestet ob eine Warning anstelle einer Fehlermeldung ausgegeben wird, wenn die Nummer Unique und identisch ist und validationConfig check auf warning geschalten ist.
@@ -1075,9 +1074,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts.
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Unique constraint Configuration23.Topic.ClassH.Constraint1 is violated! Values Ralf, 20 already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("Unique constraint Configuration23.Topic.ClassH.Constraint1 is violated! Values Ralf, 20 already exist in Object: o1", 1, logger);
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
@@ -1100,7 +1097,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("AddManConModel.AddManConTopic.AddManConView.Constraint1", 0, logger);
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
@@ -1123,9 +1120,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Mandatory Constraint AddManConModel.AddManConTopic.AddManConView.Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsError("Mandatory Constraint AddManConModel.AddManConTopic.AddManConView.Constraint1 is not true.", 0, logger);
+		AssertContainsWarning("Mandatory Constraint AddManConModel.AddManConTopic.AddManConView.Constraint1 is not true.", 1, logger);
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
@@ -1148,8 +1144,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This is my own error message!", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("This is my own error message!", 1, logger);
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
@@ -1172,8 +1167,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint AddManConModel.AddManConTopic.AddManConView.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("Mandatory Constraint AddManConModel.AddManConTopic.AddManConView.Constraint1 is not true.", 1, logger);
 	}
 	
 	// Es wird getestet ob die eigens erstellte Fehlermeldung ausgegeben wird, wenn in einer VIEW ausserhalb des Models
@@ -1203,8 +1197,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Set Constraint AddSetConModel.AddSetConTopic.AddSetConView.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("Set Constraint AddSetConModel.AddSetConTopic.AddSetConView.Constraint1 is not true.", 1, logger);
 	}
 	
 	// Es wird getestet ob die eigens erstellte Fehlermeldung ausgegeben wird, wenn in einer VIEW ausserhalb des Models
@@ -1234,8 +1227,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This is my ErrorMessage.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("This is my ErrorMessage.", 1, logger);
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg nicht leer ist.
@@ -1259,8 +1251,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This is my own Existence Constraint Error Message.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("This is my own Existence Constraint Error Message.", 1, logger);
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg definiert, jedoch leer ist.
@@ -1284,8 +1275,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Existence constraint AddExConModel.AddExConTopic.AddExConView.Constraint1 is violated! The value of the attribute subAttr of Configuration23.Topic.ClassL was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("Existence constraint AddExConModel.AddExConTopic.AddExConView.Constraint1 is violated! The value of the attribute subAttr of Configuration23.Topic.ClassL was not found in the condition class.", 1, logger);
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg nicht leer ist.
@@ -1311,8 +1301,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("My Error Message.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("My Error Message.", 1, logger);
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird,
@@ -1339,8 +1328,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Existence constraint AddExConModel.AddExConTopic.AddExConView.Constraint1 is violated! The value of the attribute subAttr of Configuration23.Topic.ClassL was not found in the condition class.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("Existence constraint AddExConModel.AddExConTopic.AddExConView.Constraint1 is violated! The value of the attribute subAttr of Configuration23.Topic.ClassL was not found in the condition class.", 1, logger);
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird,
@@ -1369,8 +1357,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("My Error Message.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("My Error Message.", 1, logger);
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann, msg=NotEmpty, check=off.
@@ -1397,7 +1384,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("AddUnConModel.AddUnConTopic.AddUnConView.Constraint1",0, logger);
+		AssertContainsError("My Error Message.",0, logger);
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg leer ist.
@@ -1423,8 +1411,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Unique constraint AddUnConModel.AddUnConTopic.AddUnConView.Constraint1 is violated! Values Ralf already exist in Object: o1", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("Unique constraint AddUnConModel.AddUnConTopic.AddUnConView.Constraint1 is violated! Values Ralf already exist in Object: o1", 1, logger);
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der hoeheren Hierarchie nicht uebereinstimmt und validationConfig.MSG nicht leer ist.
@@ -1445,8 +1432,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This Function Error is written by my own.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("This Function Error is written by my own.", 1, logger);
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird,
@@ -1475,8 +1461,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Unique constraint AddUnConModel.AddUnConTopic.AddUnConView.Constraint1 is violated! Values Ralf already exist in Object: o1", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("Unique constraint AddUnConModel.AddUnConTopic.AddUnConView.Constraint1 is violated! Values Ralf already exist in Object: o1", 1 ,logger);
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird
@@ -1500,8 +1485,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("This Function Error is written by my own.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("This Function Error is written by my own.", 1, logger);
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird
@@ -1525,8 +1509,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("Mandatory Constraint Configuration23.Topic.ClassN.Constraint1 is not true.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("Mandatory Constraint Configuration23.Topic.ClassN.Constraint1 is not true.", 1, logger);
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn bei der Funktion: isEnumSubVal, die subValue nicht mit der hoeheren Hierarchie nicht uebereinstimmt und validationConfig.MSG leer ist.
@@ -1547,8 +1530,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Mandatory Constraint Configuration23.Topic.ClassN.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("Mandatory Constraint Configuration23.Topic.ClassN.Constraint1 is not true.", 1, logger);
 	}
 	
 	// Wenn ValidationConfig auf TYPE und auf OFF steht, darf kein Fehler ausgegeben werden.
@@ -1568,7 +1550,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("Configuration23.Topic.ClassO", 0, logger);
+		
 	}
 	
 	// Wenn ValidationConfig TYPE und WARNING definiert wurde, wird kein Fehler, sondern eine Warnung ausgegeben.
@@ -1588,8 +1571,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("value <undecided> is not a BOOLEAN in attribute aBoolean", logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("value <undecided> is not a BOOLEAN in attribute aBoolean", 1, logger);
 	}
 	
 	// parameter=default=off
@@ -1611,7 +1593,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("Configuration23.Topic.ClassP", 0, logger);
 	}
 	
 	// parameter=default=warning 
@@ -1633,8 +1615,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("value 10000.000 is out of range in attribute lcoord",logger.getWarn().get(0).getEventMsg());
+		AssertContainsWarning("value 10000.000 is out of range in attribute lcoord", 1, logger);
 	}
     // parameter=default=off
     @Test
@@ -1663,7 +1644,7 @@ public class Configuration23Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("Configuration23.Topic.ClassP2", 0, logger);
     }
     @Test
     public void datatype__surfaceTypeDangleConfigGeomDefaultOff(){
@@ -1701,7 +1682,7 @@ public class Configuration23Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertTrue(logger.getErrs().size()==0);
+		AssertContainsError("Configuration23.Topic.ClassP3", 0, logger);
     }
 	
 	// target=on. Erwarte den Fehler:
@@ -1729,8 +1710,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("t1 should associate 1 to 1 target objects (instead of 3)",logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("t1 should associate 1 to 1 target objects (instead of 3)",1, logger);
 	}
 	
 	// target=WARNING.
@@ -1754,9 +1734,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("No object found with OID o3 in basket b1.", logger.getWarn().get(0).getEventMsg());
+		AssertContainsError("No object found with OID o3 in basket b1.", 0, logger);
+		AssertContainsWarning("No object found with OID o3 in basket b1.", 1, logger);
 	}
 	
 	// target=OFF.
@@ -1780,8 +1759,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==0);
+		AssertContainsError("Configuration23.Topic.qr1.q1", 0, logger);
+		AssertContainsWarning("Configuration23.Topic.qr1.q1", 0, logger);
 	}
 	
 	// target=on. Erwarte den Fehler:
@@ -1809,8 +1788,7 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("t1 should associate 1 to 1 target objects (instead of 3)",logger.getErrs().get(0).getEventMsg());
+		AssertContainsError("t1 should associate 1 to 1 target objects (instead of 3)",1, logger);
 	}
 	
 	// target=WARNING.
@@ -1840,9 +1818,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==1);
-		assertEquals("t1 should associate 1 to 1 target objects (instead of 3)", logger.getWarn().get(0).getEventMsg());
+		AssertContainsError("t1 should associate 1 to 1 target objects (instead of 3)",0, logger);
+		AssertContainsWarning("t1 should associate 1 to 1 target objects (instead of 3)",1, logger);
 	}
 	
 	// target=OFF.
@@ -1872,9 +1849,9 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==0);
-	}		
+		AssertContainsError("Configuration23.Topic.st1.t1",0, logger);
+		AssertContainsWarning("Configuration23.Topic.st1.t1",0, logger);
+	}
 	
 	// wenn die configuration: multiplicity=off und target=off gemacht wird, duerfen keine Fehler und Warnungen ausgegeben werden.
 	// Es muessen 2 Info-Meldungen ausgegeben werden.
@@ -1903,8 +1880,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==0);
+		AssertContainsError("Configuration23.Topic.st1.t1",0, logger);
+		AssertContainsWarning("Configuration23.Topic.st1.t1",0, logger);
 	}
 	
 	// wenn die configuration: multiplicity=warning und target=warning configuriert wird, duerfen keine Fehler ausgegeben werden.
@@ -1936,9 +1913,8 @@ public class Configuration23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-		assertTrue(logger.getWarn().size()==2);
-		assertEquals("t1 should associate 1 to 1 target objects (instead of 2)",logger.getWarn().get(0).getEventMsg());
-		assertEquals("No object found with OID o5 in basket b1.",logger.getWarn().get(1).getEventMsg());
+		AssertContainsError("Configuration23.Topic.st1.s1",0, logger);
+		AssertContainsWarning("t1 should associate 1 to 1 target objects (instead of 2)",1, logger);
+		AssertContainsWarning("No object found with OID o5 in basket b1.",1, logger);
 	}
 }

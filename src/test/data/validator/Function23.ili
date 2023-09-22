@@ -150,7 +150,7 @@ MODEL Function23
 		
 		CLASS ClassQ =
 			Art: (a, b, c);
-			SET CONSTRAINT WHERE Art == #a : (INTERLIS.objectCount(ALL)) == 2;
+			SET CONSTRAINT WHERE Art == #a : (INTERLIS.objectCount(ALL)) < 2;
 		END ClassQ;
 		
 		CLASS ClassR =

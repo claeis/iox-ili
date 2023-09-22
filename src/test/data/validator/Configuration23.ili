@@ -66,7 +66,7 @@ MODEL Configuration23 AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-03-07" 
 		CLASS ClassG =
 			Art: (a, b, c);
 			SET CONSTRAINT WHERE Art == #a :
-				INTERLIS.objectCount(ALL) == 5;
+				INTERLIS.objectCount(ALL) < 2;
 		END ClassG;
 		
 		CLASS ClassH =
