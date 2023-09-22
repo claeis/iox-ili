@@ -1249,29 +1249,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					constraintOutputReduction.add(setConstraint+":"+constraintName);
 					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateSetConstraint.validateSetConstraint"),getScopedName(setConstraint)));
 				}
-                Evaluable preCondition = (Evaluable) setConstraint.getPreCondition();
-                if(preCondition!=null) {
-                }else {
-                    if(objs==null) {
-                        objs=new HashSet<String>();
-                    }
-                }
-                Iterator<String> objIt=null;
-                if(objs==null){
-                    objIt=new HashSet<String>().iterator();
-                }else {
-                    objIt=objs.iterator();
-                }
-                String oid=null;
+                Iterator<String> objIt=setConstraints.get(setConstraint).iterator();
                 while(true){
+                	String oid=null;
                     if(objIt.hasNext()) {
                         oid=objIt.next();
                     }
-                    if(objs==null){
-                        allObjIterator=null;
-                    }else {
-                        allObjIterator=objs.iterator();
-                    }
+					allObjIterator=setConstraints.get(setConstraint).iterator();
                     IomObject iomObj=null;
                     if(oid!=null) {
                         iomObj=objectPool.getObject(oid, null, null);
@@ -1287,9 +1271,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     if (constraintValue.skipEvaluation()){
                         return;
                     }
-                    if (constraintValue.isTrue()){
-                        // ok
-                    } else {
+                    if (!constraintValue.isTrue()){
                         String actualLanguage = Locale.getDefault().getLanguage();
                         String msg = validationConfig.getConfigValue(getScopedName(setConstraint), ValidationConfig.MSG+"_"+actualLanguage);
                         if (msg == null) {
@@ -1730,12 +1712,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 			return getValueFromObjectPath(parentObject, iomObj, pathElements, firstRole);
 		} else if(expression instanceof Objects) {
-			// objects
-            if(allObjIterator==null){
-                //throw new IllegalStateException(rsrc.getString("evaluateExpression.argumentAllRequiresASetConstraint"));
-                return Value.createSkipEvaluation();
-           }
-
             // return cached value if available
             if (functions.containsKey(expression)) {
                 return functions.get(expression);
