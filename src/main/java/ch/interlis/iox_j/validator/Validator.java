@@ -892,7 +892,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 
 		for (SetConstraint setConstraint: setConstraints.keySet()){
-			if(setConstraint.getBasket()){
+			if(setConstraint.getBasket() && setConstraints.get(setConstraint) != null){
 				setConstraints.get(setConstraint).clear();
 			}
 		}
