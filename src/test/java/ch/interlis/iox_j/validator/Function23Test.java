@@ -2007,6 +2007,7 @@ public class Function23Test {
 
 		// asserts
 		assertEquals(0, logger.getErrs().size());
-		assertTrue(elapsedTime < 30000000000L); // 30 seconds
+		System.out.println(String.format("validator.doSecondPass() took %f seconds",elapsedTime / 1000000000.0));
+		assertTrue(String.format("Performance target not reached. Time was <%d>ns", elapsedTime), elapsedTime < 30000000000L); // 30 seconds
 	}
 }
