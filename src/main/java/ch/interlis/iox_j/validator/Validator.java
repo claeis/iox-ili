@@ -2162,129 +2162,65 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	/**
 	 * @deprecated
-	 * Use {@link #evaluateAreArea(IomObject, Value, PathEl[], PathEl[], Function, String)} instead.
+	 * Use {@link #evaluateAreArea(Value, PathEl[], PathEl[], Function, String)} instead.
 	 */
 	@Deprecated
 	public Value evaluateAreArea(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction) {
-		return evaluateAreArea(mainIomObj, value, pathToStructEle, pathToSurfaceAttr, currentFunction, null);
+		return evaluateAreArea(value, pathToStructEle, pathToSurfaceAttr, currentFunction, null);
 	}
 
-	public Value evaluateAreArea(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction, String validationKind) {
-		String mainObjTag=mainIomObj.getobjecttag();
-		if(pathToStructEle == null){
-			ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(mainObjTag, objPoolManager); // create new pool of polygons
-            ArrayList<IomObject> listOfPolygons = new ArrayList<IomObject>();
-			if(value.getViewable()!=null){
-				Iterator objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
-				while(objectIterator.hasNext()){
-					IomObject iomObj = (IomObject) objectIterator.next();
-                    Viewable iomObjClass = (Viewable) tag2class.get(iomObj.getobjecttag());
-                    if(value.getViewable().equals(iomObjClass)){
-                        getStructElesFromAttrPath(pathToSurfaceAttr, iomObj.getobjectoid(),listOfPolygons, iomObj, 0);
-                    }
-				}
-				// if objects.equals(anObjectClass) never equal, handling.
-			} else {
-				Iterator iterIomObjects = value.getComplexObjects().iterator(); 
-				while(iterIomObjects.hasNext()){
-					IomObject iomObj = (IomObject) iterIomObjects.next();
-                    getStructElesFromAttrPath(pathToSurfaceAttr, iomObj.getobjectoid(),listOfPolygons, iomObj, 0);
-				}
-			}
-            for (IomObject polygon : listOfPolygons) {
-                try {
-                    polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, errFact);
-                } catch (IoxException e) {
-                    EhiLogger.logError(e);  
-                }
-            }
-			List<IoxInvalidDataException> intersections=polygonPool.validate();
-			if(intersections!=null){
-	            if(!disableAreAreasMessages && intersections.size()>0){
-	                for(IoxInvalidDataException ex:intersections){ // iterate through non-overlay intersections
-	                    String tid1=ex.getTid();
-	                    String iliqname=ex.getIliqname();
-	                    errFact.setTid(tid1);
-	                    errFact.setIliqname(iliqname);
-	                    if(ex instanceof IoxIntersectionException) {
-	                        IoxIntersectionException intersectionEx = ((IoxIntersectionException) ex);
-	                        logMsg(areaOverlapValidation, intersectionEx);
-	                        EhiLogger.traceState(intersectionEx.toString());
-	                    }else {
-	                        logMsg(areaOverlapValidation, ex.getMessage());
-	                    }
-	                }
-	                setCurrentMainObj(null);
-	            }
-			    EhiLogger.traceState(mainObjTag+ ":" + currentFunction.getScopedName(null) + " returned false"); 
-			    // not a valid area topology
-			    return new Value(false); 
-			}
-			// valid areas
-			return new Value(true); 
+	public Value evaluateAreArea(Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction, String validationKind) {
+		ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable("", objPoolManager); // create new pool of polygons
+		ArrayList<IomObject> containingObjects = new ArrayList<IomObject>();
+
+		if (pathToStructEle == null) {
+			containingObjects = value.getComplexObjects() != null ? new ArrayList<IomObject>(value.getComplexObjects()) : new ArrayList<IomObject>();
 		} else {
-            // ASSERT: pathToStructEle is defined
-            ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(mainObjTag, objPoolManager);
-            ArrayList<IomObject> listOfPolygons = new ArrayList<IomObject>();
-            Iterator objectIterator=null;
-            Viewable classCriteria=null;
-            if(value.getViewable()!=null){
-                classCriteria=value.getViewable();
-                objectIterator = objectPool.getObjectsOfBasketId(currentBasketId).valueIterator();
-            }else {
-                objectIterator = value.getComplexObjects().iterator();
-            }
-            boolean returnValue=true;
-            while(objectIterator.hasNext()){
-                IomObject iomObj = (IomObject) objectIterator.next();
-                Viewable iomObjClass = (Viewable)tag2class.get(iomObj.getobjecttag());
-                if(classCriteria==null || classCriteria.equals(iomObjClass)){
-                    ArrayList<IomObject> complexObjects = new ArrayList<IomObject>();
-                    getStructElesFromAttrPath(pathToStructEle, iomObj.getobjectoid(),complexObjects, iomObj, 0);
-                    //Value currentValue = getValueFromObjectPath(null, iomObj, pathToStructEle, null);
-                    if (complexObjects.size()>0) {
-                        //Collection<IomObject> complexObjects = currentValue.getComplexObjects();
-                        for (IomObject currentObj : complexObjects) {
-                            getStructElesFromAttrPath(pathToSurfaceAttr, currentObj.getobjectoid(), listOfPolygons, currentObj, 0);
-                        }
-                    }
-                }
-            }
-
-            for (IomObject polygon : listOfPolygons) {
-                try {
-                    polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, errFact);
-                } catch (IoxException e) {
-                    EhiLogger.logError(e);
-                }
-            }
-
-            List<IoxInvalidDataException> intersections=polygonPool.validate();
-            if(intersections!=null) {
-                if(!disableAreAreasMessages && intersections.size()>0){
-                    for(IoxInvalidDataException ex:intersections){ // iterate through non-overlay intersections
-                        String tid1=ex.getTid();
-                        String iliqname=ex.getIliqname();
-                        errFact.setTid(tid1);
-                        errFact.setIliqname(iliqname);
-                        if(ex instanceof IoxIntersectionException) {
-                            IoxIntersectionException intersectionEx = ((IoxIntersectionException) ex);
-                            logMsg(areaOverlapValidation, intersectionEx);
-                            EhiLogger.traceState(intersectionEx.toString());
-                        }else {
-                            logMsg(areaOverlapValidation, ex.getMessage());
-                        }
-                    }
-                    setCurrentMainObj(null);
-                }
-
-                // short circuit; no need to further evaluate
-                EhiLogger.traceState(mainObjTag+ ":" + currentFunction.getScopedName(null) + " returned false");
-                return new Value(false);
-            }
-
-            return new Value(true);
+			Iterator<IomObject> iterIomObjects = value.getComplexObjects().iterator();
+			while (iterIomObjects.hasNext()) {
+				IomObject iomObj = iterIomObjects.next();
+				getStructElesFromAttrPath(pathToStructEle, iomObj.getobjectoid(), containingObjects, iomObj, 0);
+			}
 		}
+
+		ArrayList<IomObject> listOfPolygons = new ArrayList<IomObject>();
+		Iterator<IomObject> objectIterator = containingObjects.iterator();
+
+		while (objectIterator.hasNext()) {
+			IomObject iomObj = objectIterator.next();
+			getStructElesFromAttrPath(pathToSurfaceAttr, iomObj.getobjectoid(), listOfPolygons, iomObj, 0);
+		}
+
+		for (IomObject polygon : listOfPolygons) {
+			try {
+				polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, errFact);
+			} catch (IoxException e) {
+				EhiLogger.logError(e);
+			}
+		}
+
+		List<IoxInvalidDataException> intersections=polygonPool.validate();
+		if(intersections!=null){
+			if(!disableAreAreasMessages && intersections.size()>0){
+				for(IoxInvalidDataException ex:intersections){ // iterate through non-overlay intersections
+					String tid1=ex.getTid();
+					String iliqname=ex.getIliqname();
+					errFact.setTid(tid1);
+					errFact.setIliqname(iliqname);
+					if(ex instanceof IoxIntersectionException) {
+						IoxIntersectionException intersectionEx = ((IoxIntersectionException) ex);
+						logMsg(areaOverlapValidation, intersectionEx);
+						EhiLogger.traceState(intersectionEx.toString());
+					}else {
+						logMsg(areaOverlapValidation, ex.getMessage());
+					}
+				}
+				setCurrentMainObj(null);
+			}
+			EhiLogger.traceState(currentFunction.getScopedName() + " returned false");
+		}
+
+		return new Value(intersections == null || intersections.isEmpty());
 	}
 	
 	private void getStructElesFromAttrPath(PathEl[] attrPath, String oidPrefix,ArrayList<IomObject> listOfFoundStructEles, IomObject iomObj, int currentPathElIdx) {
