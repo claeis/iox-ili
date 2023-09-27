@@ -165,7 +165,7 @@ CONTRACTED MODEL AdditionalModelF AT "mailto:ceis@localhost" VERSION "2016-03-29
 			PROJECTION OF AdditionalConstraints23.Topic.ClassC;
 			=
 			ALL OF ClassC;
-			SET CONSTRAINT INTERLIS.objectCount(Numbers) == 2;
+			SET CONSTRAINT INTERLIS.objectCount(ALL) <> 1;
 		END AdditionalClassF;
 	END AdditionalTopicF;
 END AdditionalModelF.

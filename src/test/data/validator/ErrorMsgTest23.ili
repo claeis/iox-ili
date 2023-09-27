@@ -57,7 +57,7 @@ MODEL ErrorMsgTest23
 		CLASS ClassH =
 			Attr : TEXT;
 
-			SET CONSTRAINT Attr <> Attr;
+			SET CONSTRAINT INTERLIS.objectCount(ALL) < 2;
 			MANDATORY CONSTRAINT Attr <> Attr;
 			UNIQUE Attr;
 			CONSTRAINT <= 50% Attr == Attr;
@@ -69,8 +69,8 @@ MODEL ErrorMsgTest23
 			Attr : TEXT;
 
 			!!@ name = "DOROHIGE"
-			!!@ ilivalid.msg = "This is the custom message for object with Attr {Attr} and set constraint."
-			SET CONSTRAINT Attr <> Attr;
+			!!@ ilivalid.msg = "This is the custom message for a set constraint."
+			SET CONSTRAINT INTERLIS.objectCount(ALL) < 2;
 
 			!!@ name = "ENSINEPR"
 			!!@ ilivalid.msg = "This is the custom message for object with Attr {Attr} and mandatory constraint."

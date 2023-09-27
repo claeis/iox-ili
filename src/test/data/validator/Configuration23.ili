@@ -174,7 +174,7 @@ CONTRACTED MODEL AddSetConModel AT "mailto:ceis@localhost" VERSION "2016-03-29" 
 			PROJECTION OF Configuration23.Topic.ClassJ;
 			=
 			ALL OF ClassJ;
-			SET CONSTRAINT INTERLIS.objectCount(Numbers) == 2;
+			SET CONSTRAINT INTERLIS.objectCount(ALL) <> 2;
 		END AddSetConView;
 	END AddSetConTopic;
 END AddSetConModel.

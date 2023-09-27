@@ -1178,9 +1178,10 @@ public class Configuration23Test {
 		Iom_jObject iomObjStruct2=new Iom_jObject(STRUCTA, null);
 		Iom_jObject iomObjStruct3=new Iom_jObject(STRUCTA, null);
 		Iom_jObject iomObj=new Iom_jObject(CLASSJ, OID1);
+		Iom_jObject iomObj2=new Iom_jObject(CLASSJ, OID2);
 		iomObj.addattrobj("Numbers", iomObjStruct);
 		iomObj.addattrobj("Numbers", iomObjStruct2);
-		iomObj.addattrobj("Numbers", iomObjStruct3);
+		iomObj2.addattrobj("Numbers", iomObjStruct3);
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue("AddSetConModel.AddSetConTopic.AddSetConView"+".Constraint1", ValidationConfig.MSG, "");
 		LogCollector logger=new LogCollector();
@@ -1194,6 +1195,7 @@ public class Configuration23Test {
 		validator.validate(new ObjectEvent(iomObjStruct2));
 		validator.validate(new ObjectEvent(iomObjStruct3));
 		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new ObjectEvent(iomObj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
@@ -1208,9 +1210,10 @@ public class Configuration23Test {
 		Iom_jObject iomObjStruct2=new Iom_jObject(STRUCTA, null);
 		Iom_jObject iomObjStruct3=new Iom_jObject(STRUCTA, null);
 		Iom_jObject iomObj=new Iom_jObject(CLASSJ, OID1);
+		Iom_jObject iomObj2=new Iom_jObject(CLASSJ, OID2);
 		iomObj.addattrobj("Numbers", iomObjStruct);
 		iomObj.addattrobj("Numbers", iomObjStruct2);
-		iomObj.addattrobj("Numbers", iomObjStruct3);
+		iomObj2.addattrobj("Numbers", iomObjStruct3);
 		ValidationConfig modelConfig=new ValidationConfig();
 		modelConfig.setConfigValue("AddSetConModel.AddSetConTopic.AddSetConView"+".Constraint1", ValidationConfig.MSG, "This is my ErrorMessage.");
 		LogCollector logger=new LogCollector();
@@ -1224,6 +1227,7 @@ public class Configuration23Test {
 		validator.validate(new ObjectEvent(iomObjStruct2));
 		validator.validate(new ObjectEvent(iomObjStruct3));
 		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new ObjectEvent(iomObj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
