@@ -1221,7 +1221,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             SetConstraint setConstraint=(SetConstraint)cObj;
                             if(!setConstraints.containsKey(setConstraint)){
                                 // mark set constraint as seen
-                                setConstraints.put(setConstraint,null);
+                                setConstraints.put(setConstraint,new HashSet<String>());
                             }
                         }
                     }
@@ -1231,71 +1231,55 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
     }
 	
-	private void validateSetConstraint(SetConstraint setConstraint) {
-		if(!ValidationConfig.OFF.equals(constraintValidation)){
-			Collection<String> objs=setConstraints.get(setConstraint);
-			String constraintName = getScopedName(setConstraint);
-			String checkConstraint = null;
-			if(!enforceConstraintValidation){
-				checkConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
-			}
-			if(ValidationConfig.OFF.equals(checkConstraint)){
-				if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+getScopedName(setConstraint))){
-					configOffOufputReduction.add(ValidationConfig.CHECK+":"+getScopedName(setConstraint));
-					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateSetConstraint.validationConfigurationCheckOff"), getScopedName(setConstraint)));
-				}
-			}else{
-				if(!constraintOutputReduction.contains(setConstraint+":"+constraintName)){
-					constraintOutputReduction.add(setConstraint+":"+constraintName);
-					errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateSetConstraint.validateSetConstraint"),getScopedName(setConstraint)));
-				}
-                Iterator<String> objIt=setConstraints.get(setConstraint).iterator();
-                while(true){
-                	String oid=null;
-                    if(objIt.hasNext()) {
-                        oid=objIt.next();
-                    }
-					allObjIterator=setConstraints.get(setConstraint).iterator();
-                    IomObject iomObj=null;
-                    if(oid!=null) {
-                        iomObj=objectPool.getObject(oid, null, null);
-                        setCurrentMainObj(iomObj);
-                        errFact.setDefaultCoord(getDefaultCoord(iomObj));
-                    }
-                    Evaluable condition = (Evaluable) setConstraint.getCondition();
-                    Value constraintValue = evaluateExpression(null, checkConstraint, constraintName, iomObj, condition,null);
-                    if (constraintValue.isNotYetImplemented()){
-                        errs.addEvent(errFact.logWarningMsg(rsrc.getString("validateSetConstraint.functionInSetConstraintIsNotYetImplemented"), getScopedName(setConstraint)));
-                        return;
-                    }
-                    if (constraintValue.skipEvaluation()){
-                        return;
-                    }
-                    if (!constraintValue.isTrue()){
-                        String actualLanguage = Locale.getDefault().getLanguage();
-                        String msg = validationConfig.getConfigValue(getScopedName(setConstraint), ValidationConfig.MSG+"_"+actualLanguage);
-                        if (msg == null) {
-                            msg=validationConfig.getConfigValue(getScopedName(setConstraint), ValidationConfig.MSG);
-                        }
-                        if(msg!=null && msg.length()>0){
-                            if (isVerbose) {
-                                msg = String.format("%s %s", msg, getDisplayName(setConstraint));
-                            }
-                            logMsg(checkConstraint,msg);
-                        } else {
-                            if(!setConstraintOufputReduction.contains(setConstraint+":"+constraintName)){
-                                setConstraintOufputReduction.add(setConstraint+":"+constraintName);
-                                logMsg(checkConstraint,rsrc.getString("validateSetConstraint.setConstraintIsNotTrue"), getDisplayName(setConstraint));
-                            }
-                        }
-                    }
-                    if(!objIt.hasNext()) {
-                        break;
-                    }
+    private void validateSetConstraint(SetConstraint setConstraint) {
+        if(!ValidationConfig.OFF.equals(constraintValidation)){
+            Collection<String> objs=setConstraints.get(setConstraint);
+            String constraintName = getScopedName(setConstraint);
+            String checkConstraint = null;
+            if(!enforceConstraintValidation){
+                checkConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
+            }
+            if(ValidationConfig.OFF.equals(checkConstraint)){
+                if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+getScopedName(setConstraint))){
+                    configOffOufputReduction.add(ValidationConfig.CHECK+":"+getScopedName(setConstraint));
+                    errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateSetConstraint.validationConfigurationCheckOff"), getScopedName(setConstraint)));
                 }
-			}
-		}
-	}
+            }else{
+                if(!constraintOutputReduction.contains(setConstraint+":"+constraintName)){
+                    constraintOutputReduction.add(setConstraint+":"+constraintName);
+                    errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateSetConstraint.validateSetConstraint"),getScopedName(setConstraint)));
+                }
+                allObjIterator=setConstraints.get(setConstraint).iterator();
+                setCurrentMainObj(null);
+                errFact.setDefaultCoord(null);
+                Evaluable condition = setConstraint.getCondition();
+                Value constraintValue = evaluateExpression(null, checkConstraint, constraintName, null, condition,null);
+                if (constraintValue.isNotYetImplemented()){
+                    errs.addEvent(errFact.logWarningMsg(rsrc.getString("validateSetConstraint.functionInSetConstraintIsNotYetImplemented"), getScopedName(setConstraint)));
+                    return;
+                }
+                if (constraintValue.skipEvaluation()){
+                    return;
+                }
+                if (!constraintValue.isTrue() && !setConstraintOufputReduction.contains(setConstraint+":"+constraintName)){
+                    String actualLanguage = Locale.getDefault().getLanguage();
+                    String msg = validationConfig.getConfigValue(getScopedName(setConstraint), ValidationConfig.MSG+"_"+actualLanguage);
+                    if (msg == null) {
+                        msg=validationConfig.getConfigValue(getScopedName(setConstraint), ValidationConfig.MSG);
+                    }
+                    if(msg!=null && msg.length()>0){
+                        if (isVerbose) {
+                            msg = String.format("%s %s", msg, getDisplayName(setConstraint));
+                        }
+                        logMsg(checkConstraint,msg);
+                    } else {
+                        logMsg(checkConstraint,rsrc.getString("validateSetConstraint.setConstraintIsNotTrue"), getDisplayName(setConstraint));
+                    }
+                    setConstraintOufputReduction.add(setConstraint+":"+constraintName);
+                }
+            }
+        }
+    }
 	
 	private void validateMandatoryConstraint(IomObject parentObject, IomObject iomObj, MandatoryConstraint mandatoryConstraintObj,RoleDef firstRole) {
 		if(!ValidationConfig.OFF.equals(constraintValidation)){
