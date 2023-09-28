@@ -1324,7 +1324,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             }
                             logMsg(checkConstraint,msg);
                         } else {
-							String constraintIdentifier = setConstraint+":"+constraintName+(setConstraint.getBasket() ? ":Basket("+currentBasketId+")" : "");
+                            String constraintIdentifier = setConstraint+":"+constraintName+(setConstraint.getBasket() ? ":Basket("+currentBasketId+")" : "");
                             if(!setConstraintOufputReduction.contains(constraintIdentifier)){
                                 setConstraintOufputReduction.add(constraintIdentifier);
                                 logMsg(checkConstraint,rsrc.getString("validateSetConstraint.setConstraintIsNotTrue"), getDisplayName(setConstraint));
