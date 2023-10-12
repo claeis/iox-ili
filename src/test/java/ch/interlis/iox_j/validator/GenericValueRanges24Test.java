@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
+import static ch.interlis.iox_j.validator.LogCollectorAssertions.AssertContainsError;
 import static org.junit.Assert.assertEquals;
 
 public class GenericValueRanges24Test {
@@ -162,7 +163,7 @@ public class GenericValueRanges24Test {
         validator.validate(new EndTransferEvent());
 
         assertEquals(2, logger.getErrs().size());
-        LogCollectorAssertions.AssertContainsError("value 460002.000 is out of range in attribute attr1", 1, logger);
-        LogCollectorAssertions.AssertContainsError("value 45002.000 is out of range in attribute attr1", 1, logger);
+        AssertContainsError("value 460002.000 is out of range in attribute attr1", 1, logger);
+        AssertContainsError("value 45002.000 is out of range in attribute attr1", 1, logger);
     }
 }
