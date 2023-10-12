@@ -42,4 +42,10 @@ public class LogCollector implements ch.interlis.iox.IoxLogging {
 	public ArrayList<IoxLogEvent> getInfo() {
 		return info;
 	}
+
+	public void clear() {
+		errs.clear();
+		warn.clear();
+		info.clear();
+	}
 }
