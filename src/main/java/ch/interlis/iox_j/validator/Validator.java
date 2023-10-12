@@ -204,7 +204,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private IoxWriter writer=null;
     private long objectCount=0l;
     private long structCount=0l;
-	private Map<String, Domain> genericDomains = new HashMap<String, Domain>();
+	private final Map<String, Domain> genericDomains = new HashMap<String, Domain>();
 
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -450,7 +450,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private void cleanupCurrentBasket() {
         currentMainOid = null;
         errFact.setDataObj(null);
-        genericDomains = new HashMap<String, Domain>();
+        genericDomains.clear();
     }
     private void validateBasketEvent(ch.interlis.iox.StartBasketEvent event) {
         boolean isValid = true;
@@ -495,12 +495,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             }
         }
 
-        for (Entry<String, String> genericDomain : ((ch.interlis.iox_j.StartBasketEvent)event).getDomains().entrySet()) {
-            Element concreteDomain = td.getElement(genericDomain.getValue());
+        genericDomains.clear();
+        for (Entry<String, String> genericDomainAssignment : ((ch.interlis.iox_j.StartBasketEvent)event).getDomains().entrySet()) {
+            String genericDomainName = genericDomainAssignment.getKey();
+            String concreteDomainName = genericDomainAssignment.getValue();
+            Element concreteDomain = td.getElement(concreteDomainName);
             if (concreteDomain instanceof Domain) {
-                genericDomains.put(genericDomain.getKey(), (Domain) concreteDomain);
+                genericDomains.put(genericDomainName, (Domain) concreteDomain);
             } else {
-                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.genericDomainNotFound"), genericDomain.getValue(), genericDomain.getKey()));
+                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.genericDomainNotFound"), concreteDomainName, genericDomainName));
             }
         }
     }
