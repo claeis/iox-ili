@@ -1,41 +1,24 @@
 package ch.interlis.iox_j.validator;
 
 import ch.ehi.basics.settings.Settings;
-import ch.interlis.ili2c.Ili2cFailure;
-import ch.interlis.ili2c.config.Configuration;
-import ch.interlis.ili2c.config.FileEntry;
-import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
-import ch.interlis.iox_j.*;
+import ch.interlis.iox_j.EndBasketEvent;
+import ch.interlis.iox_j.EndTransferEvent;
+import ch.interlis.iox_j.ObjectEvent;
+import ch.interlis.iox_j.StartBasketEvent;
+import ch.interlis.iox_j.StartTransferEvent;
 import ch.interlis.iox_j.logging.LogEventFactory;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class GenericValueRanges24Test {
 
     private static final String DATA_DIRECTORY = "src/test/data/validator/GenericValueRanges/";
-
-    private TransferDescription compileIli(String filename) {
-        Configuration ili2cConfig = new Configuration();
-        FileEntry fileEntry = new FileEntry(filename, FileEntryKind.ILIMODELFILE);
-        ili2cConfig.addFileEntry(fileEntry);
-        TransferDescription td = null;
-        try {
-            td = ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
-        } catch (Ili2cFailure e) {
-            Assert.fail("Could not compile ili file <" + filename + ">: " + e.getMessage());
-        }
-        assertNotNull(td);
-
-        return td;
-    }
 
     private IomObject createTestClassIomObjectLv03(String tag) {
         IomObject iomObj = new Iom_jObject(tag, "o1");
@@ -46,7 +29,7 @@ public class GenericValueRanges24Test {
 
     @Test
     public void missingContext() {
-        TransferDescription td = compileIli(DATA_DIRECTORY + "MissingContext24.ili");
+        TransferDescription td = ValidatorTestHelper.compileIliFile(DATA_DIRECTORY + "MissingContext24.ili");
 
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
@@ -65,7 +48,7 @@ public class GenericValueRanges24Test {
 
     @Test
     public void nonExistentDomainInBasket() {
-        TransferDescription td = compileIli(DATA_DIRECTORY + "GenericValueRanges24.ili");
+        TransferDescription td = ValidatorTestHelper.compileIliFile(DATA_DIRECTORY + "GenericValueRanges24.ili");
         HashMap<String, String> genericDomains = new HashMap<String, String>();
         genericDomains.put("MultiCrs24.Coord", "notExistingDomain");
 
@@ -85,7 +68,7 @@ public class GenericValueRanges24Test {
 
     @Test
     public void invalidDomainInBasket() {
-        TransferDescription td = compileIli(DATA_DIRECTORY + "GenericValueRanges24.ili");
+        TransferDescription td = ValidatorTestHelper.compileIliFile(DATA_DIRECTORY + "GenericValueRanges24.ili");
         HashMap<String, String> genericDomains = new HashMap<String, String>();
         genericDomains.put("MultiCrs24.Coord", "MultiCrs24.Coord_Other");
 
@@ -106,7 +89,7 @@ public class GenericValueRanges24Test {
 
     @Test
     public void domainInBasket() {
-        TransferDescription td = compileIli(DATA_DIRECTORY + "GenericValueRanges24.ili");
+        TransferDescription td = ValidatorTestHelper.compileIliFile(DATA_DIRECTORY + "GenericValueRanges24.ili");
         HashMap<String, String> genericDomains = new HashMap<String, String>();
         genericDomains.put("MultiCrs24.Coord", "MultiCrs24.Coord_LV03");
 
@@ -126,7 +109,7 @@ public class GenericValueRanges24Test {
 
     @Test
     public void oneDomainInContext() {
-        TransferDescription td = compileIli(DATA_DIRECTORY + "GenericValueRangesMultipleModels24.ili");
+        TransferDescription td = ValidatorTestHelper.compileIliFile(DATA_DIRECTORY + "GenericValueRangesMultipleModels24.ili");
 
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
@@ -144,7 +127,7 @@ public class GenericValueRanges24Test {
 
     @Test
     public void deferredDomainMissingInTransfer() {
-        TransferDescription td = compileIli(DATA_DIRECTORY + "GenericValueRanges24.ili");
+        TransferDescription td = ValidatorTestHelper.compileIliFile(DATA_DIRECTORY + "GenericValueRanges24.ili");
 
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
@@ -163,7 +146,7 @@ public class GenericValueRanges24Test {
 
     @Test
     public void wrongObjectCoordinates() {
-        TransferDescription td = compileIli(DATA_DIRECTORY + "GenericValueRanges24.ili");
+        TransferDescription td = ValidatorTestHelper.compileIliFile(DATA_DIRECTORY + "GenericValueRanges24.ili");
         HashMap<String, String> genericDomains = new HashMap<String, String>();
         genericDomains.put("MultiCrs24.Coord", "MultiCrs24.Coord_LV95");
 
