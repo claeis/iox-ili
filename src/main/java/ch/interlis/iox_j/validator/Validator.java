@@ -17,6 +17,8 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import ch.interlis.ili2c.generator.Interlis2Generator;
+import ch.interlis.ili2c.metamodel.DomainConstraint;
+import ch.interlis.ili2c.metamodel.ValueRefThis;
 import com.vividsolutions.jts.geom.Coordinate;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
@@ -1753,7 +1755,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             Value listOfIomObjectsValue = new Value(listOfIomObjects);
             functions.put(expression, listOfIomObjectsValue);
             return listOfIomObjectsValue;
-        } else if(expression instanceof ParameterValue) {
+        } else if (expression instanceof ValueRefThis) {
+			Domain domain = (Domain) td.getElement(iomObj.getobjecttag());
+			String value = iomObj.getattrvalue("Value");
+			return new Value(domain.getType(), value);
+		} else if(expression instanceof ParameterValue) {
             ParameterValue paramValue=(ParameterValue)expression;
             String paramName=paramValue.getParameter().getScopedName();
             String value=(String)td.getActualRuntimeParameter(paramName);
@@ -4094,9 +4100,29 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         }
                     }
                 }
+                if (attr.getDomain() instanceof TypeAlias) {
+                    Domain domain = ((TypeAlias) attr.getDomain()).getAliasing();
+                    String rootDomainName = domain.getScopedName(null);
+
+                    while (domain != null) {
+                        Iterator<DomainConstraint> iterator = domain.iterator();
+                        while (iterator.hasNext()){
+                            DomainConstraint constraint = iterator.next();
+                            Iom_jObject iomValueObject = new Iom_jObject(rootDomainName, null);
+                            iomValueObject.setattrvalue("Value", iomObj.getattrprim(attrName, structi));
+
+                            Value result = evaluateExpression(null, constraint.getScopedName(), rootDomainName, iomValueObject, constraint.getCondition(), null);
+
+                            if (!result.isTrue()){
+                                logMsg(validateType, rsrc.getString("validateAttrValue.attributeXDoesNotSatisfyTheDomainConstraintY"), attrPath, constraint.getScopedName());
+                            }
+                        }
+                        domain = domain.getExtending();
+                    }
+                }
             }
-		}
-	}
+        }
+    }
 
     static private Cardinality getCardinality(AttributeDef attr) { // move to ili2c
         Type type=attr.getDomainOrDerivedDomain();

@@ -41,7 +41,7 @@ public class DomainDef24Test {
 
         logger.clear();
         validateObjectUnderTest("DomainText", "This String has over 30 characters.");
-        AssertContainsError(domainText, 1, logger);
+        AssertContainsError("Attribute DomainText is length restricted to 30", 1, logger);
 
     }
 
@@ -53,7 +53,7 @@ public class DomainDef24Test {
 
         logger.clear();
         validateObjectUnderTest(domainTextRestrictedThis, "Not the required Constant");
-        AssertContainsError(domainTextRestrictedThis, 1, logger);
+        AssertContainsError("Attribute DomainTextRestrictedThis does not satisfy the domain constraint ModelA.TopicA.DomainTextRestrictedThis.Values", 1, logger);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class DomainDef24Test {
 
         logger.clear();
         validateObjectUnderTest(domainConstraintThisFunction, "Too few chars");
-        AssertContainsError(domainConstraintThisFunction, 1, logger);
+        AssertContainsError("Attribute DomainConstraintThisFunction does not satisfy the domain constraint ModelA.TopicA.DomainConstraintThisFunction.Length", 1, logger);
     }
 
     @Test
@@ -75,15 +75,16 @@ public class DomainDef24Test {
 
         logger.clear();
         validateObjectUnderTest(domainMultiConstraintsNumeric, "9");
-        AssertContainsError(domainMultiConstraintsNumeric, 1, logger);
+        AssertContainsError("Attribute DomainMultiConstraintsNumeric does not satisfy the domain constraint ModelA.TopicA.DomainMultiConstraintsNumeric.Min", 1, logger);
 
         logger.clear();
         validateObjectUnderTest(domainMultiConstraintsNumeric, "101");
-        AssertContainsError(domainMultiConstraintsNumeric, 1, logger);
+        AssertContainsError("Attribute DomainMultiConstraintsNumeric does not satisfy the domain constraint ModelA.TopicA.DomainMultiConstraintsNumeric.Max100", 1, logger);
 
         logger.clear();
         validateObjectUnderTest(domainMultiConstraintsNumeric, "201");
-        AssertContainsError(domainMultiConstraintsNumeric, 2, logger);
+        AssertContainsError("value 201 is out of range in attribute DomainMultiConstraintsNumeric", 1, logger);
+        AssertContainsError("Attribute DomainMultiConstraintsNumeric does not satisfy the domain constraint ModelA.TopicA.DomainMultiConstraintsNumeric.Max100", 1, logger);
     }
 
     @Test
@@ -94,19 +95,22 @@ public class DomainDef24Test {
 
         logger.clear();
         validateObjectUnderTest(domainExtends, "9");
-        AssertContainsError(domainExtends, 1, logger);
+        AssertContainsError("Attribute DomainExtends does not satisfy the domain constraint ModelA.TopicA.DomainMultiConstraintsNumeric.Min", 1, logger);
 
         logger.clear();
         validateObjectUnderTest(domainExtends, "51");
-        AssertContainsError(domainExtends, 1, logger);
+        AssertContainsError("Attribute DomainExtends does not satisfy the domain constraint ModelA.TopicA.DomainExtends.Max50", 1, logger);
 
         logger.clear();
         validateObjectUnderTest(domainExtends, "101");
-        AssertContainsError(domainExtends, 2, logger);
+        AssertContainsError("Attribute DomainExtends does not satisfy the domain constraint ModelA.TopicA.DomainExtends.Max50", 1, logger);
+        AssertContainsError("Attribute DomainExtends does not satisfy the domain constraint ModelA.TopicA.DomainMultiConstraintsNumeric.Max100", 1, logger);
 
         logger.clear();
         validateObjectUnderTest(domainExtends, "151");
-        AssertContainsError(domainExtends, 3, logger);
+        AssertContainsError("value 151 is out of range in attribute DomainExtends", 1, logger);
+        AssertContainsError("Attribute DomainExtends does not satisfy the domain constraint ModelA.TopicA.DomainExtends.Max50", 1, logger);
+        AssertContainsError("Attribute DomainExtends does not satisfy the domain constraint ModelA.TopicA.DomainMultiConstraintsNumeric.Max100", 1, logger);
     }
 
     private void validateObjectUnderTest(String attributeName, String attributeValue) {
