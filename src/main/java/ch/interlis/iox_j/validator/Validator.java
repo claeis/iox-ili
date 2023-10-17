@@ -1756,10 +1756,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             functions.put(expression, listOfIomObjectsValue);
             return listOfIomObjectsValue;
         } else if (expression instanceof ValueRefThis) {
-			Domain domain = (Domain) td.getElement(iomObj.getobjecttag());
-			String value = iomObj.getattrvalue("Value");
-			return new Value(domain.getType(), value);
-		} else if(expression instanceof ParameterValue) {
+            Domain domain = (Domain) td.getElement(iomObj.getobjecttag());
+            String value = iomObj.getattrvalue("Value");
+            return new Value(domain.getType(), value);
+        } else if(expression instanceof ParameterValue) {
             ParameterValue paramValue=(ParameterValue)expression;
             String paramName=paramValue.getParameter().getScopedName();
             String value=(String)td.getActualRuntimeParameter(paramName);
