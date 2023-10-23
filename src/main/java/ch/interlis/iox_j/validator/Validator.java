@@ -871,13 +871,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 			for(SetConstraint setConstraint:setConstraints.keySet()){
-				if(setConstraint.getBasket()){
+				if(setConstraint.perBasket()){
 					validateSetConstraint(setConstraint);
 				}
 			}
 		}
 		for(SetConstraint setConstraint:setConstraints.keySet()){
-			if(!setConstraint.getBasket()) {
+			if(!setConstraint.perBasket()) {
 				validateSetConstraint(setConstraint);
 			}
 		}
@@ -886,13 +886,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private void UpdateCurrentBasket(String basketId) {
 		currentBasketId = basketId;
 		for (UniquenessConstraint uniquenessConstraint: seenUniqueConstraintValues.keySet()) {
-			if (uniquenessConstraint.getBasket()){
+			if (uniquenessConstraint.perBasket()){
 				seenUniqueConstraintValues.get(uniquenessConstraint).clear();
 			}
 		}
 
 		for (SetConstraint setConstraint: setConstraints.keySet()){
-			if(setConstraint.getBasket() && setConstraints.get(setConstraint) != null){
+			if(setConstraint.perBasket() && setConstraints.get(setConstraint) != null){
 				setConstraints.get(setConstraint).clear();
 			}
 		}
@@ -1324,7 +1324,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             }
                             logMsg(checkConstraint,msg);
                         } else {
-                            String constraintIdentifier = setConstraint+":"+constraintName+(setConstraint.getBasket() ? ":Basket("+currentBasketId+")" : "");
+                            String constraintIdentifier = setConstraint+":"+constraintName+(setConstraint.perBasket() ? ":Basket("+currentBasketId+")" : "");
                             if(!setConstraintOufputReduction.contains(constraintIdentifier)){
                                 setConstraintOufputReduction.add(constraintIdentifier);
                                 logMsg(checkConstraint,rsrc.getString("validateSetConstraint.setConstraintIsNotTrue"), getDisplayName(setConstraint));
