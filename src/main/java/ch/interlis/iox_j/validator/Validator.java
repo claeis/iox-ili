@@ -4239,7 +4239,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private boolean validateSurfaceTopology(String validateType, AttributeDef attr,SurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
 		boolean surfaceTopologyValid=true;
 		try {
-			surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, errFact,validateType);
+			AbstractCoordType coordType = resolveGenericCoordTypeOfSurface(validateType, attr);
+			if (coordType == null) {
+				return false;
+			}
+			surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, errFact, validateType, coordType);
 		} catch (IoxException e) {
 			surfaceTopologyValid=false;
 			errs.addEvent(errFact.logErrorMsg(e, rsrc.getString("validateSurfaceTopology.failedToValidatePolygon")));
@@ -4249,14 +4253,28 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private boolean validateMultiSurfaceTopology(String validateType, AttributeDef attr,MultiSurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
         boolean surfaceTopologyValid=true;
         try {
-            surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validateMultiPolygon(mainObjTid, attr, iomValue, errFact,validateType);
+            AbstractCoordType coordType = resolveGenericCoordTypeOfSurface(validateType, attr);
+            if (coordType == null) {
+                return false;
+            }
+            surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validateMultiPolygon(mainObjTid, attr, iomValue, errFact, validateType, coordType);
         } catch (IoxException e) {
             surfaceTopologyValid=false;
             errs.addEvent(errFact.logErrorMsg(e, rsrc.getString("validateSurfaceTopology.failedToValidatePolygon")));
         }
         return surfaceTopologyValid;
     }
-	
+
+    private AbstractCoordType resolveGenericCoordTypeOfSurface(String validateType, AttributeDef attr) {
+        AbstractSurfaceOrAreaType surfaceType = (AbstractSurfaceOrAreaType) attr.getDomainResolvingAliases();
+        Domain coordDomain = surfaceType.getControlPointDomain();
+        AbstractCoordType coordType = (AbstractCoordType) coordDomain.getType();
+        if (coordType.isGeneric()) {
+            coordType = resolveGenericCoordType(validateType, (Model) attr.getContainer(Model.class), coordDomain);
+        }
+        return coordType;
+    }
+
 	private void validatePolylineTopology(String attrPath,String validateType, LineType type, IomObject iomValue) {
 		CompoundCurve seg=null;
 		try {
