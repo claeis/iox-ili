@@ -763,7 +763,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		for (String basketId : objectPool.getBasketIds()){
 			// iterate through iomObjects
 			Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
-			UpdateCurrentBasket(basketId);
+			updateCurrentBasket(basketId);
 			while (objectIterator.hasNext()){
 				IomObject iomObj = objectIterator.next();
 				if(iomObj!=null){
@@ -883,7 +883,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private void UpdateCurrentBasket(String basketId) {
+	private void updateCurrentBasket(String basketId) {
 		currentBasketId = basketId;
 		for (UniquenessConstraint uniquenessConstraint: seenUniqueConstraintValues.keySet()) {
 			if (uniquenessConstraint.perBasket()){
