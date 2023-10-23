@@ -454,6 +454,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     }
     private void validateBasketEvent(ch.interlis.iox.StartBasketEvent event) {
         boolean isValid = true;
+        Topic topic = null;
+        Model model = null;
         errFact.setTid(event.getBid());
         errFact.setIliqname(event.getType());
 	    if (!isValidTopicName(event.getType())) {
@@ -467,8 +469,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
         Domain bidDomain=null;
         if(isValid) {
-            Topic topic = (Topic)td.getElement(event.getType());
-            Model model=(Model) topic.getContainer();
+            topic = (Topic)td.getElement(event.getType());
+            model = (Model) topic.getContainer();
             seenModels.add(model.getName());
             collectSetConstraints(topic);
             bidDomain=topic.getBasketOid();
@@ -496,18 +498,61 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
 
         genericDomains.clear();
-        for (Entry<String, String> genericDomainAssignment : ((ch.interlis.iox_j.StartBasketEvent)event).getDomains().entrySet()) {
-            String genericDomainName = genericDomainAssignment.getKey();
-            String concreteDomainName = genericDomainAssignment.getValue();
-            Element concreteDomain = td.getElement(concreteDomainName);
-            if (concreteDomain instanceof Domain) {
-                genericDomains.put(genericDomainName, (Domain) concreteDomain);
-            } else {
-                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.genericDomainNotFound"), concreteDomainName, genericDomainName));
+        if (isValid) {
+            for (Entry<String, String> genericDomainAssignment : ((ch.interlis.iox_j.StartBasketEvent) event).getDomains().entrySet()) {
+                String genericDomainName = genericDomainAssignment.getKey();
+                Element genericDomain = td.getElement(genericDomainName);
+                if (!(genericDomain instanceof Domain)) {
+                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.genericDomainNotFound"), genericDomainName));
+                    continue;
+                }
+
+                String concreteDomainName = genericDomainAssignment.getValue();
+                Element concreteDomain = td.getElement(concreteDomainName);
+                if (concreteDomain instanceof Domain) {
+                    if (validateDeferredGeneric(model, topic, (Domain) genericDomain, (Domain) concreteDomain)) {
+                        genericDomains.put(genericDomainName, (Domain) concreteDomain);
+                    }
+                } else {
+                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.concreteDomainNotFound"), concreteDomainName, genericDomainName));
+                }
             }
         }
     }
-	
+
+    private static <T> boolean arrayContains(T[] array, T value) {
+        for (T object : array) {
+            if (object == value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean validateDeferredGeneric(Model model, Topic topic, Domain genericDomain, Domain concreteDomain) {
+        Type genericType = genericDomain.getType();
+        if (!(genericType instanceof AbstractCoordType) || !((AbstractCoordType)genericType).isGeneric()) {
+            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.domainNotGeneric"), genericDomain.toString()));
+            return false;
+        }
+        if (!arrayContains(topic.getDefferedGenerics(), genericDomain)) {
+            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.genericNotDeferred"), genericDomain.toString()));
+            return false;
+        }
+
+        // resolve generic domain from contexts in model
+        Domain[] resolved = model.resolveGenericDomain(genericDomain);
+        if (resolved == null) {
+            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateCoordType.missingContext"), genericDomain.toString()));
+            return false;
+        }
+        if (!arrayContains(resolved, concreteDomain)) {
+            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateCoordType.invalidDomain"), concreteDomain.toString(), genericDomain.toString()));
+            return false;
+        }
+        return true;
+    }
+
     private boolean isAValidBasketOID(Domain domain, String bid) {
 
         Type type = domain.getType();
@@ -4362,23 +4407,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	private AbstractCoordType resolveGenericCoordType(String validateType, Model model, Domain coordDomain) {
+		// search deferred generic in transfer
+		Domain concreteDomain = genericDomains.get(coordDomain.getScopedName());
+		if (concreteDomain != null) {
+			return (AbstractCoordType) concreteDomain.getType();
+		}
+
 		// resolve generic domain from contexts in model
 		Domain[] resolved = model.resolveGenericDomain(coordDomain);
 		if (resolved == null) {
 			logMsg(validateType, rsrc.getString("validateCoordType.missingContext"), coordDomain.toString());
-			return null;
-		}
-
-		// search deferred generic in transfer
-		Domain concreteDomain = genericDomains.get(coordDomain.getScopedName());
-		if (concreteDomain != null) {
-			for (Domain domain : resolved) {
-				if (domain == concreteDomain) {
-					return (AbstractCoordType) concreteDomain.getType();
-				}
-			}
-
-			logMsg(validateType, rsrc.getString("validateCoordType.invalidDomain"), concreteDomain.toString(), coordDomain.toString());
 			return null;
 		}
 
