@@ -1,8 +1,8 @@
 package ch.interlis.models.IlisMeta16.ModelData;
 public class CompoundExpr_Operation{
-  static private java.util.HashMap valuev=new java.util.HashMap();
+  static protected java.util.HashMap valuev=new java.util.HashMap();
   private String value=null;
-  private CompoundExpr_Operation(String value) {
+  protected CompoundExpr_Operation(String value) {
     this.value=value;
     valuev.put(value,this);
   }
@@ -22,6 +22,10 @@ public class CompoundExpr_Operation{
   public final static String tag_Mult="Mult";
   static public CompoundExpr_Operation Div=new CompoundExpr_Operation("Div");
   public final static String tag_Div="Div";
+  static public CompoundExpr_Operation Plus=new CompoundExpr_Operation("Plus");
+  public final static String tag_Plus="Plus";
+  static public CompoundExpr_Operation Minus=new CompoundExpr_Operation("Minus");
+  public final static String tag_Minus="Minus";
   static public CompoundExpr_Operation Relation_Equal=new CompoundExpr_Operation("Relation.Equal");
   public final static String tag_Relation_Equal="Relation.Equal";
   static public CompoundExpr_Operation Relation_NotEqual=new CompoundExpr_Operation("Relation.NotEqual");

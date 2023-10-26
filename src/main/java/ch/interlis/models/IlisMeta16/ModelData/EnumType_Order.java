@@ -1,8 +1,8 @@
 package ch.interlis.models.IlisMeta16.ModelData;
 public class EnumType_Order{
-  static private java.util.HashMap valuev=new java.util.HashMap();
+  static protected java.util.HashMap valuev=new java.util.HashMap();
   private String value=null;
-  private EnumType_Order(String value) {
+  protected EnumType_Order(String value) {
     this.value=value;
     valuev.put(value,this);
   }

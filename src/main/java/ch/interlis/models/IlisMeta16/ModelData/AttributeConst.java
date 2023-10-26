@@ -5,6 +5,9 @@ public class AttributeConst extends ch.interlis.models.IlisMeta16.ModelData.Fact
   public AttributeConst() {
     super();
   }
+  protected AttributeConst(String oid) {
+    super(oid);
+  }
   public String getobjecttag() {
     return tag;
   }

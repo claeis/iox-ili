@@ -11,25 +11,49 @@ public class Dependency extends ch.interlis.iom_j.Iom_jObject
   public final static String tag_Using="Using";
   public String getUsing() {
     ch.interlis.iom.IomObject value=getattrobj("Using",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setUsing(String oid) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("Using","REF");
+  public String setUsing(String oid) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("Using",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("Using","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("Using",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
+    return oldoid;
   }
   public final static String tag_Dependent="Dependent";
   public String getDependent() {
     ch.interlis.iom.IomObject value=getattrobj("Dependent",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setDependent(String oid) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("Dependent","REF");
+  public String setDependent(String oid) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("Dependent",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("Dependent","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("Dependent",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
+    return oldoid;
   }
 }

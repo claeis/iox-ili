@@ -11,25 +11,49 @@ public class Type extends ch.interlis.models.IlisMeta16.ModelData.ExtendableME
   public final static String tag_LFTParent="LFTParent";
   public String getLFTParent() {
     ch.interlis.iom.IomObject value=getattrobj("LFTParent",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setLFTParent(String oid) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("LFTParent","REF");
+  public String setLFTParent(String oid) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("LFTParent",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("LFTParent","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("LFTParent",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
+    return oldoid;
   }
   public final static String tag_LTParent="LTParent";
   public String getLTParent() {
     ch.interlis.iom.IomObject value=getattrobj("LTParent",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setLTParent(String oid) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("LTParent","REF");
+  public String setLTParent(String oid) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("LTParent",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("LTParent","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("LTParent",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
+    return oldoid;
   }
 }

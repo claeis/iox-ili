@@ -5,6 +5,9 @@ public class UnitRef extends ch.interlis.models.IlisMeta16.ModelData.Factor
   public UnitRef() {
     super();
   }
+  protected UnitRef(String oid) {
+    super(oid);
+  }
   public String getobjecttag() {
     return tag;
   }

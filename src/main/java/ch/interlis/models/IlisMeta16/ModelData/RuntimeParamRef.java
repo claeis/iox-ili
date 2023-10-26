@@ -5,6 +5,9 @@ public class RuntimeParamRef extends ch.interlis.models.IlisMeta16.ModelData.Fac
   public RuntimeParamRef() {
     super();
   }
+  protected RuntimeParamRef(String oid) {
+    super(oid);
+  }
   public String getobjecttag() {
     return tag;
   }

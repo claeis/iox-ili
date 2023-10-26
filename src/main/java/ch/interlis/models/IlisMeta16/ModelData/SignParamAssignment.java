@@ -5,6 +5,9 @@ public class SignParamAssignment extends ch.interlis.iom_j.Iom_jObject
   public SignParamAssignment() {
     super(tag,null);
   }
+  protected SignParamAssignment(String oid) {
+    super(tag,oid);
+  }
   public String getobjecttag() {
     return tag;
   }
@@ -21,7 +24,10 @@ public class SignParamAssignment extends ch.interlis.iom_j.Iom_jObject
     structvalue.setobjectrefoid(oid);
   }
   public final static String tag_Assignment="Assignment";
+  public int sizeAssignment() {return getattrvaluecount("Assignment");}
   public ch.interlis.models.IlisMeta16.ModelData.Expression getAssignment() {
+    int size=getattrvaluecount("Assignment");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelData.Expression value=(ch.interlis.models.IlisMeta16.ModelData.Expression)getattrobj("Assignment",0);
     return value;
   }

@@ -11,13 +11,25 @@ public class LineForm extends ch.interlis.models.IlisMeta16.ModelData.MetaElemen
   public final static String tag_Structure="Structure";
   public String getStructure() {
     ch.interlis.iom.IomObject value=getattrobj("Structure",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setStructure(String oid) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("Structure","REF");
+  public String setStructure(String oid) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("Structure",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("Structure","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("Structure",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
+    return oldoid;
   }
 }

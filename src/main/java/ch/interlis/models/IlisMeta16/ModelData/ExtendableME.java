@@ -35,13 +35,25 @@ public class ExtendableME extends ch.interlis.models.IlisMeta16.ModelData.MetaEl
   public final static String tag_Super="Super";
   public String getSuper() {
     ch.interlis.iom.IomObject value=getattrobj("Super",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setSuper(String oid) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("Super","REF");
+  public String setSuper(String oid) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("Super",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("Super","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("Super",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
+    return oldoid;
   }
 }

@@ -20,6 +20,7 @@ public class Translation extends ch.interlis.iom_j.Iom_jObject
   public int sizeTranslations() {return getattrvaluecount("Translations");}
   public ch.interlis.models.IlisMeta16.ModelTranslation.METranslation[] getTranslations() {
     int size=getattrvaluecount("Translations");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelTranslation.METranslation value[]=new ch.interlis.models.IlisMeta16.ModelTranslation.METranslation[size];
     for(int i=0;i<size;i++){
       value[i]=(ch.interlis.models.IlisMeta16.ModelTranslation.METranslation)getattrobj("Translations",i);

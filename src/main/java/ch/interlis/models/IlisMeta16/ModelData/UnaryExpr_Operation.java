@@ -1,8 +1,8 @@
 package ch.interlis.models.IlisMeta16.ModelData;
 public class UnaryExpr_Operation{
-  static private java.util.HashMap valuev=new java.util.HashMap();
+  static protected java.util.HashMap valuev=new java.util.HashMap();
   private String value=null;
-  private UnaryExpr_Operation(String value) {
+  protected UnaryExpr_Operation(String value) {
     this.value=value;
     valuev.put(value,this);
   }

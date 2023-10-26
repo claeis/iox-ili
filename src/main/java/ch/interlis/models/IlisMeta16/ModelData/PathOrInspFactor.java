@@ -5,6 +5,9 @@ public class PathOrInspFactor extends ch.interlis.models.IlisMeta16.ModelData.Fa
   public PathOrInspFactor() {
     super();
   }
+  protected PathOrInspFactor(String oid) {
+    super(oid);
+  }
   public String getobjecttag() {
     return tag;
   }
@@ -12,6 +15,7 @@ public class PathOrInspFactor extends ch.interlis.models.IlisMeta16.ModelData.Fa
   public int sizePathEls() {return getattrvaluecount("PathEls");}
   public ch.interlis.models.IlisMeta16.ModelData.PathEl[] getPathEls() {
     int size=getattrvaluecount("PathEls");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelData.PathEl value[]=new ch.interlis.models.IlisMeta16.ModelData.PathEl[size];
     for(int i=0;i<size;i++){
       value[i]=(ch.interlis.models.IlisMeta16.ModelData.PathEl)getattrobj("PathEls",i);
