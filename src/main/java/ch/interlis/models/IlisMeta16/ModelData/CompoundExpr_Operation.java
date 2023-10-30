@@ -22,10 +22,10 @@ public class CompoundExpr_Operation{
   public final static String tag_Mult="Mult";
   static public CompoundExpr_Operation Div=new CompoundExpr_Operation("Div");
   public final static String tag_Div="Div";
-  static public CompoundExpr_Operation Plus=new CompoundExpr_Operation("Plus");
-  public final static String tag_Plus="Plus";
-  static public CompoundExpr_Operation Minus=new CompoundExpr_Operation("Minus");
-  public final static String tag_Minus="Minus";
+  static public CompoundExpr_Operation Add=new CompoundExpr_Operation("Add");
+  public final static String tag_Add="Add";
+  static public CompoundExpr_Operation Sub=new CompoundExpr_Operation("Sub");
+  public final static String tag_Sub="Sub";
   static public CompoundExpr_Operation Relation_Equal=new CompoundExpr_Operation("Relation.Equal");
   public final static String tag_Relation_Equal="Relation.Equal";
   static public CompoundExpr_Operation Relation_NotEqual=new CompoundExpr_Operation("Relation.NotEqual");

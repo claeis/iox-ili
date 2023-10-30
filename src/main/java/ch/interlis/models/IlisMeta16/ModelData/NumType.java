@@ -66,6 +66,11 @@ public class NumType extends ch.interlis.models.IlisMeta16.ModelData.DomainType
     if(oid==null)return null;
     return oid;
   }
+  public ch.interlis.iom.IomObject getRefSysObj() {
+    ch.interlis.iom.IomObject value=getattrobj("RefSys",0);
+    if(value==null)return null;
+    return value;
+  }
   public String setRefSys(String oid) {
     ch.interlis.iom.IomObject structvalue=getattrobj("RefSys",0);
     if(structvalue==null){
@@ -81,6 +86,20 @@ public class NumType extends ch.interlis.models.IlisMeta16.ModelData.DomainType
     String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
     return oldoid;
+  }
+  public ch.interlis.iom.IomObject setRefSysObj(String oid,ch.interlis.models.IlisMeta16.ModelData.NumsRefSys structvalue) {
+    ch.interlis.iom.IomObject structvalue0=getattrobj("RefSys",0);
+    if(structvalue0==null){
+      if(oid==null)return null;
+      addattrobj("RefSys",structvalue);
+    }else{
+      if(oid==null){
+        deleteattrobj("RefSys",0);
+        return structvalue0;
+      }
+    }
+    structvalue.setobjectrefoid(oid);
+    return structvalue0;
   }
   public final static String tag_Unit="Unit";
   public String getUnit() {

@@ -2,8 +2,8 @@ package ch.interlis.models.IlisMeta16.ModelData;
 public class AllowedInBasket extends ch.interlis.iom_j.Iom_jObject
 {
   public final static String tag= "IlisMeta16.ModelData.AllowedInBasket";
-  public AllowedInBasket(String oid) {
-    super(tag,oid);
+  public AllowedInBasket() {
+    super(tag,null);
   }
   public String getobjecttag() {
     return tag;

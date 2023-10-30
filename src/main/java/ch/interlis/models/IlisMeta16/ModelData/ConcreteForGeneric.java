@@ -2,8 +2,8 @@ package ch.interlis.models.IlisMeta16.ModelData;
 public class ConcreteForGeneric extends ch.interlis.iom_j.Iom_jObject
 {
   public final static String tag= "IlisMeta16.ModelData.ConcreteForGeneric";
-  public ConcreteForGeneric(String oid) {
-    super(tag,oid);
+  public ConcreteForGeneric() {
+    super(tag,null);
   }
   public String getobjecttag() {
     return tag;

@@ -2,8 +2,8 @@ package ch.interlis.models.IlisMeta16.ModelData;
 public class ExistenceDef extends ch.interlis.iom_j.Iom_jObject
 {
   public final static String tag= "IlisMeta16.ModelData.ExistenceDef";
-  public ExistenceDef(String oid) {
-    super(tag,oid);
+  public ExistenceDef() {
+    super(tag,null);
   }
   public String getobjecttag() {
     return tag;

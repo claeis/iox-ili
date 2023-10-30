@@ -2,8 +2,8 @@ package ch.interlis.models.IlisMeta16.ModelData;
 public class Import extends ch.interlis.iom_j.Iom_jObject
 {
   public final static String tag= "IlisMeta16.ModelData.Import";
-  public Import(String oid) {
-    super(tag,oid);
+  public Import() {
+    super(tag,null);
   }
   public String getobjecttag() {
     return tag;

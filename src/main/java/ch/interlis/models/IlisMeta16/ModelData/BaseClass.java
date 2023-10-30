@@ -2,8 +2,8 @@ package ch.interlis.models.IlisMeta16.ModelData;
 public class BaseClass extends ch.interlis.iom_j.Iom_jObject
 {
   public final static String tag= "IlisMeta16.ModelData.BaseClass";
-  public BaseClass(String oid) {
-    super(tag,oid);
+  public BaseClass() {
+    super(tag,null);
   }
   public String getobjecttag() {
     return tag;

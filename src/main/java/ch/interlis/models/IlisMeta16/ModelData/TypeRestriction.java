@@ -2,8 +2,8 @@ package ch.interlis.models.IlisMeta16.ModelData;
 public class TypeRestriction extends ch.interlis.iom_j.Iom_jObject
 {
   public final static String tag= "IlisMeta16.ModelData.TypeRestriction";
-  public TypeRestriction(String oid) {
-    super(tag,oid);
+  public TypeRestriction() {
+    super(tag,null);
   }
   public String getobjecttag() {
     return tag;

@@ -2,8 +2,8 @@ package ch.interlis.models.IlisMeta16.ModelData;
 public class AssocAcc extends ch.interlis.iom_j.Iom_jObject
 {
   public final static String tag= "IlisMeta16.ModelData.AssocAcc";
-  public AssocAcc(String oid) {
-    super(tag,oid);
+  public AssocAcc() {
+    super(tag,null);
   }
   public String getobjecttag() {
     return tag;

@@ -2,8 +2,8 @@ package ch.interlis.models.IlisMeta16.ModelData;
 public class Dependency extends ch.interlis.iom_j.Iom_jObject
 {
   public final static String tag= "IlisMeta16.ModelData.Dependency";
-  public Dependency(String oid) {
-    super(tag,oid);
+  public Dependency() {
+    super(tag,null);
   }
   public String getobjecttag() {
     return tag;

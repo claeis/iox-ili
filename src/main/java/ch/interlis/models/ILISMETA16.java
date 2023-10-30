@@ -4,19 +4,19 @@ public class ILISMETA16{
   public final static String MODEL= "IlisMeta16";
   public final static String ModelData= "IlisMeta16.ModelData";
   public final static String ModelTranslation= "IlisMeta16.ModelTranslation";
-  public static ch.interlis.iom_j.xtf.XtfModel getXtfModel(){ return new ch.interlis.iom_j.xtf.XtfModel("IlisMeta16","http://models.interlis.ch","2023-10-26ceis"); }
+  public static ch.interlis.iom_j.xtf.XtfModel getXtfModel(){ return new ch.interlis.iom_j.xtf.XtfModel("IlisMeta16","http://models.interlis.ch","2023-10-30ceis"); }
   static public ch.interlis.iox.IoxFactory getIoxFactory()
   {
     return new ch.interlis.iox.IoxFactory(){
       public ch.interlis.iom.IomObject createIomObject(String type,String oid) throws ch.interlis.iox.IoxException {
       if(type.equals("IlisMeta16.ModelData.Multiplicity"))return new ch.interlis.models.IlisMeta16.ModelData.Multiplicity();
       if(type.equals("IlisMeta16.ModelData.CompoundExpr"))return new ch.interlis.models.IlisMeta16.ModelData.CompoundExpr();
-      if(type.equals("IlisMeta16.ModelData.Import"))return new ch.interlis.models.IlisMeta16.ModelData.Import(oid);
+      if(type.equals("IlisMeta16.ModelData.Import"))return new ch.interlis.models.IlisMeta16.ModelData.Import();
       if(type.equals("IlisMeta16.ModelData.ObjectType"))return new ch.interlis.models.IlisMeta16.ModelData.ObjectType(oid);
       if(type.equals("IlisMeta16.ModelData.TextType"))return new ch.interlis.models.IlisMeta16.ModelData.TextType(oid);
-      if(type.equals("IlisMeta16.ModelData.AssocAcc"))return new ch.interlis.models.IlisMeta16.ModelData.AssocAcc(oid);
+      if(type.equals("IlisMeta16.ModelData.AssocAcc"))return new ch.interlis.models.IlisMeta16.ModelData.AssocAcc();
       if(type.equals("IlisMeta16.ModelData.AnyOIDType"))return new ch.interlis.models.IlisMeta16.ModelData.AnyOIDType(oid);
-      if(type.equals("IlisMeta16.ModelData.ARefRestriction"))return new ch.interlis.models.IlisMeta16.ModelData.ARefRestriction(oid);
+      if(type.equals("IlisMeta16.ModelData.ARefRestriction"))return new ch.interlis.models.IlisMeta16.ModelData.ARefRestriction();
       if(type.equals("IlisMeta16.ModelData.FunctionCall"))return new ch.interlis.models.IlisMeta16.ModelData.FunctionCall();
       if(type.equals("IlisMeta16.ModelData.Context"))return new ch.interlis.models.IlisMeta16.ModelData.Context(oid);
       if(type.equals("IlisMeta16.ModelTranslation.DocTextTranslation"))return new ch.interlis.models.IlisMeta16.ModelTranslation.DocTextTranslation();
@@ -24,7 +24,7 @@ public class ILISMETA16{
       if(type.equals("IlisMeta16.ModelData.DataUnit"))return new ch.interlis.models.IlisMeta16.ModelData.DataUnit(oid);
       if(type.equals("IlisMeta16.ModelTranslation.Translation"))return new ch.interlis.models.IlisMeta16.ModelTranslation.Translation(oid);
       if(type.equals("IlisMeta16.ModelData.ClassConst"))return new ch.interlis.models.IlisMeta16.ModelData.ClassConst();
-      if(type.equals("IlisMeta16.ModelData.TransferElement"))return new ch.interlis.models.IlisMeta16.ModelData.TransferElement(oid);
+      if(type.equals("IlisMeta16.ModelData.TransferElement"))return new ch.interlis.models.IlisMeta16.ModelData.TransferElement();
       if(type.equals("IlisMeta16.ModelData.Unit"))return new ch.interlis.models.IlisMeta16.ModelData.Unit(oid);
       if(type.equals("IlisMeta16.ModelData.CoordType"))return new ch.interlis.models.IlisMeta16.ModelData.CoordType(oid);
       if(type.equals("IlisMeta16.ModelData.EnumNode"))return new ch.interlis.models.IlisMeta16.ModelData.EnumNode(oid);
@@ -32,18 +32,18 @@ public class ILISMETA16{
       if(type.equals("IlisMeta16.ModelData.DrawingRule"))return new ch.interlis.models.IlisMeta16.ModelData.DrawingRule(oid);
       if(type.equals("IlisMeta16.ModelData.DocText"))return new ch.interlis.models.IlisMeta16.ModelData.DocText();
       if(type.equals("IlisMeta16.ModelData.MultiValue"))return new ch.interlis.models.IlisMeta16.ModelData.MultiValue(oid);
-      if(type.equals("IlisMeta16.ModelData.AllowedInBasket"))return new ch.interlis.models.IlisMeta16.ModelData.AllowedInBasket(oid);
+      if(type.equals("IlisMeta16.ModelData.AllowedInBasket"))return new ch.interlis.models.IlisMeta16.ModelData.AllowedInBasket();
       if(type.equals("IlisMeta16.ModelData.PathOrInspFactor"))return new ch.interlis.models.IlisMeta16.ModelData.PathOrInspFactor();
       if(type.equals("IlisMeta16.ModelData.ActualArgument"))return new ch.interlis.models.IlisMeta16.ModelData.ActualArgument();
-      if(type.equals("IlisMeta16.ModelData.ConcreteForGeneric"))return new ch.interlis.models.IlisMeta16.ModelData.ConcreteForGeneric(oid);
+      if(type.equals("IlisMeta16.ModelData.ConcreteForGeneric"))return new ch.interlis.models.IlisMeta16.ModelData.ConcreteForGeneric();
       if(type.equals("IlisMeta16.ModelData.Graphic"))return new ch.interlis.models.IlisMeta16.ModelData.Graphic(oid);
       if(type.equals("IlisMeta16.ModelData.Constraint"))return new ch.interlis.models.IlisMeta16.ModelData.Constraint(oid);
       if(type.equals("IlisMeta16.ModelData.View"))return new ch.interlis.models.IlisMeta16.ModelData.View(oid);
       if(type.equals("IlisMeta16.ModelData.UnitFunction"))return new ch.interlis.models.IlisMeta16.ModelData.UnitFunction();
-      if(type.equals("IlisMeta16.ModelData.TypeRestriction"))return new ch.interlis.models.IlisMeta16.ModelData.TypeRestriction(oid);
+      if(type.equals("IlisMeta16.ModelData.TypeRestriction"))return new ch.interlis.models.IlisMeta16.ModelData.TypeRestriction();
       if(type.equals("IlisMeta16.ModelData.LineType"))return new ch.interlis.models.IlisMeta16.ModelData.LineType(oid);
       if(type.equals("IlisMeta16.ModelTranslation.METranslation"))return new ch.interlis.models.IlisMeta16.ModelTranslation.METranslation();
-      if(type.equals("IlisMeta16.ModelData.Dependency"))return new ch.interlis.models.IlisMeta16.ModelData.Dependency(oid);
+      if(type.equals("IlisMeta16.ModelData.Dependency"))return new ch.interlis.models.IlisMeta16.ModelData.Dependency();
       if(type.equals("IlisMeta16.ModelData.Expression"))return new ch.interlis.models.IlisMeta16.ModelData.Expression();
       if(type.equals("IlisMeta16.ModelData.ClassRef"))return new ch.interlis.models.IlisMeta16.ModelData.ClassRef();
       if(type.equals("IlisMeta16.ModelData.ExistenceConstraint"))return new ch.interlis.models.IlisMeta16.ModelData.ExistenceConstraint(oid);
@@ -71,14 +71,14 @@ public class ILISMETA16{
       if(type.equals("IlisMeta16.ModelData.ExtendableME"))return new ch.interlis.models.IlisMeta16.ModelData.ExtendableME(oid);
       if(type.equals("IlisMeta16.ModelData.ReferenceType"))return new ch.interlis.models.IlisMeta16.ModelData.ReferenceType(oid);
       if(type.equals("IlisMeta16.ModelData.Ili1Format"))return new ch.interlis.models.IlisMeta16.ModelData.Ili1Format();
-      if(type.equals("IlisMeta16.ModelData.Ili1TransferElement"))return new ch.interlis.models.IlisMeta16.ModelData.Ili1TransferElement(oid);
+      if(type.equals("IlisMeta16.ModelData.Ili1TransferElement"))return new ch.interlis.models.IlisMeta16.ModelData.Ili1TransferElement();
       if(type.equals("IlisMeta16.ModelData.Class"))return new ch.interlis.models.IlisMeta16.ModelData.Class(oid);
       if(type.equals("IlisMeta16.ModelData.AttributeRefType"))return new ch.interlis.models.IlisMeta16.ModelData.AttributeRefType(oid);
-      if(type.equals("IlisMeta16.ModelData.BaseClass"))return new ch.interlis.models.IlisMeta16.ModelData.BaseClass(oid);
-      if(type.equals("IlisMeta16.ModelData.ClassRestriction"))return new ch.interlis.models.IlisMeta16.ModelData.ClassRestriction(oid);
+      if(type.equals("IlisMeta16.ModelData.BaseClass"))return new ch.interlis.models.IlisMeta16.ModelData.BaseClass();
+      if(type.equals("IlisMeta16.ModelData.ClassRestriction"))return new ch.interlis.models.IlisMeta16.ModelData.ClassRestriction();
       if(type.equals("IlisMeta16.ModelData.MetaBasketDef"))return new ch.interlis.models.IlisMeta16.ModelData.MetaBasketDef(oid);
-      if(type.equals("IlisMeta16.ModelData.AxisSpec"))return new ch.interlis.models.IlisMeta16.ModelData.AxisSpec(oid);
-      if(type.equals("IlisMeta16.ModelData.LinesForm"))return new ch.interlis.models.IlisMeta16.ModelData.LinesForm(oid);
+      if(type.equals("IlisMeta16.ModelData.AxisSpec"))return new ch.interlis.models.IlisMeta16.ModelData.AxisSpec();
+      if(type.equals("IlisMeta16.ModelData.LinesForm"))return new ch.interlis.models.IlisMeta16.ModelData.LinesForm();
       if(type.equals("IlisMeta16.ModelData.SetConstraint"))return new ch.interlis.models.IlisMeta16.ModelData.SetConstraint(oid);
       if(type.equals("IlisMeta16.ModelData.LineForm"))return new ch.interlis.models.IlisMeta16.ModelData.LineForm(oid);
       if(type.equals("IlisMeta16.ModelData.DomainType"))return new ch.interlis.models.IlisMeta16.ModelData.DomainType(oid);
@@ -663,7 +663,9 @@ public class ILISMETA16{
     nameMap.put("IlisMeta16.ModelData.LocalFType", "LocalFType");
     mapping.defineClass("IlisMeta16.ModelData.LocalFType", new String[]{  });
     nameMap.put("IlisMeta16.ModelData.GenericDef", "GenericDef");
-    mapping.defineClass("IlisMeta16.ModelData.GenericDef", new String[]{  });
+    mapping.defineClass("IlisMeta16.ModelData.GenericDef", new String[]{   "Context"
+      ,"GenericDomain"
+      });
     nameMap.put("IlisMeta16.ModelData.ResultType", "ResultType");
     mapping.defineClass("IlisMeta16.ModelData.ResultType", new String[]{  });
     nameMap.put("IlisMeta16.ModelData.Ili1Format", "Ili1Format");

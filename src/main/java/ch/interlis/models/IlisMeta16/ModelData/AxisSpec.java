@@ -2,8 +2,8 @@ package ch.interlis.models.IlisMeta16.ModelData;
 public class AxisSpec extends ch.interlis.iom_j.Iom_jObject
 {
   public final static String tag= "IlisMeta16.ModelData.AxisSpec";
-  public AxisSpec(String oid) {
-    super(tag,oid);
+  public AxisSpec() {
+    super(tag,null);
   }
   public String getobjecttag() {
     return tag;

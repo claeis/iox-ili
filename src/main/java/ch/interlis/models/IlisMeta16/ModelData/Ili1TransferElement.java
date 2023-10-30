@@ -2,8 +2,8 @@ package ch.interlis.models.IlisMeta16.ModelData;
 public class Ili1TransferElement extends ch.interlis.iom_j.Iom_jObject
 {
   public final static String tag= "IlisMeta16.ModelData.Ili1TransferElement";
-  public Ili1TransferElement(String oid) {
-    super(tag,oid);
+  public Ili1TransferElement() {
+    super(tag,null);
   }
   public String getobjecttag() {
     return tag;

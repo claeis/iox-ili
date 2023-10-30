@@ -65,6 +65,11 @@ public class Class extends ch.interlis.models.IlisMeta16.ModelData.Type
     if(oid==null)return null;
     return oid;
   }
+  public ch.interlis.iom.IomObject getExistenceConstraintObj() {
+    ch.interlis.iom.IomObject value=getattrobj("ExistenceConstraint",0);
+    if(value==null)return null;
+    return value;
+  }
   public String setExistenceConstraint(String oid) {
     ch.interlis.iom.IomObject structvalue=getattrobj("ExistenceConstraint",0);
     if(structvalue==null){
@@ -80,6 +85,20 @@ public class Class extends ch.interlis.models.IlisMeta16.ModelData.Type
     String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
     return oldoid;
+  }
+  public ch.interlis.iom.IomObject setExistenceConstraintObj(String oid,ch.interlis.models.IlisMeta16.ModelData.ExistenceDef structvalue) {
+    ch.interlis.iom.IomObject structvalue0=getattrobj("ExistenceConstraint",0);
+    if(structvalue0==null){
+      if(oid==null)return null;
+      addattrobj("ExistenceConstraint",structvalue);
+    }else{
+      if(oid==null){
+        deleteattrobj("ExistenceConstraint",0);
+        return structvalue0;
+      }
+    }
+    structvalue.setobjectrefoid(oid);
+    return structvalue0;
   }
   public final static String tag_Oid="Oid";
   public String getOid() {
