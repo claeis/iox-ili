@@ -57,49 +57,6 @@ public class Class extends ch.interlis.models.IlisMeta16.ModelData.Type
     if(value==null){setattrundefined("ili1OptionalTable");return;}
     setattrvalue("ili1OptionalTable", value?"true":"false");
   }
-  public final static String tag_ExistenceConstraint="ExistenceConstraint";
-  public String getExistenceConstraint() {
-    ch.interlis.iom.IomObject value=getattrobj("ExistenceConstraint",0);
-    if(value==null)return null;
-    String oid=value.getobjectrefoid();
-    if(oid==null)return null;
-    return oid;
-  }
-  public ch.interlis.iom.IomObject getExistenceConstraintObj() {
-    ch.interlis.iom.IomObject value=getattrobj("ExistenceConstraint",0);
-    if(value==null)return null;
-    return value;
-  }
-  public String setExistenceConstraint(String oid) {
-    ch.interlis.iom.IomObject structvalue=getattrobj("ExistenceConstraint",0);
-    if(structvalue==null){
-      if(oid==null)return null;
-      structvalue=addattrobj("ExistenceConstraint","REF");
-    }else{
-      if(oid==null){
-        String oldoid=structvalue.getobjectrefoid();
-        deleteattrobj("ExistenceConstraint",0);
-        return oldoid;
-      }
-    }
-    String oldoid=structvalue.getobjectrefoid();
-    structvalue.setobjectrefoid(oid);
-    return oldoid;
-  }
-  public ch.interlis.iom.IomObject setExistenceConstraintObj(String oid,ch.interlis.models.IlisMeta16.ModelData.ExistenceDef structvalue) {
-    ch.interlis.iom.IomObject structvalue0=getattrobj("ExistenceConstraint",0);
-    if(structvalue0==null){
-      if(oid==null)return null;
-      addattrobj("ExistenceConstraint",structvalue);
-    }else{
-      if(oid==null){
-        deleteattrobj("ExistenceConstraint",0);
-        return structvalue0;
-      }
-    }
-    structvalue.setobjectrefoid(oid);
-    return structvalue0;
-  }
   public final static String tag_Oid="Oid";
   public String getOid() {
     ch.interlis.iom.IomObject value=getattrobj("Oid",0);

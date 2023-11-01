@@ -23,4 +23,18 @@ public class ExistenceConstraint extends ch.interlis.models.IlisMeta16.ModelData
       addattrobj("Attr", value);
     }
   }
+  public final static String tag_RequiredIn="RequiredIn";
+  public int sizeRequiredIn() {return getattrvaluecount("RequiredIn");}
+  public ch.interlis.models.IlisMeta16.ModelData.ExistenceDef[] getRequiredIn() {
+    int size=getattrvaluecount("RequiredIn");
+    if(size==0)return null;
+    ch.interlis.models.IlisMeta16.ModelData.ExistenceDef value[]=new ch.interlis.models.IlisMeta16.ModelData.ExistenceDef[size];
+    for(int i=0;i<size;i++){
+      value[i]=(ch.interlis.models.IlisMeta16.ModelData.ExistenceDef)getattrobj("RequiredIn",i);
+    }
+    return value;
+  }
+  public void addRequiredIn(ch.interlis.models.IlisMeta16.ModelData.ExistenceDef value) {
+    addattrobj("RequiredIn", value);
+  }
 }

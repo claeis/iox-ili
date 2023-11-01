@@ -18,6 +18,7 @@ public class ILISMETA16{
       if(type.equals("IlisMeta16.ModelData.AnyOIDType"))return new ch.interlis.models.IlisMeta16.ModelData.AnyOIDType(oid);
       if(type.equals("IlisMeta16.ModelData.ARefRestriction"))return new ch.interlis.models.IlisMeta16.ModelData.ARefRestriction();
       if(type.equals("IlisMeta16.ModelData.FunctionCall"))return new ch.interlis.models.IlisMeta16.ModelData.FunctionCall();
+      if(type.equals("IlisMeta16.ModelData.ExistenceDef"))return new ch.interlis.models.IlisMeta16.ModelData.ExistenceDef();
       if(type.equals("IlisMeta16.ModelData.Context"))return new ch.interlis.models.IlisMeta16.ModelData.Context(oid);
       if(type.equals("IlisMeta16.ModelTranslation.DocTextTranslation"))return new ch.interlis.models.IlisMeta16.ModelTranslation.DocTextTranslation();
       if(type.equals("IlisMeta16.ModelData.Role"))return new ch.interlis.models.IlisMeta16.ModelData.Role(oid);
@@ -178,7 +179,8 @@ public class ILISMETA16{
       ,"Arguments"
       });
     nameMap.put("IlisMeta16.ModelData.ExistenceDef", "ExistenceDef");
-    mapping.defineClass("IlisMeta16.ModelData.ExistenceDef", new String[]{   "Attr"
+    mapping.defineClass("IlisMeta16.ModelData.ExistenceDef", new String[]{   "ExistsIn"
+      ,"Attr"
       });
     nameMap.put("IlisMeta16.ModelData.Context", "Context");
     mapping.defineClass("IlisMeta16.ModelData.Context", new String[]{   "Name"
@@ -384,7 +386,6 @@ public class ILISMETA16{
       ,"Multiplicity"
       ,"EmbeddedRoleTransfer"
       ,"ili1OptionalTable"
-      ,"ExistenceConstraint"
       ,"Oid"
       ,"View"
       ,"FormationKind"
@@ -440,6 +441,7 @@ public class ILISMETA16{
       ,"ToClass"
       ,"ToDomain"
       ,"Attr"
+      ,"RequiredIn"
       });
     nameMap.put("IlisMeta16.ModelData.RenamedBaseView", "RenamedBaseView");
     mapping.defineClass("IlisMeta16.ModelData.RenamedBaseView", new String[]{   "Name"
@@ -699,7 +701,6 @@ public class ILISMETA16{
       ,"Multiplicity"
       ,"EmbeddedRoleTransfer"
       ,"ili1OptionalTable"
-      ,"ExistenceConstraint"
       ,"Oid"
       ,"View"
       });
