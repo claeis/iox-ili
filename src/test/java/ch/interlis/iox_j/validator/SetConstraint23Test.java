@@ -1,6 +1,7 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+import static ch.interlis.iox_j.validator.LogCollectorAssertions.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -183,7 +184,8 @@ public class SetConstraint23Test {
         validator.validate(new StartBasketEvent(TOPICB,BID1));
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
-        assertTrue(logger.getErrs().size()==0);
+        assertTrue(logger.getErrs().size()==1);
+		AssertContainsError("SetConstraint23.TopicB.Class1.Constraint1", 1, logger);
     }
 
 	@Test

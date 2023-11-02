@@ -176,8 +176,9 @@ public class AdditionalConstraints23Test {
 		Iom_jObject iomObjStruct=new Iom_jObject(STRUCTA, null);
 		Iom_jObject iomObjStruct2=new Iom_jObject(STRUCTA, null);
 		Iom_jObject iomObj=new Iom_jObject(CLASSC, OID1);
+		Iom_jObject iomObj2=new Iom_jObject(CLASSC, OID2);
 		iomObj.addattrobj("Numbers", iomObjStruct);
-		iomObj.addattrobj("Numbers", iomObjStruct2);
+		iomObj2.addattrobj("Numbers", iomObjStruct2);
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -189,6 +190,7 @@ public class AdditionalConstraints23Test {
 		validator.validate(new ObjectEvent(iomObjStruct));
 		validator.validate(new ObjectEvent(iomObjStruct2));
 		validator.validate(new ObjectEvent(iomObj));
+		validator.validate(new ObjectEvent(iomObj2));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts

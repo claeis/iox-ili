@@ -368,7 +368,7 @@ public class ErrorMsg23Test {
 		assertLogContainsMessage(logger.getErrs(), "Mandatory Constraint ErrorMsgTest23.Topic.ClassH.Constraint2 (MANDATORY CONSTRAINT Attr <> Attr;) is not true.");
 		assertLogContainsMessage(logger.getErrs(), "Unique constraint ErrorMsgTest23.Topic.ClassH.Constraint3 (UNIQUE Attr;) is violated! Values OLOGBENS already exist in Object: o1");
 		assertLogContainsMessage(logger.getErrs(), "Existence constraint ErrorMsgTest23.Topic.ClassH.Constraint6 (EXISTENCE CONSTRAINT Attr REQUIRED IN ErrorMsgTest23.Topic.ClassA:attrA2;) is violated! The value of the attribute Attr of ErrorMsgTest23.Topic.ClassH was not found in the condition class.");
-		assertLogContainsMessage(logger.getErrs(), "Set Constraint ErrorMsgTest23.Topic.ClassH.Constraint1 (SET CONSTRAINT Attr <> Attr;) is not true.");
+		assertLogContainsMessage(logger.getErrs(), "Set Constraint ErrorMsgTest23.Topic.ClassH.Constraint1 (SET CONSTRAINT INTERLIS.objectCount (<<ERROR>>) < 2;) is not true.");
 		assertLogContainsMessage(logger.getErrs(), "Plausibility Constraint ErrorMsgTest23.Topic.ClassH.Constraint4 (CONSTRAINT <= 50.0% Attr == Attr;) is not true.");
 		assertLogContainsMessage(logger.getErrs(), "Plausibility Constraint ErrorMsgTest23.Topic.ClassH.Constraint5 (CONSTRAINT >= 50.0% Attr <> Attr;) is not true.");
 	}
@@ -386,11 +386,11 @@ public class ErrorMsg23Test {
 		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassI.BROLETON...");
 		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassI.LDESCREF...");
 
-		assertEquals(9, logger.getErrs().size());
+		assertEquals(8, logger.getErrs().size());
 		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and mandatory constraint.");
 		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and existence constraint.");
 		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and unique.");
-		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and set constraint.");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message for a set constraint.");
 		assertLogContainsMessage(logger.getErrs(), "This is the custom message and plausibility constraint (<=).");
 		assertLogContainsMessage(logger.getErrs(), "This is the custom message and plausibility constraint (>=).");
 	}
@@ -409,11 +409,11 @@ public class ErrorMsg23Test {
 		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassI.BROLETON...");
 		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassI.LDESCREF...");
 
-		assertEquals(9, logger.getErrs().size());
+		assertEquals(8, logger.getErrs().size());
 		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and mandatory constraint. ErrorMsgTest23.Topic.ClassI.ENSINEPR (MANDATORY CONSTRAINT Attr <> Attr;)");
 		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and existence constraint. ErrorMsgTest23.Topic.ClassI.ORTERINE (EXISTENCE CONSTRAINT Attr REQUIRED IN ErrorMsgTest23.Topic.ClassA:attrA2;)");
 		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and unique. ErrorMsgTest23.Topic.ClassI.UPENDESA (UNIQUE Attr;)");
-		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and set constraint. ErrorMsgTest23.Topic.ClassI.DOROHIGE (SET CONSTRAINT Attr <> Attr;)");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message for a set constraint. ErrorMsgTest23.Topic.ClassI.DOROHIGE (SET CONSTRAINT INTERLIS.objectCount (<<ERROR>>) < 2;)");
 		assertLogContainsMessage(logger.getErrs(), "This is the custom message and plausibility constraint (<=). ErrorMsgTest23.Topic.ClassI.BROLETON (CONSTRAINT <= 50.0% Attr == Attr;)");
 		assertLogContainsMessage(logger.getErrs(), "This is the custom message and plausibility constraint (>=). ErrorMsgTest23.Topic.ClassI.LDESCREF (CONSTRAINT >= 50.0% Attr <> Attr;)");
 	}
