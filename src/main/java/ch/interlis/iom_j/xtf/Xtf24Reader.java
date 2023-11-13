@@ -970,6 +970,14 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                 if(!xmlreader.peek().isEndElement()) {
                     event=skipSpacesAndGetNextEvent(event);
                 }
+            } else if (attrStartElement.getAttributeByName(QNAME_ILI_REF) != null) {
+                // reference
+                readReference(viewable, iomObj, attrStartElement, prop, null);
+                event = xmlreader.nextEvent();
+                event = skipSpacesAndGetNextEvent(event);
+                if (!xmlreader.peek().isEndElement()) {
+                    event = skipSpacesAndGetNextEvent(event);
+                }
             }else if(prop instanceof AttributeDef){
                 event=xmlreader.nextEvent(); // after start attribute
                 event=skipCommentary(event);
