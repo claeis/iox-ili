@@ -764,6 +764,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		for (String basketId : objectPool.getBasketIds()){
 			// iterate through iomObjects
 			Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
+			updateCurrentBasket(basketId);
 			while (objectIterator.hasNext()){
 				IomObject iomObj = objectIterator.next();
 				if(iomObj!=null){
@@ -870,11 +871,34 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 				}
 			}
+			for(SetConstraint setConstraint:setConstraints.keySet()){
+				if(setConstraint.perBasket()){
+					validateSetConstraint(setConstraint);
+				}
+			}
 		}
 		for(SetConstraint setConstraint:setConstraints.keySet()){
-			validateSetConstraint(setConstraint);
+			if(!setConstraint.perBasket()) {
+				validateSetConstraint(setConstraint);
+			}
 		}
 	}
+
+	private void updateCurrentBasket(String basketId) {
+		currentBasketId = basketId;
+		for (UniquenessConstraint uniquenessConstraint: seenUniqueConstraintValues.keySet()) {
+			if (uniquenessConstraint.perBasket()){
+				seenUniqueConstraintValues.get(uniquenessConstraint).clear();
+			}
+		}
+
+		for (SetConstraint setConstraint: setConstraints.keySet()){
+			if(setConstraint.perBasket() && setConstraints.get(setConstraint) != null){
+				setConstraints.get(setConstraint).clear();
+			}
+		}
+	}
+
 	private void validateConstraints(IomObject iomObj, Viewable classOfIomObj) {
 		if(!ValidationConfig.OFF.equals(constraintValidation)){
 			Viewable classOfCurrentObj=classOfIomObj;
@@ -978,7 +1002,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         if (propc >= 1) {
             IomObject embeddedLinkObj = iomObj.getattrobj(role.getName(), 0);
             AssociationDef roleOwner = (AssociationDef) role.getContainer();
-
             Viewable classOfCurrentObj = roleOwner;
             if (classOfCurrentObj != null) {
                 String iomObjOid = iomObj.getobjectoid();
@@ -1084,8 +1107,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(!ValidationConfig.OFF.equals(constraintValidation)){
 			String constraintName = getScopedName(uniquenessConstraint);
 			String checkUniqueConstraint=null;
-			if(!enforceConstraintValidation){
-				checkUniqueConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
+			if(!enforceConstraintValidation) {
+				checkUniqueConstraint = validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
 			}
 			if(ValidationConfig.OFF.equals(checkUniqueConstraint)){
 				if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
@@ -1302,8 +1325,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             }
                             logMsg(checkConstraint,msg);
                         } else {
-                            if(!setConstraintOufputReduction.contains(setConstraint+":"+constraintName)){
-                                setConstraintOufputReduction.add(setConstraint+":"+constraintName);
+                            String constraintIdentifier = setConstraint+":"+constraintName+(setConstraint.perBasket() ? ":Basket("+currentBasketId+")" : "");
+                            if(!setConstraintOufputReduction.contains(constraintIdentifier)){
+                                setConstraintOufputReduction.add(constraintIdentifier);
                                 logMsg(checkConstraint,rsrc.getString("validateSetConstraint.setConstraintIsNotTrue"), getDisplayName(setConstraint));
                             }
                         }
