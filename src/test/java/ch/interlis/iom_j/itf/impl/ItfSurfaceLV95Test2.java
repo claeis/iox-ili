@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 
+import ch.interlis.ili2c.metamodel.AbstractCoordType;
+import ch.interlis.ili2c.metamodel.Domain;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -79,7 +81,8 @@ public class ItfSurfaceLV95Test2 {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		errFactory.setLogger(logger);
-		builder.validatePolygon("38", formAttr, polygon, errFactory, null);
+		Domain coordDomain = (Domain) td.getElement("Test2LV95.LKoord");
+		builder.validatePolygon("38", formAttr, polygon, errFactory, null, (AbstractCoordType) coordDomain.getType());
 		assertEquals(0,logger.getErrs().size());
 	}
 	@Test
