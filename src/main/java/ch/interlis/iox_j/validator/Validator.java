@@ -139,6 +139,7 @@ import ch.interlis.iox_j.validator.functions.Interlis_ext;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
     private static final String ENUM_TREE_VALUES = "ENUM_TREE_VALUES";
+    private static final String VALUE_REF_THIS = "Value";
     public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
 	public static final String REGEX_FOR_ID_VALIDATION = "^[0-9a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
 	public static final String REGEX_FOR_TEXTOID_VALIDATION = "^[a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
@@ -1893,7 +1894,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             return listOfIomObjectsValue;
         } else if (expression instanceof ValueRefThis) {
             Domain domain = (Domain) td.getElement(iomObj.getobjecttag());
-            String value = iomObj.getattrvalue("Value");
+            String value = iomObj.getattrvalue(VALUE_REF_THIS);
             return new Value(domain.getType(), value);
         } else if(expression instanceof ParameterValue) {
             ParameterValue paramValue=(ParameterValue)expression;
@@ -4249,7 +4250,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         while (iterator.hasNext()){
                             DomainConstraint constraint = iterator.next();
                             Iom_jObject iomValueObject = new Iom_jObject(rootDomainName, null);
-                            iomValueObject.setattrvalue("Value", iomObj.getattrprim(attrName, structi));
+                            iomValueObject.setattrvalue(VALUE_REF_THIS, iomObj.getattrprim(attrName, structi));
 
                             Value result = evaluateExpression(null, constraint.getScopedName(), rootDomainName, iomValueObject, constraint.getCondition(), null);
 
