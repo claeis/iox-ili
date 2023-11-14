@@ -1,8 +1,8 @@
 package ch.interlis.models.IlisMeta16.ModelData;
 public class MetaBasketDef_Kind{
-  static private java.util.HashMap valuev=new java.util.HashMap();
+  static protected java.util.HashMap valuev=new java.util.HashMap();
   private String value=null;
-  private MetaBasketDef_Kind(String value) {
+  protected MetaBasketDef_Kind(String value) {
     this.value=value;
     valuev.put(value,this);
   }

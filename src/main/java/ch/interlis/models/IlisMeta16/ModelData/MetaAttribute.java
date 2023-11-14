@@ -9,10 +9,14 @@ public class MetaAttribute extends ch.interlis.iom_j.Iom_jObject
     return tag;
   }
   public final static String tag_Name="Name";
+  /** OID: <Parent-OID>.METAOBJECT.Name
+   */
   public String getName() {
     String value=getattrvalue("Name");
     return value;
   }
+  /** OID: <Parent-OID>.METAOBJECT.Name
+   */
   public void setName(String value) {
     setattrvalue("Name", value);
   }
@@ -27,13 +31,25 @@ public class MetaAttribute extends ch.interlis.iom_j.Iom_jObject
   public final static String tag_MetaElement="MetaElement";
   public String getMetaElement() {
     ch.interlis.iom.IomObject value=getattrobj("MetaElement",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setMetaElement(String oid) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("MetaElement","REF");
+  public String setMetaElement(String oid) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("MetaElement",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("MetaElement","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("MetaElement",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
+    return oldoid;
   }
 }

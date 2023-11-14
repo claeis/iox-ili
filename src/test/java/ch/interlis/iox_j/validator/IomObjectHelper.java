@@ -9,25 +9,11 @@ public class IomObjectHelper {
      * Create an IomObject containing a rectangle surface geometry with the specified corner coordinates.
      */
     public static IomObject createRectangleGeometry(String x1, String y1, String x2, String y2) {
-        IomObject startSegment = new Iom_jObject("COORD", null);
-        startSegment.setattrvalue("C1", x1);
-        startSegment.setattrvalue("C2", y1);
-
-        IomObject straightSegment1 = new Iom_jObject("COORD", null);
-        straightSegment1.setattrvalue("C1", x1);
-        straightSegment1.setattrvalue("C2", y2);
-
-        IomObject straightSegment2 = new Iom_jObject("COORD", null);
-        straightSegment2.setattrvalue("C1", x2);
-        straightSegment2.setattrvalue("C2", y2);
-
-        IomObject straightSegment3 = new Iom_jObject("COORD", null);
-        straightSegment3.setattrvalue("C1", x2);
-        straightSegment3.setattrvalue("C2", y1);
-
-        IomObject straightSegment4 = new Iom_jObject("COORD", null);
-        straightSegment4.setattrvalue("C1", x1);
-        straightSegment4.setattrvalue("C2", y1);
+        IomObject startSegment = createCoord(x1, y1);
+        IomObject straightSegment1 = createCoord(x1, y2);
+        IomObject straightSegment2 = createCoord(x2, y2);
+        IomObject straightSegment3 = createCoord(x2, y1);
+        IomObject straightSegment4 = createCoord(x1, y1);
 
         IomObject segment = new Iom_jObject("SEGMENTS", null);
         segment.addattrobj("segment", startSegment);
@@ -49,5 +35,12 @@ public class IomObjectHelper {
         multisurface.addattrobj("surface", surfaceValue);
 
         return multisurface;
+    }
+
+    public static Iom_jObject createCoord(String c1, String c2) {
+        Iom_jObject coord = new Iom_jObject("COORD", null);
+        coord.setattrvalue("C1", c1);
+        coord.setattrvalue("C2", c2);
+        return coord;
     }
 }

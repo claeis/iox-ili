@@ -5,6 +5,9 @@ public class FunctionCall extends ch.interlis.models.IlisMeta16.ModelData.Factor
   public FunctionCall() {
     super();
   }
+  protected FunctionCall(String oid) {
+    super(oid);
+  }
   public String getobjecttag() {
     return tag;
   }
@@ -24,6 +27,7 @@ public class FunctionCall extends ch.interlis.models.IlisMeta16.ModelData.Factor
   public int sizeArguments() {return getattrvaluecount("Arguments");}
   public ch.interlis.models.IlisMeta16.ModelData.ActualArgument[] getArguments() {
     int size=getattrvaluecount("Arguments");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelData.ActualArgument value[]=new ch.interlis.models.IlisMeta16.ModelData.ActualArgument[size];
     for(int i=0;i<size;i++){
       value[i]=(ch.interlis.models.IlisMeta16.ModelData.ActualArgument)getattrobj("Arguments",i);

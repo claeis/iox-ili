@@ -1,0 +1,11 @@
+INTERLIS 2.4;
+
+MODEL ModelA AT "mailto:test@localhost" VERSION "2023-09-05" =
+    TOPIC TopicA =
+        CLASS ClassA =
+            attr1 : MANDATORY 0..999;
+            SET CONSTRAINT SetConstraintGlobal: INTERLIS.objectCount(ALL) <= 3;
+            SET CONSTRAINT (BASKET) SetConstraintBasket: INTERLIS.objectCount(ALL) <= 2;
+        END ClassA;
+    END TopicA;
+END ModelA.

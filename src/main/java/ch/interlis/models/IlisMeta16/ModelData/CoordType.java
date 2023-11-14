@@ -9,27 +9,33 @@ public class CoordType extends ch.interlis.models.IlisMeta16.ModelData.DomainTyp
     return tag;
   }
   public final static String tag_NullAxis="NullAxis";
-  public int getNullAxis() {
+  public Integer getNullAxis() {
+    if(getattrvaluecount("NullAxis")==0)return null;
     String value=getattrvalue("NullAxis");
     return Integer.parseInt(value);
   }
-  public void setNullAxis(int value) {
+  public void setNullAxis(Integer value) {
+    if(value==null){setattrundefined("NullAxis");return;}
     setattrvalue("NullAxis", Integer.toString(value));
   }
   public final static String tag_PiHalfAxis="PiHalfAxis";
-  public int getPiHalfAxis() {
+  public Integer getPiHalfAxis() {
+    if(getattrvaluecount("PiHalfAxis")==0)return null;
     String value=getattrvalue("PiHalfAxis");
     return Integer.parseInt(value);
   }
-  public void setPiHalfAxis(int value) {
+  public void setPiHalfAxis(Integer value) {
+    if(value==null){setattrundefined("PiHalfAxis");return;}
     setattrvalue("PiHalfAxis", Integer.toString(value));
   }
   public final static String tag_Multi="Multi";
-  public boolean getMulti() {
+  public Boolean getMulti() {
+    if(getattrvaluecount("Multi")==0)return null;
     String value=getattrvalue("Multi");
     return value!=null && value.equals("true");
   }
-  public void setMulti(boolean value) {
+  public void setMulti(Boolean value) {
+    if(value==null){setattrundefined("Multi");return;}
     setattrvalue("Multi", value?"true":"false");
   }
 }

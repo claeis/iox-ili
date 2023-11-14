@@ -5,11 +5,17 @@ public class CondSignParamAssignment extends ch.interlis.iom_j.Iom_jObject
   public CondSignParamAssignment() {
     super(tag,null);
   }
+  protected CondSignParamAssignment(String oid) {
+    super(tag,oid);
+  }
   public String getobjecttag() {
     return tag;
   }
   public final static String tag_Where="Where";
+  public int sizeWhere() {return getattrvaluecount("Where");}
   public ch.interlis.models.IlisMeta16.ModelData.Expression getWhere() {
+    int size=getattrvaluecount("Where");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelData.Expression value=(ch.interlis.models.IlisMeta16.ModelData.Expression)getattrobj("Where",0);
     return value;
   }
@@ -24,6 +30,7 @@ public class CondSignParamAssignment extends ch.interlis.iom_j.Iom_jObject
   public int sizeAssignments() {return getattrvaluecount("Assignments");}
   public ch.interlis.models.IlisMeta16.ModelData.SignParamAssignment[] getAssignments() {
     int size=getattrvaluecount("Assignments");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelData.SignParamAssignment value[]=new ch.interlis.models.IlisMeta16.ModelData.SignParamAssignment[size];
     for(int i=0;i<size;i++){
       value[i]=(ch.interlis.models.IlisMeta16.ModelData.SignParamAssignment)getattrobj("Assignments",i);

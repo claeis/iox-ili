@@ -11,25 +11,49 @@ public class Constraint extends ch.interlis.models.IlisMeta16.ModelData.MetaElem
   public final static String tag_ToClass="ToClass";
   public String getToClass() {
     ch.interlis.iom.IomObject value=getattrobj("ToClass",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setToClass(String oid) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("ToClass","REF");
+  public String setToClass(String oid) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("ToClass",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("ToClass","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("ToClass",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
+    return oldoid;
   }
   public final static String tag_ToDomain="ToDomain";
   public String getToDomain() {
     ch.interlis.iom.IomObject value=getattrobj("ToDomain",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setToDomain(String oid) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("ToDomain","REF");
+  public String setToDomain(String oid) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("ToDomain",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("ToDomain","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("ToDomain",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
+    return oldoid;
   }
 }

@@ -5,6 +5,9 @@ public class DocTextTranslation extends ch.interlis.iom_j.Iom_jObject
   public DocTextTranslation() {
     super(tag,null);
   }
+  protected DocTextTranslation(String oid) {
+    super(tag,oid);
+  }
   public String getobjecttag() {
     return tag;
   }

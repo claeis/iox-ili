@@ -1,8 +1,8 @@
 package ch.interlis.models.IlisMeta16.ModelData;
 public class UniqueConstraint_Kind{
-  static private java.util.HashMap valuev=new java.util.HashMap();
+  static protected java.util.HashMap valuev=new java.util.HashMap();
   private String value=null;
-  private UniqueConstraint_Kind(String value) {
+  protected UniqueConstraint_Kind(String value) {
     this.value=value;
     valuev.put(value,this);
   }

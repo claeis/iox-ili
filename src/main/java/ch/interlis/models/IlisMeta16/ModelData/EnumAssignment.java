@@ -5,11 +5,17 @@ public class EnumAssignment extends ch.interlis.iom_j.Iom_jObject
   public EnumAssignment() {
     super(tag,null);
   }
+  protected EnumAssignment(String oid) {
+    super(tag,oid);
+  }
   public String getobjecttag() {
     return tag;
   }
   public final static String tag_ValueToAssign="ValueToAssign";
+  public int sizeValueToAssign() {return getattrvaluecount("ValueToAssign");}
   public ch.interlis.models.IlisMeta16.ModelData.Expression getValueToAssign() {
+    int size=getattrvaluecount("ValueToAssign");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelData.Expression value=(ch.interlis.models.IlisMeta16.ModelData.Expression)getattrobj("ValueToAssign",0);
     return value;
   }

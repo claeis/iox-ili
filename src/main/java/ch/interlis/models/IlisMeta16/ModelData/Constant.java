@@ -5,6 +5,9 @@ public class Constant extends ch.interlis.models.IlisMeta16.ModelData.Factor
   public Constant() {
     super();
   }
+  protected Constant(String oid) {
+    super(oid);
+  }
   public String getobjecttag() {
     return tag;
   }

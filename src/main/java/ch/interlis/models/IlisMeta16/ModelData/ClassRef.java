@@ -5,6 +5,9 @@ public class ClassRef extends ch.interlis.iom_j.Iom_jObject
   public ClassRef() {
     super(tag,null);
   }
+  protected ClassRef(String oid) {
+    super(tag,oid);
+  }
   public String getobjecttag() {
     return tag;
   }

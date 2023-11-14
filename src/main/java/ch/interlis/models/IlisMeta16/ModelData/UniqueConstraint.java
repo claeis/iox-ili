@@ -9,7 +9,10 @@ public class UniqueConstraint extends ch.interlis.models.IlisMeta16.ModelData.Co
     return tag;
   }
   public final static String tag_Where="Where";
+  public int sizeWhere() {return getattrvaluecount("Where");}
   public ch.interlis.models.IlisMeta16.ModelData.Expression getWhere() {
+    int size=getattrvaluecount("Where");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelData.Expression value=(ch.interlis.models.IlisMeta16.ModelData.Expression)getattrobj("Where",0);
     return value;
   }
@@ -32,6 +35,7 @@ public class UniqueConstraint extends ch.interlis.models.IlisMeta16.ModelData.Co
   public int sizeUniqueDef() {return getattrvaluecount("UniqueDef");}
   public ch.interlis.models.IlisMeta16.ModelData.PathOrInspFactor[] getUniqueDef() {
     int size=getattrvaluecount("UniqueDef");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelData.PathOrInspFactor value[]=new ch.interlis.models.IlisMeta16.ModelData.PathOrInspFactor[size];
     for(int i=0;i<size;i++){
       value[i]=(ch.interlis.models.IlisMeta16.ModelData.PathOrInspFactor)getattrobj("UniqueDef",i);

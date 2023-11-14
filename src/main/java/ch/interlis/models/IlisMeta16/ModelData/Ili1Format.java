@@ -5,6 +5,9 @@ public class Ili1Format extends ch.interlis.iom_j.Iom_jObject
   public Ili1Format() {
     super(tag,null);
   }
+  protected Ili1Format(String oid) {
+    super(tag,oid);
+  }
   public String getobjecttag() {
     return tag;
   }
@@ -17,19 +20,23 @@ public class Ili1Format extends ch.interlis.iom_j.Iom_jObject
     setattrvalue("isFree", value?"true":"false");
   }
   public final static String tag_LineSize="LineSize";
-  public int getLineSize() {
+  public Integer getLineSize() {
+    if(getattrvaluecount("LineSize")==0)return null;
     String value=getattrvalue("LineSize");
     return Integer.parseInt(value);
   }
-  public void setLineSize(int value) {
+  public void setLineSize(Integer value) {
+    if(value==null){setattrundefined("LineSize");return;}
     setattrvalue("LineSize", Integer.toString(value));
   }
   public final static String tag_tidSize="tidSize";
-  public int gettidSize() {
+  public Integer gettidSize() {
+    if(getattrvaluecount("tidSize")==0)return null;
     String value=getattrvalue("tidSize");
     return Integer.parseInt(value);
   }
-  public void settidSize(int value) {
+  public void settidSize(Integer value) {
+    if(value==null){setattrundefined("tidSize");return;}
     setattrvalue("tidSize", Integer.toString(value));
   }
   public final static String tag_blankCode="blankCode";
@@ -74,10 +81,12 @@ public class Ili1Format extends ch.interlis.iom_j.Iom_jObject
   }
   public final static String tag_tidExplanation="tidExplanation";
   public String gettidExplanation() {
+    if(getattrvaluecount("tidExplanation")==0)return null;
     String value=getattrvalue("tidExplanation");
     return value;
   }
   public void settidExplanation(String value) {
+    if(value==null){setattrundefined("tidExplanation");return;}
     setattrvalue("tidExplanation", value);
   }
 }

@@ -9,36 +9,66 @@ public class RenamedBaseView extends ch.interlis.models.IlisMeta16.ModelData.Ext
     return tag;
   }
   public final static String tag_OrNull="OrNull";
-  public boolean getOrNull() {
+  /** MetaElement.Name := Name as defined in the INTERLIS-Model
+   */
+  public Boolean getOrNull() {
+    if(getattrvaluecount("OrNull")==0)return null;
     String value=getattrvalue("OrNull");
     return value!=null && value.equals("true");
   }
-  public void setOrNull(boolean value) {
+  /** MetaElement.Name := Name as defined in the INTERLIS-Model
+   */
+  public void setOrNull(Boolean value) {
+    if(value==null){setattrundefined("OrNull");return;}
     setattrvalue("OrNull", value?"true":"false");
   }
   public final static String tag_BaseView="BaseView";
   public String getBaseView() {
     ch.interlis.iom.IomObject value=getattrobj("BaseView",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setBaseView(String oid) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("BaseView","REF");
+  public String setBaseView(String oid) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("BaseView",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("BaseView","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("BaseView",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
+    return oldoid;
   }
   public final static String tag_View="View";
   public String getView() {
     ch.interlis.iom.IomObject value=getattrobj("View",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setView(String oid,long orderPos) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("View","REF");
+  public String setView(String oid,long orderPos) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("View",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("View","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("View",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
     structvalue.setobjectreforderpos(orderPos);
+    return oldoid;
   }
 }
