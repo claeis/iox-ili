@@ -4241,8 +4241,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         }
                     }
                 }
-                if (attr.getDomain() instanceof TypeAlias) {
-                    Domain domain = ((TypeAlias) attr.getDomain()).getAliasing();
+                if (domain != null) {
                     String rootDomainName = domain.getScopedName(null);
 
                     while (domain != null) {
