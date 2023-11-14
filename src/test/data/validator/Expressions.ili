@@ -1,0 +1,15 @@
+INTERLIS 2.4;
+
+MODEL ModelA AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
+  TOPIC TopicA =
+    CLASS ClassA =
+      attr1 : 10 .. 20 ;
+      attr2 : 10 .. 20 ;
+      MANDATORY CONSTRAINT CheckImplication: (attr1 > 15) => (attr2 > 15);
+      MANDATORY CONSTRAINT CheckAddition: (attr1 + attr2) > 30;
+      MANDATORY CONSTRAINT CheckSubtraction: (attr1 - attr2) < 10;
+      MANDATORY CONSTRAINT CheckMultiplication: (attr1 * attr2) > 200;
+      MANDATORY CONSTRAINT CheckDivision: (attr1 / attr2) >= 1;
+    END ClassA;
+  END TopicA;
+END ModelA.
