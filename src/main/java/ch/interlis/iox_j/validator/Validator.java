@@ -2095,9 +2095,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                     }
                                 }
                                 if (currentObjects.size() == 1) {
-                                    if (type instanceof NumericType){
-                                        return new Value(Double.valueOf(attrValue));
-                                    }
                                     return new Value(type, attrValue);
                                 } else {
                                     String[] attrValues = new String[currentObjects.size()];

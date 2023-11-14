@@ -145,7 +145,17 @@ public class Value {
 		if(skipEvaluation()){
 			throw new IllegalArgumentException();
 		}
-		return numeric;
+        if(isUndefined()){
+            throw new IllegalArgumentException();
+        }
+        if(numericIsDefined) {
+            return numeric;
+        }
+        String val=getValue();
+        if(val==null) {
+            throw new IllegalArgumentException();
+        }
+        return Double.parseDouble(val);
 	}
 	
 	public RoleDef getRole(){
