@@ -25,8 +25,6 @@ public class Text {
     public Value evaluateFunction(Function currentFunction, FunctionCall functionCallObj, IomObject parentObject, 
             String validationKind, String usageScope, IomObject iomObj, TextType texttype, RoleDef firstRole) {
         
-        Validator validator = new Validator();
-        
         if (currentFunction.getScopedName(null).equals("Text.compareToIgnoreCase") || 
                 currentFunction.getScopedName(null).equals("Text.compareToIgnoreCaseM")) {
             Evaluable[] arguments = functionCallObj.getArguments();
