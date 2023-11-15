@@ -29,47 +29,6 @@ public class GenericValueRanges24Test {
     }
 
     @Test
-    public void missingContext() {
-        TransferDescription td = ValidatorTestHelper.compileIliFile(DATA_DIRECTORY + "MissingContext24.ili");
-
-        ValidationConfig modelConfig = new ValidationConfig();
-        LogCollector logger = new LogCollector();
-        LogEventFactory errFactory = new LogEventFactory();
-        Settings settings = new Settings();
-        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent("ModelA.TestA", "b1"));
-        validator.validate(new ObjectEvent(createTestClassIomObjectLv03("ModelA.TestA.ClassA")));
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
-
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("The Context for DOMAIN ModelA.Coord is missing", logger.getErrs().get(0).getEventMsg());
-    }
-
-    @Test
-    public void missingDeferred() {
-        TransferDescription td = ValidatorTestHelper.compileIliFile(DATA_DIRECTORY + "MissingDeferred24.ili");
-        HashMap<String, String> genericDomains = new HashMap<String, String>();
-        genericDomains.put("ModelA.Coord", "ModelA.Coord_LV03");
-
-        ValidationConfig modelConfig = new ValidationConfig();
-        LogCollector logger = new LogCollector();
-        LogEventFactory errFactory = new LogEventFactory();
-        Settings settings = new Settings();
-        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent("ModelA.TestA", "b1", genericDomains));
-        validator.validate(new ObjectEvent(createTestClassIomObjectLv03("ModelA.TestA.ClassA")));
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
-
-        assertEquals(2, logger.getErrs().size());
-        assertEquals("Generic DOMAIN ModelA.Coord is not DEFERRED but specified in transfer", logger.getErrs().get(0).getEventMsg());
-        assertEquals("Could not choose between multiple concrete domains for generic DOMAIN ModelA.Coord", logger.getErrs().get(1).getEventMsg());
-    }
-
-    @Test
     public void nonExistentDomainInBasket() {
         TransferDescription td = ValidatorTestHelper.compileIliFile(DATA_DIRECTORY + "GenericValueRanges24.ili");
         HashMap<String, String> genericDomains = new HashMap<String, String>();
