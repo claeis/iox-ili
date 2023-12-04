@@ -3,14 +3,15 @@ ideas/open issues
 - add xml validation
 - add Xtf23Reader
 
-iox-ili 1.22.0 (SNAPSHOT)
+iox-ili 1.22.0 (2023-12-04)
 -----------------------------
+- Validator: ILI2.4 Constraints zu Domains (ilivalidator#378)
 - Validator: ILI2.4 validate generic coords with concrete domain (ilivalidator#354)
 - Validator: ILI2.4 Add (BASKET) support for UNIQUE and SET CONSTRAINTS (ilivalidator#379)
 - Validator: ILI2.4 Evaluation Expressions with +,-,*,/,=> (ilivalidator#380)
 - Xtf24Reader: read reference attributes  (ilivalidator#395)
 - IlisMeta16 added missing ili2.4 elements (ili2c#103)
-- ili2c-5.3.4
+- ili2c-core-5.3.4
 
 iox-ili 1.21.18 (2023-04-24)
 -----------------------------
