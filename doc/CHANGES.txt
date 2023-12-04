@@ -3,6 +3,10 @@ ideas/open issues
 - add xml validation
 - add Xtf23Reader
 
+iox-ili 1.22.1 (2023-12-xx)
+-----------------------------
+- ili2c-5.4.0
+
 iox-ili 1.22.0 (2023-12-04)
 -----------------------------
 - Validator: ILI2.4 Constraints zu Domains (ilivalidator#378)
