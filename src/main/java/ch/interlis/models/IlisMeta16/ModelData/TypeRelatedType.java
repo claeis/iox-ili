@@ -11,13 +11,25 @@ public class TypeRelatedType extends ch.interlis.models.IlisMeta16.ModelData.Dom
   public final static String tag_BaseType="BaseType";
   public String getBaseType() {
     ch.interlis.iom.IomObject value=getattrobj("BaseType",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setBaseType(String oid) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("BaseType","REF");
+  public String setBaseType(String oid) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("BaseType",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("BaseType","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("BaseType",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
+    return oldoid;
   }
 }

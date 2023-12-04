@@ -1241,4 +1241,29 @@ public class Xtf24ReaderDataTest {
 		reader.close();
 		reader=null;
 	}
+
+	// Es wird getestet ob Referenzattribute korrekt gelesen werden.
+	@Test
+	public void testReferenceAttribute_Ok() throws IoxException {
+		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"References.xml"));
+		reader.setModel(td);
+		assertTrue(reader.read() instanceof  StartTransferEvent);
+		assertTrue(reader.read() instanceof  StartBasketEvent);
+
+		IoxEvent objectEventReferenceTarget = reader.read();
+		assertTrue(objectEventReferenceTarget instanceof ObjectEvent);
+		assertEquals("oid_target", ((ObjectEvent) objectEventReferenceTarget).getIomObject().getobjectoid());
+
+		IoxEvent objectEventReference = reader.read();
+		assertTrue(objectEventReference instanceof ObjectEvent);
+		IomObject referenceObject = ((ObjectEvent) objectEventReference).getIomObject();
+		assertEquals("oidM1", referenceObject.getobjectoid());
+		IomObject refAttrM = referenceObject.getattrobj("refAttrM", 0);
+		assertNotNull(refAttrM);
+		assertEquals("oid_target", refAttrM.getobjectrefoid());
+
+		assertTrue(reader.read() instanceof  EndBasketEvent);
+		assertTrue(reader.read() instanceof  EndTransferEvent);
+		reader.close();
+	}
 }

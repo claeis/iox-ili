@@ -1,8 +1,8 @@
 package ch.interlis.models.IlisMeta16.ModelData;
 public class TextType_Kind{
-  static private java.util.HashMap valuev=new java.util.HashMap();
+  static protected java.util.HashMap valuev=new java.util.HashMap();
   private String value=null;
-  private TextType_Kind(String value) {
+  protected TextType_Kind(String value) {
     this.value=value;
     valuev.put(value,this);
   }

@@ -139,7 +139,15 @@ MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 			attrL1 : BAG {1..*} OF StructA;
 			attrL2 : TEXT*30;
 		END ClassL;
-	
+
+		CLASS ClassM_ReferenceTarget =
+			attrM1 : TEXT*10;
+		END ClassM_ReferenceTarget;
+
+		CLASS ClassM_Reference =
+			refAttrM : REFERENCE TO ClassM_ReferenceTarget;
+		END ClassM_Reference;
+
 	END TopicA;
 	
 	TOPIC TopicB =

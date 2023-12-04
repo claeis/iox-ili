@@ -5,6 +5,9 @@ public class ActualArgument extends ch.interlis.iom_j.Iom_jObject
   public ActualArgument() {
     super(tag,null);
   }
+  protected ActualArgument(String oid) {
+    super(tag,oid);
+  }
   public String getobjecttag() {
     return tag;
   }
@@ -29,7 +32,10 @@ public class ActualArgument extends ch.interlis.iom_j.Iom_jObject
     setattrvalue("Kind", ActualArgument_Kind.toXmlCode(value));
   }
   public final static String tag_Expression="Expression";
+  public int sizeExpression() {return getattrvaluecount("Expression");}
   public ch.interlis.models.IlisMeta16.ModelData.Expression getExpression() {
+    int size=getattrvaluecount("Expression");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelData.Expression value=(ch.interlis.models.IlisMeta16.ModelData.Expression)getattrobj("Expression",0);
     return value;
   }
@@ -44,6 +50,7 @@ public class ActualArgument extends ch.interlis.iom_j.Iom_jObject
   public int sizeObjectClasses() {return getattrvaluecount("ObjectClasses");}
   public ch.interlis.models.IlisMeta16.ModelData.ClassRef[] getObjectClasses() {
     int size=getattrvaluecount("ObjectClasses");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelData.ClassRef value[]=new ch.interlis.models.IlisMeta16.ModelData.ClassRef[size];
     for(int i=0;i<size;i++){
       value[i]=(ch.interlis.models.IlisMeta16.ModelData.ClassRef)getattrobj("ObjectClasses",i);

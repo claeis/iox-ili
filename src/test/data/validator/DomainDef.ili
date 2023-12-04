@@ -1,0 +1,22 @@
+INTERLIS 2.4;
+
+MODEL ModelA AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
+    TOPIC TopicA =
+        DOMAIN
+            DomainText = TEXT*30;
+            DomainTextRestrictedThis = TEXT*30 CONSTRAINTS Values : THIS == "SomeConstant";
+            DomainConstraintThisFunction = TEXT*30 CONSTRAINTS Length : INTERLIS.len(THIS) > 20;
+            DomainMultiConstraintsNumeric = 0 .. 200 CONSTRAINTS Min : THIS > 10, Max100 : THIS <= 100;
+            DomainExtends EXTENDS DomainMultiConstraintsNumeric = 0 .. 150 CONSTRAINTS Max50 : THIS <= 50;
+
+
+        CLASS ObjectUnderTest =
+            DomainText : DomainText;
+            DomainTextRestrictedThis : DomainTextRestrictedThis;
+            DomainConstraintThisFunction : DomainConstraintThisFunction;
+            DomainMultiConstraintsNumeric : DomainMultiConstraintsNumeric;
+            DomainExtends : DomainExtends;
+        END ObjectUnderTest;
+
+    END TopicA;
+END ModelA.

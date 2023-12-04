@@ -1,8 +1,8 @@
 package ch.interlis.models.IlisMeta16.ModelData;
 public class PathEl_SpecIndex{
-  static private java.util.HashMap valuev=new java.util.HashMap();
+  static protected java.util.HashMap valuev=new java.util.HashMap();
   private String value=null;
-  private PathEl_SpecIndex(String value) {
+  protected PathEl_SpecIndex(String value) {
     this.value=value;
     valuev.put(value,this);
   }

@@ -17,11 +17,13 @@ public class TextType extends ch.interlis.models.IlisMeta16.ModelData.DomainType
     setattrvalue("Kind", TextType_Kind.toXmlCode(value));
   }
   public final static String tag_MaxLength="MaxLength";
-  public int getMaxLength() {
+  public Integer getMaxLength() {
+    if(getattrvaluecount("MaxLength")==0)return null;
     String value=getattrvalue("MaxLength");
     return Integer.parseInt(value);
   }
-  public void setMaxLength(int value) {
+  public void setMaxLength(Integer value) {
+    if(value==null){setattrundefined("MaxLength");return;}
     setattrvalue("MaxLength", Integer.toString(value));
   }
 }

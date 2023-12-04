@@ -18,42 +18,70 @@ public class LineType extends ch.interlis.models.IlisMeta16.ModelData.DomainType
   }
   public final static String tag_MaxOverlap="MaxOverlap";
   public String getMaxOverlap() {
+    if(getattrvaluecount("MaxOverlap")==0)return null;
     String value=getattrvalue("MaxOverlap");
     return value;
   }
   public void setMaxOverlap(String value) {
+    if(value==null){setattrundefined("MaxOverlap");return;}
     setattrvalue("MaxOverlap", value);
   }
   public final static String tag_Multi="Multi";
-  public boolean getMulti() {
+  public Boolean getMulti() {
+    if(getattrvaluecount("Multi")==0)return null;
     String value=getattrvalue("Multi");
     return value!=null && value.equals("true");
   }
-  public void setMulti(boolean value) {
+  public void setMulti(Boolean value) {
+    if(value==null){setattrundefined("Multi");return;}
     setattrvalue("Multi", value?"true":"false");
   }
   public final static String tag_CoordType="CoordType";
   public String getCoordType() {
     ch.interlis.iom.IomObject value=getattrobj("CoordType",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setCoordType(String oid) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("CoordType","REF");
+  public String setCoordType(String oid) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("CoordType",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("CoordType","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("CoordType",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
+    return oldoid;
   }
   public final static String tag_LAStructure="LAStructure";
   public String getLAStructure() {
     ch.interlis.iom.IomObject value=getattrobj("LAStructure",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setLAStructure(String oid) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("LAStructure","REF");
+  public String setLAStructure(String oid) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("LAStructure",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("LAStructure","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("LAStructure",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
+    return oldoid;
   }
 }

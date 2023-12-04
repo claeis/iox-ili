@@ -970,6 +970,14 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                 if(!xmlreader.peek().isEndElement()) {
                     event=skipSpacesAndGetNextEvent(event);
                 }
+            } else if (attrStartElement.getAttributeByName(QNAME_ILI_REF) != null) {
+                // reference
+                readReference(viewable, iomObj, attrStartElement, prop, null);
+                event = xmlreader.nextEvent();
+                event = skipSpacesAndGetNextEvent(event);
+                if (!xmlreader.peek().isEndElement()) {
+                    event = skipSpacesAndGetNextEvent(event);
+                }
             }else if(prop instanceof AttributeDef){
                 event=xmlreader.nextEvent(); // after start attribute
                 event=skipCommentary(event);
@@ -1114,7 +1122,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		}
     }
 
-    private IomObject readReference(Viewable aclass,IomObject iomObj, StartElement element, RoleDef role, AssociationDef association) throws IoxException, XMLStreamException{
+    private IomObject readReference(Viewable aclass,IomObject iomObj, StartElement element, Element prop, AssociationDef association) throws IoxException, XMLStreamException{
 		String refOid=element.getAttributeByName(QNAME_ILI_REF).getValue();
 		if(refOid.length()<1){
 			throw new IoxException("unexpected reference value <"+refOid+">");
@@ -1141,11 +1149,11 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
         }
 		if(aclass.isExtending(association)){
 			// role of a standalone association
-			iomObj.addattrobj(role.getName(),Iom_jObject.REF).setobjectrefoid(refOid);
+			iomObj.addattrobj(prop.getName(),Iom_jObject.REF).setobjectrefoid(refOid);
 			if(refBid!=null) {
-				iomObj.addattrobj(role.getName(),Iom_jObject.REF).setobjectrefbid(refBid); // set reference
+				iomObj.addattrobj(prop.getName(),Iom_jObject.REF).setobjectrefbid(refBid); // set reference
 			}
-			IomObject anObject=iomObj.getattrobj(role.getName(), 0);
+			IomObject anObject=iomObj.getattrobj(prop.getName(), 0);
 			if(orderPos!=null){
 				anObject.setobjectreforderpos(orderPos);
 			}
@@ -1153,7 +1161,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 				anObject.setobjectrefbid(refBid);
 			}
 		}else{
-			// embedded role
+            // embedded role or reference attribute
 	        XMLEvent peek = xmlreader.peek();
 	        XMLEvent event = null;
 	        if (peek.isCharacters()) {
@@ -1166,11 +1174,11 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
             IomObject aObject=null;
 	        if (event != null && event.isStartElement()) {
 	            element = (StartElement) event;
-	            iomObj.addattrobj(role.getName(), readObject(event));
-                aObject=iomObj.getattrobj(role.getName(), 0);
+                iomObj.addattrobj(prop.getName(), readObject(event));
+                aObject=iomObj.getattrobj(prop.getName(), 0);
 	        } else {
-	            iomObj.addattrobj(role.getName(),Iom_jObject.REF);
-	            aObject=iomObj.getattrobj(role.getName(), 0);
+                iomObj.addattrobj(prop.getName(),Iom_jObject.REF);
+                aObject=iomObj.getattrobj(prop.getName(), 0);
 	        }
 	        if(aObject!=null) {
 	            aObject.setobjectrefoid(refOid);

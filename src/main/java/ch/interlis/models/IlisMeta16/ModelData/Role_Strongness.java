@@ -1,8 +1,8 @@
 package ch.interlis.models.IlisMeta16.ModelData;
 public class Role_Strongness{
-  static private java.util.HashMap valuev=new java.util.HashMap();
+  static protected java.util.HashMap valuev=new java.util.HashMap();
   private String value=null;
-  private Role_Strongness(String value) {
+  protected Role_Strongness(String value) {
     this.value=value;
     valuev.put(value,this);
   }

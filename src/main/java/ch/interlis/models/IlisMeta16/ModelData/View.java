@@ -20,6 +20,7 @@ public class View extends ch.interlis.models.IlisMeta16.ModelData.Class
   public int sizeFormationParameter() {return getattrvaluecount("FormationParameter");}
   public ch.interlis.models.IlisMeta16.ModelData.Expression[] getFormationParameter() {
     int size=getattrvaluecount("FormationParameter");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelData.Expression value[]=new ch.interlis.models.IlisMeta16.ModelData.Expression[size];
     for(int i=0;i<size;i++){
       value[i]=(ch.interlis.models.IlisMeta16.ModelData.Expression)getattrobj("FormationParameter",i);
@@ -30,10 +31,19 @@ public class View extends ch.interlis.models.IlisMeta16.ModelData.Class
     addattrobj("FormationParameter", value);
   }
   public final static String tag_Where="Where";
+  /** Aggr.Equal: UniqueEl
+   * Inspection: Attributepath
+   */
+  public int sizeWhere() {return getattrvaluecount("Where");}
   public ch.interlis.models.IlisMeta16.ModelData.Expression getWhere() {
+    int size=getattrvaluecount("Where");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelData.Expression value=(ch.interlis.models.IlisMeta16.ModelData.Expression)getattrobj("Where",0);
     return value;
   }
+  /** Aggr.Equal: UniqueEl
+   * Inspection: Attributepath
+   */
   public void setWhere(ch.interlis.models.IlisMeta16.ModelData.Expression value) {
     if(getattrvaluecount("Where")>0){
       changeattrobj("Where",0, value);

@@ -5,6 +5,9 @@ public class ClassConst extends ch.interlis.models.IlisMeta16.ModelData.Factor
   public ClassConst() {
     super();
   }
+  protected ClassConst(String oid) {
+    super(oid);
+  }
   public String getobjecttag() {
     return tag;
   }

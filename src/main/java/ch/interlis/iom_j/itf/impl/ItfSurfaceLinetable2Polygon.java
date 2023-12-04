@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import ch.interlis.ili2c.metamodel.AbstractCoordType;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Polygon;
@@ -261,7 +263,7 @@ public class ItfSurfaceLinetable2Polygon implements Linetable2Polygon {
 			}
 		}
 	}
-    public static boolean validateMultiPolygon(String mainTid,AttributeDef surfaceAttr,IomObject polygon,LogEventFactory errFact,String validationType) 
+    public static boolean validateMultiPolygon(String mainTid,AttributeDef surfaceAttr,IomObject polygon,LogEventFactory errFact,String validationType, AbstractCoordType controlPointType)
             throws IoxException
     {
         String linetableIliqname=surfaceAttr.getContainer().getScopedName(null)+"."+surfaceAttr.getName();
@@ -273,7 +275,7 @@ public class ItfSurfaceLinetable2Polygon implements Linetable2Polygon {
         if(overlapDef!=null){
             maxOverlaps=overlapDef.doubleValue();
             if(maxOverlaps>0){
-                NumericalType[] dimensions = ((CoordType) polygonType.getControlPointDomain().getType()).getDimensions();
+                NumericalType[] dimensions = controlPointType.getDimensions();
                 double size=((NumericType)dimensions[0]).getMinimum().getAccuracy();
                 if(size>0){
                     newVertexOffset=2*Math.pow(10, -size);
@@ -312,7 +314,7 @@ public class ItfSurfaceLinetable2Polygon implements Linetable2Polygon {
         }
         return polygonValid;
     }
-	public static boolean validatePolygon(String mainTid,AttributeDef surfaceAttr,IomObject polygon,LogEventFactory errFact,String validationType) 
+	public static boolean validatePolygon(String mainTid,AttributeDef surfaceAttr,IomObject polygon,LogEventFactory errFact,String validationType, AbstractCoordType controlPointType)
 			throws IoxException
 	{
 		String linetableIliqname=surfaceAttr.getContainer().getScopedName(null)+"."+surfaceAttr.getName();
@@ -324,7 +326,7 @@ public class ItfSurfaceLinetable2Polygon implements Linetable2Polygon {
 		if(overlapDef!=null){
 			maxOverlaps=overlapDef.doubleValue();
 			if(maxOverlaps>0){
-			    NumericalType[] dimensions = ((CoordType) polygonType.getControlPointDomain().getType()).getDimensions();
+				NumericalType[] dimensions = controlPointType.getDimensions();
 				double size=((NumericType)dimensions[0]).getMinimum().getAccuracy();
 				if(size>0){
 					newVertexOffset=2*Math.pow(10, -size);

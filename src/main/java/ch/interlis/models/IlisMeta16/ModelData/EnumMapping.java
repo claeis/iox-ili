@@ -5,11 +5,17 @@ public class EnumMapping extends ch.interlis.models.IlisMeta16.ModelData.Factor
   public EnumMapping() {
     super();
   }
+  protected EnumMapping(String oid) {
+    super(oid);
+  }
   public String getobjecttag() {
     return tag;
   }
   public final static String tag_EnumValue="EnumValue";
+  public int sizeEnumValue() {return getattrvaluecount("EnumValue");}
   public ch.interlis.models.IlisMeta16.ModelData.PathOrInspFactor getEnumValue() {
+    int size=getattrvaluecount("EnumValue");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelData.PathOrInspFactor value=(ch.interlis.models.IlisMeta16.ModelData.PathOrInspFactor)getattrobj("EnumValue",0);
     return value;
   }
@@ -24,6 +30,7 @@ public class EnumMapping extends ch.interlis.models.IlisMeta16.ModelData.Factor
   public int sizeCases() {return getattrvaluecount("Cases");}
   public ch.interlis.models.IlisMeta16.ModelData.EnumAssignment[] getCases() {
     int size=getattrvaluecount("Cases");
+    if(size==0)return null;
     ch.interlis.models.IlisMeta16.ModelData.EnumAssignment value[]=new ch.interlis.models.IlisMeta16.ModelData.EnumAssignment[size];
     for(int i=0;i<size;i++){
       value[i]=(ch.interlis.models.IlisMeta16.ModelData.EnumAssignment)getattrobj("Cases",i);

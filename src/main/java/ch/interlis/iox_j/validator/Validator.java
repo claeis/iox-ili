@@ -1,7 +1,6 @@
 package ch.interlis.iox_j.validator;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -17,13 +16,14 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import ch.interlis.ili2c.generator.Interlis2Generator;
+import ch.interlis.ili2c.metamodel.DomainConstraint;
+import ch.interlis.ili2c.metamodel.Expression;
+import ch.interlis.ili2c.metamodel.ValueRefThis;
 import com.vividsolutions.jts.geom.Coordinate;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.ehi.basics.types.OutParam;
 import ch.ehi.iox.objpool.ObjectPoolManager;
-import ch.ehi.iox.objpool.impl.IomObjectSerializer;
-import ch.ehi.iox.objpool.impl.LongSerializer;
 import ch.interlis.ili2c.Ili2cException;
 import ch.interlis.ili2c.gui.UserSettings;
 import ch.interlis.ili2c.metamodel.AbstractClassDef;
@@ -139,6 +139,7 @@ import ch.interlis.iox_j.validator.functions.Interlis_ext;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
     private static final String ENUM_TREE_VALUES = "ENUM_TREE_VALUES";
+    private static final String VALUE_REF_THIS = "Value";
     public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
 	public static final String REGEX_FOR_ID_VALIDATION = "^[0-9a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
 	public static final String REGEX_FOR_TEXTOID_VALIDATION = "^[a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
@@ -207,7 +208,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private IoxWriter writer=null;
     private long objectCount=0l;
     private long structCount=0l;
-    
+	private final Map<String, Domain> genericDomains = new HashMap<String, Domain>();
+
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
 			IoxLogging errs, LogEventFactory errFact, Settings config) {
@@ -376,7 +378,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		} else if (event instanceof ch.interlis.iox.StartBasketEvent){
 			StartBasketEvent startBasketEvent = ((ch.interlis.iox.StartBasketEvent) event);
-			currentBasketId = ((ch.interlis.iox.StartBasketEvent) event).getBid();
+			currentBasketId = startBasketEvent.getBid();
 			validateBasketEvent(startBasketEvent);
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=new ch.interlis.iom_j.Iom_jObject(((ch.interlis.iox.ObjectEvent)event).getIomObject());
@@ -389,7 +391,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				throw e;
 			}
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
-		    clearCurrentBid();
+		    cleanupCurrentBasket();
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
 	        String additionalModels=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS);
 	        if(additionalModels!=null){
@@ -449,12 +451,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         return null;
     }
     
-    private void clearCurrentBid() {
+    private void cleanupCurrentBasket() {
         currentMainOid = null;
         errFact.setDataObj(null);
+        genericDomains.clear();
     }
     private void validateBasketEvent(ch.interlis.iox.StartBasketEvent event) {
         boolean isValid = true;
+        Topic topic = null;
+        Model model = null;
         errFact.setTid(event.getBid());
         errFact.setIliqname(event.getType());
 	    if (!isValidTopicName(event.getType())) {
@@ -468,8 +473,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
         Domain bidDomain=null;
         if(isValid) {
-            Topic topic = (Topic)td.getElement(event.getType());
-            Model model=(Model) topic.getContainer();
+            topic = (Topic)td.getElement(event.getType());
+            model = (Model) topic.getContainer();
             seenModels.add(model.getName());
             collectSetConstraints(topic);
             bidDomain=topic.getBasketOid();
@@ -495,8 +500,63 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             	}
             }
         }
+
+        genericDomains.clear();
+        if (isValid) {
+            for (Entry<String, String> genericDomainAssignment : ((ch.interlis.iox_j.StartBasketEvent) event).getDomains().entrySet()) {
+                String genericDomainName = genericDomainAssignment.getKey();
+                Element genericDomain = td.getElement(genericDomainName);
+                if (!(genericDomain instanceof Domain)) {
+                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.genericDomainNotFound"), genericDomainName));
+                    continue;
+                }
+
+                String concreteDomainName = genericDomainAssignment.getValue();
+                Element concreteDomain = td.getElement(concreteDomainName);
+                if (concreteDomain instanceof Domain) {
+                    if (validateDeferredGeneric(model, topic, (Domain) genericDomain, (Domain) concreteDomain)) {
+                        genericDomains.put(genericDomainName, (Domain) concreteDomain);
+                    }
+                } else {
+                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.concreteDomainNotFound"), concreteDomainName, genericDomainName));
+                }
+            }
+        }
     }
-	
+
+    private static <T> boolean arrayContains(T[] array, T value) {
+        for (T object : array) {
+            if (object == value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean validateDeferredGeneric(Model model, Topic topic, Domain genericDomain, Domain concreteDomain) {
+        Type genericType = genericDomain.getType();
+        if (!(genericType instanceof AbstractCoordType) || !((AbstractCoordType)genericType).isGeneric()) {
+            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.domainNotGeneric"), genericDomain.toString()));
+            return false;
+        }
+        if (!arrayContains(topic.getDefferedGenerics(), genericDomain)) {
+            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.genericNotDeferred"), genericDomain.toString()));
+            return false;
+        }
+
+        // resolve generic domain from contexts in model
+        Domain[] resolved = model.resolveGenericDomain(genericDomain);
+        if (resolved == null) {
+            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateCoordType.missingContext"), genericDomain.toString()));
+            return false;
+        }
+        if (!arrayContains(resolved, concreteDomain)) {
+            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateCoordType.invalidDomain"), concreteDomain.toString(), genericDomain.toString()));
+            return false;
+        }
+        return true;
+    }
+
     private boolean isAValidBasketOID(Domain domain, String bid) {
 
         Type type = domain.getType();
@@ -763,6 +823,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		for (String basketId : objectPool.getBasketIds()){
 			// iterate through iomObjects
 			Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
+			updateCurrentBasket(basketId);
 			while (objectIterator.hasNext()){
 				IomObject iomObj = objectIterator.next();
 				if(iomObj!=null){
@@ -869,11 +930,34 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 				}
 			}
+			for(SetConstraint setConstraint:setConstraints.keySet()){
+				if(setConstraint.perBasket()){
+					validateSetConstraint(setConstraint);
+				}
+			}
 		}
 		for(SetConstraint setConstraint:setConstraints.keySet()){
-			validateSetConstraint(setConstraint);
+			if(!setConstraint.perBasket()) {
+				validateSetConstraint(setConstraint);
+			}
 		}
 	}
+
+	private void updateCurrentBasket(String basketId) {
+		currentBasketId = basketId;
+		for (UniquenessConstraint uniquenessConstraint: seenUniqueConstraintValues.keySet()) {
+			if (uniquenessConstraint.perBasket()){
+				seenUniqueConstraintValues.get(uniquenessConstraint).clear();
+			}
+		}
+
+		for (SetConstraint setConstraint: setConstraints.keySet()){
+			if(setConstraint.perBasket() && setConstraints.get(setConstraint) != null){
+				setConstraints.get(setConstraint).clear();
+			}
+		}
+	}
+
 	private void validateConstraints(IomObject iomObj, Viewable classOfIomObj) {
 		if(!ValidationConfig.OFF.equals(constraintValidation)){
 			Viewable classOfCurrentObj=classOfIomObj;
@@ -977,7 +1061,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         if (propc >= 1) {
             IomObject embeddedLinkObj = iomObj.getattrobj(role.getName(), 0);
             AssociationDef roleOwner = (AssociationDef) role.getContainer();
-
             Viewable classOfCurrentObj = roleOwner;
             if (classOfCurrentObj != null) {
                 String iomObjOid = iomObj.getobjectoid();
@@ -1083,8 +1166,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(!ValidationConfig.OFF.equals(constraintValidation)){
 			String constraintName = getScopedName(uniquenessConstraint);
 			String checkUniqueConstraint=null;
-			if(!enforceConstraintValidation){
-				checkUniqueConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
+			if(!enforceConstraintValidation) {
+				checkUniqueConstraint = validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
 			}
 			if(ValidationConfig.OFF.equals(checkUniqueConstraint)){
 				if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
@@ -1301,8 +1384,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             }
                             logMsg(checkConstraint,msg);
                         } else {
-                            if(!setConstraintOufputReduction.contains(setConstraint+":"+constraintName)){
-                                setConstraintOufputReduction.add(setConstraint+":"+constraintName);
+                            String constraintIdentifier = setConstraint+":"+constraintName+(setConstraint.perBasket() ? ":Basket("+currentBasketId+")" : "");
+                            if(!setConstraintOufputReduction.contains(constraintIdentifier)){
+                                setConstraintOufputReduction.add(constraintIdentifier);
                                 logMsg(checkConstraint,rsrc.getString("validateSetConstraint.setConstraintIsNotTrue"), getDisplayName(setConstraint));
                             }
                         }
@@ -1606,6 +1690,61 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 			return new Value(false);
+		} else if(expression instanceof Expression.Implication) {
+			Expression.Implication implication = (Expression.Implication) expression;
+			Value leftValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, implication.getLeft(), firstRole);
+			Value rightValue = Value.createSkipEvaluation();
+			if (!leftValue.skipEvaluation() && !leftValue.isUndefined() && leftValue.isTrue()) {
+				rightValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, implication.getRight(), firstRole);
+			}
+
+			if (leftValue.skipEvaluation() || rightValue.skipEvaluation()) {
+				return rightValue;
+			}
+			if (leftValue.isUndefined() || rightValue.isUndefined()) {
+				return Value.createUndefined();
+			}
+			return new Value(!leftValue.isTrue() || (leftValue.isTrue() && rightValue.isTrue()));
+		} else if (expression instanceof Expression.Addition) {
+			Expression.Addition addition = (Expression.Addition) expression;
+			Value leftValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, addition.getLeft(), firstRole);
+			Value rightValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, addition.getRight(), firstRole);
+			if (leftValue.skipEvaluation() || rightValue.skipEvaluation())
+				return Value.createSkipEvaluation();
+			if (leftValue.isUndefined() || rightValue.isUndefined())
+				return Value.createUndefined();
+
+			return new Value(leftValue.getNumeric() + rightValue.getNumeric());
+		} else if (expression instanceof Expression.Subtraction) {
+			Expression.Subtraction subtraction = (Expression.Subtraction) expression;
+			Value leftValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, subtraction.getLeft(), firstRole);
+			Value rightValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, subtraction.getRight(), firstRole);
+			if (leftValue.skipEvaluation() || rightValue.skipEvaluation())
+				return Value.createSkipEvaluation();
+			if (leftValue.isUndefined() || rightValue.isUndefined())
+				return Value.createUndefined();
+
+			return new Value(leftValue.getNumeric() - rightValue.getNumeric());
+		} else if (expression instanceof Expression.Multiplication) {
+			Expression.Multiplication multiplication = (Expression.Multiplication) expression;
+			Value leftValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, multiplication.getLeft(), firstRole);
+			Value rightValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, multiplication.getRight(), firstRole);
+			if (leftValue.skipEvaluation() || rightValue.skipEvaluation())
+				return Value.createSkipEvaluation();
+			if (leftValue.isUndefined() || rightValue.isUndefined())
+				return Value.createUndefined();
+
+			return new Value(leftValue.getNumeric() * rightValue.getNumeric());
+		} else if (expression instanceof Expression.Division) {
+			Expression.Division division = (Expression.Division) expression;
+			Value leftValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, division.getLeft(), firstRole);
+			Value rightValue = evaluateExpression(parentObject, validationKind, usageScope, iomObj, division.getRight(), firstRole);
+			if (leftValue.skipEvaluation() || rightValue.skipEvaluation())
+				return Value.createSkipEvaluation();
+			if (leftValue.isUndefined() || rightValue.isUndefined())
+				return Value.createUndefined();
+
+			return new Value(leftValue.getNumeric() / rightValue.getNumeric());
 		} else if(expression instanceof Constant){
 			// constant
 			Constant constantObj = (Constant) expression;
@@ -1753,6 +1892,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             Value listOfIomObjectsValue = new Value(listOfIomObjects);
             functions.put(expression, listOfIomObjectsValue);
             return listOfIomObjectsValue;
+        } else if (expression instanceof ValueRefThis) {
+            Domain domain = (Domain) td.getElement(iomObj.getobjecttag());
+            String value = iomObj.getattrvalue(VALUE_REF_THIS);
+            return new Value(domain.getType(), value);
         } else if(expression instanceof ParameterValue) {
             ParameterValue paramValue=(ParameterValue)expression;
             String paramName=paramValue.getParameter().getScopedName();
@@ -3615,7 +3758,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				 validateGeometryType=defaultGeometryTypeValidation;
 			 }
 		 }
-		Type type0=attr.getDomain();
+		Type attrType = attr.getDomain();
+		Domain domain = attrType instanceof TypeAlias ? ((TypeAlias)attrType).getAliasing() : null;
+		Model model = (Model)attr.getContainer(Model.class);
 		Type type = attr.getDomainResolvingAll();
 		if (type instanceof CompositionType){
 			 int structc=iomObj.getattrvaluecount(attrName);
@@ -3847,7 +3992,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         PolylineType polylineType=(PolylineType)type;
                         IomObject polylineValue=iomObj.getattrobj(attrName, structi);
                         if (polylineValue != null){
-                            boolean isValid=validatePolyline(validateGeometryType, polylineType, polylineValue, attrName);
+                            boolean isValid=validatePolyline(validateGeometryType, model, polylineType, polylineValue, attrName);
                             if(isValid){
                                 validatePolylineTopology(attrPath,validateGeometryType, polylineType, polylineValue);
                             }
@@ -3866,7 +4011,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                 if(polylinec>0) {
                                     for(int polylinei=0;polylinei<polylinec;polylinei++) {
                                         IomObject polylineValue=multipolylineValue.getattrobj("polyline", polylinei);
-                                        boolean isValid=validatePolyline(validateGeometryType, polylineType, polylineValue, attrName);
+                                        boolean isValid=validatePolyline(validateGeometryType, model, polylineType, polylineValue, attrName);
                                         if(isValid){
                                             validatePolylineTopology(attrPath,validateGeometryType, polylineType, polylineValue);
                                         }
@@ -3896,7 +4041,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             SurfaceOrAreaType surfaceOrAreaType=(SurfaceOrAreaType)type;
                             IomObject surfaceValue=iomObj.getattrobj(attrName,structi);
                             if (surfaceValue != null){
-                                boolean isValid = validatePolygon(validateGeometryType,surfaceOrAreaType, surfaceValue, iomObj, attrName);
+                                boolean isValid = validatePolygon(validateGeometryType, model, surfaceOrAreaType, surfaceValue, iomObj, attrName);
                                 if(isValid){
                                     Object attrValidator=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
                                     if(attrValidator==null){
@@ -3941,7 +4086,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         MultiSurfaceOrAreaType surfaceOrAreaType=(MultiSurfaceOrAreaType)type;
                        IomObject surfaceValue=iomObj.getattrobj(attrName,structi);
                        if (surfaceValue != null){
-                           boolean isValid = validatePolygon(validateGeometryType,surfaceOrAreaType, surfaceValue, iomObj, attrName);
+                           boolean isValid = validatePolygon(validateGeometryType, model, surfaceOrAreaType, surfaceValue, iomObj, attrName);
                            if(isValid){
                                Object attrValidator=pipelinePool.getIntermediateValue(attr, ValidationConfig.TOPOLOGY);
                                if(attrValidator==null){
@@ -3983,7 +4128,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     }else if(type instanceof CoordType){
                         IomObject coord=iomObj.getattrobj(attrName, structi);
                         if (coord!=null){
-                            validateCoordType(validateGeometryType, (CoordType)type, coord, attrName);
+                            validateCoordType(validateGeometryType, model, domain, (CoordType)type, coord, attrName);
                         } else {
                             String attrValue=iomObj.getattrprim(attrName, structi);
                             if (attrValue != null) {
@@ -3999,7 +4144,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                     for(int coordi=0;coordi<coordc;coordi++) {
                                         IomObject coordValue=multicoordValue.getattrobj("coord", coordi);
                                         if(coordValue.getobjecttag().equals("COORD")) {
-                                            validateCoordType(validateGeometryType, (MultiCoordType)type, coordValue, attrName);
+                                            validateCoordType(validateGeometryType, model, domain, (MultiCoordType)type, coordValue, attrName);
                                         }else {
                                             logMsg(validateType, "unexpected Type "+coordValue.getobjecttag()+"; COORD expected");
                                         }
@@ -4094,9 +4239,28 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         }
                     }
                 }
+                if (domain != null) {
+                    String rootDomainName = domain.getScopedName(null);
+
+                    while (domain != null) {
+                        Iterator<DomainConstraint> iterator = domain.iterator();
+                        while (iterator.hasNext()){
+                            DomainConstraint constraint = iterator.next();
+                            Iom_jObject iomValueObject = new Iom_jObject(rootDomainName, null);
+                            iomValueObject.setattrvalue(VALUE_REF_THIS, iomObj.getattrprim(attrName, structi));
+
+                            Value result = evaluateExpression(null, constraint.getScopedName(), rootDomainName, iomValueObject, constraint.getCondition(), null);
+
+                            if (!result.isTrue()){
+                                logMsg(validateType, rsrc.getString("validateAttrValue.attributeXDoesNotSatisfyTheDomainConstraintY"), attrPath, constraint.getScopedName());
+                            }
+                        }
+                        domain = domain.getExtending();
+                    }
+                }
             }
-		}
-	}
+        }
+    }
 
     static private Cardinality getCardinality(AttributeDef attr) { // move to ili2c
         Type type=attr.getDomainOrDerivedDomain();
@@ -4181,7 +4345,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private boolean validateSurfaceTopology(String validateType, AttributeDef attr,SurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
 		boolean surfaceTopologyValid=true;
 		try {
-			surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, errFact,validateType);
+			AbstractCoordType coordType = resolveGenericCoordTypeOfSurface(validateType, attr);
+			if (coordType == null) {
+				return false;
+			}
+			surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, errFact, validateType, coordType);
 		} catch (IoxException e) {
 			surfaceTopologyValid=false;
 			errs.addEvent(errFact.logErrorMsg(e, rsrc.getString("validateSurfaceTopology.failedToValidatePolygon")));
@@ -4191,14 +4359,28 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private boolean validateMultiSurfaceTopology(String validateType, AttributeDef attr,MultiSurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
         boolean surfaceTopologyValid=true;
         try {
-            surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validateMultiPolygon(mainObjTid, attr, iomValue, errFact,validateType);
+            AbstractCoordType coordType = resolveGenericCoordTypeOfSurface(validateType, attr);
+            if (coordType == null) {
+                return false;
+            }
+            surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validateMultiPolygon(mainObjTid, attr, iomValue, errFact, validateType, coordType);
         } catch (IoxException e) {
             surfaceTopologyValid=false;
             errs.addEvent(errFact.logErrorMsg(e, rsrc.getString("validateSurfaceTopology.failedToValidatePolygon")));
         }
         return surfaceTopologyValid;
     }
-	
+
+    private AbstractCoordType resolveGenericCoordTypeOfSurface(String validateType, AttributeDef attr) {
+        AbstractSurfaceOrAreaType surfaceType = (AbstractSurfaceOrAreaType) attr.getDomainResolvingAliases();
+        Domain coordDomain = surfaceType.getControlPointDomain();
+        AbstractCoordType coordType = (AbstractCoordType) coordDomain.getType();
+        if (coordType.isGeneric()) {
+            coordType = resolveGenericCoordType(validateType, (Model) attr.getContainer(Model.class), coordDomain);
+        }
+        return coordType;
+    }
+
 	private void validatePolylineTopology(String attrPath,String validateType, LineType type, IomObject iomValue) {
 		CompoundCurve seg=null;
 		try {
@@ -4242,7 +4424,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	/* returns true, if polygon is valid
 	 * 
 	 */
-	private boolean validatePolygon(String validateType, AbstractSurfaceOrAreaType surfaceOrAreaType, IomObject surfaceValue, IomObject currentIomObj, String attrName) {
+	private boolean validatePolygon(String validateType, Model model, AbstractSurfaceOrAreaType surfaceOrAreaType, IomObject surfaceValue, IomObject currentIomObj, String attrName) {
         boolean foundErrs=false;
 		if (surfaceValue.getobjecttag().equals("MULTISURFACE")){
 		    int surfacec=surfaceValue.getattrvaluecount("surface");
@@ -4277,7 +4459,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						}    
 						for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
 							IomObject polyline=boundary.getattrobj("polyline",polylinei);
-					        foundErrs = foundErrs || !validatePolyline(validateType, surfaceOrAreaType, polyline, attrName);
+					        foundErrs = foundErrs || !validatePolyline(validateType, model, surfaceOrAreaType, polyline, attrName);
 							// add line to shell or hole
 						}
 					    // add shell or hole to surface
@@ -4292,7 +4474,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 
 	// returns true if valid
-	private boolean validatePolyline(String validateType, LineType polylineType, IomObject polylineValue, String attrName) {
+	private boolean validatePolyline(String validateType, Model model, LineType polylineType, IomObject polylineValue, String attrName) {
 		boolean foundErrs=false;
 		if (polylineValue.getobjecttag().equals("POLYLINE")){
 			boolean clipped = polylineValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
@@ -4318,7 +4500,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 						IomObject segment=sequence.getattrobj("segment",segmenti);
 						if(segment.getobjecttag().equals("COORD")){
 							if(lineformNames.contains("STRAIGHTS") || segmenti==0){
-							    foundErrs = foundErrs || !validateCoordType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment, attrName);
+								Domain coordDomain = polylineType.getControlPointDomain();
+							    foundErrs = foundErrs || !validateCoordType(validateType, model, coordDomain, (CoordType) coordDomain.getType(), segment, attrName);
 							}else{
 								logMsg(validateType, "unexpected COORD");
 								foundErrs = foundErrs || true;
@@ -4347,10 +4530,40 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return !foundErrs;
 	}
 
+	private AbstractCoordType resolveGenericCoordType(String validateType, Model model, Domain coordDomain) {
+		// search deferred generic in transfer
+		Domain concreteDomain = genericDomains.get(coordDomain.getScopedName());
+		if (concreteDomain != null) {
+			return (AbstractCoordType) concreteDomain.getType();
+		}
+
+		// resolve generic domain from contexts in model
+		Domain[] resolved = model.resolveGenericDomain(coordDomain);
+		if (resolved == null) {
+			logMsg(validateType, rsrc.getString("validateCoordType.missingContext"), coordDomain.toString());
+			return null;
+		}
+
+		if (resolved.length == 1) {
+			return (AbstractCoordType) resolved[0].getType();
+		}
+
+		logMsg(validateType, rsrc.getString("validateCoordType.multipleDomainsInContext"), coordDomain.toString());
+		return null;
+    }
+
     // returns true if valid
-	private boolean validateCoordType(String validateType, AbstractCoordType coordType, IomObject coordValue, String attrName) {
+	private boolean validateCoordType(String validateType, Model model, Domain coordDomain, AbstractCoordType coordType, IomObject coordValue, String attrName) {
         boolean foundErrs=false;
         OutParam<Boolean> isNumValid=new OutParam<Boolean>(true);
+
+		if (coordType.isGeneric()) {
+			coordType = resolveGenericCoordType(validateType, model, coordDomain);
+			if (coordType == null) {
+				return false;
+			}
+		}
+
 		if (coordType.getDimensions().length >= 1){
 			if (coordValue.getattrvalue("C1") != null){
 				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"), attrName,isNumValid));

@@ -80,8 +80,6 @@ public class UniqueConstraints23Test {
 	private final static String STRUCTI=TOPIC+".StructI";
 	private final static String STRUCTJ=TOPIC+".StructJ";
 	private final static String STRUCTO=TOPIC+".StructO";
-	private final static String UNDEFINED=TOPIC+".ClassUndefined";
-	private final static String EMPTYTEXT=TOPIC+".ClassEmptyText";
 	
 	@Before
 	public void setUp() throws Exception {
@@ -286,7 +284,7 @@ public class UniqueConstraints23Test {
 
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn (Attr1 und Attr2) Unique sind, jedoch Attr2 identische Werte enthaelt.
 	@Test
-	public void only1AttributeValue_Attr2ExistTwice_Ok(){
+	public void unique_twoAttr_Value2ExistTwice_Ok(){
 		// Set object.
 		Iom_jObject obj1=new Iom_jObject(CLASSB,OID1);
 		obj1.setattrvalue("attr1", "Anna");
@@ -312,7 +310,7 @@ public class UniqueConstraints23Test {
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn (attr1, attr2) Unique definiert sind und beide Werte unterschiedlich definiert sind.
 	@Test
-	public void attrValuesDifferent_Ok(){
+	public void unique_twoAttr_Ok(){
 		// Set object.
 		Iom_jObject obj1=new Iom_jObject(CLASSB,OID1);
 		obj1.setattrvalue("attr1", "Anna");
@@ -339,7 +337,7 @@ public class UniqueConstraints23Test {
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn (attr1, attr2) Unique definiert sind und beide Werte unterschiedlich definiert sind.
 	// Die Klasse: ClassB wird von der Klasse: ClassBP erweitert.
 	@Test
-	public void subClassAttrValuesDifferent_Ok(){
+	public void unique_twoAttr_subClass_Ok(){
 		// Set object.
 		Iom_jObject iomObjClassBP=new Iom_jObject(CLASSBP,OID1);
 		iomObjClassBP.setattrvalue("attr1", "Anna");
@@ -841,10 +839,10 @@ public class UniqueConstraints23Test {
 	// attr1 ist UNIQUE und noch einmal UNIQUE mit attr2 zusammen. Jedoch wird attr1 nicht erstellt.
 	// Es soll keine Fehlermeldung ausgegeben werden.
 	@Test
-	public void nonUniqueAttrValuesOfAttr1_AreUndefined_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(UNDEFINED, OID1);
+	public void unique_twoAttr_Value1Undefined_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(CLASSB, OID1);
 		iomObjA.setattrvalue("attr2", "20");
-		Iom_jObject iomObjB=new Iom_jObject(UNDEFINED, OID2);
+		Iom_jObject iomObjB=new Iom_jObject(CLASSB, OID2);
 		iomObjB.setattrvalue("attr2", "15");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -865,10 +863,10 @@ public class UniqueConstraints23Test {
 	// attr1 ist UNIQUE und noch einmal UNIQUE mit attr2 zusammen. Jedoch wird attr1 nicht erstellt.
 	// Es soll keine Fehlermeldung fuer die Unique Verletzung von attr2 ausgegeben werden.
 	@Test
-	public void nonUniqueAttr1IsUndefined_UniqueAttrValueOfAttr2ExistTwice_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(UNDEFINED, OID1);
+	public void unique_twoAttr_Value1UndefinedValue2ExistTwice_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(CLASSB, OID1);
 		iomObjA.setattrvalue("attr2", "20");
-		Iom_jObject iomObjB=new Iom_jObject(UNDEFINED, OID2);
+		Iom_jObject iomObjB=new Iom_jObject(CLASSB, OID2);
 		iomObjB.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -888,13 +886,13 @@ public class UniqueConstraints23Test {
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn eine Konstante in einem UniquenessConstraint leeren Text ist.
 	// Es soll als normaler Inhalt angeschaut werden und keine Fehlermeldung ausgeben, da attr2 unterschiedliche Werte definiert hat.
 	@Test
-	public void attrValuesOfAttr1IsEmpty_Ok(){
-		Iom_jObject iomObjA=new Iom_jObject(EMPTYTEXT, OID1);
+	public void unique_twoAttr_Value1Empty_Ok(){
+		Iom_jObject iomObjA=new Iom_jObject(CLASSB, OID1);
 		iomObjA.setattrvalue("attr1", "");
-		iomObjA.setattrvalue("attr2", "text1");
-		Iom_jObject iomObjB=new Iom_jObject(EMPTYTEXT, OID2);
+		iomObjA.setattrvalue("attr2", "10");
+		Iom_jObject iomObjB=new Iom_jObject(CLASSB, OID2);
 		iomObjB.setattrvalue("attr1", "");
-		iomObjB.setattrvalue("attr2", "text2");
+		iomObjB.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1291,7 +1289,7 @@ public class UniqueConstraints23Test {
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn (attr1, attr2) Unique definiert sind und beide Werte gleich sind.
 	// Die Klasse: ClassB wird von der Klasse: ClassBP erweitert.
 	@Test
-	public void subClassAttrValuesDifferent_Fail(){
+	public void unique_twoAttr_ValuesExistTwice_subClass_Fail(){
 		// Set object.
 		Iom_jObject iomObjClassBP=new Iom_jObject(CLASSBP,OID1);
 		iomObjClassBP.setattrvalue("attr1", "Anna");
@@ -1318,7 +1316,7 @@ public class UniqueConstraints23Test {
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn die Nummer Unique und identisch ist.
 	@Test
-	public void uniqueAttrValuesOfAttr2ExistTwice_Fail(){
+	public void unique_twoAttr_ValuesExistTwice_Fail(){
 		// Set object.
 		Iom_jObject obj1=new Iom_jObject(CLASSB,OID1);
 		obj1.setattrvalue("attr1", "Ralf");
@@ -2412,7 +2410,7 @@ public class UniqueConstraints23Test {
 	// Die Konfiguration ist nicht gesetzt.
 	// Es wird eine Fehlermeldung erwartet.
 	@Test
-	public void uniqueAttrValuesSame_ConstraintDisableSet_NotSet_Fail(){
+	public void unique_twoAttr_ValuesExistTwice_ConstraintDisableSet_NotSet_Fail(){
 		// Set object.
 		Iom_jObject obj1=new Iom_jObject(CLASSB,OID1);
 		obj1.setattrvalue("attr1", "Ralf");
@@ -2440,7 +2438,7 @@ public class UniqueConstraints23Test {
 	// Die Konfiguration ist Eingeschaltet.
 	// Es wird eine Fehlermeldung erwartet.
 	@Test
-	public void uniqueAttrValuesSame_ConstraintDisableSet_ON_Fail(){
+	public void unique_twoAttr_ValuesExistTwice_ConstraintDisableSet_ON_Fail(){
 		// Set object.
 		Iom_jObject obj1=new Iom_jObject(CLASSB,OID1);
 		obj1.setattrvalue("attr1", "Ralf");
@@ -2469,7 +2467,7 @@ public class UniqueConstraints23Test {
 	// Die Konfiguration ist Ausgeschaltet.
 	// Es wird erwartet dass keine Fehlermeldung ausgegeben wird.
 	@Test
-	public void uniqueAttrValuesSame_ConstraintDisableSet_OFF_Ok(){
+	public void unique_twoAttr_ValuesExistTwice_ConstraintDisableSet_OFF_Ok(){
 		// Set object.
 		Iom_jObject obj1=new Iom_jObject(CLASSB,OID1);
 		obj1.setattrvalue("attr1", "Ralf");

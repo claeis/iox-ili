@@ -1,8 +1,8 @@
 package ch.interlis.models.IlisMeta16.ModelData;
 public class View_FormationKind{
-  static private java.util.HashMap valuev=new java.util.HashMap();
+  static protected java.util.HashMap valuev=new java.util.HashMap();
   private String value=null;
-  private View_FormationKind(String value) {
+  protected View_FormationKind(String value) {
     this.value=value;
     valuev.put(value,this);
   }

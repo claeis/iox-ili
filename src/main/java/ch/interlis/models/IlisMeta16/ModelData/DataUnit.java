@@ -27,13 +27,25 @@ public class DataUnit extends ch.interlis.models.IlisMeta16.ModelData.Extendable
   public final static String tag_Oid="Oid";
   public String getOid() {
     ch.interlis.iom.IomObject value=getattrobj("Oid",0);
-    if(value==null)throw new IllegalStateException();
+    if(value==null)return null;
     String oid=value.getobjectrefoid();
-    if(oid==null)throw new IllegalStateException();
+    if(oid==null)return null;
     return oid;
   }
-  public void setOid(String oid) {
-    ch.interlis.iom.IomObject structvalue=addattrobj("Oid","REF");
+  public String setOid(String oid) {
+    ch.interlis.iom.IomObject structvalue=getattrobj("Oid",0);
+    if(structvalue==null){
+      if(oid==null)return null;
+      structvalue=addattrobj("Oid","REF");
+    }else{
+      if(oid==null){
+        String oldoid=structvalue.getobjectrefoid();
+        deleteattrobj("Oid",0);
+        return oldoid;
+      }
+    }
+    String oldoid=structvalue.getobjectrefoid();
     structvalue.setobjectrefoid(oid);
+    return oldoid;
   }
 }

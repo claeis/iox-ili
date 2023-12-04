@@ -1,8 +1,8 @@
 package ch.interlis.models.IlisMeta16.ModelData;
 public class Ili1Format_tidKind{
-  static private java.util.HashMap valuev=new java.util.HashMap();
+  static protected java.util.HashMap valuev=new java.util.HashMap();
   private String value=null;
-  private Ili1Format_tidKind(String value) {
+  protected Ili1Format_tidKind(String value) {
     this.value=value;
     valuev.put(value,this);
   }
