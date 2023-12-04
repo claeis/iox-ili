@@ -2225,8 +2225,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 RoleDef objRole = ((RoleDef) obj.obj).getOppEnd();
                 if (objRole.equals(role)) {
                     return true;
-                } else {
-                    return false;
                 }
             }
         }

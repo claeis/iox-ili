@@ -1,0 +1,71 @@
+INTERLIS 2.3;
+
+MODEL ModelA (de) AT "http://www.interlis.ch/ili2c/tests/" VERSION "2023-10-26" =
+  DOMAIN
+    !!@CRS=EPSG:2056
+    Coord2 = COORD
+      2460000.000 .. 2870000.000 [INTERLIS.m],
+      1045000.000 .. 1310000.000 [INTERLIS.m],
+      ROTATION 2 -> 1;
+
+  TOPIC Testdata  =
+
+    CLASS ClassA =
+      Nr: MANDATORY TEXT*8;
+    END ClassA;
+
+    CLASS ClassB =
+      Nr: MANDATORY TEXT*8;
+    END ClassB;
+
+    CLASS Point =
+      Geometry: MANDATORY Coord2;
+    END Point;
+
+    ASSOCIATION ClassA_Punkt =
+      ClassA -<#> {0..1} ClassA;
+      Point -- {0..1} Point;
+    END ClassA_Punkt;
+
+    ASSOCIATION ClassB_Punkt =
+      ClassB -<#> {0..1} ClassB;
+      Point -- {0..1} Point;
+    END ClassB_Punkt;
+
+  END Testdata;
+
+END ModelA.
+
+MODEL ModelA_AddChecks (de) AT "http://www.interlis.ch/ili2c/tests/" VERSION "2023-10-26" =
+  IMPORTS ModelA;
+
+  VIEW TOPIC ModelA_AddCheck =
+    DEPENDS ON ModelA.Testdata;
+
+    VIEW ViewA
+      PROJECTION OF ModelA.Testdata.ClassA;
+      =
+      ALL OF ClassA;
+
+      !!@ name="Constraint-A-Defined"
+      MANDATORY CONSTRAINT DEFINED(Point);
+      !!@ name="Constraint-A-Count"
+      MANDATORY CONSTRAINT INTERLIS.objectCount(Point) >= 1;
+
+    END ViewA;
+
+    VIEW ViewB
+      PROJECTION OF ModelA.Testdata.ClassB;
+      =
+      ALL OF ClassB;
+
+      !!@ name="Constraint-B-Defined"
+      MANDATORY CONSTRAINT DEFINED(Point);
+      !!@ name="Constraint-B-Count"
+      MANDATORY CONSTRAINT INTERLIS.objectCount(Point) >= 1;
+
+    END ViewB;
+
+  END ModelA_AddCheck;
+
+END ModelA_AddChecks.

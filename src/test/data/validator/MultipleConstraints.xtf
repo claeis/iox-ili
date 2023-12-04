@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+  <HEADERSECTION VERSION="2.3" SENDER="ili2pg-4.6.1-63db90def1260a503f0f2d4cb846686cd4851184">
+    <MODELS>
+      <MODEL VERSION="2023-10-26" URI="http://www.interlis.ch/ili2c/tests/" NAME="ModelA" />
+    </MODELS>
+  </HEADERSECTION>
+  <DATASECTION>
+    <ModelA.Testdata BID="1">
+      <ModelA.Testdata.ClassA TID="A1">
+        <Nr>A1</Nr>
+      </ModelA.Testdata.ClassA>
+      <ModelA.Testdata.ClassA TID="A2">
+        <Nr>A2</Nr>
+      </ModelA.Testdata.ClassA>
+      <ModelA.Testdata.ClassA TID="A3">
+        <Nr>A3</Nr>
+      </ModelA.Testdata.ClassA>
+
+      <ModelA.Testdata.ClassB TID="B1">
+        <Nr>B1</Nr>
+      </ModelA.Testdata.ClassB>
+      <ModelA.Testdata.ClassB TID="B2">
+        <Nr>B2</Nr>
+      </ModelA.Testdata.ClassB>
+      <ModelA.Testdata.ClassB TID="B3">
+        <Nr>B3</Nr>
+      </ModelA.Testdata.ClassB>
+
+      <ModelA.Testdata.Point TID="Point_A1">
+        <Geometry>
+          <COORD>
+            <C1>2680260</C1>
+            <C2>1220055</C2>
+          </COORD>
+        </Geometry>
+        <ClassA REF="A1">
+        </ClassA>
+      </ModelA.Testdata.Point>
+      <!-- No Point for A2 to test mandatory constraint -->
+
+      <ModelA.Testdata.Point TID="Point_B1">
+        <Geometry>
+          <COORD>
+            <C1>2681724</C1>
+            <C2>1224220</C2>
+          </COORD>
+        </Geometry>
+        <ClassB REF="B1">
+        </ClassB>
+      </ModelA.Testdata.Point>
+      <ModelA.Testdata.Point TID="Point_B2">
+        <Geometry>
+          <COORD>
+            <C1>2681724</C1>
+            <C2>1224220</C2>
+          </COORD>
+        </Geometry>
+        <ClassB REF="B2">
+        </ClassB>
+      </ModelA.Testdata.Point>
+
+      <ModelA.Testdata.Point TID="Point_A3_B3">
+        <Geometry>
+          <COORD>
+            <C1>2681724</C1>
+            <C2>1224220</C2>
+          </COORD>
+        </Geometry>
+        <ClassA REF="A3">
+        </ClassA>
+        <ClassB REF="B3">
+        </ClassB>
+      </ModelA.Testdata.Point>
+    </ModelA.Testdata>
+  </DATASECTION>
+</TRANSFER>
