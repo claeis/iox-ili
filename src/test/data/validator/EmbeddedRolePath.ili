@@ -22,21 +22,25 @@ MODEL ModelA (de) AT "http://www.interlis.ch/ili2c/tests/" VERSION "2023-10-26" 
       Geometry: MANDATORY Coord2;
     END Point;
 
-    ASSOCIATION ClassA_Punkt =
+    !! 1:1 Associations with cardinalities less than or equal to 1 are embedded into the target class of the second role.
+    !! In this case this is class Point.
+    !! Reference Manual chapter 3.3.9.1 defines the usage of embedded associations in XML transfer files.
+
+    ASSOCIATION ClassA_Point =
       ClassA -<#> {0..1} ClassA;
       Point -- {0..1} Point;
-    END ClassA_Punkt;
+    END ClassA_Point;
 
-    ASSOCIATION ClassB_Punkt =
+    ASSOCIATION ClassB_Point =
       ClassB -<#> {0..1} ClassB;
       Point -- {0..1} Point;
-    END ClassB_Punkt;
+    END ClassB_Point;
 
   END Testdata;
 
 END ModelA.
 
-MODEL ModelA_AddChecks (de) AT "http://www.interlis.ch/ili2c/tests/" VERSION "2023-10-26" =
+MODEL ModelA_AddChecks_Defined (de) AT "http://www.interlis.ch/ili2c/tests/" VERSION "2023-10-26" =
   IMPORTS ModelA;
 
   VIEW TOPIC ModelA_AddCheck =
@@ -49,8 +53,6 @@ MODEL ModelA_AddChecks (de) AT "http://www.interlis.ch/ili2c/tests/" VERSION "20
 
       !!@ name="Constraint-A-Defined"
       MANDATORY CONSTRAINT DEFINED(Point);
-      !!@ name="Constraint-A-Count"
-      MANDATORY CONSTRAINT INTERLIS.objectCount(Point) >= 1;
 
     END ViewA;
 
@@ -61,6 +63,34 @@ MODEL ModelA_AddChecks (de) AT "http://www.interlis.ch/ili2c/tests/" VERSION "20
 
       !!@ name="Constraint-B-Defined"
       MANDATORY CONSTRAINT DEFINED(Point);
+
+    END ViewB;
+
+  END ModelA_AddCheck;
+
+END ModelA_AddChecks_Defined.
+
+MODEL ModelA_AddChecks_Count (de) AT "http://www.interlis.ch/ili2c/tests/" VERSION "2023-10-26" =
+  IMPORTS ModelA;
+
+  VIEW TOPIC ModelA_AddCheck =
+    DEPENDS ON ModelA.Testdata;
+
+    VIEW ViewA
+      PROJECTION OF ModelA.Testdata.ClassA;
+      =
+      ALL OF ClassA;
+
+      !!@ name="Constraint-A-Count"
+      MANDATORY CONSTRAINT INTERLIS.objectCount(Point) >= 1;
+
+    END ViewA;
+
+    VIEW ViewB
+      PROJECTION OF ModelA.Testdata.ClassB;
+      =
+      ALL OF ClassB;
+
       !!@ name="Constraint-B-Count"
       MANDATORY CONSTRAINT INTERLIS.objectCount(Point) >= 1;
 
@@ -68,4 +98,4 @@ MODEL ModelA_AddChecks (de) AT "http://www.interlis.ch/ili2c/tests/" VERSION "20
 
   END ModelA_AddCheck;
 
-END ModelA_AddChecks.
+END ModelA_AddChecks_Count.

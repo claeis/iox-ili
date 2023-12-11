@@ -7,6 +7,7 @@ import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox_j.PipelinePool;
 import ch.interlis.iox_j.logging.LogEventFactory;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -16,14 +17,19 @@ import static ch.interlis.iox_j.validator.LogCollectorAssertions.AssertContainsI
 
 public class EmbeddedRolePathTest {
     private static final String DATA_DIRECTORY = "src/test/data/validator/";
+    private TransferDescription td;
+    private XtfReader reader;
+
+    @Before
+    public void setup() throws IoxException {
+        td = ValidatorTestHelper.compileIliFile(DATA_DIRECTORY + "EmbeddedRolePath.ili");
+        reader = new XtfReader(new File(DATA_DIRECTORY, "EmbeddedRolePath.xtf"));
+    }
 
     @Test
-    public void multipleAssociationsWithConstraints() throws IoxException {
-        TransferDescription td = ValidatorTestHelper.compileIliFile(DATA_DIRECTORY + "EmbeddedRolePath.ili");
-        XtfReader reader = new XtfReader(new File(DATA_DIRECTORY, "EmbeddedRolePath.xtf"));
-
+    public void multipleRolesWithDefinedConstraints() throws IoxException {
         ValidationConfig modelConfig = new ValidationConfig();
-        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS, "ModelA_AddChecks");
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS, "ModelA_AddChecks_Defined");
 
         LogCollector logger = new LogCollector();
         Validator validator = new Validator(td, modelConfig, logger, new LogEventFactory(), new PipelinePool(), new Settings());
@@ -34,10 +40,26 @@ public class EmbeddedRolePathTest {
         }
         reader.close();
 
-        assertMandatoryConstraint("ModelA_AddChecks.ModelA_AddCheck.ViewA.Constraint-A-Defined", 1, logger);
-        assertMandatoryConstraint("ModelA_AddChecks.ModelA_AddCheck.ViewA.Constraint-A-Count", 1, logger);
-        assertMandatoryConstraint("ModelA_AddChecks.ModelA_AddCheck.ViewB.Constraint-B-Defined", 0, logger);
-        assertMandatoryConstraint("ModelA_AddChecks.ModelA_AddCheck.ViewB.Constraint-B-Count", 0, logger);
+        assertMandatoryConstraint("ModelA_AddChecks_Defined.ModelA_AddCheck.ViewA.Constraint-A-Defined", 1, logger);
+        assertMandatoryConstraint("ModelA_AddChecks_Defined.ModelA_AddCheck.ViewB.Constraint-B-Defined", 0, logger);
+    }
+
+    @Test
+    public void multipleRolesWithCountConstraints() throws IoxException {
+        ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS, "ModelA_AddChecks_Count");
+
+        LogCollector logger = new LogCollector();
+        Validator validator = new Validator(td, modelConfig, logger, new LogEventFactory(), new PipelinePool(), new Settings());
+
+        IoxEvent event;
+        while ((event = reader.read()) != null) {
+            validator.validate(event);
+        }
+        reader.close();
+
+        assertMandatoryConstraint("ModelA_AddChecks_Count.ModelA_AddCheck.ViewA.Constraint-A-Count", 1, logger);
+        assertMandatoryConstraint("ModelA_AddChecks_Count.ModelA_AddCheck.ViewB.Constraint-B-Count", 0, logger);
     }
 
     private static void assertMandatoryConstraint(String constraintName, int errorCount, LogCollector logger) {
