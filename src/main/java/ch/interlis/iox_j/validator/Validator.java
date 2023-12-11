@@ -2201,7 +2201,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         AssociationDef assoc=(AssociationDef) role.getContainer();
         if(assoc.isLightweight()) {
             // if reference is embedded in srcObj then is it a forward
-            if (isRoleEmbedded(role) && role.getOppEnd().getDestination()==srcObjClass) {
+            if (role.isAssociationEmbedded() && role.getOppEnd().getDestination()==srcObjClass) {
                 return true;
             } else {
                 return false;
@@ -2215,22 +2215,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             // role is backward; srcObj doesn't contain a reference
             return true;
         }
-    }
-    private boolean isRoleEmbedded(RoleDef role) {
-        Viewable destination = role.getDestination();
-        Iterator iterator = destination.getAttributesAndRoles2();
-        while (iterator.hasNext()) {
-            ViewableTransferElement obj = (ViewableTransferElement)iterator.next();
-            if (obj.obj instanceof RoleDef) {
-                RoleDef objRole = ((RoleDef) obj.obj).getOppEnd();
-                if (objRole.equals(role)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        return false;
     }
     private Map<RoleDef,Map<String,List<IomObject>>> targetObjects=new HashMap<RoleDef,Map<String,List<IomObject>>>();
     private List<IomObject> getTargetObjectsOfReverseRole(RoleDef role, String srcObjOid) {
