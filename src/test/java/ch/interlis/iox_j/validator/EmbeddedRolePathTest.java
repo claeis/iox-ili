@@ -14,13 +14,13 @@ import java.io.File;
 import static ch.interlis.iox_j.validator.LogCollectorAssertions.AssertContainsError;
 import static ch.interlis.iox_j.validator.LogCollectorAssertions.AssertContainsInfo;
 
-public class MultipleConstraintsTest {
+public class EmbeddedRolePathTest {
     private static final String DATA_DIRECTORY = "src/test/data/validator/";
 
     @Test
     public void multipleAssociationsWithConstraints() throws IoxException {
-        TransferDescription td = ValidatorTestHelper.compileIliFile(DATA_DIRECTORY + "MultipleConstraints.ili");
-        XtfReader reader = new XtfReader(new File(DATA_DIRECTORY, "MultipleConstraints.xtf"));
+        TransferDescription td = ValidatorTestHelper.compileIliFile(DATA_DIRECTORY + "EmbeddedRolePath.ili");
+        XtfReader reader = new XtfReader(new File(DATA_DIRECTORY, "EmbeddedRolePath.xtf"));
 
         ValidationConfig modelConfig = new ValidationConfig();
         modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS, "ModelA_AddChecks");
