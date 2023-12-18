@@ -41,6 +41,7 @@ public class MandatoryConstraints23 {
 	private final static String ILI_CLASSEQUALATIONE=TOPIC+".ClassEqualE";
 	private final static String ILI_CLASSEQUALATIONF=TOPIC+".ClassEqualF";
 	private final static String ILI_CLASSEQUALATIONF2=TOPIC+".ClassEqualF2";
+    private final static String ILI_CLASSEQUALATIONF2_UNDEF=TOPIC+".ClassEqualF2undef";
 	private final static String ILI_CLASSEQUALATIONF3=TOPIC+".ClassEqualF3";
 	private final static String ILI_CLASSEQUALATIONG=TOPIC+".ClassEqualG";
 	private final static String ILI_CLASSEQUALATIONH=TOPIC+".ClassEqualH";
@@ -399,6 +400,41 @@ public class MandatoryConstraints23 {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}	
+    @Test
+    @Ignore("ilivalidator#402")
+    public void decUndefinedEqualConstant_Fail(){
+        Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF2, OID1);
+        //iomObjA.setattrvalue("attr1", "2.0");  // attr1 undefined, mandatory constraint should fail
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(iomObjA));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+    }   
+    @Test
+    public void decUndefinedEqualConstant_Ok(){
+        Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF2_UNDEF, OID1);
+        //iomObjA.setattrvalue("attr1", "2.0");  // attr1 undefined, mandatory constraint should fail
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID));
+        validator.validate(new ObjectEvent(iomObjA));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }   
 	@Test
 	public void decDomainEqualConstant_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSEQUALATIONF3, OID1);
