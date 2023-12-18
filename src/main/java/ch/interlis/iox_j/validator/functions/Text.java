@@ -11,6 +11,8 @@ import ch.interlis.iox_j.validator.Value;
 import ch.interlis.iox_j.validator.Validator;
 
 public class Text {
+    public static final String TEXT="Text";
+    public static final String TEXT_V2="Text_V2";
     
     private TransferDescription td = null;
     private ch.interlis.iox.IoxValidationConfig validationConfig = null;
@@ -25,8 +27,8 @@ public class Text {
     public Value evaluateFunction(Function currentFunction, FunctionCall functionCallObj, IomObject parentObject, 
             String validationKind, String usageScope, IomObject iomObj, TextType texttype, RoleDef firstRole) {
         
-        if (currentFunction.getScopedName(null).equals("Text.compareToIgnoreCase") || 
-                currentFunction.getScopedName(null).equals("Text.compareToIgnoreCaseM")) {
+        if (currentFunction.getName().equals("compareToIgnoreCase") || 
+                currentFunction.getName().equals("compareToIgnoreCaseM")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments.length == 2) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -48,8 +50,8 @@ public class Text {
                 }
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Text.concat") || 
-                currentFunction.getScopedName(null).equals("Text.concatM")) { 
+        } else if (currentFunction.getName().equals("concat") || 
+                currentFunction.getName().equals("concatM")) { 
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments.length == 2) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -71,8 +73,8 @@ public class Text {
                 }
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Text.endsWith") || 
-                currentFunction.getScopedName(null).equals("Text.endsWithM")) { 
+        } else if (currentFunction.getName().equals("endsWith") || 
+                currentFunction.getName().equals("endsWithM")) { 
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments.length == 2) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -94,8 +96,8 @@ public class Text {
                 }
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Text.equalsIgnoreCase") || 
-                currentFunction.getScopedName(null).equals("Text.equalsIgnoreCaseM")) { 
+        } else if (currentFunction.getName().equals("equalsIgnoreCase") || 
+                currentFunction.getName().equals("equalsIgnoreCaseM")) { 
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments.length == 2) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -117,8 +119,8 @@ public class Text {
                 }
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Text.indexOf") || 
-                currentFunction.getScopedName(null).equals("Text.indexOfM")) { 
+        } else if (currentFunction.getName().equals("indexOf") || 
+                currentFunction.getName().equals("indexOfM")) { 
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -145,8 +147,8 @@ public class Text {
 
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Text.lastIndexOf") || 
-                currentFunction.getScopedName(null).equals("Text.lastIndexOfM")) { 
+        } else if (currentFunction.getName().equals("lastIndexOf") || 
+                currentFunction.getName().equals("lastIndexOfM")) { 
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -173,8 +175,8 @@ public class Text {
 
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Text.matches") ||
-                currentFunction.getScopedName(null).equals("Text.matchesM")) { 
+        } else if (currentFunction.getName().equals("matches") ||
+                currentFunction.getName().equals("matchesM")) { 
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments.length == 2) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -196,8 +198,8 @@ public class Text {
                 }
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Text.replace") ||
-                currentFunction.getScopedName(null).equals("Text.replaceM")) {
+        } else if (currentFunction.getName().equals("replace") ||
+                currentFunction.getName().equals("replaceM")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value mainText = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -226,8 +228,8 @@ public class Text {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Text.startsWith") ||
-                currentFunction.getScopedName(null).equals("Text.startsWithM")) {
+        } else if (currentFunction.getName().equals("startsWith") ||
+                currentFunction.getName().equals("startsWithM")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -250,8 +252,8 @@ public class Text {
                 }
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Text.substring") ||
-                currentFunction.getScopedName(null).equals("Text.substringM")) {
+        } else if (currentFunction.getName().equals("substring") ||
+                currentFunction.getName().equals("substringM")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value mainText = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -280,8 +282,8 @@ public class Text {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Text.toLowerCase") ||
-                currentFunction.getScopedName(null).equals("Text.toLowerCaseM")) {
+        } else if (currentFunction.getName().equals("toLowerCase") ||
+                currentFunction.getName().equals("toLowerCaseM")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             for(Evaluable anArgument : arguments){
                 Value arg = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj,anArgument, firstRole);
@@ -294,8 +296,8 @@ public class Text {
                 return new Value(texttype, arg.getValue().toLowerCase());
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Text.toUpperCase") ||
-                currentFunction.getScopedName(null).equals("Text.toUpperCaseM")) {
+        } else if (currentFunction.getName().equals("toUpperCase") ||
+                currentFunction.getName().equals("toUpperCaseM")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             for(Evaluable anArgument : arguments){
                 Value arg = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj,anArgument, firstRole);

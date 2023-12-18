@@ -15,6 +15,8 @@ import ch.interlis.iox_j.validator.Validator;
 import ch.interlis.iox_j.validator.Value;
 
 public class Math {
+    public static final String MATH="Math";
+    public static final String MATH_V2="Math_V2";
     
     private TransferDescription td = null;
     private ch.interlis.iox.IoxValidationConfig validationConfig = null;
@@ -29,7 +31,7 @@ public class Math {
     public Value evaluateFunction(Function currentFunction, FunctionCall functionCallObj, IomObject parentObject,
             String validationKind, String usageScope, IomObject iomObj, TextType texttype, RoleDef firstRole) {
         
-        if (currentFunction.getScopedName(null).equals("Math.add")) {
+        if (currentFunction.getName().equals("add")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -54,7 +56,7 @@ public class Math {
 
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Math.sub")) {
+        } else if (currentFunction.getName().equals("sub")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -79,7 +81,7 @@ public class Math {
 
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Math.mul")) {
+        } else if (currentFunction.getName().equals("mul")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -104,7 +106,7 @@ public class Math {
 
             }
             return new Value(false); 
-        } else if (currentFunction.getScopedName(null).equals("Math.div")) {
+        } else if (currentFunction.getName().equals("div")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -129,7 +131,7 @@ public class Math {
 
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Math.abs")) {
+        } else if (currentFunction.getName().equals("abs")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -145,7 +147,7 @@ public class Math {
                 }
             }
             return new Value(false); 
-        } else if (currentFunction.getScopedName(null).equals("Math.acos")) {
+        } else if (currentFunction.getName().equals("acos")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -164,7 +166,7 @@ public class Math {
                 }
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Math.asin")) {
+        } else if (currentFunction.getName().equals("asin")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -183,7 +185,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.atan")) {
+        } else if (currentFunction.getName().equals("atan")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -202,7 +204,7 @@ public class Math {
                 }
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Math.atan2")) {
+        } else if (currentFunction.getName().equals("atan2")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -232,7 +234,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.cbrt")) {
+        } else if (currentFunction.getName().equals("cbrt")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -249,7 +251,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.cos")) {
+        } else if (currentFunction.getName().equals("cos")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -266,7 +268,7 @@ public class Math {
                 }
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Math.cosh")) {
+        } else if (currentFunction.getName().equals("cosh")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -283,7 +285,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.exp")) {
+        } else if (currentFunction.getName().equals("exp")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -299,7 +301,7 @@ public class Math {
                 }
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Math.hypot")) {
+        } else if (currentFunction.getName().equals("hypot")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -323,7 +325,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.log")) {
+        } else if (currentFunction.getName().equals("log")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -340,7 +342,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.log10")) {
+        } else if (currentFunction.getName().equals("log10")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -357,7 +359,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.pow")) {
+        } else if (currentFunction.getName().equals("pow")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -382,7 +384,7 @@ public class Math {
                 }
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Math.round")) {
+        } else if (currentFunction.getName().equals("round")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -399,7 +401,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.signum")) {
+        } else if (currentFunction.getName().equals("signum")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -416,7 +418,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.sin")) {
+        } else if (currentFunction.getName().equals("sin")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -436,7 +438,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.sinh")) {
+        } else if (currentFunction.getName().equals("sinh")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -456,7 +458,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.sqrt")) {
+        } else if (currentFunction.getName().equals("sqrt")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -473,7 +475,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.tan")) {
+        } else if (currentFunction.getName().equals("tan")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -493,7 +495,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.tanh")) {
+        } else if (currentFunction.getName().equals("tanh")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -513,7 +515,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.max")) {
+        } else if (currentFunction.getName().equals("max")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -538,7 +540,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.min")) {
+        } else if (currentFunction.getName().equals("min")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -563,7 +565,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.avg")) {
+        } else if (currentFunction.getName().equals("avg")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -595,7 +597,7 @@ public class Math {
                 }
             }
             return new Value(false);
-        } else if (currentFunction.getScopedName(null).equals("Math.max2")) {
+        } else if (currentFunction.getName().equals("max2")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -633,7 +635,7 @@ public class Math {
                 }
             }
             return new Value(false); 
-        } else if (currentFunction.getScopedName(null).equals("Math.min2")) {
+        } else if (currentFunction.getName().equals("min2")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
@@ -671,7 +673,7 @@ public class Math {
                 }
             }
             return new Value(false);                
-        } else if (currentFunction.getScopedName(null).equals("Math.sum")) {
+        } else if (currentFunction.getName().equals("sum")) {
             Evaluable[] arguments = functionCallObj.getArguments();
             if (arguments != null) {
                 Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
