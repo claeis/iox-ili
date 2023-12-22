@@ -132,6 +132,7 @@ public class CsvErrorsLogger extends AbstractXtfErrorsLogger {
             }
             sep=",";
         }
+        out.println();
     }
 	
 }
