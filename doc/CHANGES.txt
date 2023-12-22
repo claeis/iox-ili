@@ -6,6 +6,7 @@ ideas/open issues
 iox-ili 1.22.1 (2023-12-xx)
 -----------------------------
 - Validator: implement Math_V2, Text_V2 (ilivalidator#375)
+- add CsvErrorsLogger (ilivalidator#403)
 - ili2c-5.4.0
 
 iox-ili 1.22.0 (2023-12-04)
