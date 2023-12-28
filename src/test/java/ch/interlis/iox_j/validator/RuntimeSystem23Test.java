@@ -1,6 +1,7 @@
 package ch.interlis.iox_j.validator;
 
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,6 +26,10 @@ public class RuntimeSystem23Test {
     private static final String ILI_TOPICB = "RuntimeSystem23.TopicB";
     private static final String CLASSB = ILI_TOPICB+".ClassB";
     private static final String CLASSB_ATTRA = "attrA";
+    private static final String ILI_TOPICC = "RuntimeSystem23.TopicC";
+    private static final String CLASSC = ILI_TOPICC+".ClassC";
+    private static final String CLASSC_ATTRA = "attrA";
+    private static final String TRANSFER_FILE = "File.xtf";
     private TransferDescription td=null;
 	
 	@Before
@@ -33,10 +38,13 @@ public class RuntimeSystem23Test {
 		Configuration ili2cConfig=new Configuration();
         FileEntry fileEntry=new FileEntry("src/test/data/validator/MinimalRuntimeSystem01.ili", FileEntryKind.ILIMODELFILE);
         ili2cConfig.addFileEntry(fileEntry);
+        fileEntry=new FileEntry("src/test/data/validator/Text.ili", FileEntryKind.ILIMODELFILE);
+        ili2cConfig.addFileEntry(fileEntry);
 		fileEntry=new FileEntry("src/test/data/validator/RuntimeSystem23.ili", FileEntryKind.ILIMODELFILE);
 		ili2cConfig.addFileEntry(fileEntry);
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
+        td.setActualRuntimeParameter(ch.interlis.ili2c.metamodel.RuntimeParameters.MINIMAL_RUNTIME_SYSTEM01_CURRENT_TRANSFERFILE, TRANSFER_FILE);
 	}
 
 	@Test
@@ -56,6 +64,40 @@ public class RuntimeSystem23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    public void paramTextFunction(){
+        Iom_jObject objClassA=new Iom_jObject(CLASSC, "o1");
+        objClassA.setattrvalue(CLASSC_ATTRA, TRANSFER_FILE.substring(0,4)); 
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPICC,"b1"));
+        validator.validate(new ObjectEvent(objClassA));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
+    public void paramTextFunction_Fail(){
+        Iom_jObject objClassA=new Iom_jObject(CLASSC, "o1");
+        objClassA.setattrvalue(CLASSC_ATTRA, "xxxx"+TRANSFER_FILE); 
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPICC,"b1"));
+        validator.validate(new ObjectEvent(objClassA));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+    }
     @Test
     public void param_Fail(){
         Iom_jObject objClassA=new Iom_jObject(CLASSA, "o1");

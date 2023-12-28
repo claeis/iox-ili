@@ -112,6 +112,12 @@ MODEL MandatoryConstraints23
 			attr1 == 2.0;
 		END ClassEqualF2;
 		
+		CLASS ClassEqualF2undef =
+			attr1 : 0.0..10.0;
+			MANDATORY CONSTRAINT
+			attr1==UNDEFINED OR attr1 == 2.0;
+		END ClassEqualF2undef;
+		
 		CLASS ClassEqualF3 =
 			attr1 : NumType;
 			MANDATORY CONSTRAINT

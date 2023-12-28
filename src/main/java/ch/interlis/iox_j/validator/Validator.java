@@ -1795,42 +1795,43 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		} else if(expression instanceof FunctionCall){
 			FunctionCall functionCallObj = (FunctionCall) expression;
 			Function currentFunction = functionCallObj.getFunction();
-			if (currentFunction.getScopedName(null).startsWith("Text.")) {
+			final String funcName = currentFunction.getScopedName(null);
+            if (funcName.startsWith(Text.TEXT+".") || funcName.startsWith(Text.TEXT_V2+".")) {
 			    if (textFunction == null) {
 			        textFunction = new Text(this, td, validationConfig);    
 			    }
 			    
 			    return textFunction.evaluateFunction(currentFunction, functionCallObj, parentObject, validationKind, usageScope, iomObj, texttype, firstRole);
-			} else if (currentFunction.getScopedName(null).startsWith("Math.")) {
+			} else if (funcName.startsWith(Math.MATH+".") || funcName.startsWith(Math.MATH_V2+".")) {
 			    if(mathFunction == null) {
 	                mathFunction = new Math(this, td, validationConfig);
 			    }
 			    
 			    return mathFunction.evaluateFunction(currentFunction, functionCallObj, parentObject,
 			            validationKind, usageScope, iomObj, texttype, firstRole);
-            } else if (currentFunction.getScopedName(null).startsWith("MinimalRuntimeSystem01.")) {
+            } else if (funcName.startsWith("MinimalRuntimeSystem01.")) {
                 if(rtsFunction == null) {
                     rtsFunction = new MinimalRuntimeSystem(this, td, validationConfig);
                 }
                 
                 return rtsFunction.evaluateFunction(currentFunction, functionCallObj, parentObject,
                         validationKind, usageScope, iomObj, texttype, firstRole);
-			} else if (!currentFunction.getScopedName(null).equals("INTERLIS.convertUnit") && 
-			        currentFunction.getScopedName(null).startsWith("INTERLIS.")) {
+			} else if (!funcName.equals("INTERLIS.convertUnit") && 
+			        funcName.startsWith("INTERLIS.")) {
 			    if (interlisFunction == null) {
 			        interlisFunction = new Interlis(this, td, validationConfig);
 			    }
 			    
 			    return interlisFunction.evaluateFunction(currentFunction, functionCallObj, parentObject,
 			            validationKind, usageScope, iomObj, texttype, expression, functions, td, firstRole);
-			} else if (currentFunction.getScopedName(null).startsWith("INTERLIS_ext.")) {
+			} else if (funcName.startsWith("INTERLIS_ext.")) {
 			    if (interlis_ext == null) {
 			        interlis_ext = new Interlis_ext(this, td, validationConfig);
 			    }
 			    
 			    return interlis_ext.evaluateFunction(currentFunction, parentObject, validationKind, usageScope, iomObj, expression, functions, td, firstRole);
 			} else {
-				String functionQname=currentFunction.getScopedName(null);
+				String functionQname=funcName;
 				Class functionTargetClass=customFunctions.get(functionQname);
 				if(functionTargetClass==null){
 					return Value.createNotYetImplemented();
@@ -2201,7 +2202,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         AssociationDef assoc=(AssociationDef) role.getContainer();
         if(assoc.isLightweight()) {
             // if reference is embedded in srcObj then is it a forward
-            if (isRoleEmbedded(role) && role.getOppEnd().getDestination()==srcObjClass) {
+            if (role.isAssociationEmbedded() && role.getOppEnd().getDestination()==srcObjClass) {
                 return true;
             } else {
                 return false;
@@ -2215,22 +2216,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             // role is backward; srcObj doesn't contain a reference
             return true;
         }
-    }
-    private boolean isRoleEmbedded(RoleDef role) {
-        Viewable destination = role.getDestination();
-        Iterator iterator = destination.getAttributesAndRoles2();
-        while (iterator.hasNext()) {
-            ViewableTransferElement obj = (ViewableTransferElement)iterator.next();
-            if (obj.obj instanceof RoleDef) {
-                RoleDef objRole = ((RoleDef) obj.obj).getOppEnd();
-                if (objRole.equals(role)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        return false;
     }
     private Map<RoleDef,Map<String,List<IomObject>>> targetObjects=new HashMap<RoleDef,Map<String,List<IomObject>>>();
     private List<IomObject> getTargetObjectsOfReverseRole(RoleDef role, String srcObjOid) {

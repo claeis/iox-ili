@@ -5,6 +5,7 @@ MODEL RuntimeSystem23
   VERSION "2018-06-05" =
   
   IMPORTS MinimalRuntimeSystem01;
+  IMPORTS Text;
   
   TOPIC TopicA =
     CLASS ClassA =
@@ -19,6 +20,13 @@ MODEL RuntimeSystem23
       MANDATORY CONSTRAINT attrA==INTERLIS.len(MinimalRuntimeSystem01.getParameterValue("MinimalRuntimeSystem01.CurrentDateTime"));
     END ClassB;
   END TopicB;
+
+  TOPIC TopicC =
+    CLASS ClassC =
+      attrA : TEXT*30;
+      MANDATORY CONSTRAINT attrA==Text.substring(PARAMETER MinimalRuntimeSystem01.CurrentTransferfile,0,4);
+    END ClassC;
+  END TopicC;
   
 END RuntimeSystem23.
 

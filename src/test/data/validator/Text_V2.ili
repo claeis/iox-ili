@@ -1,0 +1,32 @@
+INTERLIS 2.4;
+
+TYPE MODEL Text_V2 (en) AT "http://www.interlis.ch/models"
+  VERSION "2023-05-25" =
+
+  FUNCTION compareToIgnoreCase(a: TEXT; b: TEXT): NUMERIC;
+  FUNCTION compareToIgnoreCaseM(a: MTEXT; b: MTEXT): NUMERIC;
+  FUNCTION concat(a: TEXT; b: TEXT): TEXT;
+  FUNCTION concatM(a: MTEXT; b: MTEXT): MTEXT;
+  FUNCTION endsWith(val: TEXT; suffix: TEXT): BOOLEAN;
+  FUNCTION endsWithM(val: MTEXT; suffix: MTEXT): BOOLEAN;
+  FUNCTION equalsIgnoreCase(val: TEXT; anotherVal: TEXT): BOOLEAN;
+  FUNCTION equalsIgnoreCaseM(val: MTEXT; anotherVal: MTEXT): BOOLEAN;
+  FUNCTION indexOf(val: TEXT; str: TEXT; fromIndex: NUMERIC): NUMERIC;
+  FUNCTION indexOfM(val: MTEXT; str: MTEXT; fromIndex: NUMERIC): NUMERIC;
+  FUNCTION lastIndexOf(val: TEXT; str: TEXT; fromIndex: NUMERIC): NUMERIC;
+  FUNCTION lastIndexOfM(val: MTEXT; str: MTEXT; fromIndex: NUMERIC): NUMERIC;
+  FUNCTION matches(val: TEXT; regex: TEXT): BOOLEAN;
+  FUNCTION matchesM(val: MTEXT; regex: TEXT): BOOLEAN;
+  FUNCTION replace(val: TEXT; old: TEXT; new: TEXT): TEXT;
+  FUNCTION replaceM(val: MTEXT; old: MTEXT; new: MTEXT): MTEXT;
+  FUNCTION startsWith(val: TEXT; prefix: TEXT): BOOLEAN;
+  FUNCTION startsWithM(val: MTEXT; prefix: MTEXT): BOOLEAN;
+  FUNCTION substring(val: TEXT; beginIndex: NUMERIC; endIndex: NUMERIC): TEXT;
+  FUNCTION substringM(val: MTEXT; beginIndex: NUMERIC; endIndex: NUMERIC): MTEXT;
+  FUNCTION toLowerCase(val: TEXT): TEXT;
+  FUNCTION toLowerCaseM(val: MTEXT): MTEXT;
+  FUNCTION toUpperCase(val: TEXT): TEXT;
+  FUNCTION toUpperCaseM(val: MTEXT): MTEXT;
+
+END Text_V2.
+

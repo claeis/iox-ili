@@ -1,0 +1,151 @@
+package ch.interlis.iox_j.logging;
+
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+
+import org.interlis2.validator.models.ILIVERRORS;
+import org.interlis2.validator.models.IliVErrors.ErrorLog.Error_Type;
+
+import ch.ehi.basics.logging.AbstractStdListener;
+import ch.ehi.basics.logging.LogEvent;
+import ch.ehi.basics.logging.LogListener;
+import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iom_j.xtf.XtfModel;
+import ch.interlis.iom_j.xtf.XtfWriterBase;
+import ch.interlis.iox.IoxException;
+import ch.interlis.iox.IoxLogEvent;
+import ch.interlis.iox.IoxWriter;
+import ch.interlis.iox_j.EndBasketEvent;
+import ch.interlis.iox_j.EndTransferEvent;
+import ch.interlis.iox_j.ObjectEvent;
+import ch.interlis.iox_j.StartBasketEvent;
+import ch.interlis.iox_j.StartTransferEvent;
+
+public abstract class AbstractXtfErrorsLogger implements LogListener {
+	private static final String UNDEFINED_MESSAGE = "UNDEFINED MESSAGE";
+	private int objc=1;
+    abstract public void writeObject(org.interlis2.validator.models.IliVErrors.ErrorLog.Error iomObj);
+    abstract public void close();
+	@Override
+	public void logEvent(LogEvent event) {
+		org.interlis2.validator.models.IliVErrors.ErrorLog.Error iomObj=new org.interlis2.validator.models.IliVErrors.ErrorLog.Error("o"+objc++);
+		String msg = event.getEventMsg();
+        if (msg == null) {
+            Throwable ex = event.getException();
+            if (ex != null) {
+                msg = ex.getLocalizedMessage();
+                if (msg != null) {
+                    msg = msg.trim();
+                    if (msg.length() == 0) {
+                        msg = null;
+                    }
+                }
+                if (msg == null) {
+                    msg = ex.getClass().getName();
+                }
+            }
+        }
+        if (msg != null) {
+            iomObj.setMessage(msg);
+        } else {
+            iomObj.setMessage(UNDEFINED_MESSAGE);
+        }
+		switch(event.getEventKind()){
+		case LogEvent.ERROR: 
+				iomObj.setType(Error_Type.Error);
+				break;
+		case LogEvent.ADAPTION: 
+			iomObj.setType(Error_Type.Warning);
+				break;
+		case LogEvent.STATE: 
+			iomObj.setType(Error_Type.Info);
+				break;
+		default:
+			iomObj.setType(Error_Type.DetailInfo);
+				break;
+		}
+		if(event instanceof IoxLogEvent){
+			IoxLogEvent ioxEvent=(IoxLogEvent)event;
+			String sourceObjectTag = ioxEvent.getSourceObjectTag();
+			if(sourceObjectTag!=null) {
+	            iomObj.setObjTag(sourceObjectTag);
+			}
+			String sourceObjectXtfId = ioxEvent.getSourceObjectXtfId();
+			if(sourceObjectXtfId!=null) {
+	            iomObj.setTid(sourceObjectXtfId);
+			}
+			String sourceObjectTechId = ioxEvent.getSourceObjectTechId();
+			if(sourceObjectTechId!=null) {
+	            iomObj.setTechId(sourceObjectTechId);
+			}
+			String sourceObjectUsrId = ioxEvent.getSourceObjectUsrId();
+			if(sourceObjectUsrId!=null) {
+	            iomObj.setUserId(sourceObjectUsrId); 
+			}
+			String modelEleQName = ioxEvent.getModelEleQName();
+			if(modelEleQName!=null) {
+	            iomObj.setIliQName(modelEleQName);
+			}
+			String dataSource = ioxEvent.getDataSource();
+			if(dataSource!=null) {
+	            iomObj.setDataSource(dataSource);
+			}
+			Integer sourceLineNr = ioxEvent.getSourceLineNr();
+            if(sourceLineNr!=null){
+				iomObj.setLine(sourceLineNr);
+			}
+			if(ioxEvent.getGeomC1()!=null && ioxEvent.getGeomC2()!=null){
+				Iom_jObject iomCoord=new Iom_jObject("COORD",null);
+				iomCoord.setattrvalue("C1", ioxEvent.getGeomC1().toString());
+				iomCoord.setattrvalue("C2", ioxEvent.getGeomC2().toString());
+				iomObj.addattrobj(iomObj.tag_Geometry, iomCoord);
+			}
+		}
+		if(event.getException()!=null){
+			StringBuffer details=new StringBuffer();
+			logThrowable(details, "",event.getException(), true);
+			iomObj.setTechDetails(details.toString());
+		}else if(event.getOrigin()!=null){
+			iomObj.setTechDetails(AbstractStdListener.fmtOriginMsg(event.getOrigin(), ""));
+		}
+        writeObject(iomObj);
+	}
+	private static void logThrowable(StringBuffer out,String ind,Throwable ex,boolean doStacktrace){
+		String msg=ex.getLocalizedMessage();
+		if(msg!=null){
+			msg=msg.trim();
+			if(msg.length()==0){
+				msg=null;
+			}
+		}
+		if(msg==null){
+			msg=ex.getClass().getName();
+		}
+		out.append(ind+msg+"\n");
+		if(doStacktrace){
+			StackTraceElement[] stackv=ex.getStackTrace();
+			for(int i=0;i<stackv.length;i++){
+				out.append(ind+"    "+stackv[i].toString()+"\n");
+			}
+		}
+		Throwable ex2=ex.getCause();
+		if(ex2!=null){
+			logThrowable(out,ind+"  ",ex2,doStacktrace);
+		}
+		if(ex instanceof java.sql.SQLException){
+			java.sql.SQLException exTarget=(java.sql.SQLException)ex;
+			java.sql.SQLException exTarget2=exTarget.getNextException();
+			if(exTarget2!=null){
+				logThrowable(out,ind+"  ",exTarget2,doStacktrace);
+			}
+		}
+		if(ex instanceof InvocationTargetException){
+			InvocationTargetException exTarget=(InvocationTargetException)ex;
+			Throwable exTarget2=exTarget.getTargetException();
+			if(exTarget2!=null){
+				logThrowable(out,ind+"  ",exTarget2,doStacktrace);
+			}
+		}
+	}
+	
+}
