@@ -49,31 +49,38 @@ public class CsvErrorsLogger extends AbstractXtfErrorsLogger {
 	public CsvErrorsLogger(File logFile)
 	{
 		try {
-		    out=new PrintStream(new BufferedOutputStream(new FileOutputStream(logFile)),true,"UTF-8");
-		    {
-		        String values[]=new String[12];
-		        values[FIELD_MESSAGE]="Message";
-                values[FIELD_TYPE]="Type";
-		        values[FIELD_OBJTAG]="ObjTag";
-		        values[FIELD_TID]="Tid";
-		        values[FIELD_TECHID]="TechId";
-		        values[FIELD_USERID]="UserId";
-		        values[FIELD_ILIQNAME]="IliQName";
-		        values[FIELD_DATASOURCE]="DataSource";
-                values[FIELD_LINE]="Line";
-                values[FIELD_GEOMETRY_X]="Geometry_x";
-                values[FIELD_GEOMETRY_Y]="Geometry_y";
-		        values[FIELD_TECHDETAILS]="TechDetails";
-		        try {
-		            writeRecord(values);
-		        } catch (IOException e) {
-		            throw new IllegalStateException(e);
-		        }
-		    }
+            out=new PrintStream(new BufferedOutputStream(new FileOutputStream(logFile)),true,"UTF-8");
+            writeBOM();
+		    writeHeader();
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
 	}
+    protected void writeBOM() {
+        out.print("\ufeff"); // write BOM so that Excel recognizes the UTF-8 encoding
+    }
+    protected void writeHeader() {
+        {
+            String values[]=new String[12];
+            values[FIELD_MESSAGE]="Message";
+            values[FIELD_TYPE]="Type";
+            values[FIELD_OBJTAG]="ObjTag";
+            values[FIELD_TID]="Tid";
+            values[FIELD_TECHID]="TechId";
+            values[FIELD_USERID]="UserId";
+            values[FIELD_ILIQNAME]="IliQName";
+            values[FIELD_DATASOURCE]="DataSource";
+            values[FIELD_LINE]="Line";
+            values[FIELD_GEOMETRY_X]="Geometry_x";
+            values[FIELD_GEOMETRY_Y]="Geometry_y";
+            values[FIELD_TECHDETAILS]="TechDetails";
+            try {
+                writeRecord(values);
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
     @Override
     public void writeObject(Error iomObj) {
         String values[]=new String[12];
