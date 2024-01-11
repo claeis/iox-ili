@@ -1,8 +1,8 @@
 package ch.interlis.models.INTERLIS;
 public class VALIGNMENT{
-  static private java.util.HashMap valuev=new java.util.HashMap();
+  static protected java.util.HashMap valuev=new java.util.HashMap();
   private String value=null;
-  private VALIGNMENT(String value) {
+  protected VALIGNMENT(String value) {
     this.value=value;
     valuev.put(value,this);
   }

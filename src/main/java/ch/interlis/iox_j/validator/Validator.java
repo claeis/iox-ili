@@ -1644,6 +1644,17 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			} else {
 				return new Value(true);
 			}
+        } else if(expression instanceof Expression.Subexpression){
+            // ()
+            Expression.Subexpression negation = (Expression.Subexpression) expression;              
+            Value arg=evaluateExpression(parentObject, validationKind, usageScope, iomObj,negation.getSubexpression(), firstRole);
+            if (arg.skipEvaluation()){
+                return arg;
+            }
+            if (arg.isUndefined()){
+                return Value.createSkipEvaluation();
+            }
+            return arg;
 		} else if(expression instanceof Conjunction){
 			// AND
 			Conjunction conjunction = (Conjunction) expression;
