@@ -6,6 +6,7 @@ ideas/open issues
 iox-ili 1.23.0 (2024-01-xx)
 -----------------------------
 - Validator: implement ili2c:Expression.Subexpression
+- ItfWriter: fix export of numerics on FR locale (fix decimal separator '.')
 - ili2c-5.5.0+
 
 iox-ili 1.22.1 (2023-12-28)

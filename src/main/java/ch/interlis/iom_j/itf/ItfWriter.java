@@ -620,6 +620,7 @@ public class ItfWriter implements ch.interlis.iox.IoxWriter {
 			fmt=new DecimalFormat("#0."+ch.ehi.basics.tools.StringUtility.STRING(accuracy,'0'));
 		}
 		fmt.setRoundingMode(RoundingMode.HALF_UP);
+		fmt.getDecimalFormatSymbols().setDecimalSeparator('.');
 		numFmt.put(accuracy,fmt);
 		return fmt;
 	}
