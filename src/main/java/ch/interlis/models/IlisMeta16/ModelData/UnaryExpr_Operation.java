@@ -16,4 +16,6 @@ public class UnaryExpr_Operation{
   public final static String tag_Not="Not";
   static public UnaryExpr_Operation Defined=new UnaryExpr_Operation("Defined");
   public final static String tag_Defined="Defined";
+  static public UnaryExpr_Operation Nested=new UnaryExpr_Operation("Nested");
+  public final static String tag_Nested="Nested";
 }

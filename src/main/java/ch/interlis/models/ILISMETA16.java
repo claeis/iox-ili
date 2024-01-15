@@ -4,7 +4,7 @@ public class ILISMETA16{
   public final static String MODEL= "IlisMeta16";
   public final static String ModelData= "IlisMeta16.ModelData";
   public final static String ModelTranslation= "IlisMeta16.ModelTranslation";
-  public static ch.interlis.iom_j.xtf.XtfModel getXtfModel(){ return new ch.interlis.iom_j.xtf.XtfModel("IlisMeta16","http://models.interlis.ch","2023-10-30ceis"); }
+  public static ch.interlis.iom_j.xtf.XtfModel getXtfModel(){ return new ch.interlis.iom_j.xtf.XtfModel("IlisMeta16","http://models.interlis.ch","2024-01-10ceis"); }
   static public ch.interlis.iox.IoxFactory getIoxFactory()
   {
     return new ch.interlis.iox.IoxFactory(){
