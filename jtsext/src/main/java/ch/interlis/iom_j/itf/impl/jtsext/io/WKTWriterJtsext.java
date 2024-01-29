@@ -12,6 +12,7 @@ import com.vividsolutions.jts.util.*;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
 
 public class WKTWriterJtsext
 {
@@ -322,7 +323,10 @@ public class WKTWriterJtsext
 			for (CurveSegment seg : lineString.getSegments()) {
 				if (seg instanceof ArcSegment) {
 					if (isLineString) {
-						writer.write("), ");
+						writer.write(")");
+					}
+					if (coordi > 0) {
+						writer.write(", ");
 					}
 					isLineString = false;
 					// CIRCULARSTRING (x y,x y,x y)
@@ -443,10 +447,16 @@ public class WKTWriterJtsext
   private void appendCompoundCurveRingTaggedText(CompoundCurveRing linearRing, int level, Writer writer)
 		    throws IOException
 		  {
-	  		for(CompoundCurve line : linearRing.getLines()){
-			    appendCompoundCurveText(line, level, false,writer,true);
-	  		}
-		  }
+    ArrayList<CompoundCurve> lines = linearRing.getLines();
+    writer.write("COMPOUNDCURVE (");
+    for (int i = 0; i < lines.size(); i++) {
+      if (i > 0) {
+        writer.write(", ");
+      }
+      appendCompoundCurveText(lines.get(i), level, false, writer, true);
+    }
+    writer.write(")");
+  }
 
   /**
    *  Converts a <code>Polygon</code> to &lt;Polygon Tagged Text&gt; format,
