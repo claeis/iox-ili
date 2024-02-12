@@ -248,6 +248,11 @@ public class ArcSegment extends CurveSegment {
 	{
 		return "CIRCULARSTRING ("+startPoint.x+" "+startPoint.y+", "+midPoint.x+" "+midPoint.y+", "+endPoint.x+" "+endPoint.y+")";
 	}
+
+	/**
+	 * The sign of the arc.
+	 * @return 1.0 if the arc is clockwise, -1.0 if the arc is counter-clockwise, 0.0 if the arc is a straight line or closed.
+	 */
 	public double getSign() {
 		if(centerPoint==null){
 			getCenterPoint();

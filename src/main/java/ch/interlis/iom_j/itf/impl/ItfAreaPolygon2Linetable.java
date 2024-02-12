@@ -220,14 +220,26 @@ public class ItfAreaPolygon2Linetable {
 		return (List<IomObject>) ioxlines;
 	}
 
+	/**
+	 * get all lines from a polygon.
+	 */
     public static ArrayList<IomObject> getLinesFromPolygon(IomObject polygon)
     {
         return getLinesFromPolygon_(polygon,false);
     }
+
+	/**
+	 * get all lines from a multipolygon.
+	 */
     public static ArrayList<IomObject> getLinesFromMultiPolygon(IomObject polygon)
     {
         return getLinesFromPolygon_(polygon,true);
     }
+
+	/**
+	 * get all lines from a polygon.
+	 * Performs some simple checks beforehand.
+	 */
 	private static ArrayList<IomObject> getLinesFromPolygon_(IomObject polygon,boolean isMultiPolygon)
 	{
 		ArrayList<IomObject> ret=new ArrayList<IomObject>();

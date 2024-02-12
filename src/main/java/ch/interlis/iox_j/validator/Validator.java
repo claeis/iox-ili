@@ -4338,6 +4338,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         allLines.addMultiPolygon(mainObjTid,internalTid,iomPolygon,validateType,errFact);
     }
 
+	/**
+	 * Validate that the surface is valid according to INTERLIS. For example no self-intersection etc.
+	 *
+	 * @return <c>true</c> if the surface is valid, <c>false</c> otherwise.
+	 */
 	private boolean validateSurfaceTopology(String validateType, AttributeDef attr,SurfaceOrAreaType type, String mainObjTid,IomObject iomValue) {
 		boolean surfaceTopologyValid=true;
 		try {
@@ -4417,8 +4422,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return "(" + coord.x + ", " + coord.y  + ")";
 	}
 
-	/* returns true, if polygon is valid
-	 * 
+	/**
+	 * Validate if the polygon is syntactically correct.
+	 *
+	 * @return <c>true</c> if the polygon is valid.
 	 */
 	private boolean validatePolygon(String validateType, Model model, AbstractSurfaceOrAreaType surfaceOrAreaType, IomObject surfaceValue, IomObject currentIomObj, String attrName) {
         boolean foundErrs=false;
@@ -4469,7 +4476,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		return !foundErrs;
 	}
 
-	// returns true if valid
+	/**
+	 * Validate if the polyline is syntactically correct.
+	 *
+	 * @return <c>true</c> if valid.
+	 */
 	private boolean validatePolyline(String validateType, Model model, LineType polylineType, IomObject polylineValue, String attrName) {
 		boolean foundErrs=false;
 		if (polylineValue.getobjecttag().equals("POLYLINE")){
