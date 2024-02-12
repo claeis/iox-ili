@@ -737,8 +737,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			Boolean surfaceTopologiesValid = areaAttrsAreSurfaceTopologiesValid.get(attr);
 			if (surfaceTopologiesValid == null || surfaceTopologiesValid) {
 				errs.addEvent(errFact.logInfoMsg(rsrc.getString("validateAllAreas.validateAREA"), getScopedName(attr)));
-				List<IoxInvalidDataException> intersections=allLines.validate();
-				if(intersections!=null && intersections.size()>0){
+
+				AbstractSurfaceOrAreaType type = (AbstractSurfaceOrAreaType)attr.getDomainResolvingAliases();
+				double maxOverlap = type.getMaxOverlap() == null ? 0.0 : type.getMaxOverlap().doubleValue();
+
+				List<IoxInvalidDataException> intersections=allLines.validate(maxOverlap);
+				if(intersections!=null && !intersections.isEmpty()){
 					for(IoxInvalidDataException ex:intersections){ // iterate through non-overlay intersections
 						String tid1=ex.getTid();
 						String iliqname=ex.getIliqname();
@@ -2387,7 +2391,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             }
         }
 
-        List<IoxInvalidDataException> intersections = polygonPool.validate();
+        List<IoxInvalidDataException> intersections = polygonPool.validate(0.0);
         if (intersections != null && !intersections.isEmpty()) {
             if (!disableAreAreasMessages) {
                 for (IoxInvalidDataException ex : intersections) {
