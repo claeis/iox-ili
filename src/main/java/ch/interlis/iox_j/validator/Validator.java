@@ -2388,6 +2388,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, errFact);
             } catch (IoxException e) {
                 EhiLogger.logError(e);
+                return new Value(false); // when the input polygon causes an exception, areAreas is false
+            } catch (IllegalArgumentException e) {
+                EhiLogger.logError(e);
+                return new Value(false); // when the input polygon causes an exception, areAreas is false
             }
         }
 
