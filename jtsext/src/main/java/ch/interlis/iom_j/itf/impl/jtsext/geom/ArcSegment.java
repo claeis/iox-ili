@@ -259,6 +259,11 @@ public class ArcSegment extends CurveSegment {
 		}
 		return sign;
 	}
+
+	public double getNormalizedSign() {
+		return isArcNormalized() ? getSign() : -getSign();
+	}
+
 	public double getTheta() {
 		if(centerPoint==null){
 			getCenterPoint();
@@ -315,5 +320,39 @@ public class ArcSegment extends CurveSegment {
 		midPt.x=center.x + radius * Math.sin(alpha);
 		midPt.y=center.y + radius * Math.cos(alpha);
 		return midPt;
+	}
+
+	/**
+	 * Checks if the arcs are equivalent independent of their direction or where the mid-point is located.
+	 *
+	 * @param other the other {@link ArcSegment}
+	 * @return <code>true</code> if the arcs are equivalent, <code>false</code> otherwise
+	 */
+	public boolean isEquivalent(ArcSegment other) {
+		if (!getNormalizedStartPoint().equals(other.getNormalizedStartPoint())) return false;
+		if (!getNormalizedEndPoint().equals(other.getNormalizedEndPoint())) return false;
+		if (Double.compare(getRadius(), other.getRadius()) != 0) return false;
+		return Double.compare(getNormalizedSign(), other.getNormalizedSign()) == 0;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		return isEquivalent((ArcSegment) o);
+	}
+
+	@Override
+	public int hashCode() {
+		int result;
+		long temp;
+		result = getNormalizedStartPoint().hashCode();
+		result = 31 * result + getNormalizedEndPoint().hashCode();
+		temp = Double.doubleToLongBits(getRadius());
+		result = 31 * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(getNormalizedSign());
+		result = 31 * result + (int) (temp ^ (temp >>> 32));
+		return result;
 	}
 }
