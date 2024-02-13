@@ -41,7 +41,26 @@ public class Surface23Test {
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
 	}
-	
+
+	private LogCollector validateObjects(IomObject... objects) {
+		ValidationConfig modelConfig = new ValidationConfig();
+		LogCollector logger = new LogCollector();
+		LogEventFactory errFactory = new LogEventFactory();
+		Settings settings = new Settings();
+		//settings.setValue(Validator.CONFIG_DEBUG_XTFOUT,"src/test/data/validator/Surface23Test.xtf");
+
+		Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(ILI_TOPIC, BID));
+		for (IomObject obj : objects) {
+			validator.validate(new ObjectEvent(obj));
+		}
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+
+		return logger;
+	}
+
 	// prueft, ob eine Surface erstellt werden kann.
 	@Test
 	public void surface_Ok(){
@@ -53,16 +72,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("550000.000", "90000.000"),
 						IomObjectHelper.createCoord("480000.000", "70000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -85,16 +96,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("505000.000", "78000.000"),
 						IomObjectHelper.createCoord("480000.000", "70000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -124,16 +127,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("489500.000", "200000.000"),
 						IomObjectHelper.createCoord("490500.000", "199000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -163,16 +158,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("489500.000", "200000.000"),
 						IomObjectHelper.createCoord("488000.000", "201000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -188,16 +175,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("600000.000", "200000.000"),
 						IomObjectHelper.createArc("540000.000", "160000.000", "500000.000", "100000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
@@ -214,16 +193,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("600000.000", "200000.000"),
 						IomObjectHelper.createCoord("505000.000", "105000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertEquals(4,logger.getErrs().size());
 		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
@@ -245,16 +216,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("600000.000", "200000.000"),
 						IomObjectHelper.createArc("540000.000", "160000.000", "505000.000", "105000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==4);
 		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
@@ -285,16 +248,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("500000.000", "100000.000"),
 						IomObjectHelper.createCoord("600000.000", "200000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(geometricFigure));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(geometricFigure);
+
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
 		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
@@ -322,16 +277,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("500000.000", "100000.000"),
 						IomObjectHelper.createCoord("600000.000", "190000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(geometricFigure));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(geometricFigure);
+
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
 		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
@@ -359,16 +306,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("600000.000", "200000.000"),
 						IomObjectHelper.createCoord("500000.000", "100000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(geometricFigure));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(geometricFigure);
+
 		// Asserts
 		assertEquals(2,logger.getErrs().size());
 		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 290000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
@@ -415,16 +354,9 @@ public class Surface23Test {
 			segments.addattrobj("segment", IomObjectHelper.createCoord("500000.000", "100000.000"));
 			segments.addattrobj("segment", IomObjectHelper.createCoord("600000.000", "200000.000"));
 		}
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(geometricFigure));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		LogCollector logger = validateObjects(geometricFigure);
+
 		// Asserts
 		assertEquals(2,logger.getErrs().size());
 		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
@@ -470,16 +402,9 @@ public class Surface23Test {
 			segments.addattrobj("segment", IomObjectHelper.createCoord("600000.000", "200000.000"));
 			segments.addattrobj("segment", IomObjectHelper.createCoord("500000.000", "100000.000"));
 		}
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(geometricFigure));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		LogCollector logger = validateObjects(geometricFigure);
+
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
 		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
@@ -516,16 +441,9 @@ public class Surface23Test {
 		IomObject segments3Inner=polylineValue3Inner.addattrobj("sequence", "SEGMENTS");
 		segments3Inner.addattrobj("segment", IomObjectHelper.createCoord("505000.000", "78000.000"));
 		segments3Inner.addattrobj("segment", IomObjectHelper.createCoord("480000.000", "70000.000"));
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		LogCollector logger = validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
 		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
@@ -556,16 +474,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("500000.000", "230000.000"),
 						IomObjectHelper.createCoord("500000.000", "90000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertEquals(2,logger.getErrs().size());
 		assertEquals("Intersection coord1 (581818.182, 155454.545), tids o1, o1", logger.getErrs().get(0).getEventMsg());
@@ -591,16 +501,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("505000.000", "78000.000"),
 						IomObjectHelper.createCoord("480000.000", "70000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertEquals(1,logger.getErrs().size());
 		assertEquals("Intersection coord1 (491666.667, 73333.333), tids o1, o1", logger.getErrs().get(0).getEventMsg());
@@ -612,16 +514,9 @@ public class Surface23Test {
 	public void invalidSurfaceType_Fail(){
 		Iom_jObject objNotMultisurface=new Iom_jObject(ILI_CLASSC, OID1);
 		IomObject surfaceValue=objNotMultisurface.addattrobj("surface2d", "SURFACE");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objNotMultisurface));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		LogCollector logger = validateObjects(objNotMultisurface);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("unexpected Type SURFACE; MULTISURFACE expected", logger.getErrs().get(0).getEventMsg());
@@ -638,16 +533,9 @@ public class Surface23Test {
 		IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
 		IomObject surfaceValue2 = multisurfaceValue.addattrobj("surface", "SURFACE");
 		IomObject outerBoundary2 = surfaceValue2.addattrobj("boundary", "BOUNDARY");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objCompleteMultisurface));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		LogCollector logger = validateObjects(objCompleteMultisurface);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("invalid number of surfaces in COMPLETE basket", logger.getErrs().get(0).getEventMsg());
@@ -665,16 +553,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("550000.000", "90000.000"),
 						IomObjectHelper.createCoord("480000.000", "70000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Wrong COORD structure, C3 not expected", logger.getErrs().get(0).getEventMsg());
@@ -692,16 +572,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("550000.000", "90000.000", "2000.000"),
 						IomObjectHelper.createCoord("480000.000", "70000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
@@ -719,16 +591,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("550000.000", "90000.000", "2000.000"),
 						IomObjectHelper.createCoord("4800000.000", "700000.000", "10000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==3);
 		assertEquals("value 4800000.000 is out of range in attribute surface3d", logger.getErrs().get(0).getEventMsg());
@@ -755,17 +619,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("600000.000", "200000.000", "5000.000"),
 						IomObjectHelper.createArc("540000.000", "160000.000", "500000.000", "100000.000", "5000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objAreaSuccess));
-		validator.validate(new ObjectEvent(objAreaSuccess2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objAreaSuccess, objAreaSuccess2);
+
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
@@ -788,17 +643,8 @@ public class Surface23Test {
 						IomObjectHelper.createArc("500004.000", "99997.000", "500000.000", "99995.000", "5000.000"),
 						IomObjectHelper.createCoord("499996.000", "100000.000", "5000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objAreaSuccess));
-		validator.validate(new ObjectEvent(objAreaSuccess2));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objAreaSuccess, objAreaSuccess2);
+
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
@@ -814,16 +660,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("550000.000", "90000.000", "2000.000"),
 						IomObjectHelper.createArc("4800000.000", "700000.000", "480000.000", "70000.000", "1000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(objSurfaceSuccess));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(objSurfaceSuccess);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==2);
 		assertEquals("value 4800000.000 is out of range in attribute surface3d", logger.getErrs().get(0).getEventMsg());
@@ -861,16 +699,9 @@ public class Surface23Test {
 			segments4.addattrobj("segment", IomObjectHelper.createCoord("500000.000", "200000.000"));
 			segments4.addattrobj("segment", IomObjectHelper.createCoord("500000.000", "100000.000"));
 		}
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(externalObject));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+
+		LogCollector logger = validateObjects(externalObject);
+
 		// Asserts
 		assertTrue(logger.getWarn().size()==0);
 		assertTrue(logger.getErrs().size()==1);
@@ -910,17 +741,8 @@ public class Surface23Test {
 						IomObjectHelper.createCoord("515000.000", "185000.000"),
 						IomObjectHelper.createCoord("545000.000", "130000.000"))));
 
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC,BID));
-		validator.validate(new ObjectEvent(externalObject));
-		validator.validate(new ObjectEvent(internalObject));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
+		LogCollector logger = validateObjects(externalObject, internalObject);
+
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
