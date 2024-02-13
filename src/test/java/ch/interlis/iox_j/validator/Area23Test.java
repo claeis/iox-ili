@@ -1,5 +1,7 @@
 package ch.interlis.iox_j.validator;
 
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -85,7 +87,7 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft ob ein Polygon erstellt werden kann, wenn sie sich selber an 1 Punkt beruehrt.
@@ -109,7 +111,7 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 
 	// prueft ob ein Polygon, bestehend aus 2 Innerboundaries welche sich
@@ -140,7 +142,7 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft ob ein Polygon, bestehend aus 2 Innerboundaries welche sich an einem
@@ -171,7 +173,7 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft ob ein Polygon, bestehend aus 1 Outerboundary und 1 Innerboundary erstellt werden kann.
@@ -195,7 +197,7 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben werden kann, wenn die Innerboundary, die Outerboundary
@@ -221,9 +223,9 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertEquals(2,logger.getErrs().size());
-		assertEquals("Intersection coord1 (550000.000, 100000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection coord1 (550000.000, 100000.000), tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Intersection coord1 (550000.000, 100000.000), tids o1, o1",
+				"Intersection coord1 (550000.000, 100000.000), tids o1, o1");
 	}
 	
 	// prueft, ob 2 Polygone die sich ueberlappen mit ausgeschalteter
@@ -251,7 +253,7 @@ public class Area23Test {
 		LogCollector logger = validateObjects(modelConfig, polygon1, polygon2);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn 2 Polygone sich an 4 Stellen ueberlappen.
@@ -276,12 +278,12 @@ public class Area23Test {
 		LogCollector logger = validateObjects(polygon1, polygon2);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==5);
-		assertEquals("Intersection coord1 (500000.000, 77000.000), tids o1, o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection coord1 (503500.000, 77000.000), tids o1, o2", logger.getErrs().get(1).getEventMsg());
-		assertEquals("Intersection coord1 (500000.000, 77285.714), tids o1, o2", logger.getErrs().get(2).getEventMsg());
-		assertEquals("Intersection coord1 (503669.065, 77338.129), tids o1, o2", logger.getErrs().get(3).getEventMsg());
-		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(4).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Intersection coord1 (500000.000, 77000.000), tids o1, o2",
+				"Intersection coord1 (503500.000, 77000.000), tids o1, o2",
+				"Intersection coord1 (500000.000, 77285.714), tids o1, o2",
+				"Intersection coord1 (503669.065, 77338.129), tids o1, o2",
+				"failed to validate AREA Datatypes23.Topic.ClassD.area2d");
 	}
     @Test
     public void twoPolygon_OneInsideOther_Fail(){
@@ -306,9 +308,9 @@ public class Area23Test {
         LogCollector logger = validateObjects(polygon1, polygon2);
 
         // Asserts
-        assertEquals(2,logger.getErrs().size());
-        assertEquals("polygons overlay tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
-        assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(1).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "polygons overlay tid1 o1, tid2 o2",
+                "failed to validate AREA Datatypes23.Topic.ClassD.area2d");
     }
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn die Outerboundary des zweiten Polygons,
@@ -343,12 +345,12 @@ public class Area23Test {
 		LogCollector logger = validateObjects(polygon1, polygon2);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==5);
-		assertEquals("Intersection coord1 (545000.000, 200000.000), tids o1, o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection coord1 (555000.000, 200000.000), tids o1, o2", logger.getErrs().get(1).getEventMsg());
-		assertEquals("Intersection coord1 (547000.000, 180000.000), tids o1, o2", logger.getErrs().get(2).getEventMsg());
-		assertEquals("Intersection coord1 (553000.000, 180000.000), tids o1, o2", logger.getErrs().get(3).getEventMsg());
-		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(4).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Intersection coord1 (545000.000, 200000.000), tids o1, o2",
+				"Intersection coord1 (555000.000, 200000.000), tids o1, o2",
+				"Intersection coord1 (547000.000, 180000.000), tids o1, o2",
+				"Intersection coord1 (553000.000, 180000.000), tids o1, o2",
+				"failed to validate AREA Datatypes23.Topic.ClassD.area2d");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn die Innerboundary,
@@ -374,10 +376,10 @@ public class Area23Test {
 		LogCollector logger = validateObjects(polygon1);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("superfluous outerboundary tid o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("superfluous outerboundary tid o1", logger.getErrs().get(1).getEventMsg());
-        assertEquals("multipolygon detected", logger.getErrs().get(2).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"superfluous outerboundary tid o1",
+				"superfluous outerboundary tid o1",
+				"multipolygon detected");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn 2 Polygone exakt
@@ -404,9 +406,9 @@ public class Area23Test {
 		LogCollector logger = validateObjects(polygon1, polygon2);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("polygons overlay tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"polygons overlay tid1 o1, tid2 o2",
+				"failed to validate AREA Datatypes23.Topic.ClassD.area2d");
 	}
 	
 	// prueft ob ein Polygon mit einem Kreisbogen erstellt werden kann.
@@ -423,7 +425,7 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft, ob 2 Poygone erstellt werden koennen, wenn beide Polygone
@@ -451,7 +453,7 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objAreaSuccess, objAreaSuccess2);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft, ob 2 Polygone erstellt werden koennen, wenn 2 Polygone sich auf einer Linie an
@@ -480,7 +482,7 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objAreaSuccess, objArea2Success);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn 2 Polygone sich auf einer Linie an
@@ -511,10 +513,10 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objArea1, objArea2);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("Overlay coord1 (540000.000, 150000.000), coord2 (540000.000, 160000.000), tids o1, o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Overlay coord1 (540000.000, 160000.000), coord2 (540000.000, 200000.000), tids o1, o2", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(2).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Overlay coord1 (540000.000, 150000.000), coord2 (540000.000, 160000.000), tids o1, o2",
+				"Overlay coord1 (540000.000, 160000.000), coord2 (540000.000, 200000.000), tids o1, o2",
+				"failed to validate AREA Datatypes23.Topic.ClassD.area2d");
 	}
 	
 	// prueft, ob 2 Polygone (mit je einem Arc) die genau uebereinanderliegen, als Fehler gemeldet wird
@@ -537,9 +539,9 @@ public class Area23Test {
 
 		LogCollector logger = validateObjects(objAreaSuccess, objAreaSuccess2);
 
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("polygons overlay tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area3d", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"polygons overlay tid1 o1, tid2 o2",
+				"failed to validate AREA Datatypes23.Topic.ClassD.area3d");
 	}
 	
 	// prueft, ob 2 Polygone erstellt werden koennen, wenn 2 Polygone mit je einem Arc,
@@ -563,9 +565,9 @@ public class Area23Test {
 
 		LogCollector logger = validateObjects(objAreaSuccess, objAreaSuccess2);
 
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("polygons overlay tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area3d", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"polygons overlay tid1 o1, tid2 o2",
+				"failed to validate AREA Datatypes23.Topic.ClassD.area3d");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -592,8 +594,8 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertEquals(1,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (600000.000, 100000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Overlay coord1 (500000.000, 100000.000), coord2 (600000.000, 100000.000), tids o1, o1");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -621,8 +623,8 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertEquals(1,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (600000.000, 100000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Overlay coord1 (500000.000, 100000.000), coord2 (600000.000, 100000.000), tids o1, o1");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -650,8 +652,8 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertEquals(1,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 200000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 200000.000), tids o1, o1");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -679,9 +681,9 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertEquals(2,logger.getErrs().size());
-		assertEquals("Intersection coord1 (550000.000, 200000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Overlay coord1 (500000.000, 200000.000), coord2 (550000.000, 200000.000), tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Intersection coord1 (550000.000, 200000.000), tids o1, o1",
+				"Overlay coord1 (500000.000, 200000.000), coord2 (550000.000, 200000.000), tids o1, o1");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -711,10 +713,10 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertEquals(3,logger.getErrs().size());
-		assertEquals("Intersection coord1 (550000.000, 200000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Overlay coord1 (500000.000, 200000.000), coord2 (550000.000, 200000.000), tids o1, o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 200000.000), tids o1, o1", logger.getErrs().get(2).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Intersection coord1 (550000.000, 200000.000), tids o1, o1",
+				"Overlay coord1 (500000.000, 200000.000), coord2 (550000.000, 200000.000), tids o1, o1",
+				"Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 200000.000), tids o1, o1");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn Dangles erstellt wurden.
@@ -734,8 +736,8 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertEquals(1,logger.getErrs().size());
-		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"dangle tid o1");
 	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird,
@@ -767,9 +769,9 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertEquals(2,logger.getErrs().size());
-		assertEquals("Intersection coord1 (581818.182, 155454.545), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection coord1 (581818.182, 180909.091), tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Intersection coord1 (581818.182, 155454.545), tids o1, o1",
+				"Intersection coord1 (581818.182, 180909.091), tids o1, o1");
 	}	
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -794,8 +796,8 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertEquals(1,logger.getErrs().size());
-		assertEquals("Intersection coord1 (491666.667, 73333.333), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Intersection coord1 (491666.667, 73333.333), tids o1, o1");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn diese aus 3d Koordinaten besteht,
@@ -813,8 +815,8 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Wrong COORD structure, C3 not expected", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Wrong COORD structure, C3 not expected");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn diese aus 2d Koordinaten besteht,
@@ -832,8 +834,8 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Wrong COORD structure, C3 expected");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn die Value eines Segments nicht gueltig ist.
@@ -850,10 +852,10 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("value 4800000.000 is out of range in attribute area3d", logger.getErrs().get(0).getEventMsg());
-		assertEquals("value 700000.000 is out of range in attribute area3d", logger.getErrs().get(1).getEventMsg());
-		assertEquals("value 10000.000 is out of range in attribute area3d", logger.getErrs().get(2).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"value 4800000.000 is out of range in attribute area3d",
+				"value 700000.000 is out of range in attribute area3d",
+				"value 10000.000 is out of range in attribute area3d");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn die Polygon mit einem ungueltigen Kreisbogen erstellt wird.
@@ -870,9 +872,9 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("value 4800000.000 is out of range in attribute area3d", logger.getErrs().get(0).getEventMsg());
-		assertEquals("value 700000.000 is out of range in attribute area3d", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"value 4800000.000 is out of range in attribute area3d",
+				"value 700000.000 is out of range in attribute area3d");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn der Type area nicht vom Type Multisurface ist.
@@ -884,8 +886,8 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objAreaMultisurface);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("unexpected Type AREA; MULTISURFACE expected", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"unexpected Type AREA; MULTISURFACE expected");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn die Polygon Komplett ist, jedoch aus 2 Polygonen besteht.
@@ -902,8 +904,8 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid number of surfaces in COMPLETE basket", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"invalid number of surfaces in COMPLETE basket");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn 2 Coords nacheinander die selbe Position haben.
@@ -933,10 +935,10 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("duplicate coord at (500000.0, 80000.0, NaN)", logger.getErrs().get(0).getEventMsg());
-		assertEquals("duplicate coord at (500000.0, 80000.0, NaN)", logger.getErrs().get(1).getEventMsg());
-		assertEquals("duplicate coord at (500000.0, 80000.0, NaN)", logger.getErrs().get(2).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"duplicate coord at (500000.0, 80000.0, NaN)",
+				"duplicate coord at (500000.0, 80000.0, NaN)",
+				"duplicate coord at (500000.0, 80000.0, NaN)");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn die Polygone sich an unterschiedlichen Stellen beruehren.
@@ -965,10 +967,10 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess, objSurfaceSuccess2);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("Overlay coord1 (540000.000, 100000.000), coord2 (540000.000, 150000.000), tids o1, o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Overlay coord1 (540000.000, 150000.000), coord2 (540000.000, 200000.000), tids o1, o2", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(2).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Overlay coord1 (540000.000, 100000.000), coord2 (540000.000, 150000.000), tids o1, o2",
+				"Overlay coord1 (540000.000, 150000.000), coord2 (540000.000, 200000.000), tids o1, o2",
+				"failed to validate AREA Datatypes23.Topic.ClassD.area2d");
 	}
 	
 	// pruefe ob eine Fehlermeldung ausgegeben wird, wenn die outerboundary nicht existiert.
@@ -1006,9 +1008,9 @@ public class Area23Test {
 		LogCollector logger = validateObjects(externalObject);
 
 		// Asserts
-		assertTrue(logger.getWarn().size()==0);
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("missing outerboundary in area2d of object o1.", logger.getErrs().get(0).getEventMsg());
+		assertThat(logger.getWarn(), is(empty()));
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"missing outerboundary in area2d of object o1.");
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn
@@ -1036,9 +1038,9 @@ public class Area23Test {
 		LogCollector logger = validateObjects(geometricFigure);
 
 		// Asserts
-		assertEquals(2,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 290000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection coord1 (500000.000, 290000.000), tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 290000.000), tids o1, o1",
+				"Intersection coord1 (500000.000, 290000.000), tids o1, o1");
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn
@@ -1068,9 +1070,9 @@ public class Area23Test {
 		LogCollector logger = validateObjects(polygon1, polygon2);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("polygons overlay tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"polygons overlay tid1 o1, tid2 o2",
+				"failed to validate AREA Datatypes23.Topic.ClassD.area2d");
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn
@@ -1118,9 +1120,9 @@ public class Area23Test {
 		LogCollector logger = validateObjects(polygon1, polygon2, polygon3, polygon4);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("polygons overlay tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"polygons overlay tid1 o1, tid2 o2",
+				"failed to validate AREA Datatypes23.Topic.ClassD.area2d");
 	}
 	
 	// prueft ob die folgende Situation erstellt werden kann.
@@ -1159,7 +1161,7 @@ public class Area23Test {
 		LogCollector logger = validateObjects(externalObject, internalObject);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft, ob der richtige Pfad: Model.Topic.Klasse in der Fehlermeldung einer
@@ -1185,7 +1187,7 @@ public class Area23Test {
 
 		LogCollector logger = validateObjects(objAreaSuccess, objAreaSuccess2);
 
-		assertTrue(logger.getErrs().size()==3);
+		assertEquals(3, logger.getErrs().size());
 		LogEventImpl eventImpl=(LogEventImpl) logger.getErrs().get(0);
 		assertEquals("Datatypes23.Topic.ClassD",eventImpl.getSourceObjectTag());
 		LogEventImpl eventImpl2=(LogEventImpl) logger.getErrs().get(1);
@@ -1215,7 +1217,7 @@ public class Area23Test {
 
 		LogCollector logger = validateObjects(objAreaSuccess, objAreaSuccess2);
 
-		assertTrue(logger.getErrs().size()==3);
+        assertEquals(3, logger.getErrs().size());
 		LogEventImpl eventImpl=(LogEventImpl) logger.getErrs().get(0);
 		assertEquals("o1",eventImpl.getSourceObjectXtfId());
 		LogEventImpl eventImpl2=(LogEventImpl) logger.getErrs().get(1);
@@ -1246,7 +1248,7 @@ public class Area23Test {
 
 		LogCollector logger = validateObjects(objAreaSuccess, objAreaSuccess2);
 
-		assertTrue(logger.getErrs().size()==2);
+		assertEquals(2, logger.getErrs().size());
 		LogEventImpl eventImpl=(LogEventImpl) logger.getErrs().get(0);
 		assertEquals("o1",eventImpl.getSourceObjectXtfId());
 		LogEventImpl eventImpl2=(LogEventImpl) logger.getErrs().get(1);
@@ -1283,7 +1285,7 @@ public class Area23Test {
 		LogCollector logger = validateObjects(obj1, obj2);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
     // prueft, ob die Validierung einen Fehler meldet, wenn ein Polygon,
     // innerhalb eines anderen Polygons liegt.
@@ -1309,9 +1311,9 @@ public class Area23Test {
         LogCollector logger = validateObjects(obj1, obj2);
 
         // Asserts
-        assertTrue(logger.getErrs().size()==2);
-        assertEquals("polygons overlay tid1 o1, tid2 o2",logger.getErrs().get(0).getEventMsg());
-        assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d",logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"polygons overlay tid1 o1, tid2 o2",
+				"failed to validate AREA Datatypes23.Topic.ClassD.area2d");
     }
     // prueft, ob die Validierung keinen Fehler meldet, wenn ein Polygon,
     // genau ueber einem InnerBoundary eines anderen Polygons liegt.
@@ -1338,7 +1340,7 @@ public class Area23Test {
         LogCollector logger = validateObjects(obj1, obj2);
 
         // Asserts
-        assertTrue(logger.getErrs().size()==0);        
+        assertThat(logger.getErrs(), is(empty()));
     }
 	
 	// es wird eine Fehlermeldung erwartet, da ein Polygon, nicht genau ueber einem InnerBoundary einer anderen Polygon liegt.
@@ -1370,9 +1372,9 @@ public class Area23Test {
 		LogCollector logger = validateObjects(obj1, obj2);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("polygons overlay tid1 o1, tid2 o2", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate AREA Datatypes23.Topic.ClassD.area2d", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"polygons overlay tid1 o1, tid2 o2",
+				"failed to validate AREA Datatypes23.Topic.ClassD.area2d");
 	}
 	
 	// prueft ob ein Polygon korrekt auf 3 Stellen nach dem Komma gerundet wird
@@ -1390,7 +1392,7 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft ob die Koordinaten richtig abgerundet werden.
@@ -1407,7 +1409,7 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft ob das Aufrunden der Koordinaten zu einer intersection fuehrt.
@@ -1424,8 +1426,8 @@ public class Area23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertEquals(1,logger.getErrs().size());
-		assertEquals("Intersection coord1 (480000.003, 70000.002), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Intersection coord1 (480000.003, 70000.002), tids o1, o1");
 	}
 	
     @Test
@@ -1436,8 +1438,8 @@ public class Area23Test {
         LogCollector logger = validateObjects(objSurfaceSuccess);
 
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("The value <3> is not a Polygon in attribute area2d", logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "The value <3> is not a Polygon in attribute area2d");
     }
 
     @Test
@@ -1457,14 +1459,14 @@ public class Area23Test {
         LogCollector logger = validateObjects(objectD1InvalidPolygon, objectD2, objectD3);
 
         // Asserts
-        assertEquals(2, logger.getErrs().size());
-        assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
-        assertEquals("no polygon", logger.getErrs().get(1).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "dangle tid o1",
+                "no polygon");
 
-        assertEquals(4, logger.getInfo().size());
-        assertEquals("assume unknown external objects", logger.getInfo().get(0).getEventMsg());
-        assertEquals("first validation pass...", logger.getInfo().get(1).getEventMsg());
-        assertEquals("AREA topology of attribute area2d not validated, validation of SURFACE topology failed in attribute area2d", logger.getInfo().get(2).getEventMsg());
-        assertEquals("second validation pass...", logger.getInfo().get(3).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getInfo(),
+                "assume unknown external objects",
+                "first validation pass...",
+                "AREA topology of attribute area2d not validated, validation of SURFACE topology failed in attribute area2d",
+                "second validation pass...");
     }
 }

@@ -1,5 +1,7 @@
 package ch.interlis.iox_j.validator;
 
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +77,7 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft, ob eine Surface, welche sich selber an 1 Segmentpunkt schneidet erstellt werden kann.
@@ -99,7 +101,7 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 
 	// prueft, ob eine Surface erstellt werden kann, wenn sie 2 Innerboundaries besitzt,
@@ -130,7 +132,7 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft, ob eine Surface erstellt werden kann, wenn sie 2 Innerboundaries besitzt,
@@ -161,7 +163,7 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft, ob eine Surface mit einem Kreisbogen erstellt werden kann.
@@ -178,7 +180,7 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
@@ -196,11 +198,11 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertEquals(4,logger.getErrs().size());
-		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("dangle tid o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("dangle tid o1", logger.getErrs().get(2).getEventMsg());
-        assertEquals("no polygon", logger.getErrs().get(3).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"dangle tid o1",
+				"dangle tid o1",
+				"dangle tid o1",
+				"no polygon");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
@@ -219,11 +221,11 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==4);
-		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("dangle tid o1", logger.getErrs().get(1).getEventMsg());
-		assertEquals("dangle tid o1", logger.getErrs().get(2).getEventMsg());
-		assertEquals("no polygon", logger.getErrs().get(3).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"dangle tid o1",
+				"dangle tid o1",
+				"dangle tid o1",
+				"no polygon");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird,
@@ -251,8 +253,8 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(geometricFigure);
 
 		// Asserts
-		assertEquals(1,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1");
 	}
 	
 	// prueft ob eine Overlay Fehlermeldung ausgegeben wird,
@@ -280,8 +282,8 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(geometricFigure);
 
 		// Asserts
-		assertEquals(1,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1");
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn
@@ -309,9 +311,9 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(geometricFigure);
 
 		// Asserts
-		assertEquals(2,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 290000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection coord1 (500000.000, 290000.000), tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 290000.000), tids o1, o1",
+				"Intersection coord1 (500000.000, 290000.000), tids o1, o1");
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn
@@ -358,9 +360,9 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(geometricFigure);
 
 		// Asserts
-		assertEquals(2,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection coord1 (510000.000, 300000.000), tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1",
+				"Intersection coord1 (510000.000, 300000.000), tids o1, o1");
 	}
 	
 	// prueft, ob eine Fehlermeldung ausgegeben wird, wenn
@@ -406,8 +408,8 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(geometricFigure);
 
 		// Asserts
-		assertEquals(1,logger.getErrs().size());
-		assertEquals("Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Overlay coord1 (500000.000, 100000.000), coord2 (500000.000, 300000.000), tids o1, o1");
 	}
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird,
@@ -445,8 +447,8 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertEquals(1,logger.getErrs().size());
-		assertEquals("dangle tid o1", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"dangle tid o1");
 	}
 	
 	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
@@ -477,9 +479,9 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertEquals(2,logger.getErrs().size());
-		assertEquals("Intersection coord1 (581818.182, 155454.545), tids o1, o1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("Intersection coord1 (581818.182, 180909.091), tids o1, o1", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Intersection coord1 (581818.182, 155454.545), tids o1, o1",
+				"Intersection coord1 (581818.182, 180909.091), tids o1, o1");
 	}	
 	
 	// Es soll getestet werden, ob eine Intersection Fehlermeldung ausgegeben wird,
@@ -504,8 +506,8 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertEquals(1,logger.getErrs().size());
-		assertEquals("Intersection coord1 (491666.667, 73333.333), tids o1, o1", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Intersection coord1 (491666.667, 73333.333), tids o1, o1");
 	}
 	
 	// prueft, ob eine Surface erstellt werden kann, wenn
@@ -537,8 +539,8 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objCompleteMultisurface);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("invalid number of surfaces in COMPLETE basket", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"invalid number of surfaces in COMPLETE basket");
 	}
 	
 	// prueft, ob eine Surface erstellt werden kann,
@@ -556,8 +558,8 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Wrong COORD structure, C3 not expected", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Wrong COORD structure, C3 not expected");
 	}
 	
 	// prueft, ob eine Surface erstellt werden kann,
@@ -575,8 +577,8 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Wrong COORD structure, C3 expected", logger.getErrs().get(0).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Wrong COORD structure, C3 expected");
 	}
 	
 	// prueft, ob eine Surface erstellt werden kann, wenn
@@ -594,10 +596,10 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("value 4800000.000 is out of range in attribute surface3d", logger.getErrs().get(0).getEventMsg());
-		assertEquals("value 700000.000 is out of range in attribute surface3d", logger.getErrs().get(1).getEventMsg());
-		assertEquals("value 10000.000 is out of range in attribute surface3d", logger.getErrs().get(2).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"value 4800000.000 is out of range in attribute surface3d",
+				"value 700000.000 is out of range in attribute surface3d",
+				"value 10000.000 is out of range in attribute surface3d");
 	}
 	
 	// prueft, ob 2 Polygone erstellt werden koennen, wenn 2 Polygone mit je einem Arc,
@@ -621,7 +623,7 @@ public class Surface23Test {
 
 		LogCollector logger = validateObjects(objAreaSuccess, objAreaSuccess2);
 
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft, ob 2 Polygone erstellt werden koennen, wenn 2 Polygone mit je einem Arc,
@@ -645,7 +647,7 @@ public class Surface23Test {
 
 		LogCollector logger = validateObjects(objAreaSuccess, objAreaSuccess2);
 
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 	
 	// prueft, ob eine Surface erstellt werden kann, wenn
@@ -663,9 +665,9 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(objSurfaceSuccess);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==2);
-		assertEquals("value 4800000.000 is out of range in attribute surface3d", logger.getErrs().get(0).getEventMsg());
-		assertEquals("value 700000.000 is out of range in attribute surface3d", logger.getErrs().get(1).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"value 4800000.000 is out of range in attribute surface3d",
+				"value 700000.000 is out of range in attribute surface3d");
 	}
 	
 	// prueft, ob die Fehlermeldung ausgegeben wird, wenn die outerboundary nicht existiert.
@@ -703,9 +705,9 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(externalObject);
 
 		// Asserts
-		assertTrue(logger.getWarn().size()==0);
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("missing outerboundary in surface2d of object o1.", logger.getErrs().get(0).getEventMsg());
+		assertThat(logger.getWarn(), is(empty()));
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"missing outerboundary in surface2d of object o1.");
 	}
 	
 	// prueft ob die folgende Situation erstellt werden kann.
@@ -744,6 +746,6 @@ public class Surface23Test {
 		LogCollector logger = validateObjects(externalObject, internalObject);
 
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+		assertThat(logger.getErrs(), is(empty()));
 	}
 }
