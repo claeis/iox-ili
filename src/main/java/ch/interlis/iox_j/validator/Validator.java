@@ -4045,10 +4045,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                         pipelinePool.setIntermediateValue(attr, ValidationConfig.TOPOLOGY,this);
                                     }
                                     if(attrValidator==this){
-                                        if(surfaceOrAreaType instanceof SurfaceType){
-                                            boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(SurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
-                                        }else{
-                                            boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,(AreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
+                                        boolean surfaceTopologyValid=validateSurfaceTopology(validateGeometryType,attr,surfaceOrAreaType,currentMainOid, surfaceValue);
+                                        if(surfaceOrAreaType instanceof AreaType){
                                             if(!singlePass) {
                                                 if(!ValidationConfig.OFF.equals(areaOverlapValidation)){
 
@@ -4090,10 +4088,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                    pipelinePool.setIntermediateValue(attr, ValidationConfig.TOPOLOGY,this);
                                }
                                if(attrValidator==this){
-                                   if(surfaceOrAreaType instanceof MultiSurfaceType){
-                                       boolean surfaceTopologyValid=validateMultiSurfaceTopology(validateGeometryType,attr,(MultiSurfaceType)surfaceOrAreaType,currentMainOid, surfaceValue);
-                                   }else{
-                                       boolean surfaceTopologyValid=validateMultiSurfaceTopology(validateGeometryType,attr,(MultiAreaType)surfaceOrAreaType,currentMainOid, surfaceValue);
+                                   boolean surfaceTopologyValid=validateMultiSurfaceTopology(validateGeometryType,attr, surfaceOrAreaType,currentMainOid, surfaceValue);
+                                   if(surfaceOrAreaType instanceof MultiAreaType){
                                        if(!singlePass) {
                                            if(!ValidationConfig.OFF.equals(areaOverlapValidation)){
 
