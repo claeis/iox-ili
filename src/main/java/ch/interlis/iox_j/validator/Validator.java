@@ -4057,7 +4057,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                                     }
 
                                                     if(surfaceTopologyValid) {
-                                                        validateAreaTopology(validateGeometryType,allLines,(AreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
+                                                        allLines.addPolygon(currentMainOid, null, surfaceValue, validateGeometryType, errFact);
                                                     }else {
                                                         // surface topology not valid
                                                         areaAttrsAreSurfaceTopologiesValid.put(attr, false);
@@ -4100,7 +4100,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                                }
 
                                                if(surfaceTopologyValid) {
-                                                   validateMultiAreaTopology(validateGeometryType,allLines,(MultiAreaType)surfaceOrAreaType, currentMainOid,null,surfaceValue);
+                                                   allLines.addMultiPolygon(currentMainOid, null, surfaceValue, validateGeometryType, errFact);
                                                }else {
                                                    // surface topology not valid
                                                    areaAttrsAreSurfaceTopologiesValid.put(attr, false);
@@ -4324,15 +4324,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 		return attrType.isMandatoryConsideringAliases();
 	}
-	
-	private void validateAreaTopology(String validateType, ItfAreaPolygon2Linetable allLines,AreaType type, String mainObjTid,String internalTid,IomObject iomPolygon) throws IoxException {
-		// get lines
-		allLines.addPolygon(mainObjTid,internalTid,iomPolygon,validateType,errFact);
-	}
-    private void validateMultiAreaTopology(String validateType, ItfAreaPolygon2Linetable allLines,MultiAreaType type, String mainObjTid,String internalTid,IomObject iomPolygon) throws IoxException {
-        // get lines
-        allLines.addMultiPolygon(mainObjTid,internalTid,iomPolygon,validateType,errFact);
-    }
 
 	/**
 	 * Validate that the surface is valid according to INTERLIS. For example no self-intersection etc.
