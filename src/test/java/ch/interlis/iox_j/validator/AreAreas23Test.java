@@ -804,45 +804,12 @@ public class AreAreas23Test {
     }
 
     public IomObject createRectangle(String x1, String y1, String x2, String y2) {
-        IomObject multisurfaceValue = new Iom_jObject("MULTISURFACE",null);
-        IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-        IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-        // polyline
-        IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-        IomObject segments = polylineValue.addattrobj("sequence", "SEGMENTS");
-        IomObject startSegment = segments.addattrobj("segment", "COORD");
-        startSegment.setattrvalue("C1", x1);
-        startSegment.setattrvalue("C2", y1);
-        IomObject endSegment = segments.addattrobj("segment", "COORD");
-        endSegment.setattrvalue("C1", x1);
-        endSegment.setattrvalue("C2", y2);
-        // polyline 2
-        IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-        IomObject segments2 = polylineValue2.addattrobj("sequence", "SEGMENTS");
-        IomObject startSegment2 = segments2.addattrobj("segment", "COORD");
-        startSegment2.setattrvalue("C1", x1);
-        startSegment2.setattrvalue("C2", y2);
-        IomObject endSegment2 = segments2.addattrobj("segment", "COORD");
-        endSegment2.setattrvalue("C1", x2);
-        endSegment2.setattrvalue("C2", y2);
-        // polyline 3
-        IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-        IomObject segments3 = polylineValue3.addattrobj("sequence", "SEGMENTS");
-        IomObject startSegment3 = segments3.addattrobj("segment", "COORD");
-        startSegment3.setattrvalue("C1", x2);
-        startSegment3.setattrvalue("C2", y2);
-        IomObject endSegment3 = segments3.addattrobj("segment", "COORD");
-        endSegment3.setattrvalue("C1", x2);
-        endSegment3.setattrvalue("C2", y1);
-        // polyline 4
-        IomObject polylineValue4 = outerBoundary.addattrobj("polyline", "POLYLINE");
-        IomObject segments4 = polylineValue4.addattrobj("sequence", "SEGMENTS");
-        IomObject startSegment4 = segments4.addattrobj("segment", "COORD");
-        startSegment4.setattrvalue("C1", x2);
-        startSegment4.setattrvalue("C2", y1);
-        IomObject endSegment4 = segments4.addattrobj("segment", "COORD");
-        endSegment4.setattrvalue("C1", x1);
-        endSegment4.setattrvalue("C2", y1);
-        return multisurfaceValue;
+        return IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createMultiplePolylineBoundary(
+                        IomObjectHelper.createCoord(x1, y1),
+                        IomObjectHelper.createCoord(x1, y2),
+                        IomObjectHelper.createCoord(x2, y2),
+                        IomObjectHelper.createCoord(x2, y1),
+                        IomObjectHelper.createCoord(x1, y1)));
     }
 }
