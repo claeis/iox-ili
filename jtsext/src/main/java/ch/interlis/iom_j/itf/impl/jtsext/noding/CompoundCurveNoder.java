@@ -101,6 +101,11 @@ public class CompoundCurveNoder
       }
   }
 
+	/**
+	 * Returns the lines, cut at the node points.
+	 * If  no nodes were calculated beforehand by calling {@link #getIntersections} or {@link #isValid}, the lines are returned unchanged.
+	 * The result is cached and not recalculated even if {@link #getIntersections} or {@link #isValid} is called after calling this method.
+	 */
   public Collection<? extends CompoundCurve> getNodedSubstrings()
   {
 	  if(isNoded){

@@ -592,8 +592,7 @@ public class AdditionalConstraints23Test {
 		// Asserts
 		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
 				"Intersection coord1 (571428.571, 207142.857), tids o1, o1",
-				"Intersection coord1 (586666.667, 230000.000), tids o1, o1",
-				"Set Constraint AdditionalModelH.AdditionalTopicH.AdditionalClassH.Constraint1 is not true.");
+				"Intersection coord1 (586666.667, 230000.000), tids o1, o1");
 	}
 	
 	// Prueft die Konfiguration: constraint validation.

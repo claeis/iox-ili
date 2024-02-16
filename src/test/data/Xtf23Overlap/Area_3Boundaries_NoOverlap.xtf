@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+    <HEADERSECTION SENDER="ili2gpkg-5.0.0-20f2bb62307ba6329a125fc6f10965ad9a4e6300" VERSION="2.3">
+        <MODELS>
+            <MODEL NAME="Overlap23" VERSION="2016-03-07" URI="mailto:ce@eisenhutinformatik.ch"></MODEL>
+        </MODELS>
+    </HEADERSECTION>
+    <DATASECTION>
+        <Overlap23.Topic BID="Overlap23.Topic">
+            <Overlap23.Topic.Area TID="triangle">
+                <area>
+                    <SURFACE>
+                        <BOUNDARY>
+                            <POLYLINE>
+                                <COORD><C1>2651091.454</C1><C2>1230621.171</C2></COORD>
+                                <COORD><C1>2651104.251</C1><C2>1230621.699</C2></COORD>
+                                <ARC><C1>2651098.038</C1><C2>1230632.575</C2><A1>2651099.898</A1><A2>1230626.472</A2></ARC>
+                                <COORD><C1>2651091.454</C1><C2>1230621.171</C2></COORD>
+                            </POLYLINE>
+                        </BOUNDARY>
+                    </SURFACE>
+                </area>
+            </Overlap23.Topic.Area>
+            <Overlap23.Topic.Area TID="right-a">
+                <area>
+                    <SURFACE>
+                        <BOUNDARY>
+                            <POLYLINE>
+                                <COORD><C1>2651098.038</C1><C2>1230640.661</C2></COORD>
+                                <COORD><C1>2651098.038</C1><C2>1230636.100</C2></COORD>
+                                <ARC><C1>2651098.038</C1><C2>1230632.575</C2><A1>2651098.882</A1><A2>1230634.122</A2></ARC>
+                                <ARC><C1>2651104.251</C1><C2>1230621.699</C2><A1>2651101.583</A1><A2>1230629.030</A2></ARC>
+                                <COORD><C1>2651104.359</C1><C2>1230634.952</C2></COORD>
+                                <COORD><C1>2651098.038</C1><C2>1230640.661</C2></COORD>
+                            </POLYLINE>
+                        </BOUNDARY>
+                    </SURFACE>
+                </area>
+            </Overlap23.Topic.Area>
+            <Overlap23.Topic.Area TID="left-b">
+                <area>
+                    <SURFACE>
+                        <BOUNDARY>
+                            <POLYLINE>
+                                <COORD><C1>2651091.331</C1><C2>1230633.954</C2></COORD>
+                                <COORD><C1>2651098.038</C1><C2>1230640.661</C2></COORD>
+                                <COORD><C1>2651098.038</C1><C2>1230636.100</C2></COORD>
+                                <ARC><C1>2651098.038</C1><C2>1230632.575</C2><A1>2651098.882</A1><A2>1230634.122</A2></ARC>
+                                <COORD><C1>2651091.454</C1><C2>1230621.171</C2></COORD>
+                                <COORD><C1>2651091.331</C1><C2>1230633.954</C2></COORD>
+                            </POLYLINE>
+                        </BOUNDARY>
+                    </SURFACE>
+                </area>
+            </Overlap23.Topic.Area>
+        </Overlap23.Topic>
+    </DATASECTION>
+</TRANSFER>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+	<HEADERSECTION SENDER="ili2pg-3.6.0-20161230" VERSION="2.3">
+		<MODELS>
+			<MODEL NAME="Overlap23" VERSION="2016-07-08" URI="mailto:ceis@localhost"></MODEL>
+		</MODELS>
+	</HEADERSECTION>
+	<DATASECTION>
+		<Overlap23.Topic BID="Overlap23.Topic">
+			<Overlap23.Topic.Area TID="street-a">
+				<area>
+					<SURFACE>
+						<BOUNDARY>
+							<POLYLINE>
+								<COORD><C1>2651004.962</C1><C2>1230588.766</C2></COORD>
+								<COORD><C1>2651007.934</C1><C2>1230594.772</C2></COORD>
+								<COORD><C1>2651013.010</C1><C2>1230605.029</C2></COORD>
+								<COORD><C1>2651007.309</C1><C2>1230607.879</C2></COORD>
+								<COORD><C1>2650988.159</C1><C2>1230586.703</C2></COORD>
+								<COORD><C1>2650998.911</C1><C2>1230579.259</C2></COORD>
+								<COORD><C1>2651004.962</C1><C2>1230588.766</C2></COORD>
+							</POLYLINE>
+						</BOUNDARY>
+					</SURFACE>
+				</area>
+			</Overlap23.Topic.Area>
+			<Overlap23.Topic.Area TID="street-b">
+				<area>
+					<SURFACE>
+						<BOUNDARY>
+							<POLYLINE>
+								<COORD><C1>2651027.722</C1><C2>1230590.441</C2></COORD>
+								<COORD><C1>2651030.355</C1><C2>1230596.029</C2></COORD>
+								<COORD><C1>2651013.010</C1><C2>1230605.029</C2></COORD>
+								<COORD><C1>2651007.934</C1><C2>1230594.772</C2></COORD>
+								<ARC><C1>2651013.101</C1><C2>1230597.511</C2><A1>2651010.064</A1><A2>1230596.997</A2></ARC>
+								<ARC><C1>2651017.829</C1><C2>1230596.337</C2><A1>2651015.502</A1><A2>1230597.074</A2></ARC>
+								<COORD><C1>2651027.722</C1><C2>1230590.441</C2></COORD>
+							</POLYLINE>
+						</BOUNDARY>
+					</SURFACE>
+				</area>
+			</Overlap23.Topic.Area>
+			<Overlap23.Topic.Area TID="square">
+				<area>
+					<SURFACE>
+						<BOUNDARY>
+							<POLYLINE>
+								<COORD><C1>2651021.616</C1><C2>1230578.862</C2></COORD>
+								<COORD><C1>2651027.722</C1><C2>1230590.441</C2></COORD>
+								<COORD><C1>2651017.829</C1><C2>1230596.337</C2></COORD>
+								<ARC><C1>2651013.101</C1><C2>1230597.511</C2><A1>2651015.502</A1><A2>1230597.074</A2></ARC>
+								<ARC><C1>2651007.934</C1><C2>1230594.772</C2><A1>2651010.064</A1><A2>1230596.997</A2></ARC>
+								<COORD><C1>2651004.962</C1><C2>1230588.766</C2></COORD>
+								<COORD><C1>2651021.616</C1><C2>1230578.862</C2></COORD>
+							</POLYLINE>
+						</BOUNDARY>
+					</SURFACE>
+				</area>
+			</Overlap23.Topic.Area>
+		</Overlap23.Topic>
+	</DATASECTION>
+</TRANSFER>
