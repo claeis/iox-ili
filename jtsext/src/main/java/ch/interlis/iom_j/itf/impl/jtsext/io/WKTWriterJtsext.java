@@ -12,6 +12,7 @@ import com.vividsolutions.jts.util.*;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
 
 public class WKTWriterJtsext
 {
@@ -322,7 +323,10 @@ public class WKTWriterJtsext
 			for (CurveSegment seg : lineString.getSegments()) {
 				if (seg instanceof ArcSegment) {
 					if (isLineString) {
-						writer.write("), ");
+						writer.write(")");
+					}
+					if (coordi > 0) {
+						writer.write(", ");
 					}
 					isLineString = false;
 					// CIRCULARSTRING (x y,x y,x y)
@@ -443,10 +447,16 @@ public class WKTWriterJtsext
   private void appendCompoundCurveRingTaggedText(CompoundCurveRing linearRing, int level, Writer writer)
 		    throws IOException
 		  {
-	  		for(CompoundCurve line : linearRing.getLines()){
-			    appendCompoundCurveText(line, level, false,writer,true);
-	  		}
-		  }
+    ArrayList<CompoundCurve> lines = linearRing.getLines();
+    writer.write("COMPOUNDCURVE (");
+    for (int i = 0; i < lines.size(); i++) {
+      if (i > 0) {
+        writer.write(", ");
+      }
+      appendCompoundCurveText(lines.get(i), level, false, writer, true);
+    }
+    writer.write(")");
+  }
 
   /**
    *  Converts a <code>Polygon</code> to &lt;Polygon Tagged Text&gt; format,
@@ -493,8 +503,20 @@ public class WKTWriterJtsext
       Writer writer)
     throws IOException
   {
-    writer.write("MULTILINESTRING ");
-    appendMultiLineStringText(multiLineString, level, false, writer);
+    boolean hasCurve = false;
+    for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
+      if (multiLineString.getGeometryN(i) instanceof CompoundCurve) {
+        hasCurve = true;
+        break;
+      }
+    }
+    if (hasCurve) {
+      writer.write("MULTICURVE ");
+      appendMultiCurveText(multiLineString, level, false, writer);
+    } else {
+      writer.write("MULTILINESTRING ");
+      appendMultiLineStringText(multiLineString, level, false, writer);
+    }
   }
 
   /**
@@ -736,6 +758,40 @@ public class WKTWriterJtsext
         appendCoordinate(((Point) multiPoint.getGeometryN(i)).getCoordinate(), writer);
         writer.write(")");
      }
+      writer.write(")");
+    }
+  }
+
+  /**
+   *  Converts a <code>MultiLineString</code> to &lt;MultiCurve Text&gt;
+   *  format, then appends it to the writer.
+   *
+   *@param  multiLineString  the <code>MultiLineString</code> to process
+   *@param  writer           the output writer to append to
+   */
+  private void appendMultiCurveText(MultiLineString multiLineString, int level, boolean indentFirst,
+      Writer writer)
+    throws IOException
+  {
+    if (multiLineString.isEmpty()) {
+      writer.write("EMPTY");
+    } else {
+      int level2 = level;
+      boolean doIndent = indentFirst;
+      writer.write("(");
+      for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
+        if (i > 0) {
+          writer.write(", ");
+          level2 = level + 1;
+          doIndent = true;
+        }
+        Geometry line = multiLineString.getGeometryN(i);
+        if (line instanceof CompoundCurve) {
+          appendCompoundCurveTaggedText((CompoundCurve) line, level2, writer);
+        } else {
+          appendLineStringText((LineString) line, level2, doIndent, writer);
+        }
+      }
       writer.write(")");
     }
   }
