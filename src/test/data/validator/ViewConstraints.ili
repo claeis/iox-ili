@@ -1,0 +1,118 @@
+INTERLIS 2.4;
+
+MODEL ViewConstraints AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
+    TOPIC TopicA =
+        CLASS ClassMandatory =
+            Name : TEXT*100;
+        END ClassMandatory;
+
+        VIEW ViewMandatory
+            PROJECTION OF ClassMandatory;
+            =
+            ALL OF ClassMandatory;
+
+            MANDATORY CONSTRAINT NameLength : INTERLIS.len(Name) >= 4;
+        END ViewMandatory;
+
+        CLASS ClassPlausibility =
+            Number : 0..1000;
+        END ClassPlausibility;
+
+        VIEW ViewPlausibility
+            PROJECTION OF ClassPlausibility;
+            =
+            ALL OF ClassPlausibility;
+
+            CONSTRAINT LessThan100 : >=60% Number < 100;
+        END ViewPlausibility;
+
+        CLASS ClassExistenceA =
+            Name : TEXT*100;
+        END ClassExistenceA;
+
+        CLASS ClassExistenceB =
+            Name : TEXT*100;
+        END ClassExistenceB;
+
+        VIEW ViewExistence
+            PROJECTION OF ClassExistenceA;
+            =
+            ALL OF ClassExistenceA;
+
+            EXISTENCE CONSTRAINT ExistsInB : Name REQUIRED IN ClassExistenceB:Name;
+        END ViewExistence;
+
+        CLASS ClassUnique =
+            Name : TEXT*100;
+        END ClassUnique;
+
+        VIEW ViewUnique
+            PROJECTION OF ClassUnique;
+            =
+            ALL OF ClassUnique;
+
+            UNIQUE NameUnique : Name;
+        END ViewUnique;
+
+        CLASS ClassBase =
+            Number : 0..1000;
+        END ClassBase;
+
+        VIEW ViewBase
+            PROJECTION OF ClassBase;
+            =
+            ALL OF ClassBase;
+
+            MANDATORY CONSTRAINT LessThan100OrMoreThan200 : Number < 100 OR Number > 200;
+        END ViewBase;
+    END TopicA;
+END ViewConstraints.
+
+MODEL AdditionalModelMandatory AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
+    IMPORTS ViewConstraints;
+
+    VIEW TOPIC ViewTopicA =
+        DEPENDS ON ViewConstraints.TopicA;
+        VIEW AdditionalViewMandatory
+            PROJECTION OF ViewConstraints.TopicA.ClassMandatory;
+            =
+            ALL OF ClassMandatory;
+
+            MANDATORY CONSTRAINT AdditionalNameLength : INTERLIS.len(Name) < 6;
+        END AdditionalViewMandatory;
+    END ViewTopicA;
+END AdditionalModelMandatory.
+
+MODEL ViewConstraintsSet AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
+    TOPIC TopicA =
+        CLASS ClassSet =
+            Name : TEXT*100;
+        END ClassSet;
+
+        VIEW ViewSet
+            PROJECTION OF ClassSet;
+            =
+            ALL OF ClassSet;
+
+            SET CONSTRAINT ObjectCount : INTERLIS.objectCount(ALL) >= 4;
+        END ViewSet;
+    END TopicA;
+END ViewConstraintsSet.
+
+MODEL ViewConstraintsExtending AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
+    IMPORTS ViewConstraints;
+
+    TOPIC ExtendingTopicA EXTENDS ViewConstraints.TopicA =
+        CLASS ClassExtending EXTENDS ViewConstraints.TopicA.ClassBase =
+            Text : TEXT*100;
+        END ClassExtending;
+
+        VIEW ViewExtending
+            PROJECTION OF ClassExtending;
+            =
+            ALL OF ClassExtending;
+
+            MANDATORY CONSTRAINT NewTextLength : INTERLIS.len(Text) >= 4;
+        END ViewExtending;
+    END ExtendingTopicA;
+END ViewConstraintsExtending.

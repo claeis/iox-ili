@@ -393,11 +393,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
 		    cleanupCurrentBasket();
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
-	        String additionalModels=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS);
-	        if(additionalModels!=null){
-	            String[] additionalModelv = additionalModels.split(";");
-	            iterateThroughAdditionalModels(additionalModelv);
-	        }
 			if(autoSecondPass){
 				doSecondPass();
 			}
@@ -634,12 +629,60 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     public void doSecondPass() {
         if(!singlePass) {
             errs.addEvent(errFact.logInfoMsg(rsrc.getString("doSecondPass.secondValidationPass")));
+            iterateThroughReferencedModels();
+            String additionalModelsConfig = validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS);
+            if (additionalModelsConfig != null) {
+                String[] additionalModels = additionalModelsConfig.split(";");
+                iterateThroughAdditionalModels(additionalModels);
+            }
             iterateThroughAllObjects();
             validateAllAreas();
             validatePlausibilityConstraints();
         }
-	}
-	
+    }
+
+    private void iterateThroughReferencedModels() {
+        HashSet<String> iteratedModels = new HashSet<String>();
+        for (String modelName : seenModels) {
+            Element modelElement = td.getElement(modelName);
+            if (modelElement instanceof DataModel) {
+                DataModel model = (DataModel) modelElement;
+                iterateThroughReferencedModel(model, iteratedModels);
+            }
+        }
+    }
+
+    private void iterateThroughReferencedModel(DataModel model, HashSet<String> iteratedModels) {
+        if (iteratedModels.contains(model.getName())) {
+            return;
+        }
+        iteratedModels.add(model.getName());
+
+        Iterator<Element> modelIterator = model.iterator();
+        while (modelIterator.hasNext()) {
+            Element modelEntry = modelIterator.next();
+            if (!(modelEntry instanceof Topic)) {
+                continue;
+            }
+            Topic topic = (Topic) modelEntry;
+
+            Iterator<Element> topicIterator = topic.iterator();
+            while (topicIterator.hasNext()) {
+                Element topicEntry = topicIterator.next();
+                if (topicEntry instanceof Projection) {
+                    Projection view = (Projection) topicEntry;
+                    collectProjectionConstraints(view);
+                }
+            }
+        }
+
+        for (Model importedModel : model.getImporting()) {
+            if (importedModel instanceof DataModel) {
+                iterateThroughReferencedModel((DataModel) importedModel, iteratedModels);
+            }
+        }
+    }
+
 	private void iterateThroughAdditionalModels(String[] additionalModels){
 		if(additionalModels==null){
 			return;
@@ -696,39 +739,42 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 				// view
 				Projection view = (Projection) topicObj;
-				Viewable classValue=null;
-				if(view.getSelected().getAliasing()==null){
-					continue;
-				}
-				// class
-				classValue = view.getSelected().getAliasing();
-				// constraint								
-				Iterator iteratorOfViewConstraints=view.iterator();
-				while (iteratorOfViewConstraints.hasNext()){
-					Object constraintObj = iteratorOfViewConstraints.next();
-					if(!(constraintObj instanceof Constraint)){
-						continue;
-					}
-					// constraint off
-					Constraint constraint = (Constraint) constraintObj;
-					String constraintName = getScopedName(constraint);
-					String checkConstraint=null;
-					if(!enforceConstraintValidation){
-						checkConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
-					}
-					if(ValidationConfig.OFF.equals(checkConstraint)){
-						if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
-							configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
-							errs.addEvent(errFact.logInfoMsg(rsrc.getString("collectAdditionalConstraints.validationConfigurationCheckOff"), constraintName));
-						}
-					}else{
-						additionalConstraints.put(constraint, classValue);
-					}
-				}
+				collectProjectionConstraints(view);
 			}
 		}
 	}
-	
+
+	private void collectProjectionConstraints(Projection view) {
+		Viewable classValue=null;
+		if(view.getSelected().getAliasing()==null){
+			return;
+		}
+		// class
+		classValue = view.getSelected().getAliasing();
+		// constraint
+		Iterator iteratorOfViewConstraints=view.iterator();
+		while (iteratorOfViewConstraints.hasNext()){
+			Object constraintObj = iteratorOfViewConstraints.next();
+			if(!(constraintObj instanceof Constraint)){
+				continue;
+			}
+			Constraint constraint = (Constraint) constraintObj;
+			String constraintName = getScopedName(constraint);
+			String checkConstraint=null;
+			if(!enforceConstraintValidation){
+				checkConstraint=validationConfig.getConfigValue(constraintName, ValidationConfig.CHECK);
+			}
+			if(ValidationConfig.OFF.equals(checkConstraint)){
+				if(!configOffOufputReduction.contains(ValidationConfig.CHECK+":"+constraintName)){
+					configOffOufputReduction.add(ValidationConfig.CHECK+":"+constraintName);
+					errs.addEvent(errFact.logInfoMsg(rsrc.getString("collectAdditionalConstraints.validationConfigurationCheckOff"), constraintName));
+				}
+			}else{
+				additionalConstraints.put(constraint, classValue);
+			}
+		}
+	}
+
 	private void validateAllAreas() {
 		setCurrentMainObj(null);
 		for(AttributeDef attr:areaAttrs.keySet()){
