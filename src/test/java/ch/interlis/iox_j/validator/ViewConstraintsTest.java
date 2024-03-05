@@ -1,16 +1,8 @@
 package ch.interlis.iox_j.validator;
 
-import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
-import ch.interlis.iox_j.EndBasketEvent;
-import ch.interlis.iox_j.EndTransferEvent;
-import ch.interlis.iox_j.ObjectEvent;
-import ch.interlis.iox_j.PipelinePool;
-import ch.interlis.iox_j.StartBasketEvent;
-import ch.interlis.iox_j.StartTransferEvent;
-import ch.interlis.iox_j.logging.LogEventFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -254,32 +246,12 @@ public class ViewConstraintsTest {
     }
 
     private LogCollector validateObjects(String topic, IomObject... objects) {
-        ValidationConfig modelConfig = new ValidationConfig();
-        LogCollector logger = new LogCollector();
-        validateObjects(topic, modelConfig, logger, objects);
-        return logger;
+        return ValidatorTestHelper.validateObjects(td, topic, objects);
     }
 
     private LogCollector validateObjectsWithAdditionalModel(String topic, String models, IomObject... objects) {
         ValidationConfig modelConfig = new ValidationConfig();
         modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS, models);
-        LogCollector logger = new LogCollector();
-        validateObjects(topic, modelConfig, logger, objects);
-        return logger;
-    }
-
-    private void validateObjects(String topic, ValidationConfig modelConfig, LogCollector logger, IomObject... objects) {
-        LogEventFactory errFactory = new LogEventFactory();
-        PipelinePool pool = new PipelinePool();
-        Settings settings = new Settings();
-        Validator validator = new Validator(td, modelConfig, logger, errFactory, pool, settings);
-
-        validator.validate(new StartTransferEvent());
-        validator.validate(new StartBasketEvent(topic, BASKET_ID));
-        for (IomObject object : objects) {
-            validator.validate(new ObjectEvent(object));
-        }
-        validator.validate(new EndBasketEvent());
-        validator.validate(new EndTransferEvent());
+        return ValidatorTestHelper.validateObjects(td, topic, BASKET_ID, modelConfig, objects);
     }
 }
