@@ -3,6 +3,10 @@ ideas/open issues
 - add xml validation
 - add Xtf23Reader
 
+iox-ili 1.23.1 (2024-xx-xx)
+-----------------------------
+- ItfWriter: fix export of numerics on FR locale (fix decimal separator '.')
+
 iox-ili 1.23.0 (2024-01-15)
 -----------------------------
 - Validator: implement ili2c:Expression.Subexpression

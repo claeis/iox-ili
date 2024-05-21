@@ -30,6 +30,7 @@ import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.ili2c.metamodel.*;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -613,17 +614,22 @@ public class ItfWriter implements ch.interlis.iox.IoxWriter {
 		if(numFmt.containsKey(accuracy)){
 			return numFmt.get(accuracy);
 		}
-		DecimalFormat fmt=null;
-		if(accuracy==0){
-			fmt=new DecimalFormat("#0");
-		}else{
-			fmt=new DecimalFormat("#0."+ch.ehi.basics.tools.StringUtility.STRING(accuracy,'0'));
-		}
-		fmt.setRoundingMode(RoundingMode.HALF_UP);
-		fmt.getDecimalFormatSymbols().setDecimalSeparator('.');
+		DecimalFormat fmt = buildDecimalFormat(accuracy);
 		numFmt.put(accuracy,fmt);
 		return fmt;
 	}
+    public static DecimalFormat buildDecimalFormat(int accuracy) {
+        DecimalFormatSymbols symbols=new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        DecimalFormat fmt=null;
+		if(accuracy==0){
+			fmt=new DecimalFormat("#0",symbols);
+		}else{
+			fmt=new DecimalFormat("#0."+ch.ehi.basics.tools.StringUtility.STRING(accuracy,'0'),symbols);
+		}
+		fmt.setRoundingMode(RoundingMode.HALF_UP);
+        return fmt;
+    }
 	private void writeNum(IomObject iomObj,String attrName,String numValue,NumericalType type1)
 	throws java.io.IOException, IoxException
 	{
