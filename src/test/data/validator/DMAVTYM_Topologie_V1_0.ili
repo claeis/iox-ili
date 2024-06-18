@@ -1,0 +1,32 @@
+INTERLIS 2.4;
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!
+!! Datenmodell der amtlichen Vermessung "Bund" (DMAV)
+!! beschrieben in INTERLIS Version 2.4
+!!
+!! Bundesamt fuer Landestopographie (swisstopo)
+!! Fachstelle Eidgenoessische Vermessungsdirektion (V+D)
+!! CH-3084 Wabern
+!! www.cadastre.ch und www.interlis.ch
+!!
+!! Version: 1 deutsch
+!! Dateiname: DMAVTYM_Topologie_V1_0.ili
+!!
+!! Das vorliegende Datenmodell gilt fuer den Bezugsrahmen "Landesvermessung 1903+
+!! (LV95)".
+!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!@ technicalContact = mailto:dmav@swisstopo.ch
+!!@ furtherInformation = https://www.cadastre.ch/de/manual-av/method/dmav.html
+TYPE MODEL DMAVTYM_Topologie_V1_0 (de)
+  AT "https://models.geo.admin.ch/V_D/" VERSION "2023-06-13" =
+
+  FUNCTION covers(
+    SurfaceObjects: CLASS;
+    SurfaceAttr: ATTRIBUTE;
+    MultiLineObject: ANYSTRUCTURE;
+    MultiLineAttr: ATTRIBUTE): BOOLEAN;
+
+END DMAVTYM_Topologie_V1_0.
