@@ -6,6 +6,7 @@ ideas/open issues
 iox-ili 1.23.1 (2024-xx-xx)
 -----------------------------
 - ItfWriter: fix export of numerics on FR locale (fix decimal separator '.')
+- Validator: XTF-AREA Refactoring: (ilivalidator#384)
 
 iox-ili 1.23.0 (2024-01-15)
 -----------------------------
