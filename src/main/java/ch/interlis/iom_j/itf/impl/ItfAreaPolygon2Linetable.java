@@ -2,9 +2,14 @@ package ch.interlis.iom_j.itf.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.index.strtree.STRtree;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.types.OutParam;
@@ -15,11 +20,14 @@ import ch.ehi.iox.objpool.impl.IomObjectSerializer;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CurvePolygon;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.AreaValidator;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveDissolver;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
+import ch.interlis.iom_j.itf.impl.jtsext.noding.CurvePairInt;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 import ch.interlis.iox.IoxException;
+import ch.interlis.iox_j.IoxIntersectionException;
 import ch.interlis.iox_j.IoxInvalidDataException;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 import ch.interlis.iox_j.jts.Iox2jtsext;
@@ -119,8 +127,67 @@ public class ItfAreaPolygon2Linetable {
         }
     }
 
-	public List<IoxInvalidDataException> validate(double maxOverlap)  {
+	public List<IoxInvalidDataException> validate1(double maxOverlap)  {
 		return AreaValidator.validateArea(polygons, maxOverlap, iliqname);
+	}
+	public List<IoxInvalidDataException> validate0(double maxOverlapDummy)  {
+		CompoundCurveNoder noder=new CompoundCurveNoder(recman,(java.util.List)lines,false);
+		noder.setEnableCommonSegments(true);
+        List<IoxInvalidDataException> intersectionsWithoutCompleteOverlays=new ArrayList<IoxInvalidDataException>();
+        List<Intersection> intersections=noder.getIntersections();
+        Iterator<Intersection> intersectionIter=intersections.iterator();
+        
+        while(intersectionIter.hasNext()){
+            Intersection is=intersectionIter.next();
+            CompoundCurve e0=is.getCurve1();
+            String tid1=(String) e0.getUserData();
+            intersectionsWithoutCompleteOverlays.add(new IoxIntersectionException(iliqname, tid1, is));
+        }
+        
+        if(!intersectionsWithoutCompleteOverlays.isEmpty()) {
+            return intersectionsWithoutCompleteOverlays;
+        }
+    
+        if(polygons==null) {
+            return null;
+        }
+        STRtree polyidx=new STRtree();
+        
+        // fill the polygon index
+        for (int i=0;i<polygons.size();i++) {
+            Polygon currentPolygon=polygons.get(i);
+            if(currentPolygon!=null) {
+                Envelope env=new Envelope(currentPolygon.getEnvelopeInternal());
+                polyidx.insert(env, i);
+            }
+        }
+        
+        // check if the complete polygons overlay
+        HashSet<CurvePairInt> compared=new HashSet<CurvePairInt>();
+        for (int i0=0;i0<polygons.size();i0++) {
+            Polygon e0=polygons.get(i0);
+            List<Integer> hits=polyidx.query(e0.getEnvelopeInternal());
+            for (int hitIdx = 0; hitIdx < hits.size(); hitIdx++) {
+                int i1=hits.get(hitIdx);
+                if(i0==i1) {
+                    continue;
+                }
+                CurvePairInt pair=new CurvePairInt(i0,i1);
+                if(!compared.contains(pair)) {
+                    compared.add(pair);
+                    Polygon e1 = polygons.get(i1);
+                    if(CurvePolygon.polygonOverlays(e0, e1)){
+                        String tid1=(String) e0.getUserData();
+                        String tid2=(String) e1.getUserData();
+                        intersectionsWithoutCompleteOverlays.add(new IoxInvalidDataException("polygons overlay tid1 "+tid1+", tid2 "+tid2));
+                    }
+                }
+            }
+        }
+        if(!intersectionsWithoutCompleteOverlays.isEmpty()) {
+            return intersectionsWithoutCompleteOverlays;
+        }
+		return null;
 	}
 
 	public java.util.List<IomObject> getLines() throws IoxException {
