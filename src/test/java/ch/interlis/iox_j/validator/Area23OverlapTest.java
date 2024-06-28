@@ -1,10 +1,5 @@
 package ch.interlis.iox_j.validator;
 
-import static org.junit.Assert.*;
-import java.io.File;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.Ili2cFailure;
@@ -18,6 +13,14 @@ import ch.interlis.iox.IoxEvent;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox_j.PipelinePool;
 import ch.interlis.iox_j.logging.LogEventFactory;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.File;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.junit.Assert.*;
 
 public class Area23OverlapTest {
 	private TransferDescription td=null;
@@ -74,7 +77,6 @@ public class Area23OverlapTest {
 	// Es darf keine Fehlermeldung ausgegeben werden,
 	// da die Innerboundary, die Outerboundary um den Wert: 0.02 ueberschneidet
 	// und dabei der maximal zulaessige Overlap von: 0.05 nicht ueberschritten wird.
-	@Ignore("Es wird eine Fehlermeldung ausgegeben, obwohl kein Fehler vorliegt.")
 	@Test
 	public void area1Boundary_PermissibleOverlap_Ok() throws IoxException {
 		LogCollector logger=new LogCollector();
@@ -85,11 +87,11 @@ public class Area23OverlapTest {
     // Es darf keine Fehlermeldung ausgegeben werden,
     // da der Overlap 0.0006 ist
     // und somit der maximal zulaessige Overlap von: 0.05 nicht ueberschritten wird.
-    @Ignore("Es wird eine Fehlermeldung ausgegeben, obwohl kein Fehler vorliegt. ilivalidator#366")
+    // siehe auch issue ilivalidator#366
     @Test
-    public void area1Boundary_PermissibleOverlap_GH366_Ok() throws IoxException {
+    public void area3Boundary_PermissibleOverlap_GH366_Ok() throws IoxException {
         LogCollector logger=new LogCollector();
-        runValidation(new File(TEST_IN+"Area_1Boundary_PermissibleOverlap_GH366.xtf"), logger);
+        runValidation(new File(TEST_IN+"Area_3Boundaries_PermissibleOverlap_GH366.xtf"), logger);
         // asserts
         assertEquals(0, logger.getErrs().size());
     }
@@ -97,53 +99,63 @@ public class Area23OverlapTest {
 	// Es soll eine Fehlermeldung ausgegeben werden,
 	// da die Innerboundary, die Outerboundary um den Wert: 0.10 ueberschneidet.
 	// Der maximal zulaessige Overlap von: 0.05 wird dabei ueberstiegen.
-	@Ignore("Zwei intersection tids 1, 1 Meldungen werden ausgegeben. Aber nur eine erwartet.")
 	@Test
 	public void area1Boundary_NotAllowedOverlap_Fail() throws IoxException {
 		LogCollector logger=new LogCollector();
 		runValidation(new File(TEST_IN+"Area_1Boundary_NotAllowedOverlap.xtf"), logger);
 		// asserts
-		assertEquals(3,logger.getErrs().size());
-		assertEquals("intersection tids 1, 1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate AREA Overlap23.Topic.Area.area", logger.getErrs().get(2).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Intersection overlap 0.10000000547560717, coord1 (2600000.000, 1049997.179), coord2 (2600000.000, 1050000.000), tids 1, 1");
 	}
 	
-	// Es darf keine Fehlermeldung ausgegeben werden,
-	// da der maximal zulaessige Overlap von: 0.05 nicht ueberstiegen wird.
-	@Ignore("Es wird eine Fehlermeldung ausgegeben, obwohl keine ueberschneidung vorliegt.")
+	// Es soll eine Fehlermeldung ausgegeben werden,
+	// da die Innerboundary die Outerboundary nicht an einem Stuetzpunkt beruehrt.
 	@Test
 	public void area2Boundaries_NoOverlap_Ok() throws IoxException {
 		LogCollector logger=new LogCollector();
 		runValidation(new File(TEST_IN+"Area_2Boundaries_NoOverlap.xtf"), logger);
 		// asserts
-		assertEquals(0, logger.getErrs().size());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Intersection coord1 (2600000.100, 1050011.411), tids 1, 1");
 	}
 	
-	// Es darf keine Fehlermeldung ausgegeben werden,
-	// da die Innerboundary, die Outerboundary um den Wert: 0.02 ueberschneidet
-	// und dabei der maximal zulaessige Overlap von: 0.05 nicht ueberschritten wird.
-	@Ignore("Der vorhandene Overlap wird gemeldet, obwohl dieser im gueltigen Bereich ist. Ein weiterer Overlap null wird ausgegeben, obwohl kein weiterer Overlap vorhanden.")
+	// Es soll eine Fehlermeldung ausgegeben werden,
+	// da die Innerboundary, die Outerboundary um den Wert: 0.02 ueberschneidet und keinen gemeinsamen
+	// Stuetzpunkt hat. Die Ueberschneidung ist kleiner als der maximal zulaessige Overlap von: 0.05.
 	@Test
 	public void area2Boundaries_PermissibleOverlap_Ok() throws IoxException {
 		LogCollector logger=new LogCollector();
 		runValidation(new File(TEST_IN+"Area_2Boundaries_PermissibleOverlap.xtf"), logger);
 		// asserts
-		assertEquals(0, logger.getErrs().size());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Intersection coord1 (2600000.020, 1050010.632), tids 1, 1");
 	}
 	
 	// Es soll eine Fehlermeldung ausgegeben werden,
 	// da die Innerboundary, die Outerboundary um den Wert: 0.10 ueberschneidet.
 	// Der maximal zulaessige Overlap von: 0.05 wird dabei ueberstiegen.
-	@Ignore("Ein weiterer Overlap null wird ausgegeben, obwohl kein weiterer Overlap vorhanden.")
 	@Test
 	public void area2Boundaries_NotAllowedOverlap_Fail() throws IoxException {
 		LogCollector logger=new LogCollector();
 		runValidation(new File(TEST_IN+"Area_2Boundaries_NotAllowedOverlap.xtf"), logger);
 		// asserts
-		assertTrue(logger.getErrs().size()==3);
-		assertEquals("intersection tids 1, 1", logger.getErrs().get(0).getEventMsg());
-		assertEquals("failed to validate polygon", logger.getErrs().get(1).getEventMsg());
-		assertEquals("failed to validate AREA Overlap23.Topic.Area.area", logger.getErrs().get(2).getEventMsg());
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"Intersection overlap 0.10000000473705839, coord1 (2600000.100, 1050008.590), coord2 (2600000.100, 1050011.411), tids 1, 1");
+	}
+
+	@Test
+	public void Area_3Boundaries_NoOverlap() throws Exception {
+		LogCollector logger=new LogCollector();
+		runValidation(new File(TEST_IN+"Area_3Boundaries_NoOverlap.xtf"), logger);
+
+		assertThat(logger.getErrs(), is(empty()));
+	}
+
+	@Test
+	public void Area_3Boundaries_PermissibleArcOverlaps() throws Exception {
+		LogCollector logger=new LogCollector();
+		runValidation(new File(TEST_IN+"Area_3Boundaries_PermissibleArcOverlaps.xtf"), logger);
+
+		assertThat(logger.getErrs(), is(empty()));
 	}
 }

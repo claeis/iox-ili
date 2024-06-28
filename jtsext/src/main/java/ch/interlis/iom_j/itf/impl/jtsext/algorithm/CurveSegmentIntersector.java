@@ -6,6 +6,12 @@ import ch.interlis.iom_j.itf.impl.hrg.HrgUtility;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
 
+/**
+ * Computes the intersection of two {@link CurveSegment}s.
+ * <p>
+ * The {@link CurveSegmentIntersector} can be reused. Calling {@link #computeIntersection(CurveSegment, CurveSegment)}
+ * overwrites the results of the previous intersection computation.
+ */
 public class CurveSegmentIntersector {
 	RobustLineIntersector li=new RobustLineIntersector();
 	private boolean hasIntersection_;
@@ -14,6 +20,10 @@ public class CurveSegmentIntersector {
 	private Coordinate[] is=new Coordinate[2];
 	private Double overlap=null;
 
+	/**
+	 * Computes the intersection of two {@link CurveSegment}s. If both segments are straights the intersection
+	 * calculation is calculated with {@link RobustLineIntersector}.
+	 */
 	public void computeIntersection(CurveSegment seg1,
 			CurveSegment seg2) {
 		isOverlay_=false;
@@ -157,6 +167,9 @@ public class CurveSegmentIntersector {
 		return isNum;
 	}
 
+	/**
+	 * Check if an intersection is at the given point.
+	 */
 	public boolean isIntersection(Coordinate p00) {
 		if(isNum>0){
 			if(p00.equals2D(is[0])){
@@ -177,6 +190,11 @@ public class CurveSegmentIntersector {
 		}
 		return is[i];
 	}
+
+	/**
+	 * @return the overlap of an arc with the other segment as defined by the INTERLIS reference manual.
+	 * This is needed to evaluate the WITHOUT OVERLAPS tolerance.
+	 */
 	public Double getOverlap()
 	{
 		return overlap;

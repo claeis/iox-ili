@@ -774,7 +774,42 @@ public class AreAreas23Test {
         assertEquals("Set Constraint AreAreas23.Topic.ClassF.Constraint1 is not true.",
                 logger.getErrs().get(0).getEventMsg());
     }
-    
+
+    @Test
+    public void InvalidInputPolygon() {
+        Iom_jObject classE1Valid = new Iom_jObject(CLASSE, OID1);
+        classE1Valid.setattrvalue("art", "a");
+        classE1Valid.addattrobj("flaeche", IomObjectHelper.createRectangleGeometry("480010.000", "70010.000", "480020.000", "70030.000"));
+
+        Iom_jObject classE2Invalid = new Iom_jObject(CLASSE, OID2);
+        classE2Invalid.setattrvalue("art", "a");
+        classE2Invalid.addattrobj("flaeche", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("480020.000", "70010.000"),
+                        IomObjectHelper.createCoord("480030.000", "70030.000"),
+                        IomObjectHelper.createCoord("480020.000", "70030.000"),
+                        IomObjectHelper.createCoord("480030.000", "70010.000"),
+                        IomObjectHelper.createCoord("480020.000", "70030.000"))));
+
+        // Create and run validator.
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(classE1Valid));
+        validator.validate(new ObjectEvent(classE2Invalid));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts.
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Intersection coord1 (480025.000, 70020.000), tids o2, o2",
+                "Overlay coord1 (480020.000, 70030.000), coord2 (480030.000, 70010.000), tids o2, o2",
+                "Set Constraint AreAreas23.Topic.ClassE.Constraint1 is not true.");
+    }
+
     // #############################################################//
     // ######################### GENEREL ###########################//
     // #############################################################//

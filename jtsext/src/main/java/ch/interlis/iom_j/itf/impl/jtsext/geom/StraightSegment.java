@@ -36,4 +36,31 @@ public class StraightSegment extends CurveSegment {
 		return "("+coords[0].x+" "+coords[0].y+", "+coords[1].x+" "+coords[1].y+")";
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		StraightSegment that = (StraightSegment) o;
+
+		return (coords[0].equals(that.coords[0]) && coords[1].equals(that.coords[1]))
+				|| (coords[0].equals(that.coords[1]) && coords[1].equals(that.coords[0]));
+	}
+
+	@Override
+	public int hashCode() {
+		Coordinate p0;
+		Coordinate p1;
+		if (coords[0].compareTo(coords[1]) > 0) {
+			p0 = coords[0];
+			p1 = coords[1];
+		} else {
+			p0 = coords[1];
+			p1 = coords[0];
+		}
+
+		int result = p0.hashCode();
+		result = 31 * result + p1.hashCode();
+		return result;
+	}
 }
