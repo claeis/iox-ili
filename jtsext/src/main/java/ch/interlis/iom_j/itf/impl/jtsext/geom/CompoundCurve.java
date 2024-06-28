@@ -291,12 +291,14 @@ public class CompoundCurve extends LineString {
 		return midPt;
 	}
 
-	/** calculate a point from a vector
+	/**
+	 * Calculate the point, that lies u units from p0 in the direction of vector(p0, p1) and v units
+	 * perpendicular to vector(p0, p1).
+	 *
 	 * @param p0 start point
 	 * @param p1 end point
 	 * @param u length on given vector
 	 * @param v offset from given vector. positive is left, negative is right
-	 * @return
 	 */
 	public static Coordinate calcKleinp(Coordinate p0,Coordinate p1,double u, double v)
 	{
