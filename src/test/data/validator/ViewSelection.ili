@@ -1,0 +1,105 @@
+INTERLIS 2.4;
+
+MODEL ViewSelection AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
+    DOMAIN
+        CodeEnum = (codeA, codeB, codeC);
+
+    TOPIC TopicA =
+        CLASS ClassMandatory =
+            Code : CodeEnum;
+            Name : TEXT*100;
+        END ClassMandatory;
+
+        VIEW ViewMandatory
+            PROJECTION OF NewName ~ ClassMandatory;
+            WHERE NewName->Code == #codeA;
+            =
+            ALL OF NewName;
+
+            MANDATORY CONSTRAINT NameLength : INTERLIS.len(Name) >= 4;
+        END ViewMandatory;
+
+        CLASS ClassPlausibility =
+            Code : CodeEnum;
+            Name : TEXT*100;
+        END ClassPlausibility;
+
+        VIEW ViewPlausibility
+            PROJECTION OF ClassPlausibility;
+            WHERE ClassPlausibility->Code == #codeA;
+            =
+            ALL OF ClassPlausibility;
+
+            CONSTRAINT NameLengthPlausibility : >=50% INTERLIS.len(Name) >= 4;
+        END ViewPlausibility;
+
+        CLASS ClassExistenceA =
+            Code : CodeEnum;
+            Name : TEXT*100;
+        END ClassExistenceA;
+
+        CLASS ClassExistenceB =
+            Code : CodeEnum;
+            Name : TEXT*100;
+        END ClassExistenceB;
+
+        VIEW ViewExistence
+            PROJECTION OF ClassExistenceA;
+            WHERE ClassExistenceA->Code == #codeA;
+            =
+            ALL OF ClassExistenceA;
+
+            EXISTENCE CONSTRAINT ExistsInB : Name REQUIRED IN ClassExistenceB:Name;
+        END ViewExistence;
+
+        CLASS ClassUnique =
+            Code : CodeEnum;
+            Name : TEXT*100;
+        END ClassUnique;
+
+        VIEW ViewUnique
+            PROJECTION OF ClassUnique;
+            WHERE ClassUnique->Code == #codeA;
+            =
+            ALL OF ClassUnique;
+
+            UNIQUE NameUniqueCodeA : Name;
+        END ViewUnique;
+
+        CLASS ClassMultipleWhere =
+            Code : CodeEnum;
+            Name : TEXT*100;
+        END ClassMultipleWhere;
+
+        VIEW ViewMultipleWhere
+            PROJECTION OF ClassMultipleWhere;
+            WHERE ClassMultipleWhere->Code == #codeA;
+            WHERE INTERLIS.len(ClassMultipleWhere->Name) >= 4;
+            =
+            ALL OF ClassMultipleWhere;
+
+            UNIQUE NameUnique : Name;
+        END ViewMultipleWhere;
+    END TopicA;
+END ViewSelection.
+
+MODEL ViewSelectionSet AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
+    DOMAIN
+        CodeEnum = (codeA, codeB, codeC);
+
+    TOPIC TopicA =
+        CLASS ClassSet =
+            Code : CodeEnum;
+            Name : TEXT*100;
+        END ClassSet;
+
+        VIEW ViewSet
+            PROJECTION OF NewName ~ ClassSet;
+            WHERE NewName->Code == #codeA;
+            =
+            ALL OF NewName;
+
+            SET CONSTRAINT ObjectCount : INTERLIS.objectCount(ALL) == 2;
+        END ViewSet;
+    END TopicA;
+END ViewSelectionSet.
