@@ -3,6 +3,9 @@ ideas/open issues
 - add xml validation
 - add Xtf23Reader
 
+iox-ili 1.23.2 (2024-08-xx)
+-----------------------------
+
 iox-ili 1.23.1 (2024-08-16)
 -----------------------------
 - ItfWriter: fix export of numerics on FR locale (fix decimal separator '.')
