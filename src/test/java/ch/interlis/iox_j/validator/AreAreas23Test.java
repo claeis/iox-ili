@@ -774,7 +774,42 @@ public class AreAreas23Test {
         assertEquals("Set Constraint AreAreas23.Topic.ClassF.Constraint1 is not true.",
                 logger.getErrs().get(0).getEventMsg());
     }
-    
+
+    @Test
+    public void InvalidInputPolygon() {
+        Iom_jObject classE1Valid = new Iom_jObject(CLASSE, OID1);
+        classE1Valid.setattrvalue("art", "a");
+        classE1Valid.addattrobj("flaeche", IomObjectHelper.createRectangleGeometry("480010.000", "70010.000", "480020.000", "70030.000"));
+
+        Iom_jObject classE2Invalid = new Iom_jObject(CLASSE, OID2);
+        classE2Invalid.setattrvalue("art", "a");
+        classE2Invalid.addattrobj("flaeche", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("480020.000", "70010.000"),
+                        IomObjectHelper.createCoord("480030.000", "70030.000"),
+                        IomObjectHelper.createCoord("480020.000", "70030.000"),
+                        IomObjectHelper.createCoord("480030.000", "70010.000"),
+                        IomObjectHelper.createCoord("480020.000", "70030.000"))));
+
+        // Create and run validator.
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID));
+        validator.validate(new ObjectEvent(classE1Valid));
+        validator.validate(new ObjectEvent(classE2Invalid));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts.
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Intersection coord1 (480025.000, 70020.000), tids o2, o2",
+                "Overlay coord1 (480020.000, 70030.000), coord2 (480030.000, 70010.000), tids o2, o2",
+                "Set Constraint AreAreas23.Topic.ClassE.Constraint1 is not true.");
+    }
+
     // #############################################################//
     // ######################### GENEREL ###########################//
     // #############################################################//
@@ -804,45 +839,12 @@ public class AreAreas23Test {
     }
 
     public IomObject createRectangle(String x1, String y1, String x2, String y2) {
-        IomObject multisurfaceValue = new Iom_jObject("MULTISURFACE",null);
-        IomObject surfaceValue = multisurfaceValue.addattrobj("surface", "SURFACE");
-        IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-        // polyline
-        IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
-        IomObject segments = polylineValue.addattrobj("sequence", "SEGMENTS");
-        IomObject startSegment = segments.addattrobj("segment", "COORD");
-        startSegment.setattrvalue("C1", x1);
-        startSegment.setattrvalue("C2", y1);
-        IomObject endSegment = segments.addattrobj("segment", "COORD");
-        endSegment.setattrvalue("C1", x1);
-        endSegment.setattrvalue("C2", y2);
-        // polyline 2
-        IomObject polylineValue2 = outerBoundary.addattrobj("polyline", "POLYLINE");
-        IomObject segments2 = polylineValue2.addattrobj("sequence", "SEGMENTS");
-        IomObject startSegment2 = segments2.addattrobj("segment", "COORD");
-        startSegment2.setattrvalue("C1", x1);
-        startSegment2.setattrvalue("C2", y2);
-        IomObject endSegment2 = segments2.addattrobj("segment", "COORD");
-        endSegment2.setattrvalue("C1", x2);
-        endSegment2.setattrvalue("C2", y2);
-        // polyline 3
-        IomObject polylineValue3 = outerBoundary.addattrobj("polyline", "POLYLINE");
-        IomObject segments3 = polylineValue3.addattrobj("sequence", "SEGMENTS");
-        IomObject startSegment3 = segments3.addattrobj("segment", "COORD");
-        startSegment3.setattrvalue("C1", x2);
-        startSegment3.setattrvalue("C2", y2);
-        IomObject endSegment3 = segments3.addattrobj("segment", "COORD");
-        endSegment3.setattrvalue("C1", x2);
-        endSegment3.setattrvalue("C2", y1);
-        // polyline 4
-        IomObject polylineValue4 = outerBoundary.addattrobj("polyline", "POLYLINE");
-        IomObject segments4 = polylineValue4.addattrobj("sequence", "SEGMENTS");
-        IomObject startSegment4 = segments4.addattrobj("segment", "COORD");
-        startSegment4.setattrvalue("C1", x2);
-        startSegment4.setattrvalue("C2", y1);
-        IomObject endSegment4 = segments4.addattrobj("segment", "COORD");
-        endSegment4.setattrvalue("C1", x1);
-        endSegment4.setattrvalue("C2", y1);
-        return multisurfaceValue;
+        return IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createMultiplePolylineBoundary(
+                        IomObjectHelper.createCoord(x1, y1),
+                        IomObjectHelper.createCoord(x1, y2),
+                        IomObjectHelper.createCoord(x2, y2),
+                        IomObjectHelper.createCoord(x2, y1),
+                        IomObjectHelper.createCoord(x1, y1)));
     }
 }

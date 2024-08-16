@@ -101,6 +101,11 @@ public class CompoundCurveNoder
       }
   }
 
+	/**
+	 * Returns the lines, cut at the node points.
+	 * If  no nodes were calculated beforehand by calling {@link #getIntersections} or {@link #isValid}, the lines are returned unchanged.
+	 * The result is cached and not recalculated even if {@link #getIntersections} or {@link #isValid} is called after calling this method.
+	 */
   public Collection<? extends CompoundCurve> getNodedSubstrings()
   {
 	  if(isNoded){
@@ -135,23 +140,33 @@ private void computeIntersects(int ss0Idx,CompoundCurve ss0, int ss1Idx,Compound
     endPts1[1]=ss0.getEndPoint().getCoordinate();
     endPts2[0]=ss1.getStartPoint().getCoordinate();
     endPts2[1]=ss1.getEndPoint().getCoordinate();
-    if(ss0==ss1){
-    	// diese optimierung bringt
-        // 149188 ms
-        // 106694 ms
-        for (int i0 = 0; i0 < ss0.getNumSegments(); i0++) {
-            for (int i1 = i0+1; i1 < ss1.getNumSegments(); i1++) {
-              checkInteriorIntersections(ss0Idx,ss0, i0, ss1Idx,ss1, i1,endPts1,endPts2);
-            }
-          }
-    }else{
-        for (int i0 = 0; i0 < ss0.getNumSegments(); i0++) {
-            for (int i1 = 0; i1 < ss1.getNumSegments(); i1++) {
-              checkInteriorIntersections(ss0Idx,ss0, i0, ss1Idx,ss1, i1,endPts1,endPts2);
-            }
-          }
-    }
 	
+	STRtree index0 = new STRtree();
+	for (int i = 0; i < ss0.getNumSegments(); i++) {
+		CurveSegment seg = ss0.getSegments().get(i);
+		index0.insert(seg.computeEnvelopeInternal(), i);
+	}
+	if (ss0 == ss1) {
+		for (int i = 0; i < ss1.getNumSegments(); i++) {
+			CurveSegment seg = ss1.getSegments().get(i);
+			List<Integer> hits = index0.query(seg.computeEnvelopeInternal());
+			Collections.sort(hits); // Necessary because segIntAdd might lose intersections if they are not added in order
+			for (int hit : hits) {
+				if (hit > i) {
+					checkInteriorIntersections(ss0Idx,ss0, hit, ss1Idx,ss1, i,endPts1,endPts2);
+				}
+			}
+		}
+	} else {
+		for (int i = 0; i < ss1.getNumSegments(); i++) {
+			CurveSegment seg = ss1.getSegments().get(i);
+			List<Integer> hits = index0.query(seg.computeEnvelopeInternal());
+			Collections.sort(hits); // Necessary because segIntAdd might lose intersections if they are not added in order
+			for (int hit : hits) {
+				checkInteriorIntersections(ss0Idx,ss0, hit, ss1Idx,ss1, i,endPts1,endPts2);
+			}
+		}
+	}
 }
 	private void checkInteriorIntersections(int e0_i,CompoundCurve e0, int segIndex0, int e1_i,CompoundCurve e1, int segIndex1,Coordinate endPts1[],Coordinate endPts2[])
 	{

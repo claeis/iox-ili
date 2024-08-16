@@ -17,11 +17,11 @@ import ch.ehi.iox.objpool.ObjectPoolManager;
 import ch.ehi.iox.objpool.impl.CompoundCurveSerializer;
 import ch.ehi.iox.objpool.impl.FileBasedCollection;
 import ch.ehi.iox.objpool.impl.IomObjectSerializer;
-import ch.ehi.iox.objpool.impl.JavaSerializer;
 import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurvePolygon;
+import ch.interlis.iom_j.itf.impl.jtsext.noding.AreaValidator;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveDissolver;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CurvePairInt;
@@ -126,8 +126,11 @@ public class ItfAreaPolygon2Linetable {
             }
         }
     }
-	
-	public List<IoxInvalidDataException> validate()  {
+
+	public List<IoxInvalidDataException> validate1(double maxOverlap)  {
+		return AreaValidator.validateArea(polygons, maxOverlap, iliqname);
+	}
+	public List<IoxInvalidDataException> validate0(double maxOverlapDummy)  {
 		CompoundCurveNoder noder=new CompoundCurveNoder(recman,(java.util.List)lines,false);
 		noder.setEnableCommonSegments(true);
         List<IoxInvalidDataException> intersectionsWithoutCompleteOverlays=new ArrayList<IoxInvalidDataException>();
@@ -186,7 +189,7 @@ public class ItfAreaPolygon2Linetable {
         }
 		return null;
 	}
-	
+
 	public java.util.List<IomObject> getLines() throws IoxException {
 		if(ioxlines==null){
 			{
@@ -220,14 +223,26 @@ public class ItfAreaPolygon2Linetable {
 		return (List<IomObject>) ioxlines;
 	}
 
+	/**
+	 * get all lines from a polygon.
+	 */
     public static ArrayList<IomObject> getLinesFromPolygon(IomObject polygon)
     {
         return getLinesFromPolygon_(polygon,false);
     }
+
+	/**
+	 * get all lines from a multipolygon.
+	 */
     public static ArrayList<IomObject> getLinesFromMultiPolygon(IomObject polygon)
     {
         return getLinesFromPolygon_(polygon,true);
     }
+
+	/**
+	 * get all lines from a polygon.
+	 * Performs some simple checks beforehand.
+	 */
 	private static ArrayList<IomObject> getLinesFromPolygon_(IomObject polygon,boolean isMultiPolygon)
 	{
 		ArrayList<IomObject> ret=new ArrayList<IomObject>();
