@@ -3,10 +3,13 @@ ideas/open issues
 - add xml validation
 - add Xtf23Reader
 
-iox-ili 1.23.1 (2024-xx-xx)
+iox-ili 1.23.1 (2024-08-16)
 -----------------------------
 - ItfWriter: fix export of numerics on FR locale (fix decimal separator '.')
-- Validator: XTF-AREA Refactoring: (ilivalidator#384)
+- Validator: XTF-AREA Refactoring (ilivalidator#384)
+- Validator: implement DMAVTYM_Topologie_V1_0 covers function (#129)
+- Validator: support where conditions (selections) in projection views (ilivalidator#408)
+- Validator: validate views in data models (ilivalidator#324)
 
 iox-ili 1.23.0 (2024-01-15)
 -----------------------------
