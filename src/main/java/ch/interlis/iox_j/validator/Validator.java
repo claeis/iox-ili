@@ -135,6 +135,7 @@ import ch.interlis.iox_j.PipelinePool;
 import ch.interlis.iox_j.jts.Iox2jtsext;
 import ch.interlis.iox_j.logging.LogEventFactory;
 import ch.interlis.iox_j.utility.ReaderFactory;
+import ch.interlis.iox_j.validator.functions.DmavtymTopologie;
 import ch.interlis.iox_j.validator.functions.Text;
 import ch.interlis.iox_j.validator.functions.Math;
 import ch.interlis.iox_j.validator.functions.MinimalRuntimeSystem;
@@ -1917,6 +1918,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			    }
 			    
 			    return interlis_ext.evaluateFunction(currentFunction, parentObject, validationKind, usageScope, iomObj, expression, functions, td, firstRole);
+            } else if (funcName.startsWith("DMAVTYM_Topologie_V1_0.")) {
+                if (dmavtymTopologie == null) {
+                    dmavtymTopologie = new DmavtymTopologie(this, td, validationConfig, errFact);
+                }
+
+                return dmavtymTopologie.evaluateFunction(currentFunction, functionCallObj, parentObject,
+                        validationKind, usageScope, iomObj, texttype, firstRole);
 			} else {
 				String functionQname=funcName;
 				Class functionTargetClass=customFunctions.get(functionQname);
@@ -3478,6 +3486,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private Math mathFunction=null;
     private Text textFunction=null;
     private MinimalRuntimeSystem rtsFunction=null;
+    private DmavtymTopologie dmavtymTopologie=null;
 	
 	private void validateObject(IomObject iomObj,String attrPath,Viewable assocClass) throws IoxException {
 		// validate if object is null

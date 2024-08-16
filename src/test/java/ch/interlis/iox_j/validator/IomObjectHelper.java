@@ -37,6 +37,29 @@ public class IomObjectHelper {
      * Create a BOUNDARY object consisting of one POLYLINE object with the specified segments.
      */
     public static IomObject createBoundary(IomObject... segments) {
+        IomObject polyline = createPolyline(segments);
+
+        IomObject boundary = new Iom_jObject("BOUNDARY", null);
+        boundary.addattrobj("polyline", polyline);
+        return boundary;
+    }
+
+    /**
+     * Create a MULTIPOLYLINE object from the specified polylines.
+     */
+    public static IomObject createMultiPolyline(IomObject... polylines) {
+        IomObject multiPolyline = new Iom_jObject("MULTIPOLYLINE", null);
+        for (IomObject polyline : polylines) {
+            multiPolyline.addattrobj("polyline", polyline);
+        }
+
+        return multiPolyline;
+    }
+
+    /**
+     * Create a POLYLINE object with the specified segments.
+     */
+    public static IomObject createPolyline(IomObject... segments) {
         IomObject polylineSegments = new Iom_jObject("SEGMENTS", null);
         for (IomObject segment : segments) {
             polylineSegments.addattrobj("segment", segment);
@@ -45,9 +68,7 @@ public class IomObjectHelper {
         IomObject polyline = new Iom_jObject("POLYLINE", null);
         polyline.addattrobj("sequence", polylineSegments);
 
-        IomObject boundary = new Iom_jObject("BOUNDARY", null);
-        boundary.addattrobj("polyline", polyline);
-        return boundary;
+        return polyline;
     }
 
     /**
