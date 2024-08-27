@@ -17,13 +17,13 @@ public class IniFileWriter {
             java.util.Set<String> sectionsS=metaConfig.getIliQnames();
             if(sectionsS!=null) {
                 java.util.List<String> sections=new java.util.ArrayList<String>(sectionsS);
-                sections.sort(null);
+                java.util.Collections.sort(sections);
                 for(String section:sections) {
                     writer.write("["+section+"]");writer.newLine();
                     java.util.Set<String> paramsS=metaConfig.getConfigParams(section);
                     if(paramsS!=null) {
                         java.util.List<String> params=new java.util.ArrayList<String>(paramsS);
-                        params.sort(null);
+                        java.util.Collections.sort(params);
                         for(String param:params) {
                             String value=metaConfig.getConfigValue(section, param);
                             if(value!=null) {
