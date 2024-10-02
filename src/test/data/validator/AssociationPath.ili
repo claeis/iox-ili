@@ -1,0 +1,25 @@
+INTERLIS 2.4;
+
+MODEL ModelA (en) AT "http://www.interlis.ch/ili2c/tests/" VERSION "2024-10-01" =
+  TOPIC TopicA =
+    CLASS ClassA1 =
+      Attr : BOOLEAN;
+    END ClassA1;
+
+    CLASS ClassB1 =
+      Code: TEXT*10;
+    END ClassB1;
+
+    ASSOCIATION Assoc1 =
+      AssocA -- {0..*} ClassA1;
+      AssocB -<> {1} ClassB1;
+    END Assoc1;
+
+    CONSTRAINTS OF ClassA1 =
+      MANDATORY CONSTRAINT IsOfClassAShouldFail : INTERLIS.isOfClass(THIS->AssocB, >ClassA1);
+      MANDATORY CONSTRAINT IsOfClassB : INTERLIS.isOfClass(THIS->AssocB, >ClassB1);
+
+      MANDATORY CONSTRAINT CodeLength : INTERLIS.len(THIS->AssocB->Code) >= 3;
+    END;
+  END TopicA;
+END ModelA.

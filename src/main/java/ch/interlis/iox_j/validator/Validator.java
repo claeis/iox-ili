@@ -2099,26 +2099,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                     continue;
                                 }
                             }
-                            if (k != lastPathIndex) {
-                                IomObject targetObj = getReferencedObject(role, targetOid);
-                                if (targetObj != null) {
-                                    nextCurrentObjects.add(targetObj);
-                                }
-                            }else {
-                                List<IomObject> objects = new ArrayList<IomObject>();
-                                IomObject targetRefObj = getReferencedObject(role, targetOid);
-                                if (targetRefObj != null) {
-                                    if (role instanceof RoleDef) {
-                                        return Value.createOidValue(targetRefObj.getobjectoid());
-                                    } else {
-                                        objects.add(targetRefObj);
-                                        nextCurrentObjects.addAll(objects);                                        
-                                    }
-  
-                                } else if (roleDefValue != null) {
-                                    objects.add(roleDefValue);
-                                    nextCurrentObjects.addAll(objects);
-                                }
+
+                            IomObject targetObj = getReferencedObject(role, targetOid);
+                            if (targetObj != null) {
+                                nextCurrentObjects.add(targetObj);
                             }
                         }
                     }
