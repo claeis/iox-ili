@@ -205,7 +205,7 @@ public class UniqueConstraints10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertEquals(1,logger.getErrs().size());
-		assertEquals("Unique constraint UniqueConstraints10.Topic.TableB.Constraint1 is violated! Values o1 already exist in Object: o3",logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints10.Topic.TableB.Constraint1 is violated! Values UniqueConstraints10.Topic.TableA oid o1 {} already exist in Object: o3",logger.getErrs().get(0).getEventMsg());
 	}
 	@Test
 	public void ref_Ok(){
