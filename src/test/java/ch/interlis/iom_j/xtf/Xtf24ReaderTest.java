@@ -121,6 +121,40 @@ public class Xtf24ReaderTest {
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void testSkipBasket_Ok()  throws Iox2jtsException, IoxException {
+        Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"SkipBasket.xml"));
+        reader.setModel(td);
+        reader.setTopicFilter(new String[] {"Test1.TopicA"});
+        assertTrue(reader.read() instanceof  StartTransferEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
+    @Test
+    public void testSkipBasketFirst_Ok()  throws Iox2jtsException, IoxException {
+        Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"SkipBasketFirst.xml"));
+        reader.setModel(td);
+        reader.setTopicFilter(new String[] {"Test1.TopicA"});
+        assertTrue(reader.read() instanceof  StartTransferEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
+    @Test
+    public void testSkipBasketOnly_Ok()  throws Iox2jtsException, IoxException {
+        Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"SkipBasketOnly.xml"));
+        reader.setModel(td);
+        reader.setTopicFilter(new String[] {"Test1.TopicA"});
+        assertTrue(reader.read() instanceof  StartTransferEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
 	
 	// In diesem Test soll getestet werden, ob die topic (basketname, basket ID)
 	// mehrere Male erstellt werden kann, ohne dass dabei eine Fehlermeldung entsteht.

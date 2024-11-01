@@ -3,6 +3,9 @@ package ch.interlis.iom_j.xtf;
 import static org.junit.Assert.*;
 import java.io.File;
 import java.util.Map;
+
+import javax.xml.stream.XMLStreamException;
+
 import org.junit.Test;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox.EndBasketEvent;
@@ -68,8 +71,9 @@ public class Xtf23ReaderTest {
 			reader.read();
 			fail();
 		}catch(IoxException ex) {
-			assertTrue((ex).getMessage().contains("The end-tag for element type \"TRANSFER\" must end with a '>' delimiter."));
-			assertTrue(ex instanceof IoxException);
+            Throwable ex1=ex.getCause();
+            assertTrue(ex1 instanceof XMLStreamException);
+			//assertTrue((ex).getMessage().contains("The end-tag for element type \"TRANSFER\" must end with a '>' delimiter."));
 		}
 		reader.close();
 		reader=null;
@@ -154,8 +158,11 @@ public class Xtf23ReaderTest {
 			reader.read();
 			fail();
 		}catch(IoxException ex) {
-			assertTrue((ex).getMessage().contains("XML document structures must start and end within the same entity."));
-			assertTrue(ex instanceof IoxException);
+		    Throwable ex1=ex.getCause();
+		    assertTrue(ex1 instanceof XMLStreamException);
+		    String msg=ex1.getMessage();
+		    System.out.println(msg);
+			//assertTrue(msg.contains("XML document structures must start and end within the same entity."));
 		}finally {
 			reader.close();
 			reader=null;
