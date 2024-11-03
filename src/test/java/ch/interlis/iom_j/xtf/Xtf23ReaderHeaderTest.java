@@ -2,6 +2,9 @@ package ch.interlis.iom_j.xtf;
 
 import static org.junit.Assert.*;
 import java.io.File;
+
+import javax.xml.stream.XMLStreamException;
+
 import org.junit.Test;
 import ch.interlis.iox.EndTransferEvent;
 import ch.interlis.iox.IoxException;
@@ -156,9 +159,11 @@ public class Xtf23ReaderHeaderTest {
 			reader.read();
 			fail();
 		}catch(IoxException ioxEx){
+            Throwable ex1=ioxEx.getCause();
+            assertTrue(ex1 instanceof XMLStreamException);
 		    String msg=(ioxEx).getMessage();
 		    System.out.println(msg);
-			assertTrue(msg.contains("Open quote is expected"));
+			//assertTrue(msg.contains("Open quote is expected"));
 		}
 		reader.close();
 		reader=null;

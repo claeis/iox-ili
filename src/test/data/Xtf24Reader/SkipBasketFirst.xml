@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" xmlns="http://www.interlis.ch/xtf/2.4/Test1"
+	xmlns:skip="http://www.interlis.ch/xtf/2.4/TestSkipModel">
+	<ili:headersection>
+		<ili:models>
+			<ili:model>Test1</ili:model>
+			<ili:model>TestSkipModel</ili:model>
+		</ili:models>
+	</ili:headersection>
+	<ili:datasection>
+		<skip:TopicSkip ili:bid="bid2">
+		</skip:TopicSkip>
+		<TopicA ili:bid="bid1">
+		</TopicA>
+	</ili:datasection>
+</ili:transfer>

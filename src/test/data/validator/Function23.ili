@@ -82,7 +82,7 @@ MODEL Function23
 		CLASS ClassD2 =
 			attr2: MTEXT;
 			MANDATORY CONSTRAINT
-				(INTERLIS.trimM (" abcdef\\nhij "))==attr2;
+				(INTERLIS.trimM (" abcdef\u000Ahij "))==attr2;
 		END ClassD2;
 		
 		CLASS ClassD3 =

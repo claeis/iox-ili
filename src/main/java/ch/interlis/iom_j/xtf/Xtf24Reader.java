@@ -233,6 +233,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		IomObject iomObj=null;
 		try {
 			javax.xml.stream.events.XMLEvent event=null;
+			while(true) {
 			if(state==STATE_START){
 				// after start
 				event=xmlreader.nextEvent();
@@ -284,8 +285,26 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 				event=xmlreader.nextEvent(); 
 				event=skipSpacesAndGetNextEvent(event);
                 if(event.isStartElement()){ // start element basket
-                	state=STATE_AFTER_STARTBASKET;
-                	return createStartBasket(event); // create new basket
+                    StartElement element = (StartElement) event;
+                    currentTopic=getIliTopic(element.getName());
+                    if(currentTopic==null){
+                        if(filterTopics!=null) {
+                            // skip basket
+                            event=skipBasket(event);
+                            state=STATE_AFTER_ENDBASKET;
+                        }else {
+                            throw new IoxSyntaxException("Unknown topic <"+element.getName()+">");
+                        }
+                    }else {
+                        if(filterTopics==null || filterTopics.contains(currentTopic.getScopedName())) {
+                            state=STATE_AFTER_STARTBASKET;
+                            return createStartBasket(element); // create new basket
+                        }else {
+                            // skip basket
+                            event=skipBasket(event);
+                            state=STATE_AFTER_ENDBASKET;
+                        }
+                    }
                 }else if(event.isEndElement()){
                     // event is end element datasection
                     return readEndTransfer(event);
@@ -331,8 +350,26 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 				event=xmlreader.nextEvent();
 				event=skipSpacesAndGetNextEvent(event);
 		    	if(event.isStartElement()){ // start element basket
-		    		state=STATE_AFTER_STARTBASKET;
-		        	return createStartBasket(event); // create new basket
+                    StartElement element = (StartElement) event;
+                    currentTopic=getIliTopic(element.getName());
+                    if(currentTopic==null){
+                        if(filterTopics!=null) {
+                            // skip basket
+                            event=skipBasket(event);
+                            state=STATE_AFTER_ENDBASKET;
+                        }else {
+                            throw new IoxSyntaxException("Unknown topic <"+element.getName()+">");
+                        }
+                    }else {
+                        if(filterTopics==null || filterTopics.contains(currentTopic.getScopedName())) {
+                            state=STATE_AFTER_STARTBASKET;
+                            return createStartBasket(element); // create new basket
+                        }else {
+                            // skip basket
+                            event=skipBasket(event);
+                            state=STATE_AFTER_ENDBASKET;
+                        }
+                    }
 		        }else if(event.isEndElement()) { // end element datasection
 		            return readEndTransfer(event);
 		        }
@@ -341,13 +378,38 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 			if(state==STATE_AFTER_ENDTRANSFER) {
 				throw new IoxSyntaxException(event2msgtext(event));
 			}
+			}
 		}catch(javax.xml.stream.XMLStreamException ex){
 			throw new IoxException(ex);
 		}
-		return null;
+		// return null;
 	}
 	
-	private IoxEvent readEndTransfer(XMLEvent event) throws IoxSyntaxException, XMLStreamException {
+	private XMLEvent skipBasket(XMLEvent event) throws XMLStreamException {
+	    XMLEvent ret=skip(xmlreader);
+        return ret;
+    }
+    static XMLEvent skip(XMLEventReader parser) throws XMLStreamException {
+        int elemenetLevel = 0;
+        XMLEvent event=null;
+        for (event = parser.nextEvent(); !event.isEndDocument(); event = parser
+                .nextEvent()) {
+            switch (event.getEventType()) {
+            case XMLStreamConstants.START_ELEMENT:
+                elemenetLevel++;
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                elemenetLevel--;
+                break;
+            } // end switch
+            if (elemenetLevel < 0) {
+                break;
+            }
+        } // end while
+        return event;
+    }
+
+    private IoxEvent readEndTransfer(XMLEvent event) throws IoxSyntaxException, XMLStreamException {
         if(event.isEndElement() && event.asEndElement().getName().equals(QNAME_XML_DATASECTION)){ // end data section
             event=xmlreader.nextEvent();
             event=skipSpacesAndGetNextEvent(event);
@@ -412,13 +474,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 		}
 	}
 	
-	private IoxEvent createStartBasket(javax.xml.stream.events.XMLEvent event) throws XMLStreamException, IoxException {
-		event=skipSpacesAndGetNextEvent(event);
-		StartElement element = (StartElement) event;
-		currentTopic=getIliTopic(element.getName());
-		if(currentTopic==null){
-			throw new IoxSyntaxException("Unknown topic <"+element.getName()+">");
-		}
+	private IoxEvent createStartBasket(StartElement element) throws XMLStreamException, IoxException {
 		QName gmlId = QNAME_ILI_BID;
 		Attribute bid = element.getAttributeByName(gmlId);
 		if(bid!=null){
@@ -429,7 +485,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 			newObj=setConsistency(element, newObj);
 			return newObj;
 		}else{
-			throw new IoxSyntaxException(event2msgtext(event));
+			throw new IoxSyntaxException(event2msgtext(element));
 		}
 	}
 	
@@ -1405,9 +1461,13 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 
     @Override
     public void setTopicFilter(String[] topicNames) {
-        this.filterTopics=new java.util.HashSet<String>();
-        for(String topicName:topicNames) {
-            filterTopics.add(topicName);
+        if(topicNames==null || topicNames.length==0) {
+            filterTopics=null;
+        }else {
+            filterTopics=new java.util.HashSet<String>();
+            for(String topicName:topicNames) {
+                filterTopics.add(topicName);
+            }
         }
     }
 
