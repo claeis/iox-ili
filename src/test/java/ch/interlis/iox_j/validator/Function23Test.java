@@ -332,7 +332,7 @@ public class Function23Test {
 	@Test
 	public void trimMConstant_Ok(){
 		Iom_jObject iomObjA=new Iom_jObject(ILI_CLASSD2, OBJ_OID1);
-		iomObjA.setattrvalue(OBJ_ATTR2, "abcdef\\\\nhij");
+		iomObjA.setattrvalue(OBJ_ATTR2, "abcdef\nhij");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
