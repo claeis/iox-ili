@@ -3,7 +3,7 @@ ideas/open issues
 - add xml validation
 - add Xtf23Reader
 
-iox-ili 1.23.2 (2024-08-xx)
+iox-ili 1.23.2 (2024-11-03)
 -----------------------------
 - Xtf24Reader: support setTopicFilter() (ili2db#546)
 - IniFileWriter added
