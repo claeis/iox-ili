@@ -36,6 +36,11 @@
 								</COORD>
 							</POLYLINE>
 							<POLYLINE>
+								<COORD>
+									<C1>480000.032</C1>
+									<C2>70000.032</C2>
+									<C3>5000.032</C3>
+								</COORD>
 								<ARC>
 									<C1>480000.031</C1>
 									<C2>70000.031</C2>
@@ -44,11 +49,6 @@
 									<A2>70000.031</A2>
 									<R>31</R>
 								</ARC>
-								<COORD>
-									<C1>480000.032</C1>
-									<C2>70000.032</C2>
-									<C3>5000.032</C3>
-								</COORD>
 							</POLYLINE>
 						<!--1. comment--></BOUNDARY><!--1. comment-->
 						<!--1. comment--><BOUNDARY><!--1. comment-->
@@ -89,6 +89,11 @@
 								</COORD>
 							</POLYLINE>
 							<!--1. comment--><POLYLINE><!--1. comment-->
+								<!--1. comment--><COORD><!--1. comment-->
+									<C1>480000.232</C1>
+									<C2>70000.232</C2>
+									<C3>5000.232</C3>
+								</COORD>
 								<!--1. comment--><ARC><!--1. comment-->
 									<!--1. comment--><C1>480000.231</C1><!--1. comment-->
 									<!--1. comment--><C2>70000.231</C2><!--1. comment-->
@@ -97,11 +102,6 @@
 									<!--1. comment--><A2>70000.231</A2><!--1. comment-->
 									<!--1. comment--><R>31</R><!--1. comment-->
 								<!--1. comment--></ARC><!--1. comment-->
-								<!--1. comment--><COORD><!--1. comment-->
-									<C1>480000.232</C1>
-									<C2>70000.232</C2>
-									<C3>5000.232</C3>
-								</COORD>
 							</POLYLINE>
 							<POLYLINE>
 								<COORD>

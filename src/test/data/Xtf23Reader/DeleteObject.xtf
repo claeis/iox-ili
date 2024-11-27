@@ -2,20 +2,20 @@
 <TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
 	<HEADERSECTION SENDER="xtf23Reader" VERSION="2.3">
 		<MODELS>
-			<MODEL NAME="DataTest1" VERSION="2011-12-22" URI="http://interlis.ch"></MODEL>
+			<MODEL NAME="Test1" VERSION="2011-12-22" URI="http://interlis.ch"></MODEL>
 		</MODELS>
 	</HEADERSECTION>
 	<DATASECTION>
-		<DataTest1.TopicA BID="bidA">
-			<DataTest1.TopicA.ClassA TID="oidA">
-			</DataTest1.TopicA.ClassA>
-		</DataTest1.TopicA>
+		<Test1.TopicA BID="bidA">
+			<Test1.TopicA.ClassA TID="oidA">
+			</Test1.TopicA.ClassA>
+		</Test1.TopicA>
 
-		<DataTest1.TopicC BID="bidC">
-			<DataTest1.TopicA.ClassC TID="oidC">
-			</DataTest1.TopicA.ClassC>
-			<DELETE TID="oidC"></DELETE>
-		</DataTest1.TopicC>
+		<Test1.TopicA BID="bidC">
+			<Test1.TopicA.ClassA TID="oidC">
+			</Test1.TopicA.ClassA>
+			<DELETE TID="oidDelete"></DELETE>
+		</Test1.TopicA>
 		
 		<!--<DataTest1.TopicD BID="bidD">
 			<DELETE TID="oidD">

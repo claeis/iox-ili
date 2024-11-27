@@ -83,6 +83,7 @@ public class Xtf23ReaderHeaderTest {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN_HEADER,"MultipleHeaderSectionDefined.xtf"));
 		try{
 			reader.read();
+            reader.read();
 			fail();
 		}catch(IoxSyntaxException ioxEx){
 			assertTrue((ioxEx).getMessage().contains("Unexpected XML event HEADERSECTION found."));

@@ -709,21 +709,22 @@ public class Xtf23ReaderDataTest {
         assertNotNull(attrO1);
         IomObject sequence = attrO1.getattrobj("sequence", 0);
         assertNotNull(sequence);
-        IomObject segment = sequence.getattrobj("segment", 0);
-        assertNotNull(segment);
         
-        assertEquals("480000.000", segment.getattrvalue("A1"));
-        assertEquals("70000.000", segment.getattrvalue("A2"));
-        assertEquals("5000.000", segment.getattrvalue("C3"));
-        assertEquals("480005.000", segment.getattrvalue("C1"));
-        assertEquals("70000.000", segment.getattrvalue("C2"));
-
+        IomObject segment0 = sequence.getattrobj("segment", 0);
+        assertNotNull(segment0);
+        assertEquals("5000.000", segment0.getattrvalue("C3"));
+        assertEquals("480010.000", segment0.getattrvalue("C1"));
+        assertEquals("70000.000", segment0.getattrvalue("C2"));
+        
         IomObject segment1 = sequence.getattrobj("segment", 1);
         assertNotNull(segment1);
-        assertEquals("5000.000", segment1.getattrvalue("C3"));
-        assertEquals("480010.000", segment1.getattrvalue("C1"));
-        assertEquals("70000.000", segment1.getattrvalue("C2"));
         
+        assertEquals("480000.000", segment1.getattrvalue("A1"));
+        assertEquals("70000.000", segment1.getattrvalue("A2"));
+        assertEquals("5000.000", segment1.getattrvalue("C3"));
+        assertEquals("480005.000", segment1.getattrvalue("C1"));
+        assertEquals("70000.000", segment1.getattrvalue("C2"));
+
 		assertTrue(reader.read() instanceof EndBasketEvent);
 		assertTrue(reader.read() instanceof EndTransferEvent);
 		reader.close();
@@ -747,20 +748,22 @@ public class Xtf23ReaderDataTest {
         assertNotNull(attrO1);
         IomObject sequence = attrO1.getattrobj("sequence", 0);
         assertNotNull(sequence);
-        IomObject segment = sequence.getattrobj("segment", 0);
-        assertNotNull(segment);
-        
-        assertEquals("480000.000", segment.getattrvalue("A1"));
-        assertEquals("70000.000", segment.getattrvalue("A2"));
-        assertEquals("5000.000", segment.getattrvalue("C3"));
-        assertEquals("480005.000", segment.getattrvalue("C1"));
-        assertEquals("70000.000", segment.getattrvalue("C2"));
 
+        IomObject segment0 = sequence.getattrobj("segment", 0);
+        assertNotNull(segment0);
+        assertEquals("5000.000", segment0.getattrvalue("C3"));
+        assertEquals("480010.000", segment0.getattrvalue("C1"));
+        assertEquals("70000.000", segment0.getattrvalue("C2"));
+        
         IomObject segment1 = sequence.getattrobj("segment", 1);
         assertNotNull(segment1);
+        
+        assertEquals("480000.000", segment1.getattrvalue("A1"));
+        assertEquals("70000.000", segment1.getattrvalue("A2"));
         assertEquals("5000.000", segment1.getattrvalue("C3"));
-        assertEquals("480010.000", segment1.getattrvalue("C1"));
+        assertEquals("480005.000", segment1.getattrvalue("C1"));
         assertEquals("70000.000", segment1.getattrvalue("C2"));
+
         
         assertTrue(reader.read() instanceof EndBasketEvent);
         assertTrue(reader.read() instanceof EndTransferEvent);
@@ -787,15 +790,21 @@ public class Xtf23ReaderDataTest {
         assertNotNull(attrO1);
         IomObject sequence = attrO1.getattrobj("sequence", 0);
         assertNotNull(sequence);
-        IomObject segment = sequence.getattrobj("segment", 0);
-        assertNotNull(segment);
-		
-        assertEquals("480001.000", segment.getattrvalue("A1"));
-        assertEquals("70001.000", segment.getattrvalue("A2"));
-        assertEquals("5000.000", segment.getattrvalue("C3"));
-        assertEquals("480000.000", segment.getattrvalue("C1"));
-        assertEquals("70000.000", segment.getattrvalue("C2"));
-        assertEquals("45", segment.getattrvalue("R"));
+        
+        IomObject segment0 = sequence.getattrobj("segment", 0);
+        assertNotNull(segment0);
+        assertEquals("5000.000", segment0.getattrvalue("C3"));
+        assertEquals("480010.000", segment0.getattrvalue("C1"));
+        assertEquals("70000.000", segment0.getattrvalue("C2"));
+        
+        IomObject segment1 = sequence.getattrobj("segment", 1);
+        assertNotNull(segment1);
+        assertEquals("480001.000", segment1.getattrvalue("A1"));
+        assertEquals("70001.000", segment1.getattrvalue("A2"));
+        assertEquals("5000.000", segment1.getattrvalue("C3"));
+        assertEquals("480000.000", segment1.getattrvalue("C1"));
+        assertEquals("70000.000", segment1.getattrvalue("C2"));
+        assertEquals("45", segment1.getattrvalue("R"));
 		
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);
@@ -820,7 +829,7 @@ public class Xtf23ReaderDataTest {
         IomObject formQ = iomObject.getattrobj("formQ", 0);
         assertNotNull(formQ);
 
-        assertEquals("MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.011, C2 70000.011, C3 5000.011}, COORD {C1 490000.012, C2 80000.012, C3 5000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.021, C2 70000.021, C3 5000.021}, COORD {C1 490000.022, C2 80000.022, C3 5000.022}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {A1 480000.031, A2 70000.031, C1 480000.031, C2 70000.031, C3 5000.031, R 31}, COORD {C1 480000.032, C2 70000.032, C3 5000.032}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.041, C2 70000.041, C3 5000.041}, COORD {C1 490000.042, C2 80000.042, C3 5000.042}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.211, C2 70000.211, C3 5000.211}, COORD {C1 490000.212, C2 80000.212, C3 5000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.221, C2 70000.221, C3 5000.221}, COORD {C1 490000.222, C2 80000.222, C3 5000.222}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {A1 480000.231, A2 70000.231, C1 480000.231, C2 70000.231, C3 5000.231, R 31}, COORD {C1 480000.232, C2 70000.232, C3 5000.232}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.241, C2 70000.241, C3 5000.241}, COORD {C1 490000.242, C2 80000.242, C3 5000.242}]}}]}]}}",
+        assertEquals("MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.011, C2 70000.011, C3 5000.011}, COORD {C1 490000.012, C2 80000.012, C3 5000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.021, C2 70000.021, C3 5000.021}, COORD {C1 490000.022, C2 80000.022, C3 5000.022}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.032, C2 70000.032, C3 5000.032}, ARC {A1 480000.031, A2 70000.031, C1 480000.031, C2 70000.031, C3 5000.031, R 31}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.041, C2 70000.041, C3 5000.041}, COORD {C1 490000.042, C2 80000.042, C3 5000.042}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.211, C2 70000.211, C3 5000.211}, COORD {C1 490000.212, C2 80000.212, C3 5000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.221, C2 70000.221, C3 5000.221}, COORD {C1 490000.222, C2 80000.222, C3 5000.222}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.232, C2 70000.232, C3 5000.232}, ARC {A1 480000.231, A2 70000.231, C1 480000.231, C2 70000.231, C3 5000.231, R 31}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.241, C2 70000.241, C3 5000.241}, COORD {C1 490000.242, C2 80000.242, C3 5000.242}]}}]}]}}",
                 formQ.toString());
 
 		assertTrue(reader.read() instanceof  EndBasketEvent);
@@ -846,7 +855,7 @@ public class Xtf23ReaderDataTest {
         IomObject formQ = iomObject.getattrobj("formQ", 0);
         assertNotNull(formQ);
         
-        assertEquals("MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.011, C2 70000.011, C3 5000.011}, COORD {C1 490000.012, C2 80000.012, C3 5000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.021, C2 70000.021, C3 5000.021}, COORD {C1 490000.022, C2 80000.022, C3 5000.022}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {A1 480000.031, A2 70000.031, C1 480000.031, C2 70000.031, C3 5000.031, R 31}, COORD {C1 480000.032, C2 70000.032, C3 5000.032}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.041, C2 70000.041, C3 5000.041}, COORD {C1 490000.042, C2 80000.042, C3 5000.042}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.211, C2 70000.211, C3 5000.211}, COORD {C1 490000.212, C2 80000.212, C3 5000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.221, C2 70000.221, C3 5000.221}, COORD {C1 490000.222, C2 80000.222, C3 5000.222}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {A1 480000.231, A2 70000.231, C1 480000.231, C2 70000.231, C3 5000.231, R 31}, COORD {C1 480000.232, C2 70000.232, C3 5000.232}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.241, C2 70000.241, C3 5000.241}, COORD {C1 490000.242, C2 80000.242, C3 5000.242}]}}]}]}}",
+        assertEquals("MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.011, C2 70000.011, C3 5000.011}, COORD {C1 490000.012, C2 80000.012, C3 5000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.021, C2 70000.021, C3 5000.021}, COORD {C1 490000.022, C2 80000.022, C3 5000.022}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.032, C2 70000.032, C3 5000.032}, ARC {A1 480000.031, A2 70000.031, C1 480000.031, C2 70000.031, C3 5000.031, R 31}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.041, C2 70000.041, C3 5000.041}, COORD {C1 490000.042, C2 80000.042, C3 5000.042}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.211, C2 70000.211, C3 5000.211}, COORD {C1 490000.212, C2 80000.212, C3 5000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.221, C2 70000.221, C3 5000.221}, COORD {C1 490000.222, C2 80000.222, C3 5000.222}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.232, C2 70000.232, C3 5000.232}, ARC {A1 480000.231, A2 70000.231, C1 480000.231, C2 70000.231, C3 5000.231, R 31}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.241, C2 70000.241, C3 5000.241}, COORD {C1 490000.242, C2 80000.242, C3 5000.242}]}}]}]}}",
                 formQ.toString());
 		
 		assertTrue(reader.read() instanceof  EndBasketEvent);
@@ -872,7 +881,7 @@ public class Xtf23ReaderDataTest {
         IomObject formR = iomObject.getattrobj("formR", 0);
         assertNotNull(formR);
 
-        assertEquals("MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.011, C2 70000.011, C3 5000.011}, COORD {C1 490000.012, C2 80000.012, C3 5000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.021, C2 70000.021, C3 5000.021}, COORD {C1 490000.022, C2 80000.022, C3 5000.022}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {A1 480000.031, A2 70000.031, C1 480000.031, C2 70000.031, C3 5000.031, R 31}, COORD {C1 480000.032, C2 70000.032, C3 5000.032}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.041, C2 70000.041, C3 5000.041}, COORD {C1 490000.042, C2 80000.042, C3 5000.042}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.211, C2 70000.211, C3 5000.211}, COORD {C1 490000.212, C2 80000.212, C3 5000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.221, C2 70000.221, C3 5000.221}, COORD {C1 490000.222, C2 80000.222, C3 5000.222}]}}, POLYLINE {sequence SEGMENTS {segment [ARC {A1 480000.231, A2 70000.231, C1 480000.231, C2 70000.231, C3 5000.231, R 31}, COORD {C1 480000.232, C2 70000.232, C3 5000.232}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.241, C2 70000.241, C3 5000.241}, COORD {C1 490000.242, C2 80000.242, C3 5000.242}]}}]}]}}",
+        assertEquals("MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.011, C2 70000.011, C3 5000.011}, COORD {C1 490000.012, C2 80000.012, C3 5000.012}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.021, C2 70000.021, C3 5000.021}, COORD {C1 490000.022, C2 80000.022, C3 5000.022}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.032, C2 70000.032, C3 5000.032}, ARC {A1 480000.031, A2 70000.031, C1 480000.031, C2 70000.031, C3 5000.031, R 31}]}}]}, BOUNDARY {polyline [POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.041, C2 70000.041, C3 5000.041}, COORD {C1 490000.042, C2 80000.042, C3 5000.042}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.211, C2 70000.211, C3 5000.211}, COORD {C1 490000.212, C2 80000.212, C3 5000.212}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.221, C2 70000.221, C3 5000.221}, COORD {C1 490000.222, C2 80000.222, C3 5000.222}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.232, C2 70000.232, C3 5000.232}, ARC {A1 480000.231, A2 70000.231, C1 480000.231, C2 70000.231, C3 5000.231, R 31}]}}, POLYLINE {sequence SEGMENTS {segment [COORD {C1 480000.241, C2 70000.241, C3 5000.241}, COORD {C1 490000.242, C2 80000.242, C3 5000.242}]}}]}]}}",
                 formR.toString());
 		
 		assertTrue(reader.read() instanceof  EndBasketEvent);

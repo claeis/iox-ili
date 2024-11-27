@@ -10,6 +10,11 @@
 			<DataTest1.TopicB.ClassO TID="oidO">
 				<attrO1>
 					<POLYLINE>
+						<COORD>
+							<C1>480010.000</C1>
+							<C2>70000.000</C2>
+							<C3>5000.000</C3>
+						</COORD>
 						<ARC>
 							<C1>480000.000</C1>
 							<C2>70000.000</C2>
