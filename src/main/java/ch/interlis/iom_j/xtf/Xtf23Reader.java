@@ -1093,10 +1093,12 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
                         event=nextEvent(event); // skip end of XMLBLBOX
 	                }else{
 	    				// structure
-	                    OutParam<IomObject> iomObjOut=new OutParam<IomObject>();
-	                    event=readObject(event, iomObjOut); // read object;
-	                    IomObject structObj=iomObjOut.value;
-	                    iomObj.addattrobj(attrName, structObj);
+	                    do {
+	                        OutParam<IomObject> iomObjOut=new OutParam<IomObject>();
+	                        event=readObject(event, iomObjOut); // read object;
+	                        IomObject structObj=iomObjOut.value;
+	                        iomObj.addattrobj(attrName, structObj);
+	                    }while(event.isStartElement());
 	                }
 		    	}
 	            // event is endElement of attribute 

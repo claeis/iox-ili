@@ -410,22 +410,11 @@ public class Xtf23ReaderDataTest {
         assertEquals("DataTest1.TopicA.ClassB", iomObject.getobjecttag());
         assertEquals("oidL", iomObject.getobjectoid());
         
-        // RoleA1
-        IomObject roleA1 = iomObject.getattrobj("roleA1", 0);
-        assertNotNull(roleA1);
-        assertEquals("oidA1", roleA1.getobjectrefoid());
-        assertEquals("REF", roleA1.getobjecttag());
-        
         // AttrA
         IomObject attrA = iomObject.getattrobj("attrA", 0);
         assertEquals("DataTest1.TopicA.StructA", attrA.getobjecttag());
         assertNotNull(attrA);
         
-        
-        // AttrA -> RoleB1 
-        IomObject roleB1 = attrA.getattrobj("roleB1", 0);
-        assertEquals("oidB1", roleB1.getobjectrefoid());
-        assertEquals("REF", roleB1.getobjecttag());
         
         // AttrA -> attrB2
         assertEquals("textB2", attrA.getattrvalue("attrB2"));
@@ -434,26 +423,28 @@ public class Xtf23ReaderDataTest {
         IomObject attrB = attrA.getattrobj("attrB", 0);
         assertNotNull(attrB);
         
-        // AttrA -> attrB -> roleC1 
-        IomObject roleC1 = attrB.getattrobj("roleC1", 0);
-        assertEquals("oidC1", roleC1.getobjectrefoid());
-        assertEquals("REF", roleC1.getobjecttag());
-        
         // AttrA -> attrB -> attrC
-        IomObject attrC = attrB.getattrobj("attrC", 0);
-        assertNotNull(attrC);
-        
-        // AttrA -> attrB -> attrC -> role1
-        IomObject role1 = attrC.getattrobj("role1", 0);
-        assertNotNull(role1);
-        assertEquals("oidStr1", role1.getobjectrefoid());
-        assertEquals("REF", role1.getobjecttag());        
-        
-        // AttrA -> attrB -> attrC -> attr2
-        assertEquals("textStr2", attrC.getattrvalue("attr2"));
-        
-        // AttrA -> attrB -> attrC -> attr1
-        assertEquals("textStr1", attrC.getattrvalue("attr1"));
+        {
+            IomObject attrC_0 = attrB.getattrobj("attrC", 0);
+            assertNotNull(attrC_0);
+            
+            // AttrA -> attrB -> attrC -> attr1
+            assertEquals("textStr1", attrC_0.getattrvalue("attr1"));
+            
+            // AttrA -> attrB -> attrC -> attr2
+            assertEquals("textStr2", attrC_0.getattrvalue("attr2"));
+        }
+        {
+            IomObject attrC_1 = attrB.getattrobj("attrC", 1);
+            assertNotNull(attrC_1);
+            
+            // AttrA -> attrB -> attrC -> attr1
+            assertEquals("textStr3", attrC_1.getattrvalue("attr1"));
+            
+            // AttrA -> attrB -> attrC -> attr2
+            assertEquals("textStr4", attrC_1.getattrvalue("attr2"));
+            
+        }
         
         // AttrA -> attrB -> attrC2
         assertEquals("textC2", attrB.getattrvalue("attrC2"));

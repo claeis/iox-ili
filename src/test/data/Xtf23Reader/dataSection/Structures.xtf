@@ -18,19 +18,19 @@
 									<DataTest1.TopicA.StructC>
 										<attr1>textStr1</attr1>
 										<attr2>textStr2</attr2>
-										<role1 REF="oidStr1"></role1>
+									</DataTest1.TopicA.StructC>
+									<DataTest1.TopicA.StructC>
+										<attr1>textStr3</attr1>
+										<attr2>textStr4</attr2>
 									</DataTest1.TopicA.StructC>
 								</attrC>
 								<attrC2>textC2</attrC2>
-								<roleC1 REF="oidC1"></roleC1>
 							</DataTest1.TopicA.StructB>
 						</attrB>
 						<attrB2>textB2</attrB2>
-						<roleB1 REF="oidB1"></roleB1>
 					</DataTest1.TopicA.StructA>
 				</attrA>
 				<attrA2>textA2</attrA2>
-				<roleA1 REF="oidA1"></roleA1>
 			</DataTest1.TopicA.ClassB>
 		</DataTest1.TopicA>
 	</DATASECTION>
