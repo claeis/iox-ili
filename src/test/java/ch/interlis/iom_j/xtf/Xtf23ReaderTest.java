@@ -60,6 +60,17 @@ public class Xtf23ReaderTest {
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void test_XTF22_Ok() throws Iox2jtsException, IoxException {
+        Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"Simple22a.xtf"));
+        assertTrue(reader.read() instanceof  StartTransferEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        assertTrue(reader.read() instanceof  ObjectEvent);
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
 	
 	// prueft ob eine Fehlermeldung ausgegeben wird, wenn end-TRANSFER-tag
 	// falsch geschrieben wurde: 'TRANSFERS'.

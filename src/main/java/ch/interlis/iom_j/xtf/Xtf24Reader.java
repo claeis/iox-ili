@@ -178,9 +178,9 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
             String ns=event.asStartElement().getName().getNamespaceURI();
             if(ns.equals(NAMESPACE_ILIXMLBASE_INTERLIS)) {
                 return new Xtf24Reader(xtffile);
-            }else if(ns.equals(Xtf23Reader.NAMESPACE_ILIXMLBASE)) {
+            }else if(ns.equals(Xtf23Reader.NAMESPACE_XTF23)) {
                 return new XtfReader(xtffile);
-            }else if(ns.equals(XtfWriterAlt.ili22Ns)) {
+            }else if(ns.equals(Xtf23Reader.NAMESPACE_XTF22)) {
                 return new XtfReader(xtffile);
             }else {
                 throw new IoxException("unexpected namesapce "+ns);
