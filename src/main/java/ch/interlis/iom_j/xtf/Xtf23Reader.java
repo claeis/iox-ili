@@ -469,8 +469,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 		}else {
 			throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
 		}
-		event=reader.nextEvent();
-		event=skipSpaces(event);
+		event=nextEvent(event);
 		models=new ArrayList<XtfModel>();
 		
 		// start model
@@ -502,11 +501,14 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
             XtfModel xtfModel=new XtfModel(name.getValue(),version.getValue(),uri.getValue());
         	models.add(xtfModel);
         	
+        }else if(name!=null && isXtf23Reader0_compatible){
+                // add model to models
+                XtfModel xtfModel=new XtfModel(name.getValue(),version!=null?version.getValue():null,uri!=null?uri.getValue():null);
+                models.add(xtfModel);
         }else {
         	throw new IoxSyntaxException(unexpectedXmlEvent2msg(startElementModel));
         }
-        event=reader.nextEvent();
-        event=skipSpaces(event);
+        event=nextEvent(event);
         
         // end element Model
  		if(event.isEndElement() && event.asEndElement().getName().equals(getQName(NAME_XML_MODEL))) {
@@ -514,8 +516,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
  		}else {
  			throw new IoxSyntaxException(unexpectedXmlEvent2msg(event)); 
  		}
- 		event=reader.nextEvent();
- 		event=skipSpaces(event);      	
+ 		event=nextEvent(event);
  		return event;
 	}
 	
@@ -1390,6 +1391,10 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
         }
         // remove leading 'x' to get real OID
         return oid.substring(1);
+    }
+
+    public void setStrict(boolean b) {
+        isXtf23Reader0_compatible=false;
     }
     
 }
