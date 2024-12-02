@@ -232,8 +232,8 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
         		for(XtfModel xtfModel:models){
                     IomObject model=createIomObject(ch.interlis.iom_j.xtf.impl.MyHandler.HEADER_OBJECT_MODELENTRY,hsNextOid());
         			model.setattrvalue(ch.interlis.iom_j.xtf.impl.MyHandler.HEADER_OBJECT_MODELENTRY_NAME,xtfModel.getName());
-                    model.setattrvalue(ch.interlis.iom_j.xtf.impl.MyHandler.HEADER_OBJECT_MODELENTRY_VERSION,xtfModel.getVersion());
-                    model.setattrvalue(ch.interlis.iom_j.xtf.impl.MyHandler.HEADER_OBJECT_MODELENTRY_URI,xtfModel.getUri());
+                    if(xtfModel.getVersion()!=null)model.setattrvalue(ch.interlis.iom_j.xtf.impl.MyHandler.HEADER_OBJECT_MODELENTRY_VERSION,xtfModel.getVersion());
+                    if(xtfModel.getUri()!=null)model.setattrvalue(ch.interlis.iom_j.xtf.impl.MyHandler.HEADER_OBJECT_MODELENTRY_URI,xtfModel.getUri());
         			modelx.put(model.getobjectoid(),model);
         		}
         		startTransferEvent.setHeaderObjects(modelx);
