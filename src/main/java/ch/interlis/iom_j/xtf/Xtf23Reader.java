@@ -1070,9 +1070,6 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 	                    OutParam<IomObject> polylineOut=new OutParam<IomObject>();
 	                    event=readPolyline(event,polylineOut);
 	                    IomObject polyline = polylineOut.value;
-	                    if(polyline.getattrcount()==0){
-	                    	throw new IoxException("expected polyline. unexpected event: "+event.asStartElement().getName().getLocalPart());
-	                    }
 	                    iomObj.addattrobj(attrName, polyline);
 	                }else if(event.isStartElement() && event.asStartElement().getName().equals(getQName(QNAME_XML_SURFACE))){
 	                    // SURFACE
@@ -1222,6 +1219,9 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
             event=readPolyline(event,polylineOut);
 	    	boundary.addattrobj(Iom_jObject.BOUNDARY_POLYLINE, polylineOut.value);
     	}
+        if(boundary.getattrcount()==0){
+            throw new IoxException("at least one POLYLINE expected");
+        }
         assert(event.isEndElement() && event.asEndElement().getName().equals(getQName(QNAME_XML_BOUNDARY)));
         event=nextEvent(event);
     	return event;
@@ -1237,9 +1237,14 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
         assert(event.isStartElement() && event.asStartElement().getName().equals(getQName(QNAME_XML_POLYLINE)));
     	IomObject polyline=createIomObject(Iom_jObject.POLYLINE, null);
 		event=nextEvent(event);
-		OutParam<IomObject> seqOut=new OutParam<IomObject>();
-		event=readSequence(event,seqOut);
-		polyline.addattrobj(Iom_jObject.POLYLINE_SEQUENCE, seqOut.value);
+		if(event.isStartElement()) {
+	        OutParam<IomObject> seqOut=new OutParam<IomObject>();
+	        event=readSequence(event,seqOut);
+	        polyline.addattrobj(Iom_jObject.POLYLINE_SEQUENCE, seqOut.value);
+		}
+        if(polyline.getattrcount()==0){
+            throw new IoxException("at least one COORD expected");
+        }
 		polylineOut.value=polyline;
         assert(event.isEndElement() && event.asEndElement().getName().equals(getQName(QNAME_XML_POLYLINE)));
         event=nextEvent(event);

@@ -816,6 +816,21 @@ public class Xtf23ReaderDataTest {
 		reader.close();
 		reader=null;
 	}
+	@Test
+    public void testPolylineNoSegment_Fail()  throws Iox2jtsException, IoxException {
+        Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"PolylineNoSegment.xtf"));
+        assertTrue(reader.read() instanceof  StartTransferEvent); // no lines found in polygon of Form.
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        try{
+            reader.read();
+            fail();
+        }catch(IoxException ex){
+            assertTrue((ex).getMessage().contains("at least one COORD expected"));
+            assertTrue(ex instanceof IoxException);
+        }
+        reader.close();
+        reader=null;
+    }
 	
 	// Es wird getestet ob ein Surface mit mehreren boundaries ohne Fehler gelesen werden kann.
 	@Test
@@ -922,7 +937,7 @@ public class Xtf23ReaderDataTest {
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei einer Surface keine Linien definiert wurden.
 	@Test
-	public void testSurfaceNoLinesFound_Fail()  throws Iox2jtsException, IoxException {
+	public void testSurfaceNoBoundary_Fail()  throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"UndefinedSurface.xtf"));
 		assertTrue(reader.read() instanceof  StartTransferEvent); // no lines found in polygon of Form.
 		assertTrue(reader.read() instanceof  StartBasketEvent);
@@ -936,6 +951,36 @@ public class Xtf23ReaderDataTest {
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void testSurfaceNoBoundary_NoSpace_Fail()  throws Iox2jtsException, IoxException {
+        Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"UndefinedSurface_NoSpace.xtf"));
+        assertTrue(reader.read() instanceof  StartTransferEvent); // no lines found in polygon of Form.
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        try{
+            reader.read();
+            fail();
+        }catch(IoxException ex){
+            assertTrue((ex).getMessage().contains("expected surface"));
+            assertTrue(ex instanceof IoxException);
+        }
+        reader.close();
+        reader=null;
+    }
+    @Test
+    public void testSurfaceNoPolyline_Fail()  throws Iox2jtsException, IoxException {
+        Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"SurfaceNoPolyline.xtf"));
+        assertTrue(reader.read() instanceof  StartTransferEvent); // no lines found in polygon of Form.
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        try{
+            reader.read();
+            fail();
+        }catch(IoxException ex){
+            assertTrue((ex).getMessage().contains("at least one POLYLINE expected"));
+            assertTrue(ex instanceof IoxException);
+        }
+        reader.close();
+        reader=null;
+    }
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn A1 und A2 bei einer ARC fehlen.
 	@Test
