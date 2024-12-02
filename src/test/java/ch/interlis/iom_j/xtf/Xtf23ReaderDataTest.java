@@ -107,7 +107,7 @@ public class Xtf23ReaderDataTest {
 		reader.close();
 		reader=null;
 	}
-	
+
 	// Es wird getestet ob Boolean Werte ohne Fehler erstellt werden koennen.
 	@Test
 	public void testBooleanDataTypes_Ok()  throws Iox2jtsException, IoxException {
@@ -287,7 +287,6 @@ public class Xtf23ReaderDataTest {
 		reader=null;
 	}
 	
-	// Es wird getestet ob Black Box Typen ohne Fehler erstellt werden koennen.
 	@Test
 	public void testBlackBoxType_Ok()  throws Iox2jtsException, IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"BlackBoxTypes.xtf"));
@@ -303,6 +302,21 @@ public class Xtf23ReaderDataTest {
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void testBlackBoxType_NoSpace_Ok()  throws Iox2jtsException, IoxException {
+        Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"BlackBoxTypes_NoSpace.xtf"));
+        assertTrue(reader.read() instanceof  StartTransferEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        IoxEvent event = reader.read();
+        assertTrue(event instanceof  ObjectEvent);
+        IomObject iomObject = ((ObjectEvent) event).getIomObject();
+        assertEquals("AAAA",iomObject.getattrvalue("attrBin"));
+        assertEquals("<anyXml xmlns=\"http://www.interlis.ch/INTERLIS2.3\"></anyXml>",iomObject.getattrvalue("attrXml"));
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
 	
 	// Es wird getestet ob Nummern ohne Fehler erstellt werden koennen.
 	@Test

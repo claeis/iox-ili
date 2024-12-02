@@ -137,8 +137,8 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
     private static final QName QNAME_XML_DOMAIN=new QName("DOMAINS");
     private static final String NAME_XML_DELETE="DELETE";
     // interlis types
-    private static final QName QNAME_XML_BINBLBOX = new QName(NAMESPACE_XTF23, "BINBLBOX");
-    private static final QName QNAME_XML_XMLBLBOX = new QName(NAMESPACE_XTF23, "XMLBLBOX");
+    private static final String QNAME_XML_BINBLBOX = "BINBLBOX";
+    private static final String QNAME_XML_XMLBLBOX = "XMLBLBOX";
     private static final String QNAME_XML_COORD = "COORD";
     private static final String QNAME_XML_ARC = "ARC";
     private static final String QNAME_XML_POLYLINE = "POLYLINE";
@@ -911,7 +911,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 		return startBasketEvent;
 	}
 
-	private static XMLEvent collectXMLElement(XMLEventReader xmlReader, XMLEvent event, java.io.StringWriter strw) throws XMLStreamException {
+	private XMLEvent collectXMLElement(XMLEvent event, java.io.StringWriter strw) throws XMLStreamException, IoxSyntaxException {
         XMLOutputFactory xmloutputf = XMLOutputFactory.newInstance();
         xmloutputf.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES,true);
         XMLEventFactory.newInstance();
@@ -919,8 +919,8 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
         //xmlw.add(xmlef.createStartDocument());
         xmlw.add(event);
         int inHeader = 1;
-        while(xmlReader.hasNext()){
-            event = xmlReader.nextEvent();
+        while(reader.hasNext()){
+            event = reader.nextEvent();
             xmlw.add(event);
             switch (event.getEventType()) {
 	            case XMLStreamConstants.START_ELEMENT:
@@ -940,7 +940,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
         //xmlw.add(xmlef.createEndDocument());
         xmlw.flush();
         xmlw.close();
-        event = xmlReader.nextEvent();
+        event = nextEvent(event);
         return event;
     }
 	
@@ -1086,19 +1086,19 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 	                    }
 	                	multiSurface.addattrobj(Iom_jObject.MULTISURFACE_SURFACE, surface);
 	                	iomObj.addattrobj(attrName, multiSurface);
-	                }else if(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_XML_XMLBLBOX))){
+	                }else if(event.isStartElement() && (event.asStartElement().getName().equals(getQName(QNAME_XML_XMLBLBOX)))){
                         event=nextEvent(event); // skip XMLBLBOX
 	                    // BLACKBOX (binary and/or xml)
 	                	java.io.StringWriter strw=new java.io.StringWriter();
-	                	event=collectXMLElement(reader,event, strw); // start BLACKBOX
-	                	assert(event.isEndElement() && event.asEndElement().getName().equals(QNAME_XML_XMLBLBOX));
+	                	event=collectXMLElement(event, strw); // start BLACKBOX
+	                	assert(event.isEndElement() && event.asEndElement().getName().equals(getQName(QNAME_XML_XMLBLBOX)));
 	        			iomObj.setattrvalue(attrName, strw.toString());
                         event=nextEvent(event); // skip end of XMLBLBOX
-                    }else if(event.isStartElement() && (event.asStartElement().getName().equals(QNAME_XML_BINBLBOX)) ){
+                    }else if(event.isStartElement() && (event.asStartElement().getName().equals(getQName(QNAME_XML_BINBLBOX))) ){
                         event=reader.nextEvent(); // skip BLBOX
                         StringBuffer value=new StringBuffer();
                         event=readSimpleContent(event,value);
-                        assert(event.isEndElement() && event.asEndElement().getName().equals(QNAME_XML_BINBLBOX));
+                        assert(event.isEndElement() && event.asEndElement().getName().equals(getQName(QNAME_XML_BINBLBOX)));
                         iomObj.setattrvalue(attrName, value.toString());
                         event=nextEvent(event); // skip end of XMLBLBOX
 	                }else{
