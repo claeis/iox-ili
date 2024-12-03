@@ -6,6 +6,7 @@ ideas/open issues
 iox-ili 1.23.3 (2024-11-xx)
 -----------------------------
 - Xtf23: use Xtf23Reader by default
+- Validator: fix INTERLIS.elementCount(undefined attribute) (ilivalidator#430)
 
 iox-ili 1.23.2 (2024-11-03)
 -----------------------------

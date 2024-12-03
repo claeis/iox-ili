@@ -159,7 +159,7 @@ public class Interlis {
                 return value;
             }
             if (value.isUndefined()){
-                return Value.createSkipEvaluation();
+                return new Value(0);
             }
             return new Value(value.getComplexObjects().size());
         } else if (currentFunction.getScopedName(null).equals("INTERLIS.isOfClass")){
