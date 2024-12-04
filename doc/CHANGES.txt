@@ -3,6 +3,10 @@ ideas/open issues
 - add xml validation
 - add Xtf23Reader
 
+iox-ili 1.23.4 (2024-12-xx)
+-----------------------------
+- Xtf23Reader: fix xml whitespace/comment reading in headersection (ili2c#136)
+
 iox-ili 1.23.3 (2024-12-04)
 -----------------------------
 - Xtf23: use Xtf23Reader by default
