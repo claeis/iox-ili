@@ -3,7 +3,7 @@ ideas/open issues
 - add xml validation
 - add Xtf23Reader
 
-iox-ili 1.23.3 (2024-11-xx)
+iox-ili 1.23.3 (2024-12-04)
 -----------------------------
 - Xtf23: use Xtf23Reader by default
 - Validator: fix INTERLIS.elementCount(undefined attribute) (ilivalidator#430)
