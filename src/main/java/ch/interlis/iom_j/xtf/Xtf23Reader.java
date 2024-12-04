@@ -470,38 +470,26 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
  		return event;
 	}
 	
-	private XMLEvent readHeaderSectionAlias(XMLEvent startElementAlias) throws IoxException, XMLStreamException {
-		XMLEvent event=null;
+	private XMLEvent readHeaderSectionAlias(XMLEvent event) throws IoxException, XMLStreamException {
 		// start alias
-		if(startElementAlias.isStartElement() && startElementAlias.asStartElement().getName().equals(getQName(NAME_XML_ALIAS))){
-			; // skip start alias event
+		if(event.isStartElement()){
+			assert(event.asStartElement().getName().equals(getQName(NAME_XML_ALIAS)));
 		}else {
 			throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
 		}
 		event=nextEvent(event);
 		
-		// end alias
-		if(event.isEndElement()) {
-			if(event.asEndElement().getName().equals(getQName(NAME_XML_ALIAS))) {
-				; // skip end alias event
-				return event;
-			}else {
-				throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
-			}
-		}	
-		
 		// start entries
-    	if(event.isStartElement() && event.asStartElement().getName().equals(getQName(QNAME_XML_ENTRIES))) {
-    		while(event.isStartElement() && event.asStartElement().getName().equals(getQName(QNAME_XML_ENTRIES))) {
-	    		event = readAliasEntries(event);
-    		}
-    	}else{
+        while(event.isStartElement() && event.asStartElement().getName().equals(getQName(QNAME_XML_ENTRIES))) {
+            event = readAliasEntries(event);
+        }
+    	if(event.isStartElement() && !event.asStartElement().getName().equals(getQName(QNAME_XML_ENTRIES))) {
     		throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
     	}
     	
     	// end alias
-		if(event.isEndElement() && event.asEndElement().getName().equals(getQName(NAME_XML_ALIAS))) {
-			; // skip end alias event
+		if(event.isEndElement()) {
+			assert(event.asEndElement().getName().equals(getQName(NAME_XML_ALIAS)));
 		}else {
 			throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
 		}
@@ -509,25 +497,14 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 		return event;
 	}
 
-	private XMLEvent readAliasEntries(XMLEvent startElementAliasEntries) throws IoxSyntaxException, XMLStreamException, IoxException {
-		XMLEvent event=null;
+	private XMLEvent readAliasEntries(XMLEvent event) throws IoxSyntaxException, XMLStreamException, IoxException {
 		// start entries
-		Attribute entryFor=startElementAliasEntries.asStartElement().getAttributeByName(QNAME_XML_ENTRIES_VALUE_FOR);
+		Attribute entryFor=event.asStartElement().getAttributeByName(QNAME_XML_ENTRIES_VALUE_FOR);
     	if(entryFor!=null){
 		}else {
-			throw new IoxSyntaxException(unexpectedXmlEvent2msg(startElementAliasEntries));
+			throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
 		}
     	event=nextEvent(event);
-		
-		// end entries
-		if(event.isEndElement()) {
-			if(event.asEndElement().getName().equals(getQName(QNAME_XML_ENTRIES))) {
-				event=nextEvent(event);
-				return event;
-			}else {
-				throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
-			}
-		}
 		
 		// start entry
 		while(event.isStartElement() &&

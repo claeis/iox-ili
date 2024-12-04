@@ -6,6 +6,7 @@ ideas/open issues
 iox-ili 1.23.4 (2024-12-xx)
 -----------------------------
 - Xtf23Reader: fix xml whitespace/comment reading in headersection (ili2c#136)
+- Xtf23Reader: fix xml whitespace/comment reading in alias table (ilivalidator#431)
 
 iox-ili 1.23.3 (2024-12-04)
 -----------------------------
