@@ -41,83 +41,124 @@ import ch.ehi.basics.logging.EhiLogger;
  * @author ce
  * @version $Revision: 1.0 $ $Date: 08.02.2007 $
  */
-public class XtfReader implements IoxReader, IoxIliReader {
+public class Xtf23Reader0 implements IoxReader, IoxIliReader {
     public static final String XMLNS_XTF22=XtfWriterAlt.ili22Ns;
     public static final String XMLNS_XTF23=XtfWriterAlt.ili23Ns;
-    private static final String ILI_XTF23_READER = "ILI_XTF23_READER";
-    
-    private IoxReader reader=null;
+	private ch.interlis.iom_j.xtf.impl.MyHandler handler = null;
+	private java.io.InputStream inputFile=null;
+	private javax.xml.stream.XMLEventReader reader=null;
+	private IoxFactoryCollection factory=new  ch.interlis.iox_j.DefaultIoxFactoryCollection();
 	
 	/** Creates a new reader.
 	 * @param in Input stream to read from
 	 * @throws IoxException
 	 */
-	public XtfReader(java.io.InputStream in)
+	public Xtf23Reader0(java.io.InputStream in)
 	throws IoxException
 	{
-	    if(Xtf23Reader0.class.getName().equals(System.getenv(ILI_XTF23_READER))){
-	        reader=new Xtf23Reader0(in);
-	    }else {
-	        reader=new Xtf23Reader(in);
-	    }
+		init(in);
+	}
+	
+	private void init(java.io.InputStream in) 
+		throws IoxException 
+	{
+		handler = new MyHandler();
+		handler.setFactory(factory);
+		javax.xml.stream.XMLInputFactory inputFactory = javax.xml.stream.XMLInputFactory.newInstance();
+		try{
+			reader=inputFactory.createXMLEventReader(in);
+		}catch(javax.xml.stream.XMLStreamException ex){
+			throw new IoxException(ex);
+		}
 	}
 	
 	/** Creates a new reader.
 	 * @param in Input reader to read from
 	 * @throws IoxException
 	 */
-	public XtfReader(java.io.InputStreamReader in)
+	public Xtf23Reader0(java.io.InputStreamReader in)
 	throws IoxException
 	{
-        if(Xtf23Reader0.class.getName().equals(System.getenv(ILI_XTF23_READER))){
-            reader=new Xtf23Reader0(in);
-        }else {
-            reader=new Xtf23Reader(in);
-        }
 	}
 	
 	/** Creates a new reader.
 	 * @param xtffile File to read from
 	 * @throws IoxException
 	 */
-	public XtfReader(java.io.File in)
+	public Xtf23Reader0(java.io.File xtffile)
 	throws IoxException
 	{
-        if(Xtf23Reader0.class.getName().equals(System.getenv(ILI_XTF23_READER))){
-            reader=new Xtf23Reader0(in);
-        }else {
-            reader=new Xtf23Reader(in);
-        }
+		try{
+			inputFile=new java.io.FileInputStream(xtffile);
+			init(inputFile);
+		}catch(java.io.IOException ex){
+			throw new IoxException(ex);
+		}
 	}
 	public void close() throws IoxException {
-		reader.close();
+		reader=null;
+		handler=null;
+		if(inputFile!=null){
+			try{
+				inputFile.close();
+			}catch(java.io.IOException ex){
+				throw new IoxException(ex);
+			}
+			inputFile=null;
+		}
 	}
 
 	public IoxEvent read() throws IoxException {
-	    return reader.read();
+		while(reader.hasNext()){
+			javax.xml.stream.events.XMLEvent event=null;
+			try{
+				event=reader.nextEvent();
+			}catch(javax.xml.stream.XMLStreamException ex){
+				throw new IoxException(ex);
+			}
+			//EhiLogger.debug(event.toString());
+			handler.stopParser=false;
+			if(event instanceof StartElement){
+				handler.startElement((StartElement)event);
+			}else if(event instanceof EndElement){
+				handler.endElement((EndElement)event);
+			}else if(event instanceof Characters){
+				handler.characters((Characters)event);
+			}else{
+				handler.otherEvents(event);
+			}
+			if(handler.stopParser){
+				//EhiLogger.debug(handler.returnObject.toString());
+				return handler.returnObject;
+			}
+		}
+		return null;
 	}
 	public IomObject createIomObject(String type, String oid) throws IoxException {
-		return reader.createIomObject(type, oid);
+		return factory.createIomObject(type, oid);
 	}
 	public IoxFactoryCollection getFactory() throws IoxException {
-		return reader.getFactory();
+		return factory;
 	}
 	public void setFactory(IoxFactoryCollection factory) throws IoxException {
-		reader.setFactory(factory);
+		this.factory=factory;
+		handler.setFactory(factory);
 	}
 
     @Override
     public void setTopicFilter(String[] topicNames) {
-        ((IoxIliReader)reader).setTopicFilter(topicNames);
+        handler.setTopicFilter(topicNames);
     }
 
     @Override
     public void setModel(TransferDescription td) {
-        ((IoxIliReader)reader).setModel(td);
     }
 
     @Override
     public String getMimeType() {
-        return ((IoxIliReader)reader).getMimeType();
+        if(handler!=null && handler.isIli22()) {
+            return XTF_22;
+        }
+        return XTF_23;
     }
 }

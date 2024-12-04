@@ -208,11 +208,14 @@ public class IoxUtility {
             }else if(ioxReader instanceof XtfReader) {
                 modelVersion=Model.ILI2_3;
                 IoxEvent event = ioxReader.read();
-                if(event instanceof StartTransferEvent && ((StartTransferEvent) event).getVersion().equals("2.2")) {
+                if(((XtfReader)ioxReader).getMimeType().equals(Xtf23Reader.XTF_22)) {
                     modelVersion=Model.ILI2_2;
                 }
             }else if(ioxReader instanceof Xtf23Reader) {
                 modelVersion=Model.ILI2_3;
+                if(((Xtf23Reader)ioxReader).getMimeType().equals(Xtf23Reader.XTF_22)) {
+                    modelVersion=Model.ILI2_2;
+                }
             }else if(ioxReader instanceof ItfReader) {
                 modelVersion=Model.ILI1;
             }else if(ioxReader instanceof ItfReader2) {

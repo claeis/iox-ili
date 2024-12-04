@@ -429,9 +429,8 @@ public class Function23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 	
-	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Anzahl der elemente mit dem attr2 uebereinstimmen.
 	@Test
-	public void elementCountTrue_Ok(){
+	public void elementCountBag3_Ok(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
 		Iom_jObject iomObjM2=new Iom_jObject(ILI_STRUCTM, null);
 		Iom_jObject iomObjM3=new Iom_jObject(ILI_STRUCTM, null);
@@ -447,9 +446,6 @@ public class Function23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjM));
-		validator.validate(new ObjectEvent(iomObjM2));
-		validator.validate(new ObjectEvent(iomObjM3));
 		validator.validate(new ObjectEvent(iomObjN));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -459,10 +455,8 @@ public class Function23Test {
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount der Bag mit dem attr2 uebereinstimmt.
 	@Test
-	public void elementCount_Ok(){
-		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
+	public void elementCountBag0_Fail(){
 		Iom_jObject iomObjN=new Iom_jObject(ILI_CLASSN, OBJ_OID2);
-		iomObjN.addattrobj("attrbag1", iomObjM);
 		iomObjN.setattrvalue("attr2", "1");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
@@ -471,17 +465,18 @@ public class Function23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjM));
 		validator.validate(new ObjectEvent(iomObjN));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==0);
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Mandatory Constraint Function23.Topic.ClassN.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Anzahl der Listen mit der Anzahl von attr2 uebereinstimmt.
 	@Test
-	public void elementCount5Lists_Ok(){
+	public void elementCountList5_Ok(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
 		Iom_jObject iomObjM2=new Iom_jObject(ILI_STRUCTM, null);
 		Iom_jObject iomObjM3=new Iom_jObject(ILI_STRUCTM, null);
@@ -501,11 +496,6 @@ public class Function23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjM));
-		validator.validate(new ObjectEvent(iomObjM2));
-		validator.validate(new ObjectEvent(iomObjM3));
-		validator.validate(new ObjectEvent(iomObjM4));
-		validator.validate(new ObjectEvent(iomObjM5));
 		validator.validate(new ObjectEvent(iomObjO));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -515,11 +505,9 @@ public class Function23Test {
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Liste mit dem Attribute2 uebereinstimmt.
 	@Test
-	public void elementCountList_Ok(){
-		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
+	public void elementCountList0_Ok(){
 		Iom_jObject iomObjO=new Iom_jObject(ILI_CLASSO, OBJ_OID2);
-		iomObjO.addattrobj("attrlist1", iomObjM);
-		iomObjO.setattrvalue("attr2", "1");
+		iomObjO.setattrvalue("attr2", "0");
 		ValidationConfig modelConfig=new ValidationConfig();
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -527,7 +515,6 @@ public class Function23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjM));
 		validator.validate(new ObjectEvent(iomObjO));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1217,7 +1204,7 @@ public class Function23Test {
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount, der Count des BAG nicht mit dem attr2 uebereinstimmt.
 	@Test
-	public void elementCount_CountOfBagNotEqual_Fail(){
+	public void elementCountBag_NotEqual_Fail(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
 		Iom_jObject iomObjM2=new Iom_jObject(ILI_STRUCTM, null);
 		Iom_jObject iomObjM3=new Iom_jObject(ILI_STRUCTM, null);
@@ -1233,9 +1220,6 @@ public class Function23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjM));
-		validator.validate(new ObjectEvent(iomObjM2));
-		validator.validate(new ObjectEvent(iomObjM3));
 		validator.validate(new ObjectEvent(iomObjN));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
@@ -1246,7 +1230,7 @@ public class Function23Test {
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: elementCount die Anzahl der Listen nicht mit der Value von attr2 uebereinstimmt.
 	@Test
-	public void elementCount_ListCountNotEqual_Fail(){
+	public void elementCountList_NotEqual_Fail(){
 		Iom_jObject iomObjM=new Iom_jObject(ILI_STRUCTM, null);
 		Iom_jObject iomObjM2=new Iom_jObject(ILI_STRUCTM, null);
 		Iom_jObject iomObjM3=new Iom_jObject(ILI_STRUCTM, null);
@@ -1266,11 +1250,6 @@ public class Function23Test {
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
 		validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
-		validator.validate(new ObjectEvent(iomObjM));
-		validator.validate(new ObjectEvent(iomObjM2));
-		validator.validate(new ObjectEvent(iomObjM3));
-		validator.validate(new ObjectEvent(iomObjM4));
-		validator.validate(new ObjectEvent(iomObjM5));
 		validator.validate(new ObjectEvent(iomObjO));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());

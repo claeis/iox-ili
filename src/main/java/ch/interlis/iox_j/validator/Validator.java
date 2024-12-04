@@ -423,7 +423,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 if (currentObj.getobjecttag().equals(MyHandler.HEADER_OBJECT_MODELENTRY) && 
                         currentObj.getattrvaluecount(MyHandler.HEADER_OBJECT_MODELENTRY_VERSION) > 0) {
                     String currentVersion = currentObj.getattrvalue(MyHandler.HEADER_OBJECT_MODELENTRY_VERSION);
-                    String currentModelName = currentObj.getattrvalue("model");
+                    String currentModelName = currentObj.getattrvalue(MyHandler.HEADER_OBJECT_MODELENTRY_NAME);
                     Model model = getModelFromTransferDesc(currentModelName);
                     String iliVersion = model.getModelVersion();
                     if (!(currentVersion.equals(iliVersion))) {

@@ -83,6 +83,7 @@ public class Xtf23ReaderHeaderTest {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN_HEADER,"MultipleHeaderSectionDefined.xtf"));
 		try{
 			reader.read();
+            reader.read();
 			fail();
 		}catch(IoxSyntaxException ioxEx){
 			assertTrue((ioxEx).getMessage().contains("Unexpected XML event HEADERSECTION found."));
@@ -172,8 +173,9 @@ public class Xtf23ReaderHeaderTest {
 	// prueft ob eine XTF Datei ohne einer gueltigen: VERSION
 	// erstellt werden kann.
 	@Test
-	public void test_HeaderSectionWithoutVersion_Fail() throws IoxException {
+	public void test_HeaderSectionWithoutVersionStrict_Fail() throws IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN_HEADER,"HeaderSectionWithoutVersion.xtf"));
+		reader.setStrict(true);
 		try{
 			reader.read();
 			fail();
@@ -229,17 +231,10 @@ public class Xtf23ReaderHeaderTest {
 		reader=null;
 	}
 	
-	// prueft ob eine XTF Datei ohne einem gueltigen: VERSION innerhalb der Modeldefinition
-	// erstellt werden kann.
 	@Test
-	public void test_HeaderSectionModelWithoutVersion_Fail() throws IoxException {
+	public void test_HeaderSectionModelWithoutVersion_Ok() throws IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN_HEADER,"HeaderSectionModelWithoutVersion.xtf"));
-		try{
-			reader.read();
-			fail();
-		}catch(Exception ioxEx){
-			assertTrue((ioxEx).getMessage().contains("Unexpected XML event MODEL found."));
-		}
+		reader.read();
 		reader.close();
 		reader=null;
 	}
@@ -247,8 +242,9 @@ public class Xtf23ReaderHeaderTest {
 	// prueft ob eine XTF Datei ohne einem gueltigen: URI innerhalb der Modeldefinition
 	// erstellt werden kann.
 	@Test
-	public void test_HeaderSectionModelWithoutUri_Fail() throws IoxException {
+	public void test_HeaderSectionModelWithoutUriStrict_Fail() throws IoxException {
 		Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN_HEADER,"HeaderSectionModelWithoutUri.xtf"));
+        reader.setStrict(true);
 		try{
 			reader.read();
 			fail();
@@ -258,6 +254,13 @@ public class Xtf23ReaderHeaderTest {
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void test_HeaderSectionModelWithoutUri_Ok() throws IoxException {
+        Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN_HEADER,"HeaderSectionModelWithoutUri.xtf"));
+        reader.read();
+        reader.close();
+        reader=null;
+    }
 	
 	// prueft ob eine XTF Datei ohne: NAME, VERSION, URI innerhalb der Modeldefinition
 	// erstellt werden kann.
