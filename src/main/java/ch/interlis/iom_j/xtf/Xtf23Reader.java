@@ -677,6 +677,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
                 }else{
                     iomObjOut.value=createIomObject(currentViewableName, null);
                 }
+                iomObjOut.value.setobjectline(event.getLocation().getLineNumber());
                 event=nextEvent(event);
                 // event is startElement of attribute or endElement of object 
             }
