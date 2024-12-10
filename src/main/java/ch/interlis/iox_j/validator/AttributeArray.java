@@ -85,13 +85,18 @@ public class AttributeArray {
 	}
 
 	private boolean equalsIomObj(IomObject thisObj, IomObject otherObj) {
-		// ignore oid, because only structEles that should never have an oid
-		
 		// compare class/assoc/coord/...
 		if(!thisObj.getobjecttag().equals(otherObj.getobjecttag())){
 			return false;
 		}
-		
+
+		// referenced objects can have oid
+		String oid = thisObj.getobjectoid();
+		String otherOid = otherObj.getobjectoid();
+		if (oid == null ? otherOid != null : !oid.equals(otherOid)) {
+			return false;
+		}
+
 		// compare ref
 		String refoid=thisObj.getobjectrefoid();
 		String otherRefoid=otherObj.getobjectrefoid();
