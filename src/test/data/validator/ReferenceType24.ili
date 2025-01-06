@@ -1,0 +1,26 @@
+INTERLIS 2.4;
+
+MODEL ReferenceType24
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-04" =
+	TOPIC Topic=
+	
+						   
+		CLASS ClassA =
+		END ClassA;
+		
+		CLASS ClassB =
+		END ClassB;
+		
+		CLASS ClassF =
+		   attrF1 : MANDATORY REFERENCE TO ClassA;
+		END ClassF;	
+
+		CLASS ClassH =
+		   attrH1 : MANDATORY REFERENCE TO (EXTERNAL) ClassA;
+		END ClassH;	
+		
+	END Topic;
+	
+	
+	
+END ReferenceType24.

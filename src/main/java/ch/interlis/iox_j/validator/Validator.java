@@ -946,31 +946,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 					// validate constraints
 					validateConstraints(iomObj, classOfCurrentObj);
+                    String objectBid = objectPool.getBidOfObject(iomObj.getobjectoid(), classOfCurrentObj);
+                    validateReferenceAttrs("",iomObj, classOfCurrentObj, objectBid);
+					
 					Iterator<ViewableTransferElement> attrIterator=classOfCurrentObj.getAttributesAndRoles2();
 					while (attrIterator.hasNext()) {
 						ViewableTransferElement objA = attrIterator.next();
-						if (objA.obj instanceof LocalAttribute){
-							LocalAttribute attr = (LocalAttribute)objA.obj;
-							String attrName=attr.getName();
-							Type type = attr.getDomain();
-							// composition
-							if (type instanceof CompositionType){
-								CompositionType compositionType = (CompositionType) type;
-								Table structure = compositionType.getComponentType();
-								// bid of iomObject
-								String objectBid = objectPool.getBidOfObject(iomObj.getobjectoid(), classOfCurrentObj);
-								int structc=iomObj.getattrvaluecount(attrName);
-								 for(int structi=0;structi<structc;structi++){
-									IomObject structValue=iomObj.getattrobj(attrName, structi);
-									if(structValue==null) {
-									    // invalid: structAttributeName element without a nested structure element
-									    // but already reported in validateAttrValue()
-									}else {
-	                                    validateReferenceAttrs(attr.getScopedName(),structValue, structure, objectBid);
-									}
-								}
-							}
-						}else if(objA.obj instanceof RoleDef){
+						if(objA.obj instanceof RoleDef){
 							RoleDef roleDef = (RoleDef) objA.obj;
 							validateRoleReference(basketId,roleDef, iomObj);
 						}
@@ -2908,7 +2890,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	        }
             return (IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
     }
-    private void validateReferenceAttrs(String structAttrQName,IomObject iomStruct, Table structure, String bidOfObj){
+    private void validateReferenceAttrs(String structAttrQName,IomObject iomStruct, Viewable structure, String bidOfObj){
 		Iterator attrIter=structure.getAttributesAndRoles();
 		while (attrIter.hasNext()){
 			Object refAttrO = attrIter.next();
