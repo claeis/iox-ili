@@ -1029,11 +1029,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private RoleDef findExtendedRole(AbstractClassDef target, RoleDef role) {
         ArrayList<RoleDef> extRoles=new ArrayList<RoleDef>();
         extRoles.addAll(role.getExtensions());
-        extRoles.sort(new java.util.Comparator<RoleDef>() {
+        java.util.Collections.sort(extRoles,new java.util.Comparator<RoleDef>() {
 
             @Override
             public int compare(RoleDef o1, RoleDef o2) {
-                return -Integer.compare(o1.getDefidx(),o2.getDefidx());
+                return -Integer.valueOf(o1.getDefidx()).compareTo(Integer.valueOf(o2.getDefidx()));
             }
             
         });
