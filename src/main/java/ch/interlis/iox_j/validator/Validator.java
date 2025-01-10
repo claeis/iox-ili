@@ -959,12 +959,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 					if(classOfCurrentObj instanceof AbstractClassDef){
 						AbstractClassDef abstractClassDef = (AbstractClassDef) classOfCurrentObj;
-						Iterator<RoleDef> targetRoleIterator=abstractClassDef.getOpposideRoles();
+						Iterator<RoleDef> targetRoleIterator=getOpposideRoles(abstractClassDef);
 						while(targetRoleIterator.hasNext()){
 							RoleDef role=targetRoleIterator.next();
+							// suche Spezialisierung
 							validateRoleCardinality(role, iomObj);
 						}
-						targetRoleIterator=abstractClassDef.getOpposideForNonNavigableRoles();
+						targetRoleIterator=getOpposideForNonNavigableRoles(abstractClassDef);
 						while(targetRoleIterator.hasNext()){
 							RoleDef role=targetRoleIterator.next();
 							validateRoleCardinality(role, iomObj);
@@ -985,7 +986,65 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private boolean viewIncludesObject(Projection view, IomObject iomObj) {
+	private Iterator<RoleDef> getOpposideForNonNavigableRoles(AbstractClassDef classDef) {
+	    List<RoleDef> result = new ArrayList<RoleDef>();
+	    Iterator<RoleDef> rolei = classDef.getTargetForNonNavigableRoles();
+	    while(rolei.hasNext()){
+	      RoleDef role = rolei.next();
+          role=findExtendedRole(classDef,role);
+	      AssociationDef assoc=(AssociationDef)role.getContainer();
+	      Iterator<Element> iter = assoc.getAttributesAndRoles();
+	      while (iter.hasNext()){
+	          Element oppRole = iter.next();
+	        if(oppRole instanceof RoleDef){
+	          if (oppRole != role) {
+	            result.add((RoleDef) oppRole);
+	          }
+	        }
+	      }
+	    }
+
+	    return result.iterator();
+    }
+    private Iterator<RoleDef> getOpposideRoles(AbstractClassDef classDef) {
+	    List<RoleDef> result = new ArrayList<RoleDef>();
+	    Iterator<RoleDef> rolei = classDef.getTargetForRoles();
+	    while(rolei.hasNext()){
+	      RoleDef role = rolei.next();
+	      role=findExtendedRole(classDef,role);
+	      AssociationDef assoc=(AssociationDef)role.getContainer();
+	      Iterator<Element> iter = assoc.getAttributesAndRoles();
+	      while (iter.hasNext()){
+	          Element oppRole = iter.next();
+	        if(oppRole instanceof RoleDef){
+	          if (oppRole != role) {
+	            result.add((RoleDef) oppRole);
+	          }
+	        }
+	      }
+	    }
+
+	    return result.iterator();
+    }
+    private RoleDef findExtendedRole(AbstractClassDef target, RoleDef role) {
+        ArrayList<RoleDef> extRoles=new ArrayList<RoleDef>();
+        extRoles.addAll(role.getExtensions());
+        extRoles.sort(new java.util.Comparator<RoleDef>() {
+
+            @Override
+            public int compare(RoleDef o1, RoleDef o2) {
+                return -Integer.compare(o1.getDefidx(),o2.getDefidx());
+            }
+            
+        });
+        for(RoleDef found:extRoles) {
+            if(target.isExtending(found.getDestination())){
+                return found;
+            }
+        }
+        return role;
+    }
+    private boolean viewIncludesObject(Projection view, IomObject iomObj) {
 		String viewName = getScopedName(view);
 		Iterator<?> viewIterator = view.iterator();
 		while (viewIterator.hasNext()) {

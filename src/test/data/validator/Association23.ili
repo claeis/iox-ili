@@ -221,4 +221,38 @@ MODEL Association23
 		
 	END TopicC;
 	
+  TOPIC TopicD (ABSTRACT) =
+
+    CLASS ClassA (ABSTRACT) =  
+    END ClassA;
+
+    CLASS ClassB (ABSTRACT) = 
+    END ClassB;
+
+    ASSOCIATION ClassA_ClassB =
+      a  -- {0..*} ClassA;
+      b  -- {0..*} ClassB;
+    END ClassA_ClassB;
+
+  END TopicD;
+
+
+  TOPIC TopicDV EXTENDS TopicD =
+
+    CLASS ClassA (EXTENDED) =
+      AttrA: 1..10;    
+    END ClassA;
+
+    CLASS ClassB (EXTENDED) =
+      AttrB: TEXT*10;  
+    END ClassB;
+
+    ASSOCIATION ClassA_ClassB (EXTENDED) =
+      a (EXTENDED) -- {1..*} ClassA;
+      b (EXTENDED) -- {1..*} ClassB;
+    END ClassA_ClassB;
+
+  END TopicDV;
+	
+	
 END Association23.

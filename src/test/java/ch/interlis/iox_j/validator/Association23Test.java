@@ -35,6 +35,8 @@ public class Association23Test {
     private final static String ILI_MODEL="Association23";
 	private final static String ILI_TOPIC=ILI_MODEL+".Topic";
 	private final static String ILI_TOPICB=ILI_MODEL+".TopicB";
+    private final static String ILI_TOPICD=ILI_MODEL+".TopicD";
+    private final static String ILI_TOPICDV=ILI_MODEL+".TopicDV";
 	// CLASS
 	private final static String ILI_CLASSA=ILI_TOPIC+".ClassA";
 	private final static String ILI_CLASSB=ILI_TOPIC+".ClassB";
@@ -53,6 +55,8 @@ public class Association23Test {
 	private final static String ILI_TOPICB_CLASSG=ILI_TOPICB+".ClassG";
 	private final static String ILI_TOPICB_CLASSH=ILI_TOPICB+".ClassH";
 	private final static String ILI_TOPICB_CLASSO=ILI_TOPICB+".ClassO";
+    private final static String ILI_TOPICDV_CLASSA=ILI_TOPICDV+".ClassA";
+    private final static String ILI_TOPICDV_CLASSB=ILI_TOPICDV+".ClassB";
 	// CLASS EXTEND
 	private final static String ILI_CLASSAP=ILI_TOPIC+".ClassAp";
 	private final static String ILI_CLASSBP=ILI_TOPIC+".ClassBp";
@@ -97,6 +101,8 @@ public class Association23Test {
 	private final static String ILI_ASSOC_GH1_G1="g1";
 	private final static String ILI_ASSOC_GH1_H1="h1";
 	
+    private final static String ILI_TOPICDV_ASSOC_AB_A="a";
+    private final static String ILI_TOPICDV_ASSOC_AB_B="b";
 	// ASSOCIATION CLASS
 	private final static String ILI_ASSOC_AB2=ILI_TOPIC+".ab2";
 	private final static String ILI_ASSOC_ABP2=ILI_TOPIC+".abp2";
@@ -107,6 +113,7 @@ public class Association23Test {
 	private final static String ILI_TOPICB_ASSOC_EF1=ILI_TOPICB+".ef1";
 	private final static String ILI_TOPICB_ASSOC_EF1_E1="e1";
 	private final static String ILI_TOPICB_ASSOC_EF1_F1="f1";
+    private final static String ILI_TOPICDV_ASSOC_AB=ILI_TOPICDV+".ClassA_ClassB";
 	
 	// START BASKET EVENT
 	private final static String BASKET_ID1="b1";
@@ -1041,6 +1048,26 @@ public class Association23Test {
         // Asserts
         assertEquals("f1 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
         assertEquals("e1 should associate 1 to * target objects (instead of 0)", logger.getErrs().get(1).getEventMsg());
+    }
+    @Test
+    public void standAloneAsso_NtoN_Extended_noLink_Fail(){
+        Iom_jObject iomObjA=new Iom_jObject(ILI_TOPICDV_CLASSA, OBJ_OID1);
+        Iom_jObject iomObjB=new Iom_jObject(ILI_TOPICDV_CLASSB, OBJ_OID2);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPICDV,BASKET_ID1));
+        validator.validate(new ObjectEvent(iomObjA));
+        validator.validate(new ObjectEvent(iomObjB));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(2,logger.getErrs().size());
+        assertEquals("b should associate 1 to * target objects (instead of 0)", logger.getErrs().get(0).getEventMsg());
+        assertEquals("a should associate 1 to * target objects (instead of 0)", logger.getErrs().get(1).getEventMsg());
     }
     // Wenn in einer N:N Association der Link ohne Referenzen ist, 
     // soll eine Fehlermeldung ausgegeben werden.
