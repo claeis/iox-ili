@@ -26,6 +26,20 @@ public class Xtf23ReaderHeaderTest {
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void test_AliasComment_Ok() throws IoxException {
+        Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN_HEADER,"AliasComment.xtf"));
+        while(reader.read()!=null);
+        reader.close();
+        reader=null;
+    }
+    @Test
+    public void test_EmptyAlias22_Ok() throws IoxException {
+        Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN_HEADER,"EmptyAlias22.xtf"));
+        while(reader.read()!=null);
+        reader.close();
+        reader=null;
+    }
 	
 	// Innerhalb der HeaderSection werden diverse Kommentare erstellt.
 	@Test

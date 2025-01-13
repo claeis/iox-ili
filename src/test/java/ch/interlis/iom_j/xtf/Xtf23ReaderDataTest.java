@@ -87,6 +87,7 @@ public class Xtf23ReaderDataTest {
 	    // DataTest1.TopicA.ClassA oid oid1 {}
         assertEquals("DataTest1.TopicA.ClassA", iomObject.getobjecttag());
         assertEquals("oid1", iomObject.getobjectoid());
+        assertEquals(10, iomObject.getobjectline());
         
         // DataTest1.TopicA.ClassA oid oid2 {}
         event = reader.read();
@@ -94,6 +95,7 @@ public class Xtf23ReaderDataTest {
         iomObject = ((ObjectEvent) event).getIomObject();
         assertEquals("DataTest1.TopicA.ClassA", iomObject.getobjecttag());
         assertEquals("oid2", iomObject.getobjectoid());
+        assertEquals(12, iomObject.getobjectline());
         
         // DataTest1.TopicA.ClassA oid oid3 {}
         event = reader.read();
@@ -101,6 +103,7 @@ public class Xtf23ReaderDataTest {
         iomObject = ((ObjectEvent) event).getIomObject();
         assertEquals("DataTest1.TopicA.ClassA", iomObject.getobjecttag());
         assertEquals("oid3", iomObject.getobjectoid());
+        assertEquals(14, iomObject.getobjectline());
 	         
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);

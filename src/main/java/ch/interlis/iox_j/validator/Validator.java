@@ -946,43 +946,26 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 					// validate constraints
 					validateConstraints(iomObj, classOfCurrentObj);
+                    String objectBid = objectPool.getBidOfObject(iomObj.getobjectoid(), classOfCurrentObj);
+                    validateReferenceAttrs("",iomObj, classOfCurrentObj, objectBid);
+					
 					Iterator<ViewableTransferElement> attrIterator=classOfCurrentObj.getAttributesAndRoles2();
 					while (attrIterator.hasNext()) {
 						ViewableTransferElement objA = attrIterator.next();
-						if (objA.obj instanceof LocalAttribute){
-							LocalAttribute attr = (LocalAttribute)objA.obj;
-							String attrName=attr.getName();
-							Type type = attr.getDomain();
-							// composition
-							if (type instanceof CompositionType){
-								CompositionType compositionType = (CompositionType) type;
-								Table structure = compositionType.getComponentType();
-								// bid of iomObject
-								String objectBid = objectPool.getBidOfObject(iomObj.getobjectoid(), classOfCurrentObj);
-								int structc=iomObj.getattrvaluecount(attrName);
-								 for(int structi=0;structi<structc;structi++){
-									IomObject structValue=iomObj.getattrobj(attrName, structi);
-									if(structValue==null) {
-									    // invalid: structAttributeName element without a nested structure element
-									    // but already reported in validateAttrValue()
-									}else {
-	                                    validateReferenceAttrs(attr.getScopedName(),structValue, structure, objectBid);
-									}
-								}
-							}
-						}else if(objA.obj instanceof RoleDef){
+						if(objA.obj instanceof RoleDef){
 							RoleDef roleDef = (RoleDef) objA.obj;
 							validateRoleReference(basketId,roleDef, iomObj);
 						}
 					}
 					if(classOfCurrentObj instanceof AbstractClassDef){
 						AbstractClassDef abstractClassDef = (AbstractClassDef) classOfCurrentObj;
-						Iterator<RoleDef> targetRoleIterator=abstractClassDef.getOpposideRoles();
+						Iterator<RoleDef> targetRoleIterator=getOpposideRoles(abstractClassDef);
 						while(targetRoleIterator.hasNext()){
 							RoleDef role=targetRoleIterator.next();
+							// suche Spezialisierung
 							validateRoleCardinality(role, iomObj);
 						}
-						targetRoleIterator=abstractClassDef.getOpposideForNonNavigableRoles();
+						targetRoleIterator=getOpposideForNonNavigableRoles(abstractClassDef);
 						while(targetRoleIterator.hasNext()){
 							RoleDef role=targetRoleIterator.next();
 							validateRoleCardinality(role, iomObj);
@@ -1003,7 +986,65 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 	}
 
-	private boolean viewIncludesObject(Projection view, IomObject iomObj) {
+	private Iterator<RoleDef> getOpposideForNonNavigableRoles(AbstractClassDef classDef) {
+	    List<RoleDef> result = new ArrayList<RoleDef>();
+	    Iterator<RoleDef> rolei = classDef.getTargetForNonNavigableRoles();
+	    while(rolei.hasNext()){
+	      RoleDef role = rolei.next();
+          role=findExtendedRole(classDef,role);
+	      AssociationDef assoc=(AssociationDef)role.getContainer();
+	      Iterator<Element> iter = assoc.getAttributesAndRoles();
+	      while (iter.hasNext()){
+	          Element oppRole = iter.next();
+	        if(oppRole instanceof RoleDef){
+	          if (oppRole != role) {
+	            result.add((RoleDef) oppRole);
+	          }
+	        }
+	      }
+	    }
+
+	    return result.iterator();
+    }
+    private Iterator<RoleDef> getOpposideRoles(AbstractClassDef classDef) {
+	    List<RoleDef> result = new ArrayList<RoleDef>();
+	    Iterator<RoleDef> rolei = classDef.getTargetForRoles();
+	    while(rolei.hasNext()){
+	      RoleDef role = rolei.next();
+	      role=findExtendedRole(classDef,role);
+	      AssociationDef assoc=(AssociationDef)role.getContainer();
+	      Iterator<Element> iter = assoc.getAttributesAndRoles();
+	      while (iter.hasNext()){
+	          Element oppRole = iter.next();
+	        if(oppRole instanceof RoleDef){
+	          if (oppRole != role) {
+	            result.add((RoleDef) oppRole);
+	          }
+	        }
+	      }
+	    }
+
+	    return result.iterator();
+    }
+    private RoleDef findExtendedRole(AbstractClassDef target, RoleDef role) {
+        ArrayList<RoleDef> extRoles=new ArrayList<RoleDef>();
+        extRoles.addAll(role.getExtensions());
+        java.util.Collections.sort(extRoles,new java.util.Comparator<RoleDef>() {
+
+            @Override
+            public int compare(RoleDef o1, RoleDef o2) {
+                return -Integer.valueOf(o1.getDefidx()).compareTo(Integer.valueOf(o2.getDefidx()));
+            }
+            
+        });
+        for(RoleDef found:extRoles) {
+            if(target.isExtending(found.getDestination())){
+                return found;
+            }
+        }
+        return role;
+    }
+    private boolean viewIncludesObject(Projection view, IomObject iomObj) {
 		String viewName = getScopedName(view);
 		Iterator<?> viewIterator = view.iterator();
 		while (viewIterator.hasNext()) {
@@ -2099,26 +2140,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                     continue;
                                 }
                             }
-                            if (k != lastPathIndex) {
-                                IomObject targetObj = getReferencedObject(role, targetOid);
-                                if (targetObj != null) {
-                                    nextCurrentObjects.add(targetObj);
-                                }
-                            }else {
-                                List<IomObject> objects = new ArrayList<IomObject>();
-                                IomObject targetRefObj = getReferencedObject(role, targetOid);
-                                if (targetRefObj != null) {
-                                    if (role instanceof RoleDef) {
-                                        return Value.createOidValue(targetRefObj.getobjectoid());
-                                    } else {
-                                        objects.add(targetRefObj);
-                                        nextCurrentObjects.addAll(objects);                                        
-                                    }
-  
-                                } else if (roleDefValue != null) {
-                                    objects.add(roleDefValue);
-                                    nextCurrentObjects.addAll(objects);
-                                }
+
+                            IomObject targetObj = getReferencedObject(role, targetOid);
+                            if (targetObj != null) {
+                                nextCurrentObjects.add(targetObj);
                             }
                         }
                     }
@@ -2908,7 +2933,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	        }
             return (IomObject) objectPool.getObject(targetOid, destinationClasses, bidOfTargetObj);
     }
-    private void validateReferenceAttrs(String structAttrQName,IomObject iomStruct, Table structure, String bidOfObj){
+    private void validateReferenceAttrs(String structAttrQName,IomObject iomStruct, Viewable structure, String bidOfObj){
 		Iterator attrIter=structure.getAttributesAndRoles();
 		while (attrIter.hasNext()){
 			Object refAttrO = attrIter.next();
