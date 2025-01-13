@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS"
+              xmlns:geom="http://www.interlis.ch/geometry/1.0"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:ModelA="http://www.interlis.ch/xtf/2.4/ModelA">
+    <ili:headersection>
+        <ili:models>
+            <ili:model>ModelA</ili:model>
+        </ili:models>
+        <ili:sender>ili2gpkg-5.0.1-447c03f22b8f346a44ada86c553d10110872fd40</ili:sender>
+    </ili:headersection>
+    <ili:datasection>
+        <ModelA:TopicA ili:bid="basket_1">
+            <ModelA:ClassB1 ili:tid="obj_b1">
+                <ModelA:Code>abc</ModelA:Code>
+            </ModelA:ClassB1>
+            <ModelA:ClassB1 ili:tid="obj_b2">
+                <ModelA:Code>xyz</ModelA:Code>
+            </ModelA:ClassB1>
+            <ModelA:ClassA1 ili:tid="obj_a1">
+                <ModelA:AssocB ili:ref="obj_b2"></ModelA:AssocB>
+                <ModelA:Attr>true</ModelA:Attr>
+            </ModelA:ClassA1>
+        </ModelA:TopicA>
+    </ili:datasection>
+</ili:transfer>
