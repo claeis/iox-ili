@@ -2,6 +2,10 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.23.5 (2025-03-xx)
+-----------------------------
+- Xtf24Reader: fix reading of BAG/LIST OF Reference
+
 iox-ili 1.23.4 (2025-01-13)
 -----------------------------
 - Xtf23Reader: fix xml whitespace/comment reading in headersection (ili2c#136)

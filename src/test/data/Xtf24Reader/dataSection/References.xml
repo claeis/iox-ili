@@ -7,11 +7,15 @@
     </ili:headersection>
     <ili:datasection>
         <TopicA ili:bid="bidA">
-            <ClassM_ReferenceTarget ili:tid="oid_target">
+            <ClassM_ReferenceTarget ili:tid="oid_target1">
+                <attrM1>text</attrM1>
+            </ClassM_ReferenceTarget>
+            <ClassM_ReferenceTarget ili:tid="oid_target2">
                 <attrM1>text</attrM1>
             </ClassM_ReferenceTarget>
             <ClassM_Reference ili:tid="oidM1">
-                <refAttrM ili:ref="oid_target"></refAttrM>
+                <refAttrM ili:ref="oid_target1"></refAttrM>
+                <refAttrM ili:ref="oid_target2"></refAttrM>
             </ClassM_Reference>
         </TopicA>
     </ili:datasection>
