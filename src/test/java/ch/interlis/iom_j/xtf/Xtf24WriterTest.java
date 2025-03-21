@@ -11,6 +11,7 @@ import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
+import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.ViewableProperties;
 import ch.interlis.iom_j.xtf.impl.Xtf24WriterAlt;
 import ch.interlis.iox.IoxException;
@@ -115,6 +116,31 @@ public class Xtf24WriterTest {
         xtfWriter.writeEndTransfer();
 
         String expected = new Scanner(new File(TEST_IN,"MultiCoord.xtf")).useDelimiter("\\Z").next();
+        assertEquals(expected, byteArrayOutputStream.toString());
+    }
+    @Test
+    public void writeReferenceAttr() throws IOException, IoxException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, "UTF-8");
+
+        IomObject obj_target1 = factory.createIomObject("DataTest1.TopicA.ClassM_ReferenceTarget", "oid_target1");
+        obj_target1.setattrvalue("attrM1","text");
+        IomObject obj_target2 = factory.createIomObject("DataTest1.TopicA.ClassM_ReferenceTarget", "oid_target2");
+        obj_target2.setattrvalue("attrM1","text");
+        IomObject objM1 = factory.createIomObject("DataTest1.TopicA.ClassM_Reference", "oidM1");
+        objM1.addattrobj("refAttrM",Iom_jObject.REF).setobjectrefoid(obj_target1.getobjectoid());
+        objM1.addattrobj("refAttrM",Iom_jObject.REF).setobjectrefoid(obj_target2.getobjectoid());
+        
+        Xtf24WriterAlt xtfWriter = new Xtf24WriterAlt(outputStreamWriter, Ili2cUtility.getIoxMappingTable(td));
+        xtfWriter.writeStartTransfer(null, null, Ili2cUtility.buildModelList(td));
+        xtfWriter.writeStartBasket("DataTest1.TopicA", "bidA");
+        xtfWriter.writeObject(obj_target1);
+        xtfWriter.writeObject(obj_target2);
+        xtfWriter.writeObject(objM1);
+        xtfWriter.writeEndBasket();
+        xtfWriter.writeEndTransfer();
+
+        String expected = new Scanner(new File(TEST_IN,"References.xtf")).useDelimiter("\\Z").next();
         assertEquals(expected, byteArrayOutputStream.toString());
     }
 

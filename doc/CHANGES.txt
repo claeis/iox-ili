@@ -5,6 +5,7 @@ ideas/open issues
 iox-ili 1.23.5 (2025-03-xx)
 -----------------------------
 - Xtf24Reader: fix reading of BAG/LIST OF Reference
+- Xtf24Writer: fix writing of BAG/LIST OF Reference
 
 iox-ili 1.23.4 (2025-01-13)
 -----------------------------
