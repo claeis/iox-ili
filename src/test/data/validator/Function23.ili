@@ -157,9 +157,11 @@ MODEL Function23
 		END ClassR;
 		
 		CLASS ClassS =
+		   OID AS INTERLIS.UUIDOID;
 		END ClassS;
 		
 		CLASS ClassT =
+		   OID AS INTERLIS.UUIDOID;
 		END ClassT;
 		
 		ASSOCIATION ST1 =
@@ -173,9 +175,11 @@ MODEL Function23
 		END;
 
 		CLASS ClassSA =
+		   OID AS INTERLIS.UUIDOID;
 		END ClassSA;
 
 		CLASS ClassTA =
+		   OID AS INTERLIS.UUIDOID;
 		END ClassTA;
 
 		ASSOCIATION ST2 =
@@ -188,6 +192,24 @@ MODEL Function23
                 (INTERLIS.objectCount(t2)) == 1;
 		END;
 
+		CLASS ClassSB =
+		   OID AS INTERLIS.UUIDOID;
+		END ClassSB;
+
+		CLASS ClassTB =
+		   OID AS INTERLIS.UUIDOID;
+		END ClassTB;
+
+		ASSOCIATION ST3 =
+		  s3 -- {0..*} ClassSB;
+		  t3 -- {0..1} ClassTB;
+		END ST3;
+
+		CONSTRAINTS OF ClassTB =
+            MANDATORY CONSTRAINT
+                (INTERLIS.objectCount(s3)) == 1;
+		END;
+		
 		STRUCTURE StructA =
         END StructA;
         

@@ -2362,10 +2362,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 if (((Viewable)tag2class.get(targetObj.getobjecttag())).isExtending(role.getDestination())) {
                     IomObject refStruct = targetObj.getattrobj(role.getOppEnd().getName(), 0);
                     if (refStruct!=null) {
-                        List<IomObject> objects = values.get(refStruct.getobjectrefoid());
+                        final String refoid = normalizeOid(role.getDestination(),refStruct.getobjectrefoid());
+                        List<IomObject> objects = values.get(refoid);
                         if (objects == null) {
                             objects = new ArrayList<IomObject>();
-                            values.put(refStruct.getobjectrefoid(), objects);                            
+                            values.put(refoid, objects);                            
                         }
                         objects.add(targetObj);
                     }
@@ -2404,10 +2405,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 if (((Viewable)tag2class.get(linkObj.getobjecttag())).isExtending(role.getContainer())) {
                     IomObject refStruct = linkObj.getattrobj(role.getOppEnd().getName(), 0);
                     if (refStruct!=null) {
-                        List<IomObject> objects = values.get(refStruct.getobjectrefoid());
+                        final String refoid = normalizeOid(role.getOppEnd().getDestination(),refStruct.getobjectrefoid());
+                        List<IomObject> objects = values.get(refoid);
                         if (objects == null) {
                             objects = new ArrayList<IomObject>();
-                            values.put(refStruct.getobjectrefoid(), objects);                            
+                            values.put(refoid, objects);                            
                         }
                         objects.add(linkObj);
                     }
