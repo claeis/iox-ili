@@ -58,6 +58,8 @@ import java.util.ArrayList;
         public static final String INTERNAL_T_ID="_t_id";
         public static final String REF="REF";
         public static final String DELETE="DELETE";
+        public static final String TRUE="true";
+        public static final String FALSE="false";
         
 		// HashMap<string attrname,ArrayList<string|iomObject>>
 	    private final HashMap<String, ArrayList> attrv = new HashMap<String, ArrayList>();

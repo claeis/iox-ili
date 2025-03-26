@@ -1884,9 +1884,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					// enumeration
 					Enumeration enumObj = (Enumeration) enumConstOrRange;
 					String value = getEnumerationConstantXtfValue(enumObj);
-					if (value.equals("true")){
+					if (value.equals(Iom_jObject.TRUE)){
 						return new Value(true);
-					} else if (value.equals("false")){
+					} else if (value.equals(Iom_jObject.FALSE)){
 						return new Value(false);
 					}
 					return new Value(texttype, value);
@@ -2087,7 +2087,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                     nextCurrentObjects.add(iomObj);
                                 }else {
                                     // create/return a reference object to parent object
-                                    Iom_jObject ref = new Iom_jObject("REF", null);
+                                    Iom_jObject ref = new Iom_jObject(Iom_jObject.REF, null);
                                     ref.setobjectrefoid(parentObject.getobjectoid());
                                     nextCurrentObjects.add(ref);
                                 }
@@ -2164,9 +2164,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             }else {
                                 String attrValue = iomObj.getattrvalue(currentAttrName);
                                 if (attrValue != null) {
-                                    if (attrValue.equals("true")) {
+                                    if (attrValue.equals(Iom_jObject.TRUE)) {
                                         return new Value(true);
-                                    } else if (attrValue.equals("false")) {
+                                    } else if (attrValue.equals(Iom_jObject.FALSE)) {
                                         return new Value(false);
                                     } else {
                                         return new Value(type, attrValue);
@@ -2202,9 +2202,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                 if(attrRef.getAttr().isDomainIliUuid()) {
                                     Type aliasedType = ((TypeAlias) type).getAliasing().getType();
                                     return new Value(aliasedType, normalizeUUID(attrValue));
-                                }else if (attrValue.equals("true")) {
+                                }else if (attrValue.equals(Iom_jObject.TRUE)) {
                                     return new Value(true);
-                                } else if (attrValue.equals("false")) {
+                                } else if (attrValue.equals(Iom_jObject.FALSE)) {
                                     return new Value(false);
                                 // if null, then complex value.
                                 } else {
@@ -3265,100 +3265,100 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		IomObject objB = otherIomObj.getattrobj(otherAttrName, 0);
 		if (objA != null && objB != null){
 			// validate if count of surfaces or areas of the objects are equal and get current surface or area
-			for (int i=0;i<objA.getattrvaluecount("surface");i++){
-				IomObject surfaceA = objA.getattrobj("surface",i);
-				IomObject surfaceB = objB.getattrobj("surface",i);
-				if (objA.getattrvaluecount("surface") == objB.getattrvaluecount("surface")){
+			for (int i=0;i<objA.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE);i++){
+				IomObject surfaceA = objA.getattrobj(Iom_jObject.MULTISURFACE_SURFACE,i);
+				IomObject surfaceB = objB.getattrobj(Iom_jObject.MULTISURFACE_SURFACE,i);
+				if (objA.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE) == objB.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE)){
 					// ok
 				} else {
 					return false;
 				}
 				// validate if count of boundaries of the current surface is equal and get current boundary
-				for (int j=0;j<surfaceA.getattrvaluecount("boundary");j++){
-					IomObject boundaryA=surfaceA.getattrobj("boundary",j);
-					IomObject boundaryB=surfaceB.getattrobj("boundary",j);
-					if (boundaryA.getattrvaluecount("boundary") == boundaryB.getattrvaluecount("boundary")){
+				for (int j=0;j<surfaceA.getattrvaluecount(Iom_jObject.SURFACE_BOUNDARY);j++){
+					IomObject boundaryA=surfaceA.getattrobj(Iom_jObject.SURFACE_BOUNDARY,j);
+					IomObject boundaryB=surfaceB.getattrobj(Iom_jObject.SURFACE_BOUNDARY,j);
+					if (boundaryA.getattrvaluecount(Iom_jObject.SURFACE_BOUNDARY) == boundaryB.getattrvaluecount(Iom_jObject.SURFACE_BOUNDARY)){
 						// ok
 					} else {
 						return false;
 					}
 					// validate if count of polylines of the current boundary is equal and get current polyline
-					for (int k=0;k<boundaryA.getattrvaluecount("polyline");k++){
-						IomObject polylineA=boundaryA.getattrobj("polyline",k);
-						IomObject polylineB=boundaryB.getattrobj("polyline",k);
-						if (polylineA.getattrvaluecount("polyline") == polylineB.getattrvaluecount("polyline")){
+					for (int k=0;k<boundaryA.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE);k++){
+						IomObject polylineA=boundaryA.getattrobj(Iom_jObject.BOUNDARY_POLYLINE,k);
+						IomObject polylineB=boundaryB.getattrobj(Iom_jObject.BOUNDARY_POLYLINE,k);
+						if (polylineA.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE) == polylineB.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE)){
 							// ok
 						} else {
 							return false;
 						}
 						// validate if count of sequences of the objects is equal and get current sequence
-						for(int l=0;l<polylineA.getattrvaluecount("sequence");l++){
-							IomObject sequenceA=polylineA.getattrobj("sequence",l);
-							IomObject sequenceB=polylineB.getattrobj("sequence",l);
-							if (objA.getattrvaluecount("sequence") == objB.getattrvaluecount("sequence")){
+						for(int l=0;l<polylineA.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE);l++){
+							IomObject sequenceA=polylineA.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,l);
+							IomObject sequenceB=polylineB.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,l);
+							if (objA.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE) == objB.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE)){
 								// ok
 							} else {
 								return false;
 							}
 							// validate if count of segments of the current sequence is equal and get current current segment
-							for(int m=0;m<sequenceA.getattrvaluecount("segment");m++){
-								IomObject segmentA=sequenceA.getattrobj("segment",m);
-								IomObject segmentB=sequenceB.getattrobj("segment", m);
-								if (segmentA.getattrvaluecount("segment") == segmentB.getattrvaluecount("segment")){
+							for(int m=0;m<sequenceA.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT);m++){
+								IomObject segmentA=sequenceA.getattrobj(Iom_jObject.SEGMENTS_SEGMENT,m);
+								IomObject segmentB=sequenceB.getattrobj(Iom_jObject.SEGMENTS_SEGMENT, m);
+								if (segmentA.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT) == segmentB.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT)){
 									// ok
 								} else {
 									return false;
 								}
 								for (int n=0;n<segmentA.getattrcount();n++){
-									if (segmentA.getobjecttag().equals("COORD")){
+									if (segmentA.getobjecttag().equals(Iom_jObject.COORD)){
 										// equalation of values of dimensions(C1-3) where C is not null
-										if (segmentA.getattrvalue("C1") != null && segmentB.getattrvalue("C1") != null){
-											if (!segmentA.getattrvalue("C1").equals(segmentB.getattrvalue("C1"))){
+										if (segmentA.getattrvalue(Iom_jObject.COORD_C1) != null && segmentB.getattrvalue(Iom_jObject.COORD_C1) != null){
+											if (!segmentA.getattrvalue(Iom_jObject.COORD_C1).equals(segmentB.getattrvalue(Iom_jObject.COORD_C1))){
 												return false;
 											}
 										} else {
 											return false;
 										}
-										if (segmentA.getattrvalue("C2") != null && segmentB.getattrvalue("C2") != null){
-											if (!segmentA.getattrvalue("C2").equals(segmentB.getattrvalue("C2"))){
+										if (segmentA.getattrvalue(Iom_jObject.COORD_C2) != null && segmentB.getattrvalue(Iom_jObject.COORD_C2) != null){
+											if (!segmentA.getattrvalue(Iom_jObject.COORD_C2).equals(segmentB.getattrvalue(Iom_jObject.COORD_C2))){
 												return false;
 											}
 										}
-										if (segmentA.getattrvalue("C3") != null && segmentB.getattrvalue("C3") != null){
-											if (!segmentA.getattrvalue("C3").equals(segmentB.getattrvalue("C3"))){
+										if (segmentA.getattrvalue(Iom_jObject.COORD_C3) != null && segmentB.getattrvalue(Iom_jObject.COORD_C3) != null){
+											if (!segmentA.getattrvalue(Iom_jObject.COORD_C3).equals(segmentB.getattrvalue(Iom_jObject.COORD_C3))){
 												return false;
 											}
 										}
-									} else if (segmentA.getobjecttag().equals("ARC")) {
+									} else if (segmentA.getobjecttag().equals(Iom_jObject.ARC)) {
 										// equalation of values of dimensions(C1-3) where C or A is not null
-										if (segmentA.getattrvalue("A1") != null && segmentB.getattrvalue("A1") != null){
-											if (!segmentA.getattrvalue("A1").equals(segmentB.getattrvalue("A1"))){
+										if (segmentA.getattrvalue(Iom_jObject.ARC_A1) != null && segmentB.getattrvalue(Iom_jObject.ARC_A1) != null){
+											if (!segmentA.getattrvalue(Iom_jObject.ARC_A1).equals(segmentB.getattrvalue(Iom_jObject.ARC_A1))){
 												return false;
 											}
 										} else {
 											return false;
 										}
-										if (segmentA.getattrvalue("A2") != null && segmentB.getattrvalue("A2") != null){
-											if (!segmentA.getattrvalue("A2").equals(segmentB.getattrvalue("A2"))){
+										if (segmentA.getattrvalue(Iom_jObject.ARC_A2) != null && segmentB.getattrvalue(Iom_jObject.ARC_A2) != null){
+											if (!segmentA.getattrvalue(Iom_jObject.ARC_A2).equals(segmentB.getattrvalue(Iom_jObject.ARC_A2))){
 												return false;
 											}
 										} else {
 											return false;
 										}
-										if (segmentA.getattrvalue("C1") != null && segmentB.getattrvalue("C1") != null){
-											if (!segmentA.getattrvalue("C1").equals(segmentB.getattrvalue("C1"))){
+										if (segmentA.getattrvalue(Iom_jObject.COORD_C1) != null && segmentB.getattrvalue(Iom_jObject.COORD_C1) != null){
+											if (!segmentA.getattrvalue(Iom_jObject.COORD_C1).equals(segmentB.getattrvalue(Iom_jObject.COORD_C1))){
 												return false;
 											}
 										} else {
 											return false;
 										}
-										if (segmentA.getattrvalue("C2") != null && segmentB.getattrvalue("C2") != null){
-											if (!segmentA.getattrvalue("C2").equals(segmentB.getattrvalue("C2"))){
+										if (segmentA.getattrvalue(Iom_jObject.COORD_C2) != null && segmentB.getattrvalue(Iom_jObject.COORD_C2) != null){
+											if (!segmentA.getattrvalue(Iom_jObject.COORD_C2).equals(segmentB.getattrvalue(Iom_jObject.COORD_C2))){
 												return false;
 											}
 										}
-										if (segmentA.getattrvalue("C3") != null && segmentB.getattrvalue("C3") != null){
-											if (!segmentA.getattrvalue("C3").equals(segmentB.getattrvalue("C3"))){
+										if (segmentA.getattrvalue(Iom_jObject.COORD_C3) != null && segmentB.getattrvalue(Iom_jObject.COORD_C3) != null){
+											if (!segmentA.getattrvalue(Iom_jObject.COORD_C3).equals(segmentB.getattrvalue(Iom_jObject.COORD_C3))){
 												return false;
 											}
 										}
@@ -3379,73 +3379,73 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		// validate if one object is null
 		if (objA != null && objB != null){
 			// validate if count of sequences of the objects is equal and get current sequence
-			for(int i=0;i<objA.getattrvaluecount("sequence");i++){
-				IomObject sequenceA=objA.getattrobj("sequence",i);
-				IomObject sequenceB=objB.getattrobj("sequence",i);
-				if (objA.getattrvaluecount("sequence") == objB.getattrvaluecount("sequence")){
+			for(int i=0;i<objA.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE);i++){
+				IomObject sequenceA=objA.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,i);
+				IomObject sequenceB=objB.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,i);
+				if (objA.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE) == objB.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE)){
 					// ok
 				} else {
 					return false;
 				}
 				// validate if count of segments of the current sequence is equal and get current current segment
-				for(int j=0;j<sequenceA.getattrvaluecount("segment");j++){
-					IomObject segmentA=sequenceA.getattrobj("segment",j);
-					IomObject segmentB=sequenceB.getattrobj("segment", j);
-					if (segmentA.getattrvaluecount("segment") == segmentB.getattrvaluecount("segment")){
+				for(int j=0;j<sequenceA.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT);j++){
+					IomObject segmentA=sequenceA.getattrobj(Iom_jObject.SEGMENTS_SEGMENT,j);
+					IomObject segmentB=sequenceB.getattrobj(Iom_jObject.SEGMENTS_SEGMENT, j);
+					if (segmentA.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT) == segmentB.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT)){
 						// ok
 					} else {
 						return false;
 					}
 					for (int k=0;k<segmentA.getattrcount();k++){
-						if (segmentA.getobjecttag().equals("COORD")){
+						if (segmentA.getobjecttag().equals(Iom_jObject.COORD)){
 							// equalation of values of dimensions(C1-3) where C is not null
-							if (segmentA.getattrvalue("C1") != null && segmentB.getattrvalue("C1") != null){
-								if (!segmentA.getattrvalue("C1").equals(segmentB.getattrvalue("C1"))){
+							if (segmentA.getattrvalue(Iom_jObject.COORD_C1) != null && segmentB.getattrvalue(Iom_jObject.COORD_C1) != null){
+								if (!segmentA.getattrvalue(Iom_jObject.COORD_C1).equals(segmentB.getattrvalue(Iom_jObject.COORD_C1))){
 									return false;
 								}
 							} else {
 								return false;
 							}
-							if (segmentA.getattrvalue("C2") != null && segmentB.getattrvalue("C2") != null){
-								if (!segmentA.getattrvalue("C2").equals(segmentB.getattrvalue("C2"))){
+							if (segmentA.getattrvalue(Iom_jObject.COORD_C2) != null && segmentB.getattrvalue(Iom_jObject.COORD_C2) != null){
+								if (!segmentA.getattrvalue(Iom_jObject.COORD_C2).equals(segmentB.getattrvalue(Iom_jObject.COORD_C2))){
 									return false;
 								}
 							}
-							if (segmentA.getattrvalue("C3") != null && segmentB.getattrvalue("C3") != null){
-								if (!segmentA.getattrvalue("C3").equals(segmentB.getattrvalue("C3"))){
+							if (segmentA.getattrvalue(Iom_jObject.COORD_C3) != null && segmentB.getattrvalue(Iom_jObject.COORD_C3) != null){
+								if (!segmentA.getattrvalue(Iom_jObject.COORD_C3).equals(segmentB.getattrvalue(Iom_jObject.COORD_C3))){
 									return false;
 								}
 							}
-						} else if (segmentA.getobjecttag().equals("ARC")) {
+						} else if (segmentA.getobjecttag().equals(Iom_jObject.ARC)) {
 							// equalation of values of dimensions(C1-3) where C or A is not null
-							if (segmentA.getattrvalue("A1") != null && segmentB.getattrvalue("A1") != null){
-								if (!segmentA.getattrvalue("A1").equals(segmentB.getattrvalue("A1"))){
+							if (segmentA.getattrvalue(Iom_jObject.ARC_A1) != null && segmentB.getattrvalue(Iom_jObject.ARC_A1) != null){
+								if (!segmentA.getattrvalue(Iom_jObject.ARC_A1).equals(segmentB.getattrvalue(Iom_jObject.ARC_A1))){
 									return false;
 								}
 							} else {
 								return false;
 							}
-							if (segmentA.getattrvalue("A2") != null && segmentB.getattrvalue("A2") != null){
-								if (!segmentA.getattrvalue("A2").equals(segmentB.getattrvalue("A2"))){
+							if (segmentA.getattrvalue(Iom_jObject.ARC_A2) != null && segmentB.getattrvalue(Iom_jObject.ARC_A2) != null){
+								if (!segmentA.getattrvalue(Iom_jObject.ARC_A2).equals(segmentB.getattrvalue(Iom_jObject.ARC_A2))){
 									return false;
 								}
 							} else {
 								return false;
 							}
-							if (segmentA.getattrvalue("C1") != null && segmentB.getattrvalue("C1") != null){
-								if (!segmentA.getattrvalue("C1").equals(segmentB.getattrvalue("C1"))){
+							if (segmentA.getattrvalue(Iom_jObject.COORD_C1) != null && segmentB.getattrvalue(Iom_jObject.COORD_C1) != null){
+								if (!segmentA.getattrvalue(Iom_jObject.COORD_C1).equals(segmentB.getattrvalue(Iom_jObject.COORD_C1))){
 									return false;
 								}
 							} else {
 								return false;
 							}
-							if (segmentA.getattrvalue("C2") != null && segmentB.getattrvalue("C2") != null){
-								if (!segmentA.getattrvalue("C2").equals(segmentB.getattrvalue("C2"))){
+							if (segmentA.getattrvalue(Iom_jObject.COORD_C2) != null && segmentB.getattrvalue(Iom_jObject.COORD_C2) != null){
+								if (!segmentA.getattrvalue(Iom_jObject.COORD_C2).equals(segmentB.getattrvalue(Iom_jObject.COORD_C2))){
 									return false;
 								}
 							}
-							if (segmentA.getattrvalue("C3") != null && segmentB.getattrvalue("C3") != null){
-								if (!segmentA.getattrvalue("C3").equals(segmentB.getattrvalue("C3"))){
+							if (segmentA.getattrvalue(Iom_jObject.COORD_C3) != null && segmentB.getattrvalue(Iom_jObject.COORD_C3) != null){
+								if (!segmentA.getattrvalue(Iom_jObject.COORD_C3).equals(segmentB.getattrvalue(Iom_jObject.COORD_C3))){
 									return false;
 								}
 							}
@@ -3472,29 +3472,29 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		IomObject coordValueOther = otherIomObj.getattrobj(otherAttrName, 0);
 		// depends on dimension of coord. validate if coords are not null and equals the values of coord of the objects
 		if (coordType.getDimensions().length >= 1){
-			if (coordValueRestricted.getattrvalue("C1") != null ){
-				if (!coordValueRestricted.getattrvalue("C1").equals(coordValueOther.getattrvalue("C1"))){
+			if (coordValueRestricted.getattrvalue(Iom_jObject.COORD_C1) != null ){
+				if (!coordValueRestricted.getattrvalue(Iom_jObject.COORD_C1).equals(coordValueOther.getattrvalue(Iom_jObject.COORD_C1))){
 					return false;
 				}
-			}else if(coordValueOther.getattrvalue("C1") != null){
+			}else if(coordValueOther.getattrvalue(Iom_jObject.COORD_C1) != null){
 				return false;
 			}
 		}
 		if (coordType.getDimensions().length >= 2){
-			if (coordValueRestricted.getattrvalue("C2") != null ){
-				if (!coordValueRestricted.getattrvalue("C2").equals(coordValueOther.getattrvalue("C2"))){
+			if (coordValueRestricted.getattrvalue(Iom_jObject.COORD_C2) != null ){
+				if (!coordValueRestricted.getattrvalue(Iom_jObject.COORD_C2).equals(coordValueOther.getattrvalue(Iom_jObject.COORD_C2))){
 					return false;
 				}
-			}else if(coordValueOther.getattrvalue("C2") != null){
+			}else if(coordValueOther.getattrvalue(Iom_jObject.COORD_C2) != null){
 				return false;
 			}
 		}
 		if (coordType.getDimensions().length >= 3){
-			if (coordValueRestricted.getattrvalue("C3") != null){
-				if (!coordValueRestricted.getattrvalue("C3").equals(coordValueOther.getattrvalue("C3"))){
+			if (coordValueRestricted.getattrvalue(Iom_jObject.COORD_C3) != null){
+				if (!coordValueRestricted.getattrvalue(Iom_jObject.COORD_C3).equals(coordValueOther.getattrvalue(Iom_jObject.COORD_C3))){
 					return false;
 				}
-			}else if(coordValueOther.getattrvalue("C3") != null){
+			}else if(coordValueOther.getattrvalue(Iom_jObject.COORD_C3) != null){
 				return false;
 			}
 		}
@@ -3527,7 +3527,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		
 		String tag=iomObj.getobjecttag();
         Object modelele=null;
-		if(assocClass!=null && "REF".equals(tag)) {
+		if(assocClass!=null && Iom_jObject.REF.equals(tag)) {
 		    modelele=assocClass;
 		}else {
 	        modelele=tag2class.get(tag);
@@ -3839,13 +3839,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								SurfaceOrAreaType surfaceOrAreaType=(SurfaceOrAreaType)type;
 								IomObject surfaceValue=iomObj.getattrobj(attrName,0);
 								if (surfaceValue != null){
-									for(int surfacei=0;surfacei< surfaceValue.getattrvaluecount("surface");surfacei++){
-										IomObject surface= surfaceValue.getattrobj("surface",surfacei);
-										int boundaryc=surface.getattrvaluecount("boundary");
+									for(int surfacei=0;surfacei< surfaceValue.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE);surfacei++){
+										IomObject surface= surfaceValue.getattrobj(Iom_jObject.MULTISURFACE_SURFACE,surfacei);
+										int boundaryc=surface.getattrvaluecount(Iom_jObject.SURFACE_BOUNDARY);
 										for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
-											IomObject boundary=surface.getattrobj("boundary",boundaryi);
-											for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
-												IomObject polyline=boundary.getattrobj("polyline",polylinei);
+											IomObject boundary=surface.getattrobj(Iom_jObject.SURFACE_BOUNDARY,boundaryi);
+											for(int polylinei=0;polylinei<boundary.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE);polylinei++){
+												IomObject polyline=boundary.getattrobj(Iom_jObject.BOUNDARY_POLYLINE,polylinei);
 												IomObject coord=getFirstCoordFromPolyline(polyline);
 												if (coord!=null){
 													return coord;
@@ -3870,10 +3870,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
 	private IomObject getFirstCoordFromPolyline(IomObject polylineValue) {
-		for(int sequencei=0;sequencei<polylineValue.getattrvaluecount("sequence");sequencei++){
-			IomObject sequence=polylineValue.getattrobj("sequence",sequencei);
-			for(int segmenti=0;segmenti<sequence.getattrvaluecount("segment");segmenti++){
-				IomObject segment=sequence.getattrobj("segment",segmenti);
+		for(int sequencei=0;sequencei<polylineValue.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE);sequencei++){
+			IomObject sequence=polylineValue.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequencei);
+			for(int segmenti=0;segmenti<sequence.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT);segmenti++){
+				IomObject segment=sequence.getattrobj(Iom_jObject.SEGMENTS_SEGMENT,segmenti);
 				return segment;
 			}
 		}
@@ -4101,7 +4101,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     } else if (attr.isDomainBoolean()) {
                         // Value has to be not null and ("true" or "false")
                         String valueStr=iomObj.getattrprim(attrName, structi);
-                        if (valueStr == null || valueStr.equals("true") || valueStr.equals("false")){
+                        if (valueStr == null || valueStr.equals(Iom_jObject.TRUE) || valueStr.equals(Iom_jObject.FALSE)){
                             // Value okay, skip it
                         } else {
                             logMsg(validateType, rsrc.getString("validateAttrValue.valueXIsNotABooleanInAttributeY"), valueStr, attrPathEle);
@@ -4211,11 +4211,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         MultiPolylineType polylineType=(MultiPolylineType)type;
                         IomObject multipolylineValue=iomObj.getattrobj(attrName, structi);
                         if (multipolylineValue != null){
-                            if(multipolylineValue.getobjecttag().equals("MULTIPOLYLINE")) {
-                                int polylinec=multipolylineValue.getattrvaluecount("polyline");
+                            if(multipolylineValue.getobjecttag().equals(Iom_jObject.MULTIPOLYLINE)) {
+                                int polylinec=multipolylineValue.getattrvaluecount(Iom_jObject.MULTIPOLYLINE_POLYLINE);
                                 if(polylinec>0) {
                                     for(int polylinei=0;polylinei<polylinec;polylinei++) {
-                                        IomObject polylineValue=multipolylineValue.getattrobj("polyline", polylinei);
+                                        IomObject polylineValue=multipolylineValue.getattrobj(Iom_jObject.MULTIPOLYLINE_POLYLINE, polylinei);
                                         boolean isValid=validatePolyline(validateGeometryType, model, polylineType, polylineValue, attrName);
                                         if(isValid){
                                             validatePolylineTopology(attrPath,validateGeometryType, polylineType, polylineValue);
@@ -4339,12 +4339,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     }else if(type instanceof MultiCoordType){
                         IomObject multicoordValue=iomObj.getattrobj(attrName, structi);
                         if (multicoordValue!=null){
-                            if(multicoordValue.getobjecttag().equals("MULTICOORD")) {
-                                int coordc=multicoordValue.getattrvaluecount("coord");
+                            if(multicoordValue.getobjecttag().equals(Iom_jObject.MULTICOORD)) {
+                                int coordc=multicoordValue.getattrvaluecount(Iom_jObject.MULTICOORD_COORD);
                                 if(coordc>0) {
                                     for(int coordi=0;coordi<coordc;coordi++) {
-                                        IomObject coordValue=multicoordValue.getattrobj("coord", coordi);
-                                        if(coordValue.getobjecttag().equals("COORD")) {
+                                        IomObject coordValue=multicoordValue.getattrobj(Iom_jObject.MULTICOORD_COORD, coordi);
+                                        if(coordValue.getobjecttag().equals(Iom_jObject.COORD)) {
                                             validateCoordType(validateGeometryType, model, domain, (MultiCoordType)type, coordValue, attrPathEle);
                                         }else {
                                             logMsg(validateType, "unexpected Type "+coordValue.getobjecttag()+"; COORD expected");
@@ -4627,8 +4627,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	 */
 	private boolean validatePolygon(String validateType, Model model, AbstractSurfaceOrAreaType surfaceOrAreaType, IomObject surfaceValue, IomObject currentIomObj, String attrName) {
         boolean foundErrs=false;
-		if (surfaceValue.getobjecttag().equals("MULTISURFACE")){
-		    int surfacec=surfaceValue.getattrvaluecount("surface");
+		if (surfaceValue.getobjecttag().equals(Iom_jObject.MULTISURFACE)){
+		    int surfacec=surfaceValue.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE);
             if(surfacec==0){
                 logMsg(validateType, rsrc.getString("validateMultiPolygon.invalidNumberOfSurfaces"));
                 return false;
@@ -4640,8 +4640,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 return false;
             }
 			for(int surfacei=0;surfacei< surfacec;surfacei++){
-				IomObject surface= surfaceValue.getattrobj("surface",surfacei);
-				int boundaryc=surface.getattrvaluecount("boundary");
+				IomObject surface= surfaceValue.getattrobj(Iom_jObject.MULTISURFACE_SURFACE,surfacei);
+				int boundaryc=surface.getattrvaluecount(Iom_jObject.SURFACE_BOUNDARY);
 				// a multisurface consists of at least one boundary.
 				if(boundaryc==0){
 					String objectIdentification = currentIomObj.getobjectoid();
@@ -4652,14 +4652,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					return false;
 				} else {
 					for(int boundaryi=0;boundaryi<boundaryc;boundaryi++){
-						IomObject boundary=surface.getattrobj("boundary",boundaryi);
+						IomObject boundary=surface.getattrobj(Iom_jObject.SURFACE_BOUNDARY,boundaryi);
 						if(boundaryi==0){
 							// shell
 						}else{
 						    // hole
 						}    
-						for(int polylinei=0;polylinei<boundary.getattrvaluecount("polyline");polylinei++){
-							IomObject polyline=boundary.getattrobj("polyline",polylinei);
+						for(int polylinei=0;polylinei<boundary.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE);polylinei++){
+							IomObject polyline=boundary.getattrobj(Iom_jObject.BOUNDARY_POLYLINE,polylinei);
 					        foundErrs = foundErrs || !validatePolyline(validateType, model, surfaceOrAreaType, polyline, attrName);
 							// add line to shell or hole
 						}
@@ -4681,38 +4681,38 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	 */
 	private boolean validatePolyline(String validateType, Model model, LineType polylineType, IomObject polylineValue, String attrName) {
 		boolean foundErrs=false;
-		if (polylineValue.getobjecttag().equals("POLYLINE")){
+		if (polylineValue.getobjecttag().equals(Iom_jObject.POLYLINE)){
 			boolean clipped = polylineValue.getobjectconsistency()==IomConstants.IOM_INCOMPLETE;
-            if(!clipped && polylineValue.getattrvaluecount("sequence")>1){
+            if(!clipped && polylineValue.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE)>1){
                 // an unclipped polyline should have only one sequence element
                 logMsg(validateType, rsrc.getString("validatePolyline.invalidNumberOfSequenceInCompleteBasket"));
                 foundErrs = foundErrs || true;
             }
-			for(int sequencei=0;sequencei<polylineValue.getattrvaluecount("sequence");sequencei++){
-				IomObject sequence=polylineValue.getattrobj("sequence",sequencei);
+			for(int sequencei=0;sequencei<polylineValue.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE);sequencei++){
+				IomObject sequence=polylineValue.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequencei);
 				LineForm[] lineforms = polylineType.getLineForms();
 				HashSet<String> lineformNames=new HashSet<String>();
 				for(LineForm lf:lineforms){
 					lineformNames.add(lf.getName());
 				}
-				if(sequence.getobjecttag().equals("SEGMENTS")){
-		            if(sequence.getattrvaluecount("segment")<=1){
+				if(sequence.getobjecttag().equals(Iom_jObject.SEGMENTS)){
+		            if(sequence.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT)<=1){
 		                logMsg(validateType, rsrc.getString("validatePolyline.invalidNumberOfSegments"));
 		                foundErrs = foundErrs || true;
 		            }
-					for(int segmenti=0;segmenti<sequence.getattrvaluecount("segment");segmenti++){
+					for(int segmenti=0;segmenti<sequence.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT);segmenti++){
 						// segment = all segments which are in the actual sequence.
-						IomObject segment=sequence.getattrobj("segment",segmenti);
-						if(segment.getobjecttag().equals("COORD")){
-							if(lineformNames.contains("STRAIGHTS") || segmenti==0){
+						IomObject segment=sequence.getattrobj(Iom_jObject.SEGMENTS_SEGMENT,segmenti);
+						if(segment.getobjecttag().equals(Iom_jObject.COORD)){
+							if(lineformNames.contains(PredefinedModel.getInstance().STRAIGHTS.getName()) || segmenti==0){
 								Domain coordDomain = polylineType.getControlPointDomain();
 							    foundErrs = foundErrs || !validateCoordType(validateType, model, coordDomain, (CoordType) coordDomain.getType(), segment, attrName);
 							}else{
 								logMsg(validateType, "unexpected COORD");
 								foundErrs = foundErrs || true;
 							}
-						} else if (segment.getobjecttag().equals("ARC")){
-							if(lineformNames.contains("ARCS") && segmenti>0){
+						} else if (segment.getobjecttag().equals(Iom_jObject.ARC)){
+							if(lineformNames.contains(PredefinedModel.getInstance().ARCS.getName()) && segmenti>0){
 							    foundErrs = foundErrs || !validateARCSType(validateType, (CoordType) polylineType.getControlPointDomain().getType(), segment, attrName);
 							}else{
 								logMsg(validateType, "unexpected ARC");
@@ -4770,9 +4770,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}
 
 		if (coordType.getDimensions().length >= 1){
-			if (coordValue.getattrvalue("C1") != null){
-				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue("C1"), attrName,isNumValid));
-			} else if (coordValue.getattrvalue("A1") != null) {
+			if (coordValue.getattrvalue(Iom_jObject.COORD_C1) != null){
+				coordValue.setattrvalue(Iom_jObject.COORD_C1, validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], coordValue.getattrvalue(Iom_jObject.COORD_C1), attrName,isNumValid));
+			} else if (coordValue.getattrvalue(Iom_jObject.ARC_A1) != null) {
 				logMsg(validateType, rsrc.getString("validateCoordType.notATypeOfCoord"));
 	            foundErrs = foundErrs || true;
 			} else {
@@ -4781,15 +4781,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 		if (coordType.getDimensions().length == 2){
-			if (coordValue.getattrvalue("C3") != null){
+			if (coordValue.getattrvalue(Iom_jObject.COORD_C3) != null){
 				logMsg(validateType, rsrc.getString("validateCoordType.wrongCoordStructureC3NotExpected"));
 	            foundErrs = foundErrs || true;
 			}
 		}
 		if (coordType.getDimensions().length >= 2){
-			if (coordValue.getattrvalue("C2") != null){
-				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue("C2"), attrName,isNumValid));
-			} else if (coordValue.getattrvalue("A2") != null) {
+			if (coordValue.getattrvalue(Iom_jObject.COORD_C2) != null){
+				coordValue.setattrvalue(Iom_jObject.COORD_C2, validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], coordValue.getattrvalue(Iom_jObject.COORD_C2), attrName,isNumValid));
+			} else if (coordValue.getattrvalue(Iom_jObject.ARC_A2) != null) {
 				logMsg(validateType, rsrc.getString("validateCoordType.notATypeOfCoord"));
 	            foundErrs = foundErrs || true;
 			} else {
@@ -4798,8 +4798,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 		if (coordType.getDimensions().length == 3){
-			if (coordValue.getattrvalue("C3") != null){
-				coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue("C3"), attrName,isNumValid));
+			if (coordValue.getattrvalue(Iom_jObject.COORD_C3) != null){
+				coordValue.setattrvalue(Iom_jObject.COORD_C3, validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], coordValue.getattrvalue(Iom_jObject.COORD_C3), attrName,isNumValid));
 			} else {
 				logMsg(validateType, rsrc.getString("validateCoordType.wrongCoordStructureC3Expected"));
 	            foundErrs = foundErrs || true;
@@ -4812,7 +4812,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(propName.startsWith("_")){
 				// ok, software internal properties start with a '_'
 			}else{
-				if(!propName.equals("C1") && !propName.equals("C2") && !propName.equals("C3")){
+				if(!propName.equals(Iom_jObject.COORD_C1) && !propName.equals(Iom_jObject.COORD_C2) && !propName.equals(Iom_jObject.COORD_C3)){
 					errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateCoordType.wrongCoordStructureUnknownPropertyX"),propName));
 		            foundErrs = foundErrs || true;
 				}
@@ -4825,21 +4825,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private boolean validateARCSType(String validateType, CoordType coordType, IomObject coordValue, String attrName) {
         boolean foundErrs=false;
 		int dimLength=coordType.getDimensions().length;
-		String c1=coordValue.getattrvalue("C1");
-		String c2=coordValue.getattrvalue("C2");
-		String c3=coordValue.getattrvalue("C3");
-		String a1=coordValue.getattrvalue("A1");
-		String a2=coordValue.getattrvalue("A2");
+		String c1=coordValue.getattrvalue(Iom_jObject.COORD_C1);
+		String c2=coordValue.getattrvalue(Iom_jObject.COORD_C2);
+		String c3=coordValue.getattrvalue(Iom_jObject.COORD_C3);
+		String a1=coordValue.getattrvalue(Iom_jObject.ARC_A1);
+		String a2=coordValue.getattrvalue(Iom_jObject.ARC_A2);
 		
 		boolean wrongArcStructure=false;
 		OutParam<Boolean> isNumValid=new OutParam<Boolean>(true);
-		int c1Count=coordValue.getattrvaluecount("C1");
+		int c1Count=coordValue.getattrvaluecount(Iom_jObject.COORD_C1);
 		if (dimLength>=2 && dimLength<=3){
 			if(a1!=null && a2!=null && c1!=null && c2!=null){
-				coordValue.setattrvalue("A1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], a1, attrName,isNumValid));
-				coordValue.setattrvalue("A2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], a2, attrName,isNumValid));
-				coordValue.setattrvalue("C1", validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], c1, attrName,isNumValid));
-				coordValue.setattrvalue("C2", validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], c2, attrName,isNumValid));
+				coordValue.setattrvalue(Iom_jObject.ARC_A1, validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], a1, attrName,isNumValid));
+				coordValue.setattrvalue(Iom_jObject.ARC_A2, validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], a2, attrName,isNumValid));
+				coordValue.setattrvalue(Iom_jObject.COORD_C1, validateNumericType(validateType, (NumericType)coordType.getDimensions()[0], c1, attrName,isNumValid));
+				coordValue.setattrvalue(Iom_jObject.COORD_C2, validateNumericType(validateType, (NumericType)coordType.getDimensions()[1], c2, attrName,isNumValid));
 				if(dimLength==2) {
 					if(c3!=null) {
 						logMsg(validateType, rsrc.getString("validateARCSType.wrongArcStructureC3NotExpected"));
@@ -4847,7 +4847,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					}
 				}else if(dimLength==3) {
 					if(c3!=null) {
-						coordValue.setattrvalue("C3", validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], c3, attrName,isNumValid));
+						coordValue.setattrvalue(Iom_jObject.COORD_C3, validateNumericType(validateType, (NumericType)coordType.getDimensions()[2], c3, attrName,isNumValid));
 					}else {
 						logMsg(validateType, rsrc.getString("validateARCSType.wrongArcStructureC3Expected"));
 	                    foundErrs = foundErrs || true;
@@ -4871,7 +4871,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if(propName.startsWith("_")){
 				// ok, software internal properties start with a '_'
 			}else{
-				if(!propName.equals("A1") || !propName.equals("A2") || !propName.equals("C1") || !propName.equals("C2") || !propName.equals("C3")){
+				if(!propName.equals(Iom_jObject.ARC_A1) || !propName.equals(Iom_jObject.ARC_A2) || !propName.equals(Iom_jObject.COORD_C1) || !propName.equals(Iom_jObject.COORD_C2) || !propName.equals(Iom_jObject.COORD_C3)){
 					// ok.
 				} else {
 					errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateARCSType.wrongArcStructureUnknownPropertyX"),propName));
