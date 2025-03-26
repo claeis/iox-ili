@@ -93,6 +93,25 @@ public class AttributeDef24Test {
         assertTrue(logger.getErrs().size()==0);
     }
     @Test
+    public void class_attr0_2_WrongTextValue_Fail() {
+        Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSA2, OID1);
+        iomObj1.addattrvalue("attrOptional", "test");
+        iomObj1.addattrvalue("attrOptional", "TestValueToLong");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC_ATTRMULTIPLICITY,BID1));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Attribute attrOptional[1] is length restricted to 10", logger.getErrs().get(0).getEventMsg());
+    }
+    @Test
     public void class_attr0_2_With2NumValue_Ok() {
         Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSA3, OID1);
         iomObj1.addattrvalue("attrOptional", "1");
@@ -109,6 +128,25 @@ public class AttributeDef24Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
+    public void class_attr0_2_WrongNumericValue_Fail() {
+        Iom_jObject iomObj1=new Iom_jObject(DIRECT_CLASSA3, OID1);
+        iomObj1.addattrvalue("attrOptional", "1");
+        iomObj1.addattrvalue("attrOptional", "false");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC_ATTRMULTIPLICITY,BID1));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("value <false> is not a number in attribute attrOptional[1]", logger.getErrs().get(0).getEventMsg());
     }
     @Test
     public void class_attr0_2_With3Value_Fail() {

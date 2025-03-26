@@ -160,7 +160,7 @@ public class StructAttr23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <true> is not a number",logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <true> is not a number in attribute attrB2[0]/attrA",logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Kardinalitaet bei BAG OF

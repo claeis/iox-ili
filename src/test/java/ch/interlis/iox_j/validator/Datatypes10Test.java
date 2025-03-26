@@ -1028,7 +1028,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <test> is not a number", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <test> is not a number in attribute bereich", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn die Zahleneingabe groesser ist, als erlaubt.
@@ -1259,7 +1259,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <abc> is not a number", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <abc> is not a number in attribute laenge", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn die Eingabe nicht Numerisch ist. Test mit Koordinaten.
@@ -1280,7 +1280,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2.0 5.2> is not a number", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <2.0 5.2> is not a number in attribute laenge", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Gibt einen Fehler aus, wenn die Flaechendefinition zu gross ist.
@@ -1343,7 +1343,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <abc> is not a number", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <abc> is not a number in attribute flaeche", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn die Flaeche nicht numerisch, sondern aus koordinaten besteht aus.
@@ -1364,7 +1364,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <2.0 5.2> is not a number", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <2.0 5.2> is not a number in attribute flaeche", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn der Radian groesser ist, als die Definition des Maximums.
@@ -1511,7 +1511,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <abc> is not a number", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <abc> is not a number in attribute radians", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn der Radian keine Nummer ist. Test2
@@ -1532,7 +1532,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <1.5 5.2> is not a number", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <1.5 5.2> is not a number in attribute radians", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn Grads nicht valid ist.
@@ -1553,7 +1553,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <1.5 5.2> is not a number", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <1.5 5.2> is not a number in attribute grads", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Gibt einen Fehler aus, wenn degrees nicht valid ist.
@@ -1574,7 +1574,7 @@ public class Datatypes10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <1.5 5.2> is not a number", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <1.5 5.2> is not a number in attribute degrees", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// Gibt einen Fehler aus, wenn das Datum des Jahres zu klein ist.

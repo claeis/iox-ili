@@ -267,7 +267,7 @@ public class Association23Test {
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(1,logger.getErrs().size());
-        assertEquals("value <test1> is not a number", logger.getErrs().get(0).getEventMsg());
+        assertEquals("value <test1> is not a number in attribute a1Attr/attrAssoc", logger.getErrs().get(0).getEventMsg());
     }
     @Test
     public void embeddedAssoExtended_Ok(){

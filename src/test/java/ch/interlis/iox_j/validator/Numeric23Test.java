@@ -211,7 +211,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <a> is not a number", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <a> is not a number in attribute numericInt", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird eine Fehlermeldung erwartet, da der eingegebene Wert nicht dem Format entspricht.
@@ -231,7 +231,7 @@ public class Numeric23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <a> is not a number", logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <a> is not a number in attribute numericDec", logger.getErrs().get(0).getEventMsg());
 	}
 
 	// prueft, ob 0.0(6) erfolgreich auf 0.1 aufrundet
