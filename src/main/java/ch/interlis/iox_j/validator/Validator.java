@@ -1218,7 +1218,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 /*
                  * Ist eine Konsistenzbedingung (MANDATORY CONSTRAINT) nicht berechenbar 
                  * (weil z.B. ein Attribut beteiligt ist, dessen Wert undefiniert ist, 
-                 * oder der Divisor 0 betraegt) so gilt die Konsistenzbedingung für das 
+                 * oder der Divisor 0 betraegt) so gilt die Konsistenzbedingung fuer das 
                  * aktuelle Objekt als erfuellt. 
                  */
 				plausibilityConstraints.put(constraint, new PlausibilityPoolValue(1.0, 1.0));
