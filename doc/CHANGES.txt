@@ -9,6 +9,7 @@ iox-ili 1.23.5 (2025-03-xx)
 - Validator: fix object path evaluation with mixed case INTERLIS.UUIDOID (ilivalidator#416)
 - Validator: Missing index in error log for list/bag of simple types (ilivalidator#440)
 - Validator: use Iom_jObject constants
+- Validator: IllegalArgumentException with plausibility constraint (ilivalidator##441)
 
 iox-ili 1.23.4 (2025-01-13)
 -----------------------------

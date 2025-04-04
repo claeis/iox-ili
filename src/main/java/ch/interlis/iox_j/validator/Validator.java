@@ -1205,19 +1205,25 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			PlausibilityPoolValue poolConstraintValues = plausibilityConstraints.get(constraint);
 			double successfulResults = poolConstraintValues.getSuccessfulResults();
 			double totalSumOfConstraints = poolConstraintValues.getTotalSumOfConstraints();
-			if (conditionValue.isTrue()){
+            if (conditionValue.skipEvaluation() || conditionValue.isTrue()){
 				plausibilityConstraints.remove(constraint);
 				plausibilityConstraints.put(constraint, new PlausibilityPoolValue(successfulResults+1.0, totalSumOfConstraints+1.0));
 			} else {
-				// error, undefined, false
+				// false
 				plausibilityConstraints.remove(constraint);
 				plausibilityConstraints.put(constraint, new PlausibilityPoolValue(successfulResults, totalSumOfConstraints+1.0));
 			}
 		} else {
-			if (conditionValue.isTrue()){
+            if (conditionValue.skipEvaluation() || conditionValue.isTrue()){
+                /*
+                 * Ist eine Konsistenzbedingung (MANDATORY CONSTRAINT) nicht berechenbar 
+                 * (weil z.B. ein Attribut beteiligt ist, dessen Wert undefiniert ist, 
+                 * oder der Divisor 0 betraegt) so gilt die Konsistenzbedingung für das 
+                 * aktuelle Objekt als erfuellt. 
+                 */
 				plausibilityConstraints.put(constraint, new PlausibilityPoolValue(1.0, 1.0));
 			} else {
-				// error, undefined, false
+			    // false
 				plausibilityConstraints.put(constraint, new PlausibilityPoolValue(0.0, 1.0));
 			}
 		}
