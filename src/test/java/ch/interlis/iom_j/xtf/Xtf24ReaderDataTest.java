@@ -1250,17 +1250,34 @@ public class Xtf24ReaderDataTest {
 		assertTrue(reader.read() instanceof  StartTransferEvent);
 		assertTrue(reader.read() instanceof  StartBasketEvent);
 
-		IoxEvent objectEventReferenceTarget = reader.read();
-		assertTrue(objectEventReferenceTarget instanceof ObjectEvent);
-		assertEquals("oid_target", ((ObjectEvent) objectEventReferenceTarget).getIomObject().getobjectoid());
+		{
+	        IoxEvent objectEventReferenceTarget = reader.read();
+	        assertTrue(objectEventReferenceTarget instanceof ObjectEvent);
+	        assertEquals("oid_target1", ((ObjectEvent) objectEventReferenceTarget).getIomObject().getobjectoid());
+		    
+		}
+        {
+            IoxEvent objectEventReferenceTarget = reader.read();
+            assertTrue(objectEventReferenceTarget instanceof ObjectEvent);
+            assertEquals("oid_target2", ((ObjectEvent) objectEventReferenceTarget).getIomObject().getobjectoid());
+            
+        }
 
 		IoxEvent objectEventReference = reader.read();
 		assertTrue(objectEventReference instanceof ObjectEvent);
 		IomObject referenceObject = ((ObjectEvent) objectEventReference).getIomObject();
 		assertEquals("oidM1", referenceObject.getobjectoid());
-		IomObject refAttrM = referenceObject.getattrobj("refAttrM", 0);
-		assertNotNull(refAttrM);
-		assertEquals("oid_target", refAttrM.getobjectrefoid());
+        assertEquals(2, referenceObject.getattrvaluecount("refAttrM"));
+		{
+	        IomObject refAttrM = referenceObject.getattrobj("refAttrM", 0);
+	        assertNotNull(refAttrM);
+	        assertEquals("oid_target1", refAttrM.getobjectrefoid());
+		}
+        {
+            IomObject refAttrM = referenceObject.getattrobj("refAttrM", 1);
+            assertNotNull(refAttrM);
+            assertEquals("oid_target2", refAttrM.getobjectrefoid());
+        }
 
 		assertTrue(reader.read() instanceof  EndBasketEvent);
 		assertTrue(reader.read() instanceof  EndTransferEvent);

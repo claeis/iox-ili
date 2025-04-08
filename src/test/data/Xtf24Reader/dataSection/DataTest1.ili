@@ -145,7 +145,7 @@ MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 		END ClassM_ReferenceTarget;
 
 		CLASS ClassM_Reference =
-			refAttrM : REFERENCE TO ClassM_ReferenceTarget;
+			refAttrM : LIST {0..*} OF REFERENCE TO ClassM_ReferenceTarget;
 		END ClassM_Reference;
 
 	END TopicA;

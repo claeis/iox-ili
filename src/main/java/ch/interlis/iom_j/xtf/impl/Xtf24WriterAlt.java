@@ -345,7 +345,19 @@ import java.util.Map;
 									xout.writeEndElement(/*attr*/);
 									if (valueCount > 1)
 									{
-										throw new IoxException("max one reference value allowed ("+iliAttrName+")");
+									    if(child.getattrcount() > 0) {
+	                                        throw new IoxException("max one reference value allowed ("+iliAttrName+")");
+									    }else {
+									        // BAG/LIST OF ReferenceType
+					                        for (int i = 1; i < obj.getattrvaluecount(iliAttrName); i++) {
+					                            child=obj.getattrobj(iliAttrName,i);
+				                                aref = child.getobjectrefoid();
+			                                    xout.writeStartElement(xmlns_attr,iliAttrName);
+			                                    xout.writeAttribute(iliNs,XSD24Generator.REF_ATTR, makeOid(aref));
+			                                    xout.writeEndElement(/*attr*/);
+					                        }
+									        
+									    }
 									}
 								}
 								else

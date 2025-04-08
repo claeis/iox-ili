@@ -2,6 +2,16 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.23.5 (2025-04-08)
+-----------------------------
+- Xtf24Reader: fix reading of BAG/LIST OF Reference
+- Xtf24Writer: fix writing of BAG/LIST OF Reference
+- Validator: fix object path evaluation with mixed case INTERLIS.UUIDOID (ilivalidator#416)
+- Validator: Missing index in error log for list/bag of simple types (ilivalidator#440)
+- Validator: use Iom_jObject constants
+- Validator: IllegalArgumentException with plausibility constraint (ilivalidator#441)
+- Validator: wrong object reported in set constraint error (ilivalidator#438)
+
 iox-ili 1.23.4 (2025-01-13)
 -----------------------------
 - Xtf23Reader: fix xml whitespace/comment reading in headersection (ili2c#136)

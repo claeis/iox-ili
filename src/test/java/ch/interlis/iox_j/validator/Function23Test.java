@@ -57,6 +57,8 @@ public class Function23Test {
 	private final static String ILI_CLASST=ILI_TOPIC+".ClassT";
 	private final static String ILI_CLASSSA=ILI_TOPIC+".ClassSA";
 	private final static String ILI_CLASSTA=ILI_TOPIC+".ClassTA";
+    private final static String ILI_CLASSSB=ILI_TOPIC+".ClassSB";
+    private final static String ILI_CLASSTB=ILI_TOPIC+".ClassTB";
 	private final static String ILI_CLASSU=ILI_TOPIC+".ClassU";
 	private final static String ILI_CLASSUA=ILI_TOPIC+".ClassUA";
 	private final static String ILI_CLASSV=ILI_TOPIC+".ClassV";
@@ -91,6 +93,8 @@ public class Function23Test {
 	private final static String ILI_ASSOC_ST1_T1="t1";
 	private final static String ILI_ASSOC_SATA1_S2="s2";
 	private final static String ILI_ASSOC_SATA1_T2="t2";
+    private final static String ILI_ASSOC_ST3_S3="s3";
+    private final static String ILI_ASSOC_ST3_T3="t3";
 	// ASSOCIATION CLASS
 	private final static String ILI_ASSOC_QR1=ILI_TOPIC+".QR1";
 	private final static String ILI_ASSOC_ST1=ILI_TOPIC+".ST1";
@@ -678,9 +682,9 @@ public class Function23Test {
 
 	//Es wird getestet, ob keine Fehlermeldung ausgegeben wird, wenn bei der Funktion objectCount(Role) die Anzahl der Objekte, welche von SA zu TA via Role referenzieren, 1 ist.
 	@Test
-	public void objectCount_1Object_Ok() {
-		Iom_jObject iomObjS1 = new Iom_jObject(ILI_CLASSSA, OBJ_OID1);
-		Iom_jObject iomObjT1 = new Iom_jObject(ILI_CLASSTA, OBJ_OID2);
+	public void objectCount_1toN_ref_Ok() {
+		Iom_jObject iomObjS1 = new Iom_jObject(ILI_CLASSSA, "f4afa88e-0f2e-467c-98d7-d5aba6f61d5e");
+		Iom_jObject iomObjT1 = new Iom_jObject(ILI_CLASSTA, "f85940f1-93bf-4a7b-ac66-ac6fcad22c58");
 		iomObjS1.addattrobj(ILI_ASSOC_SATA1_T2, "REF").setobjectrefoid(iomObjT1.getobjectoid());
 
 		ValidationConfig modelConfig=new ValidationConfig();
@@ -697,18 +701,158 @@ public class Function23Test {
 
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    public void objectCount_1toN_ref_0Object_Fail() {
+        Iom_jObject iomObjS1 = new Iom_jObject(ILI_CLASSSA, "f4afa88e-0f2e-467c-98d7-d5aba6f61d5e");
+        Iom_jObject iomObjT1 = new Iom_jObject(ILI_CLASSTA, "f85940f1-93bf-4a7b-ac66-ac6fcad22c58");
+
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObjS1));
+        validator.validate(new ObjectEvent(iomObjT1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Mandatory Constraint Function23.Topic.ClassSA.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+    }
+    @Test
+    public void objectCount_1toN_ref_lowerCaseTID_UUID_Ok() {
+        Iom_jObject iomObjS1 = new Iom_jObject(ILI_CLASSSA, "f4afa88e-0f2e-467c-98d7-d5aba6f61d5e");
+        Iom_jObject iomObjT1 = new Iom_jObject(ILI_CLASSTA, "f85940f1-93bf-4a7b-ac66-ac6fcad22c58");
+        iomObjS1.addattrobj(ILI_ASSOC_SATA1_T2, "REF").setobjectrefoid(iomObjT1.getobjectoid().toUpperCase());
+
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObjS1));
+        validator.validate(new ObjectEvent(iomObjT1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+
+        assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
+    public void objectCount_1toN_ref_upperCaseTID_UUID_Ok() {
+        Iom_jObject iomObjS1 = new Iom_jObject(ILI_CLASSSA, "F4AFA88E-0F2E-467C-98D7-D5ABA6F61D5E");
+        Iom_jObject iomObjT1 = new Iom_jObject(ILI_CLASSTA, "F85940F1-93BF-4A7B-AC66-AC6FCAD22C58");
+        iomObjS1.addattrobj(ILI_ASSOC_SATA1_T2, "REF").setobjectrefoid(iomObjT1.getobjectoid().toLowerCase());
+
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObjS1));
+        validator.validate(new ObjectEvent(iomObjT1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+
+        assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
+    public void objectCount_1toN_oppend_Ok() {
+        Iom_jObject iomObjS1 = new Iom_jObject(ILI_CLASSSB, "f4afa88e-0f2e-467c-98d7-d5aba6f61d5e");
+        Iom_jObject iomObjT1 = new Iom_jObject(ILI_CLASSTB, "f85940f1-93bf-4a7b-ac66-ac6fcad22c58");
+        iomObjS1.addattrobj(ILI_ASSOC_ST3_T3, "REF").setobjectrefoid(iomObjT1.getobjectoid());
+
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObjS1));
+        validator.validate(new ObjectEvent(iomObjT1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+
+        assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
+    public void objectCount_1toN_oppend_lowerCaseTID_UUID_Ok() {
+        Iom_jObject iomObjS1 = new Iom_jObject(ILI_CLASSSB, "f4afa88e-0f2e-467c-98d7-d5aba6f61d5e");
+        Iom_jObject iomObjT1 = new Iom_jObject(ILI_CLASSTB, "f85940f1-93bf-4a7b-ac66-ac6fcad22c58");
+        iomObjS1.addattrobj(ILI_ASSOC_ST3_T3, "REF").setobjectrefoid(iomObjT1.getobjectoid().toUpperCase());
+
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObjS1));
+        validator.validate(new ObjectEvent(iomObjT1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+
+        assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
+    public void objectCount_1toN_oppend_upperCaseTID_UUID_Ok() {
+        Iom_jObject iomObjS1 = new Iom_jObject(ILI_CLASSSB, "F4AFA88E-0F2E-467C-98D7-D5ABA6F61D5E");
+        Iom_jObject iomObjT1 = new Iom_jObject(ILI_CLASSTB, "F85940F1-93BF-4A7B-AC66-AC6FCAD22C58");
+        iomObjS1.addattrobj(ILI_ASSOC_ST3_T3, "REF").setobjectrefoid(iomObjT1.getobjectoid().toLowerCase());
+
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObjS1));
+        validator.validate(new ObjectEvent(iomObjT1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+
+        assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
+    public void objectCount_1toN_oppend_0Object_Fail() {
+        Iom_jObject iomObjS1 = new Iom_jObject(ILI_CLASSSB, "f4afa88e-0f2e-467c-98d7-d5aba6f61d5e");
+        Iom_jObject iomObjT1 = new Iom_jObject(ILI_CLASSTB, "f85940f1-93bf-4a7b-ac66-ac6fcad22c58");
+
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObjS1));
+        validator.validate(new ObjectEvent(iomObjT1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Mandatory Constraint Function23.Topic.ClassTB.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+    }
 
 	// Es wird getestet ob keine Fehlermeldung ausgegeben wird, wenn bei der Funktion: objectCount(Role) die Anzahl der Objekte welche von S zu T via Role referenzieren, 2 ist.
 	@Test
-	public void objectCount_2Object_Ok(){
+	public void objectCount_NtoN_Ok(){
 		// erstes S->T
-		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
-		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, OBJ_OID3);
+		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, "f4afa88e-0f2e-467c-98d7-d5aba6f61d5e");
+		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, "f85940f1-93bf-4a7b-ac66-ac6fcad22c58");
 		Iom_jObject iomObjST1=new Iom_jObject(ILI_ASSOC_ST1, null);
 		iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(iomObjS1.getobjectoid());
 		iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(iomObjT1.getobjectoid());
 		// zweites S->T
-		Iom_jObject iomObjT2=new Iom_jObject(ILI_CLASST, OBJ_OID4);
+		Iom_jObject iomObjT2=new Iom_jObject(ILI_CLASST, "55778f13-6d93-4a53-9f85-526865bf59a4");
 		Iom_jObject iomObjST2=new Iom_jObject(ILI_ASSOC_ST1, null);
 		iomObjST2.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(iomObjS1.getobjectoid());
 		iomObjST2.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(iomObjT2.getobjectoid());
@@ -729,6 +873,66 @@ public class Function23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    public void objectCount_NtoN_lowerCaseTID_UUID_Ok(){
+        // erstes S->T
+        Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, "f4afa88e-0f2e-467c-98d7-d5aba6f61d5e");
+        Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, "f85940f1-93bf-4a7b-ac66-ac6fcad22c58");
+        Iom_jObject iomObjST1=new Iom_jObject(ILI_ASSOC_ST1, null);
+        iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(iomObjS1.getobjectoid());
+        iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(iomObjT1.getobjectoid().toUpperCase());
+        // zweites S->T
+        Iom_jObject iomObjT2=new Iom_jObject(ILI_CLASST, "55778f13-6d93-4a53-9f85-526865bf59a4");
+        Iom_jObject iomObjST2=new Iom_jObject(ILI_ASSOC_ST1, null);
+        iomObjST2.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(iomObjS1.getobjectoid());
+        iomObjST2.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(iomObjT2.getobjectoid().toUpperCase());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObjS1));
+        validator.validate(new ObjectEvent(iomObjT1));
+        validator.validate(new ObjectEvent(iomObjT2));
+        validator.validate(new ObjectEvent(iomObjST1));
+        validator.validate(new ObjectEvent(iomObjST2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
+    @Test
+    public void objectCount_NtoN_upperCaseTID_UUID_Ok(){
+        // erstes S->T
+        Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, "F4AFA88E-0F2E-467C-98D7-D5ABA6F61D5E");
+        Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, "F85940F1-93BF-4A7B-AC66-AC6FCAD22C58");
+        Iom_jObject iomObjST1=new Iom_jObject(ILI_ASSOC_ST1, null);
+        iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(iomObjS1.getobjectoid());
+        iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(iomObjT1.getobjectoid().toLowerCase());
+        // zweites S->T
+        Iom_jObject iomObjT2=new Iom_jObject(ILI_CLASST, "55778F13-6D93-4A53-9F85-526865BF59A4");
+        Iom_jObject iomObjST2=new Iom_jObject(ILI_ASSOC_ST1, null);
+        iomObjST2.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(iomObjS1.getobjectoid());
+        iomObjST2.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(iomObjT2.getobjectoid().toLowerCase());
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObjS1));
+        validator.validate(new ObjectEvent(iomObjT1));
+        validator.validate(new ObjectEvent(iomObjT2));
+        validator.validate(new ObjectEvent(iomObjST1));
+        validator.validate(new ObjectEvent(iomObjST2));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==0);
+    }
 	
 	// Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: areArea die richtige Anzahl der Areas von der Geometrie: AREA stammt.
 	// 2 objects. Objects with Class implementation
@@ -1285,10 +1489,10 @@ public class Function23Test {
 	
     // Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: objectCount(Role) die Anzahl der Objekte welche von S zu T via Role referenzieren 1!=2 ist.
 	@Test
-	public void objectCount_1Object_Fail(){
+	public void objectCount_NtoN_1Object_Fail(){
 		// erstes S->T
-		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
-		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, OBJ_OID3);
+		Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, "f4afa88e-0f2e-467c-98d7-d5aba6f61d5e");
+		Iom_jObject iomObjT1=new Iom_jObject(ILI_CLASST, "f85940f1-93bf-4a7b-ac66-ac6fcad22c58");
 		Iom_jObject iomObjST1=new Iom_jObject(ILI_ASSOC_ST1, null);
 		iomObjST1.addattrobj(ILI_ASSOC_ST1_S1, "REF").setobjectrefoid(iomObjS1.getobjectoid());
 		iomObjST1.addattrobj(ILI_ASSOC_ST1_T1, "REF").setobjectrefoid(iomObjT1.getobjectoid());
@@ -1310,9 +1514,9 @@ public class Function23Test {
 	}
     // Es wird getestet ob eine Fehlermeldung ausgegeben wird, wenn bei der Funktion: objectCount(Role) die Anzahl der Objekte welche von S zu T via Role referenzieren 1!=2 ist.
     @Test
-    public void objectCount_0Object_Fail(){
+    public void objectCount_NtoN_0Object_Fail(){
         // erstes S->T
-        Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, OBJ_OID1);
+        Iom_jObject iomObjS1=new Iom_jObject(ILI_CLASSS, "f4afa88e-0f2e-467c-98d7-d5aba6f61d5e");
         ValidationConfig modelConfig=new ValidationConfig();
         LogCollector logger=new LogCollector();
         LogEventFactory errFactory=new LogEventFactory();

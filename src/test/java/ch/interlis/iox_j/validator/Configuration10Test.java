@@ -184,7 +184,7 @@ public class Configuration10Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("value <1.5 5.2> is not a number", logger.getWarn().get(0).getEventMsg());
+		assertEquals("value <1.5 5.2> is not a number in attribute attr1", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Wenn Type validierung auf OFF steht, aber nur Multplicity auf OFF stehen darf, werden trotzdem Typfehler ausgegeben.
@@ -207,7 +207,7 @@ public class Configuration10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("value <1.5 5.2> is not a number",logger.getErrs().get(0).getEventMsg());
+		assertEquals("value <1.5 5.2> is not a number in attribute attr1",logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob der eigens erstellte Fehler ausgegeben wird, wenn beide Values von einem Unique Attribute identisch sind und validationConfig msg nicht leer ist.

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" xmlns:geom="http://www.interlis.ch/geometry/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:DataTest1="http://www.interlis.ch/xtf/2.4/DataTest1">
+<ili:headersection><ili:models><ili:model>DataTest1</ili:model></ili:models><ili:sender>IOX</ili:sender></ili:headersection>
+<ili:datasection>
+<DataTest1:TopicA ili:bid="bidA">
+<DataTest1:ClassM_ReferenceTarget ili:tid="oid_target1"><DataTest1:attrM1>text</DataTest1:attrM1></DataTest1:ClassM_ReferenceTarget>
+<DataTest1:ClassM_ReferenceTarget ili:tid="oid_target2"><DataTest1:attrM1>text</DataTest1:attrM1></DataTest1:ClassM_ReferenceTarget>
+<DataTest1:ClassM_Reference ili:tid="oidM1"><DataTest1:refAttrM ili:ref="oid_target1"></DataTest1:refAttrM><DataTest1:refAttrM ili:ref="oid_target2"></DataTest1:refAttrM></DataTest1:ClassM_Reference>
+</DataTest1:TopicA>
+</ili:datasection>
+</ili:transfer>

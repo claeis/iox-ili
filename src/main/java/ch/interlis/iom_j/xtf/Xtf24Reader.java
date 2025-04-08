@@ -1230,11 +1230,10 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
             IomObject aObject=null;
 	        if (event != null && event.isStartElement()) {
 	            element = (StartElement) event;
-                iomObj.addattrobj(prop.getName(), readObject(event));
-                aObject=iomObj.getattrobj(prop.getName(), 0);
+	            aObject=readObject(event);
+                iomObj.addattrobj(prop.getName(), aObject);
 	        } else {
-                iomObj.addattrobj(prop.getName(),Iom_jObject.REF);
-                aObject=iomObj.getattrobj(prop.getName(), 0);
+                aObject=iomObj.addattrobj(prop.getName(),Iom_jObject.REF);
 	        }
 	        if(aObject!=null) {
 	            aObject.setobjectrefoid(refOid);
