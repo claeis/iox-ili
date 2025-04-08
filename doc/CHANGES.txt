@@ -2,6 +2,9 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.24.0 (2025-04-xx)
+-----------------------------
+
 iox-ili 1.23.5 (2025-04-08)
 -----------------------------
 - Xtf24Reader: fix reading of BAG/LIST OF Reference
