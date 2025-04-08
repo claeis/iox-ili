@@ -1230,6 +1230,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
 	private void validatePlausibilityConstraints(){
+        setCurrentMainObj(null);
 		if(!ValidationConfig.OFF.equals(constraintValidation)){
 			for (Entry<PlausibilityConstraint, PlausibilityPoolValue> constraintEntry : plausibilityConstraints.entrySet()){
 				PlausibilityConstraint constraint = constraintEntry.getKey();
@@ -1439,6 +1440,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     }
 	
 	private void validateSetConstraint(SetConstraint setConstraint) {
+	    setCurrentMainObj(null);
 		if(!ValidationConfig.OFF.equals(constraintValidation)){
 			Collection<String> objs=setConstraints.get(setConstraint);
 			String constraintName = getScopedName(setConstraint);

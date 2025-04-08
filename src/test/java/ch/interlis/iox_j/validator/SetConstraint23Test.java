@@ -12,6 +12,7 @@ import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iox.IoxLogEvent;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
@@ -46,6 +47,7 @@ public class SetConstraint23Test {
 		
     private final static String TOPICC="SetConstraint23.TopicC";
     private static final String TOPICC_CLASS1=TOPICC+".Class1";
+    private static final String TOPICC_CLASS2=TOPICC+".Class2";
     
 	@Before
 	public void setUp() throws Exception {
@@ -139,6 +141,7 @@ public class SetConstraint23Test {
     }
     @Test
     public void objectCount_Fail(){
+        Iom_jObject iomObj1=new Iom_jObject(TOPICC_CLASS2, OID1);
         ValidationConfig modelConfig=new ValidationConfig();
         LogCollector logger=new LogCollector();
         LogEventFactory errFactory=new LogEventFactory();
@@ -146,10 +149,14 @@ public class SetConstraint23Test {
         Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
         validator.validate(new StartTransferEvent());
         validator.validate(new StartBasketEvent(TOPICC,BID1));
+        validator.validate(new ObjectEvent(iomObj1));
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         assertEquals(1,logger.getErrs().size());
-        assertEquals("Set Constraint SetConstraint23.TopicC.Class1.Constraint1 is not true.", logger.getErrs().get(0).getEventMsg());
+        final IoxLogEvent err = logger.getErrs().get(0);
+        assertEquals("Set Constraint SetConstraint23.TopicC.Class1.Constraint1 is not true.", err.getEventMsg());
+        assertNull(err.getSourceObjectXtfId());
+        assertNull(err.getSourceObjectTag());
     }
     
 	@Test
