@@ -475,7 +475,19 @@ public class Iox2wkbTest {
         Wkb2iox test=new Wkb2iox();
         assertEquals("MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2645116.0, C2 1247903.0}, COORD {C1 2650896.0, C2 1245677.0}, COORD {C1 2650921.0, C2 1247915.0}, COORD {C1 2650921.0, C2 1250572.0}, COORD {C1 2645116.0, C2 1247903.0}]}}}, BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2650921.0, C2 1247915.0}, ARC {A1 2649853.0, A2 1247123.0, C1 2648651.0, C2 1247238.0}, COORD {C1 2648618.0, C2 1248913.0}, ARC {A1 2649677.0, A2 1248889.0, C1 2650921.0, C2 1247915.0}]}}}]}}",test.read(wkb).toString());
         String wkbText=Iox2wkb.bytesToHex(wkb);
-        assertEquals("000000000A0000000200000000090000000200000000020000000341442E3E0000000041330A9F000000004144398800000000413301ED00000000414439948000000041330AAB00000000000000000200000003414439948000000041330AAB0000000041443994800000004133150C0000000041442E3E0000000041330A9F00000000000000000900000003000000000800000003414439948000000041330AAB000000004144377E8000000041330793000000004144352580000000413308060000000000000000020000000241443525800000004133080600000000414435150000000041330E9100000000000000000800000003414435150000000041330E9100000000414437268000000041330E7900000000414439948000000041330AAB00000000",wkbText);
+        assertEquals("000000000A0000000200000000090000000100000000020000000541442E3E0000000041330A9F000000004144398800000000413301ED00000000414439948000000041330AAB0000000041443994800000004133150C0000000041442E3E0000000041330A9F00000000000000000900000003000000000800000003414439948000000041330AAB000000004144377E8000000041330793000000004144352580000000413308060000000000000000020000000241443525800000004133080600000000414435150000000041330E9100000000000000000800000003414435150000000041330E9100000000414437268000000041330E7900000000414439948000000041330AAB00000000",wkbText);
+    }
+    @Test
+    public void surfaceReapirTouchingRingWithArcs() throws Exception {
+        IomObject multiSurface=getBananaPolygonWithArcs();
+        Iox2wkb convWkb=new Iox2wkb(2, java.nio.ByteOrder.BIG_ENDIAN, false);
+        byte wkb[]=convWkb.surface2wkb(multiSurface, true, 0.0, true);
+        // verify
+
+        Wkb2iox test=new Wkb2iox();
+        assertEquals("MULTISURFACE {surface SURFACE {boundary [BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2755031.988, C2 1245955.668}, ARC {A1 2755031.058, A2 1245955.258, C1 2755030.142, C2 1245954.817}, COORD {C1 2755020.0, C2 1245926.0}, COORD {C1 2755053.689, C2 1245956.226}, ARC {A1 2755042.786, A2 1245957.99, C1 2755031.988, C2 1245955.668}]}}}, BOUNDARY {polyline POLYLINE {sequence SEGMENTS {segment [COORD {C1 2755025.29, C2 1245931.463}, ARC {A1 2755026.933, A2 1245944.037, C1 2755031.988, C2 1245955.668}, COORD {C1 2755036.86, C2 1245951.575}, COORD {C1 2755025.29, C2 1245931.463}]}}}]}}",test.read(wkb).toString());
+        String wkbText=Iox2wkb.bytesToHex(wkb);
+        assertEquals("000000000A00000002000000000900000003000000000800000003414504EBFE76C8B441330303AB020C4A414504EB876C8B4441330303420C49BA414504EB122D0E5641330302D126E979000000000200000003414504EB122D0E5641330302D126E979414504E600000000413302E600000000414504F6D83126E94133030439DB22D1000000000800000003414504F6D83126E94133030439DB22D1414504F1649BA5E341330305FD70A3D7414504EBFE76C8B441330303AB020C4A000000000900000002000000000800000003414504E8A51EB852413302EB76872B02414504E9776C8B44413302F80978D4FE414504EBFE76C8B441330303AB020C4A000000000200000003414504EBFE76C8B441330303AB020C4A414504EE6E147AE1413302FF93333333414504E8A51EB852413302EB76872B02",wkbText);
     }
     
     @Test
@@ -648,50 +660,74 @@ public class Iox2wkbTest {
     }
 
     private IomObject getBananaPolygonWithInnerArcs() {
-        IomObject multiSurface=new Iom_jObject("MULTISURFACE", null);
-        IomObject surfaceValue = multiSurface.addattrobj("surface", "SURFACE");
+        IomObject multiSurface=new Iom_jObject(Iom_jObject.MULTISURFACE, null);
+        IomObject surfaceValue = multiSurface.addattrobj(Iom_jObject.MULTISURFACE_SURFACE, Iom_jObject.SURFACE);
         // outer boundary
-        IomObject outerBoundary = surfaceValue.addattrobj("boundary", "BOUNDARY");
-        IomObject polylineValue = outerBoundary.addattrobj("polyline", "POLYLINE");
+        IomObject outerBoundary = surfaceValue.addattrobj(Iom_jObject.SURFACE_BOUNDARY, Iom_jObject.BOUNDARY);
+        IomObject polylineValue = outerBoundary.addattrobj(Iom_jObject.BOUNDARY_POLYLINE, Iom_jObject.POLYLINE);
 
-        IomObject segments=polylineValue.addattrobj("sequence", "SEGMENTS");
-        IomObject c1=segments.addattrobj("segment", "COORD");
-        IomObject c2=segments.addattrobj("segment", "COORD");
-        IomObject c3=segments.addattrobj("segment", "COORD");
-        IomObject a1=segments.addattrobj("segment", "ARC");
-        IomObject c4=segments.addattrobj("segment", "COORD");
-        IomObject a2=segments.addattrobj("segment", "ARC");
-        IomObject c5=segments.addattrobj("segment", "COORD");
-        IomObject c6=segments.addattrobj("segment", "COORD");
-
-        c1.setattrvalue("C1", "2645116.000");
-        c1.setattrvalue("C2", "1247903.000");
-
-        c2.setattrvalue("C1", "2650896.000");
-        c2.setattrvalue("C2", "1245677.000");
-
-        c3.setattrvalue("C1", "2650921.000");
-        c3.setattrvalue("C2", "1247915.000");
-
-        a1.setattrvalue("C1", "2648651.000");
-        a1.setattrvalue("C2", "1247238.000");
-        a1.setattrvalue("A1", "2649853.000");
-        a1.setattrvalue("A2", "1247123.000");
-
-        c4.setattrvalue("C1", "2648618.000");
-        c4.setattrvalue("C2", "1248913.000");
-
-        a2.setattrvalue("C1", "2650921.000");
-        a2.setattrvalue("C2", "1247915.000");
-        a2.setattrvalue("A1", "2649677.000");
-        a2.setattrvalue("A2", "1248889.000");
-
-        c5.setattrvalue("C1", "2650921.000");
-        c5.setattrvalue("C2", "1250572.000");
-
-        c6.setattrvalue("C1", "2645116.000");
-        c6.setattrvalue("C2", "1247903.000");
-
+        IomObject segments=polylineValue.addattrobj(Iom_jObject.POLYLINE_SEQUENCE, Iom_jObject.SEGMENTS);
+        addCoord(segments,"2645116.000","1247903.000");
+        addCoord(segments,"2650896.000","1245677.000");
+        addCoord(segments,"2650921.000","1247915.000");
+        addArc(segments,"2648651.000","1247238.000","2649853.000","1247123.000");
+        addCoord(segments,"2648618.000","1248913.000");
+        addArc(segments,"2650921.000","1247915.000","2649677.000","1248889.000");
+        addCoord(segments,"2650921.000","1250572.000");
+        addCoord(segments,"2645116.000","1247903.000");
         return multiSurface;
+    }
+    private IomObject getBananaPolygonWithArcs() {
+        IomObject multiSurface=new Iom_jObject(Iom_jObject.MULTISURFACE, null);
+        IomObject surfaceValue = multiSurface.addattrobj(Iom_jObject.MULTISURFACE_SURFACE, Iom_jObject.SURFACE);
+        // outer boundary
+        IomObject outerBoundary = surfaceValue.addattrobj(Iom_jObject.SURFACE_BOUNDARY, Iom_jObject.BOUNDARY);
+        IomObject polylineValue = outerBoundary.addattrobj(Iom_jObject.BOUNDARY_POLYLINE, Iom_jObject.POLYLINE);
+
+      IomObject segments=polylineValue.addattrobj(Iom_jObject.POLYLINE_SEQUENCE, Iom_jObject.SEGMENTS);
+      
+      addCoord(segments,"2755025.290","1245931.463"); // startpunkt letztes segmend innerer Rand
+      addArc(segments,"2755031.988","1245955.668", // endpunkt innerer Rand/startpunkt aeusserer Rand
+        "2755026.933", // letzter Bogenzwischenpunkt innerer Rand
+        "1245944.037");
+      
+      
+      addArc(segments,    //  aeusserer Rand
+        "2755030.142",
+        "1245954.817",
+        "2755031.058",
+        "1245955.258");
+      addCoord(segments,
+        "2755020.000",  // tiefe linke ecke
+        "1245926.000");
+      addCoord(segments,
+        "2755053.689",
+        "1245956.226");
+      addArc(segments, // letztes Segment aeusserer Rand
+        "2755031.988", // endpunkt aeusserer Rand/startpunkt innerer Rand
+        "1245955.668",
+        "2755042.786", // Bogenzwischenpunkt aeusserer Rand
+        "1245957.990");
+      
+      addCoord(segments, // innerer Rand -->
+        "2755036.860", // endpunkt erstes Segment innerer Rand
+        "1245951.575");
+      addCoord(segments,
+        "2755025.290", //startpunkt letztes segmend innerer Rand, tiefe linke ecke
+        "1245931.463");
+        
+        return multiSurface;
+    }
+    private void addArc(IomObject segments, String c1, String c2, String a1, String a2) {
+        IomObject obj=segments.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, Iom_jObject.ARC);
+        obj.setattrvalue(Iom_jObject.COORD_C1, c1);
+        obj.setattrvalue(Iom_jObject.COORD_C2, c2);
+        obj.setattrvalue(Iom_jObject.ARC_A1, a1);
+        obj.setattrvalue(Iom_jObject.ARC_A2, a2);
+    }
+    private void addCoord(IomObject segments, String c1, String c2) {
+        IomObject obj=segments.addattrobj(Iom_jObject.SEGMENTS_SEGMENT, Iom_jObject.COORD);
+        obj.setattrvalue(Iom_jObject.COORD_C1, c1);
+        obj.setattrvalue(Iom_jObject.COORD_C2, c2);
     }
 }
