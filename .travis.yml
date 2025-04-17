@@ -16,6 +16,8 @@ after_failure:
   - cat  build/junitreport/TEST-*.txt
 deploy:
   - provider: script
+    edge:
+      branch: v2.0.5-beta
     skip_cleanup: true
     script: ./gradlew -Drepos_pwd=${repos_pwd} -Drepos_usr=jql_jars-INTE upload
     on:
