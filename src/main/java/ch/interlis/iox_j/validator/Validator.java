@@ -21,6 +21,8 @@ import ch.interlis.ili2c.metamodel.DomainConstraint;
 import ch.interlis.ili2c.metamodel.Expression;
 import ch.interlis.ili2c.metamodel.ValueRefThis;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Polygon;
+
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.ehi.basics.types.OutParam;
@@ -117,6 +119,7 @@ import ch.interlis.iom_j.itf.ModelUtilities;
 import ch.interlis.iom_j.itf.impl.ItfAreaPolygon2Linetable;
 import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 import ch.interlis.iom_j.xtf.XtfStartTransferEvent;
@@ -137,6 +140,7 @@ import ch.interlis.iox_j.logging.LogEventFactory;
 import ch.interlis.iox_j.utility.ReaderFactory;
 import ch.interlis.iox_j.validator.functions.DmavtymTopologie;
 import ch.interlis.iox_j.validator.functions.Text;
+import ch.interlis.iox_j.wkb.RingCollector;
 import ch.interlis.iox_j.validator.functions.Math;
 import ch.interlis.iox_j.validator.functions.MinimalRuntimeSystem;
 import ch.interlis.iox_j.validator.functions.Interlis;
@@ -180,6 +184,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private Settings settings=null;
 	private boolean validationOff=false;
 	private boolean singlePass=false;
+    private boolean validateSimpleBoundary=false;
 	private String areaOverlapValidation=null;
 	private String constraintValidation=null;
 	private String defaultGeometryTypeValidation=null;
@@ -279,6 +284,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         disableRounding=ValidationConfig.TRUE.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_ROUNDING));
         if(disableRounding){
             errs.addEvent(errFact.logInfoMsg("disable rounding"));
+        }
+        String validateSimpleBoundaryParam=validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.SIMPLE_BOUNDARY);
+        if(validateSimpleBoundaryParam!=null) {
+            validateSimpleBoundary=ValidationConfig.TRUE.equals(validateSimpleBoundaryParam);
+        }else {
+            validateSimpleBoundary=td.getLastModel().getIliVersion().equals(Model.ILI2_4);
+        }
+        if(validateSimpleBoundary){
+            errs.addEvent(errFact.logInfoMsg("validate simple boundaries"));
         }
         disableAreAreasMessages=ValidationConfig.TRUE.equals(validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DISABLE_AREAREAS_MESSAGES));
         if(disableAreAreasMessages){
@@ -4555,6 +4569,28 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			AbstractCoordType coordType = resolveGenericCoordTypeOfSurface(validateType, attr);
 			if (coordType == null) {
 				return false;
+			}
+			if(validateSimpleBoundary) {
+			    JtsextGeometryFactory fact=new JtsextGeometryFactory();
+		        Polygon polygon=Iox2jtsext.surface2JTS(iomValue,0.0);
+		        {
+	                RingCollector ringCollector=new RingCollector();
+	                ringCollector.addLine(fact.createCompoundCurve(polygon.getExteriorRing()));
+	                List<CompoundCurve> rings=ringCollector.getRings();
+	                if(rings.size()>1) {
+	                    errs.addEvent(errFact.logErrorMsg("not a simple boundary "+rings.get(1).getSegments().get(0).getStartPoint()));
+	                    surfaceTopologyValid=false;
+	                }
+		        }
+		        for(int i=0;surfaceTopologyValid && i<polygon.getNumInteriorRing();i++) {
+                    RingCollector ringCollector=new RingCollector();
+		            ringCollector.addLine(fact.createCompoundCurve(polygon.getInteriorRingN(i)));
+                    List<CompoundCurve> rings=ringCollector.getRings();
+                    if(rings.size()>1) {
+                        errs.addEvent(errFact.logErrorMsg("not a simple boundary "+rings.get(1).getSegments().get(0).getStartPoint()));
+                        surfaceTopologyValid=false;
+                    }
+		        }
 			}
 			surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, errFact, validateType, coordType);
 		} catch (IoxException e) {

@@ -46,22 +46,25 @@ public class Surface23Test {
 
 	private LogCollector validateObjects(IomObject... objects) {
 		ValidationConfig modelConfig = new ValidationConfig();
-		LogCollector logger = new LogCollector();
-		LogEventFactory errFactory = new LogEventFactory();
-		Settings settings = new Settings();
-		//settings.setValue(Validator.CONFIG_DEBUG_XTFOUT,"src/test/data/validator/Surface23Test.xtf");
-
-		Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(ILI_TOPIC, BID));
-		for (IomObject obj : objects) {
-			validator.validate(new ObjectEvent(obj));
-		}
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-
-		return logger;
+		return validateObjects(modelConfig,objects);
 	}
+    private LogCollector validateObjects(ValidationConfig modelConfig,IomObject... objects) {
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        //settings.setValue(Validator.CONFIG_DEBUG_XTFOUT,"src/test/data/validator/Surface23Test.xtf");
+
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC, BID));
+        for (IomObject obj : objects) {
+            validator.validate(new ObjectEvent(obj));
+        }
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+
+        return logger;
+    }
 
 	// prueft, ob eine Surface erstellt werden kann.
 	@Test
@@ -103,6 +106,29 @@ public class Surface23Test {
 		// Asserts
 		assertThat(logger.getErrs(), is(empty()));
 	}
+    @Test
+    public void surfaceSelfCuttingOn1Point_OnePolyline_Ok(){
+        Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
+        objSurfaceSuccess.addattrobj("surface2d", IomObjectHelper.createPolygonFromBoundaries(
+                // outer boundary
+                IomObjectHelper.createMultiplePolylineBoundary(
+                        IomObjectHelper.createCoord("480000.000", "70000.000"),
+                        IomObjectHelper.createCoord("500000.000", "80000.000"),
+                        IomObjectHelper.createCoord("550000.000", "90000.000"),
+                        IomObjectHelper.createCoord("480000.000", "70000.000"),
+                // inner boundary
+                        IomObjectHelper.createCoord("500000.000", "78000.000"),
+                        IomObjectHelper.createCoord("505000.000", "78000.000"),
+                        IomObjectHelper.createCoord("480000.000", "70000.000"))));
+
+        ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.SIMPLE_BOUNDARY,ValidationConfig.TRUE);
+        LogCollector logger = validateObjects(modelConfig,objSurfaceSuccess);
+
+        // Asserts
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "not a simple boundary (480000.0, 70000.0, NaN)");
+    }
 
 	// prueft, ob eine Surface erstellt werden kann, wenn sie 2 Innerboundaries besitzt,
 	// welche sich nicht ueberschneiden.
