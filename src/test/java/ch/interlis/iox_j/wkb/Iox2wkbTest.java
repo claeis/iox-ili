@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
-import net.iharder.Base64;
 
 
 public class Iox2wkbTest {
@@ -60,7 +59,7 @@ public class Iox2wkbTest {
             endSegment3.setattrvalue("C2", "70000.000");
         }
         // convert
-        byte wkb[]=conv.surface2wkb(multiSurface, true, 0.0);
+        byte wkb[]=conv.surface2wkb(multiSurface, true, 0.0,false);
         // verify
         Wkb2iox test=new Wkb2iox();
         IomObject iomObj=test.read(wkb);
@@ -146,7 +145,7 @@ public class Iox2wkbTest {
     public void surfaceZToStandardWkb() throws Exception {
         IomObject multiSurface=getSurfaceZ();
         Iox2wkb convWkb=new Iox2wkb(3,java.nio.ByteOrder.LITTLE_ENDIAN, false);
-        byte wkb[]=convWkb.surface2wkb(multiSurface, true, 0.0);
+        byte wkb[]=convWkb.surface2wkb(multiSurface, true, 0.0,false);
         // verify
         Wkb2iox test=new Wkb2iox();
         IomObject iomObj=test.read(wkb);
@@ -159,7 +158,7 @@ public class Iox2wkbTest {
     public void surfaceZToExtendedWkb() throws Exception {
         IomObject multiSurface=getSurfaceZ();
         Iox2wkb convEwkb=new Iox2wkb(3,java.nio.ByteOrder.LITTLE_ENDIAN, true);
-        byte ewkb[]=convEwkb.surface2wkb(multiSurface, true, 0.0);
+        byte ewkb[]=convEwkb.surface2wkb(multiSurface, true, 0.0,false);
         // verify
         Wkb2iox test=new Wkb2iox();
         IomObject iomObj=test.read(ewkb);
@@ -357,7 +356,7 @@ public class Iox2wkbTest {
     public void multiSurfaceZToStandardWkb() throws Exception{
         IomObject multiSurface=getMultiSurfaceZ();
         Iox2wkb convWkb=new Iox2wkb(3,java.nio.ByteOrder.LITTLE_ENDIAN, false);
-        byte wkb[]=convWkb.multisurface2wkb(multiSurface, false, 0.0);
+        byte wkb[]=convWkb.multisurface2wkb(multiSurface, false, 0.0,false);
         // verify
         Wkb2iox test=new Wkb2iox();
         IomObject iomObj=test.read(wkb);
@@ -370,7 +369,7 @@ public class Iox2wkbTest {
     public void multiSurfaceZToExtendedWkb() throws Exception{
         IomObject multiSurface=getMultiSurfaceZ();
         Iox2wkb convEwkb=new Iox2wkb(3,java.nio.ByteOrder.LITTLE_ENDIAN, true);
-        byte ewkb[]=convEwkb.multisurface2wkb(multiSurface, false, 0.0);
+        byte ewkb[]=convEwkb.multisurface2wkb(multiSurface, false, 0.0,false);
         // verify
         Wkb2iox test=new Wkb2iox();
         IomObject iomObj=test.read(ewkb);
