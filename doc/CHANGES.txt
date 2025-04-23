@@ -5,6 +5,8 @@ ideas/open issues
 iox-ili 1.24.0 (2025-04-xx)
 -----------------------------
 - Iox2wkb: fix boundary recoding (ili2db#564)
+- Validator: validate simple polyline as boundary (ilivalidator#331)
+- Validator: validate if first boundary is shell of polygon (ilivalidator#429)
 
 iox-ili 1.23.5 (2025-04-08)
 -----------------------------

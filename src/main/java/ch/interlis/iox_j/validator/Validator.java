@@ -21,6 +21,7 @@ import ch.interlis.ili2c.metamodel.DomainConstraint;
 import ch.interlis.ili2c.metamodel.Expression;
 import ch.interlis.ili2c.metamodel.ValueRefThis;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Polygon;
 
 import ch.ehi.basics.logging.EhiLogger;
@@ -4570,29 +4571,42 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if (coordType == null) {
 				return false;
 			}
-			if(validateSimpleBoundary) {
-			    JtsextGeometryFactory fact=new JtsextGeometryFactory();
-		        Polygon polygon=Iox2jtsext.surface2JTS(iomValue,0.0);
-		        {
-	                RingCollector ringCollector=new RingCollector();
-	                ringCollector.addLine(fact.createCompoundCurve(polygon.getExteriorRing()));
-	                List<CompoundCurve> rings=ringCollector.getRings();
-	                if(rings.size()>1) {
-	                    errs.addEvent(errFact.logErrorMsg("not a simple boundary "+rings.get(1).getSegments().get(0).getStartPoint()));
-	                    surfaceTopologyValid=false;
-	                }
-		        }
-		        for(int i=0;surfaceTopologyValid && i<polygon.getNumInteriorRing();i++) {
+			surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, errFact, validateType, coordType);
+            Polygon polygon=null;
+            if(surfaceTopologyValid) {
+                polygon=Iox2jtsext.surface2JTS(iomValue,0.0);
+                {
+                    Envelope shell=polygon.getExteriorRing().getEnvelopeInternal();
+                    for(int i=0;surfaceTopologyValid && i<polygon.getNumInteriorRing();i++) {
+                        Envelope hole=polygon.getInteriorRingN(i).getEnvelopeInternal();
+                        if(hole.contains(shell)) {
+                            errs.addEvent(errFact.logErrorMsg("first boundary not shell "+polygon.getExteriorRing().getStartPoint().getCoordinate()));
+                            surfaceTopologyValid=false;
+                        }
+                    }
+                }
+            }
+            if(validateSimpleBoundary && surfaceTopologyValid) {
+                JtsextGeometryFactory fact=new JtsextGeometryFactory();
+                {
                     RingCollector ringCollector=new RingCollector();
-		            ringCollector.addLine(fact.createCompoundCurve(polygon.getInteriorRingN(i)));
+                    ringCollector.addLine(fact.createCompoundCurve(polygon.getExteriorRing()));
                     List<CompoundCurve> rings=ringCollector.getRings();
                     if(rings.size()>1) {
                         errs.addEvent(errFact.logErrorMsg("not a simple boundary "+rings.get(1).getSegments().get(0).getStartPoint()));
                         surfaceTopologyValid=false;
                     }
-		        }
-			}
-			surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, errFact, validateType, coordType);
+                }
+                for(int i=0;surfaceTopologyValid && i<polygon.getNumInteriorRing();i++) {
+                    RingCollector ringCollector=new RingCollector();
+                    ringCollector.addLine(fact.createCompoundCurve(polygon.getInteriorRingN(i)));
+                    List<CompoundCurve> rings=ringCollector.getRings();
+                    if(rings.size()>1) {
+                        errs.addEvent(errFact.logErrorMsg("not a simple boundary "+rings.get(1).getSegments().get(0).getStartPoint()));
+                        surfaceTopologyValid=false;
+                    }
+                }
+            }
 		} catch (IoxException e) {
 			surfaceTopologyValid=false;
 			errs.addEvent(errFact.logErrorMsg(e, rsrc.getString("validateSurfaceTopology.failedToValidatePolygon")));

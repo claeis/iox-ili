@@ -107,7 +107,31 @@ public class Surface23Test {
 		assertThat(logger.getErrs(), is(empty()));
 	}
     @Test
-    public void surfaceSelfCuttingOn1Point_OnePolyline_Ok(){
+    public void surfaceInnerBoundaryBeforeOuterBoundary_Fail(){
+        Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
+        objSurfaceSuccess.addattrobj("surface2d", IomObjectHelper.createPolygonFromBoundaries(
+                // inner boundary
+                IomObjectHelper.createMultiplePolylineBoundary(
+                        IomObjectHelper.createCoord("480000.000", "70000.000"),
+                        IomObjectHelper.createCoord("500000.000", "78000.000"),
+                        IomObjectHelper.createCoord("505000.000", "78000.000"),
+                        IomObjectHelper.createCoord("480000.000", "70000.000")),
+                // outer boundary
+                IomObjectHelper.createMultiplePolylineBoundary(
+                        IomObjectHelper.createCoord("480000.000", "70000.000"),
+                        IomObjectHelper.createCoord("500000.000", "80000.000"),
+                        IomObjectHelper.createCoord("550000.000", "90000.000"),
+                        IomObjectHelper.createCoord("480000.000", "70000.000"))
+                ));
+
+        LogCollector logger = validateObjects(objSurfaceSuccess);
+
+        // Asserts
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "first boundary not shell (480000.0, 70000.0, NaN)");
+    }
+    @Test
+    public void surfaceSelfCuttingOn1Point_OnePolyline_Fail(){
         Iom_jObject objSurfaceSuccess=new Iom_jObject(ILI_CLASSC, OID1);
         objSurfaceSuccess.addattrobj("surface2d", IomObjectHelper.createPolygonFromBoundaries(
                 // outer boundary
