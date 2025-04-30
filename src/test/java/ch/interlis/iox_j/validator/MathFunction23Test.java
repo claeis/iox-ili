@@ -63,6 +63,7 @@ public class MathFunction23Test {
     private final static String CLASSC = TOPIC + ".ClassC";
     private final static String CLASSD = TOPIC + ".ClassD";
     private final static String CLASSE = TOPIC + ".ClassE";
+    private final static String CLASSF = TOPIC + ".ClassF";
     
     // STRUCTURE
     private final static String STRUCTA = TOPIC + ".StructA";
@@ -695,6 +696,23 @@ public class MathFunction23Test {
         validator.validate(new StartTransferEvent());
         validator.validate(new StartBasketEvent(TOPIC, BID1));
         validator.validate(new ObjectEvent(classE));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+
+    @Test
+    public void sum_ZeroObjects() {
+        Iom_jObject classF = new Iom_jObject(CLASSF, OID1);
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID1));
+        validator.validate(new ObjectEvent(classF));
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts

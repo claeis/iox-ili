@@ -701,6 +701,8 @@ public class Math {
                             sum += tmpValue;
                         }
                         return new Value(sum);
+                    } else if (valueOfObjectPath.isUndefined()) {
+                        return new Value(0);
                     }
                 }
             }
