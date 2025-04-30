@@ -718,6 +718,26 @@ public class MathFunction24Test {
         // Asserts
         assertEquals(0, logger.getErrs().size());
     }
+
+    @Test
+    public void sum_OneObject() {
+        Iom_jObject structA1 = new Iom_jObject(STRUCTA, null);
+        structA1.setattrvalue("attrA", "20");
+        Iom_jObject classE = new Iom_jObject(CLASSE, OID1);
+        classE.addattrobj("attre", structA1);
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID1));
+        validator.validate(new ObjectEvent(classE));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
     
     // #############################################################//
     // ######################### FAIL ##############################//
