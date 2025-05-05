@@ -705,8 +705,37 @@ public class Math {
                     }
                 }
             }
-            return new Value(false);                
-        } 
+            return new Value(false);
+        } else if (currentFunction.getName().equals("mod")) {
+            Evaluable[] arguments = functionCallObj.getArguments();
+            if (arguments != null) {
+                Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                if (firstValue.skipEvaluation()) {
+                    return firstValue;
+                }
+                if (firstValue.isUndefined()) {
+                    return Value.createSkipEvaluation();
+                }
+                Value secondValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[1], firstRole);
+                if (secondValue.skipEvaluation()) {
+                    return secondValue;
+                }
+                if (secondValue.isUndefined()) {
+                    return Value.createSkipEvaluation();
+                }
+
+                if (firstValue.getValue() != null && secondValue.getValue() != null) {
+                    double firstAttrValue = Double.parseDouble(firstValue.getValue());
+                    double secondAttrValue = Double.parseDouble(secondValue.getValue());
+                    if (secondAttrValue == 0) {
+                        return Value.createUndefined();
+                    } else {
+                        return new Value(((firstAttrValue % secondAttrValue) + java.lang.Math.abs(secondAttrValue)) % secondAttrValue);
+                    }
+                }
+            }
+            return new Value(false);
+        }
         return null;
     }
 

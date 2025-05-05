@@ -33,5 +33,6 @@ TYPE MODEL Math_V2_1 (en) AT "http://www.interlis.ch/models"
   FUNCTION max2(attributePath: TEXT): NUMERIC;
   FUNCTION min2(attributePath: TEXT): NUMERIC;
   FUNCTION sum(attributePath: TEXT): NUMERIC;
+  FUNCTION mod(a: NUMERIC; b: NUMERIC): NUMERIC;
 
 END Math_V2_1.

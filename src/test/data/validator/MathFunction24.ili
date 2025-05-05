@@ -195,6 +195,14 @@ MODEL MathFunction24
 			MANDATORY CONSTRAINT Math_V2_1.sum("THIS->attre->attrA")==20;
 		END ClassE;
 
+        CLASS ClassG =
+            a : -100.00 .. 100.00;
+            b : -100.00 .. 100.00;
+            expected : -100.00 .. 100.00;
+            MANDATORY CONSTRAINT moduloTest:
+                (Math_V2_1.round(Math_V2_1.mod(a, b) * 100) / 100) == expected;
+        END ClassG;
+
 	END Topic;
 	
 END MathFunction24.
