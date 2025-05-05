@@ -81,7 +81,7 @@ public class MathFunction24Test {
         // ili-datei lesen
         Configuration ili2cConfig = new Configuration();
         {
-            FileEntry fileEntry = new FileEntry("src/test/data/validator/Math_V2.ili", FileEntryKind.ILIMODELFILE);
+            FileEntry fileEntry = new FileEntry("src/test/data/validator/Math_V2_1.ili", FileEntryKind.ILIMODELFILE);
             ili2cConfig.addFileEntry(fileEntry);
         }
         {

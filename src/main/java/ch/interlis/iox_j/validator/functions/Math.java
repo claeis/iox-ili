@@ -17,6 +17,7 @@ import ch.interlis.iox_j.validator.Value;
 public class Math {
     public static final String MATH="Math";
     public static final String MATH_V2="Math_V2";
+    public static final String MATH_V2_1="Math_V2_1";
     
     private TransferDescription td = null;
     private ch.interlis.iox.IoxValidationConfig validationConfig = null;

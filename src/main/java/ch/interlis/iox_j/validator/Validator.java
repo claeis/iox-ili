@@ -1954,7 +1954,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			    }
 			    
 			    return textFunction.evaluateFunction(currentFunction, functionCallObj, parentObject, validationKind, usageScope, iomObj, texttype, firstRole);
-			} else if (funcName.startsWith(Math.MATH+".") || funcName.startsWith(Math.MATH_V2+".")) {
+			} else if (funcName.startsWith(Math.MATH+".") || funcName.startsWith(Math.MATH_V2+".") || funcName.startsWith(Math.MATH_V2_1 + ".")) {
 			    if(mathFunction == null) {
 	                mathFunction = new Math(this, td, validationConfig);
 			    }

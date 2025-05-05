@@ -1,7 +1,7 @@
 INTERLIS 2.4;
 
-TYPE MODEL Math_V2 (en) AT "http://www.interlis.ch/models"
-  VERSION "2023-05-25" =
+TYPE MODEL Math_V2_1 (en) AT "http://www.interlis.ch/models"
+  VERSION "2025-05-05" =
 
   FUNCTION add(a: NUMERIC; b: NUMERIC): NUMERIC;
   FUNCTION sub(a: NUMERIC; b: NUMERIC): NUMERIC;
@@ -34,4 +34,4 @@ TYPE MODEL Math_V2 (en) AT "http://www.interlis.ch/models"
   FUNCTION min2(attributePath: TEXT): NUMERIC;
   FUNCTION sum(attributePath: TEXT): NUMERIC;
 
-END Math_V2.
+END Math_V2_1.
