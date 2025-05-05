@@ -735,6 +735,23 @@ public class Math {
                 }
             }
             return new Value(false);
+        } else if (currentFunction.getName().equals("toNumeric")) {
+            Evaluable[] arguments = functionCallObj.getArguments();
+            if (arguments != null) {
+                Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                if (firstValue.skipEvaluation()) {
+                    return firstValue;
+                }
+                if (firstValue.isUndefined()) {
+                    return Value.createSkipEvaluation();
+                }
+
+                if (firstValue.getValue() != null) {
+                    double firstAttrValue = Double.parseDouble(firstValue.getValue());
+                    return new Value(firstAttrValue);
+                }
+            }
+            return new Value(false);
         }
         return null;
     }

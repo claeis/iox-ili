@@ -203,6 +203,13 @@ MODEL MathFunction24
                 (Math_V2_1.round(Math_V2_1.mod(a, b) * 100) / 100) == expected;
         END ClassG;
 
+        CLASS ClassH =
+            a : TEXT;
+            expected : -1000.00 .. 1000.00;
+            MANDATORY CONSTRAINT toNumericTest:
+                Math_V2_1.toNumeric(a) == expected;
+        END ClassH;
+
 	END Topic;
 	
 END MathFunction24.

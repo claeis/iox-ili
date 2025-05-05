@@ -64,6 +64,7 @@ public class MathFunction24Test {
     private final static String CLASSD = TOPIC + ".ClassD";
     private final static String CLASSE = TOPIC + ".ClassE";
     private final static String CLASSG = TOPIC + ".ClassG";
+    private final static String CLASSH = TOPIC + ".ClassH";
     
     // STRUCTURE
     private final static String STRUCTA = TOPIC + ".StructA";
@@ -737,6 +738,38 @@ public class MathFunction24Test {
 
             // Asserts
             assertEquals("Test case: " + testCase[0] + " (" + testCase[1] + " mod " + testCase[2] + " = " + testCase[3] + ")", 0, logger.getErrs().size());
+        }
+    }
+
+    @Test
+    public void toNumeric_Ok() {
+        String[][] testCases = {
+                { "Positive numbers", "38", "38" },
+                { "Negative number", "-835", "-835" },
+                { "Decimal numbers", "-8.59", "-8.59" },
+                { "Undefined attribute", null, null },
+        };
+
+        for (int i = 0; i < testCases.length; i++) {
+            String[] testCase = testCases[i];
+            Iom_jObject iomObj = new Iom_jObject(CLASSH, "o" + i);
+            if (testCase[1] != null) iomObj.setattrvalue("a", testCase[1]);
+            if (testCase[2] != null) iomObj.setattrvalue("expected", testCase[2]);
+
+            ValidationConfig modelConfig = new ValidationConfig();
+            LogCollector logger = new LogCollector();
+            LogEventFactory errFactory = new LogEventFactory();
+            Settings settings = new Settings();
+
+            Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+            validator.validate(new StartTransferEvent());
+            validator.validate(new StartBasketEvent(TOPIC, BID1));
+            validator.validate(new ObjectEvent(iomObj));
+            validator.validate(new EndBasketEvent());
+            validator.validate(new EndTransferEvent());
+
+            // Asserts
+            assertEquals("Test case: " + testCase[0] + " (toNumeric(" + testCase[1] + ") = " + testCase[2] + ")", 0, logger.getErrs().size());
         }
     }
 
