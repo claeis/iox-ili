@@ -54,6 +54,14 @@ public class JtsextGeometryFactory extends GeometryFactory {
 				CurveSegment newseg=createCurveSegment(seg);
 				newline.add(newseg);
 			}
+		}else if(srcLine instanceof CompoundCurveRing){
+	            CompoundCurveRing ring=(CompoundCurveRing)srcLine;
+	            for(CompoundCurve line:ring.getLines()) {
+	                for(CurveSegment seg:line.getSegments()){
+	                    CurveSegment newseg=createCurveSegment(seg);
+	                    newline.add(newseg);
+	                }
+	            }
 		}else{
 			Coordinate[] coords = srcLine.getCoordinates();
 			for(int coordi=1;coordi<coords.length;coordi++){

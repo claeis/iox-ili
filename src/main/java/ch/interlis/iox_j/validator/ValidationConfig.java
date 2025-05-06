@@ -44,6 +44,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	public static final String ALLOW_ONLY_MULTIPLICITY_REDUCTION="allowOnlyMultiplicityReduction";
 	public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
     public static final String DISABLE_ROUNDING="disableRounding";
+    public static final String SIMPLE_BOUNDARY="simpleBoundary";
     public static final String DISABLE_AREAREAS_MESSAGES="disableAreAreasMessages";
 	// PipelinePool
 	public static final String TOPOLOGY_VALIDATION_OK="topologyValidationOk";

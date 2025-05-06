@@ -32,7 +32,13 @@ import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.ArcSegment;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.StraightSegment;
+import ch.interlis.iox.IoxException;
 import ch.interlis.iox_j.jts.Iox2jtsException;
+import ch.interlis.iox_j.jts.Iox2jtsext;
 
 /** Utility to convert from INTERLIS to WKB geometry.
  * @author ceis
@@ -269,7 +275,7 @@ public class Iox2wkb {
 	throws Iox2wkbException
 	{
 
-        List<List<LineSegment>> lines = new ArrayList<List<LineSegment>>();
+        List<CompoundCurve> lines = new ArrayList<CompoundCurve>();
         for(int polylinei=0;polylinei<polylineObjs.length;polylinei++){
             IomObject polyline = polylineObjs[polylinei];
             lines.addAll(collectSegments(new IomObject[] {polyline}, asCompoundCurve, p, false));
@@ -277,15 +283,11 @@ public class Iox2wkb {
 	    
 		try {
 			os.reset();
-			for (List<LineSegment> line : lines){
+			for (CompoundCurve line : lines){
 				if (asCompoundCurve) {
 					writeCompoundCurve(line);
-				} else if (isSurfaceOrArea){
-					if (line.get(0).size() > 1)
-						throw new Iox2wkbException("Multiple segments in linearring not supported");
-					writeLinearRing(line.get(0));
 				} else {
-					writeSegments(line);
+					writeLineString(line);
 				}
 			}
 		} catch (IOException e) {
@@ -295,66 +297,55 @@ public class Iox2wkb {
 		return os.toByteArray();
 	}
 
-    private List<List<LineSegment>> collectSegments(IomObject[] polylineObjs, boolean asCompoundCurve, double p, boolean repairTouchingLine)
+    private List<CompoundCurve> collectSegments(IomObject[] polylineObjs, boolean asCompoundCurve, double p, boolean repairTouchingLine)
     throws Iox2wkbException {
-        RingCollector ringCollector = new RingCollector(repairTouchingLine);
-        ringCollector.startNewRing();
-        Coordinate lastCoordinate = null;
-        for (IomObject polylineObj : polylineObjs) {
-            if (polylineObj == null) {
+        if(repairTouchingLine) {
+            RingCollector ringCollector = new RingCollector();
+            for(IomObject polylineObj:polylineObjs) {
+                if(polylineObj==null) {
+                    continue;
+                }
+                CompoundCurve poly;
+                try {
+                    poly = Iox2jtsext.polyline2JTS(polylineObj,false,p);
+                } catch (IoxException e) {
+                    throw new Iox2wkbException(e);
+                }
+                List<CurveSegment> segs=new ArrayList<CurveSegment>();
+                for(CurveSegment seg:poly.getSegments()) {
+                    if(seg instanceof ArcSegment) {
+                        
+                        seg=new ArcSegment(((ArcSegment)seg).getStartPoint(),((ArcSegment)seg).getMidPoint(),((ArcSegment)seg).getEndPoint(),p);
+                    }
+                    segs.add(seg);
+                }
+                poly=new CompoundCurve(segs,new JtsextGeometryFactory());
+                ringCollector.addLine(poly);
+            }
+            return ringCollector.getRings();
+        }
+        List<CompoundCurve> lines=new ArrayList<CompoundCurve>();
+        List<CurveSegment> segs=new ArrayList<CurveSegment>();
+        for(IomObject polylineObj:polylineObjs) {
+            if(polylineObj==null) {
                 continue;
             }
-
-            for(int sequencei=0; sequencei<polylineObj.getattrvaluecount(Iom_jObject.POLYLINE_SEQUENCE); sequencei++) {
-                IomObject sequence=polylineObj.getattrobj(Iom_jObject.POLYLINE_SEQUENCE,sequencei);
-                int segmentc=sequence.getattrvaluecount(Iom_jObject.SEGMENTS_SEGMENT);
-
-                for(int segmenti=0; segmenti<segmentc; segmenti++){
-                    IomObject segment = sequence.getattrobj(Iom_jObject.SEGMENTS_SEGMENT, segmenti);
-                    Coordinate segmentCoordinate = coord2JTS(segment);
-                    lastCoordinate = ringCollector.getLastCoordinate();
+            CompoundCurve poly;
+            try {
+                poly = Iox2jtsext.polyline2JTS(polylineObj,false,p);
+            } catch (IoxException e) {
+                throw new Iox2wkbException(e);
+            }
+            for(CurveSegment seg:poly.getSegments()) {
+                if(seg instanceof ArcSegment) {
                     
-                    if (segment.getobjecttag().equals(Iom_jObject.COORD)){
-                        if(lastCoordinate==null || !lastCoordinate.equals(segmentCoordinate)) {
-                            ringCollector.addStraight(segmentCoordinate);
-                        }
-                    }
-                    else if (segment.getobjecttag().equals(Iom_jObject.ARC))
-                    {
-                        Coordinate midPt = arcSupportingCoord2JTS(segment);
-                        if(lastCoordinate!=null && lastCoordinate.equals(midPt)) {
-                            if(!lastCoordinate.equals(segmentCoordinate)) {
-                                ringCollector.addStraight(segmentCoordinate);
-                            }
-                        }else if(midPt.equals(segmentCoordinate)){
-                            if(lastCoordinate==null || !lastCoordinate.equals(segmentCoordinate)) {
-                                ringCollector.addStraight(segmentCoordinate);
-                            }
-                        }else {
-                            if (asCompoundCurve){
-                                ringCollector.addArc(midPt,segmentCoordinate);
-                            }else if(p==0.0){
-                                ringCollector.addStraight(midPt);
-                                ringCollector.addStraight(segmentCoordinate);
-                            } else {
-                                ArcSegment arc = new ArcSegment(lastCoordinate,midPt, segmentCoordinate, p);
-                                for (Coordinate c: arc.getCoordinates()) {
-                                    if(lastCoordinate!=null && !lastCoordinate.equals(c)) {
-                                        ringCollector.addStraight(c);
-                                        lastCoordinate=c;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        throw new Iox2wkbException("custom line form not supported");
-                    }
+                    seg=new ArcSegment(((ArcSegment)seg).getStartPoint(),((ArcSegment)seg).getMidPoint(),((ArcSegment)seg).getEndPoint(),p);
                 }
+                segs.add(seg);
             }
         }
-
-        return ringCollector.getRings();
+        lines.add(new CompoundCurve(segs,new JtsextGeometryFactory()));
+        return lines;
     }
 	
 	/** Converts a SURFACE to a JTS Polygon.
@@ -381,7 +372,7 @@ public class Iox2wkb {
 			throw new Iox2wkbException("clipped surface not supported");
 		}
 
-        List<List<LineSegment>> rings = new ArrayList<List<LineSegment>>();
+        List<CompoundCurve> rings = new ArrayList<CompoundCurve>();
 		for (int surfacei = 0; surfacei < obj.getattrvaluecount(Iom_jObject.MULTISURFACE_SURFACE); surfacei++) {
 			if (surfacei > 0) {
 				throw new Iox2wkbException("unclipped surface with multi 'surface' elements");
@@ -413,13 +404,11 @@ public class Iox2wkb {
 			writeGeometryType(asCurvePolygon ? WKBConstants.wkbCurvePolygon : WKBConstants.wkbPolygon);
 			os.writeInt(rings.size());
 
-			for (List<LineSegment> ring: rings) {
+			for (CompoundCurve ring: rings) {
 				if (asCurvePolygon){
 					writeCompoundCurve(ring);
 				} else {
-					if (ring.size() > 1)
-						throw new Iox2wkbException("Multiple polylines in linearring not supported");
-					writeLinearRing(ring.get(0));
+					writeWkblinearring(ring);
 				}
 			}
 		} catch (IOException e) {
@@ -470,7 +459,7 @@ public class Iox2wkb {
 
 		int polylinec=obj.getattrvaluecount(Iom_jObject.MULTIPOLYLINE_POLYLINE);
 
-        List<List<LineSegment>> lines = new ArrayList<List<LineSegment>>();
+        List<CompoundCurve> lines = new ArrayList<CompoundCurve>();
 		for(int polylinei=0;polylinei<polylinec;polylinei++){
 			IomObject polyline = obj.getattrobj(Iom_jObject.MULTIPOLYLINE_POLYLINE,polylinei);
 			if (polyline.getobjectconsistency() == IomConstants.IOM_INCOMPLETE) {
@@ -486,11 +475,11 @@ public class Iox2wkb {
 			writeGeometryType(asCurve ? WKBConstants.wkbMultiCurve : WKBConstants.wkbMultiLineString);
 			os.writeInt(lines.size());
 
-			for (List<LineSegment> line : lines) {
+			for (CompoundCurve line : lines) {
 				if(asCurve){
 					writeCompoundCurve(line);
 				} else {
-					writeSegments(line);
+					writeLineString(line);
 				}
 			}
 		} catch (IOException e) {
@@ -516,25 +505,66 @@ public class Iox2wkb {
         int typeInt = geometryType + flag3D;
 	    os.writeInt(typeInt);
 	  }
+      private void writeLineString(CompoundCurve line) throws IOException {
+          writeByteOrder();
+          writeGeometryType(WKBConstants.wkbLineString);
+          os.writeInt(line.getCoordinates().length);
+          writeCoords(line.getCoordinates());
+        }
+      private void writeWkblinearring(CompoundCurve line) throws IOException {
+          os.writeInt(line.getCoordinates().length);
+          writeCoords(line.getCoordinates());
+        }
 
-	  private void writeLinearRing(LineSegment line) throws IOException {
-		os.writeInt(line.size());
-		writeCoords(line);
-	  }
-
-	  private void writeCompoundCurve(List<LineSegment> segments) throws IOException {
+	  private void writeCompoundCurve(CompoundCurve segments) throws IOException {
 		writeByteOrder();
 		writeGeometryType(WKBConstants.wkbCompoundCurve);
-		os.writeInt(segments.size());
-		writeSegments(segments);
-	  }
-
-	  private void writeSegments(Iterable<LineSegment> segments) throws IOException {
-		for (LineSegment segment : segments) {
-			writeByteOrder();
-			writeGeometryType(segment.getWkbType());
-			os.writeInt(segment.size());
-			writeCoords(segment);
+        int max=segments.getNumSegments();
+        // scan for start/end 
+        List<Integer> starts=new ArrayList<Integer>();
+        List<Integer> ends=new ArrayList<Integer>();
+        int start=0;
+        int idx=1;
+        Class startType=segments.getSegments().get(0).getClass();
+        for(;idx<max;idx++) {
+            if(startType.equals(segments.getSegments().get(idx).getClass())) {
+                
+            }else {
+                starts.add(start);
+                ends.add(idx);
+                start=idx;
+                startType=segments.getSegments().get(idx).getClass();
+            }
+        }
+        starts.add(start);
+        ends.add(idx);
+        
+		os.writeInt(starts.size());
+		
+		for(start=0;start<starts.size();start++) {
+		    startType=segments.getSegments().get(starts.get(start)).getClass();
+		    int wkbType=startType==StraightSegment.class?WKBConstants.wkbLineString:WKBConstants.wkbCircularString;
+            writeByteOrder();
+		    writeGeometryType(wkbType);
+		    int coordc=ends.get(start)-starts.get(start);
+            if(wkbType==WKBConstants.wkbCircularString) {
+                coordc*=2;
+            }
+            coordc++;  // start coord
+            os.writeInt(coordc);
+            // write start coord
+            writeCoord(segments.getSegments().get(starts.get(start)).getStartPoint());
+            if(wkbType==WKBConstants.wkbLineString) {
+                for(idx=starts.get(start);idx<ends.get(start);idx++) {
+                    writeCoord(segments.getSegments().get(idx).getEndPoint());
+                }
+            }else {
+                for(idx=starts.get(start);idx<ends.get(start);idx++) {
+                    writeCoord(((ArcSegment)segments.getSegments().get(idx)).getMidPoint());
+                    writeCoord(segments.getSegments().get(idx).getEndPoint());
+                }
+                
+            }
 		}
 	  }
 
@@ -543,6 +573,11 @@ public class Iox2wkb {
 			writeCoord(c);
 		}
 	  }
+      private void writeCoords(Coordinate coordinates[]){
+          for (Coordinate c : coordinates){
+              writeCoord(c);
+          }
+        }
 
 	  private void writeCoord(Coordinate coordinate){
 		writeCoord(coordinate.x, coordinate.y, coordinate.z);
