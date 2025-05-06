@@ -3,12 +3,14 @@ INTERLIS 2.4;
 MODEL DMAVTYM_Topologie_Function24
     AT "mailto:noreply@localhost" VERSION "2024-06-17" =
     IMPORTS DMAVTYM_Topologie_V1_0;
+    IMPORTS Utils;
 
     DOMAIN
         Coord2 = COORD
             0.000 .. 2870000.000,
             0.000 .. 1310000.000;
         Surface = SURFACE WITH (STRAIGHTS, ARCS) VERTEX Coord2 WITHOUT OVERLAPS > 0.002;
+        Line = POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Coord2;
         Multiline = MULTIPOLYLINE WITH (STRAIGHTS, ARCS) VERTEX Coord2;
 
     TOPIC Topic =
@@ -19,5 +21,16 @@ MODEL DMAVTYM_Topologie_Function24
             MANDATORY CONSTRAINT linesCoverSurface:
                 DMAVTYM_Topologie_V1_0.covers(THIS, >>surface, THIS, >>lines);
         END ClassA;
+
+        CLASS SurfaceClass =
+            surface: Surface;
+        END SurfaceClass;
+
+        CLASS LineClass =
+            line: Line;
+
+            MANDATORY CONSTRAINT lineCoversSurface:
+                DMAVTYM_Topologie_V1_0.coversWithTolerance(Utils.findObjects(>SurfaceClass), >>SurfaceClass->surface, THIS, >>line, 0.002);
+        END LineClass;
     END Topic;
 END DMAVTYM_Topologie_Function24.

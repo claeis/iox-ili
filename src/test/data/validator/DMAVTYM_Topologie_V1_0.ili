@@ -21,12 +21,19 @@ INTERLIS 2.4;
 !!@ technicalContact = mailto:dmav@swisstopo.ch
 !!@ furtherInformation = https://www.cadastre.ch/de/manual-av/method/dmav.html
 TYPE MODEL DMAVTYM_Topologie_V1_0 (de)
-  AT "https://models.geo.admin.ch/V_D/" VERSION "2023-06-13" =
+  AT "https://models.geo.admin.ch/V_D/" VERSION "2025-05-06" =
 
   FUNCTION covers(
     SurfaceObjects: CLASS;
     SurfaceAttr: ATTRIBUTE;
     MultiLineObject: ANYSTRUCTURE;
     MultiLineAttr: ATTRIBUTE): BOOLEAN;
+
+  FUNCTION coversWithTolerance(
+    SurfaceObjects: ANYSTRUCTURE;
+    SurfaceAttr: ATTRIBUTE OF @ SurfaceObjects;
+    MultiLineObject: ANYSTRUCTURE;
+    MultiLineAttr: ATTRIBUTE OF @ MultiLineObject;
+    Tolerance: NUMERIC): BOOLEAN;
 
 END DMAVTYM_Topologie_V1_0.
