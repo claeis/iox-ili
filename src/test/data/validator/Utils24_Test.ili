@@ -1,0 +1,18 @@
+INTERLIS 2.4;
+
+MODEL Utils24_Test (en)
+    AT "mailto:noreply@localhost" VERSION "2025-05-06" =
+    IMPORTS Utils;
+
+    TOPIC Topic =
+        CLASS ClassA =
+            attrA: TEXT;
+        END ClassA;
+
+        CLASS ClassB =
+            MANDATORY CONSTRAINT findClassA:
+                INTERLIS.objectCount(Utils.findObjects(>ClassA)) == 2;
+        END ClassB;
+    END Topic;
+
+END Utils24_Test.

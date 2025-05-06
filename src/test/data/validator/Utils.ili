@@ -1,0 +1,12 @@
+INTERLIS 2.4;
+
+TYPE MODEL Utils (en)
+    AT "http://www.interlis.ch/models" VERSION "2025-05-06" =
+
+    !!@ fn.description = "Searches the current transfer for objects of the ObjectClass.";
+    !!@ fn.param = "ObjectClass: Class reference of the objects to find.";
+    !!@ fn.return = "All objects of the ObjectClass in the current transfer.";
+    !!@ fn.since = "2025-05-06";
+    FUNCTION findObjects(ObjectClass: CLASS): BAG OF ANYSTRUCTURE;
+
+END Utils.
