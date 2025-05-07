@@ -715,6 +715,7 @@ public class MathFunction24Test {
             { "Decimal numbers", "-8.59", "3.1", "0.71" },
             { "a absent", null, "0", null },
             { "b absent", "5", null, null },
+            { "large a", "9999999951", "97", "0" },
         };
 
         for (int i = 0; i < testCases.length; i++) {

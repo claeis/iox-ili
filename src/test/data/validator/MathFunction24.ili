@@ -196,7 +196,7 @@ MODEL MathFunction24
 		END ClassE;
 
         CLASS ClassG =
-            a : -100.00 .. 100.00;
+            a : -10000000000.00 .. 10000000000.00;
             b : -100.00 .. 100.00;
             expected : -100.00 .. 100.00;
             MANDATORY CONSTRAINT moduloTest:
