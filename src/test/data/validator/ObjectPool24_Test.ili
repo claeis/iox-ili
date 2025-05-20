@@ -13,6 +13,18 @@ MODEL ObjectPool24_Test (en)
             MANDATORY CONSTRAINT allOfClassA:
                 INTERLIS.objectCount(ObjectPool.allObjects(>ClassA)) == 2;
         END ClassB;
+
+        VIEW ViewA
+            PROJECTION OF ClassA;
+            WHERE ClassA->attrA == "test";
+            =
+            ALL OF ClassA;
+        END ViewA;
+
+        CLASS ClassC =
+            MANDATORY CONSTRAINT allOfViewA:
+                INTERLIS.objectCount(ObjectPool.allObjects(>ViewA)) == 1;
+        END ClassC;
     END Topic;
 
 END ObjectPool24_Test.

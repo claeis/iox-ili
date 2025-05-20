@@ -17,6 +17,7 @@ public class ObjectPool24Test {
     private final static String TOPIC = MODEL + ".Topic";
     private final static String CLASS_A = TOPIC + ".ClassA";
     private final static String CLASS_B = TOPIC + ".ClassB";
+    private final static String CLASS_C = TOPIC + ".ClassC";
     private TransferDescription td;
 
     @Before
@@ -64,5 +65,36 @@ public class ObjectPool24Test {
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
                 "Mandatory Constraint ObjectPool24_Test.Topic.ClassB.allOfClassA is not true.");
         assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void allObjectsView() {
+        Iom_jObject objectC = new Iom_jObject(CLASS_C, "o1");
+        Iom_jObject objectA1 = createObjectA("o2", "test");
+        Iom_jObject objectA2 = createObjectA("o3", "test2");
+        Iom_jObject objectA3 = createObjectA("o4", "test3");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, objectC, objectA1, objectA2, objectA3);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getErrs(), is(empty()));
+    }
+
+    @Test
+    public void allObjectsViewInvalidCount() {
+        Iom_jObject objectC = new Iom_jObject(CLASS_C, "o1");
+        Iom_jObject objectA1 = createObjectA("o2", "test");
+        Iom_jObject objectA2 = createObjectA("o3", "");
+        Iom_jObject objectA3 = createObjectA("o4", "test");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, objectA1, objectA2, objectC, objectA3);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint ObjectPool24_Test.Topic.ClassC.allOfViewA is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    private Iom_jObject createObjectA(String oid, String attrValue) {
+        Iom_jObject object = new Iom_jObject(CLASS_A, oid);
+        object.setattrvalue("attrA", attrValue);
+        return object;
     }
 }

@@ -4,6 +4,7 @@ import ch.ehi.iox.objpool.impl.ObjPoolImpl2;
 import ch.interlis.ili2c.metamodel.Evaluable;
 import ch.interlis.ili2c.metamodel.Function;
 import ch.interlis.ili2c.metamodel.FunctionCall;
+import ch.interlis.ili2c.metamodel.Projection;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.TextType;
 import ch.interlis.ili2c.metamodel.Viewable;
@@ -57,14 +58,21 @@ public class ObjectPoolFunctions {
             return Value.createUndefined();
         }
 
-        String className = viewable.getScopedName();
+        Projection projection = null;
+        Viewable<?> objectClass = viewable;
+        if (viewable instanceof Projection) {
+            projection = (Projection) viewable;
+            objectClass = projection.getSelected().getAliasing();
+        }
+
+        String className = objectClass.getScopedName();
         List<IomObject> objects = new ArrayList<IomObject>();
         for (String basketId : objectPool.getBasketIds()) {
             ObjPoolImpl2<ObjectPoolKey, IomObject> basketObjectPool = objectPool.getObjectsOfBasketId(basketId);
             Iterator<IomObject> valueIterator = basketObjectPool.valueIterator();
             while (valueIterator.hasNext()) {
                 IomObject object = valueIterator.next();
-                if (object.getobjecttag().equals(className)) {
+                if (object.getobjecttag().equals(className) && (projection == null || validator.viewIncludesObject(projection, object))) {
                     objects.add(object);
                 }
             }

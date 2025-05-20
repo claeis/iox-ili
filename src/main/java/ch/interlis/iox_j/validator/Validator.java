@@ -1060,7 +1060,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
         return role;
     }
-    private boolean viewIncludesObject(Projection view, IomObject iomObj) {
+    public boolean viewIncludesObject(Projection view, IomObject iomObj) {
 		String viewName = getScopedName(view);
 		Iterator<?> viewIterator = view.iterator();
 		while (viewIterator.hasNext()) {
