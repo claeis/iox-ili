@@ -1,8 +1,8 @@
 INTERLIS 2.4;
 
-MODEL Utils24_Test (en)
+MODEL ObjectPool24_Test (en)
     AT "mailto:noreply@localhost" VERSION "2025-05-06" =
-    IMPORTS Utils;
+    IMPORTS ObjectPool;
 
     TOPIC Topic =
         CLASS ClassA =
@@ -10,9 +10,9 @@ MODEL Utils24_Test (en)
         END ClassA;
 
         CLASS ClassB =
-            MANDATORY CONSTRAINT findClassA:
-                INTERLIS.objectCount(Utils.findObjects(>ClassA)) == 2;
+            MANDATORY CONSTRAINT allOfClassA:
+                INTERLIS.objectCount(ObjectPool.allObjects(>ClassA)) == 2;
         END ClassB;
     END Topic;
 
-END Utils24_Test.
+END ObjectPool24_Test.

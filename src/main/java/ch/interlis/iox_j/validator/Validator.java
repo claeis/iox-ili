@@ -146,7 +146,7 @@ import ch.interlis.iox_j.validator.functions.Math;
 import ch.interlis.iox_j.validator.functions.MinimalRuntimeSystem;
 import ch.interlis.iox_j.validator.functions.Interlis;
 import ch.interlis.iox_j.validator.functions.Interlis_ext;
-import ch.interlis.iox_j.validator.functions.Utils;
+import ch.interlis.iox_j.validator.functions.ObjectPoolFunctions;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
     private static final String ILI_LEGACYAREAREAS = "ILI_LEGACYAREAREAS";
@@ -1990,12 +1990,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
                 return dmavtymTopologie.evaluateFunction(currentFunction, functionCallObj, parentObject,
                         validationKind, usageScope, iomObj, texttype, firstRole);
-			} else if (funcName.startsWith("Utils.")) {
-				if (utils == null) {
-					utils = new Utils(this, objectPool, errFact);
+			} else if (funcName.startsWith("ObjectPool.")) {
+				if (objectPoolFunctions == null) {
+					objectPoolFunctions = new ObjectPoolFunctions(this, objectPool, errFact);
 				}
 
-				return utils.evaluateFunction(currentFunction, functionCallObj, parentObject,
+				return objectPoolFunctions.evaluateFunction(currentFunction, functionCallObj, parentObject,
 						validationKind, usageScope, iomObj, texttype, firstRole);
 			} else {
 				String functionQname=funcName;
@@ -3545,7 +3545,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private Text textFunction=null;
     private MinimalRuntimeSystem rtsFunction=null;
     private DmavtymTopologie dmavtymTopologie=null;
-	private Utils utils=null;
+	private ObjectPoolFunctions objectPoolFunctions=null;
 	
 	private void validateObject(IomObject iomObj,String attrPath,Viewable assocClass) throws IoxException {
 		// validate if object is null

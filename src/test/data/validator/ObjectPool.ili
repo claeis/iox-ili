@@ -1,0 +1,12 @@
+INTERLIS 2.4;
+
+TYPE MODEL ObjectPool (en)
+    AT "http://www.interlis.ch/models" VERSION "2025-05-06" =
+
+    !!@ fn.description = "Gets all objects of the ObjectClass in the current validation.";
+    !!@ fn.param = "ObjectClass: Class reference of the objects.";
+    !!@ fn.return = "All objects of the ObjectClass in the current validation.";
+    !!@ fn.since = "2025-05-06";
+    FUNCTION allObjects(ObjectClass: CLASS): BAG OF ANYSTRUCTURE;
+
+END ObjectPool.

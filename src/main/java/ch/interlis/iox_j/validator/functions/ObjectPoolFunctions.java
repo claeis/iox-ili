@@ -18,12 +18,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Utils {
+public class ObjectPoolFunctions {
     private final Validator validator;
     private final ObjectPool objectPool;
     private final LogEventFactory logger;
 
-    public Utils(Validator validator, ObjectPool objectPool, LogEventFactory logger) {
+    public ObjectPoolFunctions(Validator validator, ObjectPool objectPool, LogEventFactory logger) {
         this.validator = validator;
         this.objectPool = objectPool;
         this.logger = logger;
@@ -42,18 +42,18 @@ public class Utils {
             actualArguments[i] = result;
         }
 
-        if (currentFunction.getName().equals("findObjects")) {
-            return evaluateFindObjects(validationKind, usageScope, iomObj, actualArguments);
+        if (currentFunction.getName().equals("allObjects")) {
+            return evaluateAllObjects(validationKind, usageScope, iomObj, actualArguments);
         } else {
             return Value.createNotYetImplemented();
         }
     }
 
-    private Value evaluateFindObjects(String validationKind, String usageScope, IomObject iomObj, Value[] actualArguments) {
+    private Value evaluateAllObjects(String validationKind, String usageScope, IomObject iomObj, Value[] actualArguments) {
         Viewable<?> viewable = actualArguments[0].getViewable();
 
         if (viewable == null) {
-            logger.logErrorMsg("Missing ObjectClass argument for findObjects");
+            logger.logErrorMsg("Missing ObjectClass argument for allObjects");
             return Value.createUndefined();
         }
 

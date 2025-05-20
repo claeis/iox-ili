@@ -3,7 +3,7 @@ INTERLIS 2.4;
 MODEL DMAVTYM_Topologie_Function24
     AT "mailto:noreply@localhost" VERSION "2024-06-17" =
     IMPORTS DMAVTYM_Topologie_V1_0;
-    IMPORTS Utils;
+    IMPORTS ObjectPool;
 
     DOMAIN
         Coord2 = COORD
@@ -30,7 +30,7 @@ MODEL DMAVTYM_Topologie_Function24
             line: Line;
 
             MANDATORY CONSTRAINT lineCoversSurface:
-                DMAVTYM_Topologie_V1_0.coversWithTolerance(Utils.findObjects(>SurfaceClass), >>SurfaceClass->surface, THIS, >>line, 0.002);
+                DMAVTYM_Topologie_V1_0.coversWithTolerance(ObjectPool.allObjects(>SurfaceClass), >>SurfaceClass->surface, THIS, >>line, 0.002);
         END LineClass;
     END Topic;
 END DMAVTYM_Topologie_Function24.

@@ -12,8 +12,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-public class Utils24Test {
-    private final static String MODEL = "Utils24_Test";
+public class ObjectPool24Test {
+    private final static String MODEL = "ObjectPool24_Test";
     private final static String TOPIC = MODEL + ".Topic";
     private final static String CLASS_A = TOPIC + ".ClassA";
     private final static String CLASS_B = TOPIC + ".ClassB";
@@ -22,10 +22,10 @@ public class Utils24Test {
     @Before
     public void setUp() {
         Configuration ili2cConfig = new Configuration();
-        FileEntry functionIli = new FileEntry("src/test/data/validator/Utils.ili", FileEntryKind.ILIMODELFILE);
+        FileEntry functionIli = new FileEntry("src/test/data/validator/ObjectPool.ili", FileEntryKind.ILIMODELFILE);
         ili2cConfig.addFileEntry(functionIli);
 
-        FileEntry modelIli = new FileEntry("src/test/data/validator/Utils24_Test.ili", FileEntryKind.ILIMODELFILE);
+        FileEntry modelIli = new FileEntry("src/test/data/validator/ObjectPool24_Test.ili", FileEntryKind.ILIMODELFILE);
         ili2cConfig.addFileEntry(modelIli);
 
         td = ch.interlis.ili2c.Main.runCompiler(ili2cConfig);
@@ -33,7 +33,7 @@ public class Utils24Test {
     }
 
     @Test
-    public void findObjects() {
+    public void allObjects() {
         Iom_jObject objectA1 = new Iom_jObject(CLASS_A, "o1");
         Iom_jObject objectA2 = new Iom_jObject(CLASS_A, "o2");
         Iom_jObject objectB = new Iom_jObject(CLASS_B, "o3");
@@ -44,17 +44,17 @@ public class Utils24Test {
     }
 
     @Test
-    public void findObjectsNoInstances() {
+    public void allObjectsNoInstances() {
         Iom_jObject objectB = new Iom_jObject(CLASS_B, "o1");
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, objectB);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "Mandatory Constraint Utils24_Test.Topic.ClassB.findClassA is not true.");
+                "Mandatory Constraint ObjectPool24_Test.Topic.ClassB.allOfClassA is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 
     @Test
-    public void findObjectsInvalidCount() {
+    public void allObjectsInvalidCount() {
         Iom_jObject objectB = new Iom_jObject(CLASS_B, "o1");
         Iom_jObject objectA1 = new Iom_jObject(CLASS_A, "o2");
         Iom_jObject objectA2 = new Iom_jObject(CLASS_A, "o3");
@@ -62,7 +62,7 @@ public class Utils24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, objectA1, objectA2, objectB, objectA3);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "Mandatory Constraint Utils24_Test.Topic.ClassB.findClassA is not true.");
+                "Mandatory Constraint ObjectPool24_Test.Topic.ClassB.allOfClassA is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 }
