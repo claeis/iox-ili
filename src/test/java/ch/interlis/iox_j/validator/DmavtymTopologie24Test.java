@@ -27,8 +27,11 @@ public class DmavtymTopologie24Test {
     @Before
     public void setUp() {
         Configuration ili2cConfig = new Configuration();
-        FileEntry functionIli = new FileEntry("src/test/data/validator/DMAVTYM_Topologie_V1_0.ili", FileEntryKind.ILIMODELFILE);
-        ili2cConfig.addFileEntry(functionIli);
+        FileEntry topologieV1_0_Ili = new FileEntry("src/test/data/validator/DMAVTYM_Topologie_V1_0.ili", FileEntryKind.ILIMODELFILE);
+        ili2cConfig.addFileEntry(topologieV1_0_Ili);
+
+        FileEntry topologieV1_1_Ili = new FileEntry("src/test/data/validator/DMAVTYM_Topologie_V1_1.ili", FileEntryKind.ILIMODELFILE);
+        ili2cConfig.addFileEntry(topologieV1_1_Ili);
 
         FileEntry objectPoolIli = new FileEntry("src/test/data/validator/ObjectPool.ili", FileEntryKind.ILIMODELFILE);
         ili2cConfig.addFileEntry(objectPoolIli);
@@ -190,6 +193,8 @@ public class DmavtymTopologie24Test {
         assertThat(logger.getErrs(), is(empty()));
         LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
                 "MultiLineAttr contains duplicate line segment: (10.0 10.0, 10.0 30.0).",
+                "MultiLineAttr contains duplicate line segment: CIRCULARSTRING (10.0 30.0, 27.0 20.0, 30.0 10.0).",
+                "MultiLineAttr contains duplicate line segment: (10.0 10.0, 10.0 30.0).",
                 "MultiLineAttr contains duplicate line segment: CIRCULARSTRING (10.0 30.0, 27.0 20.0, 30.0 10.0).");
     }
 
@@ -203,7 +208,8 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface is not true.");
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_0 is not true.",
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_1 is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 
@@ -214,7 +220,8 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface is not true.");
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_0 is not true.",
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_1 is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 
@@ -234,7 +241,10 @@ public class DmavtymTopologie24Test {
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
                 "MultiLineAttr contains unmatched line segment: (100.0 100.0, 142.0 142.0).",
                 "MultiLineAttr contains unmatched line segment: CIRCULARSTRING (100.0 100.0, 130.0 170.0, 200.0 200.0).",
-                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface is not true.");
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_0 is not true.",
+                "MultiLineAttr contains unmatched line segment: (100.0 100.0, 142.0 142.0).",
+                "MultiLineAttr contains unmatched line segment: CIRCULARSTRING (100.0 100.0, 130.0 170.0, 200.0 200.0).",
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_1 is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 
@@ -250,7 +260,9 @@ public class DmavtymTopologie24Test {
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
                 "MultiLineAttr contains unmatched line segment: (10.0 15.0, 10.0 30.0).",
-                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface is not true.");
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_0 is not true.",
+                "MultiLineAttr contains unmatched line segment: (10.0 15.0, 10.0 30.0).",
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_1 is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 
@@ -293,7 +305,7 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, surface1, line);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineClass.lineCoversSurface is not true.");
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineClass.lineCoversSurface_V1_1 is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 
@@ -306,7 +318,7 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, line);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineClass.lineCoversSurface is not true.");
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineClass.lineCoversSurface_V1_1 is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 
@@ -319,7 +331,7 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, surface, line);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineClass.lineCoversSurface is not true.");
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineClass.lineCoversSurface_V1_1 is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 

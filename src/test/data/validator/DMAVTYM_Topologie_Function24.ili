@@ -2,6 +2,7 @@ INTERLIS 2.4;
 
 MODEL DMAVTYM_Topologie_Function24
     AT "mailto:noreply@localhost" VERSION "2024-06-17" =
+    IMPORTS DMAVTYM_Topologie_V1_1;
     IMPORTS DMAVTYM_Topologie_V1_0;
     IMPORTS ObjectPool;
 
@@ -18,8 +19,10 @@ MODEL DMAVTYM_Topologie_Function24
             surface: Surface;
             lines: Multiline;
 
-            MANDATORY CONSTRAINT linesCoverSurface:
+            MANDATORY CONSTRAINT linesCoverSurface_V1_0:
                 DMAVTYM_Topologie_V1_0.covers(THIS, >>surface, THIS, >>lines);
+            MANDATORY CONSTRAINT linesCoverSurface_V1_1:
+                DMAVTYM_Topologie_V1_1.covers(THIS, >>surface, THIS, >>lines);
         END ClassA;
 
         CLASS SurfaceClass =
@@ -29,8 +32,8 @@ MODEL DMAVTYM_Topologie_Function24
         CLASS LineClass =
             line: Line;
 
-            MANDATORY CONSTRAINT lineCoversSurface:
-                DMAVTYM_Topologie_V1_0.coversWithTolerance(ObjectPool.allObjects(>SurfaceClass), >>SurfaceClass->surface, THIS, >>line, 0.002);
+            MANDATORY CONSTRAINT lineCoversSurface_V1_1:
+                DMAVTYM_Topologie_V1_1.coversWithTolerance(ObjectPool.allObjects(>SurfaceClass), >>SurfaceClass->surface, THIS, >>line, 0.002);
         END LineClass;
     END Topic;
 END DMAVTYM_Topologie_Function24.

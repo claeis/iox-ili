@@ -1983,7 +1983,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			    }
 			    
 			    return interlis_ext.evaluateFunction(currentFunction, parentObject, validationKind, usageScope, iomObj, expression, functions, td, firstRole);
-            } else if (funcName.startsWith("DMAVTYM_Topologie_V1_0.")) {
+            } else if (funcName.startsWith(DmavtymTopologie.DMAVTYM_Topologie_V1_0 + ".") || funcName.startsWith(DmavtymTopologie.DMAVTYM_Topologie_V1_1 + ".")) {
                 if (dmavtymTopologie == null) {
                     dmavtymTopologie = new DmavtymTopologie(this, td, validationConfig, errFact);
                 }

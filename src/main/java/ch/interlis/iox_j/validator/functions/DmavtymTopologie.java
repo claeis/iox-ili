@@ -31,6 +31,9 @@ import java.util.Collection;
 import java.util.HashMap;
 
 public class DmavtymTopologie {
+    public static final String DMAVTYM_Topologie_V1_0 = "DMAVTYM_Topologie_V1_0";
+    public static final String DMAVTYM_Topologie_V1_1 = "DMAVTYM_Topologie_V1_1";
+
     private final TransferDescription td;
     private final IoxValidationConfig validationConfig;
     private final Validator validator;
