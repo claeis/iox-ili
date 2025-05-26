@@ -195,6 +195,11 @@ MODEL MathFunction24
 			MANDATORY CONSTRAINT Math_V2.sum("THIS->attre->attrA")==20;
 		END ClassE;
 
+		CLASS ClassF =
+			attrf : BAG OF StructA;
+			MANDATORY CONSTRAINT Math_V2.sum("THIS->attrf->attrA")==0;
+		END ClassF;
+
 	END Topic;
 	
 END MathFunction24.
