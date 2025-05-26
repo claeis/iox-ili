@@ -83,6 +83,10 @@ public class MathFunction24Test {
         // ili-datei lesen
         Configuration ili2cConfig = new Configuration();
         {
+            FileEntry fileEntry = new FileEntry("src/test/data/validator/Math_V2.ili", FileEntryKind.ILIMODELFILE);
+            ili2cConfig.addFileEntry(fileEntry);
+        }
+        {
             FileEntry fileEntry = new FileEntry("src/test/data/validator/Math_V2_1.ili", FileEntryKind.ILIMODELFILE);
             ili2cConfig.addFileEntry(fileEntry);
         }
@@ -795,9 +799,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA1.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA1.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA1.Math_V2_1 is not true.");
     }
     
     @Test
@@ -816,9 +820,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA2.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA2.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA2.Math_V2_1 is not true.");
     }
     
     @Test
@@ -837,9 +841,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA3.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA3.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA3.Math_V2_1 is not true.");
     }
 
     @Test
@@ -858,9 +862,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA4.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA4.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA4.Math_V2_1 is not true.");
     }
     
     @Test
@@ -878,9 +882,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA5.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA5.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA5.Math_V2_1 is not true.");
     }
     
     @Test
@@ -898,9 +902,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA6.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA6.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA6.Math_V2_1 is not true.");
     }
     
     @Test
@@ -919,9 +923,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA7.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA7.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA7.Math_V2_1 is not true.");
     }
     
     @Test
@@ -940,9 +944,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA8.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA8.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA8.Math_V2_1 is not true.");
     }
     
     @Test
@@ -963,9 +967,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA9.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA9.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA9.Math_V2_1 is not true.");
     }
     
     @Test
@@ -983,9 +987,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA10.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA10.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA10.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1003,9 +1007,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA11.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA11.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA11.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1023,9 +1027,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA12.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA12.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA12.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1043,9 +1047,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA13.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA13.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA13.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1064,9 +1068,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA14.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA14.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA14.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1084,9 +1088,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA15.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA15.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA15.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1104,9 +1108,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA16.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA16.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA16.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1125,9 +1129,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA17.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA17.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA17.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1145,9 +1149,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA18.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA18.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA18.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1165,9 +1169,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA19.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA19.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA19.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1185,9 +1189,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA20.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA20.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA20.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1205,9 +1209,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA21.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA21.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA21.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1225,9 +1229,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA22.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA22.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA22.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1245,9 +1249,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA23.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA23.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA23.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1265,9 +1269,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA24.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA24.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA24.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1286,9 +1290,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA25.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA25.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA25.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1307,9 +1311,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassA26.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassA26.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassA26.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1335,9 +1339,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassB.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassB.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassB.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1369,9 +1373,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassC.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassC.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassC.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1403,9 +1407,9 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassD.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassD.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassD.Math_V2_1 is not true.");
     }
     
     @Test
@@ -1437,8 +1441,8 @@ public class MathFunction24Test {
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
-        assertEquals(1, logger.getErrs().size());
-        assertEquals("Mandatory Constraint MathFunction24.Topic.ClassE.Constraint1 is not true.",
-                logger.getErrs().get(0).getEventMsg());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint MathFunction24.Topic.ClassE.Constraint1 is not true.",
+                "Mandatory Constraint MathFunction24.Topic.ClassE.Math_V2_1 is not true.");
     }
 }
