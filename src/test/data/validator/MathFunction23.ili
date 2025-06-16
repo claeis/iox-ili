@@ -195,6 +195,11 @@ MODEL MathFunction23
 			MANDATORY CONSTRAINT Math.sum("THIS->attre->attrA")==20;
 		END ClassE;
 
+		CLASS ClassF =
+			attrf : BAG OF StructA;
+			MANDATORY CONSTRAINT Math.sum("THIS->attrf->attrA")==0;
+		END ClassF;
+
 	END Topic;
 	
 END MathFunction23.
