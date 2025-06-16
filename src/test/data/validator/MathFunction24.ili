@@ -2,6 +2,7 @@ INTERLIS 2.4;
 MODEL MathFunction24
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
 	IMPORTS Math_V2;
+	IMPORTS Math_V2_1;
 
 	TOPIC Topic=
 
@@ -11,6 +12,8 @@ MODEL MathFunction24
 			attr3: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.add(attr1, Math_V2.add(attr2, attr3))==6;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.add(attr1, Math_V2_1.add(attr2, attr3))==6;
 		END ClassA1;
 		
 		CLASS ClassA2 =
@@ -18,6 +21,8 @@ MODEL MathFunction24
 			attr2: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.sub(attr1, attr2)==5;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.sub(attr1, attr2)==5;
 		END ClassA2;
 
 		CLASS ClassA3 =
@@ -25,6 +30,8 @@ MODEL MathFunction24
 			attr2: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.mul(attr1, attr2)==5;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.mul(attr1, attr2)==5;
 		END ClassA3;
 
 		CLASS ClassA4 =
@@ -32,30 +39,40 @@ MODEL MathFunction24
 			attr2: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.div(attr1, attr2)==5;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.div(attr1, attr2)==5;
 		END ClassA4;
 
 		CLASS ClassA5 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.abs(attr1)==5;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.abs(attr1)==5;
 		END ClassA5;
 
 		CLASS ClassA6 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.acos(attr1)==1.5433773235341761;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.acos(attr1)==1.5433773235341761;
 		END ClassA6;
 
 		CLASS ClassA7 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.asin(attr1)==0.02741900326072046;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.asin(attr1)==0.02741900326072046;
 		END ClassA7;
 
 		CLASS ClassA8 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.atan(attr1)==0.0274087022410345;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.atan(attr1)==0.0274087022410345;
 		END ClassA8;
 
 		CLASS ClassA9 =
@@ -63,30 +80,40 @@ MODEL MathFunction24
 			attr2: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.atan2(attr1, attr2)==0.9827937232473292;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.atan2(attr1, attr2)==0.9827937232473292;
 		END ClassA9;
 
 		CLASS ClassA10 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.cbrt(attr1)==5;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.cbrt(attr1)==5;
 		END ClassA10;
 
 		CLASS ClassA11 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.cos(attr1)==0.7071067811865476;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.cos(attr1)==0.7071067811865476;
 		END ClassA11;
 
 		CLASS ClassA12 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.cosh(attr1)==1.3246090892520057;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.cosh(attr1)==1.3246090892520057;
 		END ClassA12;
 
 		CLASS ClassA13 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.exp(attr1)==148.4131591025766;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.exp(attr1)==148.4131591025766;
 		END ClassA13;
 
 		CLASS ClassA14 =
@@ -94,18 +121,24 @@ MODEL MathFunction24
 			attr2: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.hypot(attr1, attr2)==60986.133234122164;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.hypot(attr1, attr2)==60986.133234122164;
 		END ClassA14;
 
 		CLASS ClassA15 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.log(attr1)==11.018368453441132;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.log(attr1)==11.018368453441132;
 		END ClassA15;
 
 		CLASS ClassA16 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.log10(attr1)==4.78521661890635;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.log10(attr1)==4.78521661890635;
 		END ClassA16;
 
 		CLASS ClassA17 =
@@ -113,48 +146,64 @@ MODEL MathFunction24
 			attr2: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.pow(attr1,attr2)==42.22425314473263;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.pow(attr1,attr2)==42.22425314473263;
 		END ClassA17;
 
 		CLASS ClassA18 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.round(attr1)==101;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.round(attr1)==101;
 		END ClassA18;
 
 		CLASS ClassA19 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.signum(attr1)==1;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.signum(attr1)==1;
 		END ClassA19;
 
 		CLASS ClassA20 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.sin(attr1)==0.7071067811865475;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.sin(attr1)==0.7071067811865475;
 		END ClassA20;
 
 		CLASS ClassA21 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.sinh(attr1)==0.8686709614860095;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.sinh(attr1)==0.8686709614860095;
 		END ClassA21;
 
 		CLASS ClassA22 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.sqrt(attr1)==5;
-		END ClassA22;	
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.sqrt(attr1)==5;
+		END ClassA22;
 
 		CLASS ClassA23 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.tan(attr1)==0.9999999999999999;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.tan(attr1)==0.9999999999999999;
 		END ClassA23;
 
 		CLASS ClassA24 =
 			attr1: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.tanh(attr1)==0.6557942026326724;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.tanh(attr1)==0.6557942026326724;
 		END ClassA24;
 
 		CLASS ClassA25 =
@@ -162,6 +211,8 @@ MODEL MathFunction24
 			attr2: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.max(attr1, attr2)==5;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.max(attr1, attr2)==5;
 		END ClassA25;
 
 		CLASS ClassA26 =
@@ -169,6 +220,8 @@ MODEL MathFunction24
 			attr2: TEXT;
 			MANDATORY CONSTRAINT
 				Math_V2.min(attr1, attr2)==3;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.min(attr1, attr2)==3;
 		END ClassA26;
 
 		STRUCTURE StructA =
@@ -178,22 +231,41 @@ MODEL MathFunction24
 		CLASS ClassB =
 			attrb : BAG OF StructA;
 			MANDATORY CONSTRAINT Math_V2.avg("THIS->attrb->attrA")<5.0;
+			MANDATORY CONSTRAINT Math_V2_1: Math_V2_1.avg("THIS->attrb->attrA")<5.0;
 		END ClassB;
 
 		CLASS ClassC =
 			attrc : BAG OF StructA;
 			MANDATORY CONSTRAINT Math_V2.max2("THIS->attrc->attrA")==12;
+			MANDATORY CONSTRAINT Math_V2_1: Math_V2_1.max2("THIS->attrc->attrA")==12;
 		END ClassC;
 
 		CLASS ClassD =
 			attrd : BAG OF StructA;
 			MANDATORY CONSTRAINT Math_V2.min2("THIS->attrd->attrA")==3;
+			MANDATORY CONSTRAINT Math_V2_1: Math_V2_1.min2("THIS->attrd->attrA")==3;
 		END ClassD;
 
 		CLASS ClassE =
 			attre : BAG OF StructA;
 			MANDATORY CONSTRAINT Math_V2.sum("THIS->attre->attrA")==20;
+			MANDATORY CONSTRAINT Math_V2_1: Math_V2_1.sum("THIS->attre->attrA")==20;
 		END ClassE;
+
+        CLASS ClassG =
+            a : -10000000000.00 .. 10000000000.00;
+            b : -100.00 .. 100.00;
+            expected : -100.00 .. 100.00;
+            MANDATORY CONSTRAINT Math_V2_1:
+                (Math_V2_1.round(Math_V2_1.mod(a, b) * 100) / 100) == expected;
+        END ClassG;
+
+        CLASS ClassH =
+            a : TEXT;
+            expected : -1000.00 .. 1000.00;
+            MANDATORY CONSTRAINT Math_V2_1:
+                Math_V2_1.toNumeric(a) == expected;
+        END ClassH;
 
 	END Topic;
 	
