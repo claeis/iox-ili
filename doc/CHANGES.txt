@@ -2,7 +2,11 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
-iox-ili 1.24.0 (2025-04-xx)
+iox-ili 1.24.1 (2025-05-xx)
+-----------------------------
+- Xtf23Reader: allow XML-attribute BID on object element
+
+iox-ili 1.24.0 (2025-05-06)
 -----------------------------
 - Iox2wkb: fix boundary recoding (ili2db#564)
 - Validator: validate simple polyline as boundary (ilivalidator#331)
