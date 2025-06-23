@@ -432,4 +432,16 @@ public class Xtf23ReaderTest {
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void test_ObjectWithBID_Ok() throws Iox2jtsException, IoxException {
+        Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"ObjectWithBID.xtf"));
+        assertTrue(reader.read() instanceof  StartTransferEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        IoxEvent event=reader.read();
+        assertTrue(event instanceof  ObjectEvent);
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
 }
