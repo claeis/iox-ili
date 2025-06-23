@@ -1990,7 +1990,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
                 return dmavtymTopologie.evaluateFunction(currentFunction, functionCallObj, parentObject,
                         validationKind, usageScope, iomObj, texttype, firstRole);
-			} else if (funcName.startsWith("ObjectPool.")) {
+			} else if (funcName.startsWith(ObjectPoolFunctions.OBJECTPOOL + ".")) {
 				if (objectPoolFunctions == null) {
 					objectPoolFunctions = new ObjectPoolFunctions(this, objectPool, errFact);
 				}
