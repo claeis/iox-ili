@@ -252,20 +252,25 @@ MODEL MathFunction24
 			MANDATORY CONSTRAINT Math_V2_1: Math_V2_1.sum("THIS->attre->attrA")==20;
 		END ClassE;
 
-        CLASS ClassG =
-            a : -10000000000.00 .. 10000000000.00;
-            b : -100.00 .. 100.00;
-            expected : -100.00 .. 100.00;
-            MANDATORY CONSTRAINT Math_V2_1:
-                (Math_V2_1.round(Math_V2_1.mod(a, b) * 100) / 100) == expected;
-        END ClassG;
+		CLASS ClassF =
+			attrf : BAG OF StructA;
+			MANDATORY CONSTRAINT NOT (DEFINED (Math_V2.sum("THIS->attrf->attrA")));
+		END ClassF;
 
-        CLASS ClassH =
-            a : TEXT;
-            expected : -1000.00 .. 1000.00;
-            MANDATORY CONSTRAINT Math_V2_1:
-                Math_V2_1.toNumeric(a) == expected;
-        END ClassH;
+		CLASS ClassG =
+			a : -10000000000.00 .. 10000000000.00;
+			b : -100.00 .. 100.00;
+			expected : -100.00 .. 100.00;
+			MANDATORY CONSTRAINT Math_V2_1:
+				(Math_V2_1.round(Math_V2_1.mod(a, b) * 100) / 100) == expected;
+		END ClassG;
+
+		CLASS ClassH =
+			a : TEXT;
+			expected : -1000.00 .. 1000.00;
+			MANDATORY CONSTRAINT Math_V2_1:
+				Math_V2_1.toNumeric(a) == expected;
+		END ClassH;
 
 	END Topic;
 	
