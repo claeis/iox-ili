@@ -254,7 +254,7 @@ MODEL MathFunction24
 
 		CLASS ClassF =
 			attrf : BAG OF StructA;
-			MANDATORY CONSTRAINT Math_V2.sum("THIS->attrf->attrA")==0;
+			MANDATORY CONSTRAINT NOT (DEFINED (Math_V2.sum("THIS->attrf->attrA")));
 		END ClassF;
 
 		CLASS ClassG =

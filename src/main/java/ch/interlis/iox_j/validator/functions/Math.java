@@ -706,7 +706,7 @@ public class Math {
                         double sum = Double.parseDouble(valueOfObjectPath.getValue());
                         return new Value(sum);
                     } else if (valueOfObjectPath.isUndefined()) {
-                        return new Value(0);
+                        return valueOfObjectPath;
                     }
                 }
             }
