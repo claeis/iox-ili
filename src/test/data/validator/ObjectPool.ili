@@ -1,7 +1,7 @@
 INTERLIS 2.4;
 
 TYPE MODEL ObjectPool (en)
-    AT "http://www.interlis.ch/models" VERSION "2025-05-06" =
+    AT "http://www.interlis.ch/models" VERSION "2025-06-25" =
 
     /**
      * Gets all objects of the ObjectClass in the current validation and its reference data.
@@ -9,5 +9,13 @@ TYPE MODEL ObjectPool (en)
      * Since 2025-05-06
      */
     FUNCTION allObjects(ObjectClass: CLASS): BAG OF ANYSTRUCTURE;
+
+    /**
+     * If the first argument evaluates to UNDEFINED, the second argument is returned.
+     * inputValue: The value to check for UNDEFINED.
+     * defaultValue: The value to return if mainValue is UNDEFINED.
+     * Since 2025-06-25
+     */
+     FUNCTION coalesceNumeric(inputValue: NUMERIC; defaultValue: NUMERIC): NUMERIC;
 
 END ObjectPool.

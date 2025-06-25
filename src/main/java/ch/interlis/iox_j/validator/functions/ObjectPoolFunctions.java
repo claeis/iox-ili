@@ -47,6 +47,8 @@ public class ObjectPoolFunctions {
 
         if (currentFunction.getName().equals("allObjects")) {
             return evaluateAllObjects(validationKind, usageScope, iomObj, actualArguments);
+        } else if (currentFunction.getName().equals("coalesceNumeric")) {
+            return evaluateCoalesce(validationKind, usageScope, iomObj, actualArguments);
         } else {
             return Value.createNotYetImplemented();
         }
@@ -80,5 +82,16 @@ public class ObjectPoolFunctions {
             }
         }
         return new Value(objects);
+    }
+
+    private Value evaluateCoalesce(String validationKind, String usageScope, IomObject iomObj, Value[] actualArguments) {
+        Value input = actualArguments[0];
+        Value defaultValue = actualArguments[1];
+
+        if (input.isUndefined()) {
+            return defaultValue;
+        } else {
+            return input;
+        }
     }
 }
