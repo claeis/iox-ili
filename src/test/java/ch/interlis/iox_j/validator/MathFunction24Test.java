@@ -688,12 +688,15 @@ public class MathFunction24Test {
         structA4.setattrvalue("attrA", "10");
         Iom_jObject structA5 = new Iom_jObject(STRUCTA, null);
         structA5.setattrvalue("attrA", "1");
+        Iom_jObject structA6 = new Iom_jObject(STRUCTA, null);
+        // structA6 attrA is UNDEFINED
         Iom_jObject classE = new Iom_jObject(CLASSE, OID1);
         classE.addattrobj("attre", structA1);
         classE.addattrobj("attre", structA2);
         classE.addattrobj("attre", structA3);
         classE.addattrobj("attre", structA4);
         classE.addattrobj("attre", structA5);
+        classE.addattrobj("attre", structA6);
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();

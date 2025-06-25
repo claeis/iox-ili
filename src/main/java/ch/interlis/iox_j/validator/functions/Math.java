@@ -698,8 +698,10 @@ public class Math {
                         String[] values = valueOfObjectPath.getValues();
                         double sum = 0;
                         for (String value : values) {
-                            double tmpValue = Double.parseDouble(value);
-                            sum += tmpValue;
+                            if (value != null) {
+                                double tmpValue = Double.parseDouble(value);
+                                sum += tmpValue;
+                            }
                         }
                         return new Value(sum);
                     } else if (valueOfObjectPath.getValue() != null) {
