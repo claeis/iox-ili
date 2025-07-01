@@ -539,6 +539,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 }
             }
         }
+
+        // For INTERLIS 2.4, TRANSLATION OF models are not allowed in the transfer
+        // Referenzhandbuch Kapitel 4.3.3: Fuer uebersetzte Datenmodelle (TRANSLATION OF) bleiben die Tagnamen in der Ursprungs-Sprache
+        if (isValid && Model.ILI2_4.equals(model.getIliVersion())) {
+            if (model.getTranslationOf() != null) {
+                Model baseModel = (Model)model.getTranslationOf();
+                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.Ili24TranslatedTransferNotAllowed"), event.getType(), model.getLanguage(), baseModel.getLanguage()));
+            }
+        }
     }
 
     private static <T> boolean arrayContains(T[] array, T value) {
