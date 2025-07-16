@@ -4,6 +4,7 @@ ideas/open issues
 
 iox-ili 1.24.1 (2025-05-xx)
 -----------------------------
+- IoxStatistics: add fileMd5, basketEndState
 - Xtf23Reader: allow XML-attribute BID on object element
 - Xtf23Reader: read BAG/LIST OF Text to improve validation (ilivalidator#446)
 

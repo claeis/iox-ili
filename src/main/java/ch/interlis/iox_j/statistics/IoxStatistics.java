@@ -30,7 +30,11 @@ public class IoxStatistics {
 		}
 	}
 	protected BasketStat createBasketStat(ch.interlis.iox.IoxEvent event) {
-		return new BasketStat(this,dataset,filename,((ch.interlis.iox.StartBasketEvent) event).getType(),((ch.interlis.iox.StartBasketEvent) event).getBid());
+	    String fileMd5=null;
+	    if(event instanceof ch.interlis.iox_j.StartBasketEvent) {
+	        fileMd5=((ch.interlis.iox_j.StartBasketEvent)event).getFileMd5();
+	    }
+		return new BasketStat(this,dataset,filename,((ch.interlis.iox.StartBasketEvent) event).getType(),((ch.interlis.iox.StartBasketEvent) event).getBid(),((ch.interlis.iox.StartBasketEvent) event).getEndstate(),fileMd5);
 	}
 	public java.util.List<BasketStat> getBaskets(){
         java.util.List<BasketStat> statv=baskets;
@@ -69,10 +73,17 @@ public class IoxStatistics {
 				prefix.append(file);
 				sep=": ";
 			}
+			String version="";
+			if(basketStat.getBasketEndState()!=null) {
+			    version=" ENDSTATE="+basketStat.getBasketEndState();
+			}
+            if(basketStat.getFileMd5()!=null) {
+                version=" fileVersion="+basketStat.getFileMd5();
+            }
 			if(hideBid){
-				EhiLogger.logState(prefix+sep+basketStat.getTopic());
+				EhiLogger.logState(prefix+sep+basketStat.getTopic()+version);
 			}else{
-				EhiLogger.logState(prefix+sep+basketStat.getTopic()+" BID="+basketStat.getBasketId());
+				EhiLogger.logState(prefix+sep+basketStat.getTopic()+" BID="+basketStat.getBasketId()+version);
 			}
 			java.util.Map<String, ClassStat> objStat=basketStat.getObjStat();
 			ArrayList<String> classv=new ArrayList<String>(objStat.keySet());

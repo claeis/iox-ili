@@ -12,13 +12,17 @@ public class BasketStat{
 	private String file=null;
 	private String topic=null;
 	private String basketId=null;
+    private String basketEndState=null;
+    private String fileMd5=null;
 	public BasketStat(IoxStatistics statistics, String dataset,String file,
-			String topic, String iliBasketId) {
+			String topic, String iliBasketId, String iliBasketEndState,String fileMd5) {
 		this.statistics=statistics;
 		this.dataset = dataset;
 		this.file = file;
 		this.topic = topic;
 		this.basketId = iliBasketId;
+        this.basketEndState = iliBasketEndState;
+        this.fileMd5=fileMd5;
 	}
 	public java.util.Map<String, ClassStat> getObjStat() {
 		return objStat;
@@ -32,6 +36,9 @@ public class BasketStat{
 	public String getBasketId() {
 		return basketId;
 	}
+    public String getBasketEndState() {
+        return basketEndState;
+    }
 	public void addObject(IomObject iomObj) {
 		String tag=iomObj.getobjecttag();
 		if(objStat.containsKey(tag)){
@@ -46,5 +53,8 @@ public class BasketStat{
 	public String getDataset() {
 		return dataset;
 	}
+    public String getFileMd5() {
+        return fileMd5;
+    }
 	
 }
