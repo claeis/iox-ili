@@ -63,6 +63,7 @@ public class MathFunction24Test {
     private final static String CLASSC = TOPIC + ".ClassC";
     private final static String CLASSD = TOPIC + ".ClassD";
     private final static String CLASSE = TOPIC + ".ClassE";
+    private final static String CLASSF = TOPIC + ".ClassF";
     private final static String CLASSG = TOPIC + ".ClassG";
     private final static String CLASSH = TOPIC + ".ClassH";
     
@@ -687,12 +688,52 @@ public class MathFunction24Test {
         structA4.setattrvalue("attrA", "10");
         Iom_jObject structA5 = new Iom_jObject(STRUCTA, null);
         structA5.setattrvalue("attrA", "1");
+        Iom_jObject structA6 = new Iom_jObject(STRUCTA, null);
+        // structA6 attrA is UNDEFINED
         Iom_jObject classE = new Iom_jObject(CLASSE, OID1);
         classE.addattrobj("attre", structA1);
         classE.addattrobj("attre", structA2);
         classE.addattrobj("attre", structA3);
         classE.addattrobj("attre", structA4);
         classE.addattrobj("attre", structA5);
+        classE.addattrobj("attre", structA6);
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID1));
+        validator.validate(new ObjectEvent(classE));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+
+    @Test
+    public void sum_ZeroObjects() {
+        Iom_jObject classF = new Iom_jObject(CLASSF, OID1);
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC, BID1));
+        validator.validate(new ObjectEvent(classF));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+
+    @Test
+    public void sum_OneObject() {
+        Iom_jObject structA1 = new Iom_jObject(STRUCTA, null);
+        structA1.setattrvalue("attrA", "20");
+        Iom_jObject classE = new Iom_jObject(CLASSE, OID1);
+        classE.addattrobj("attre", structA1);
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
