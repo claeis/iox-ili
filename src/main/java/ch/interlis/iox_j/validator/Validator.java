@@ -146,6 +146,7 @@ import ch.interlis.iox_j.validator.functions.Math;
 import ch.interlis.iox_j.validator.functions.MinimalRuntimeSystem;
 import ch.interlis.iox_j.validator.functions.Interlis;
 import ch.interlis.iox_j.validator.functions.Interlis_ext;
+import ch.interlis.iox_j.validator.functions.ObjectPoolFunctions;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
     private static final String ILI_LEGACYAREAREAS = "ILI_LEGACYAREAREAS";
@@ -1059,7 +1060,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
         return role;
     }
-    private boolean viewIncludesObject(Projection view, IomObject iomObj) {
+    public boolean viewIncludesObject(Projection view, IomObject iomObj) {
 		String viewName = getScopedName(view);
 		Iterator<?> viewIterator = view.iterator();
 		while (viewIterator.hasNext()) {
@@ -1954,7 +1955,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			    }
 			    
 			    return textFunction.evaluateFunction(currentFunction, functionCallObj, parentObject, validationKind, usageScope, iomObj, texttype, firstRole);
-			} else if (funcName.startsWith(Math.MATH+".") || funcName.startsWith(Math.MATH_V2+".")) {
+			} else if (funcName.startsWith(Math.MATH+".") || funcName.startsWith(Math.MATH_V2+".") || funcName.startsWith(Math.MATH_V2_1 + ".")) {
 			    if(mathFunction == null) {
 	                mathFunction = new Math(this, td, validationConfig);
 			    }
@@ -1982,13 +1983,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			    }
 			    
 			    return interlis_ext.evaluateFunction(currentFunction, parentObject, validationKind, usageScope, iomObj, expression, functions, td, firstRole);
-            } else if (funcName.startsWith("DMAVTYM_Topologie_V1_0.")) {
+            } else if (funcName.startsWith(DmavtymTopologie.DMAVTYM_Topologie_V1_0 + ".") || funcName.startsWith(DmavtymTopologie.DMAVTYM_Topologie_V1_1 + ".")) {
                 if (dmavtymTopologie == null) {
                     dmavtymTopologie = new DmavtymTopologie(this, td, validationConfig, errFact);
                 }
 
                 return dmavtymTopologie.evaluateFunction(currentFunction, functionCallObj, parentObject,
                         validationKind, usageScope, iomObj, texttype, firstRole);
+			} else if (funcName.startsWith(ObjectPoolFunctions.OBJECTPOOL + ".")) {
+				if (objectPoolFunctions == null) {
+					objectPoolFunctions = new ObjectPoolFunctions(this, objectPool, errFact);
+				}
+
+				return objectPoolFunctions.evaluateFunction(currentFunction, functionCallObj, parentObject,
+						validationKind, usageScope, iomObj, texttype, firstRole);
 			} else {
 				String functionQname=funcName;
 				Class functionTargetClass=customFunctions.get(functionQname);
@@ -3537,6 +3545,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private Text textFunction=null;
     private MinimalRuntimeSystem rtsFunction=null;
     private DmavtymTopologie dmavtymTopologie=null;
+	private ObjectPoolFunctions objectPoolFunctions=null;
 	
 	private void validateObject(IomObject iomObj,String attrPath,Viewable assocClass) throws IoxException {
 		// validate if object is null

@@ -1,0 +1,30 @@
+INTERLIS 2.4;
+
+MODEL ObjectPool24_Test (en)
+    AT "mailto:noreply@localhost" VERSION "2025-05-06" =
+    IMPORTS ObjectPool;
+
+    TOPIC Topic =
+        CLASS ClassA =
+            attrA: TEXT;
+        END ClassA;
+
+        CLASS ClassB =
+            MANDATORY CONSTRAINT allOfClassA:
+                INTERLIS.objectCount(ObjectPool.allObjects(>ClassA)) == 2;
+        END ClassB;
+
+        VIEW ViewA
+            PROJECTION OF ClassA;
+            WHERE ClassA->attrA == "test";
+            =
+            ALL OF ClassA;
+        END ViewA;
+
+        CLASS ClassC =
+            MANDATORY CONSTRAINT allOfViewA:
+                INTERLIS.objectCount(ObjectPool.allObjects(>ViewA)) == 1;
+        END ClassC;
+    END Topic;
+
+END ObjectPool24_Test.
