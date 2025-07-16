@@ -148,6 +148,10 @@ MODEL DataTest1 (de) AT "mailto:ceis@localhost" VERSION "20170703" =
 			refAttrM : LIST {0..*} OF REFERENCE TO ClassM_ReferenceTarget;
 		END ClassM_Reference;
 
+		CLASS ClassAN =
+			attrN : LIST {0..*} OF TEXT*100;
+		END ClassAN;
+		
 	END TopicA;
 	
 	TOPIC TopicB =

@@ -953,7 +953,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 	            	// event is endElement of attribute
 	                if(event.isEndElement()) {
 	                    // ok, is content and not only white space
-	                    iomObj.setattrvalue(attrName, value.toString());
+	                    ((Iom_jObject)iomObj).addattrvalue(attrName, value.toString());
 	                }
 	            }
 	            if(!event.isStartElement() && !event.isEndElement()) {
