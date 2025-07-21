@@ -77,6 +77,29 @@ public class ReferenceType24Test {
 		// Asserts
 		assertEquals(0,logger.getErrs().size());
 	}
+    @Test
+    public void referenceData_Ok(){
+        String objTargetId=OID1;
+        Iom_jObject iomObjtarget=new Iom_jObject(ILI_CLASSA, objTargetId);
+        iomObjtarget.setattrvalue("illegalAttr","test"); // triggers an error, if not added as reference data
+        Iom_jObject o1Ref=new Iom_jObject("REF", null);
+        o1Ref.setobjectrefoid(objTargetId);
+        Iom_jObject iomObj=new Iom_jObject(ILI_CLASSF, OID2);
+        iomObj.addattrobj(ILI_CLASSF_ATTRF1, o1Ref);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(TOPIC,BID1));
+        validator.validate(new ObjectEvent(iomObj));
+        validator.addReferenceData(new ObjectEvent(iomObjtarget));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0,logger.getErrs().size());
+    }
     // Es wird getestet, ob ein Fehler ausgegeben wird, wenn die Referenz External true ist und die Klasse A gefunden wird.
 	@Test
 	public void external_otherBasketTargetObj_Ok(){

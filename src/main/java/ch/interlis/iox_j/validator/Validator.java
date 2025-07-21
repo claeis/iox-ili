@@ -386,14 +386,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public void setLoggingHandler(IoxLogging handler) {
 		errs=handler;
 	}
-	@Override
-	public void validate(ch.interlis.iox.IoxEvent event) {
+    public void addReferenceData(ch.interlis.iox.IoxEvent event) {
+        validate(event,false);
+    }
+    @Override
+    public void validate(ch.interlis.iox.IoxEvent event) {
+        validate(event,true);
+    }
+	private void validate(ch.interlis.iox.IoxEvent event,boolean doValidation) {
 		if(validationOff){
 			return;
 		}
 		if (event instanceof ch.interlis.iox.StartTransferEvent){
 			errs.addEvent(errFact.logInfoMsg(rsrc.getString("validate.firstValidationPass")));
-			validateInconsistentIliAndXMLVersion(event);
+			if(doValidation) {
+	            validateInconsistentIliAndXMLVersion(event);
+			}
 			uniquenessOfBid.clear();
 			uniquenessOfBid.putAll(stableBids);
 			if(!singlePass) {
@@ -406,7 +414,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=new ch.interlis.iom_j.Iom_jObject(((ch.interlis.iox.ObjectEvent)event).getIomObject());
 			try {
-                validateObject(iomObj,null,null);
+                validateObject(iomObj,null,null,doValidation);
 			} catch (IoxException e) {
 				errs.addEvent(errFact.logInfoMsg(rsrc.getString("validate.failedToValidateObject"), iomObj.toString()));
 			}catch(RuntimeException e) {
@@ -416,9 +424,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
 		    cleanupCurrentBasket();
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
-			if(autoSecondPass){
-				doSecondPass();
-			}
+		    if(doValidation) {
+	            if(autoSecondPass){
+	                doSecondPass();
+	            }
+		    }
 		}
         if(writer!=null) {
 		    try {
@@ -3547,7 +3557,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private DmavtymTopologie dmavtymTopologie=null;
 	private ObjectPoolFunctions objectPoolFunctions=null;
 	
-	private void validateObject(IomObject iomObj,String attrPath,Viewable assocClass) throws IoxException {
+	private void validateObject(IomObject iomObj,String attrPath,Viewable assocClass,boolean doValidation) throws IoxException {
 		// validate if object is null
 		boolean isObject = attrPath==null;
 		if(isObject){
@@ -3590,7 +3600,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(isObject){
 			// is it a SURFACE or AREA line table?
 			if(doItfLineTables && modelele instanceof AttributeDef){
-				validateItfLineTableObject(iomObj,(AttributeDef)modelele);
+			    if(doValidation) {
+	                validateItfLineTableObject(iomObj,(AttributeDef)modelele);
+			    }
 				return;
 			}
 		}
@@ -3682,100 +3694,102 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 
-		HashSet<String> propNames=new HashSet<String>();
-		Iterator iter = aclass1.getAttributesAndRoles2();
-		while (iter.hasNext()) {
-			ViewableTransferElement obj = (ViewableTransferElement)iter.next();
-			if (obj.obj instanceof AttributeDef) {
-				AttributeDef attr = (AttributeDef) obj.obj;
-				if(!attr.isTransient()){
-					Type proxyType=attr.getDomain();
-					if(proxyType!=null && (proxyType instanceof ObjectType)){
-						// skip implicit particles (base-viewables) of views
-					}else{
-						propNames.add(attr.getName());
-						validateAttrValue(aclass1,iomObj,attr,attrPath);
-					}
-				}
-			}
-			if (isObject && obj.obj instanceof RoleDef) {
-				RoleDef role = (RoleDef) obj.obj;
-				{ // if (role.getExtending() == null)
-					String refoid = null;
-					String roleName = role.getName();
-					// a role of an embedded association?
-                    if (obj.embedded) {
-                        int propc=iomObj.getattrvaluecount(roleName);
-                        if(propc>=1) {
-                            IomObject embeddedLinkObj = iomObj.getattrobj(roleName, 0);
-                            AssociationDef roleOwner = (AssociationDef) role.getContainer();
-                            
-                            if (roleOwner.getDerivedFrom() == null) {
-                                // not just a link?
-                                propNames.add(roleName);
-                                
-                                //Validate if no superfluous properties
-                                if(propc>0) {
-                                    validateObject(embeddedLinkObj,roleName,roleOwner);
-                                }
-                                
-                                if (embeddedLinkObj != null) {
-                                    refoid = embeddedLinkObj.getobjectrefoid();
-                                    long orderPos = embeddedLinkObj
-                                            .getobjectreforderpos();
-                                    if (orderPos != 0) {
-                                        // refoid,orderPos
-                                        // ret.setStringAttribute(roleName,
-                                        // refoid);
-                                        // ret.setStringAttribute(roleName+".orderPos",
-                                        // Long.toString(orderPos));
-                                    } else {
-                                        // refoid
-                                        // ret.setStringAttribute(roleName,
-                                        // refoid);
-                                    }
-                                } else {
-                                    refoid = null;
-                                }
-                            }
-                            if(propc>1) {
-                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresOnlyOneReferenceProperty"),role.getScopedName()));
-                            }
-                            if(refoid==null) {
-                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresAReferenceToAnotherObject"),role.getScopedName()));
-                            }
-                        }
-                    } else {
-                        int propc=iomObj.getattrvaluecount(roleName);
-                        if(propc==1) {
-                            IomObject structvalue = iomObj.getattrobj(roleName, 0);
-                            propNames.add(roleName);
-                            refoid = structvalue.getobjectrefoid();
-                            long orderPos = structvalue
-                                    .getobjectreforderpos();
-                            if (orderPos != 0) {
-                                // refoid,orderPos
-                                // ret.setStringAttribute(roleName, refoid);
-                                // ret.setStringAttribute(roleName+".orderPos",
-                                // Long.toString(orderPos));
-                            } else {
-                                // refoid
-                                // ret.setStringAttribute(roleName, refoid);
-                            }
-                        }
-                        if(refoid==null) {
-                            addToPool = false;
-                            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresAReferenceToAnotherObject"),role.getScopedName()));
-                        }
-                    }
-                    if (refoid != null) {
-                        if(!singlePass) {
-                            linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
+        HashSet<String> propNames=new HashSet<String>();
+        if(doValidation) {
+            Iterator iter = aclass1.getAttributesAndRoles2();
+            while (iter.hasNext()) {
+                ViewableTransferElement obj = (ViewableTransferElement)iter.next();
+                if (obj.obj instanceof AttributeDef) {
+                    AttributeDef attr = (AttributeDef) obj.obj;
+                    if(!attr.isTransient()){
+                        Type proxyType=attr.getDomain();
+                        if(proxyType!=null && (proxyType instanceof ObjectType)){
+                            // skip implicit particles (base-viewables) of views
+                        }else{
+                            propNames.add(attr.getName());
+                            validateAttrValue(aclass1,iomObj,attr,attrPath);
                         }
                     }
                 }
-			}
-		}
+                if (isObject && obj.obj instanceof RoleDef) {
+                    RoleDef role = (RoleDef) obj.obj;
+                    { // if (role.getExtending() == null)
+                        String refoid = null;
+                        String roleName = role.getName();
+                        // a role of an embedded association?
+                        if (obj.embedded) {
+                            int propc=iomObj.getattrvaluecount(roleName);
+                            if(propc>=1) {
+                                IomObject embeddedLinkObj = iomObj.getattrobj(roleName, 0);
+                                AssociationDef roleOwner = (AssociationDef) role.getContainer();
+                                
+                                if (roleOwner.getDerivedFrom() == null) {
+                                    // not just a link?
+                                    propNames.add(roleName);
+                                    
+                                    //Validate if no superfluous properties
+                                    if(propc>0) {
+                                        validateObject(embeddedLinkObj,roleName,roleOwner,true);
+                                    }
+                                    
+                                    if (embeddedLinkObj != null) {
+                                        refoid = embeddedLinkObj.getobjectrefoid();
+                                        long orderPos = embeddedLinkObj
+                                                .getobjectreforderpos();
+                                        if (orderPos != 0) {
+                                            // refoid,orderPos
+                                            // ret.setStringAttribute(roleName,
+                                            // refoid);
+                                            // ret.setStringAttribute(roleName+".orderPos",
+                                            // Long.toString(orderPos));
+                                        } else {
+                                            // refoid
+                                            // ret.setStringAttribute(roleName,
+                                            // refoid);
+                                        }
+                                    } else {
+                                        refoid = null;
+                                    }
+                                }
+                                if(propc>1) {
+                                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresOnlyOneReferenceProperty"),role.getScopedName()));
+                                }
+                                if(refoid==null) {
+                                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresAReferenceToAnotherObject"),role.getScopedName()));
+                                }
+                            }
+                        } else {
+                            int propc=iomObj.getattrvaluecount(roleName);
+                            if(propc==1) {
+                                IomObject structvalue = iomObj.getattrobj(roleName, 0);
+                                propNames.add(roleName);
+                                refoid = structvalue.getobjectrefoid();
+                                long orderPos = structvalue
+                                        .getobjectreforderpos();
+                                if (orderPos != 0) {
+                                    // refoid,orderPos
+                                    // ret.setStringAttribute(roleName, refoid);
+                                    // ret.setStringAttribute(roleName+".orderPos",
+                                    // Long.toString(orderPos));
+                                } else {
+                                    // refoid
+                                    // ret.setStringAttribute(roleName, refoid);
+                                }
+                            }
+                            if(refoid==null) {
+                                addToPool = false;
+                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresAReferenceToAnotherObject"),role.getScopedName()));
+                            }
+                        }
+                        if (refoid != null) {
+                            if(!singlePass) {
+                                linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 		
 		if(isObject){
 			if(addToPool){
@@ -3790,18 +3804,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 		
-		// validate if no superfluous properties
-		int propc=iomObj.getattrcount();
-		for(int propi=0;propi<propc;propi++){
-			String propName=iomObj.getattrname(propi);
-			if(propName.startsWith("_")){
-				// ok, software internal properties start with a '_'
-			}else{
-				if(!propNames.contains(propName)){
-					errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.unknownPropertyX"),propName));
-				}
-			}
-		}
+        if(doValidation) {
+            // validate if no superfluous properties
+            int propc=iomObj.getattrcount();
+            for(int propi=0;propi<propc;propi++){
+                String propName=iomObj.getattrname(propi);
+                if(propName.startsWith("_")){
+                    // ok, software internal properties start with a '_'
+                }else{
+                    if(!propNames.contains(propName)){
+                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.unknownPropertyX"),propName));
+                    }
+                }
+            }
+        }
 	}
 	
 	private void setCurrentMainObj(IomObject iomObj) {
@@ -4053,7 +4069,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								 logMsg(validateType, rsrc.getString("validateAttrValue.attributeXRequiresANonAbstractStructure"), attrPath);
 							}
 						}
-						validateObject(structEle, attrPath+"["+structi+"]",null);
+						validateObject(structEle, attrPath+"["+structi+"]",null,true);
 					}
 			 }
 		}else{
