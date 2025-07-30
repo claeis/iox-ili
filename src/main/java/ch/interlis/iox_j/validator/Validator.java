@@ -410,6 +410,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		} else if (event instanceof ch.interlis.iox.StartBasketEvent){
 			StartBasketEvent startBasketEvent = ((ch.interlis.iox.StartBasketEvent) event);
 			currentBasketId = startBasketEvent.getBid();
+			if(isValidId(currentBasketId)){
+			    objectPool.startBasket(currentBasketId,doValidation);
+			}
 			validateBasketEvent(startBasketEvent);
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=new ch.interlis.iom_j.Iom_jObject(((ch.interlis.iox.ObjectEvent)event).getIomObject());
@@ -905,7 +908,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	private void iterateThroughAllObjects(){
 		HashSet<Type> types=new HashSet<Type>();
-		for (String basketId : objectPool.getBasketIds()){
+		for (String basketId : objectPool.getDataBids()){
 			// iterate through iomObjects
 			Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
 			updateCurrentBasket(basketId);
@@ -2396,7 +2399,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private void buildTargetObjectsMap(RoleDef role) {     
         Map<String, List<IomObject>> values = new HashMap<String, List<IomObject>>();
         targetObjects.put(role, values);
-        for (String basketId : objectPool.getBasketIds()) {
+        for (String basketId : objectPool.getDataBids()) {
             Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
             while (objectIterator.hasNext()) { 
                 IomObject targetObj = objectIterator.next();
@@ -2439,7 +2442,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private void buildLinkObjMap(RoleDef role) {     
         Map<String, List<IomObject>> values = new HashMap<String, List<IomObject>>();
         linkObjects.put(role, values);
-        for (String basketId : objectPool.getBasketIds()) {
+        for (String basketId : objectPool.getDataBids()) {
             Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
             while (objectIterator.hasNext()) { 
                 IomObject linkObj = objectIterator.next();
@@ -2931,7 +2934,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
     }
     private IomObject findExternalObject(String targetBid,String targetOid, ArrayList<Viewable> destinationClasses, OutParam<String> bidOfTargetObj) {
-	        if(!objectPool.getBasketIds().contains(targetBid)) {
+	        if(!objectPool.getDataBids().contains(targetBid)) {
 	            List<Dataset> dataset = null;
 	            File[] datasetFiles = null;
 	            IoxReader reader=null;
@@ -2952,6 +2955,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	                               IomObject objectValue = objectPool.addObject(((ch.interlis.iox.ObjectEvent) currentIoxEvent).getIomObject(), currentBid);
 	                            }else if (currentIoxEvent instanceof ch.interlis.iox.StartBasketEvent) {
 	                                currentBid=((ch.interlis.iox.StartBasketEvent) currentIoxEvent).getBid();
+	                                objectPool.startBasket(currentBid,false);
 	                            } else if (currentIoxEvent instanceof ch.interlis.iox.EndTransferEvent) {
 	                                break;
 	                            }
@@ -3162,7 +3166,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					String otherAttrName = otherAttrPath.toString();
 					otherClass = (Table) otherAttrPath.getRoot();
 					String attrValueThisObj = iomObj.getattrvalue(restrictedAttrName);
-					Iterator<String> basketIdIterator=objectPool.getBasketIds().iterator();
+					Iterator<String> basketIdIterator=objectPool.getDataBids().iterator();
 					while( !valueExists &&  basketIdIterator.hasNext()){
 						String basketId=basketIdIterator.next();
 						// iterate through iomObjects

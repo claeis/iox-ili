@@ -34,7 +34,8 @@ public class ObjectPool {
 	private HashMap<String,Object> tag2class;
 	private ObjectPoolManager objPoolManager=null;
 	private Map<String, Map<ObjectPoolKey, IomObject>> collectionOfBaskets = new java.util.HashMap<String, Map<ObjectPoolKey, IomObject>>();
-	private java.util.TreeSet<String> bids=new java.util.TreeSet<String>();
+	private java.util.TreeSet<String> dataBids=new java.util.TreeSet<String>();
+    private java.util.TreeSet<String> refdataBids=new java.util.TreeSet<String>();
 	
 	public ObjectPool(boolean doItfOidPerTable, IoxLogging errs, LogEventFactory errFact, HashMap<String,Object> tag2class,ObjectPoolManager objPoolManager){
 		this.doItfOidPerTable = doItfOidPerTable;
@@ -96,13 +97,7 @@ public class ObjectPool {
 			key=new ObjectPoolKey(oid, null, currentBasketId);
 		}
 		Map<ObjectPoolKey, IomObject> collectionOfObjects =null;
-		if(collectionOfBaskets.containsKey(currentBasketId)){
-			collectionOfObjects=collectionOfBaskets.get(currentBasketId);
-		} else {
-			collectionOfObjects=objPoolManager.newObjectPoolImpl2(this.getClass().getSimpleName(),new IomObjectSerializer()); // new HashMap<ObjectPoolKey, IomObject>();
-			collectionOfBaskets.put(currentBasketId, collectionOfObjects);
-			bids.add(currentBasketId);
-		}
+		collectionOfObjects = getCollectionOfObjects(currentBasketId);
 		if(collectionOfObjects.containsKey(key)){
 			return collectionOfObjects.get(key);
 		}
@@ -118,13 +113,26 @@ public class ObjectPool {
 			collectionOfObjects.put(key,iomObj);
 		return null;
 	}
+    private Map<ObjectPoolKey, IomObject> getCollectionOfObjects(String basketId) {
+        if(basketId==null || basketId.length()==0) {
+            throw new IllegalArgumentException("basketId==null");
+        }
+        Map<ObjectPoolKey, IomObject> collectionOfObjects;
+        if(collectionOfBaskets.containsKey(basketId)){
+			collectionOfObjects=collectionOfBaskets.get(basketId);
+		} else {
+			collectionOfObjects=objPoolManager.newObjectPoolImpl2(this.getClass().getSimpleName(),new IomObjectSerializer()); // new HashMap<ObjectPoolKey, IomObject>();
+			collectionOfBaskets.put(basketId, collectionOfObjects);
+		}
+        return collectionOfObjects;
+    }
 	
 	public ch.ehi.iox.objpool.impl.ObjPoolImpl2 getObjectsOfBasketId(String basketId){
-		return (ch.ehi.iox.objpool.impl.ObjPoolImpl2)collectionOfBaskets.get(basketId);
+		return (ch.ehi.iox.objpool.impl.ObjPoolImpl2)getCollectionOfObjects(basketId);
 	}
 	
-	public Set<String> getBasketIds(){
-		return bids;
+	public Set<String> getDataBids(){
+		return dataBids;
 	}
 	
 	public String getBidOfObject(String oid, Viewable classObj){
@@ -134,8 +142,8 @@ public class ObjectPool {
 	            oid=Validator.normalizeUUID(oid);
 	        }
 	    }
-		for(String basketId : bids){
-			Map<ObjectPoolKey, IomObject> collectionOfObjects = collectionOfBaskets.get(basketId);
+		for(String basketId : dataBids){
+			Map<ObjectPoolKey, IomObject> collectionOfObjects = getCollectionOfObjects(basketId);
 			if(doItfOidPerTable){
 				IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, classObj, basketId));
 				if(object != null){
@@ -152,8 +160,11 @@ public class ObjectPool {
 	}
 	
 	public IomObject getObject(String oid, ArrayList<Viewable> ili1Tables, OutParam<String> retBasketId) {
+	    java.util.List<String> bids=new ArrayList<String>();
+	    bids.addAll(dataBids);
+	    bids.addAll(refdataBids);
 		for(String basketId : bids){
-			Map<ObjectPoolKey, IomObject> collectionOfObjects = collectionOfBaskets.get(basketId);
+			Map<ObjectPoolKey, IomObject> collectionOfObjects = getCollectionOfObjects(basketId);
 			if(doItfOidPerTable){
 				for(Viewable aClass : ili1Tables){
 					IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, aClass, basketId));
@@ -191,5 +202,16 @@ public class ObjectPool {
 	}
     public void startNewTransfer() {
         // TODO clear/remove transient TIDs
+    }
+    public void startBasket(String basketId, boolean doValidation) {
+        if(basketId==null || basketId.length()==0) {
+            throw new IllegalArgumentException("basketId==null");
+        }
+        if(doValidation) {
+            dataBids.add(basketId);
+        }else {
+            refdataBids.add(basketId);
+        }
+        
     }
 }

@@ -69,7 +69,7 @@ public class ObjectPoolFunctions {
 
         String className = objectClass.getScopedName();
         List<IomObject> objects = new ArrayList<IomObject>();
-        for (String basketId : objectPool.getBasketIds()) {
+        for (String basketId : objectPool.getDataBids()) {
             ObjPoolImpl2<ObjectPoolKey, IomObject> basketObjectPool = objectPool.getObjectsOfBasketId(basketId);
             Iterator<IomObject> valueIterator = basketObjectPool.valueIterator();
             while (valueIterator.hasNext()) {
