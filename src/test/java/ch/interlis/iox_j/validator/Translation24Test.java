@@ -48,7 +48,21 @@ public class Translation24Test {
     }
 
     @Test
-    public void validateTranslatedBasket() {
+    public void validateTranslatedBasket_Ok() {
+        ValidationConfig modelConfig = new ValidationConfig();
+        LogCollector logger = new LogCollector();
+        LogEventFactory errFactory = new LogEventFactory();
+        Settings settings = new Settings();
+        Validator validator = new Validator(td, modelConfig, logger, errFactory, settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_DE_TOPIC_A, "b1"));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+    @Test
+    public void validateTranslatedBasket_Fail() {
         ValidationConfig modelConfig = new ValidationConfig();
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
