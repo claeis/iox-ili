@@ -1,0 +1,15 @@
+INTERLIS 2.4;
+
+MODEL Basket24
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2025-07-31" =
+	
+	TOPIC TopicA=
+	END TopicA;
+	
+	TOPIC TopicB=
+	END TopicB;
+
+	TOPIC TopicC=
+	END TopicC;	
+	
+END Basket24.

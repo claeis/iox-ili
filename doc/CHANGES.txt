@@ -4,6 +4,7 @@ ideas/open issues
 
 iox-ili 1.24.1 (2025-05-xx)
 -----------------------------
+- Validator: support mandatoryBaskets, optionalBaskets, bannedBaskets (ilivalidator#433)
 - Validator: report error when validating INTERLIS 2.4 translated XTF
 - IoxStatistics: add fileMd5, basketEndState
 - Xtf23Reader: allow XML-attribute BID on object element

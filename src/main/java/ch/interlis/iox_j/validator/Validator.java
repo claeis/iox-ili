@@ -222,6 +222,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private long objectCount=0l;
     private long structCount=0l;
 	private final Map<String, Domain> genericDomains = new HashMap<String, Domain>();
+    /** mappings from xml-tags to Viewable|AttributeDef
+     */
+    private HashMap<String,Object> tag2class=null;
+    /** list of seen but unknown types; maintained to prevent duplicate error messages
+     */
+    private HashSet<String> unknownTypev=null;
+    private java.util.Set<String> mandatoryBaskets=null;
+    private java.util.Set<String> optionalBaskets=null;
+    private java.util.Set<String> bannedBaskets=null;
+    private java.util.Set<String> seenTopics=null;
 
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -313,6 +323,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			tag2class=ch.interlis.ili2c.generator.XSDGenerator.getTagMap(td);
 		}
 		unknownTypev=new HashSet<String>();
+        seenTopics=new HashSet<String>();
+        mandatoryBaskets=new HashSet<String>();
+        parseBasketList(mandatoryBaskets, validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.MANDATORY_BASKETS));
+        optionalBaskets=new HashSet<String>();
+        parseBasketList(optionalBaskets, validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.OPTIONAL_BASKETS));
+        bannedBaskets=new HashSet<String>();
+        parseBasketList(bannedBaskets, validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.BANNED_BASKETS));
+        if(mandatoryBaskets.isEmpty() && optionalBaskets.isEmpty() && bannedBaskets.isEmpty()) {
+            optionalBaskets.add(ValidationConfig.ANY);
+        }
+        if(!optionalBaskets.isEmpty() && !optionalBaskets.contains(ValidationConfig.ANY) && bannedBaskets.isEmpty() && !mandatoryBaskets.contains(ValidationConfig.ANY)) {
+            bannedBaskets.add(ValidationConfig.ANY);
+        }
+        if(!mandatoryBaskets.isEmpty() && !mandatoryBaskets.contains(ValidationConfig.ANY) && optionalBaskets.isEmpty() && !bannedBaskets.contains(ValidationConfig.ANY)) {
+            optionalBaskets.add(ValidationConfig.ANY);
+        }
 		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
 		globalMultiplicity=validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.MULTIPLICITY);
 		if(globalMultiplicity!=null && ValidationConfig.ON.equals(globalMultiplicity)){
@@ -350,12 +376,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             }
 		}
 	}
-	/** mappings from xml-tags to Viewable|AttributeDef
-	 */
-	private HashMap<String,Object> tag2class=null;
-	/** list of seen but unknown types; maintained to prevent duplicate error messages
-	 */
-	private HashSet<String> unknownTypev=null;
+    private void parseBasketList(java.util.Set<String> mandatoryBaskets, String baskets) {
+        if(baskets!=null) {
+		    String basketv[]=baskets.split(ValidationConfig.SEP);
+		    for(String basket:basketv) {
+		        mandatoryBaskets.add(basket);
+		    }
+		}
+    }
 	
 	@Override
 	public void close() {
@@ -492,19 +520,31 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         Topic topic = null;
         Model model = null;
         errFact.setTid(event.getBid());
-        errFact.setIliqname(event.getType());
-	    if (!isValidTopicName(event.getType())) {
+        final String topicQName = event.getType();
+        errFact.setIliqname(topicQName);
+	    if (!isValidTopicName(topicQName)) {
 	        isValid = false;
-            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.invalidBasketElementName"), event.getType()));
+            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.invalidBasketElementName"), topicQName));
         }
         if (!isValidId(event.getBid())) {
             isValid = false;
             LogEventFactory factory = new LogEventFactory();
             errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.valueIsNotAValidBID"), event.getBid()==null?"":event.getBid()));
         }
+        seenTopics.add(topicQName);
+        if(isValid) {
+            if(mandatoryBaskets.contains(topicQName) || mandatoryBaskets.contains(ValidationConfig.ANY)) {
+                // ok
+            }else if(optionalBaskets.contains(topicQName)|| optionalBaskets.contains(ValidationConfig.ANY)) {
+                // ok
+            }else if(bannedBaskets.contains(topicQName)|| bannedBaskets.contains(ValidationConfig.ANY)) {
+                isValid = false;
+                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.bannedBasket"), topicQName));
+            }
+        }
         Domain bidDomain=null;
         if(isValid) {
-            topic = (Topic)td.getElement(event.getType());
+            topic = (Topic)td.getElement(topicQName);
             model = (Model) topic.getContainer();
             seenModels.add(model.getName());
             collectSetConstraints(topic);
@@ -522,11 +562,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     bid=normalizeUUID(bid);
                 }
             	if(uniquenessOfBid.containsKey(bid)){
-            		errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateUniqueBasketId.bidOfAlreadyExistIn"), bid, event.getType(), uniquenessOfBid.get(bid)));
+            		errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateUniqueBasketId.bidOfAlreadyExistIn"), bid, topicQName, uniquenessOfBid.get(bid)));
             	} else {
-            		uniquenessOfBid.put(bid, event.getType());
+            		uniquenessOfBid.put(bid, topicQName);
                     if (bidDomain!=null) {
-                        stableBids.put(bid, event.getType());
+                        stableBids.put(bid, topicQName);
                     }
             	}
             }
@@ -559,7 +599,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         if (isValid && Model.ILI2_4.equals(model.getIliVersion())) {
             if (model.getTranslationOf() != null) {
                 Model baseModel = (Model)model.getTranslationOf();
-                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.Ili24TranslatedTransferNotAllowed"), event.getType(), model.getLanguage(), baseModel.getLanguage()));
+                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.Ili24TranslatedTransferNotAllowed"), topicQName, model.getLanguage(), baseModel.getLanguage()));
             }
         }
     }
@@ -674,10 +714,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     public void doSecondPass() {
         if(!singlePass) {
             errs.addEvent(errFact.logInfoMsg(rsrc.getString("doSecondPass.secondValidationPass")));
+            for(String mandatoryBasket:mandatoryBaskets) {
+                if(ValidationConfig.ANY.equals(mandatoryBasket)) {
+                    continue;
+                }
+                if(seenTopics.contains(mandatoryBasket)) {
+                    // ok
+                }else {
+                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.mandatoryBasketMissing"), mandatoryBasket));
+                }
+            }
             iterateThroughReferencedModels();
             String additionalModelsConfig = validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS);
             if (additionalModelsConfig != null) {
-                String[] additionalModels = additionalModelsConfig.split(";");
+                String[] additionalModels = additionalModelsConfig.split(ValidationConfig.SEP);
                 iterateThroughAdditionalModels(additionalModels);
             }
             iterateThroughAllObjects();
