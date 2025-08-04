@@ -17,6 +17,7 @@ import ch.interlis.iox_j.validator.Value;
 public class Math {
     public static final String MATH="Math";
     public static final String MATH_V2="Math_V2";
+    public static final String MATH_V2_1="Math_V2_1";
     
     private TransferDescription td = null;
     private ch.interlis.iox.IoxValidationConfig validationConfig = null;
@@ -697,15 +698,68 @@ public class Math {
                         String[] values = valueOfObjectPath.getValues();
                         double sum = 0;
                         for (String value : values) {
-                            double tmpValue = Double.parseDouble(value);
-                            sum += tmpValue;
+                            if (value != null) {
+                                double tmpValue = Double.parseDouble(value);
+                                sum += tmpValue;
+                            }
                         }
                         return new Value(sum);
+                    } else if (valueOfObjectPath.getValue() != null) {
+                        double sum = Double.parseDouble(valueOfObjectPath.getValue());
+                        return new Value(sum);
+                    } else if (valueOfObjectPath.isUndefined()) {
+                        return valueOfObjectPath;
                     }
                 }
             }
-            return new Value(false);                
-        } 
+            return new Value(false);
+        } else if (currentFunction.getName().equals("mod")) {
+            Evaluable[] arguments = functionCallObj.getArguments();
+            if (arguments != null) {
+                Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                if (firstValue.skipEvaluation()) {
+                    return firstValue;
+                }
+                if (firstValue.isUndefined()) {
+                    return Value.createSkipEvaluation();
+                }
+                Value secondValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[1], firstRole);
+                if (secondValue.skipEvaluation()) {
+                    return secondValue;
+                }
+                if (secondValue.isUndefined()) {
+                    return Value.createSkipEvaluation();
+                }
+
+                if (firstValue.getValue() != null && secondValue.getValue() != null) {
+                    double firstAttrValue = Double.parseDouble(firstValue.getValue());
+                    double secondAttrValue = Double.parseDouble(secondValue.getValue());
+                    if (secondAttrValue == 0) {
+                        return Value.createUndefined();
+                    } else {
+                        return new Value(((firstAttrValue % secondAttrValue) + java.lang.Math.abs(secondAttrValue)) % secondAttrValue);
+                    }
+                }
+            }
+            return new Value(false);
+        } else if (currentFunction.getName().equals("toNumeric")) {
+            Evaluable[] arguments = functionCallObj.getArguments();
+            if (arguments != null) {
+                Value firstValue = validator.evaluateExpression(parentObject, validationKind, usageScope, iomObj, arguments[0], firstRole);
+                if (firstValue.skipEvaluation()) {
+                    return firstValue;
+                }
+                if (firstValue.isUndefined()) {
+                    return Value.createSkipEvaluation();
+                }
+
+                if (firstValue.getValue() != null) {
+                    double firstAttrValue = Double.parseDouble(firstValue.getValue());
+                    return new Value(firstAttrValue);
+                }
+            }
+            return new Value(false);
+        }
         return null;
     }
 

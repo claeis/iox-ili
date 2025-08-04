@@ -2,6 +2,17 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.24.1 (2025-08-04)
+-----------------------------
+- Validator: support mandatoryBaskets, optionalBaskets, bannedBaskets (ilivalidator#433)
+- Validator: report error when validating INTERLIS 2.4 translated XTF
+- IoxStatistics: add fileMd5, basketEndState
+- Xtf23Reader: allow XML-attribute BID on object element
+- Xtf23Reader: read BAG/LIST OF Text to improve validation (ilivalidator#446)
+- Validator: new function addReferenceData (ilivalidator#437) 
+- Xtf24Writer: fail with translated basket/object
+- ili2c-5.6.5
+
 iox-ili 1.24.0 (2025-05-06)
 -----------------------------
 - Iox2wkb: fix boundary recoding (ili2db#564)

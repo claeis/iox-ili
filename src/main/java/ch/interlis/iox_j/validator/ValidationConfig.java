@@ -33,10 +33,15 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	public static final String ON="on";
 	public static final String TRUE="true";
 	public static final String FALSE="false";
+    public static final String ANY="ANY";
+    public static final String SEP = ";";
 	// PARAMETER
 	public static final String PARAMETER = "PARAMETER";
 	public static final String VALIDATION = "validation";
-	public static final String AREA_OVERLAP_VALIDATION = "areaOverlapValidation";
+    public static final String AREA_OVERLAP_VALIDATION = "areaOverlapValidation";
+	public static final String MANDATORY_BASKETS = "mandatoryBaskets";
+	public static final String OPTIONAL_BASKETS="optionalBaskets";
+	public static final String BANNED_BASKETS="bannedBaskets";
 	public static final String CONSTRAINT_VALIDATION = "constraintValidation";
 	public static final String DEFAULT_GEOMETRY_TYPE_VALIDATION = "defaultGeometryTypeValidation";
 	public static final String ADDITIONAL_MODELS="additionalModels";

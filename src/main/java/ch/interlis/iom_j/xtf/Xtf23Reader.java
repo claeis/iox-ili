@@ -659,9 +659,6 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
                 throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
 	    	}
             Attribute oid = event.asStartElement().getAttributeByName(QNAME_XML_OBJECT_TID);
-            if(event.asStartElement().getAttributeByName(QNAME_XML_TOPIC_BID) != null){
-                throw new IoxSyntaxException(unexpectedXmlEvent2msg(event));
-            }
             // DeleteObject
             if(event.asStartElement().getName().equals(getQName(NAME_XML_DELETE))) {
                 event = readDelete(event, iomObjOut);
@@ -956,7 +953,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 	            	// event is endElement of attribute
 	                if(event.isEndElement()) {
 	                    // ok, is content and not only white space
-	                    iomObj.setattrvalue(attrName, value.toString());
+	                    ((Iom_jObject)iomObj).addattrvalue(attrName, value.toString());
 	                }
 	            }
 	            if(!event.isStartElement() && !event.isEndElement()) {

@@ -146,6 +146,7 @@ import ch.interlis.iox_j.validator.functions.Math;
 import ch.interlis.iox_j.validator.functions.MinimalRuntimeSystem;
 import ch.interlis.iox_j.validator.functions.Interlis;
 import ch.interlis.iox_j.validator.functions.Interlis_ext;
+import ch.interlis.iox_j.validator.functions.ObjectPoolFunctions;
 
 public class Validator implements ch.interlis.iox.IoxValidator {
     private static final String ILI_LEGACYAREAREAS = "ILI_LEGACYAREAREAS";
@@ -221,6 +222,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private long objectCount=0l;
     private long structCount=0l;
 	private final Map<String, Domain> genericDomains = new HashMap<String, Domain>();
+    /** mappings from xml-tags to Viewable|AttributeDef
+     */
+    private HashMap<String,Object> tag2class=null;
+    /** list of seen but unknown types; maintained to prevent duplicate error messages
+     */
+    private HashSet<String> unknownTypev=null;
+    private java.util.Set<String> mandatoryBaskets=null;
+    private java.util.Set<String> optionalBaskets=null;
+    private java.util.Set<String> bannedBaskets=null;
+    private java.util.Set<String> seenTopics=null;
 
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -312,6 +323,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			tag2class=ch.interlis.ili2c.generator.XSDGenerator.getTagMap(td);
 		}
 		unknownTypev=new HashSet<String>();
+        seenTopics=new HashSet<String>();
+        mandatoryBaskets=new HashSet<String>();
+        parseBasketList(mandatoryBaskets, validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.MANDATORY_BASKETS));
+        optionalBaskets=new HashSet<String>();
+        parseBasketList(optionalBaskets, validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.OPTIONAL_BASKETS));
+        bannedBaskets=new HashSet<String>();
+        parseBasketList(bannedBaskets, validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.BANNED_BASKETS));
+        if(mandatoryBaskets.isEmpty() && optionalBaskets.isEmpty() && bannedBaskets.isEmpty()) {
+            optionalBaskets.add(ValidationConfig.ANY);
+        }
+        if(!optionalBaskets.isEmpty() && !optionalBaskets.contains(ValidationConfig.ANY) && bannedBaskets.isEmpty() && !mandatoryBaskets.contains(ValidationConfig.ANY)) {
+            bannedBaskets.add(ValidationConfig.ANY);
+        }
+        if(!mandatoryBaskets.isEmpty() && !mandatoryBaskets.contains(ValidationConfig.ANY) && optionalBaskets.isEmpty() && !bannedBaskets.contains(ValidationConfig.ANY)) {
+            optionalBaskets.add(ValidationConfig.ANY);
+        }
 		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
 		globalMultiplicity=validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.MULTIPLICITY);
 		if(globalMultiplicity!=null && ValidationConfig.ON.equals(globalMultiplicity)){
@@ -349,12 +376,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             }
 		}
 	}
-	/** mappings from xml-tags to Viewable|AttributeDef
-	 */
-	private HashMap<String,Object> tag2class=null;
-	/** list of seen but unknown types; maintained to prevent duplicate error messages
-	 */
-	private HashSet<String> unknownTypev=null;
+    private void parseBasketList(java.util.Set<String> mandatoryBaskets, String baskets) {
+        if(baskets!=null) {
+		    String basketv[]=baskets.split(ValidationConfig.SEP);
+		    for(String basket:basketv) {
+		        mandatoryBaskets.add(basket);
+		    }
+		}
+    }
 	
 	@Override
 	public void close() {
@@ -385,14 +414,22 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public void setLoggingHandler(IoxLogging handler) {
 		errs=handler;
 	}
-	@Override
-	public void validate(ch.interlis.iox.IoxEvent event) {
+    public void addReferenceData(ch.interlis.iox.IoxEvent event) {
+        validate(event,false);
+    }
+    @Override
+    public void validate(ch.interlis.iox.IoxEvent event) {
+        validate(event,true);
+    }
+	private void validate(ch.interlis.iox.IoxEvent event,boolean doValidation) {
 		if(validationOff){
 			return;
 		}
 		if (event instanceof ch.interlis.iox.StartTransferEvent){
 			errs.addEvent(errFact.logInfoMsg(rsrc.getString("validate.firstValidationPass")));
-			validateInconsistentIliAndXMLVersion(event);
+			if(doValidation) {
+	            validateInconsistentIliAndXMLVersion(event);
+			}
 			uniquenessOfBid.clear();
 			uniquenessOfBid.putAll(stableBids);
 			if(!singlePass) {
@@ -401,11 +438,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		} else if (event instanceof ch.interlis.iox.StartBasketEvent){
 			StartBasketEvent startBasketEvent = ((ch.interlis.iox.StartBasketEvent) event);
 			currentBasketId = startBasketEvent.getBid();
+			if(isValidId(currentBasketId)){
+			    objectPool.startBasket(currentBasketId,doValidation);
+			}
 			validateBasketEvent(startBasketEvent);
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
 			IomObject iomObj=new ch.interlis.iom_j.Iom_jObject(((ch.interlis.iox.ObjectEvent)event).getIomObject());
 			try {
-                validateObject(iomObj,null,null);
+                validateObject(iomObj,null,null,doValidation);
 			} catch (IoxException e) {
 				errs.addEvent(errFact.logInfoMsg(rsrc.getString("validate.failedToValidateObject"), iomObj.toString()));
 			}catch(RuntimeException e) {
@@ -415,9 +455,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		} else if (event instanceof ch.interlis.iox.EndBasketEvent){
 		    cleanupCurrentBasket();
 		}else if (event instanceof ch.interlis.iox.EndTransferEvent){
-			if(autoSecondPass){
-				doSecondPass();
-			}
+		    if(doValidation) {
+	            if(autoSecondPass){
+	                doSecondPass();
+	            }
+		    }
 		}
         if(writer!=null) {
 		    try {
@@ -478,19 +520,31 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         Topic topic = null;
         Model model = null;
         errFact.setTid(event.getBid());
-        errFact.setIliqname(event.getType());
-	    if (!isValidTopicName(event.getType())) {
+        final String topicQName = event.getType();
+        errFact.setIliqname(topicQName);
+	    if (!isValidTopicName(topicQName)) {
 	        isValid = false;
-            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.invalidBasketElementName"), event.getType()));
+            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.invalidBasketElementName"), topicQName));
         }
         if (!isValidId(event.getBid())) {
             isValid = false;
             LogEventFactory factory = new LogEventFactory();
             errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.valueIsNotAValidBID"), event.getBid()==null?"":event.getBid()));
         }
+        seenTopics.add(topicQName);
+        if(isValid) {
+            if(mandatoryBaskets.contains(topicQName) || mandatoryBaskets.contains(ValidationConfig.ANY)) {
+                // ok
+            }else if(optionalBaskets.contains(topicQName)|| optionalBaskets.contains(ValidationConfig.ANY)) {
+                // ok
+            }else if(bannedBaskets.contains(topicQName)|| bannedBaskets.contains(ValidationConfig.ANY)) {
+                isValid = false;
+                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.bannedBasket"), topicQName));
+            }
+        }
         Domain bidDomain=null;
         if(isValid) {
-            topic = (Topic)td.getElement(event.getType());
+            topic = (Topic)td.getElement(topicQName);
             model = (Model) topic.getContainer();
             seenModels.add(model.getName());
             collectSetConstraints(topic);
@@ -508,11 +562,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     bid=normalizeUUID(bid);
                 }
             	if(uniquenessOfBid.containsKey(bid)){
-            		errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateUniqueBasketId.bidOfAlreadyExistIn"), bid, event.getType(), uniquenessOfBid.get(bid)));
+            		errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateUniqueBasketId.bidOfAlreadyExistIn"), bid, topicQName, uniquenessOfBid.get(bid)));
             	} else {
-            		uniquenessOfBid.put(bid, event.getType());
+            		uniquenessOfBid.put(bid, topicQName);
                     if (bidDomain!=null) {
-                        stableBids.put(bid, event.getType());
+                        stableBids.put(bid, topicQName);
                     }
             	}
             }
@@ -537,6 +591,15 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 } else {
                     errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.concreteDomainNotFound"), concreteDomainName, genericDomainName));
                 }
+            }
+        }
+
+        // For INTERLIS 2.4, TRANSLATION OF models are not allowed in the transfer
+        // Referenzhandbuch Kapitel 4.3.3: Fuer uebersetzte Datenmodelle (TRANSLATION OF) bleiben die Tagnamen in der Ursprungs-Sprache
+        if (isValid && Model.ILI2_4.equals(model.getIliVersion())) {
+            if (model.getTranslationOf() != null) {
+                Model baseModel = (Model)model.getTranslationOf();
+                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.Ili24TranslatedTransferNotAllowed"), topicQName, model.getLanguage(), baseModel.getLanguage()));
             }
         }
     }
@@ -651,10 +714,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     public void doSecondPass() {
         if(!singlePass) {
             errs.addEvent(errFact.logInfoMsg(rsrc.getString("doSecondPass.secondValidationPass")));
+            for(String mandatoryBasket:mandatoryBaskets) {
+                if(ValidationConfig.ANY.equals(mandatoryBasket)) {
+                    continue;
+                }
+                if(seenTopics.contains(mandatoryBasket)) {
+                    // ok
+                }else {
+                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.mandatoryBasketMissing"), mandatoryBasket));
+                }
+            }
             iterateThroughReferencedModels();
             String additionalModelsConfig = validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS);
             if (additionalModelsConfig != null) {
-                String[] additionalModels = additionalModelsConfig.split(";");
+                String[] additionalModels = additionalModelsConfig.split(ValidationConfig.SEP);
                 iterateThroughAdditionalModels(additionalModels);
             }
             iterateThroughAllObjects();
@@ -894,7 +967,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	private void iterateThroughAllObjects(){
 		HashSet<Type> types=new HashSet<Type>();
-		for (String basketId : objectPool.getBasketIds()){
+		for (String basketId : objectPool.getDataBids()){
 			// iterate through iomObjects
 			Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
 			updateCurrentBasket(basketId);
@@ -1059,7 +1132,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
         return role;
     }
-    private boolean viewIncludesObject(Projection view, IomObject iomObj) {
+    public boolean viewIncludesObject(Projection view, IomObject iomObj) {
 		String viewName = getScopedName(view);
 		Iterator<?> viewIterator = view.iterator();
 		while (viewIterator.hasNext()) {
@@ -1954,7 +2027,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			    }
 			    
 			    return textFunction.evaluateFunction(currentFunction, functionCallObj, parentObject, validationKind, usageScope, iomObj, texttype, firstRole);
-			} else if (funcName.startsWith(Math.MATH+".") || funcName.startsWith(Math.MATH_V2+".")) {
+			} else if (funcName.startsWith(Math.MATH+".") || funcName.startsWith(Math.MATH_V2+".") || funcName.startsWith(Math.MATH_V2_1 + ".")) {
 			    if(mathFunction == null) {
 	                mathFunction = new Math(this, td, validationConfig);
 			    }
@@ -1982,13 +2055,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			    }
 			    
 			    return interlis_ext.evaluateFunction(currentFunction, parentObject, validationKind, usageScope, iomObj, expression, functions, td, firstRole);
-            } else if (funcName.startsWith("DMAVTYM_Topologie_V1_0.")) {
+            } else if (funcName.startsWith(DmavtymTopologie.DMAVTYM_Topologie_V1_0 + ".") || funcName.startsWith(DmavtymTopologie.DMAVTYM_Topologie_V1_1 + ".")) {
                 if (dmavtymTopologie == null) {
                     dmavtymTopologie = new DmavtymTopologie(this, td, validationConfig, errFact);
                 }
 
                 return dmavtymTopologie.evaluateFunction(currentFunction, functionCallObj, parentObject,
                         validationKind, usageScope, iomObj, texttype, firstRole);
+			} else if (funcName.startsWith(ObjectPoolFunctions.OBJECTPOOL + ".")) {
+				if (objectPoolFunctions == null) {
+					objectPoolFunctions = new ObjectPoolFunctions(this, objectPool, errFact);
+				}
+
+				return objectPoolFunctions.evaluateFunction(currentFunction, functionCallObj, parentObject,
+						validationKind, usageScope, iomObj, texttype, firstRole);
 			} else {
 				String functionQname=funcName;
 				Class functionTargetClass=customFunctions.get(functionQname);
@@ -2378,7 +2458,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private void buildTargetObjectsMap(RoleDef role) {     
         Map<String, List<IomObject>> values = new HashMap<String, List<IomObject>>();
         targetObjects.put(role, values);
-        for (String basketId : objectPool.getBasketIds()) {
+        for (String basketId : objectPool.getDataBids()) {
             Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
             while (objectIterator.hasNext()) { 
                 IomObject targetObj = objectIterator.next();
@@ -2421,7 +2501,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private void buildLinkObjMap(RoleDef role) {     
         Map<String, List<IomObject>> values = new HashMap<String, List<IomObject>>();
         linkObjects.put(role, values);
-        for (String basketId : objectPool.getBasketIds()) {
+        for (String basketId : objectPool.getDataBids()) {
             Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
             while (objectIterator.hasNext()) { 
                 IomObject linkObj = objectIterator.next();
@@ -2913,7 +2993,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
     }
     private IomObject findExternalObject(String targetBid,String targetOid, ArrayList<Viewable> destinationClasses, OutParam<String> bidOfTargetObj) {
-	        if(!objectPool.getBasketIds().contains(targetBid)) {
+	        if(!objectPool.getDataBids().contains(targetBid)) {
 	            List<Dataset> dataset = null;
 	            File[] datasetFiles = null;
 	            IoxReader reader=null;
@@ -2934,6 +3014,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	                               IomObject objectValue = objectPool.addObject(((ch.interlis.iox.ObjectEvent) currentIoxEvent).getIomObject(), currentBid);
 	                            }else if (currentIoxEvent instanceof ch.interlis.iox.StartBasketEvent) {
 	                                currentBid=((ch.interlis.iox.StartBasketEvent) currentIoxEvent).getBid();
+	                                objectPool.startBasket(currentBid,false);
 	                            } else if (currentIoxEvent instanceof ch.interlis.iox.EndTransferEvent) {
 	                                break;
 	                            }
@@ -3144,7 +3225,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					String otherAttrName = otherAttrPath.toString();
 					otherClass = (Table) otherAttrPath.getRoot();
 					String attrValueThisObj = iomObj.getattrvalue(restrictedAttrName);
-					Iterator<String> basketIdIterator=objectPool.getBasketIds().iterator();
+					Iterator<String> basketIdIterator=objectPool.getDataBids().iterator();
 					while( !valueExists &&  basketIdIterator.hasNext()){
 						String basketId=basketIdIterator.next();
 						// iterate through iomObjects
@@ -3537,8 +3618,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private Text textFunction=null;
     private MinimalRuntimeSystem rtsFunction=null;
     private DmavtymTopologie dmavtymTopologie=null;
+	private ObjectPoolFunctions objectPoolFunctions=null;
 	
-	private void validateObject(IomObject iomObj,String attrPath,Viewable assocClass) throws IoxException {
+	private void validateObject(IomObject iomObj,String attrPath,Viewable assocClass,boolean doValidation) throws IoxException {
 		// validate if object is null
 		boolean isObject = attrPath==null;
 		if(isObject){
@@ -3581,7 +3663,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(isObject){
 			// is it a SURFACE or AREA line table?
 			if(doItfLineTables && modelele instanceof AttributeDef){
-				validateItfLineTableObject(iomObj,(AttributeDef)modelele);
+			    if(doValidation) {
+	                validateItfLineTableObject(iomObj,(AttributeDef)modelele);
+			    }
 				return;
 			}
 		}
@@ -3673,100 +3757,102 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 
-		HashSet<String> propNames=new HashSet<String>();
-		Iterator iter = aclass1.getAttributesAndRoles2();
-		while (iter.hasNext()) {
-			ViewableTransferElement obj = (ViewableTransferElement)iter.next();
-			if (obj.obj instanceof AttributeDef) {
-				AttributeDef attr = (AttributeDef) obj.obj;
-				if(!attr.isTransient()){
-					Type proxyType=attr.getDomain();
-					if(proxyType!=null && (proxyType instanceof ObjectType)){
-						// skip implicit particles (base-viewables) of views
-					}else{
-						propNames.add(attr.getName());
-						validateAttrValue(aclass1,iomObj,attr,attrPath);
-					}
-				}
-			}
-			if (isObject && obj.obj instanceof RoleDef) {
-				RoleDef role = (RoleDef) obj.obj;
-				{ // if (role.getExtending() == null)
-					String refoid = null;
-					String roleName = role.getName();
-					// a role of an embedded association?
-                    if (obj.embedded) {
-                        int propc=iomObj.getattrvaluecount(roleName);
-                        if(propc>=1) {
-                            IomObject embeddedLinkObj = iomObj.getattrobj(roleName, 0);
-                            AssociationDef roleOwner = (AssociationDef) role.getContainer();
-                            
-                            if (roleOwner.getDerivedFrom() == null) {
-                                // not just a link?
-                                propNames.add(roleName);
-                                
-                                //Validate if no superfluous properties
-                                if(propc>0) {
-                                    validateObject(embeddedLinkObj,roleName,roleOwner);
-                                }
-                                
-                                if (embeddedLinkObj != null) {
-                                    refoid = embeddedLinkObj.getobjectrefoid();
-                                    long orderPos = embeddedLinkObj
-                                            .getobjectreforderpos();
-                                    if (orderPos != 0) {
-                                        // refoid,orderPos
-                                        // ret.setStringAttribute(roleName,
-                                        // refoid);
-                                        // ret.setStringAttribute(roleName+".orderPos",
-                                        // Long.toString(orderPos));
-                                    } else {
-                                        // refoid
-                                        // ret.setStringAttribute(roleName,
-                                        // refoid);
-                                    }
-                                } else {
-                                    refoid = null;
-                                }
-                            }
-                            if(propc>1) {
-                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresOnlyOneReferenceProperty"),role.getScopedName()));
-                            }
-                            if(refoid==null) {
-                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresAReferenceToAnotherObject"),role.getScopedName()));
-                            }
-                        }
-                    } else {
-                        int propc=iomObj.getattrvaluecount(roleName);
-                        if(propc==1) {
-                            IomObject structvalue = iomObj.getattrobj(roleName, 0);
-                            propNames.add(roleName);
-                            refoid = structvalue.getobjectrefoid();
-                            long orderPos = structvalue
-                                    .getobjectreforderpos();
-                            if (orderPos != 0) {
-                                // refoid,orderPos
-                                // ret.setStringAttribute(roleName, refoid);
-                                // ret.setStringAttribute(roleName+".orderPos",
-                                // Long.toString(orderPos));
-                            } else {
-                                // refoid
-                                // ret.setStringAttribute(roleName, refoid);
-                            }
-                        }
-                        if(refoid==null) {
-                            addToPool = false;
-                            errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresAReferenceToAnotherObject"),role.getScopedName()));
-                        }
-                    }
-                    if (refoid != null) {
-                        if(!singlePass) {
-                            linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
+        HashSet<String> propNames=new HashSet<String>();
+        if(doValidation) {
+            Iterator iter = aclass1.getAttributesAndRoles2();
+            while (iter.hasNext()) {
+                ViewableTransferElement obj = (ViewableTransferElement)iter.next();
+                if (obj.obj instanceof AttributeDef) {
+                    AttributeDef attr = (AttributeDef) obj.obj;
+                    if(!attr.isTransient()){
+                        Type proxyType=attr.getDomain();
+                        if(proxyType!=null && (proxyType instanceof ObjectType)){
+                            // skip implicit particles (base-viewables) of views
+                        }else{
+                            propNames.add(attr.getName());
+                            validateAttrValue(aclass1,iomObj,attr,attrPath);
                         }
                     }
                 }
-			}
-		}
+                if (isObject && obj.obj instanceof RoleDef) {
+                    RoleDef role = (RoleDef) obj.obj;
+                    { // if (role.getExtending() == null)
+                        String refoid = null;
+                        String roleName = role.getName();
+                        // a role of an embedded association?
+                        if (obj.embedded) {
+                            int propc=iomObj.getattrvaluecount(roleName);
+                            if(propc>=1) {
+                                IomObject embeddedLinkObj = iomObj.getattrobj(roleName, 0);
+                                AssociationDef roleOwner = (AssociationDef) role.getContainer();
+                                
+                                if (roleOwner.getDerivedFrom() == null) {
+                                    // not just a link?
+                                    propNames.add(roleName);
+                                    
+                                    //Validate if no superfluous properties
+                                    if(propc>0) {
+                                        validateObject(embeddedLinkObj,roleName,roleOwner,true);
+                                    }
+                                    
+                                    if (embeddedLinkObj != null) {
+                                        refoid = embeddedLinkObj.getobjectrefoid();
+                                        long orderPos = embeddedLinkObj
+                                                .getobjectreforderpos();
+                                        if (orderPos != 0) {
+                                            // refoid,orderPos
+                                            // ret.setStringAttribute(roleName,
+                                            // refoid);
+                                            // ret.setStringAttribute(roleName+".orderPos",
+                                            // Long.toString(orderPos));
+                                        } else {
+                                            // refoid
+                                            // ret.setStringAttribute(roleName,
+                                            // refoid);
+                                        }
+                                    } else {
+                                        refoid = null;
+                                    }
+                                }
+                                if(propc>1) {
+                                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresOnlyOneReferenceProperty"),role.getScopedName()));
+                                }
+                                if(refoid==null) {
+                                    errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresAReferenceToAnotherObject"),role.getScopedName()));
+                                }
+                            }
+                        } else {
+                            int propc=iomObj.getattrvaluecount(roleName);
+                            if(propc==1) {
+                                IomObject structvalue = iomObj.getattrobj(roleName, 0);
+                                propNames.add(roleName);
+                                refoid = structvalue.getobjectrefoid();
+                                long orderPos = structvalue
+                                        .getobjectreforderpos();
+                                if (orderPos != 0) {
+                                    // refoid,orderPos
+                                    // ret.setStringAttribute(roleName, refoid);
+                                    // ret.setStringAttribute(roleName+".orderPos",
+                                    // Long.toString(orderPos));
+                                } else {
+                                    // refoid
+                                    // ret.setStringAttribute(roleName, refoid);
+                                }
+                            }
+                            if(refoid==null) {
+                                addToPool = false;
+                                errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.roleRequiresAReferenceToAnotherObject"),role.getScopedName()));
+                            }
+                        }
+                        if (refoid != null) {
+                            if(!singlePass) {
+                                linkPool.addLink(iomObj,role,refoid,doItfOidPerTable);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 		
 		if(isObject){
 			if(addToPool){
@@ -3781,18 +3867,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 			}
 		
-		// validate if no superfluous properties
-		int propc=iomObj.getattrcount();
-		for(int propi=0;propi<propc;propi++){
-			String propName=iomObj.getattrname(propi);
-			if(propName.startsWith("_")){
-				// ok, software internal properties start with a '_'
-			}else{
-				if(!propNames.contains(propName)){
-					errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.unknownPropertyX"),propName));
-				}
-			}
-		}
+        if(doValidation) {
+            // validate if no superfluous properties
+            int propc=iomObj.getattrcount();
+            for(int propi=0;propi<propc;propi++){
+                String propName=iomObj.getattrname(propi);
+                if(propName.startsWith("_")){
+                    // ok, software internal properties start with a '_'
+                }else{
+                    if(!propNames.contains(propName)){
+                        errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateObject.unknownPropertyX"),propName));
+                    }
+                }
+            }
+        }
 	}
 	
 	private void setCurrentMainObj(IomObject iomObj) {
@@ -4044,7 +4132,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 								 logMsg(validateType, rsrc.getString("validateAttrValue.attributeXRequiresANonAbstractStructure"), attrPath);
 							}
 						}
-						validateObject(structEle, attrPath+"["+structi+"]",null);
+						validateObject(structEle, attrPath+"["+structi+"]",null,true);
 					}
 			 }
 		}else{

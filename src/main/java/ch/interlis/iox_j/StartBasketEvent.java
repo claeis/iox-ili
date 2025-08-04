@@ -36,6 +36,7 @@ public class StartBasketEvent implements ch.interlis.iox.StartBasketEvent {
 	private String startstate=null;
 	private String endstate=null; 
 	private String[] topicv=null;
+	private String fileMd5=null;
 	private java.util.Map<String,String> domains=new java.util.HashMap<String,String>();
 	/** Creates a new start basket event.
 	 * @param type Type of basket
@@ -116,4 +117,10 @@ public class StartBasketEvent implements ch.interlis.iox.StartBasketEvent {
 	public String getDomain(String genericDomain) {
 		return domains.get(genericDomain);
 	}
+    public void setFileMd5(String string) {
+        fileMd5 = string;
+    }
+    public String getFileMd5() {
+        return fileMd5;
+    }
 }

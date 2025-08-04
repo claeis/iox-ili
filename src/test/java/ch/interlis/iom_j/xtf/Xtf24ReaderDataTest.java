@@ -68,6 +68,28 @@ public class Xtf24ReaderDataTest {
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void testTextType_List_Ok()  throws Iox2jtsException, IoxException {
+        Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"TextTypes_List.xml"));
+        reader.setModel(td);
+        assertTrue(reader.read() instanceof  StartTransferEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        
+        IoxEvent event = reader.read();
+        assertTrue(event instanceof ObjectEvent);
+        IomObject iomObject = ((ObjectEvent) event).getIomObject();
+        
+        assertEquals("DataTest1.TopicA.ClassAN", iomObject.getobjecttag());
+        assertEquals("oidN", iomObject.getobjectoid());
+        
+        assertEquals("text0", iomObject.getattrprim("attrN",0));
+        assertEquals("text1", iomObject.getattrprim("attrN",1));
+        
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
 	
 	// Es wird getestet ob Texte ohne Fehler auf einer Linie gelesen werden koennen.
 	@Test
@@ -1244,7 +1266,7 @@ public class Xtf24ReaderDataTest {
 
 	// Es wird getestet ob Referenzattribute korrekt gelesen werden.
 	@Test
-	public void testReferenceAttribute_Ok() throws IoxException {
+	public void testReferenceAttribute_List_Ok() throws IoxException {
 		Xtf24Reader reader=new Xtf24Reader(new File(TEST_IN,"References.xml"));
 		reader.setModel(td);
 		assertTrue(reader.read() instanceof  StartTransferEvent);

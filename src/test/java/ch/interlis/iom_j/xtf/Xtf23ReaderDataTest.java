@@ -154,6 +154,28 @@ public class Xtf23ReaderDataTest {
 		reader.close();
 		reader=null;
 	}
+    @Test
+    public void testTextType_List_Ok()  throws Iox2jtsException, IoxException {
+        Xtf23Reader reader=new Xtf23Reader(new File(TEST_IN,"TextTypes_List.xtf"));
+        assertTrue(reader.read() instanceof  StartTransferEvent);
+        assertTrue(reader.read() instanceof  StartBasketEvent);
+        
+        IoxEvent event = reader.read();
+        assertTrue(event instanceof  ObjectEvent);
+        IomObject iomObject = ((ObjectEvent) event).getIomObject();
+        
+        // DataTest1.TopicA.ClassA oid oidA {attrMText m text, attrName Randomname, attrText normal text, attrUri http://www.interlis.ch}
+        assertEquals("DataTest1.TopicA.ClassA", iomObject.getobjecttag());
+        assertEquals("oidA", iomObject.getobjectoid());     
+        
+        assertEquals("text0", iomObject.getattrprim("attrText",0));
+        assertEquals("text1", iomObject.getattrprim("attrText",1));
+        
+        assertTrue(reader.read() instanceof  EndBasketEvent);
+        assertTrue(reader.read() instanceof  EndTransferEvent);
+        reader.close();
+        reader=null;
+    }
 	
     // Es wird getestet ob Texte ohne Fehler gelesen werden koennen.
     @Test
