@@ -267,11 +267,14 @@ import java.util.ArrayList;
 				if (attrv.containsKey(attrName))
 				{
 					ArrayList valuev = attrv.get(attrName);
-					Object val = valuev.get(index);
-					if (val instanceof Iom_jObject)
-					{
-						return (Iom_jObject)val;
-					}
+	                if (index>=0 && index<valuev.size())
+	                {
+	                    Object val = valuev.get(index);
+	                    if (val instanceof Iom_jObject)
+	                    {
+	                        return (Iom_jObject)val;
+	                    }
+	                }
 				}
 				return null;
 		}
@@ -282,10 +285,13 @@ import java.util.ArrayList;
 			if (attrv.containsKey(attrName))
 			{
 				ArrayList valuev = attrv.get(attrName);
-				Object val=valuev.get(index);
-				if(val instanceof String){
-					return (String)val;
-				}
+                if (index>=0 && index<valuev.size())
+                {
+                    Object val=valuev.get(index);
+                    if(val instanceof String){
+                        return (String)val;
+                    }
+                }
 			}
 			return null;
 		}

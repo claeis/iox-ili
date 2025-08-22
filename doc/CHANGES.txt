@@ -4,6 +4,7 @@ ideas/open issues
 
 iox-ili 1.24.2 (2025-08-xx)
 -----------------------------
+- Iom_jObject.getattrobj(), getattrprim() return null is index out of bounds
 
 iox-ili 1.24.1 (2025-08-04)
 -----------------------------
