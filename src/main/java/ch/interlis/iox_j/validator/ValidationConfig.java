@@ -16,7 +16,9 @@ import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iox_j.inifile.IniFileReader;
 
 public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
-	private HashMap<String,HashMap<String,String>> data=new HashMap<String,HashMap<String,String>>();
+	public static final String ILI_METAATTR_MESSAGE = "message";
+    public static final String ILI_METAATTR_CATEGORY = "category";
+    private HashMap<String,HashMap<String,String>> data=new HashMap<String,HashMap<String,String>>();
 	// CONFIG
 	public static final String MULTIPLICITY="multiplicity";
 	public static final String TYPE="type";
@@ -78,6 +80,14 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 					String paramName=name.substring(ILI_METAATTR_PREFIX.length());
 					String paramValue=metaValues.getValue(name);
 					setConfigValue(iliQName,paramName,paramValue);
+				}
+				// map standard meta attrs to ilivalidator config
+				if(name.equals(ILI_METAATTR_CATEGORY)) {
+                    String paramValue=metaValues.getValue(name);
+                    setConfigValue(iliQName,CHECK,paramValue);
+				}else if(name.equals(ILI_METAATTR_MESSAGE)) {
+                    String paramValue=metaValues.getValue(name);
+                    setConfigValue(iliQName,MSG,paramValue);
 				}
 			}
 		}
