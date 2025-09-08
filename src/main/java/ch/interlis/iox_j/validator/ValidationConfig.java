@@ -88,6 +88,10 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 				}else if(name.equals(ILI_METAATTR_MESSAGE)) {
                     String paramValue=metaValues.getValue(name);
                     setConfigValue(iliQName,MSG,paramValue);
+                }else if(name.startsWith(ILI_METAATTR_MESSAGE+"_")) {
+                    String paramValue=metaValues.getValue(name);
+                    String suffix=name.substring(ILI_METAATTR_MESSAGE.length());
+                    setConfigValue(iliQName,MSG+suffix,paramValue);
 				}
 			}
 		}
