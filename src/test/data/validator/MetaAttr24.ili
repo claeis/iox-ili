@@ -1,0 +1,17 @@
+INTERLIS 2.4;
+
+MODEL MetaAttr24 AT "mailto:ce@eisenhutinformatik.ch" VERSION "2025-09-06" =
+  	
+	TOPIC TopicA =
+	
+		CLASS ClassA =
+			attrA : TEXT*10;
+			!!@ category = warning
+			!!@ message = "Bei Bedarf zwingend"
+			MANDATORY CONSTRAINT DEFINED (attrA); 			
+		END ClassA;
+		
+	END TopicA;
+	
+END MetaAttr24.
+
