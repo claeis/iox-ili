@@ -2,6 +2,9 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.24.3 (2025-09-xx)
+-----------------------------
+
 iox-ili 1.24.2 (2025-09-16)
 -----------------------------
 - Iom_jObject.getattrobj(), getattrprim() return null if index is out of bounds
