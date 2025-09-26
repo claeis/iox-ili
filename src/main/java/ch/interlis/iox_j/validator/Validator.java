@@ -439,7 +439,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			StartBasketEvent startBasketEvent = ((ch.interlis.iox.StartBasketEvent) event);
 			currentBasketId = startBasketEvent.getBid();
 			if(isValidId(currentBasketId)){
-			    objectPool.startBasket(currentBasketId,doValidation);
+	            if(!singlePass) {
+	                objectPool.startBasket(currentBasketId,doValidation);
+	            }
 			}
 			validateBasketEvent(startBasketEvent);
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
