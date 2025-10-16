@@ -2064,6 +2064,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
                 return dmavtymTopologie.evaluateFunction(currentFunction, functionCallObj, parentObject,
                         validationKind, usageScope, iomObj, texttype, firstRole);
+            } else if (funcName.startsWith(ch.interlis.iox_j.validator.functions.ElementsFunctions.ELEMENTS_V1_0 + ".")) {
+                if (elementsFunctions == null) {
+                    elementsFunctions = new ch.interlis.iox_j.validator.functions.ElementsFunctions(this, td, validationConfig, errFact);
+                }
+
+                return elementsFunctions.evaluateFunction(currentFunction, functionCallObj, parentObject,
+                        validationKind, usageScope, iomObj, firstRole);
 			} else if (funcName.startsWith(ObjectPoolFunctions.OBJECTPOOL + ".")) {
 				if (objectPoolFunctions == null) {
 					objectPoolFunctions = new ObjectPoolFunctions(this, objectPool, errFact);
@@ -3621,6 +3628,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private MinimalRuntimeSystem rtsFunction=null;
     private DmavtymTopologie dmavtymTopologie=null;
 	private ObjectPoolFunctions objectPoolFunctions=null;
+    private ch.interlis.iox_j.validator.functions.ElementsFunctions elementsFunctions=null;
 	
 	private void validateObject(IomObject iomObj,String attrPath,Viewable assocClass,boolean doValidation) throws IoxException {
 		// validate if object is null

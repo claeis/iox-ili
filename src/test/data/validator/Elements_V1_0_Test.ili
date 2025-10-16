@@ -1,0 +1,66 @@
+INTERLIS 2.4;
+
+MODEL Elements_V1_0_Test (de) 
+AT "mailto:ce@eisenhutinformatik.ch" 
+VERSION "2025-10-13" =
+IMPORTS Elements_V1_0;
+
+    TOPIC TopicA = 
+
+		STRUCTURE Lokalisationsname =
+		  Name: TEXT*60; 
+		END Lokalisationsname; 
+    
+	    CLASS Lokalisation =
+	    	LokalisationName: BAG {0..*} OF Lokalisationsname;
+            MANDATORY CONSTRAINT LOK01:
+                Elements_V1_0.existsInList("Test-Wert",Elements_V1_0.valuesOfPath("LokalisationName->Name"))
+            ;
+	    END Lokalisation;
+	    
+    END TopicA;
+    
+    TOPIC TopicB = 
+
+		STRUCTURE Lokalisationsname =
+		  Name: TEXT*60; 
+		END Lokalisationsname; 
+    
+	    CLASS Lokalisation =
+	    	LokalisationName: BAG {0..*} OF Lokalisationsname;
+	    END Lokalisation;
+	    
+        CLASS Gebaeudeeingang =
+        END Gebaeudeeingang;
+        
+		ASSOCIATION LokalisationGebaeudeeingang =
+		  Lokalisation -<> {0..1} Lokalisation;
+		  Gebaeudeeingang -- {0..*} Gebaeudeeingang;
+		END LokalisationGebaeudeeingang;
+
+		CONSTRAINTS OF Gebaeudeeingang =
+            MANDATORY CONSTRAINT GEB01:
+                Elements_V1_0.existsInList("Test-Wert",Elements_V1_0.valuesOfPath("Lokalisation->LokalisationName->Name"))
+            ;
+         END;
+		
+    END TopicB;
+
+    TOPIC TopicC = 
+
+	    CLASS Lokalisation1 =
+		  Name: TEXT*60; 
+          MANDATORY CONSTRAINT LOK01:
+                Elements_V1_0.existsInList(Name,Elements_V1_0.values("Test-Wert"))
+            ;
+	    END Lokalisation1;
+	    CLASS Lokalisation2 =
+		  Name: TEXT*60; 
+          MANDATORY CONSTRAINT LOK02:
+                Elements_V1_0.existsInList(Name,Elements_V1_0.values("Anderer-Wert;Test-Wert"))
+            ;
+	    END Lokalisation2;
+	    
+    END TopicC;
+    
+END Elements_V1_0_Test.
