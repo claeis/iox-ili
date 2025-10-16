@@ -43,6 +43,10 @@ abstract public class CurveSegment implements java.io.Serializable {
 	}
 
 	public boolean equals2D(CurveSegment other, double tolerance) {
+		if (this.getClass() != other.getClass()) {
+			return false;
+		}
+
 		Coordinate startA = getStartPoint();
 		Coordinate endA = getEndPoint();
 		Coordinate startB = other.getStartPoint();

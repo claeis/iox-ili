@@ -389,6 +389,27 @@ public class DmavtymTopologie24Test {
     }
 
     @Test
+    public void coversWithToleranceDifferentArcs() {
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o1");
+        surface.addattrobj("surface", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createArc("23", "19", "10", "30"),
+                        IomObjectHelper.createCoord("10", "10"))));
+
+        Iom_jObject line = new Iom_jObject(CLASS_LINE, "o2");
+        line.addattrobj("line", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("30", "10"),
+                IomObjectHelper.createArc("23.005", "19", "10", "30")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, surface, line);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineClass.lineCoversSurface_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
     public void coversWithToleranceFromXtf() throws IoxException {
         LogCollector logger = ValidatorTestHelper.validateObjectsFromXtf24(td, new File("src/test/data/validator/DMAVTYM_Topologie_Tolerance.xtf"));
         assertThat(logger.getErrs(), is(empty()));
