@@ -41,4 +41,14 @@ abstract public class CurveSegment implements java.io.Serializable {
 	public void setUserData(Object userData) {
 		this.userData = userData;
 	}
+
+	public boolean equals2D(CurveSegment other, double tolerance) {
+		Coordinate startA = getStartPoint();
+		Coordinate endA = getEndPoint();
+		Coordinate startB = other.getStartPoint();
+		Coordinate endB = other.getEndPoint();
+
+		return (startA.equals2D(startB, tolerance) && endA.equals2D(endB, tolerance))
+				|| (startA.equals2D(endB, tolerance) && endA.equals2D(startB, tolerance));
+	}
 }

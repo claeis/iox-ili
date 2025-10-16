@@ -43,12 +43,12 @@
                 <DMAVTYM_Topologie_Function24:line>
                     <geom:polyline>
                         <geom:coord>
-                            <geom:c1>9.998</geom:c1>
+                            <geom:c1>9.999</geom:c1>
                             <geom:c2>30</geom:c2>
                         </geom:coord>
                         <geom:coord>
                             <geom:c1>10</geom:c1>
-                            <geom:c2>10.002</geom:c2>
+                            <geom:c2>10.001</geom:c2>
                         </geom:coord>
                     </geom:polyline>
                 </DMAVTYM_Topologie_Function24:line>

@@ -280,9 +280,9 @@ public class DmavtymTopologie24Test {
 
         Iom_jObject line = new Iom_jObject(CLASS_LINE, "o2");
         line.addattrobj("line", IomObjectHelper.createPolyline(
-                IomObjectHelper.createCoord("10.002", "15"),
+                IomObjectHelper.createCoord("10.001", "10"),
                 IomObjectHelper.createCoord("9.999", "30.001"),
-                IomObjectHelper.createCoord("20", "30")));
+                IomObjectHelper.createCoord("29.999", "30")));
 
         Iom_jObject surface2 = new Iom_jObject(CLASS_SURFACE, "o3");
         surface2.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
@@ -364,11 +364,27 @@ public class DmavtymTopologie24Test {
 
         Iom_jObject line = new Iom_jObject(CLASS_LINE, "o2");
         line.addattrobj("line", IomObjectHelper.createPolyline(
-                IomObjectHelper.createCoord("22", "20"),
-                IomObjectHelper.createCoord("25.001", "19.999")));
+                IomObjectHelper.createCoord("20.001", "20"),
+                IomObjectHelper.createCoord("25", "19.999")));
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, surface, line);
         assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceLineTooShort() {
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o1");
+        surface.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+
+        Iom_jObject line = new Iom_jObject(CLASS_LINE, "o2");
+        line.addattrobj("line", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("10", "29")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, surface, line);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineClass.lineCoversSurface_V1_1 is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 

@@ -23,12 +23,13 @@ import ch.interlis.iox_j.validator.Validator;
 import ch.interlis.iox_j.validator.Value;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.index.ItemVisitor;
+import com.vividsolutions.jts.index.strtree.STRtree;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DmavtymTopologie {
     public static final String DMAVTYM_Topologie_V1_0 = "DMAVTYM_Topologie_V1_0";
@@ -203,30 +204,41 @@ public class DmavtymTopologie {
         return new Value(false);
     }
 
-    private boolean coversWithTolerance(CurvePolygon surface, Collection<CompoundCurve> lines, double tolerance) {
-        LineString surfaceOutline = surface.getExteriorRing();
-        Geometry bufferedOutline = surfaceOutline.buffer(tolerance);
-        if (coversAllLines(bufferedOutline, lines)) {
-            return true;
+    private boolean coversWithTolerance(CurvePolygon surface, Collection<CompoundCurve> lines, final double tolerance) {
+        STRtree tree = new STRtree();
+        addSegments(tree, (CompoundCurveRing) surface.getExteriorRing());
+        for (int i = 0; i < surface.getNumInteriorRing(); i++) {
+            addSegments(tree, (CompoundCurveRing) surface.getInteriorRingN(i));
         }
 
-        for (int i = 0; i < surface.getNumInteriorRing(); i++) {
-            LineString surfaceInterior = surface.getInteriorRingN(i);
-            Geometry bufferedInterior = surfaceInterior.buffer(tolerance);
-            if (coversAllLines(bufferedInterior, lines)) {
-                return true;
+        // Check if all line segments have a matching entry in the tree
+        for (CompoundCurve line : lines) {
+            for (final CurveSegment segment : line.getSegments()) {
+                final AtomicBoolean found = new AtomicBoolean(false);
+                tree.query(segment.computeEnvelopeInternal(), new ItemVisitor() {
+                    @Override
+                    public void visitItem(Object item) {
+                        if (!found.get() && item instanceof CurveSegment && segment.equals2D((CurveSegment) item, tolerance)) {
+                            found.set(true);
+                        }
+                    }
+                });
+
+                if (!found.get()) {
+                    return false;
+                }
             }
         }
-        return false;
+
+        return true;
     }
 
-    private boolean coversAllLines(Geometry geometry, Collection<CompoundCurve> lines) {
-        for (CompoundCurve line : lines) {
-            if (!geometry.covers(line)) {
-                return false;
+    private void addSegments(STRtree tree, CompoundCurveRing ring) {
+        for (CompoundCurve line : ring.getLines()) {
+            for (CurveSegment segment : line.getSegments()) {
+                tree.insert(segment.computeEnvelopeInternal(), segment);
             }
         }
-        return true;
     }
 
     private Collection<CompoundCurve> getLines(IomObject multiLine) throws IoxException {
