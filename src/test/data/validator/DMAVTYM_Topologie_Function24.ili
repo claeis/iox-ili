@@ -35,5 +35,13 @@ MODEL DMAVTYM_Topologie_Function24
             MANDATORY CONSTRAINT lineCoversSurface_V1_1:
                 DMAVTYM_Topologie_V1_1.coversWithTolerance(ObjectPool.allObjects(>SurfaceClass), >>SurfaceClass->surface, THIS, >>line, 0.002);
         END LineClass;
+
+        CLASS CompareLinesClass =
+            line1: Line;
+            line2: Line;
+
+            MANDATORY CONSTRAINT lineCoversLine_V1_1:
+                DMAVTYM_Topologie_V1_1.coversWithTolerance(THIS, >>line1, THIS, >>line2, 0.002);
+        END CompareLinesClass;
     END Topic;
 END DMAVTYM_Topologie_Function24.

@@ -155,48 +155,67 @@ public class DmavtymTopologie {
         }
 
         // Check the type of the arguments
-        Collection<IomObject> surfaceObjects = actualArguments[0].getComplexObjects();
-        String surfaceAttr = actualArguments[1].getValue();
+        Collection<IomObject> referenceObjects = actualArguments[0].getComplexObjects();
+        String referenceAttr = actualArguments[1].getValue();
         Collection<IomObject> multiLineObjects = actualArguments[2].getComplexObjects();
         String multiLineAttr = actualArguments[3].getValue();
         double tolerance = actualArguments[4].getNumeric();
-        if (surfaceObjects == null || surfaceAttr == null
+        if (referenceObjects == null || referenceAttr == null
                 || multiLineObjects == null || multiLineObjects.size() != 1 || multiLineAttr == null
                 || tolerance < 0) {
             return Value.createUndefined();
         }
 
-        // Resolve lines
+        // Resolve multiline
         IomObject multiLineObject = multiLineObjects.iterator().next();
         if (multiLineObject.getattrvaluecount(multiLineAttr) != 1) {
             return Value.createUndefined();
         }
 
         // Convert the IOM objects to JTS objects
-        Collection<CurvePolygon> surfaces = new ArrayList<CurvePolygon>(surfaceObjects.size());
-        Collection<CompoundCurve> lines;
+        Collection<Collection<CompoundCurve>> referenceMultiLines = new ArrayList<Collection<CompoundCurve>>(referenceObjects.size());
+        Collection<CompoundCurve> multiLine;
         try {
-            for (IomObject surfaceObject : surfaceObjects) {
-                if (surfaceObject.getattrvaluecount(surfaceAttr) != 1) {
+            for (IomObject referenceObject : referenceObjects) {
+                if (referenceObject.getattrvaluecount(referenceAttr) != 1) {
                     return Value.createUndefined();
                 }
-                surfaces.add(getSurface(surfaceObject.getattrobj(surfaceAttr, 0), validationKind));
+                IomObject attrValue = referenceObject.getattrobj(referenceAttr, 0);
+                String objectTag = attrValue.getobjecttag();
+                if (objectTag.equals(Iom_jObject.MULTISURFACE)) {
+                    CurvePolygon surface = getSurface(attrValue, validationKind);
+                    referenceMultiLines.add(((CompoundCurveRing) surface.getExteriorRing()).getLines());
+                    for (int i = 0; i < surface.getNumInteriorRing(); i++) {
+                        referenceMultiLines.add(((CompoundCurveRing) surface.getInteriorRingN(i)).getLines());
+                    }
+                } else if (objectTag.equals(Iom_jObject.MULTIPOLYLINE) || objectTag.equals(Iom_jObject.POLYLINE)) {
+                    referenceMultiLines.add(getLines(attrValue));
+                } else {
+                    return Value.createUndefined();
+                }
             }
 
-            lines = getLines(multiLineObject.getattrobj(multiLineAttr, 0));
+            multiLine = getLines(multiLineObject.getattrobj(multiLineAttr, 0));
         } catch (IoxException e) {
             EhiLogger.logError(e);
             return Value.createUndefined();
         }
 
         Envelope linesEnvelope = new Envelope();
-        for (CompoundCurve line : lines) {
+        for (CompoundCurve line : multiLine) {
             linesEnvelope.expandToInclude(line.getEnvelopeInternal());
         }
         linesEnvelope.expandBy(tolerance);
 
-        for (CurvePolygon surface : surfaces) {
-            if (surface.getEnvelopeInternal().intersects(linesEnvelope) && coversWithTolerance(surface, lines, tolerance)) {
+        for (Collection<CompoundCurve> referenceMultiLine : referenceMultiLines) {
+            boolean envelopesIntersect = false;
+            for (CompoundCurve line : referenceMultiLine) {
+                if (linesEnvelope.intersects(line.getEnvelopeInternal())) {
+                    envelopesIntersect = true;
+                    break;
+                }
+            }
+            if (envelopesIntersect && coversWithTolerance(referenceMultiLine, multiLine, tolerance)) {
                 return new Value(true);
             }
         }
@@ -204,15 +223,16 @@ public class DmavtymTopologie {
         return new Value(false);
     }
 
-    private boolean coversWithTolerance(CurvePolygon surface, Collection<CompoundCurve> lines, final double tolerance) {
+    private boolean coversWithTolerance(Collection<CompoundCurve> referenceMultiLine, Collection<CompoundCurve> multiLine, final double tolerance) {
         STRtree tree = new STRtree();
-        addSegments(tree, (CompoundCurveRing) surface.getExteriorRing());
-        for (int i = 0; i < surface.getNumInteriorRing(); i++) {
-            addSegments(tree, (CompoundCurveRing) surface.getInteriorRingN(i));
+        for (CompoundCurve referenceLine : referenceMultiLine) {
+            for (CurveSegment segment : referenceLine.getSegments()) {
+                tree.insert(segment.computeEnvelopeInternal(), segment);
+            }
         }
 
         // Check if all line segments have a matching entry in the tree
-        for (CompoundCurve line : lines) {
+        for (CompoundCurve line : multiLine) {
             for (final CurveSegment segment : line.getSegments()) {
                 final AtomicBoolean found = new AtomicBoolean(false);
                 tree.query(segment.computeEnvelopeInternal(), new ItemVisitor() {
@@ -231,14 +251,6 @@ public class DmavtymTopologie {
         }
 
         return true;
-    }
-
-    private void addSegments(STRtree tree, CompoundCurveRing ring) {
-        for (CompoundCurve line : ring.getLines()) {
-            for (CurveSegment segment : line.getSegments()) {
-                tree.insert(segment.computeEnvelopeInternal(), segment);
-            }
-        }
     }
 
     private Collection<CompoundCurve> getLines(IomObject multiLine) throws IoxException {
