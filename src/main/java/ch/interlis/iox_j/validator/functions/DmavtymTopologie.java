@@ -14,6 +14,7 @@ import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurveRing;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurvePolygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxValidationConfig;
 import ch.interlis.iox_j.jts.Iox2jtsext;
@@ -25,6 +26,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +40,7 @@ public class DmavtymTopologie {
     private final IoxValidationConfig validationConfig;
     private final Validator validator;
     private final LogEventFactory logger;
+    private final JtsextGeometryFactory geometryFactory = new JtsextGeometryFactory();
 
     public DmavtymTopologie(Validator validator, TransferDescription td, IoxValidationConfig validationConfig, LogEventFactory logger) {
         this.validator = validator;
@@ -66,6 +69,8 @@ public class DmavtymTopologie {
             return evaluateCovers(validationKind, usageScope, iomObj, actualArguments);
         } else if (currentFunction.getName().equals("coversWithTolerance")) {
             return evaluateCoversWithTolerance(validationKind, usageScope, iomObj, actualArguments);
+        } else if (currentFunction.getName().equals("isInside")) {
+            return evaluateIsInside(validationKind, usageScope, iomObj, actualArguments);
         } else {
             return Value.createNotYetImplemented();
         }
@@ -227,6 +232,60 @@ public class DmavtymTopologie {
             }
         }
         return true;
+    }
+
+    private Value evaluateIsInside(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
+        // All arguments must be defined
+        for (Value arg : actualArguments) {
+            if (arg.isUndefined()) {
+                return Value.createSkipEvaluation();
+            }
+        }
+
+        // Check the type of the arguments
+        Collection<IomObject> pointObjects = actualArguments[0].getComplexObjects();
+        String pointAttr = actualArguments[1].getValue();
+        Collection<IomObject> surfaceObjects = actualArguments[2].getComplexObjects();
+        String surfaceAttr = actualArguments[3].getValue();
+        if (pointObjects == null || pointObjects.size() != 1 || pointAttr == null
+                || surfaceObjects == null || surfaceAttr == null) {
+            return Value.createUndefined();
+        }
+
+        IomObject pointObject = pointObjects.iterator().next();
+        if (pointObject.getattrvaluecount(pointAttr) != 1) {
+            return Value.createUndefined();
+        }
+
+        // Resolve attributes
+        Collection<CurvePolygon> surfaces = new ArrayList<CurvePolygon>(surfaceObjects.size());
+        Point point;
+        try {
+            for (IomObject surfaceObject : surfaceObjects) {
+                if (surfaceObject.getattrvaluecount(surfaceAttr) != 1) {
+                    return Value.createUndefined();
+                }
+                surfaces.add(getSurface(surfaceObject.getattrobj(surfaceAttr, 0), validationKind));
+            }
+
+            point = getPoint(pointObject.getattrobj(pointAttr, 0));
+        } catch (IoxException e) {
+            EhiLogger.logError(e);
+            return Value.createUndefined();
+        }
+
+        for (CurvePolygon surface : surfaces) {
+            if (surface.covers(point)) {
+                return new Value(true);
+            }
+        }
+
+        return new Value(false);
+    }
+
+    private Point getPoint(IomObject point) throws IoxException {
+        Coordinate coordinate = Iox2jtsext.coord2JTS(point);
+        return geometryFactory.createPoint(coordinate);
     }
 
     private Collection<CompoundCurve> getLines(IomObject multiLine) throws IoxException {

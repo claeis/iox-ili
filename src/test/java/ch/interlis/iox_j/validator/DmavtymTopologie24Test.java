@@ -22,6 +22,7 @@ public class DmavtymTopologie24Test {
     private final static String CLASSA = TOPIC + ".ClassA";
     private final static String CLASS_SURFACE = TOPIC + ".SurfaceClass";
     private final static String CLASS_LINE = TOPIC + ".LineClass";
+    private final static String CLASS_POINT = TOPIC + ".PointClass";
     private TransferDescription td;
 
     @Before
@@ -376,6 +377,37 @@ public class DmavtymTopologie24Test {
     public void coversWithToleranceFromXtf() throws IoxException {
         LogCollector logger = ValidatorTestHelper.validateObjectsFromXtf24(td, new File("src/test/data/validator/DMAVTYM_Topologie_Tolerance.xtf"));
         assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointIsInsideSurface() {
+        Iom_jObject point1 = new Iom_jObject(CLASS_POINT, "o1");
+        point1.addattrobj("point", IomObjectHelper.createCoord("22", "20"));
+        Iom_jObject point2 = new Iom_jObject(CLASS_POINT, "o2");
+        point2.addattrobj("point", IomObjectHelper.createCoord("30", "25"));
+        Iom_jObject point3 = new Iom_jObject(CLASS_POINT, "o3");
+        point3.addattrobj("point", IomObjectHelper.createCoord("30", "30"));
+
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o4");
+        surface.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, point1, point2, point3, surface);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointIsInsideSurfaceOutside() {
+        Iom_jObject point = new Iom_jObject(CLASS_POINT, "o1");
+        point.addattrobj("point", IomObjectHelper.createCoord("30.001", "20"));
+
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o2");
+        surface.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, point, surface);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.PointClass.pointIsInsideSurface_V1_1 is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 }

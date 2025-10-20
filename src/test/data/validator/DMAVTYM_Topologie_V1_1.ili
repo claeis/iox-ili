@@ -21,7 +21,7 @@ INTERLIS 2.4;
 !!@ technicalContact = mailto:dmav@swisstopo.ch
 !!@ furtherInformation = https://www.cadastre-manual.admin.ch/de/modelldokumentation-dmav
 TYPE MODEL DMAVTYM_Topologie_V1_1 (de)
-  AT "https://models.geo.admin.ch/V_D/" VERSION "2025-05-06" =
+  AT "https://models.geo.admin.ch/V_D/" VERSION "2025-10-20" =
 
   FUNCTION covers(
     SurfaceObjects: CLASS;
@@ -35,5 +35,11 @@ TYPE MODEL DMAVTYM_Topologie_V1_1 (de)
     MultiLineObject: ANYSTRUCTURE;
     MultiLineAttr: ATTRIBUTE OF @ MultiLineObject;
     Tolerance: NUMERIC): BOOLEAN;
+
+  FUNCTION isInside(
+    PointObject: ANYSTRUCTURE;
+    PointAttr: ATTRIBUTE OF @ PointObject;
+    SurfaceObjects: ANYSTRUCTURE;
+    SurfaceAttr: ATTRIBUTE OF @ SurfaceObjects): BOOLEAN;
 
 END DMAVTYM_Topologie_V1_1.

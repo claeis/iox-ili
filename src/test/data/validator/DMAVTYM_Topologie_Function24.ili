@@ -35,5 +35,12 @@ MODEL DMAVTYM_Topologie_Function24
             MANDATORY CONSTRAINT lineCoversSurface_V1_1:
                 DMAVTYM_Topologie_V1_1.coversWithTolerance(ObjectPool.allObjects(>SurfaceClass), >>SurfaceClass->surface, THIS, >>line, 0.002);
         END LineClass;
+
+        CLASS PointClass =
+            point: Coord2;
+
+            MANDATORY CONSTRAINT pointIsInsideSurface_V1_1:
+                DMAVTYM_Topologie_V1_1.isInside(THIS, >>point, ObjectPool.allObjects(>SurfaceClass), >>SurfaceClass->surface);
+        END PointClass;
     END Topic;
 END DMAVTYM_Topologie_Function24.
