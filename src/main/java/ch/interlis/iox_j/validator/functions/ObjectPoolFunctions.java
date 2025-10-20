@@ -47,7 +47,7 @@ public class ObjectPoolFunctions {
 
         if (currentFunction.getName().equals("allObjects")) {
             return evaluateAllObjects(validationKind, usageScope, iomObj, actualArguments);
-        } else if (currentFunction.getName().equals("coalesceNumeric")) {
+        } else if (currentFunction.getName().equals("coalesceN")) {
             return evaluateCoalesce(validationKind, usageScope, iomObj, actualArguments);
         } else {
             return Value.createNotYetImplemented();

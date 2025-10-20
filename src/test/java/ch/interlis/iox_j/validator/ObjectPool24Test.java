@@ -95,7 +95,7 @@ public class ObjectPool24Test {
     }
 
     @Test
-    public void coalesceNumeric() {
+    public void coalesceN() {
         String[][] testCases = {
                 { "Input is defined", "42", "7", "42" },
                 { "Input UNDEFINED", null, "7", "7" },
@@ -112,15 +112,15 @@ public class ObjectPool24Test {
 
             LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
 
-            assertEquals("Test case: " + testCase[0] + " (coalesceNumeric(" + testCase[1] + ", " + testCase[2] + ") = " + testCase[3] + ")", 0, logger.getErrs().size());
+            assertEquals("Test case: " + testCase[0] + " (coalesceN(" + testCase[1] + ", " + testCase[2] + ") = " + testCase[3] + ")", 0, logger.getErrs().size());
         }
     }
 
     /**
-     * Test case that ensures that the coalesceNumeric is actually executed and can fail.
+     * Test case that ensures that coalesceN (coalesceNumeric) is actually executed and can fail.
      */
     @Test
-    public void coalesceNumericFail() {
+    public void coalesceNFail() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_COALESCE_NUMERIC_TEST, "o1");
         iomObj.setattrvalue("InputValue", "42");
         iomObj.setattrvalue("DefaultValue", "7");

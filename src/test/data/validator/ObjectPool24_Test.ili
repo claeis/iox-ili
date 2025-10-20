@@ -31,7 +31,7 @@ MODEL ObjectPool24_Test (en)
             DefaultValue: 0..100;
             Expected: 0..100;
 
-            MANDATORY CONSTRAINT coalesceNumericTest: ObjectPool.coalesceNumeric(InputValue, DefaultValue) == Expected;
+            MANDATORY CONSTRAINT coalesceNumericTest: ObjectPool.coalesceN(InputValue, DefaultValue) == Expected;
         END CoalesceTest;
     END Topic;
 

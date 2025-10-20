@@ -16,6 +16,6 @@ TYPE MODEL ObjectPool (en)
      * defaultValue: The value to return if mainValue is UNDEFINED.
      * Since 2025-06-25
      */
-     FUNCTION coalesceNumeric(inputValue: NUMERIC; defaultValue: NUMERIC): NUMERIC;
+     FUNCTION coalesceN(inputValue: NUMERIC; defaultValue: NUMERIC): NUMERIC;
 
 END ObjectPool.
