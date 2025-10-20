@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
@@ -18,6 +19,7 @@ public class ObjectPool24Test {
     private final static String CLASS_A = TOPIC + ".ClassA";
     private final static String CLASS_B = TOPIC + ".ClassB";
     private final static String CLASS_C = TOPIC + ".ClassC";
+    private final static String CLASS_COALESCE_NUMERIC_TEST = TOPIC + ".CoalesceTest";
     private TransferDescription td;
 
     @Before
@@ -90,6 +92,44 @@ public class ObjectPool24Test {
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
                 "Mandatory Constraint ObjectPool24_Test.Topic.ClassC.allOfViewA is not true.");
         assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coalesceN() {
+        String[][] testCases = {
+                { "Input is defined", "42", "7", "42" },
+                { "Input UNDEFINED", null, "7", "7" },
+                { "Default UNDEFINED", "19", null, "19"},
+                { "Both UNDEFINED", null, null, null },
+        };
+
+        for (int i = 0; i < testCases.length; i++) {
+            String[] testCase = testCases[i];
+            Iom_jObject iomObj = new Iom_jObject(CLASS_COALESCE_NUMERIC_TEST, "o" + i);
+            if (testCase[1] != null) iomObj.setattrvalue("InputValue", testCase[1]);
+            if (testCase[2] != null) iomObj.setattrvalue("DefaultValue", testCase[2]);
+            if (testCase[3] != null) iomObj.setattrvalue("Expected", testCase[3]);
+
+            LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+
+            assertEquals("Test case: " + testCase[0] + " (coalesceN(" + testCase[1] + ", " + testCase[2] + ") = " + testCase[3] + ")", 0, logger.getErrs().size());
+        }
+    }
+
+    /**
+     * Test case that ensures that coalesceN (coalesceNumeric) is actually executed and can fail.
+     */
+    @Test
+    public void coalesceNFail() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COALESCE_NUMERIC_TEST, "o1");
+        iomObj.setattrvalue("InputValue", "42");
+        iomObj.setattrvalue("DefaultValue", "7");
+        iomObj.setattrvalue("Expected", "67");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint ObjectPool24_Test.Topic.CoalesceTest.coalesceNumericTest is not true.");
     }
 
     private Iom_jObject createObjectA(String oid, String attrValue) {

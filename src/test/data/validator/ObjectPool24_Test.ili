@@ -25,6 +25,14 @@ MODEL ObjectPool24_Test (en)
             MANDATORY CONSTRAINT allOfViewA:
                 INTERLIS.objectCount(ObjectPool.allObjects(>ViewA)) == 1;
         END ClassC;
+
+        CLASS CoalesceTest =
+            InputValue: 0..100;
+            DefaultValue: 0..100;
+            Expected: 0..100;
+
+            MANDATORY CONSTRAINT coalesceNumericTest: ObjectPool.coalesceN(InputValue, DefaultValue) == Expected;
+        END CoalesceTest;
     END Topic;
 
 END ObjectPool24_Test.
