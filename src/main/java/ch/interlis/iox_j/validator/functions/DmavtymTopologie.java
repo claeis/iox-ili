@@ -2,12 +2,19 @@ package ch.interlis.iox_j.validator.functions;
 
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.types.OutParam;
+import ch.interlis.ili2c.metamodel.CoordType;
+import ch.interlis.ili2c.metamodel.Element;
 import ch.interlis.ili2c.metamodel.Evaluable;
 import ch.interlis.ili2c.metamodel.Function;
 import ch.interlis.ili2c.metamodel.FunctionCall;
+import ch.interlis.ili2c.metamodel.LocalAttribute;
+import ch.interlis.ili2c.metamodel.NumericType;
+import ch.interlis.ili2c.metamodel.NumericalType;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.TextType;
 import ch.interlis.ili2c.metamodel.TransferDescription;
+import ch.interlis.ili2c.metamodel.Type;
+import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
@@ -28,6 +35,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
+import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -274,13 +282,41 @@ public class DmavtymTopologie {
             return Value.createUndefined();
         }
 
+        int accuracy = getPointAccuracy(td, pointObject, pointAttr);
+        double precision = Math.pow(10, -accuracy);
+        double tolerance = precision * Math.sqrt(2) / 2.0;
+
         for (CurvePolygon surface : surfaces) {
-            if (surface.covers(point)) {
+            if (surface.buffer(tolerance).covers(point)) {
                 return new Value(true);
             }
         }
 
         return new Value(false);
+    }
+
+    private int getPointAccuracy(TransferDescription td, IomObject object, String pointAttribute) {
+        String className = object.getobjecttag();
+        Element classElement = td.getElement(className);
+        if (classElement instanceof Viewable) {
+            Viewable<?> viewable = (Viewable<?>) classElement;
+            LocalAttribute attrElement = (LocalAttribute) viewable.getElement(LocalAttribute.class, pointAttribute);
+            if (attrElement != null) {
+                Type attrType = attrElement.getDomainResolvingAliases();
+                if (attrType instanceof CoordType) {
+                    NumericalType firstDimension = ((CoordType) attrType).getDimensions()[0];
+                    if (firstDimension instanceof NumericType) {
+                        NumericType numericType = (NumericType) firstDimension;
+                        if (numericType.getMinimum() != null) {
+                            return numericType.getMinimum().getAccuracy();
+                        }
+                    }
+                }
+            }
+        }
+
+        logger.addEvent(logger.logWarningMsg("Cannot determine accuracy for point attribute '{0}' in class '{1}'.", pointAttribute, className));
+        return 0;
     }
 
     private Point getPoint(IomObject point) throws IoxException {
