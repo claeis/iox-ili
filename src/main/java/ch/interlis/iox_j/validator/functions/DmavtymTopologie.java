@@ -287,7 +287,9 @@ public class DmavtymTopologie {
         double tolerance = precision * Math.sqrt(2) / 2.0;
 
         for (CurvePolygon surface : surfaces) {
-            if (surface.buffer(tolerance).covers(point)) {
+            Envelope envelope = surface.getEnvelopeInternal();
+            envelope.expandBy(tolerance);
+            if (envelope.contains(point.getCoordinate()) && surface.buffer(tolerance).covers(point)) {
                 return new Value(true);
             }
         }
