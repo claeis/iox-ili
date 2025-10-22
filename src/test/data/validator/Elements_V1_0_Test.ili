@@ -63,4 +63,14 @@ IMPORTS Elements_V1_0;
 	    
     END TopicC;
     
+    TOPIC TopicD =
+        CLASS CoalesceTest =
+            InputValue: 0..100;
+            DefaultValue: 0..100;
+            Expected: 0..100;
+
+            MANDATORY CONSTRAINT coalesceNumericTest: Elements_V1_0.coalesceN(InputValue, DefaultValue) == Expected;
+        END CoalesceTest;
+    END TopicD;
+    
 END Elements_V1_0_Test.

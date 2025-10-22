@@ -33,7 +33,7 @@ public class DmavtymTopologie24Test {
         FileEntry topologieV1_1_Ili = new FileEntry("src/test/data/validator/DMAVTYM_Topologie_V1_1.ili", FileEntryKind.ILIMODELFILE);
         ili2cConfig.addFileEntry(topologieV1_1_Ili);
 
-        FileEntry objectPoolIli = new FileEntry("src/test/data/validator/ObjectPool.ili", FileEntryKind.ILIMODELFILE);
+        FileEntry objectPoolIli = new FileEntry("src/test/data/validator/ObjectPool_V1_0.ili", FileEntryKind.ILIMODELFILE);
         ili2cConfig.addFileEntry(objectPoolIli);
 
         FileEntry modelIli = new FileEntry("src/test/data/validator/DMAVTYM_Topologie_Function24.ili", FileEntryKind.ILIMODELFILE);

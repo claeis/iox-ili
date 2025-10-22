@@ -2,7 +2,7 @@ INTERLIS 2.4;
 
 MODEL ObjectPool24_Test (en)
     AT "mailto:noreply@localhost" VERSION "2025-05-06" =
-    IMPORTS ObjectPool;
+    IMPORTS ObjectPool_V1_0;
 
     TOPIC Topic =
         CLASS ClassA =
@@ -11,7 +11,7 @@ MODEL ObjectPool24_Test (en)
 
         CLASS ClassB =
             MANDATORY CONSTRAINT allOfClassA:
-                INTERLIS.objectCount(ObjectPool.allObjects(>ClassA)) == 2;
+                INTERLIS.objectCount(ObjectPool_V1_0.allObjects(>ClassA)) == 2;
         END ClassB;
 
         VIEW ViewA
@@ -23,16 +23,9 @@ MODEL ObjectPool24_Test (en)
 
         CLASS ClassC =
             MANDATORY CONSTRAINT allOfViewA:
-                INTERLIS.objectCount(ObjectPool.allObjects(>ViewA)) == 1;
+                INTERLIS.objectCount(ObjectPool_V1_0.allObjects(>ViewA)) == 1;
         END ClassC;
 
-        CLASS CoalesceTest =
-            InputValue: 0..100;
-            DefaultValue: 0..100;
-            Expected: 0..100;
-
-            MANDATORY CONSTRAINT coalesceNumericTest: ObjectPool.coalesceN(InputValue, DefaultValue) == Expected;
-        END CoalesceTest;
     END Topic;
 
 END ObjectPool24_Test.

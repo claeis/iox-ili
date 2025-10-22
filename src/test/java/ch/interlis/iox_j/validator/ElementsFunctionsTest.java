@@ -21,6 +21,8 @@ import org.junit.Before;
 
 import org.junit.Assert;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Map;
 
 public class ElementsFunctionsTest {
@@ -45,6 +47,10 @@ public class ElementsFunctionsTest {
     private static final String ILI_C_LOKALISATION1 = ILI_TOPIC_C+".Lokalisation1";
     private static final String ILI_C_LOKALISATION2_NAME = "Name";
     private static final String ILI_C_LOKALISATION2 = ILI_TOPIC_C+".Lokalisation2";
+    
+    private static final String ILI_TOPIC_D=ILI_MODEL+".TopicD";
+    private final static String CLASS_COALESCE_NUMERIC_TEST = ILI_TOPIC_D + ".CoalesceTest";
+    
     
     private TransferDescription td=null;
     @Before
@@ -336,5 +342,42 @@ public class ElementsFunctionsTest {
         // Asserts
         Assert.assertEquals(1,logger.getErrs().size());
         Assert.assertEquals("Mandatory Constraint Elements_V1_0_Test.TopicC.Lokalisation2.LOK02 is not true.",logger.getErrs().get(0).getEventMsg());
+    }
+    @Test
+    public void coalesceN() {
+        String[][] testCases = {
+                { "Input is defined", "42", "7", "42" },
+                { "Input UNDEFINED", null, "7", "7" },
+                { "Default UNDEFINED", "19", null, "19"},
+                { "Both UNDEFINED", null, null, null },
+        };
+
+        for (int i = 0; i < testCases.length; i++) {
+            String[] testCase = testCases[i];
+            Iom_jObject iomObj = new Iom_jObject(CLASS_COALESCE_NUMERIC_TEST, "o" + i);
+            if (testCase[1] != null) iomObj.setattrvalue("InputValue", testCase[1]);
+            if (testCase[2] != null) iomObj.setattrvalue("DefaultValue", testCase[2]);
+            if (testCase[3] != null) iomObj.setattrvalue("Expected", testCase[3]);
+
+            LogCollector logger = ValidatorTestHelper.validateObjects(td, ILI_TOPIC_D, iomObj);
+
+            assertEquals("Test case: " + testCase[0] + " (coalesceN(" + testCase[1] + ", " + testCase[2] + ") = " + testCase[3] + ")", 0, logger.getErrs().size());
+        }
+    }
+
+    /**
+     * Test case that ensures that coalesceN (coalesceNumeric) is actually executed and can fail.
+     */
+    @Test
+    public void coalesceNFail() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COALESCE_NUMERIC_TEST, "o1");
+        iomObj.setattrvalue("InputValue", "42");
+        iomObj.setattrvalue("DefaultValue", "7");
+        iomObj.setattrvalue("Expected", "67");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, ILI_TOPIC_D, iomObj);
+
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint Elements_V1_0_Test.TopicD.CoalesceTest.coalesceNumericTest is not true.");
     }
 }

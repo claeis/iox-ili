@@ -9,5 +9,14 @@ MODEL Elements_V1_0
   FUNCTION valuesN(list: TEXT): LIST OF NUMERIC;
   FUNCTION valuesOfPath(attrPath: TEXT): BAG OF TEXT;
   FUNCTION valuesOfPathN(attrPath: TEXT): BAG OF NUMERIC;
+    /**
+     * If the first argument evaluates to UNDEFINED, the second argument is returned.
+     * inputValue: The value to check for UNDEFINED.
+     * defaultValue: The value to return if mainValue is UNDEFINED.
+     * Since 2025-06-25
+     */
+     FUNCTION coalesce(inputValue: TEXT; defaultValue: TEXT): TEXT;
+     FUNCTION coalesceN(inputValue: NUMERIC; defaultValue: NUMERIC): NUMERIC;
+
   
 END Elements_V1_0.

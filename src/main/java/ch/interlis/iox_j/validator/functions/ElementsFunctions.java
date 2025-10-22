@@ -44,6 +44,8 @@ public class ElementsFunctions {
     private static final String FUNCTION_EXISTS_IN_LIST_N = "existsInListN";
     private static final String FUNCTION_VALUES = "values";
     private static final String FUNCTION_VALUES_N = "valuesN";
+    private static final String FUNCTION_COALESCE = "coalesce";
+    private static final String FUNCTION_COALESCE_N = "coalesceN";
 
     public static final String ELEMENTS_V1_0 = "Elements_V1_0";
 
@@ -87,6 +89,10 @@ public class ElementsFunctions {
             return evaluateValues(validationKind, usageScope, iomObj, actualArguments,new ch.interlis.ili2c.metamodel.TextType());
         }else if (currentFunction.getName().equals(FUNCTION_VALUES_N)) {
             return evaluateValues(validationKind, usageScope, iomObj, actualArguments,new ch.interlis.ili2c.metamodel.NumericType());
+        }else if (currentFunction.getName().equals(FUNCTION_COALESCE)) {
+            return evaluateCoalesce(validationKind, usageScope, iomObj, actualArguments);
+        }else if (currentFunction.getName().equals(FUNCTION_COALESCE_N)) {
+            return evaluateCoalesce(validationKind, usageScope, iomObj, actualArguments);
         } else {
             return Value.createNotYetImplemented();
         }
@@ -151,4 +157,17 @@ public class ElementsFunctions {
         Value ret=new Value(type,values);
         return ret;
     }
+    // FUNCTION coalesce(inputValue: TEXT; defaultValue: TEXT): TEXT;
+    // FUNCTION coalesceN(inputValue: NUMERIC; defaultValue: NUMERIC): NUMERIC;
+    private Value evaluateCoalesce(String validationKind, String usageScope, IomObject iomObj, Value[] actualArguments) {
+        Value input = actualArguments[0];
+        Value defaultValue = actualArguments[1];
+
+        if (input.isUndefined()) {
+            return defaultValue;
+        } else {
+            return input;
+        }
+    }
+    
 }
