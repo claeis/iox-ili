@@ -7,6 +7,7 @@ import ch.interlis.ili2c.metamodel.FunctionCall;
 import ch.interlis.ili2c.metamodel.Projection;
 import ch.interlis.ili2c.metamodel.RoleDef;
 import ch.interlis.ili2c.metamodel.TextType;
+import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.ili2c.metamodel.Viewable;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iox_j.logging.LogEventFactory;
@@ -23,13 +24,15 @@ public class ObjectPoolFunctions {
     private final Validator validator;
     private final ObjectPool objectPool;
     private final LogEventFactory logger;
+    private final TransferDescription td;
 
     public static final String OBJECTPOOL = "ObjectPool_V1_0";
 
-    public ObjectPoolFunctions(Validator validator, ObjectPool objectPool, LogEventFactory logger) {
+    public ObjectPoolFunctions(Validator validator, TransferDescription td, ObjectPool objectPool, LogEventFactory logger) {
         this.validator = validator;
         this.objectPool = objectPool;
         this.logger = logger;
+        this.td = td;
     }
 
     public Value evaluateFunction(Function currentFunction, FunctionCall functionCallObj, IomObject parentObject,
