@@ -59,7 +59,7 @@ public class ObjectPoolFunctions {
         Viewable<?> viewable = actualArguments[0].getViewable();
 
         if (viewable == null) {
-            logger.logErrorMsg("Missing ObjectClass argument for allObjects");
+            logger.addEvent(logger.logErrorMsg("Missing ObjectClass argument for allObjects"));
             return Value.createUndefined();
         }
 
