@@ -47,6 +47,9 @@ public class ValidatorTestHelper {
     }
 
     public static LogCollector validateObjects(TransferDescription td, String topic, String baskedId, ValidationConfig modelConfig, IomObject... objects) {
+        // Enable trace logging
+        EhiLogger.getInstance().setTraceFilter(false);
+
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
         PipelinePool pool = new PipelinePool();
