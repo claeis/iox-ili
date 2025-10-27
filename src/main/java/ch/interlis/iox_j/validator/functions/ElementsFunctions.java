@@ -127,7 +127,7 @@ public class ElementsFunctions {
         if(actualArguments[0].isUndefined()) {
             return Value.createUndefined();
         }
-        if(actualArguments[0].isUndefined()) {
+        if(actualArguments[1].isUndefined()) {
             return new Value(false);
         }
         String valueArg=actualArguments[0].getValue();

@@ -51,6 +51,10 @@ public class ElementsFunctionsTest {
     private static final String ILI_TOPIC_D=ILI_MODEL+".TopicD";
     private final static String CLASS_COALESCE_NUMERIC_TEST = ILI_TOPIC_D + ".CoalesceTest";
     
+    private static final String ILI_TOPIC_E=ILI_MODEL+".TopicE";
+    private static final String ILI_E_CLASSA_VALUE = "value";
+    private static final String ILI_E_CLASSA_LIST = "list";
+    private static final String ILI_E_CLASSA = ILI_TOPIC_E+".ClassA";
     
     private TransferDescription td=null;
     @Before
@@ -379,5 +383,44 @@ public class ElementsFunctionsTest {
 
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
                 "Mandatory Constraint Elements_V1_0_Test.TopicD.CoalesceTest.coalesceNumericTest is not true.");
+    }
+    @Test
+    public void existsInList_Ok() {
+        Iom_jObject iomObj1=new Iom_jObject(ILI_E_CLASSA, "o1");
+        iomObj1.setattrvalue(ILI_E_CLASSA_VALUE,TEST_WERT);
+        iomObj1.addattrvalue(ILI_E_CLASSA_LIST,TEST_WERT+"0");
+        iomObj1.addattrvalue(ILI_E_CLASSA_LIST,TEST_WERT);
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC_E,"b1"));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        Assert.assertEquals(0,logger.getErrs().size());
+    }
+    @Test
+    public void existsInList_Fail() {
+        Iom_jObject iomObj1=new Iom_jObject(ILI_E_CLASSA, "o1");
+        iomObj1.setattrvalue(ILI_E_CLASSA_VALUE,"x"+TEST_WERT);
+        iomObj1.addattrvalue(ILI_E_CLASSA_LIST,TEST_WERT+"1");
+        iomObj1.addattrvalue(ILI_E_CLASSA_LIST,TEST_WERT+"2");
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPIC_E,"b1"));
+        validator.validate(new ObjectEvent(iomObj1));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        Assert.assertEquals(1,logger.getErrs().size());
+        Assert.assertEquals("Mandatory Constraint Elements_V1_0_Test.TopicE.ClassA.LSTE01 is not true.",logger.getErrs().get(0).getEventMsg());
     }
 }

@@ -72,5 +72,15 @@ IMPORTS Elements_V1_0;
             MANDATORY CONSTRAINT coalesceNumericTest: Elements_V1_0.coalesceN(InputValue, DefaultValue) == Expected;
         END CoalesceTest;
     END TopicD;
+
+    TOPIC TopicE =
+        CLASS ClassA =
+            value: TEXT;
+            list: LIST OF TEXT;
+
+            MANDATORY CONSTRAINT LSTE01: Elements_V1_0.existsInList(value, list);
+        END ClassA;
+        
+    END TopicE;
     
 END Elements_V1_0_Test.
