@@ -49,6 +49,7 @@ public class DmavtymTopologie {
     private final Validator validator;
     private final LogEventFactory logger;
     private final JtsextGeometryFactory geometryFactory = new JtsextGeometryFactory();
+    private final HashMap<String, Double> pointToleranceCache = new HashMap<String, Double>();
 
     public DmavtymTopologie(Validator validator, TransferDescription td, IoxValidationConfig validationConfig, LogEventFactory logger) {
         this.validator = validator;
@@ -282,9 +283,7 @@ public class DmavtymTopologie {
             return Value.createUndefined();
         }
 
-        int accuracy = getPointAccuracy(td, pointObject, pointAttr);
-        double precision = Math.pow(10, -accuracy);
-        double tolerance = precision * Math.sqrt(2) / 2.0;
+        double tolerance = getPointTolerance(td, pointObject, pointAttr);
 
         for (CurvePolygon surface : surfaces) {
             Envelope envelope = surface.getEnvelopeInternal();
@@ -297,8 +296,22 @@ public class DmavtymTopologie {
         return new Value(false);
     }
 
-    private int getPointAccuracy(TransferDescription td, IomObject object, String pointAttribute) {
+    private double getPointTolerance(TransferDescription td, IomObject object, String pointAttribute) {
         String className = object.getobjecttag();
+        String qualifiedAttributeName = className + "." + pointAttribute;
+        Double cached = pointToleranceCache.get(qualifiedAttributeName);
+        if (cached != null) {
+            return cached;
+        }
+
+        int accuracy = getPointAccuracy(td, className, pointAttribute);
+        double precision = Math.pow(10, -accuracy);
+        double tolerance = precision * Math.sqrt(2) / 2.0;
+        pointToleranceCache.put(qualifiedAttributeName, tolerance);
+        return tolerance;
+    }
+
+    private int getPointAccuracy(TransferDescription td, String className, String pointAttribute) {
         Element classElement = td.getElement(className);
         if (classElement instanceof Viewable) {
             Viewable<?> viewable = (Viewable<?>) classElement;
