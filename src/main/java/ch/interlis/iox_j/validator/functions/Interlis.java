@@ -161,6 +161,10 @@ public class Interlis {
             if (value.isUndefined()){
                 return new Value(0);
             }
+            String values[]=value.getValues();
+            if(values!=null) {
+                return new Value(value.getValues().length);
+            }
             return new Value(value.getComplexObjects().size());
         } else if (currentFunction.getScopedName(null).equals("INTERLIS.isOfClass")){
             FunctionCall functionCall = (FunctionCall) expression;

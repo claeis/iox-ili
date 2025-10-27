@@ -138,6 +138,11 @@ public class Value {
         if(skipEvaluation()){
             throw new IllegalArgumentException();
         }
+        if(values==null && value!=null) {
+            String ret[]=new String[1];
+            ret[0]=value;
+            return ret;
+        }
         return values;
     }
 	
