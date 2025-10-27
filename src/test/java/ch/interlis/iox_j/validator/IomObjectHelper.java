@@ -3,6 +3,8 @@ package ch.interlis.iox_j.validator;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 
+import java.util.function.Consumer;
+
 public class IomObjectHelper {
 
     /**
@@ -127,5 +129,14 @@ public class IomObjectHelper {
         IomObject arc = createArc(a1, a2, c1, c2);
         arc.setattrvalue("C3", c3);
         return arc;
+    }
+
+    @SafeVarargs
+    public static IomObject createIomObject(String tag, String oid, Consumer<Iom_jObject>... attributeSetters) {
+        Iom_jObject iomObject = new Iom_jObject(tag, oid);
+        for (Consumer<Iom_jObject> attributeSetter : attributeSetters) {
+            attributeSetter.accept(iomObject);
+        }
+        return iomObject;
     }
 }

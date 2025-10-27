@@ -2073,7 +2073,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         validationKind, usageScope, iomObj, firstRole);
 			} else if (funcName.startsWith(ObjectPoolFunctions.OBJECTPOOL + ".")) {
 				if (objectPoolFunctions == null) {
-					objectPoolFunctions = new ObjectPoolFunctions(this, objectPool, errFact);
+					objectPoolFunctions = new ObjectPoolFunctions(this, td, objectPool, errFact);
 				}
 
 				return objectPoolFunctions.evaluateFunction(currentFunction, functionCallObj, parentObject,
