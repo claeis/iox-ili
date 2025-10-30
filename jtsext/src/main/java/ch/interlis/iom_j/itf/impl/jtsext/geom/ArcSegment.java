@@ -358,7 +358,18 @@ public class ArcSegment extends CurveSegment {
 
 	@Override
 	public boolean equals2D(CurveSegment other, double tolerance) {
-		if (!(other instanceof ArcSegment) || !super.equals2D(other, tolerance)) {
+		if (this.getClass() != other.getClass()) {
+			return false;
+		}
+
+		Coordinate startA = getStartPoint();
+		Coordinate endA = getEndPoint();
+		Coordinate startB = other.getStartPoint();
+		Coordinate endB = other.getEndPoint();
+
+		boolean equalStartAndEnd = (startA.equals2D(startB, tolerance) && endA.equals2D(endB, tolerance))
+				|| (startA.equals2D(endB, tolerance) && endA.equals2D(startB, tolerance));
+		if (!equalStartAndEnd) {
 			return false;
 		}
 
