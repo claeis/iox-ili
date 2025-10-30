@@ -29,7 +29,6 @@ import com.vividsolutions.jts.index.strtree.STRtree;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DmavtymTopologie {
     public static final String DMAVTYM_Topologie_V1_0 = "DMAVTYM_Topologie_V1_0";
@@ -234,17 +233,17 @@ public class DmavtymTopologie {
         // Check if all line segments have a matching entry in the tree
         for (CompoundCurve line : multiLine) {
             for (final CurveSegment segment : line.getSegments()) {
-                final AtomicBoolean found = new AtomicBoolean(false);
+                final boolean[] found = new boolean[]{false};
                 tree.query(segment.computeEnvelopeInternal(), new ItemVisitor() {
                     @Override
                     public void visitItem(Object item) {
-                        if (!found.get() && item instanceof CurveSegment && segment.equals2D((CurveSegment) item, tolerance)) {
-                            found.set(true);
+                        if (!found[0] && item instanceof CurveSegment && segment.equals2D((CurveSegment) item, tolerance)) {
+                            found[0] = true;
                         }
                     }
                 });
 
-                if (!found.get()) {
+                if (!found[0]) {
                     return false;
                 }
             }
