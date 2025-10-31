@@ -355,4 +355,35 @@ public class ArcSegment extends CurveSegment {
 		result = 31 * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
+
+	@Override
+	public boolean equals2D(CurveSegment other, double tolerance) {
+		if (this.getClass() != other.getClass()) {
+			return false;
+		}
+
+		Coordinate startA = getStartPoint();
+		Coordinate endA = getEndPoint();
+		Coordinate startB = other.getStartPoint();
+		Coordinate endB = other.getEndPoint();
+
+		boolean equalStartAndEnd = (startA.equals2D(startB, tolerance) && endA.equals2D(endB, tolerance))
+				|| (startA.equals2D(endB, tolerance) && endA.equals2D(startB, tolerance));
+		if (!equalStartAndEnd) {
+			return false;
+		}
+
+		ArcSegment otherArc = (ArcSegment) other;
+		if (getNormalizedSign() != otherArc.getNormalizedSign()) {
+			return false;
+		}
+		if (getMidPoint().equals2D(otherArc.getMidPoint(), tolerance)) {
+			return true;
+		}
+		return calculateMidPoint().equals2D(otherArc.calculateMidPoint(), tolerance);
+	}
+
+	private Coordinate calculateMidPoint() {
+		return calcArcPt(getNormalizedStartPoint(), getNormalizedEndPoint(), getCenterPoint(), getRadius(), getNormalizedSign());
+	}
 }

@@ -23,15 +23,34 @@ INTERLIS 2.4;
 TYPE MODEL DMAVTYM_Topologie_V1_1 (de)
   AT "https://models.geo.admin.ch/V_D/" VERSION "2025-05-06" =
 
+  /**
+   * Tests if the line or multiline is fully covered by an outer or inner ring of the surface.
+   * The control points of all line segments need to match the surface points exactly.
+   * SurfaceObjects: objects containing a surface geometry.
+   * SurfaceAttr: the surface attribute of the SurfaceObjects.
+   * MultiLineObject: object containing the multiline geometry that should be covered by the surface geometry.
+   * MultiLineAttr: the multiline attribute of the MultiLineObject.
+   * Since 2025-05-06
+   */
   FUNCTION covers(
     SurfaceObjects: CLASS;
     SurfaceAttr: ATTRIBUTE;
     MultiLineObject: ANYSTRUCTURE;
     MultiLineAttr: ATTRIBUTE): BOOLEAN;
 
+  /**
+   * Tests if the line or multiline is fully covered by another line or by an outer or inner ring of a surface.
+   * The control points of all line segments need to match the reference points within the specified tolerance.
+   * ReferenceObjects: objects containing a reference geometry (line or surface).
+   * ReferenceAttr: the geometry attribute of the ReferenceObjects.
+   * MultiLineObject: object containing the multiline geometry that should be covered by the reference geometry.
+   * MultiLineAttr: the multiline attribute of the MultiLineObject.
+   * Tolerance: the maximum allowed distance between a control point and its matching point on the reference geometry.
+   * Since 2025-05-06
+   */
   FUNCTION coversWithTolerance(
-    SurfaceObjects: ANYSTRUCTURE;
-    SurfaceAttr: ATTRIBUTE OF @ SurfaceObjects;
+    ReferenceObjects: ANYSTRUCTURE;
+    ReferenceAttr: ATTRIBUTE OF @ ReferenceObjects;
     MultiLineObject: ANYSTRUCTURE;
     MultiLineAttr: ATTRIBUTE OF @ MultiLineObject;
     Tolerance: NUMERIC): BOOLEAN;

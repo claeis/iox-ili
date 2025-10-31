@@ -41,4 +41,6 @@ abstract public class CurveSegment implements java.io.Serializable {
 	public void setUserData(Object userData) {
 		this.userData = userData;
 	}
+
+	public abstract boolean equals2D(CurveSegment other, double tolerance);
 }
