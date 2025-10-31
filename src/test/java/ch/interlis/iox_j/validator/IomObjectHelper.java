@@ -130,13 +130,4 @@ public class IomObjectHelper {
         arc.setattrvalue("C3", c3);
         return arc;
     }
-
-    @SafeVarargs
-    public static IomObject createIomObject(String tag, String oid, Consumer<Iom_jObject>... attributeSetters) {
-        Iom_jObject iomObject = new Iom_jObject(tag, oid);
-        for (Consumer<Iom_jObject> attributeSetter : attributeSetters) {
-            attributeSetter.accept(iomObject);
-        }
-        return iomObject;
-    }
 }

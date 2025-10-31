@@ -9,9 +9,8 @@ import ch.interlis.iom_j.Iom_jObject;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
@@ -108,13 +107,15 @@ public class ObjectPool24Test {
 
     @Test
     public void filter() {
-        IomObject testObject = IomObjectHelper.createIomObject(CLASS_FILTER_TEST, "o1",
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_BASE, null,
-                        o1 -> o1.setattrvalue("numericAttr", "5"))),
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_BASE, null,
-                        o2 -> o2.setattrvalue("numericAttr", "42"))),
-                o -> o.setattrvalue("filterExpression", "numericAttr > 10"),
-                o -> o.setattrvalue("expectedCount", "1"));
+        Iom_jObject testObject = new Iom_jObject(CLASS_FILTER_TEST, "o1");
+        Iom_jObject inputObject1 = new Iom_jObject(STRUCT_FILTER_BASE, null);
+        inputObject1.setattrvalue("numericAttr", "5");
+        testObject.addattrobj("inputObjects", inputObject1);
+        Iom_jObject inputObject2 = new Iom_jObject(STRUCT_FILTER_BASE, null);
+        inputObject2.setattrvalue("numericAttr", "42");
+        testObject.addattrobj("inputObjects", inputObject2);
+        testObject.setattrvalue("filterExpression", "numericAttr > 10");
+        testObject.setattrvalue("expectedCount", "1");
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_FILTER, testObject);
         assertEquals(0, logger.getErrs().size());
@@ -122,9 +123,9 @@ public class ObjectPool24Test {
 
     @Test
     public void filterNoObjects() {
-        IomObject testObject = IomObjectHelper.createIomObject(CLASS_FILTER_TEST, "o1",
-                o -> o.setattrvalue("filterExpression", "numericAttr > 10"),
-                o -> o.setattrvalue("expectedCount", "0"));
+        Iom_jObject testObject = new Iom_jObject(CLASS_FILTER_TEST, "o1");
+        testObject.setattrvalue("filterExpression", "numericAttr > 10");
+        testObject.setattrvalue("expectedCount", "0");
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_FILTER, testObject);
         assertEquals(0, logger.getErrs().size());
@@ -132,15 +133,17 @@ public class ObjectPool24Test {
 
     @Test
     public void filterExtendedObjects() {
-        IomObject testObject = IomObjectHelper.createIomObject(CLASS_FILTER_TEST, "o1",
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_A, null,
-                        o1 -> o1.setattrvalue("numericAttr", "70"),
-                        o1 -> o1.setattrvalue("textAttr", "test"))),
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_B, null,
-                        o2 -> o2.setattrvalue("numericAttr", "35"),
-                        o2 -> o2.setattrvalue("enumAttr", "red"))),
-                o -> o.setattrvalue("filterExpression", "numericAttr == 35"),
-                o -> o.setattrvalue("expectedCount", "1"));
+        Iom_jObject testObject = new Iom_jObject(CLASS_FILTER_TEST, "o1");
+        Iom_jObject inputObject1 = new Iom_jObject(STRUCT_FILTER_A, null);
+        inputObject1.setattrvalue("numericAttr", "70");
+        inputObject1.setattrvalue("textAttr", "test");
+        testObject.addattrobj("inputObjects", inputObject1);
+        Iom_jObject inputObject2 = new Iom_jObject(STRUCT_FILTER_B, null);
+        inputObject2.setattrvalue("numericAttr", "35");
+        inputObject2.setattrvalue("enumAttr", "red");
+        testObject.addattrobj("inputObjects", inputObject2);
+        testObject.setattrvalue("filterExpression", "numericAttr == 35");
+        testObject.setattrvalue("expectedCount", "1");
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_FILTER, testObject);
         assertEquals(0, logger.getErrs().size());
@@ -148,15 +151,17 @@ public class ObjectPool24Test {
 
     @Test
     public void filterReferencingCurrentObjectNumericAttr() {
-        IomObject testObject = IomObjectHelper.createIomObject(CLASS_FILTER_TEST, "o1",
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_BASE, null)),
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_BASE, null,
-                        o1 -> o1.setattrvalue("numericAttr", "5"))),
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_BASE, null,
-                        o2 -> o2.setattrvalue("numericAttr", "42"))),
-                o -> o.setattrvalue("filterNumber", "42"),
-                o -> o.setattrvalue("filterExpression", "numericAttr == {filterNumber}"),
-                o -> o.setattrvalue("expectedCount", "1"));
+        Iom_jObject testObject = new Iom_jObject(CLASS_FILTER_TEST, "o1");
+        testObject.addattrobj("inputObjects", new Iom_jObject(STRUCT_FILTER_BASE, null));
+        Iom_jObject inputObject1 = new Iom_jObject(STRUCT_FILTER_BASE, null);
+        inputObject1.setattrvalue("numericAttr", "5");
+        testObject.addattrobj("inputObjects", inputObject1);
+        Iom_jObject inputObject2 = new Iom_jObject(STRUCT_FILTER_BASE, null);
+        inputObject2.setattrvalue("numericAttr", "42");
+        testObject.addattrobj("inputObjects", inputObject2);
+        testObject.setattrvalue("filterNumber", "42");
+        testObject.setattrvalue("filterExpression", "numericAttr == {filterNumber}");
+        testObject.setattrvalue("expectedCount", "1");
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_FILTER, testObject);
         assertEquals(0, logger.getErrs().size());
@@ -164,15 +169,17 @@ public class ObjectPool24Test {
 
     @Test
     public void filterReferencingCurrentObjectTextAttr() {
-        IomObject testObject = IomObjectHelper.createIomObject(CLASS_FILTER_TEST, "o1",
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_A, null)),
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_A, null,
-                        o1 -> o1.setattrvalue("textAttr", "ALABSI"))),
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_A, null,
-                        o2 -> o2.setattrvalue("textAttr", "VELAGE"))),
-                o -> o.setattrvalue("filterText", "VELAGE"),
-                o -> o.setattrvalue("filterExpression", "textAttr == {filterText}"),
-                o -> o.setattrvalue("expectedCount", "1"));
+        Iom_jObject testObject = new Iom_jObject(CLASS_FILTER_TEST, "o1");
+        testObject.addattrobj("inputObjects", new Iom_jObject(STRUCT_FILTER_A, null));
+        Iom_jObject inputObject1 = new Iom_jObject(STRUCT_FILTER_A, null);
+        inputObject1.setattrvalue("textAttr", "ALABSI");
+        testObject.addattrobj("inputObjects", inputObject1);
+        Iom_jObject inputObject2 = new Iom_jObject(STRUCT_FILTER_A, null);
+        inputObject2.setattrvalue("textAttr", "VELAGE");
+        testObject.addattrobj("inputObjects", inputObject2);
+        testObject.setattrvalue("filterText", "VELAGE");
+        testObject.setattrvalue("filterExpression", "textAttr == {filterText}");
+        testObject.setattrvalue("expectedCount", "1");
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_FILTER, testObject);
         assertEquals(0, logger.getErrs().size());
@@ -180,15 +187,17 @@ public class ObjectPool24Test {
 
     @Test
     public void filterReferencingCurrentObjectEnumAttr() {
-        IomObject testObject = IomObjectHelper.createIomObject(CLASS_FILTER_TEST, "o1",
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_B, null)),
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_B, null,
-                        o1 -> o1.setattrvalue("enumAttr", "red"))),
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_B, null,
-                        o2 -> o2.setattrvalue("enumAttr", "green"))),
-                o -> o.setattrvalue("filterEnum", "green"),
-                o -> o.setattrvalue("filterExpression", "enumAttr == {filterEnum}"),
-                o -> o.setattrvalue("expectedCount", "1"));
+        Iom_jObject testObject = new Iom_jObject(CLASS_FILTER_TEST, "o1");
+        testObject.addattrobj("inputObjects", new Iom_jObject(STRUCT_FILTER_B, null));
+        Iom_jObject inputObject1 = new Iom_jObject(STRUCT_FILTER_B, null);
+        inputObject1.setattrvalue("enumAttr", "red");
+        testObject.addattrobj("inputObjects", inputObject1);
+        Iom_jObject inputObject2 = new Iom_jObject(STRUCT_FILTER_B, null);
+        inputObject2.setattrvalue("enumAttr", "green");
+        testObject.addattrobj("inputObjects", inputObject2);
+        testObject.setattrvalue("filterEnum", "green");
+        testObject.setattrvalue("filterExpression", "enumAttr == {filterEnum}");
+        testObject.setattrvalue("expectedCount", "1");
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_FILTER, testObject);
         assertEquals(0, logger.getErrs().size());
@@ -196,11 +205,12 @@ public class ObjectPool24Test {
 
     @Test
     public void filterReferencingCurrentObjectUnsupported() {
-        IomObject testObject = IomObjectHelper.createIomObject(CLASS_FILTER_TEST, "o1",
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_BASE, null,
-                        o1 -> o1.setattrvalue("blackboxAttr", "SU5URVJMSVM="))),
-                o -> o.setattrvalue("filterExpression", "blackboxAttr == {filterBlackbox}"),
-                o -> o.setattrvalue("expectedCount", "1"));
+        Iom_jObject testObject = new Iom_jObject(CLASS_FILTER_TEST, "o1");
+        Iom_jObject inputObject = new Iom_jObject(STRUCT_FILTER_BASE, null);
+        inputObject.setattrvalue("blackboxAttr", "SU5URVJMSVM=");
+        testObject.addattrobj("inputObjects", inputObject);
+        testObject.setattrvalue("filterExpression", "blackboxAttr == {filterBlackbox}");
+        testObject.setattrvalue("expectedCount", "1");
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_FILTER, testObject);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
@@ -210,11 +220,12 @@ public class ObjectPool24Test {
 
     @Test
     public void filterInvalidExpression() {
-        IomObject testObject = IomObjectHelper.createIomObject(CLASS_FILTER_TEST, "o1",
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_BASE, null,
-                        o1 -> o1.setattrvalue("numericAttr", "1"))),
-                o -> o.setattrvalue("filterExpression", "INVALID_&"),
-                o -> o.setattrvalue("expectedCount", "1"));
+        Iom_jObject testObject = new Iom_jObject(CLASS_FILTER_TEST, "o1");
+        Iom_jObject inputObject = new Iom_jObject(STRUCT_FILTER_BASE, null);
+        inputObject.setattrvalue("numericAttr", "1");
+        testObject.addattrobj("inputObjects", inputObject);
+        testObject.setattrvalue("filterExpression", "INVALID_&");
+        testObject.setattrvalue("expectedCount", "1");
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_FILTER, testObject);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
@@ -224,11 +235,12 @@ public class ObjectPool24Test {
 
     @Test
     public void filterUnknownAttribute() {
-        IomObject testObject = IomObjectHelper.createIomObject(CLASS_FILTER_TEST, "o1",
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_BASE, null,
-                        o1 -> o1.setattrvalue("numericAttr", "1"))),
-                o -> o.setattrvalue("filterExpression", "nonExistingAttr == 10"),
-                o -> o.setattrvalue("expectedCount", "1"));
+        Iom_jObject testObject = new Iom_jObject(CLASS_FILTER_TEST, "o1");
+        Iom_jObject inputObject = new Iom_jObject(STRUCT_FILTER_BASE, null);
+        inputObject.setattrvalue("numericAttr", "1");
+        testObject.addattrobj("inputObjects", inputObject);
+        testObject.setattrvalue("filterExpression", "nonExistingAttr == 10");
+        testObject.setattrvalue("expectedCount", "1");
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_FILTER, testObject);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
@@ -238,11 +250,12 @@ public class ObjectPool24Test {
 
     @Test
     public void filterNonLogicExpression() {
-        IomObject testObject = IomObjectHelper.createIomObject(CLASS_FILTER_TEST, "o1",
-                o -> o.addattrobj("inputObjects", IomObjectHelper.createIomObject(STRUCT_FILTER_BASE, null,
-                        o1 -> o1.setattrvalue("numericAttr", "1"))),
-                o -> o.setattrvalue("filterExpression", "3 + 5"),
-                o -> o.setattrvalue("expectedCount", "1"));
+        Iom_jObject testObject = new Iom_jObject(CLASS_FILTER_TEST, "o1");
+        Iom_jObject inputObject = new Iom_jObject(STRUCT_FILTER_BASE, null);
+        inputObject.setattrvalue("numericAttr", "1");
+        testObject.addattrobj("inputObjects", inputObject);
+        testObject.setattrvalue("filterExpression", "3 + 5");
+        testObject.setattrvalue("expectedCount", "1");
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_FILTER, testObject);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
@@ -252,9 +265,9 @@ public class ObjectPool24Test {
 
     @Test
     public void filterFail() {
-        IomObject testObject = IomObjectHelper.createIomObject(CLASS_FILTER_TEST, "o1",
-                o -> o.setattrvalue("filterExpression", "numericAttr > 10"),
-                o -> o.setattrvalue("expectedCount", "2"));
+        Iom_jObject testObject = new Iom_jObject(CLASS_FILTER_TEST, "o1");
+        testObject.setattrvalue("filterExpression", "numericAttr > 10");
+        testObject.setattrvalue("expectedCount", "2");
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_FILTER, testObject);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
@@ -263,14 +276,17 @@ public class ObjectPool24Test {
 
     @Test
     public void filterCombinedWithAllObjects() {
-        List<IomObject> inputObjects = IntStream.range(0, 10)
-                .mapToObj(i -> IomObjectHelper.createIomObject(CLASS_FILTER_SOME_CLASS, "o" + i,
-                        o -> o.setattrvalue("numericAttr", Integer.toString(i * 10))))
-                .collect(Collectors.toList());
+        List<IomObject> inputObjects = new ArrayList<IomObject>();
+        for (int i = 0; i < 10; i++) {
+            Iom_jObject obj = new Iom_jObject(CLASS_FILTER_SOME_CLASS, "o" + i);
+            obj.setattrvalue("numericAttr", Integer.toString(i * 10));
+            inputObjects.add(obj);
+        }
 
-        inputObjects.add(IomObjectHelper.createIomObject(CLASS_FILTER_ALL_TEST, "o-test",
-                o -> o.setattrvalue("filterExpression", "numericAttr < 45"),
-                o -> o.setattrvalue("expectedCount", "5")));
+        Iom_jObject testObj = new Iom_jObject(CLASS_FILTER_ALL_TEST, "o-test");
+        testObj.setattrvalue("filterExpression", "numericAttr < 45");
+        testObj.setattrvalue("expectedCount", "5");
+        inputObjects.add(testObj);
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, inputObjects.toArray(new IomObject[0]));
         assertEquals(0, logger.getErrs().size());

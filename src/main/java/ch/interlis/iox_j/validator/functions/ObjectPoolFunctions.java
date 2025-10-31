@@ -25,12 +25,12 @@ import ch.interlis.iox_j.validator.Value;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class ObjectPoolFunctions {
     private final Validator validator;
@@ -129,12 +129,13 @@ public class ObjectPoolFunctions {
             return Value.createUndefined();
         }
 
-        List<IomObject> filteredObjects = objects.stream()
-            .filter(object -> {
-                Value value = validator.evaluateExpression(null, validationKind, usageScope, object, filter, null);
-                return !value.skipEvaluation() && value.isTrue();
-            })
-            .collect(Collectors.toList());
+        List<IomObject> filteredObjects = new ArrayList<IomObject>();
+        for (IomObject object : objects) {
+            Value value = validator.evaluateExpression(null, validationKind, usageScope, object, filter, null);
+            if (!value.skipEvaluation() && value.isTrue()) {
+                filteredObjects.add(object);
+            }
+        }
 
         return new Value(filteredObjects);
     }
@@ -162,17 +163,23 @@ public class ObjectPoolFunctions {
             return null;
         }
 
-        Set<String> classNames = objects.stream()
-                .map(IomObject::getobjecttag)
-                .collect(Collectors.toSet());
+        Set<String> classNames = new HashSet<String>();
+        for (IomObject obj : objects) {
+            classNames.add(obj.getobjecttag());
+        }
+
         Viewable<?> firstClass = (Viewable<?>) td.getElement(classNames.iterator().next());
         if (classNames.size() == 1) {
             return firstClass;
         }
 
-        return classNames.stream()
-                .map(className -> (Viewable) td.getElement(className))
-                .reduce(firstClass, ObjectPoolFunctions::getCommonBaseClass);
+        Viewable<?> commonBaseClass = firstClass;
+        for (String className : classNames) {
+            Viewable<?> classViewable = (Viewable<?>) td.getElement(className);
+            commonBaseClass = getCommonBaseClass(commonBaseClass, classViewable);
+        }
+
+        return commonBaseClass;
     }
 
     private static Viewable<?> getCommonBaseClass(Viewable<?> classA, Viewable<?> classB) {
