@@ -21,7 +21,10 @@ import org.junit.Before;
 
 import org.junit.Assert;
 
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.util.Map;
 
@@ -55,7 +58,11 @@ public class ElementsFunctionsTest {
     private static final String ILI_E_CLASSA_VALUE = "value";
     private static final String ILI_E_CLASSA_LIST = "list";
     private static final String ILI_E_CLASSA = ILI_TOPIC_E+".ClassA";
-    
+
+    private static final String ILI_F_TOPIC = ILI_MODEL + ".TopicF";
+    private static final String ILI_F_STRUCT_COMPONENET = ILI_F_TOPIC + ".Component";
+    private static final String ILI_F_CLASS_TESTCASE = ILI_F_TOPIC + ".TestCase";
+
     private TransferDescription td=null;
     @Before
     public void setUp() throws Exception {
@@ -277,6 +284,35 @@ public class ElementsFunctionsTest {
         Assert.assertEquals(1,logger.getErrs().size());
         Assert.assertEquals("Mandatory Constraint Elements_V1_0_Test.TopicB.Gebaeudeeingang.GEB01 is not true.",logger.getErrs().get(0).getEventMsg());
     }
+
+    @Test
+    public void valuesOfPathAnyStructure_Ok() {
+        Iom_jObject component1 = new Iom_jObject(ILI_F_STRUCT_COMPONENET, null);
+        component1.addattrobj("geom", IomObjectHelper.createCoord("2600000.000","1200000.000"));
+        Iom_jObject component2 = new Iom_jObject(ILI_F_STRUCT_COMPONENET, null);
+        component2.addattrobj("geom", IomObjectHelper.createCoord("2700000.000","1100000.000"));
+        Iom_jObject testCase = new Iom_jObject(ILI_F_CLASS_TESTCASE, "test1");
+        testCase.setattrvalue("path", "geom");
+        testCase.setattrvalue("expectedCount", "2");
+        testCase.addattrobj("objects", component1);
+        testCase.addattrobj("objects", component2);
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, ILI_F_TOPIC, testCase);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void valuesOfPathAnyStructure_Fail() {
+        Iom_jObject testCase = new Iom_jObject(ILI_F_CLASS_TESTCASE, "test1");
+        testCase.setattrvalue("path", "geom");
+        testCase.setattrvalue("expectedCount", "2");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, ILI_F_TOPIC, testCase);
+        Assert.assertEquals("Mandatory Constraint Elements_V1_0_Test.TopicF.TestCase.valuesOfPathAnyStructure is not true.",logger.getErrs().get(0).getEventMsg());
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
     @Test
     public void values_attr_value1_Ok() {
         Iom_jObject iomObj1=new Iom_jObject(ILI_C_LOKALISATION1, "o1");
