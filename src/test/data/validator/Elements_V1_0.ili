@@ -9,6 +9,7 @@ MODEL Elements_V1_0
   FUNCTION valuesN(list: TEXT): LIST OF NUMERIC;
   FUNCTION valuesOfPath(attrPath: TEXT): BAG OF TEXT;
   FUNCTION valuesOfPathN(attrPath: TEXT): BAG OF NUMERIC;
+  FUNCTION valuesOfPathAnyStructure(objects: BAG OF ANYSTRUCTURE; attrPath: TEXT): BAG OF ANYSTRUCTURE;
     /**
      * If the first argument evaluates to UNDEFINED, the second argument is returned.
      * inputValue: The value to check for UNDEFINED.
