@@ -3,6 +3,8 @@ package ch.interlis.iox_j.validator;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 
+import java.util.function.Consumer;
+
 public class IomObjectHelper {
 
     /**
