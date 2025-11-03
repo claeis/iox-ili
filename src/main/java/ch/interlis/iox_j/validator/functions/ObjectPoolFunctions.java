@@ -24,7 +24,7 @@ public class ObjectPoolFunctions {
     private final ObjectPool objectPool;
     private final LogEventFactory logger;
 
-    public static final String OBJECTPOOL = "ObjectPool";
+    public static final String OBJECTPOOL = "ObjectPool_V1_0";
 
     public ObjectPoolFunctions(Validator validator, ObjectPool objectPool, LogEventFactory logger) {
         this.validator = validator;
@@ -81,4 +81,5 @@ public class ObjectPoolFunctions {
         }
         return new Value(objects);
     }
+
 }

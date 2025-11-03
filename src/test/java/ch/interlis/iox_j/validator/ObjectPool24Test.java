@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
@@ -23,7 +24,7 @@ public class ObjectPool24Test {
     @Before
     public void setUp() {
         Configuration ili2cConfig = new Configuration();
-        FileEntry functionIli = new FileEntry("src/test/data/validator/ObjectPool.ili", FileEntryKind.ILIMODELFILE);
+        FileEntry functionIli = new FileEntry("src/test/data/validator/ObjectPool_V1_0.ili", FileEntryKind.ILIMODELFILE);
         ili2cConfig.addFileEntry(functionIli);
 
         FileEntry modelIli = new FileEntry("src/test/data/validator/ObjectPool24_Test.ili", FileEntryKind.ILIMODELFILE);
@@ -91,6 +92,7 @@ public class ObjectPool24Test {
                 "Mandatory Constraint ObjectPool24_Test.Topic.ClassC.allOfViewA is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
+
 
     private Iom_jObject createObjectA(String oid, String attrValue) {
         Iom_jObject object = new Iom_jObject(CLASS_A, oid);

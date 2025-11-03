@@ -5,6 +5,9 @@ ideas/open issues
 iox-ili 1.24.3 (2025-09-xx)
 -----------------------------
 - fix NPE with --singlePass (ilivalidator#452)
+- Validator: ILI2.4 fix Validator.getValueFromObjectPath() with list of simple values
+- Validator: ILI2.4 fix INTERLIS.elementCount() with list of simple values (ilivalidator#445)
+- new functions model Elements_V1_0 
 
 iox-ili 1.24.2 (2025-09-16)
 -----------------------------

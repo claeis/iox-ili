@@ -1,7 +1,7 @@
 INTERLIS 2.4;
 
-TYPE MODEL ObjectPool (en)
-    AT "http://www.interlis.ch/models" VERSION "2025-05-06" =
+TYPE MODEL ObjectPool_V1_0 (en)
+    AT "http://www.interlis.ch/models" VERSION "2025-06-25" =
 
     /**
      * Gets all objects of the ObjectClass in the current validation and its reference data.
@@ -10,4 +10,4 @@ TYPE MODEL ObjectPool (en)
      */
     FUNCTION allObjects(ObjectClass: CLASS): BAG OF ANYSTRUCTURE;
 
-END ObjectPool.
+END ObjectPool_V1_0.
