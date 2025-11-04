@@ -63,6 +63,10 @@ public class ElementsFunctionsTest {
     private static final String ILI_F_STRUCT_COMPONENET = ILI_F_TOPIC + ".Component";
     private static final String ILI_F_CLASS_TESTCASE = ILI_F_TOPIC + ".TestCase";
 
+    private final static String TOPIC_CONCAT = ILI_MODEL + ".TopicConcat";
+    private final static String CLASS_CONCAT_PRIMITIVE = TOPIC_CONCAT + ".TestPrimitiveType";
+    private final static String CLASS_CONCAT_COMPLEX = TOPIC_CONCAT + ".TestComplexType";
+
     private TransferDescription td=null;
     @Before
     public void setUp() throws Exception {
@@ -458,5 +462,89 @@ public class ElementsFunctionsTest {
         // Asserts
         Assert.assertEquals(1,logger.getErrs().size());
         Assert.assertEquals("Mandatory Constraint Elements_V1_0_Test.TopicE.ClassA.LSTE01 is not true.",logger.getErrs().get(0).getEventMsg());
+    }
+
+    @Test
+    public void concatPrimitive_Ok() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_CONCAT_PRIMITIVE, "test1");
+        iomObj.addattrvalue("firstCollection", "text1");
+        iomObj.addattrvalue("firstCollection", "text2");
+        iomObj.addattrvalue("secondCollection", "text3");
+        iomObj.addattrvalue("secondCollection", "text4");
+        iomObj.setattrvalue("expectedCount", "4");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_CONCAT, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void concatPrimitive_Fail() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_CONCAT_PRIMITIVE, "test1");
+        iomObj.setattrvalue("expectedCount", "93");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_CONCAT, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint Elements_V1_0_Test.TopicConcat.TestPrimitiveType.combineCollections is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void concatComplex_Ok() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_CONCAT_COMPLEX, "test1");
+        iomObj.addattrobj("firstCollection", IomObjectHelper.createCoord("10", "10"));
+        iomObj.addattrobj("firstCollection", IomObjectHelper.createCoord("20", "20"));
+        iomObj.addattrobj("secondCollection", IomObjectHelper.createCoord("30", "30"));
+        iomObj.addattrobj("secondCollection", IomObjectHelper.createCoord("40", "40"));
+        iomObj.setattrvalue("expectedCount", "4");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_CONCAT, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void concatComplex_Fail() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_CONCAT_COMPLEX, "test1");
+        iomObj.setattrvalue("expectedCount", "45");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_CONCAT, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint Elements_V1_0_Test.TopicConcat.TestComplexType.combineCollections is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void concatEmptyFirstCollection_Ok() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_CONCAT_COMPLEX, "test1");
+        iomObj.addattrobj("secondCollection", IomObjectHelper.createCoord("30", "30"));
+        iomObj.addattrobj("secondCollection", IomObjectHelper.createCoord("40", "40"));
+        iomObj.setattrvalue("expectedCount", "2");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_CONCAT, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void concatEmptySecondCollection_Ok() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_CONCAT_COMPLEX, "test1");
+        iomObj.addattrobj("firstCollection", IomObjectHelper.createCoord("10", "10"));
+        iomObj.addattrobj("firstCollection", IomObjectHelper.createCoord("20", "20"));
+        iomObj.setattrvalue("expectedCount", "2");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_CONCAT, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void concatBothEmpty_Ok() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_CONCAT_COMPLEX, "test1");
+        iomObj.setattrvalue("expectedCount", "0");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_CONCAT, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
     }
 }

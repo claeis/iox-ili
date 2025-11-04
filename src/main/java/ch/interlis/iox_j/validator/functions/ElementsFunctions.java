@@ -47,6 +47,7 @@ public class ElementsFunctions {
     private static final String FUNCTION_VALUES_N = "valuesN";
     private static final String FUNCTION_COALESCE = "coalesce";
     private static final String FUNCTION_COALESCE_N = "coalesceN";
+    private static final String FUNCTION_CONCAT = "concat";
 
     public static final String ELEMENTS_V1_0 = "Elements_V1_0";
 
@@ -96,6 +97,8 @@ public class ElementsFunctions {
             return evaluateCoalesce(validationKind, usageScope, iomObj, actualArguments);
         }else if (currentFunction.getName().equals(FUNCTION_COALESCE_N)) {
             return evaluateCoalesce(validationKind, usageScope, iomObj, actualArguments);
+        } else if (currentFunction.getName().equals(FUNCTION_CONCAT)) {
+            return evaluateConcat(validationKind, usageScope, iomObj, actualArguments);
         } else {
             return Value.createNotYetImplemented();
         }
@@ -206,5 +209,34 @@ public class ElementsFunctions {
             return input;
         }
     }
-    
+    // FUNCTION concat(FirstCollection: BAG OF ANYSTRUCTURE; SecondCollection: BAG OF ANYSTRUCTURE): BAG OF ANYSTRUCTURE;
+    private Value evaluateConcat(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
+        Value argFirstCollection = actualArguments[0];
+        Value argSecondCollection = actualArguments[1];
+        if (argFirstCollection.isUndefined()) {
+            return argSecondCollection;
+        }
+        if (argSecondCollection.isUndefined()) {
+            return argFirstCollection;
+        }
+
+        if (argFirstCollection.getValues() != null) {
+            String[] firstCollection = argFirstCollection.getValues();
+            String[] secondCollection = argSecondCollection.getValues();
+
+            String[] combinedObjects = new String[firstCollection.length + secondCollection.length];
+            System.arraycopy(firstCollection, 0, combinedObjects, 0, firstCollection.length);
+            System.arraycopy(secondCollection, 0, combinedObjects, firstCollection.length, secondCollection.length);
+
+            return new Value(null, combinedObjects);
+        } else {
+            Collection<IomObject> firstCollection = argFirstCollection.getComplexObjects();
+            Collection<IomObject> secondCollection = argSecondCollection.getComplexObjects();
+
+            List<IomObject> combinedObjects = new ArrayList<IomObject>(firstCollection);
+            combinedObjects.addAll(secondCollection);
+
+            return new Value(combinedObjects);
+        }
+    }
 }

@@ -68,14 +68,4 @@ TYPE MODEL DMAVTYM_Topologie_V1_1 (de)
     pointAttr: ATTRIBUTE OF @ PointObject;
     ReferencePoints: ANYSTRUCTURE): BOOLEAN;
 
-  /**
-    * Combines two collections into one collection. The type of the input collections must be compatible.
-    * FirstCollection: the first collection.
-    * SecondCollection: the second collection.
-    * Since 2025-11-03
-    */
-  FUNCTION combineCollections(
-    FirstCollection: BAG OF ANYSTRUCTURE,
-    SecondCollection: BAG OF ANYSTRUCTURE): BAG OF ANYSTRUCTURE;
-
 END DMAVTYM_Topologie_V1_1.
