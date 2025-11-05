@@ -21,7 +21,7 @@ INTERLIS 2.4;
 !!@ technicalContact = mailto:dmav@swisstopo.ch
 !!@ furtherInformation = https://www.cadastre-manual.admin.ch/de/modelldokumentation-dmav
 TYPE MODEL DMAVTYM_Topologie_V1_1 (de)
-  AT "https://models.geo.admin.ch/V_D/" VERSION "2025-10-30" =
+  AT "https://models.geo.admin.ch/V_D/" VERSION "2025-11-05" =
 
   /**
    * Tests if the line or multiline is fully covered by an outer or inner ring of the surface.
@@ -56,15 +56,31 @@ TYPE MODEL DMAVTYM_Topologie_V1_1 (de)
     Tolerance: NUMERIC): BOOLEAN;
 
   /**
-   * Checks whether two combined surfaces and its control points are equal within the specified tolerance.
+   * Checks whether the control points of two combined surfaces are equal within the specified tolerance.
    * SurfaceObjects1: The first set of surface objects.
    * SurfaceAttr1: The geometry attribute of SurfaceObjects1.
    * SurfaceObjects2: The second set of surface objects.
    * SurfaceAttr2: The geometry attribute of SurfaceObjects2.
    * Tolerance: The maximum allowed distance between a control point in one geometry and its matching point in the other geometry.
-   * Since 2025-10-30
+   * Since 2025-11-05
    */
-  FUNCTION isGeometryCongruent(
+  FUNCTION hasGeometrySameControlPoints(
+    SurfaceObjects1: ANYSTRUCTURE;
+    SurfaceAttr1: ATTRIBUTE OF @ SurfaceObjects1;
+    SurfaceObjects2: ANYSTRUCTURE;
+    SurfaceAttr2: ATTRIBUTE OF @ SurfaceObjects2;
+    Tolerance: NUMERIC): BOOLEAN;
+
+  /**
+   * Checks whether two combined surfaces are spatially equal within the specified tolerance.
+   * SurfaceObjects1: The first set of surface objects.
+   * SurfaceAttr1: The geometry attribute of SurfaceObjects1.
+   * SurfaceObjects2: The second set of surface objects.
+   * SurfaceAttr2: The geometry attribute of SurfaceObjects2.
+   * Tolerance: The maximum allowed distance between both geometries.
+   * Since 2025-11-05
+   */
+  FUNCTION isGeometrySpatiallyEqual(
     SurfaceObjects1: ANYSTRUCTURE;
     SurfaceAttr1: ATTRIBUTE OF @ SurfaceObjects1;
     SurfaceObjects2: ANYSTRUCTURE;

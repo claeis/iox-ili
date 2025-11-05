@@ -37,6 +37,10 @@ public class DmavtymTopologie {
     public static final String DMAVTYM_Topologie_V1_0 = "DMAVTYM_Topologie_V1_0";
     public static final String DMAVTYM_Topologie_V1_1 = "DMAVTYM_Topologie_V1_1";
 
+    private interface GeometryEqualityFunction {
+        boolean areEqual(Geometry geom1, Geometry geom2, double tolerance);
+    }
+
     private final TransferDescription td;
     private final IoxValidationConfig validationConfig;
     private final Validator validator;
@@ -70,8 +74,10 @@ public class DmavtymTopologie {
             return evaluateCovers(validationKind, usageScope, iomObj, actualArguments);
         } else if (currentFunction.getName().equals("coversWithTolerance")) {
             return evaluateCoversWithTolerance(validationKind, usageScope, iomObj, actualArguments);
-        } else if (currentFunction.getName().equals("isGeometryCongruent")) {
-            return evaluateIsGeometryCongruent(validationKind, usageScope, iomObj, actualArguments);
+        } else if (currentFunction.getName().equals("hasGeometrySameControlPoints")) {
+            return evaluateHasGeometrySameControlPoints(validationKind, usageScope, iomObj, actualArguments);
+        } else if (currentFunction.getName().equals("isGeometrySpatiallyEqual")) {
+            return evaluateIsGeometrySpatiallyEqual(validationKind, usageScope, iomObj, actualArguments);
         } else {
             return Value.createNotYetImplemented();
         }
@@ -258,7 +264,27 @@ public class DmavtymTopologie {
         return true;
     }
 
-    private Value evaluateIsGeometryCongruent(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
+    private Value evaluateHasGeometrySameControlPoints(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
+        return evaluateGeometryEquality(validationKind, usageScope, mainObj, actualArguments, new GeometryEqualityFunction() {
+            @Override
+            public boolean areEqual(Geometry geom1, Geometry geom2, double tolerance) {
+                geom1.normalize();
+                geom2.normalize();
+                return geom1.equalsExact(geom2, tolerance);
+            }
+        });
+    }
+
+    private Value evaluateIsGeometrySpatiallyEqual(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
+        return evaluateGeometryEquality(validationKind, usageScope, mainObj, actualArguments, new GeometryEqualityFunction() {
+            @Override
+            public boolean areEqual(Geometry geom1, Geometry geom2, double tolerance) {
+                return geom1.buffer(tolerance).covers(geom2) && geom2.buffer(tolerance).covers(geom1);
+            }
+        });
+    }
+
+    private Value evaluateGeometryEquality(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments, GeometryEqualityFunction equality) {
         // All arguments must be defined
         for (Value arg : actualArguments) {
             if (arg.isUndefined()) {
@@ -300,9 +326,7 @@ public class DmavtymTopologie {
             return new Value(false);
         }
 
-        surface1.normalize();
-        surface2.normalize();
-        return new Value(surface1.equalsExact(surface2, tolerance));
+        return new Value(equality.areEqual(surface1, surface2, tolerance));
     }
 
     private Geometry unionSurfaces(Collection<IomObject> objects, String attribute, String validationKind) throws IoxException {

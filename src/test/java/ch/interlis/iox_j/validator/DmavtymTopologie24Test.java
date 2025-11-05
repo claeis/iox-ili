@@ -490,7 +490,7 @@ public class DmavtymTopologie24Test {
     }
 
     @Test
-    public void isGeometryCongruentRectangle() {
+    public void geometryEqualityRectangle() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
         iomObj.addattrobj("surface1", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
         iomObj.addattrobj("surface2", IomObjectHelper.createRectangleGeometry("10", "9.999", "30", "30.001"));
@@ -501,7 +501,7 @@ public class DmavtymTopologie24Test {
     }
 
     @Test
-    public void isGeometryCongruentDifferentStartPoint() {
+    public void geometryEqualityDifferentStartPoint() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
         iomObj.addattrobj("surface1", IomObjectHelper.createPolygonFromBoundaries(
                 IomObjectHelper.createBoundary(
@@ -524,7 +524,7 @@ public class DmavtymTopologie24Test {
     }
 
     @Test
-    public void isGeometryCongruentAdditionalPoint() {
+    public void geometryEqualityAdditionalPoint() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
         iomObj.addattrobj("surface1", IomObjectHelper.createPolygonFromBoundaries(
                 IomObjectHelper.createBoundary(
@@ -544,12 +544,12 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.CompareSurfacesClass.geometryCongruent_V1_1 is not true.");
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.CompareSurfacesClass.geometrySameControlPoints_V1_1 is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 
     @Test
-    public void isGeometryCongruentDifferentInnerRings() {
+    public void geometryEqualityDifferentInnerRings() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
         iomObj.addattrobj("surface1", IomObjectHelper.createPolygonFromBoundaries(
                 IomObjectHelper.createRectangleBoundary("10", "10", "30", "30"),
@@ -560,7 +560,8 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.CompareSurfacesClass.geometryCongruent_V1_1 is not true.");
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.CompareSurfacesClass.geometrySameControlPoints_V1_1 is not true.",
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.CompareSurfacesClass.geometrySpatiallyEquals_V1_1 is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 }
