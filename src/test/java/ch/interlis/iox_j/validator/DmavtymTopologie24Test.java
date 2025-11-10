@@ -23,6 +23,10 @@ public class DmavtymTopologie24Test {
     private final static String CLASS_SURFACE = TOPIC + ".SurfaceClass";
     private final static String CLASS_LINE = TOPIC + ".LineClass";
     private final static String CLASS_COMPARE_LINES = TOPIC + ".CompareLinesClass";
+
+    private final static String TOPIC_POINT_IN_POINTS = MODEL + ".PointInPoints";
+    private final static String CLASS_POINT_IN_POINTS_TEST = TOPIC_POINT_IN_POINTS + ".TestCase";
+
     private TransferDescription td;
 
     @Before
@@ -485,6 +489,192 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPoints() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("20", "20"));
+        iomObj.setattrvalue("attribute", "pointAttr");
+        iomObj.addattrobj("pointAttr", IomObjectHelper.createCoord("10.00049", "9.9995"));
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsNoMatch() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("99", "99"));
+        iomObj.setattrvalue("attribute", "pointAttr");
+        iomObj.addattrobj("pointAttr", IomObjectHelper.createCoord("10", "10"));
+        iomObj.setattrvalue("expected", "false");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsSurface() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "30"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("30", "30"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("30", "10"));
+        iomObj.setattrvalue("attribute", "surfaceAttr");
+        iomObj.addattrobj("surfaceAttr", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsSurfaceWithArcs() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "30"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("30", "10"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("15", "15"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("15", "25"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("25", "15"));
+        iomObj.setattrvalue("attribute", "surfaceAttr");
+        iomObj.addattrobj("surfaceAttr", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createArc("23", "19", "10", "30"),
+                        IomObjectHelper.createCoord("10", "10")),
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("15", "15"),
+                        IomObjectHelper.createCoord("25", "15"),
+                        IomObjectHelper.createArc("21", "21", "15", "25"),
+                        IomObjectHelper.createCoord("15", "15"))));
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsSurfaceWithHoles() {
+        // Coordinates from the hole are not in the reference points therefore expected is false
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "30"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("30", "30"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("30", "10"));
+        iomObj.setattrvalue("attribute", "surfaceAttr");
+        iomObj.addattrobj("surfaceAttr", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createRectangleBoundary("10", "10", "30", "30"),
+                IomObjectHelper.createRectangleBoundary("15", "15", "25", "25")));
+        iomObj.setattrvalue("expected", "false");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsPolyline() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("20", "42"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("30", "99"));
+        iomObj.setattrvalue("attribute", "lineAttr");
+        iomObj.addattrobj("lineAttr", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("20", "42"),
+                IomObjectHelper.createCoord("30", "99")));
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsPolylineWithArcs() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "30"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("30", "10"));
+        iomObj.setattrvalue("attribute", "lineAttr");
+        iomObj.addattrobj("lineAttr", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("30", "10"),
+                IomObjectHelper.createArc("23", "19", "10", "30")));
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsMultiPolyline() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("20", "42"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "50"));
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("20", "99"));
+        iomObj.setattrvalue("attribute", "multiLineAttr");
+        iomObj.addattrobj("multiLineAttr", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                    IomObjectHelper.createCoord("10", "10"),
+                    IomObjectHelper.createCoord("20", "42")),
+                IomObjectHelper.createPolyline(
+                    IomObjectHelper.createCoord("10", "50"),
+                    IomObjectHelper.createCoord("20", "99"))));
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsUndefinedReferencePoints() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.setattrvalue("attribute", "pointAttr");
+        iomObj.addattrobj("pointAttr", IomObjectHelper.createCoord("10", "10"));
+        iomObj.setattrvalue("expected", "false");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsUndefinedInputPoints() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
+        iomObj.setattrvalue("attribute", "pointAttr");
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsFail() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("99", "99"));
+        iomObj.setattrvalue("attribute", "pointAttr");
+        iomObj.addattrobj("pointAttr", IomObjectHelper.createCoord("0", "0"));
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.PointInPoints.TestCase.pointInPoints is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 }

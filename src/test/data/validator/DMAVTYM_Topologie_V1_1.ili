@@ -65,7 +65,7 @@ TYPE MODEL DMAVTYM_Topologie_V1_1 (de)
     */
   FUNCTION pointInPoints(
     PointObjects: ANYSTRUCTURE;
-    pointAttr: ATTRIBUTE OF @ PointObject;
+    pointAttr: ATTRIBUTE OF @ PointObjects;
     ReferencePoints: ANYSTRUCTURE): BOOLEAN;
 
 END DMAVTYM_Topologie_V1_1.

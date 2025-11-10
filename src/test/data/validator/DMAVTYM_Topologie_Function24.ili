@@ -44,4 +44,25 @@ MODEL DMAVTYM_Topologie_Function24
                 DMAVTYM_Topologie_V1_1.coversWithTolerance(THIS, >>line1, THIS, >>line2, 0.002);
         END CompareLinesClass;
     END Topic;
+
+    TOPIC PointInPoints =
+        DOMAIN
+            Coord2 = COORD
+                0.000 .. 1000.000,
+                0.000 .. 1000.000;
+
+        CLASS TestCase =
+            pointAttr: Coord2;
+            lineAttr: POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Coord2 WITHOUT OVERLAPS > 0.002;
+            multiLineAttr: MULTIPOLYLINE WITH (STRAIGHTS, ARCS) VERTEX Coord2 WITHOUT OVERLAPS > 0.002;
+            surfaceAttr: SURFACE WITH (STRAIGHTS, ARCS) VERTEX Coord2 WITHOUT OVERLAPS > 0.002;
+
+            attribute: ATTRIBUTE;
+            referencePoints: BAG OF Coord2;
+            expected: MANDATORY BOOLEAN;
+
+            MANDATORY CONSTRAINT pointInPoints:
+                DMAVTYM_Topologie_V1_1.pointInPoints(THIS, attribute, referencePoints) == expected;
+        END TestCase;
+    END PointInPoints;
 END DMAVTYM_Topologie_Function24.

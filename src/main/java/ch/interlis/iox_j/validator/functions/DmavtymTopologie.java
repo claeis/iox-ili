@@ -29,6 +29,8 @@ import com.vividsolutions.jts.index.strtree.STRtree;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DmavtymTopologie {
     public static final String DMAVTYM_Topologie_V1_0 = "DMAVTYM_Topologie_V1_0";
@@ -66,6 +68,8 @@ public class DmavtymTopologie {
             return evaluateCovers(validationKind, usageScope, iomObj, actualArguments);
         } else if (currentFunction.getName().equals("coversWithTolerance")) {
             return evaluateCoversWithTolerance(validationKind, usageScope, iomObj, actualArguments);
+        } else if (currentFunction.getName().equals("pointInPoints")) {
+            return evaluatePointInPoints(validationKind, usageScope, iomObj, actualArguments);
         } else {
             return Value.createNotYetImplemented();
         }
@@ -273,5 +277,96 @@ public class DmavtymTopologie {
 
     private CurvePolygon getSurface(IomObject surface, String validationKind) throws IoxException {
         return (CurvePolygon) Iox2jtsext.surface2JTS(surface, 0.0, new OutParam<Boolean>(), logger, 0.0, validationKind);
+    }
+
+    private Value evaluatePointInPoints(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
+        Value argPointObjects = actualArguments[0];
+        Value argPointAttr = actualArguments[1];
+        Value argReferencePoints = actualArguments[2];
+        if (argPointAttr.isUndefined() || (argPointObjects.isUndefined() && argReferencePoints.isUndefined())) {
+            return Value.createUndefined();
+        }
+        // No points are always contained in the reference points
+        if (argPointObjects.isUndefined()) {
+            return new Value(true);
+        }
+        // If no reference points are given, the points cannot be contained in it
+        if (argReferencePoints.isUndefined()) {
+            return new Value(false);
+        }
+
+        // Check the type of the arguments
+        Collection<IomObject> pointObjects = argPointObjects.getComplexObjects();
+        String pointAttr = argPointAttr.getValue();
+        Collection<IomObject> referencePoints = argReferencePoints.getComplexObjects();
+        if (pointObjects == null || pointAttr == null || referencePoints == null) {
+            return Value.createUndefined();
+        }
+
+        try {
+            // Prepare reference point set
+            Set<Coordinate> referencePointSet = new HashSet<Coordinate>();
+            for (IomObject referencePoint : referencePoints) {
+                String objectTag = referencePoint.getobjecttag();
+                if (objectTag.equals(Iom_jObject.COORD)) {
+                    referencePointSet.add(Iox2jtsext.coord2JTS(referencePoint));
+                } else {
+                    logger.addEvent(logger.logErrorMsg("Reference Point with unexpected type: {0}.", objectTag));
+                    return Value.createUndefined();
+                }
+            }
+
+            // Check point objects
+            for (IomObject point : pointObjects) {
+                for (int i = 0; i < point.getattrvaluecount(pointAttr); i++) {
+                    IomObject pointValue = point.getattrobj(pointAttr, i);
+                    String objectTag = pointValue.getobjecttag();
+                    if (objectTag.equals(Iom_jObject.COORD)) { // MULTICOORD ?? Surface, Polyline
+                        Coordinate coord = Iox2jtsext.coord2JTS(pointValue);
+                        if (!referencePointSet.contains(coord)) {
+                            return new Value(false);
+                        }
+                    } else if (objectTag.equals(Iom_jObject.MULTISURFACE)) {
+                        CurvePolygon surface = getSurface(pointValue, validationKind);
+                        // Check every start and end point of the surface segments if they are contained inside the referencePointSet
+                        CompoundCurveRing exteriorRing = (CompoundCurveRing) surface.getExteriorRing();
+                        for (CompoundCurve line : exteriorRing.getLines()) {
+                            for (CurveSegment segment : line.getSegments()) {
+                                if (!referencePointSet.contains(segment.getStartPoint()) || !referencePointSet.contains(segment.getEndPoint())) {
+                                    return new Value(false);
+                                }
+                            }
+                        }
+                        for (int ringIndex = 0; ringIndex < surface.getNumInteriorRing(); ringIndex++) {
+                            CompoundCurveRing interiorRing = (CompoundCurveRing) surface.getInteriorRingN(ringIndex);
+                            for (CompoundCurve line : interiorRing.getLines()) {
+                                for (CurveSegment segment : line.getSegments()) {
+                                    if (!referencePointSet.contains(segment.getStartPoint()) || !referencePointSet.contains(segment.getEndPoint())) {
+                                        return new Value(false);
+                                    }
+                                }
+                            }
+                        }
+                    } else if (objectTag.equals(Iom_jObject.MULTIPOLYLINE) || objectTag.equals(Iom_jObject.POLYLINE)) {
+                        Collection<CompoundCurve> lines = getLines(pointValue);
+                        for (CompoundCurve line : lines) {;
+                            for (CurveSegment segment : line.getSegments()) {
+                                if (!referencePointSet.contains(segment.getStartPoint()) || !referencePointSet.contains(segment.getEndPoint())) {
+                                    return new Value(false);
+                                }
+                            }
+                        }
+                    } else {
+                        logger.addEvent(logger.logErrorMsg("Point with unexpected type: {0}.", objectTag));
+                        return Value.createUndefined();
+                    }
+                }
+            }
+        } catch (IoxException e) {
+            EhiLogger.logError(e);
+            return Value.createUndefined();
+        }
+
+        return new Value(true);
     }
 }
