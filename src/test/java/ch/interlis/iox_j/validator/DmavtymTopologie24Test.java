@@ -492,6 +492,7 @@ public class DmavtymTopologie24Test {
     @Test
     public void geometryEqualityRectangle() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
+        iomObj.setattrvalue("tolerance", "0.002");
         iomObj.addattrobj("surface1", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
         iomObj.addattrobj("surface2", IomObjectHelper.createRectangleGeometry("10", "9.999", "30", "30.001"));
 
@@ -503,6 +504,7 @@ public class DmavtymTopologie24Test {
     @Test
     public void geometryEqualityDifferentStartPoint() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
+        iomObj.setattrvalue("tolerance", "0.002");
         iomObj.addattrobj("surface1", IomObjectHelper.createPolygonFromBoundaries(
                 IomObjectHelper.createBoundary(
                         IomObjectHelper.createCoord("10", "30"),
@@ -526,6 +528,7 @@ public class DmavtymTopologie24Test {
     @Test
     public void geometryEqualityArcs() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
+        iomObj.setattrvalue("tolerance", "0.002");
         iomObj.addattrobj("surface1", IomObjectHelper.createPolygonFromBoundaries(
                 IomObjectHelper.createBoundary(
                         IomObjectHelper.createCoord("10", "10"),
@@ -547,6 +550,7 @@ public class DmavtymTopologie24Test {
     @Test
     public void geometryEqualityDifferentArcs() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
+        iomObj.setattrvalue("tolerance", "0.002");
         iomObj.addattrobj("surface1", IomObjectHelper.createPolygonFromBoundaries(
                 IomObjectHelper.createBoundary(
                         IomObjectHelper.createCoord("10", "10"),
@@ -570,6 +574,7 @@ public class DmavtymTopologie24Test {
     @Test
     public void geometryEqualityAdditionalPoint() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
+        iomObj.setattrvalue("tolerance", "0.002");
         iomObj.addattrobj("surface1", IomObjectHelper.createPolygonFromBoundaries(
                 IomObjectHelper.createBoundary(
                         IomObjectHelper.createCoord("10", "30"),
@@ -595,6 +600,7 @@ public class DmavtymTopologie24Test {
     @Test
     public void geometryEqualityDifferentInnerRings() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
+        iomObj.setattrvalue("tolerance", "0.002");
         iomObj.addattrobj("surface1", IomObjectHelper.createPolygonFromBoundaries(
                 IomObjectHelper.createRectangleBoundary("10", "10", "30", "30"),
                 IomObjectHelper.createRectangleBoundary("20", "20", "25", "25")));
