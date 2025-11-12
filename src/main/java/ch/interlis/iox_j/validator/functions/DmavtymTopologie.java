@@ -296,10 +296,9 @@ public class DmavtymTopologie {
         }
 
         // Check the type of the arguments
-        Collection<IomObject> pointObjects = argPointObjects.getComplexObjects();
-        String pointAttr = argPointAttr.getValue();
+        Collection<IomObject> pointObjects = getAttribute(argPointObjects, argPointAttr);
         Collection<IomObject> referencePoints = argReferencePoints.getComplexObjects();
-        if (pointObjects == null || pointAttr == null || referencePoints == null) {
+        if (pointObjects == null || referencePoints == null) {
             return Value.createUndefined();
         }
 
@@ -318,48 +317,45 @@ public class DmavtymTopologie {
 
             // Check point objects
             for (IomObject point : pointObjects) {
-                for (int i = 0; i < point.getattrvaluecount(pointAttr); i++) {
-                    IomObject pointValue = point.getattrobj(pointAttr, i);
-                    String objectTag = pointValue.getobjecttag();
-                    if (objectTag.equals(Iom_jObject.COORD)) { // MULTICOORD ?? Surface, Polyline
-                        Coordinate coord = Iox2jtsext.coord2JTS(pointValue);
-                        if (!referencePointSet.contains(coord)) {
-                            return new Value(false);
-                        }
-                    } else if (objectTag.equals(Iom_jObject.MULTISURFACE)) {
-                        CurvePolygon surface = getSurface(pointValue, validationKind);
-                        // Check every start and end point of the surface segments if they are contained inside the referencePointSet
-                        CompoundCurveRing exteriorRing = (CompoundCurveRing) surface.getExteriorRing();
-                        for (CompoundCurve line : exteriorRing.getLines()) {
-                            for (CurveSegment segment : line.getSegments()) {
-                                if (!referencePointSet.contains(segment.getStartPoint()) || !referencePointSet.contains(segment.getEndPoint())) {
-                                    return new Value(false);
-                                }
-                            }
-                        }
-                        for (int ringIndex = 0; ringIndex < surface.getNumInteriorRing(); ringIndex++) {
-                            CompoundCurveRing interiorRing = (CompoundCurveRing) surface.getInteriorRingN(ringIndex);
-                            for (CompoundCurve line : interiorRing.getLines()) {
-                                for (CurveSegment segment : line.getSegments()) {
-                                    if (!referencePointSet.contains(segment.getStartPoint()) || !referencePointSet.contains(segment.getEndPoint())) {
-                                        return new Value(false);
-                                    }
-                                }
-                            }
-                        }
-                    } else if (objectTag.equals(Iom_jObject.MULTIPOLYLINE) || objectTag.equals(Iom_jObject.POLYLINE)) {
-                        Collection<CompoundCurve> lines = getLines(pointValue);
-                        for (CompoundCurve line : lines) {;
-                            for (CurveSegment segment : line.getSegments()) {
-                                if (!referencePointSet.contains(segment.getStartPoint()) || !referencePointSet.contains(segment.getEndPoint())) {
-                                    return new Value(false);
-                                }
-                            }
-                        }
-                    } else {
-                        logger.addEvent(logger.logErrorMsg("Point with unexpected type: {0}.", objectTag));
-                        return Value.createUndefined();
+                String objectTag = point.getobjecttag();
+                if (objectTag.equals(Iom_jObject.COORD)) { // MULTICOORD ?? Surface, Polyline
+                    Coordinate coord = Iox2jtsext.coord2JTS(point);
+                    if (!referencePointSet.contains(coord)) {
+                        return new Value(false);
                     }
+                } else if (objectTag.equals(Iom_jObject.MULTISURFACE)) {
+                    CurvePolygon surface = getSurface(point, validationKind);
+                    // Check every start and end point of the surface segments if they are contained inside the referencePointSet
+                    CompoundCurveRing exteriorRing = (CompoundCurveRing) surface.getExteriorRing();
+                    for (CompoundCurve line : exteriorRing.getLines()) {
+                        for (CurveSegment segment : line.getSegments()) {
+                            if (!referencePointSet.contains(segment.getStartPoint()) || !referencePointSet.contains(segment.getEndPoint())) {
+                                return new Value(false);
+                            }
+                        }
+                    }
+                    for (int ringIndex = 0; ringIndex < surface.getNumInteriorRing(); ringIndex++) {
+                        CompoundCurveRing interiorRing = (CompoundCurveRing) surface.getInteriorRingN(ringIndex);
+                        for (CompoundCurve line : interiorRing.getLines()) {
+                            for (CurveSegment segment : line.getSegments()) {
+                                if (!referencePointSet.contains(segment.getStartPoint()) || !referencePointSet.contains(segment.getEndPoint())) {
+                                    return new Value(false);
+                                }
+                            }
+                        }
+                    }
+                } else if (objectTag.equals(Iom_jObject.MULTIPOLYLINE) || objectTag.equals(Iom_jObject.POLYLINE)) {
+                    Collection<CompoundCurve> lines = getLines(point);
+                    for (CompoundCurve line : lines) {;
+                        for (CurveSegment segment : line.getSegments()) {
+                            if (!referencePointSet.contains(segment.getStartPoint()) || !referencePointSet.contains(segment.getEndPoint())) {
+                                return new Value(false);
+                            }
+                        }
+                    }
+                } else {
+                    logger.addEvent(logger.logErrorMsg("Point with unexpected type: {0}.", objectTag));
+                    return Value.createUndefined();
                 }
             }
         } catch (IoxException e) {
@@ -368,5 +364,26 @@ public class DmavtymTopologie {
         }
 
         return new Value(true);
+    }
+
+    /**
+     * Extract the IomObjects with the given attribute from the objects.
+     */
+    private Collection<IomObject> getAttribute(Value objectsValue, Value attrValue) {
+        Collection<IomObject> objects = objectsValue.getComplexObjects();
+        String attribute = attrValue.getValue();
+
+        if (objects == null || attribute == null ) {
+            return null;
+        }
+
+        Collection<IomObject> result = new ArrayList<IomObject>();
+        for (IomObject object : objects) {
+            for (int i = 0; i < object.getattrvaluecount(attribute); i++) {
+                result.add(object.getattrobj(attribute, i));
+            }
+        }
+
+        return result;
     }
 }
