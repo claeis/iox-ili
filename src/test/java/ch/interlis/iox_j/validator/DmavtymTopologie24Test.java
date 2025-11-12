@@ -4,6 +4,7 @@ import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
+import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox.IoxException;
 import org.junit.Before;
@@ -26,6 +27,7 @@ public class DmavtymTopologie24Test {
 
     private final static String TOPIC_POINT_IN_POINTS = MODEL + ".PointInPoints";
     private final static String CLASS_POINT_IN_POINTS_TEST = TOPIC_POINT_IN_POINTS + ".TestCase";
+    private final static String STRUCT_POINT_IN_POINTS_POINT = TOPIC_POINT_IN_POINTS + ".Point";
 
     private TransferDescription td;
 
@@ -495,8 +497,8 @@ public class DmavtymTopologie24Test {
     @Test
     public void pointInPoints() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("20", "20"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("20", "20"));
         iomObj.setattrvalue("attribute", "pointAttr");
         iomObj.addattrobj("pointAttr", IomObjectHelper.createCoord("10.00049", "9.9995"));
         iomObj.setattrvalue("expected", "true");
@@ -509,7 +511,7 @@ public class DmavtymTopologie24Test {
     @Test
     public void pointInPointsNoMatch() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("99", "99"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("99", "99"));
         iomObj.setattrvalue("attribute", "pointAttr");
         iomObj.addattrobj("pointAttr", IomObjectHelper.createCoord("10", "10"));
         iomObj.setattrvalue("expected", "false");
@@ -522,10 +524,10 @@ public class DmavtymTopologie24Test {
     @Test
     public void pointInPointsSurface() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "30"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("30", "30"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("30", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "30"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("30", "30"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("30", "10"));
         iomObj.setattrvalue("attribute", "surfaceAttr");
         iomObj.addattrobj("surfaceAttr", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
         iomObj.setattrvalue("expected", "true");
@@ -538,12 +540,12 @@ public class DmavtymTopologie24Test {
     @Test
     public void pointInPointsSurfaceWithArcs() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "30"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("30", "10"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("15", "15"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("15", "25"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("25", "15"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "30"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("30", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("15", "15"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("15", "25"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("25", "15"));
         iomObj.setattrvalue("attribute", "surfaceAttr");
         iomObj.addattrobj("surfaceAttr", IomObjectHelper.createPolygonFromBoundaries(
                 IomObjectHelper.createBoundary(
@@ -567,10 +569,10 @@ public class DmavtymTopologie24Test {
     public void pointInPointsSurfaceWithHoles() {
         // Coordinates from the hole are not in the reference points therefore expected is false
         Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "30"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("30", "30"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("30", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "30"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("30", "30"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("30", "10"));
         iomObj.setattrvalue("attribute", "surfaceAttr");
         iomObj.addattrobj("surfaceAttr", IomObjectHelper.createPolygonFromBoundaries(
                 IomObjectHelper.createRectangleBoundary("10", "10", "30", "30"),
@@ -585,9 +587,9 @@ public class DmavtymTopologie24Test {
     @Test
     public void pointInPointsPolyline() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("20", "42"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("30", "99"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("20", "42"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("30", "99"));
         iomObj.setattrvalue("attribute", "lineAttr");
         iomObj.addattrobj("lineAttr", IomObjectHelper.createPolyline(
                 IomObjectHelper.createCoord("10", "10"),
@@ -603,9 +605,9 @@ public class DmavtymTopologie24Test {
     @Test
     public void pointInPointsPolylineWithArcs() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "30"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("30", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "30"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("30", "10"));
         iomObj.setattrvalue("attribute", "lineAttr");
         iomObj.addattrobj("lineAttr", IomObjectHelper.createPolyline(
                 IomObjectHelper.createCoord("10", "10"),
@@ -621,10 +623,10 @@ public class DmavtymTopologie24Test {
     @Test
     public void pointInPointsMultiPolyline() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("20", "42"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "50"));
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("20", "99"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("20", "42"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "50"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("20", "99"));
         iomObj.setattrvalue("attribute", "multiLineAttr");
         iomObj.addattrobj("multiLineAttr", IomObjectHelper.createMultiPolyline(
                 IomObjectHelper.createPolyline(
@@ -655,7 +657,7 @@ public class DmavtymTopologie24Test {
     @Test
     public void pointInPointsUndefinedInputPoints() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
         iomObj.setattrvalue("attribute", "pointAttr");
         iomObj.setattrvalue("expected", "true");
 
@@ -667,7 +669,7 @@ public class DmavtymTopologie24Test {
     @Test
     public void pointInPointsFail() {
         Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
-        iomObj.addattrobj("referencePoints", IomObjectHelper.createCoord("99", "99"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("99", "99"));
         iomObj.setattrvalue("attribute", "pointAttr");
         iomObj.addattrobj("pointAttr", IomObjectHelper.createCoord("0", "0"));
         iomObj.setattrvalue("expected", "true");
@@ -676,5 +678,11 @@ public class DmavtymTopologie24Test {
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.PointInPoints.TestCase.pointInPoints is not true.");
         assertThat(logger.getWarn(), is(empty()));
+    }
+
+    private IomObject createPointInPointsPoint(String x, String y) {
+        Iom_jObject point = new Iom_jObject(STRUCT_POINT_IN_POINTS_POINT, null);
+        point.addattrobj("geometry", IomObjectHelper.createCoord(x, y));
+        return point;
     }
 }

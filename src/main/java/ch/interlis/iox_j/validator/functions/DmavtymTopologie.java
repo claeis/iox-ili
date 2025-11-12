@@ -282,8 +282,9 @@ public class DmavtymTopologie {
     private Value evaluatePointInPoints(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
         Value argPointObjects = actualArguments[0];
         Value argPointAttr = actualArguments[1];
-        Value argReferencePoints = actualArguments[2];
-        if (argPointAttr.isUndefined() || (argPointObjects.isUndefined() && argReferencePoints.isUndefined())) {
+        Value argReferencePointObjects = actualArguments[2];
+        Value argReferencePointAttr = actualArguments[3];
+        if (argPointAttr.isUndefined() || argReferencePointAttr.isUndefined() || (argPointObjects.isUndefined() && argReferencePointObjects.isUndefined())) {
             return Value.createUndefined();
         }
         // No points are always contained in the reference points
@@ -291,13 +292,13 @@ public class DmavtymTopologie {
             return new Value(true);
         }
         // If no reference points are given, the points cannot be contained in it
-        if (argReferencePoints.isUndefined()) {
+        if (argReferencePointObjects.isUndefined()) {
             return new Value(false);
         }
 
         // Check the type of the arguments
         Collection<IomObject> pointObjects = getAttribute(argPointObjects, argPointAttr);
-        Collection<IomObject> referencePoints = argReferencePoints.getComplexObjects();
+        Collection<IomObject> referencePoints = getAttribute(argReferencePointObjects, argReferencePointAttr);
         if (pointObjects == null || referencePoints == null) {
             return Value.createUndefined();
         }
