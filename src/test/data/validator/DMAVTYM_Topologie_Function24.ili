@@ -5,6 +5,7 @@ MODEL DMAVTYM_Topologie_Function24
     IMPORTS DMAVTYM_Topologie_V1_1;
     IMPORTS DMAVTYM_Topologie_V1_0;
     IMPORTS ObjectPool_V1_0;
+    IMPORTS Elements_V1_0;
 
     DOMAIN
         Coord2 = COORD
@@ -67,6 +68,8 @@ MODEL DMAVTYM_Topologie_Function24
 
             MANDATORY CONSTRAINT pointInPoints:
                 DMAVTYM_Topologie_V1_1.pointInPoints(THIS, attribute, referencePoints, "geometry") == expected;
+            MANDATORY CONSTRAINT pointInPointsWithValuesOfPath:
+                DMAVTYM_Topologie_V1_1.pointInPoints(THIS, attribute, Elements_V1_0.valuesOfPathAnyStructure(referencePoints, "geometry"), UNDEFINED) == expected;
         END TestCase;
     END PointInPoints;
 END DMAVTYM_Topologie_Function24.

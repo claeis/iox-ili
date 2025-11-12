@@ -284,7 +284,7 @@ public class DmavtymTopologie {
         Value argPointAttr = actualArguments[1];
         Value argReferencePointObjects = actualArguments[2];
         Value argReferencePointAttr = actualArguments[3];
-        if (argPointAttr.isUndefined() || argReferencePointAttr.isUndefined() || (argPointObjects.isUndefined() && argReferencePointObjects.isUndefined())) {
+        if (argPointObjects.isUndefined() && argReferencePointObjects.isUndefined()) {
             return Value.createUndefined();
         }
         // No points are always contained in the reference points
@@ -369,12 +369,20 @@ public class DmavtymTopologie {
 
     /**
      * Extract the IomObjects with the given attribute from the objects.
+     * If attrValue is UNDEFINED, the objects themselves are returned.
      */
     private Collection<IomObject> getAttribute(Value objectsValue, Value attrValue) {
         Collection<IomObject> objects = objectsValue.getComplexObjects();
-        String attribute = attrValue.getValue();
+        if (objects == null) {
+            return null;
+        }
 
-        if (objects == null || attribute == null ) {
+        if (attrValue.isUndefined()) {
+            return objects;
+        }
+
+        String attribute = attrValue.getValue();
+        if (attribute == null) {
             return null;
         }
 

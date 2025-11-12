@@ -43,6 +43,9 @@ public class DmavtymTopologie24Test {
         FileEntry objectPoolIli = new FileEntry("src/test/data/validator/ObjectPool_V1_0.ili", FileEntryKind.ILIMODELFILE);
         ili2cConfig.addFileEntry(objectPoolIli);
 
+        FileEntry elementsIli = new FileEntry("src/test/data/validator/Elements_V1_0.ili", FileEntryKind.ILIMODELFILE);
+        ili2cConfig.addFileEntry(elementsIli);
+
         FileEntry modelIli = new FileEntry("src/test/data/validator/DMAVTYM_Topologie_Function24.ili", FileEntryKind.ILIMODELFILE);
         ili2cConfig.addFileEntry(modelIli);
 
@@ -676,7 +679,8 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "Mandatory Constraint DMAVTYM_Topologie_Function24.PointInPoints.TestCase.pointInPoints is not true.");
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.PointInPoints.TestCase.pointInPoints is not true.",
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.PointInPoints.TestCase.pointInPointsWithValuesOfPath is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 
