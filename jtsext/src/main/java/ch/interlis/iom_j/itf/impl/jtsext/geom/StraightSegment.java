@@ -63,4 +63,19 @@ public class StraightSegment extends CurveSegment {
 		result = 31 * result + p1.hashCode();
 		return result;
 	}
+
+	@Override
+	public boolean equals2D(CurveSegment other, double tolerance) {
+		if (this.getClass() != other.getClass()) {
+			return false;
+		}
+
+		Coordinate startA = getStartPoint();
+		Coordinate endA = getEndPoint();
+		Coordinate startB = other.getStartPoint();
+		Coordinate endB = other.getEndPoint();
+
+		return (startA.equals2D(startB, tolerance) && endA.equals2D(endB, tolerance))
+				|| (startA.equals2D(endB, tolerance) && endA.equals2D(startB, tolerance));
+	}
 }

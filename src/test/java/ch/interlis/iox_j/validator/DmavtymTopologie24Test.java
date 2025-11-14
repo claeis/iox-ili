@@ -22,6 +22,7 @@ public class DmavtymTopologie24Test {
     private final static String CLASSA = TOPIC + ".ClassA";
     private final static String CLASS_SURFACE = TOPIC + ".SurfaceClass";
     private final static String CLASS_LINE = TOPIC + ".LineClass";
+    private final static String CLASS_COMPARE_LINES = TOPIC + ".CompareLinesClass";
     private TransferDescription td;
 
     @Before
@@ -280,9 +281,9 @@ public class DmavtymTopologie24Test {
 
         Iom_jObject line = new Iom_jObject(CLASS_LINE, "o2");
         line.addattrobj("line", IomObjectHelper.createPolyline(
-                IomObjectHelper.createCoord("10.002", "15"),
+                IomObjectHelper.createCoord("10.001", "10"),
                 IomObjectHelper.createCoord("9.999", "30.001"),
-                IomObjectHelper.createCoord("20", "30")));
+                IomObjectHelper.createCoord("29.999", "30")));
 
         Iom_jObject surface2 = new Iom_jObject(CLASS_SURFACE, "o3");
         surface2.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
@@ -364,8 +365,8 @@ public class DmavtymTopologie24Test {
 
         Iom_jObject line = new Iom_jObject(CLASS_LINE, "o2");
         line.addattrobj("line", IomObjectHelper.createPolyline(
-                IomObjectHelper.createCoord("22", "20"),
-                IomObjectHelper.createCoord("25.001", "19.999")));
+                IomObjectHelper.createCoord("20.001", "20"),
+                IomObjectHelper.createCoord("25", "19.999")));
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, surface, line);
         assertThat(logger.getErrs(), is(empty()));
@@ -373,8 +374,116 @@ public class DmavtymTopologie24Test {
     }
 
     @Test
+    public void coversWithToleranceLineTooShort() {
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o1");
+        surface.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+
+        Iom_jObject line = new Iom_jObject(CLASS_LINE, "o2");
+        line.addattrobj("line", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("10", "29")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, surface, line);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineClass.lineCoversSurface_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceDifferentArcs() {
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o1");
+        surface.addattrobj("surface", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createArc("23", "19", "10", "30"),
+                        IomObjectHelper.createCoord("10", "10"))));
+
+        Iom_jObject line = new Iom_jObject(CLASS_LINE, "o2");
+        line.addattrobj("line", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("30", "10"),
+                IomObjectHelper.createArc("23.005", "19", "10", "30")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, surface, line);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineClass.lineCoversSurface_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
     public void coversWithToleranceFromXtf() throws IoxException {
         LogCollector logger = ValidatorTestHelper.validateObjectsFromXtf24(td, new File("src/test/data/validator/DMAVTYM_Topologie_Tolerance.xtf"));
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversLineWithTolerance() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_LINES, "o1");
+        iomObj.addattrobj("line1", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30"),
+                IomObjectHelper.createCoord("30", "10")));
+        iomObj.addattrobj("line2", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10.001", "10"),
+                IomObjectHelper.createCoord("9.999", "30.001"),
+                IomObjectHelper.createCoord("29.999", "30")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversLineWithToleranceMissingSegment() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_LINES, "o1");
+        iomObj.addattrobj("line1", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10.001", "10"),
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30")));
+        iomObj.addattrobj("line2", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("9.999", "30.001"),
+                IomObjectHelper.createCoord("29.999", "30"),
+                IomObjectHelper.createCoord("30", "10")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.CompareLinesClass.lineCoversLine_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversLineWithToleranceArc() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_LINES, "o1");
+        iomObj.addattrobj("line1", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("30", "10"),
+                IomObjectHelper.createArc("23", "19", "10", "30"),
+                IomObjectHelper.createCoord("30", "30")));
+
+        iomObj.addattrobj("line2", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("29.999", "10"),
+                IomObjectHelper.createArc("23.001", "19.001", "10", "30")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversLineArcDifferentMidPoint() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_LINES, "o1");
+        iomObj.addattrobj("line1", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("30", "10"),
+                IomObjectHelper.createArc("23", "19", "10", "30")));
+        iomObj.addattrobj("line2", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("30", "10"),
+                IomObjectHelper.createArc("19", "23.001", "10", "30")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         assertThat(logger.getErrs(), is(empty()));
         assertThat(logger.getWarn(), is(empty()));
     }
