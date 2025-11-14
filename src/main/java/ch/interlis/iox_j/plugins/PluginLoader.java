@@ -68,7 +68,10 @@ public class PluginLoader {
 			try
 			{
 				JARClassLoader loader=new JARClassLoader(path);
-				loader.loadAllPlugins(this);
+				if(loader.isIoxPluginJar()){
+	                loader.loadDependencies();
+	                loader.loadAllPlugins(this);
+				}
 			}
 			catch(java.io.IOException io)
 			{
