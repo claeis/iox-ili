@@ -40,12 +40,14 @@ import java.util.List;
 public class ElementsFunctions {
     private static final String FUNCTION_VALUES_OF_PATH = "valuesOfPath";
     private static final String FUNCTION_VALUES_OF_PATH_N = "valuesOfPathN";
+    private static final String FUNCTION_VALUES_OF_PATH_ANY_STRUCTURE = "valuesOfPathAnyStructure";
     private static final String FUNCTION_EXISTS_IN_LIST = "existsInList";
     private static final String FUNCTION_EXISTS_IN_LIST_N = "existsInListN";
     private static final String FUNCTION_VALUES = "values";
     private static final String FUNCTION_VALUES_N = "valuesN";
     private static final String FUNCTION_COALESCE = "coalesce";
     private static final String FUNCTION_COALESCE_N = "coalesceN";
+    private static final String FUNCTION_CONCAT = "concat";
 
     public static final String ELEMENTS_V1_0 = "Elements_V1_0";
 
@@ -81,6 +83,8 @@ public class ElementsFunctions {
             return evaluateValuesOfPath(validationKind, usageScope, iomObj, actualArguments);
         }else if (currentFunction.getName().equals(FUNCTION_VALUES_OF_PATH_N)) {
                 return evaluateValuesOfPath(validationKind, usageScope, iomObj, actualArguments);
+        }else if (currentFunction.getName().equals(FUNCTION_VALUES_OF_PATH_ANY_STRUCTURE)) {
+            return evaluateValuesOfPathAnyStructure(validationKind, usageScope, iomObj, actualArguments);
         }else if (currentFunction.getName().equals(FUNCTION_EXISTS_IN_LIST)) {
             return evaluateExistsInList(validationKind, usageScope, iomObj, actualArguments);
         }else if (currentFunction.getName().equals(FUNCTION_EXISTS_IN_LIST_N)) {
@@ -93,6 +97,8 @@ public class ElementsFunctions {
             return evaluateCoalesce(validationKind, usageScope, iomObj, actualArguments);
         }else if (currentFunction.getName().equals(FUNCTION_COALESCE_N)) {
             return evaluateCoalesce(validationKind, usageScope, iomObj, actualArguments);
+        } else if (currentFunction.getName().equals(FUNCTION_CONCAT)) {
+            return evaluateConcat(validationKind, usageScope, iomObj, actualArguments);
         } else {
             return Value.createNotYetImplemented();
         }
@@ -120,6 +126,40 @@ public class ElementsFunctions {
         
         Value valueOfObjectPath=validator.getValueFromObjectPath(null, mainObj, attrPath, null);
         return valueOfObjectPath;
+    }
+    //FUNCTION valuesOfPathAnyStructure(objects: BAG OF ANYSTRUCTURE; attrPath: TEXT): BAG OF ANYSTRUCTURE;
+    private Value evaluateValuesOfPathAnyStructure(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
+        Value argObjects = actualArguments[0];
+        Value argPath = actualArguments[1];
+        if (argObjects.isUndefined() || argPath.isUndefined() || argObjects.getComplexObjects() == null || argObjects.getComplexObjects().isEmpty()) {
+            return Value.createUndefined();
+        }
+
+        Collection<IomObject> inputObjects = argObjects.getComplexObjects();
+        String inputAttrPath = argPath.getValue();
+
+        Viewable<?> contextClass = (Viewable<?>) td.getElement(inputObjects.iterator().next().getobjecttag());
+
+        PathEl[] attrPath = null;
+        ObjectPath attrObjPath;
+        try {
+            attrObjPath = validator.parseObjectOrAttributePath(contextClass, inputAttrPath);
+            if (attrObjPath.getPathElements() != null) {
+                attrPath = attrObjPath.getPathElements();
+            }
+        } catch (Ili2cException e) {
+            EhiLogger.logError(e);
+        }
+
+        ArrayList<IomObject> resultObjects = new ArrayList<IomObject>();
+        for(IomObject obj: inputObjects) {
+            Value valueOfObjectPath = validator.getValueFromObjectPath(null, obj, attrPath, null);
+            if (valueOfObjectPath.getComplexObjects() != null) {
+                resultObjects.addAll(valueOfObjectPath.getComplexObjects());
+            }
+        }
+
+        return new Value(resultObjects);
     }
     //FUNCTION existsInList(value: TEXT;list: BAG OF TEXT): BOOLEAN;
     //FUNCTION existsInListN(value: NUMERIC;list: BAG OF NUMERIC): BOOLEAN;
@@ -169,5 +209,34 @@ public class ElementsFunctions {
             return input;
         }
     }
-    
+    // FUNCTION concat(FirstCollection: BAG OF ANYSTRUCTURE; SecondCollection: BAG OF ANYSTRUCTURE): BAG OF ANYSTRUCTURE;
+    private Value evaluateConcat(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
+        Value argFirstCollection = actualArguments[0];
+        Value argSecondCollection = actualArguments[1];
+        if (argFirstCollection.isUndefined()) {
+            return argSecondCollection;
+        }
+        if (argSecondCollection.isUndefined()) {
+            return argFirstCollection;
+        }
+
+        if (argFirstCollection.getValues() != null) {
+            String[] firstCollection = argFirstCollection.getValues();
+            String[] secondCollection = argSecondCollection.getValues();
+
+            String[] combinedObjects = new String[firstCollection.length + secondCollection.length];
+            System.arraycopy(firstCollection, 0, combinedObjects, 0, firstCollection.length);
+            System.arraycopy(secondCollection, 0, combinedObjects, firstCollection.length, secondCollection.length);
+
+            return new Value(null, combinedObjects);
+        } else {
+            Collection<IomObject> firstCollection = argFirstCollection.getComplexObjects();
+            Collection<IomObject> secondCollection = argSecondCollection.getComplexObjects();
+
+            List<IomObject> combinedObjects = new ArrayList<IomObject>(firstCollection);
+            combinedObjects.addAll(secondCollection);
+
+            return new Value(combinedObjects);
+        }
+    }
 }

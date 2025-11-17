@@ -102,4 +102,19 @@ TYPE MODEL DMAVTYM_Topologie_V1_1 (de)
     SurfaceObjects: ANYSTRUCTURE;
     SurfaceAttr: ATTRIBUTE OF @ SurfaceObjects): BOOLEAN;
 
+  /**
+    * Tests if a point is contained in a collection of points. Surface of Line geometries are also allowed as
+    * PointObjects. If Surface or Line geometries are used, each control point is tested against the ReferencePoints.
+    * PointObjects: objects containing geometries.
+    * PointAttr: the geometry attribute of the PointObjects.
+    * ReferencePointObjects: collection of reference points.
+    * ReferencePointAttr: the geometry attribute of the ReferencePointObjects.
+    * Since 2025-11-03
+    */
+  FUNCTION pointInPoints(
+    PointObjects: ANYSTRUCTURE;
+    PointAttr: ATTRIBUTE OF @ PointObjects;
+    ReferencePointObjects: ANYSTRUCTURE;
+    ReferencePointAttr: ATTRIBUTE OF @ ReferencePointObjects): BOOLEAN;
+
 END DMAVTYM_Topologie_V1_1.

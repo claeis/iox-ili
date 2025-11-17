@@ -9,6 +9,7 @@ MODEL Elements_V1_0
   FUNCTION valuesN(list: TEXT): LIST OF NUMERIC;
   FUNCTION valuesOfPath(attrPath: TEXT): BAG OF TEXT;
   FUNCTION valuesOfPathN(attrPath: TEXT): BAG OF NUMERIC;
+  FUNCTION valuesOfPathAnyStructure(objects: BAG OF ANYSTRUCTURE; attrPath: TEXT): BAG OF ANYSTRUCTURE;
     /**
      * If the first argument evaluates to UNDEFINED, the second argument is returned.
      * inputValue: The value to check for UNDEFINED.
@@ -18,5 +19,14 @@ MODEL Elements_V1_0
      FUNCTION coalesce(inputValue: TEXT; defaultValue: TEXT): TEXT;
      FUNCTION coalesceN(inputValue: NUMERIC; defaultValue: NUMERIC): NUMERIC;
 
+  /**
+    * Combines two collections into one collection. The type of the input collections must be compatible.
+    * FirstCollection: the first collection.
+    * SecondCollection: the second collection.
+    * Since 2025-11-03
+    */
+  FUNCTION concat(
+    FirstCollection: BAG OF ANYSTRUCTURE;
+    SecondCollection: BAG OF ANYSTRUCTURE): BAG OF ANYSTRUCTURE;
   
 END Elements_V1_0.
