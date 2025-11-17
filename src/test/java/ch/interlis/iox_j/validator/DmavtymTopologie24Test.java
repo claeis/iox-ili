@@ -24,6 +24,7 @@ public class DmavtymTopologie24Test {
     private final static String CLASS_LINE = TOPIC + ".LineClass";
     private final static String CLASS_COMPARE_LINES = TOPIC + ".CompareLinesClass";
     private final static String CLASS_COMPARE_SURFACES = TOPIC + ".CompareSurfacesClass";
+    private final static String CLASS_POINT = TOPIC + ".PointClass";
     private TransferDescription td;
 
     @Before
@@ -612,6 +613,74 @@ public class DmavtymTopologie24Test {
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.CompareSurfacesClass.geometrySameControlPoints_V1_1 is not true.",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.CompareSurfacesClass.geometrySpatiallyEquals_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointIsInsideSurface() {
+        Iom_jObject point1 = new Iom_jObject(CLASS_POINT, "o1");
+        point1.addattrobj("point", IomObjectHelper.createCoord("22", "20"));
+        Iom_jObject point2 = new Iom_jObject(CLASS_POINT, "o2");
+        point2.addattrobj("point", IomObjectHelper.createCoord("30", "25"));
+        Iom_jObject point3 = new Iom_jObject(CLASS_POINT, "o3");
+        point3.addattrobj("point", IomObjectHelper.createCoord("30", "30"));
+
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o4");
+        surface.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, point1, point2, point3, surface);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointIsInsideSurfaceOutside() {
+        Iom_jObject point = new Iom_jObject(CLASS_POINT, "o1");
+        point.addattrobj("point", IomObjectHelper.createCoord("30.001", "20"));
+
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o2");
+        surface.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, point, surface);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.PointClass.pointIsInsideSurface_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointIsInsideSurfaceInsideTolerance() {
+        Iom_jObject point = new Iom_jObject(CLASS_POINT, "o1");
+        point.addattrobj("point", IomObjectHelper.createCoord("10.003", "10.002"));
+
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o2");
+        surface.addattrobj("surface", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createCoord("30", "20"),
+                        IomObjectHelper.createCoord("10", "10"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, point, surface);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointIsInsideSurfaceOutsideTolerance() {
+        Iom_jObject point = new Iom_jObject(CLASS_POINT, "o1");
+        point.addattrobj("point", IomObjectHelper.createCoord("10.004", "10.003"));
+
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o2");
+        surface.addattrobj("surface", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createCoord("30", "20"),
+                        IomObjectHelper.createCoord("10", "10"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, point, surface);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.PointClass.pointIsInsideSurface_V1_1 is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 }

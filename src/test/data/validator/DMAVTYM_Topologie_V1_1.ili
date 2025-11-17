@@ -87,4 +87,19 @@ TYPE MODEL DMAVTYM_Topologie_V1_1 (de)
     SurfaceAttr2: ATTRIBUTE OF @ SurfaceObjects2;
     Tolerance: NUMERIC): BOOLEAN;
 
+  /**
+   * Tests if the point is within a surface.
+   * Uses an implicit tolerance based on the precision of the point.
+   * PointObject: object containing the point geometry that should be inside the surface geometry.
+   * PointAttr: the point attribute of the PointObject.
+   * SurfaceObjects: objects containing a surface geometry.
+   * SurfaceAttr: the surface attribute of the SurfaceObjects.
+   * Since 2025-10-20
+   */
+  FUNCTION isInside(
+    PointObject: ANYSTRUCTURE;
+    PointAttr: ATTRIBUTE OF @ PointObject;
+    SurfaceObjects: ANYSTRUCTURE;
+    SurfaceAttr: ATTRIBUTE OF @ SurfaceObjects): BOOLEAN;
+
 END DMAVTYM_Topologie_V1_1.

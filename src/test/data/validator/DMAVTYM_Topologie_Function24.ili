@@ -54,5 +54,12 @@ MODEL DMAVTYM_Topologie_Function24
             MANDATORY CONSTRAINT geometrySpatiallyEquals_V1_1:
                 DMAVTYM_Topologie_V1_1.isGeometrySpatiallyEqual(THIS, >>surface1, THIS, >>surface2, tolerance);
         END CompareSurfacesClass;
+
+        CLASS PointClass =
+            point: Coord2;
+
+            MANDATORY CONSTRAINT pointIsInsideSurface_V1_1:
+                DMAVTYM_Topologie_V1_1.isInside(THIS, >>point, ObjectPool_V1_0.allObjects(>SurfaceClass), >>SurfaceClass->surface);
+        END PointClass;
     END Topic;
 END DMAVTYM_Topologie_Function24.
