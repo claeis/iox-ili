@@ -44,5 +44,16 @@ MODEL ReferenceData24
 		END;
 		
 	END TopicB;
+
+	TOPIC TopicC =
+		CLASS ClassA =
+			attrA1: TEXT;
+		END ClassA;
+		
+		CLASS ClassB =
+			attrB1: TEXT;
+			EXISTENCE CONSTRAINT attrB1 REQUIRED IN ClassA:attrA1;
+		END ClassB;
+	END TopicC;
 	
 END ReferenceData24.

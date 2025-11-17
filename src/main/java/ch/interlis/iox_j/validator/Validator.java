@@ -969,7 +969,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	private void iterateThroughAllObjects(){
 		HashSet<Type> types=new HashSet<Type>();
-		for (String basketId : objectPool.getDataBids()){
+		for (String basketId : objectPool.getOnlyDataBids()){
 			// iterate through iomObjects
 			Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
 			updateCurrentBasket(basketId);
