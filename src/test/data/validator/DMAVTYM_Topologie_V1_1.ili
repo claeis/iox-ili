@@ -21,7 +21,7 @@ INTERLIS 2.4;
 !!@ technicalContact = mailto:dmav@swisstopo.ch
 !!@ furtherInformation = https://www.cadastre-manual.admin.ch/de/modelldokumentation-dmav
 TYPE MODEL DMAVTYM_Topologie_V1_1 (de)
-  AT "https://models.geo.admin.ch/V_D/" VERSION "2025-05-06" =
+  AT "https://models.geo.admin.ch/V_D/" VERSION "2025-10-20" =
 
   /**
    * Tests if the line or multiline is fully covered by an outer or inner ring of the surface.
@@ -54,5 +54,20 @@ TYPE MODEL DMAVTYM_Topologie_V1_1 (de)
     MultiLineObject: ANYSTRUCTURE;
     MultiLineAttr: ATTRIBUTE OF @ MultiLineObject;
     Tolerance: NUMERIC): BOOLEAN;
+
+  /**
+   * Tests if the point is within a surface.
+   * Uses an implicit tolerance based on the precision of the point.
+   * PointObject: object containing the point geometry that should be inside the surface geometry.
+   * PointAttr: the point attribute of the PointObject.
+   * SurfaceObjects: objects containing a surface geometry.
+   * SurfaceAttr: the surface attribute of the SurfaceObjects.
+   * Since 2025-10-20
+   */
+  FUNCTION isInside(
+    PointObject: ANYSTRUCTURE;
+    PointAttr: ATTRIBUTE OF @ PointObject;
+    SurfaceObjects: ANYSTRUCTURE;
+    SurfaceAttr: ATTRIBUTE OF @ SurfaceObjects): BOOLEAN;
 
 END DMAVTYM_Topologie_V1_1.
