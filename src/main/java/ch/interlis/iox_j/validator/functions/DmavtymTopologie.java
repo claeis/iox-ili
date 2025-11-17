@@ -14,6 +14,7 @@ import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurveRing;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurvePolygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CurveSegment;
+import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxValidationConfig;
 import ch.interlis.iox_j.jts.Iox2jtsext;
@@ -23,6 +24,8 @@ import ch.interlis.iox_j.validator.Validator;
 import ch.interlis.iox_j.validator.Value;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.index.ItemVisitor;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
@@ -34,10 +37,15 @@ public class DmavtymTopologie {
     public static final String DMAVTYM_Topologie_V1_0 = "DMAVTYM_Topologie_V1_0";
     public static final String DMAVTYM_Topologie_V1_1 = "DMAVTYM_Topologie_V1_1";
 
+    private interface GeometryEqualityFunction {
+        boolean areEqual(Geometry geom1, Geometry geom2, double tolerance);
+    }
+
     private final TransferDescription td;
     private final IoxValidationConfig validationConfig;
     private final Validator validator;
     private final LogEventFactory logger;
+    private final JtsextGeometryFactory geometryFactory = new JtsextGeometryFactory();
 
     public DmavtymTopologie(Validator validator, TransferDescription td, IoxValidationConfig validationConfig, LogEventFactory logger) {
         this.validator = validator;
@@ -66,6 +74,10 @@ public class DmavtymTopologie {
             return evaluateCovers(validationKind, usageScope, iomObj, actualArguments);
         } else if (currentFunction.getName().equals("coversWithTolerance")) {
             return evaluateCoversWithTolerance(validationKind, usageScope, iomObj, actualArguments);
+        } else if (currentFunction.getName().equals("hasGeometrySameControlPoints")) {
+            return evaluateHasGeometrySameControlPoints(validationKind, usageScope, iomObj, actualArguments);
+        } else if (currentFunction.getName().equals("isGeometrySpatiallyEqual")) {
+            return evaluateIsGeometrySpatiallyEqual(validationKind, usageScope, iomObj, actualArguments);
         } else {
             return Value.createNotYetImplemented();
         }
@@ -250,6 +262,85 @@ public class DmavtymTopologie {
         }
 
         return true;
+    }
+
+    private Value evaluateHasGeometrySameControlPoints(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
+        return evaluateGeometryEquality(validationKind, usageScope, mainObj, actualArguments, new GeometryEqualityFunction() {
+            @Override
+            public boolean areEqual(Geometry geom1, Geometry geom2, double tolerance) {
+                geom1.normalize();
+                geom2.normalize();
+                return geom1.equalsExact(geom2, tolerance);
+            }
+        });
+    }
+
+    private Value evaluateIsGeometrySpatiallyEqual(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
+        return evaluateGeometryEquality(validationKind, usageScope, mainObj, actualArguments, new GeometryEqualityFunction() {
+            @Override
+            public boolean areEqual(Geometry geom1, Geometry geom2, double tolerance) {
+                return geom1.buffer(tolerance).covers(geom2) && geom2.buffer(tolerance).covers(geom1);
+            }
+        });
+    }
+
+    private Value evaluateGeometryEquality(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments, GeometryEqualityFunction equality) {
+        // All arguments must be defined
+        for (Value arg : actualArguments) {
+            if (arg.isUndefined()) {
+                return Value.createSkipEvaluation();
+            }
+        }
+
+        // Check the type of the arguments
+        Collection<IomObject> surface1Objects = actualArguments[0].getComplexObjects();
+        String surface1Attr = actualArguments[1].getValue();
+        Collection<IomObject> surface2Objects = actualArguments[2].getComplexObjects();
+        String surface2Attr = actualArguments[3].getValue();
+        double tolerance = actualArguments[4].getNumeric();
+        if (surface1Objects == null || surface1Attr == null || surface2Objects == null || surface2Attr == null || tolerance < 0) {
+            return Value.createUndefined();
+        }
+
+        // Convert the IOM objects to JTS objects
+        Geometry surface1;
+        Geometry surface2;
+        try {
+            surface1 = unionSurfaces(surface1Objects, surface1Attr, validationKind);
+            surface2 = unionSurfaces(surface2Objects, surface2Attr, validationKind);
+            if (surface1 == null || surface2 == null) {
+                return Value.createUndefined();
+            }
+        } catch (IoxException e) {
+            EhiLogger.logError(e);
+            return Value.createUndefined();
+        }
+
+        Envelope envelope1 = surface1.getEnvelopeInternal();
+        Envelope envelope2 = surface2.getEnvelopeInternal();
+        Envelope expandedEnvelope1 = new Envelope(envelope1);
+        expandedEnvelope1.expandBy(tolerance);
+        Envelope expandedEnvelope2 = new Envelope(envelope2);
+        expandedEnvelope2.expandBy(tolerance);
+        if (!expandedEnvelope1.covers(envelope2) || !expandedEnvelope2.covers(envelope1)) {
+            return new Value(false);
+        }
+
+        return new Value(equality.areEqual(surface1, surface2, tolerance));
+    }
+
+    private Geometry unionSurfaces(Collection<IomObject> objects, String attribute, String validationKind) throws IoxException {
+        Geometry[] surfaces = new Geometry[objects.size()];
+        int i = 0;
+        for (IomObject surfaceObject : objects) {
+            if (surfaceObject.getattrvaluecount(attribute) != 1) {
+                return null;
+            }
+            surfaces[i] = getSurface(surfaceObject.getattrobj(attribute, 0), validationKind);
+            i++;
+        }
+        GeometryCollection collection = new GeometryCollection(surfaces, geometryFactory);
+        return collection.buffer(0);
     }
 
     private Collection<CompoundCurve> getLines(IomObject multiLine) throws IoxException {

@@ -43,5 +43,16 @@ MODEL DMAVTYM_Topologie_Function24
             MANDATORY CONSTRAINT lineCoversLine_V1_1:
                 DMAVTYM_Topologie_V1_1.coversWithTolerance(THIS, >>line1, THIS, >>line2, 0.002);
         END CompareLinesClass;
+
+        CLASS CompareSurfacesClass =
+            surface1: Surface;
+            surface2: Surface;
+            tolerance: MANDATORY 0.000 .. 1.000;
+
+            MANDATORY CONSTRAINT geometrySameControlPoints_V1_1:
+                DMAVTYM_Topologie_V1_1.hasGeometrySameControlPoints(THIS, >>surface1, THIS, >>surface2, tolerance);
+            MANDATORY CONSTRAINT geometrySpatiallyEquals_V1_1:
+                DMAVTYM_Topologie_V1_1.isGeometrySpatiallyEqual(THIS, >>surface1, THIS, >>surface2, tolerance);
+        END CompareSurfacesClass;
     END Topic;
 END DMAVTYM_Topologie_Function24.
