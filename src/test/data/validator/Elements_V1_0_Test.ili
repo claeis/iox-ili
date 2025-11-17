@@ -82,5 +82,46 @@ IMPORTS Elements_V1_0;
         END ClassA;
         
     END TopicE;
-    
+
+    TOPIC TopicF =
+        DOMAIN Coord2 = COORD
+            2460000.000 .. 2870000.000,
+            1045000.000 .. 1310000.000,
+            ROTATION 2 -> 1;
+
+        STRUCTURE Component =
+            geom: Coord2;
+        END Component;
+
+        CLASS TestCase =
+            path: TEXT*60;
+            objects: BAG OF Component;
+            expectedCount: 0..100;
+
+            MANDATORY CONSTRAINT valuesOfPathAnyStructure: INTERLIS.elementCount(Elements_V1_0.valuesOfPathAnyStructure(objects, path)) == expectedCount;
+        END TestCase;
+    END TopicF;
+
+    TOPIC TopicConcat =
+        DOMAIN Coord2 = COORD
+            0.000 .. 1000.000,
+            0.000 .. 1000.000;
+
+        CLASS TestPrimitiveType =
+            firstCollection: BAG OF TEXT*60;
+            secondCollection: BAG OF TEXT*60;
+            expectedCount: 0..100;
+            MANDATORY CONSTRAINT combineCollections:
+                INTERLIS.elementCount(Elements_V1_0.concat(firstCollection, secondCollection)) == expectedCount;
+        END TestPrimitiveType;
+
+        CLASS TestComplexType =
+            firstCollection: BAG OF Coord2;
+            secondCollection: BAG OF Coord2;
+            expectedCount: 0..100;
+            MANDATORY CONSTRAINT combineCollections:
+                INTERLIS.elementCount(Elements_V1_0.concat(firstCollection, secondCollection)) == expectedCount;
+        END TestComplexType;
+    END TopicConcat;
+
 END Elements_V1_0_Test.

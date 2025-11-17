@@ -41,6 +41,8 @@ import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DmavtymTopologie {
     public static final String DMAVTYM_Topologie_V1_0 = "DMAVTYM_Topologie_V1_0";
@@ -90,6 +92,8 @@ public class DmavtymTopologie {
             return evaluateIsGeometrySpatiallyEqual(validationKind, usageScope, iomObj, actualArguments);
         } else if (currentFunction.getName().equals("isInside")) {
             return evaluateIsInside(validationKind, usageScope, iomObj, actualArguments);
+        } else if (currentFunction.getName().equals("pointInPoints")) {
+            return evaluatePointInPoints(validationKind, usageScope, iomObj, actualArguments);
         } else {
             return Value.createNotYetImplemented();
         }
@@ -472,5 +476,122 @@ public class DmavtymTopologie {
 
     private CurvePolygon getSurface(IomObject surface, String validationKind) throws IoxException {
         return (CurvePolygon) Iox2jtsext.surface2JTS(surface, 0.0, new OutParam<Boolean>(), logger, 0.0, validationKind);
+    }
+
+    private Value evaluatePointInPoints(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
+        Value argPointObjects = actualArguments[0];
+        Value argPointAttr = actualArguments[1];
+        Value argReferencePointObjects = actualArguments[2];
+        Value argReferencePointAttr = actualArguments[3];
+        if (argPointObjects.isUndefined() && argReferencePointObjects.isUndefined()) {
+            return Value.createUndefined();
+        }
+        // No points are always contained in the reference points
+        if (argPointObjects.isUndefined()) {
+            return new Value(true);
+        }
+        // If no reference points are given, the points cannot be contained in it
+        if (argReferencePointObjects.isUndefined()) {
+            return new Value(false);
+        }
+
+        // Check the type of the arguments
+        Collection<IomObject> pointObjects = getAttribute(argPointObjects, argPointAttr);
+        Collection<IomObject> referencePoints = getAttribute(argReferencePointObjects, argReferencePointAttr);
+        if (pointObjects == null || referencePoints == null) {
+            return Value.createUndefined();
+        }
+
+        try {
+            // Prepare reference point set
+            Set<Coordinate> referencePointSet = new HashSet<Coordinate>();
+            for (IomObject referencePoint : referencePoints) {
+                String objectTag = referencePoint.getobjecttag();
+                if (objectTag.equals(Iom_jObject.COORD)) {
+                    referencePointSet.add(Iox2jtsext.coord2JTS(referencePoint));
+                } else {
+                    logger.addEvent(logger.logErrorMsg("Reference Point with unexpected type: {0}.", objectTag));
+                    return Value.createUndefined();
+                }
+            }
+
+            // Check point objects
+            for (IomObject point : pointObjects) {
+                String objectTag = point.getobjecttag();
+                if (objectTag.equals(Iom_jObject.COORD)) { // MULTICOORD ?? Surface, Polyline
+                    Coordinate coord = Iox2jtsext.coord2JTS(point);
+                    if (!referencePointSet.contains(coord)) {
+                        return new Value(false);
+                    }
+                } else if (objectTag.equals(Iom_jObject.MULTISURFACE)) {
+                    CurvePolygon surface = getSurface(point, validationKind);
+                    // Check every start and end point of the surface segments if they are contained inside the referencePointSet
+                    CompoundCurveRing exteriorRing = (CompoundCurveRing) surface.getExteriorRing();
+                    for (CompoundCurve line : exteriorRing.getLines()) {
+                        for (CurveSegment segment : line.getSegments()) {
+                            if (!referencePointSet.contains(segment.getStartPoint()) || !referencePointSet.contains(segment.getEndPoint())) {
+                                return new Value(false);
+                            }
+                        }
+                    }
+                    for (int ringIndex = 0; ringIndex < surface.getNumInteriorRing(); ringIndex++) {
+                        CompoundCurveRing interiorRing = (CompoundCurveRing) surface.getInteriorRingN(ringIndex);
+                        for (CompoundCurve line : interiorRing.getLines()) {
+                            for (CurveSegment segment : line.getSegments()) {
+                                if (!referencePointSet.contains(segment.getStartPoint()) || !referencePointSet.contains(segment.getEndPoint())) {
+                                    return new Value(false);
+                                }
+                            }
+                        }
+                    }
+                } else if (objectTag.equals(Iom_jObject.MULTIPOLYLINE) || objectTag.equals(Iom_jObject.POLYLINE)) {
+                    Collection<CompoundCurve> lines = getLines(point);
+                    for (CompoundCurve line : lines) {;
+                        for (CurveSegment segment : line.getSegments()) {
+                            if (!referencePointSet.contains(segment.getStartPoint()) || !referencePointSet.contains(segment.getEndPoint())) {
+                                return new Value(false);
+                            }
+                        }
+                    }
+                } else {
+                    logger.addEvent(logger.logErrorMsg("Point with unexpected type: {0}.", objectTag));
+                    return Value.createUndefined();
+                }
+            }
+        } catch (IoxException e) {
+            EhiLogger.logError(e);
+            return Value.createUndefined();
+        }
+
+        return new Value(true);
+    }
+
+    /**
+     * Extract the IomObjects with the given attribute from the objects.
+     * If attrValue is UNDEFINED, the objects themselves are returned.
+     */
+    private Collection<IomObject> getAttribute(Value objectsValue, Value attrValue) {
+        Collection<IomObject> objects = objectsValue.getComplexObjects();
+        if (objects == null) {
+            return null;
+        }
+
+        if (attrValue.isUndefined()) {
+            return objects;
+        }
+
+        String attribute = attrValue.getValue();
+        if (attribute == null) {
+            return null;
+        }
+
+        Collection<IomObject> result = new ArrayList<IomObject>();
+        for (IomObject object : objects) {
+            for (int i = 0; i < object.getattrvaluecount(attribute); i++) {
+                result.add(object.getattrobj(attribute, i));
+            }
+        }
+
+        return result;
     }
 }
