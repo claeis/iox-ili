@@ -3190,6 +3190,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
 	private void validateExistenceConstraint(IomObject iomObj, ExistenceConstraint existenceConstraint) {
+        if(!allObjectsAccessible) {
+            // existence constraints koennen nur geprueft werden, wenn alle Objekte bekannt sind
+            return;
+        }
 		if(!ValidationConfig.OFF.equals(constraintValidation)){
 			String constraintName = getScopedName(existenceConstraint);
 			String checkConstraint = null;
@@ -3292,14 +3296,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     if (msg == null) {
                         msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
                     }
-					if(msg!=null && msg.length()>0){
-						if (isVerbose) {
-							msg = String.format("%s %s", msg, getDisplayName(existenceConstraint));
-						}
-						logMsg(checkConstraint,msg);
-					} else {
-						logMsg(checkConstraint, rsrc.getString("validateExistenceConstraint.valueOfTheAttributeWasNotFoundInTheConditionClass"), getDisplayName(existenceConstraint), restrictedAttrName.toString(), iomObj.getobjecttag().toString());
-					}
+                    if(msg!=null && msg.length()>0){
+                        if (isVerbose) {
+                            msg = String.format("%s %s", msg, getDisplayName(existenceConstraint));
+                        }
+                        logMsg(checkConstraint,msg);
+                    } else {
+                        logMsg(checkConstraint, rsrc.getString("validateExistenceConstraint.valueOfTheAttributeWasNotFoundInTheConditionClass"), getDisplayName(existenceConstraint), restrictedAttrName.toString(), iomObj.getobjecttag().toString());
+                    }
 				}
 			}
 		}

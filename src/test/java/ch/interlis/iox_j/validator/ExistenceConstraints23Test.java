@@ -100,6 +100,7 @@ public class ExistenceConstraints23Test {
 		objA.setattrvalue("attr5", "lars");
 		objA.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -126,6 +127,7 @@ public class ExistenceConstraints23Test {
 		objAP.setattrvalue("attr5", "lars");
 		objAP.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -150,6 +152,7 @@ public class ExistenceConstraints23Test {
 		objA.setattrvalue("attr5", "lars");
 		objA.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -164,42 +167,18 @@ public class ExistenceConstraints23Test {
 		assertTrue(logger.getErrs().size()==0);
 	}
 
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der KlasseB ueber die
-	// Existence Constraint auf das Attr1 der Klasse ConditionClass verweist, welche sich in einer anderen Basket befindet und dieselbe Value hat.
-	@Test
-	public void existenceConstraintViaDiffModelDiffBasket_Ok() throws Exception {
-		Iom_jObject objBedingung=new Iom_jObject(EXISTENCE_CONSTRAINTS23_CONDITION_TOPIC_CONDITION_CLASS, OID1);
-		objBedingung.setattrvalue("attr1", "lars");
-		Iom_jObject objB=new Iom_jObject(EXISTENCE_CONSTRAINTS23_TOPIC_CLASS_B, OID2);
-		objB.setattrvalue("attr1", "lars");
-		objB.setattrvalue("attr2", "20");
-		ValidationConfig modelConfig=new ValidationConfig();
-		LogCollector logger=new LogCollector();
-		LogEventFactory errFactory=new LogEventFactory();
-		Settings settings=new Settings();
-		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
-		validator.validate(new StartTransferEvent());
-		validator.validate(new StartBasketEvent(EXISTENCE_CONSTRAINTS23_CONDITION_TOPIC,BID1));
-		validator.validate(new ObjectEvent(objBedingung));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new StartBasketEvent(EXISTENCE_CONSTRAINTS23_TOPIC,BID2));
-		validator.validate(new ObjectEvent(objB));
-		validator.validate(new EndBasketEvent());
-		validator.validate(new EndTransferEvent());
-		// Asserts
-		assertTrue(logger.getErrs().size()==0);
-	}
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn das Attr1 der KlasseB ueber die
 	// Existence Constraint auf das Attr1 der Klasse ConditionClass eines anderen Models verweist und dieselbe Value hat.
 	@Test
-	public void existenceConstraintViaDiffModel_Ok() throws Exception {
+	public void text_sameValue_Ok() throws Exception {
 		Iom_jObject objBedingung=new Iom_jObject(EXISTENCE_CONSTRAINTS23_CONDITION_TOPIC_CONDITION_CLASS, OID1);
 		objBedingung.setattrvalue("attr1", "lars");
 		Iom_jObject objB=new Iom_jObject(EXISTENCE_CONSTRAINTS23_TOPIC_CLASS_B, OID2);
 		objB.setattrvalue("attr1", "lars");
 		objB.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -225,6 +204,7 @@ public class ExistenceConstraints23Test {
 		IomObject coordValue=objCoord.addattrobj("attr1", "COORD");
 		coordValue.setattrvalue("C1", "480000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -254,6 +234,7 @@ public class ExistenceConstraints23Test {
 		coordValue.setattrvalue("C1", "480000.000");
 		coordValue.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -285,6 +266,7 @@ public class ExistenceConstraints23Test {
 		coordValue.setattrvalue("C2", "70000.000");
 		coordValue.setattrvalue("C3", "4000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -326,6 +308,7 @@ public class ExistenceConstraints23Test {
 		coordEnd.setattrvalue("C1", "490000.000");
 		coordEnd.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -371,6 +354,7 @@ public class ExistenceConstraints23Test {
 		coordEnd.setattrvalue("C2", "70000.000");
 		coordEnd.setattrvalue("C3", "5000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -414,6 +398,7 @@ public class ExistenceConstraints23Test {
 		arcSegment.setattrvalue("C1", "480000.000");
 		arcSegment.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -461,6 +446,7 @@ public class ExistenceConstraints23Test {
 		arcSegment.setattrvalue("C2", "70000.000");
 		arcSegment.setattrvalue("C3", "4000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -516,6 +502,7 @@ public class ExistenceConstraints23Test {
 		arcSegment.setattrvalue("C2", "70000.000");
 		arcSegment.setattrvalue("C3", "4000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -565,6 +552,7 @@ public class ExistenceConstraints23Test {
 		arcSegment.setattrvalue("C1", "550000.000");
 		arcSegment.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -652,6 +640,7 @@ public class ExistenceConstraints23Test {
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -751,6 +740,7 @@ public class ExistenceConstraints23Test {
 		arcSegment2.setattrvalue("C2", "70000.000");
 		arcSegment2.setattrvalue("C3", "1000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -838,6 +828,7 @@ public class ExistenceConstraints23Test {
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -937,6 +928,7 @@ public class ExistenceConstraints23Test {
 		arcSegment2.setattrvalue("C2", "70000.000");
 		arcSegment2.setattrvalue("C3", "1000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -967,6 +959,7 @@ public class ExistenceConstraints23Test {
 		coordValue.setattrvalue("C1", "480000.000");
 		coordValue.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -995,6 +988,7 @@ public class ExistenceConstraints23Test {
 		conditionValue.setattrvalue("C3", "4000.000");
 		Iom_jObject objCoord=new Iom_jObject(EXISTENCE_CONSTRAINTS23_COORDS_TOPIC_CLASS_COORD3D, OID2);
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1019,6 +1013,7 @@ public class ExistenceConstraints23Test {
 		Iom_jObject objCoord=new Iom_jObject(EXISTENCE_CONSTRAINTS23_COORDS_TOPIC_CLASS_COORD3D, OID2);
 		objCoord.setattrvalue("attr2", "lars");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1046,6 +1041,7 @@ public class ExistenceConstraints23Test {
 		Iom_jObject baseClassD=new Iom_jObject(EXISTENCE_CONSTRAINTS23_TOPIC_CLASS_D, OID2);
 		baseClassD.addattrobj("attr1", baseClassStruct);
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1067,6 +1063,7 @@ public class ExistenceConstraints23Test {
 		Iom_jObject baseClassD=new Iom_jObject(EXISTENCE_CONSTRAINTS23_TOPIC_CLASS_D, OID2);
 		baseClassD.setattrvalue("attr1", "lars"); // sollte eigentlich ein Strukturelement sein, darf nicht zum Absturz fuehren
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1095,6 +1092,7 @@ public class ExistenceConstraints23Test {
 		// base class references to condition struct.
 		objC.addattrobj("attr1", conditionStruct);
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1130,6 +1128,7 @@ public class ExistenceConstraints23Test {
 		// base class references to condition struct.
 		objC.addattrobj("attr1", conditionStruct2);
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1159,6 +1158,7 @@ public class ExistenceConstraints23Test {
 		objA.setattrvalue("attr5", "lars");
 		objA.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1186,6 +1186,7 @@ public class ExistenceConstraints23Test {
 		objAP.setattrvalue("attr5", "lars");
 		objAP.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1201,15 +1202,15 @@ public class ExistenceConstraints23Test {
 		assertEquals("Existence constraint ExistenceConstraints23.Topic.ClassA.Constraint1 is violated! The value of the attribute attr5 of ExistenceConstraints23.Topic.ClassAp was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 	
-	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute, welche in 2 unterschiedlichen Model sich befinden nicht uebereinstimmen.
 	@Test
-	public void diffModelConstraintValuesDifferent_Fail() throws Exception {
+	public void text_diffValue_notAllObjects_Ok() throws Exception {
 		Iom_jObject objBedingung=new Iom_jObject(EXISTENCE_CONSTRAINTS23_CONDITION_TOPIC_CONDITION_CLASS, OID1);
 		objBedingung.setattrvalue("attr1", "other");
 		Iom_jObject objB=new Iom_jObject(EXISTENCE_CONSTRAINTS23_TOPIC_CLASS_B, OID2);
-		objB.setattrvalue("attr1", "lars");
+		objB.setattrvalue("attr1", "lars"); // should not trigger an error, because not all objects are known
 		objB.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.FALSE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1223,9 +1224,33 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
-		assertTrue(logger.getErrs().size()==1);
-		assertEquals("Existence constraint ExistenceConstraints23.Topic.ClassB.Constraint1 is violated! The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+		assertTrue(logger.getErrs().size()==0);
 	}
+    @Test
+    public void text_diffValue_allObjects_Fail() throws Exception {
+        Iom_jObject objBedingung=new Iom_jObject(EXISTENCE_CONSTRAINTS23_CONDITION_TOPIC_CONDITION_CLASS, OID1);
+        objBedingung.setattrvalue("attr1", "other");
+        Iom_jObject objB=new Iom_jObject(EXISTENCE_CONSTRAINTS23_TOPIC_CLASS_B, OID2);
+        objB.setattrvalue("attr1", "lars");
+        objB.setattrvalue("attr2", "20");
+        ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(EXISTENCE_CONSTRAINTS23_CONDITION_TOPIC,BID1));
+        validator.validate(new ObjectEvent(objBedingung));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new StartBasketEvent(EXISTENCE_CONSTRAINTS23_TOPIC,BID2));
+        validator.validate(new ObjectEvent(objB));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertTrue(logger.getErrs().size()==1);
+        assertEquals("Existence constraint ExistenceConstraints23.Topic.ClassB.Constraint1 is violated! The value of the attribute attr1 of ExistenceConstraints23.Topic.ClassB was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
+    }
 	
 	// Es soll getestet werden, ob eine Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht uebereinstimmen.
 	@Test
@@ -1236,6 +1261,7 @@ public class ExistenceConstraints23Test {
 		objA.setattrvalue("attr5", "lars");
 		objA.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1260,6 +1286,7 @@ public class ExistenceConstraints23Test {
 		objA.setattrvalue("attr5", "ben");
 		objA.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1285,6 +1312,7 @@ public class ExistenceConstraints23Test {
 		IomObject coordValue=objCoord.addattrobj("attr1", "COORD");
 		coordValue.setattrvalue("C1", "480001.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1314,6 +1342,7 @@ public class ExistenceConstraints23Test {
 		coordValue.setattrvalue("C1", "480000.000");
 		coordValue.setattrvalue("C2", "70001.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1345,6 +1374,7 @@ public class ExistenceConstraints23Test {
 		coordValue.setattrvalue("C2", "70000.000");
 		coordValue.setattrvalue("C3", "4001.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1386,6 +1416,7 @@ public class ExistenceConstraints23Test {
 		coordEnd.setattrvalue("C1", "500000.000");
 		coordEnd.setattrvalue("C2", "70001.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1431,6 +1462,7 @@ public class ExistenceConstraints23Test {
 		coordEnd.setattrvalue("C2", "70000.000");
 		coordEnd.setattrvalue("C3", "5000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1474,6 +1506,7 @@ public class ExistenceConstraints23Test {
 		arcSegment.setattrvalue("C1", "480000.000");
 		arcSegment.setattrvalue("C2", "71111.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1521,6 +1554,7 @@ public class ExistenceConstraints23Test {
 		arcSegment.setattrvalue("C2", "70000.000");
 		arcSegment.setattrvalue("C3", "4111.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1576,6 +1610,7 @@ public class ExistenceConstraints23Test {
 		arcSegment.setattrvalue("C2", "70000.000");
 		arcSegment.setattrvalue("C3", "4111.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1625,6 +1660,7 @@ public class ExistenceConstraints23Test {
 		arcSegment.setattrvalue("C1", "550000.000");
 		arcSegment.setattrvalue("C2", "71111.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1712,6 +1748,7 @@ public class ExistenceConstraints23Test {
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1811,6 +1848,7 @@ public class ExistenceConstraints23Test {
 		arcSegment2.setattrvalue("C2", "70000.000");
 		arcSegment2.setattrvalue("C3", "1000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1898,6 +1936,7 @@ public class ExistenceConstraints23Test {
 		arcSegment2.setattrvalue("C1", "480000.000");
 		arcSegment2.setattrvalue("C2", "70000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -1997,6 +2036,7 @@ public class ExistenceConstraints23Test {
 		arcSegment2.setattrvalue("C2", "70000.000");
 		arcSegment2.setattrvalue("C3", "1000.000");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -2025,6 +2065,7 @@ public class ExistenceConstraints23Test {
 		Iom_jObject baseClassD=new Iom_jObject(EXISTENCE_CONSTRAINTS23_TOPIC_CLASS_D, OID2);
 		baseClassD.addattrobj("attr1", baseClassStruct);
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -2055,6 +2096,7 @@ public class ExistenceConstraints23Test {
 		Iom_jObject objC=new Iom_jObject(EXISTENCE_CONSTRAINTS23_TOPIC_CLASS_STRUCTURE_OTHER_MODEL, OID2);
 		objC.addattrobj("attr1", structureValueBedingung2);
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -2092,6 +2134,7 @@ public class ExistenceConstraints23Test {
 		// base class references to condition struct.
 		objC.addattrobj("attr1", conditionStruct4);
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -2120,6 +2163,7 @@ public class ExistenceConstraints23Test {
 		objA.setattrvalue("attr5", "lars");
 		objA.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
@@ -2146,6 +2190,7 @@ public class ExistenceConstraints23Test {
 		objA.setattrvalue("attr5", "lars");
 		objA.setattrvalue("attr2", "20");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.CONSTRAINT_VALIDATION, ValidationConfig.ON);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
