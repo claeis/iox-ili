@@ -2,7 +2,7 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
-iox-ili 1.24.3 (2025-09-xx)
+iox-ili 1.24.3 (2025-11-18)
 -----------------------------
 - fix NPE with --singlePass (ilivalidator#452)
 - Validator: ILI2.4 fix Validator.getValueFromObjectPath() with list of simple values
@@ -12,7 +12,7 @@ iox-ili 1.24.3 (2025-09-xx)
 - Validator: validate existence constraints to referenceData (if all objects accessible)
 - new functions model Elements_V1_0 
 - new FUNCTION ObjectPool_V1_0.filter()
-- new FUNCTION ObjectPool_V1_0.FUNCTION allObjects()
+- new FUNCTION ObjectPool_V1_0.allObjects()
 - new FUNCTION DMAVTYM_Topologie_V1_1.coversWithTolerance()
 - new FUNCTION DMAVTYM_Topologie_V1_1.hasGeometrySameControlPoints()
 - new FUNCTION DMAVTYM_Topologie_V1_1.isGeometrySpatiallyEqual()
