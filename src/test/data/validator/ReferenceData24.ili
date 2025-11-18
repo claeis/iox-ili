@@ -1,0 +1,59 @@
+INTERLIS 2.4;
+
+MODEL ReferenceData24
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2025-07-22" =
+  
+	TOPIC TopicA =
+	
+		DOMAIN 
+		
+	    !!@CRS=EPSG:2056
+	    Coord2 = COORD
+	    	2460000.000 .. 2870000.000,
+	    		1045000.000 .. 1310000.000,
+	    		ROTATION 2 -> 1;
+						   
+		CLASS ClassA =
+			attr : MANDATORY 1..10;
+		END ClassA;
+		
+		CLASS ClassB =
+			geom: AREA WITH (STRAIGHTS,ARCS) VERTEX Coord2 WITHOUT OVERLAPS > 0.001;
+		END ClassB;
+		
+		CLASS ClassC =
+			geom: SURFACE WITH (STRAIGHTS,ARCS) VERTEX Coord2 WITHOUT OVERLAPS > 0.001;
+			SET CONSTRAINT INTERLIS.areAreas(ALL,UNDEFINED,>>geom);
+		END ClassC;
+		
+	END TopicA;
+	
+	TOPIC TopicB =
+	
+		CLASS ClassD =
+			attr : 1..10;
+		END ClassD;
+
+		ASSOCIATION dd =
+		  d1 (EXTERNAL) -- {1..1} ClassD;
+		  dN (EXTERNAL) -- {0..2} ClassD;
+		END dd;
+		
+		CONSTRAINTS OF ClassD =
+		   MANDATORY CONSTRAINT d1->attr==2;
+		END;
+		
+	END TopicB;
+
+	TOPIC TopicC =
+		CLASS ClassA =
+			attrA1: TEXT;
+		END ClassA;
+		
+		CLASS ClassB =
+			attrB1: TEXT;
+			EXISTENCE CONSTRAINT attrB1 REQUIRED IN ClassA:attrA1;
+		END ClassB;
+	END TopicC;
+	
+END ReferenceData24.

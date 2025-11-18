@@ -4,6 +4,7 @@ import ch.interlis.ili2c.config.Configuration;
 import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
+import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iox.IoxException;
 import org.junit.Before;
@@ -22,6 +23,14 @@ public class DmavtymTopologie24Test {
     private final static String CLASSA = TOPIC + ".ClassA";
     private final static String CLASS_SURFACE = TOPIC + ".SurfaceClass";
     private final static String CLASS_LINE = TOPIC + ".LineClass";
+    private final static String CLASS_COMPARE_LINES = TOPIC + ".CompareLinesClass";
+    private final static String CLASS_COMPARE_SURFACES = TOPIC + ".CompareSurfacesClass";
+    private final static String CLASS_POINT = TOPIC + ".PointClass";
+
+    private final static String TOPIC_POINT_IN_POINTS = MODEL + ".PointInPoints";
+    private final static String CLASS_POINT_IN_POINTS_TEST = TOPIC_POINT_IN_POINTS + ".TestCase";
+    private final static String STRUCT_POINT_IN_POINTS_POINT = TOPIC_POINT_IN_POINTS + ".Point";
+
     private TransferDescription td;
 
     @Before
@@ -33,8 +42,11 @@ public class DmavtymTopologie24Test {
         FileEntry topologieV1_1_Ili = new FileEntry("src/test/data/validator/DMAVTYM_Topologie_V1_1.ili", FileEntryKind.ILIMODELFILE);
         ili2cConfig.addFileEntry(topologieV1_1_Ili);
 
-        FileEntry objectPoolIli = new FileEntry("src/test/data/validator/ObjectPool.ili", FileEntryKind.ILIMODELFILE);
+        FileEntry objectPoolIli = new FileEntry("src/test/data/validator/ObjectPool_V1_0.ili", FileEntryKind.ILIMODELFILE);
         ili2cConfig.addFileEntry(objectPoolIli);
+
+        FileEntry elementsIli = new FileEntry("src/test/data/validator/Elements_V1_0.ili", FileEntryKind.ILIMODELFILE);
+        ili2cConfig.addFileEntry(elementsIli);
 
         FileEntry modelIli = new FileEntry("src/test/data/validator/DMAVTYM_Topologie_Function24.ili", FileEntryKind.ILIMODELFILE);
         ili2cConfig.addFileEntry(modelIli);
@@ -280,9 +292,9 @@ public class DmavtymTopologie24Test {
 
         Iom_jObject line = new Iom_jObject(CLASS_LINE, "o2");
         line.addattrobj("line", IomObjectHelper.createPolyline(
-                IomObjectHelper.createCoord("10.002", "15"),
+                IomObjectHelper.createCoord("10.001", "10"),
                 IomObjectHelper.createCoord("9.999", "30.001"),
-                IomObjectHelper.createCoord("20", "30")));
+                IomObjectHelper.createCoord("29.999", "30")));
 
         Iom_jObject surface2 = new Iom_jObject(CLASS_SURFACE, "o3");
         surface2.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
@@ -364,11 +376,48 @@ public class DmavtymTopologie24Test {
 
         Iom_jObject line = new Iom_jObject(CLASS_LINE, "o2");
         line.addattrobj("line", IomObjectHelper.createPolyline(
-                IomObjectHelper.createCoord("22", "20"),
-                IomObjectHelper.createCoord("25.001", "19.999")));
+                IomObjectHelper.createCoord("20.001", "20"),
+                IomObjectHelper.createCoord("25", "19.999")));
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, surface, line);
         assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceLineTooShort() {
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o1");
+        surface.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+
+        Iom_jObject line = new Iom_jObject(CLASS_LINE, "o2");
+        line.addattrobj("line", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("10", "29")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, surface, line);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineClass.lineCoversSurface_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceDifferentArcs() {
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o1");
+        surface.addattrobj("surface", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createArc("23", "19", "10", "30"),
+                        IomObjectHelper.createCoord("10", "10"))));
+
+        Iom_jObject line = new Iom_jObject(CLASS_LINE, "o2");
+        line.addattrobj("line", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("30", "10"),
+                IomObjectHelper.createArc("23.005", "19", "10", "30")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, surface, line);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineClass.lineCoversSurface_V1_1 is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 
@@ -377,5 +426,463 @@ public class DmavtymTopologie24Test {
         LogCollector logger = ValidatorTestHelper.validateObjectsFromXtf24(td, new File("src/test/data/validator/DMAVTYM_Topologie_Tolerance.xtf"));
         assertThat(logger.getErrs(), is(empty()));
         assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversLineWithTolerance() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_LINES, "o1");
+        iomObj.addattrobj("line1", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30"),
+                IomObjectHelper.createCoord("30", "10")));
+        iomObj.addattrobj("line2", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10.001", "10"),
+                IomObjectHelper.createCoord("9.999", "30.001"),
+                IomObjectHelper.createCoord("29.999", "30")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversLineWithToleranceMissingSegment() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_LINES, "o1");
+        iomObj.addattrobj("line1", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10.001", "10"),
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30")));
+        iomObj.addattrobj("line2", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("9.999", "30.001"),
+                IomObjectHelper.createCoord("29.999", "30"),
+                IomObjectHelper.createCoord("30", "10")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.CompareLinesClass.lineCoversLine_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversLineWithToleranceArc() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_LINES, "o1");
+        iomObj.addattrobj("line1", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("30", "10"),
+                IomObjectHelper.createArc("23", "19", "10", "30"),
+                IomObjectHelper.createCoord("30", "30")));
+
+        iomObj.addattrobj("line2", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("29.999", "10"),
+                IomObjectHelper.createArc("23.001", "19.001", "10", "30")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversLineArcDifferentMidPoint() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_LINES, "o1");
+        iomObj.addattrobj("line1", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("30", "10"),
+                IomObjectHelper.createArc("23", "19", "10", "30")));
+        iomObj.addattrobj("line2", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("30", "10"),
+                IomObjectHelper.createArc("19", "23.001", "10", "30")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void geometryEqualityRectangle() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
+        iomObj.setattrvalue("tolerance", "0.002");
+        iomObj.addattrobj("surface1", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.addattrobj("surface2", IomObjectHelper.createRectangleGeometry("10", "9.999", "30", "30.001"));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void geometryEqualityDifferentStartPoint() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
+        iomObj.setattrvalue("tolerance", "0.002");
+        iomObj.addattrobj("surface1", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createCoord("30", "30"),
+                        IomObjectHelper.createCoord("10", "30"))));
+        iomObj.addattrobj("surface2", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "9.999"),
+                        IomObjectHelper.createCoord("30", "10.001"),
+                        IomObjectHelper.createCoord("30", "30.001"),
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createCoord("10", "9.999"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void geometryEqualityArcs() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
+        iomObj.setattrvalue("tolerance", "0.002");
+        iomObj.addattrobj("surface1", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createArc("23", "19", "10", "30"),
+                        IomObjectHelper.createCoord("10", "10"))));
+        iomObj.addattrobj("surface2", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "9.999"),
+                        IomObjectHelper.createCoord("30", "10.001"),
+                        IomObjectHelper.createArc("23.001", "19", "10", "30"),
+                        IomObjectHelper.createCoord("10", "9.999"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void geometryEqualityDifferentArcs() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
+        iomObj.setattrvalue("tolerance", "0.002");
+        iomObj.addattrobj("surface1", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createArc("23", "19", "10", "30"),
+                        IomObjectHelper.createCoord("10", "10"))));
+        iomObj.addattrobj("surface2", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createArc("19", "19", "10", "30"),
+                        IomObjectHelper.createCoord("10", "10"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.CompareSurfacesClass.geometrySameControlPoints_V1_1 is not true.",
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.CompareSurfacesClass.geometrySpatiallyEquals_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void geometryEqualityAdditionalPoint() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
+        iomObj.setattrvalue("tolerance", "0.002");
+        iomObj.addattrobj("surface1", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createCoord("30", "30"),
+                        IomObjectHelper.createCoord("10", "30"))));
+        iomObj.addattrobj("surface2", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createCoord("10", "20"),
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createCoord("30", "30"),
+                        IomObjectHelper.createCoord("10", "30"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.CompareSurfacesClass.geometrySameControlPoints_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void geometryEqualityDifferentInnerRings() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_COMPARE_SURFACES, "o1");
+        iomObj.setattrvalue("tolerance", "0.002");
+        iomObj.addattrobj("surface1", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createRectangleBoundary("10", "10", "30", "30"),
+                IomObjectHelper.createRectangleBoundary("20", "20", "25", "25")));
+        iomObj.addattrobj("surface2", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createRectangleBoundary("10", "10", "30", "30"),
+                IomObjectHelper.createRectangleBoundary("22", "20", "25", "25")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.CompareSurfacesClass.geometrySameControlPoints_V1_1 is not true.",
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.CompareSurfacesClass.geometrySpatiallyEquals_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointIsInsideSurface() {
+        Iom_jObject point1 = new Iom_jObject(CLASS_POINT, "o1");
+        point1.addattrobj("point", IomObjectHelper.createCoord("22", "20"));
+        Iom_jObject point2 = new Iom_jObject(CLASS_POINT, "o2");
+        point2.addattrobj("point", IomObjectHelper.createCoord("30", "25"));
+        Iom_jObject point3 = new Iom_jObject(CLASS_POINT, "o3");
+        point3.addattrobj("point", IomObjectHelper.createCoord("30", "30"));
+
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o4");
+        surface.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, point1, point2, point3, surface);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointIsInsideSurfaceOutside() {
+        Iom_jObject point = new Iom_jObject(CLASS_POINT, "o1");
+        point.addattrobj("point", IomObjectHelper.createCoord("30.001", "20"));
+
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o2");
+        surface.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, point, surface);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.PointClass.pointIsInsideSurface_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointIsInsideSurfaceInsideTolerance() {
+        Iom_jObject point = new Iom_jObject(CLASS_POINT, "o1");
+        point.addattrobj("point", IomObjectHelper.createCoord("10.003", "10.002"));
+
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o2");
+        surface.addattrobj("surface", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createCoord("30", "20"),
+                        IomObjectHelper.createCoord("10", "10"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, point, surface);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointIsInsideSurfaceOutsideTolerance() {
+        Iom_jObject point = new Iom_jObject(CLASS_POINT, "o1");
+        point.addattrobj("point", IomObjectHelper.createCoord("10.004", "10.003"));
+
+        Iom_jObject surface = new Iom_jObject(CLASS_SURFACE, "o2");
+        surface.addattrobj("surface", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createCoord("30", "20"),
+                        IomObjectHelper.createCoord("10", "10"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, point, surface);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.PointClass.pointIsInsideSurface_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPoints() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("20", "20"));
+        iomObj.setattrvalue("attribute", "pointAttr");
+        iomObj.addattrobj("pointAttr", IomObjectHelper.createCoord("10.00049", "9.9995"));
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsNoMatch() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("99", "99"));
+        iomObj.setattrvalue("attribute", "pointAttr");
+        iomObj.addattrobj("pointAttr", IomObjectHelper.createCoord("10", "10"));
+        iomObj.setattrvalue("expected", "false");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsSurface() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "30"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("30", "30"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("30", "10"));
+        iomObj.setattrvalue("attribute", "surfaceAttr");
+        iomObj.addattrobj("surfaceAttr", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsSurfaceWithArcs() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "30"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("30", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("15", "15"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("15", "25"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("25", "15"));
+        iomObj.setattrvalue("attribute", "surfaceAttr");
+        iomObj.addattrobj("surfaceAttr", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createArc("23", "19", "10", "30"),
+                        IomObjectHelper.createCoord("10", "10")),
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("15", "15"),
+                        IomObjectHelper.createCoord("25", "15"),
+                        IomObjectHelper.createArc("21", "21", "15", "25"),
+                        IomObjectHelper.createCoord("15", "15"))));
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsSurfaceWithHoles() {
+        // Coordinates from the hole are not in the reference points therefore expected is false
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "30"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("30", "30"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("30", "10"));
+        iomObj.setattrvalue("attribute", "surfaceAttr");
+        iomObj.addattrobj("surfaceAttr", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createRectangleBoundary("10", "10", "30", "30"),
+                IomObjectHelper.createRectangleBoundary("15", "15", "25", "25")));
+        iomObj.setattrvalue("expected", "false");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsPolyline() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("20", "42"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("30", "99"));
+        iomObj.setattrvalue("attribute", "lineAttr");
+        iomObj.addattrobj("lineAttr", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("20", "42"),
+                IomObjectHelper.createCoord("30", "99")));
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsPolylineWithArcs() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "30"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("30", "10"));
+        iomObj.setattrvalue("attribute", "lineAttr");
+        iomObj.addattrobj("lineAttr", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("30", "10"),
+                IomObjectHelper.createArc("23", "19", "10", "30")));
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsMultiPolyline() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("20", "42"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "50"));
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("20", "99"));
+        iomObj.setattrvalue("attribute", "multiLineAttr");
+        iomObj.addattrobj("multiLineAttr", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                    IomObjectHelper.createCoord("10", "10"),
+                    IomObjectHelper.createCoord("20", "42")),
+                IomObjectHelper.createPolyline(
+                    IomObjectHelper.createCoord("10", "50"),
+                    IomObjectHelper.createCoord("20", "99"))));
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsUndefinedReferencePoints() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.setattrvalue("attribute", "pointAttr");
+        iomObj.addattrobj("pointAttr", IomObjectHelper.createCoord("10", "10"));
+        iomObj.setattrvalue("expected", "false");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsUndefinedInputPoints() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("10", "10"));
+        iomObj.setattrvalue("attribute", "pointAttr");
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void pointInPointsFail() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_POINT_IN_POINTS_TEST, "test1");
+        iomObj.addattrobj("referencePoints", createPointInPointsPoint("99", "99"));
+        iomObj.setattrvalue("attribute", "pointAttr");
+        iomObj.addattrobj("pointAttr", IomObjectHelper.createCoord("0", "0"));
+        iomObj.setattrvalue("expected", "true");
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_POINT_IN_POINTS, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.PointInPoints.TestCase.pointInPoints is not true.",
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.PointInPoints.TestCase.pointInPointsWithValuesOfPath is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    private IomObject createPointInPointsPoint(String x, String y) {
+        Iom_jObject point = new Iom_jObject(STRUCT_POINT_IN_POINTS_POINT, null);
+        point.addattrobj("geometry", IomObjectHelper.createCoord(x, y));
+        return point;
     }
 }

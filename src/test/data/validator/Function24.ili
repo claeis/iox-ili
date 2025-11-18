@@ -1,0 +1,15 @@
+INTERLIS 2.4;
+
+MODEL Function24
+  AT "mailto:ce@localhost" VERSION "2025-10-27" =
+
+  TOPIC ElementCount =
+
+    CLASS ClassA =
+      Name: BAG OF TEXT;
+      MANDATORY CONSTRAINT INTERLIS.elementCount(Name) == 3;
+    END ClassA;
+
+  END ElementCount;
+
+END Function24.

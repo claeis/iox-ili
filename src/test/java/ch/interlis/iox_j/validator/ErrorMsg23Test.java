@@ -80,6 +80,7 @@ public class ErrorMsg23Test {
 		errFactory = new LogEventFactory();
 		settings = new Settings();
 		modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 
 		Map<String,Class> newFunctions=new HashMap<String,Class>();
 		newFunctions.put("FunctionsExt23.subText",SubText.class);

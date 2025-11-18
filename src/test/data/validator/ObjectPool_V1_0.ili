@@ -1,0 +1,22 @@
+INTERLIS 2.4;
+
+TYPE MODEL ObjectPool_V1_0 (en)
+    AT "http://www.interlis.ch/models" VERSION "2025-06-25" =
+
+    /**
+     * Gets all objects of the ObjectClass in the current validation and its reference data.
+     * ObjectClass: Class or View reference of the objects.
+     * Since 2025-05-06
+     */
+    FUNCTION allObjects(ObjectClass: CLASS): BAG OF ANYSTRUCTURE;
+
+    /**
+     * Filters the input objects with the given filter expression. Filter is a logic expression in INTERLIS 2 syntax.
+     * THIS references to the object being filtered.
+     * Objects: Input objects to filter.
+     * Filter: Logic expression in INTERLIS 2 syntax.
+     * Since 2025-10-20
+     */
+    FUNCTION filter(Objects: BAG OF ANYSTRUCTURE; Filter: TEXT): BAG OF ANYSTRUCTURE;
+
+END ObjectPool_V1_0.

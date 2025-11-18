@@ -4,7 +4,8 @@ MODEL DMAVTYM_Topologie_Function24
     AT "mailto:noreply@localhost" VERSION "2024-06-17" =
     IMPORTS DMAVTYM_Topologie_V1_1;
     IMPORTS DMAVTYM_Topologie_V1_0;
-    IMPORTS ObjectPool;
+    IMPORTS ObjectPool_V1_0;
+    IMPORTS Elements_V1_0;
 
     DOMAIN
         Coord2 = COORD
@@ -33,7 +34,60 @@ MODEL DMAVTYM_Topologie_Function24
             line: Line;
 
             MANDATORY CONSTRAINT lineCoversSurface_V1_1:
-                DMAVTYM_Topologie_V1_1.coversWithTolerance(ObjectPool.allObjects(>SurfaceClass), >>SurfaceClass->surface, THIS, >>line, 0.002);
+                DMAVTYM_Topologie_V1_1.coversWithTolerance(ObjectPool_V1_0.allObjects(>SurfaceClass), >>SurfaceClass->surface, THIS, >>line, 0.002);
         END LineClass;
+
+        CLASS CompareLinesClass =
+            line1: Line;
+            line2: Line;
+
+            MANDATORY CONSTRAINT lineCoversLine_V1_1:
+                DMAVTYM_Topologie_V1_1.coversWithTolerance(THIS, >>line1, THIS, >>line2, 0.002);
+        END CompareLinesClass;
+
+        CLASS CompareSurfacesClass =
+            surface1: Surface;
+            surface2: Surface;
+            tolerance: MANDATORY 0.000 .. 1.000;
+
+            MANDATORY CONSTRAINT geometrySameControlPoints_V1_1:
+                DMAVTYM_Topologie_V1_1.hasGeometrySameControlPoints(THIS, >>surface1, THIS, >>surface2, tolerance);
+            MANDATORY CONSTRAINT geometrySpatiallyEquals_V1_1:
+                DMAVTYM_Topologie_V1_1.isGeometrySpatiallyEqual(THIS, >>surface1, THIS, >>surface2, tolerance);
+        END CompareSurfacesClass;
+
+        CLASS PointClass =
+            point: Coord2;
+
+            MANDATORY CONSTRAINT pointIsInsideSurface_V1_1:
+                DMAVTYM_Topologie_V1_1.isInside(THIS, >>point, ObjectPool_V1_0.allObjects(>SurfaceClass), >>SurfaceClass->surface);
+        END PointClass;
     END Topic;
+
+    TOPIC PointInPoints =
+        DOMAIN
+            Coord2 = COORD
+                0.000 .. 1000.000,
+                0.000 .. 1000.000;
+
+        STRUCTURE Point =
+            geometry: Coord2;
+        END Point;
+
+        CLASS TestCase =
+            pointAttr: Coord2;
+            lineAttr: POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Coord2 WITHOUT OVERLAPS > 0.002;
+            multiLineAttr: MULTIPOLYLINE WITH (STRAIGHTS, ARCS) VERTEX Coord2 WITHOUT OVERLAPS > 0.002;
+            surfaceAttr: SURFACE WITH (STRAIGHTS, ARCS) VERTEX Coord2 WITHOUT OVERLAPS > 0.002;
+
+            attribute: ATTRIBUTE;
+            referencePoints: BAG OF Point;
+            expected: MANDATORY BOOLEAN;
+
+            MANDATORY CONSTRAINT pointInPoints:
+                DMAVTYM_Topologie_V1_1.pointInPoints(THIS, attribute, referencePoints, "geometry") == expected;
+            MANDATORY CONSTRAINT pointInPointsWithValuesOfPath:
+                DMAVTYM_Topologie_V1_1.pointInPoints(THIS, attribute, Elements_V1_0.valuesOfPathAnyStructure(referencePoints, "geometry"), UNDEFINED) == expected;
+        END TestCase;
+    END PointInPoints;
 END DMAVTYM_Topologie_Function24.

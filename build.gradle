@@ -1,5 +1,5 @@
 group 'ch.interlis'
-version '1.24.2'+System.getProperty('release','-SNAPSHOT')
+version '1.24.3'+System.getProperty('release','-SNAPSHOT')
 
 apply plugin: "java"
 apply plugin: "maven"
@@ -39,7 +39,7 @@ dependencies {
 	testCompile group: 'org.xmlunit',name: 'xmlunit-matchers',version: '2.5.1'
 	testCompile group: 'org.xmlunit', name: 'xmlunit-core',version: '2.5.1'
     compileOnly group: 'ch.interlis', name: 'ili2c-core', version: '5.6.5'
-    testImplementation (group: 'ch.interlis', name: 'ili2c-tool', version: '5.6.6+'){
+    testImplementation (group: 'ch.interlis', name: 'ili2c-tool', version: '5.6.6'){
         exclude group: 'ch.interlis', module: 'iox-ili'
     }
     testImplementation group: 'ch.interlis', name: 'ili2c-core', version: '5.6.5'

@@ -1,0 +1,32 @@
+INTERLIS 2.4;
+
+MODEL Elements_V1_0
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "20251015" =
+  
+  FUNCTION existsInList(value: TEXT;list: BAG OF TEXT): BOOLEAN;
+  FUNCTION existsInListN(value: NUMERIC;list: BAG OF NUMERIC): BOOLEAN;
+  FUNCTION values(list: TEXT): LIST OF TEXT;
+  FUNCTION valuesN(list: TEXT): LIST OF NUMERIC;
+  FUNCTION valuesOfPath(attrPath: TEXT): BAG OF TEXT;
+  FUNCTION valuesOfPathN(attrPath: TEXT): BAG OF NUMERIC;
+  FUNCTION valuesOfPathAnyStructure(objects: BAG OF ANYSTRUCTURE; attrPath: TEXT): BAG OF ANYSTRUCTURE;
+    /**
+     * If the first argument evaluates to UNDEFINED, the second argument is returned.
+     * inputValue: The value to check for UNDEFINED.
+     * defaultValue: The value to return if mainValue is UNDEFINED.
+     * Since 2025-06-25
+     */
+     FUNCTION coalesce(inputValue: TEXT; defaultValue: TEXT): TEXT;
+     FUNCTION coalesceN(inputValue: NUMERIC; defaultValue: NUMERIC): NUMERIC;
+
+  /**
+    * Combines two collections into one collection. The type of the input collections must be compatible.
+    * FirstCollection: the first collection.
+    * SecondCollection: the second collection.
+    * Since 2025-11-03
+    */
+  FUNCTION concat(
+    FirstCollection: BAG OF ANYSTRUCTURE;
+    SecondCollection: BAG OF ANYSTRUCTURE): BAG OF ANYSTRUCTURE;
+  
+END Elements_V1_0.

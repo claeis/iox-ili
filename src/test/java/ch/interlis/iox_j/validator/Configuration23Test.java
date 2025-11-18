@@ -116,6 +116,7 @@ public class Configuration23Test {
 		Iom_jObject objA=new Iom_jObject(CLASSA, OID2);
 		objA.setattrvalue("attrText", "lars");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		modelConfig.setConfigValue(CLASSA+".Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -141,6 +142,7 @@ public class Configuration23Test {
 		Iom_jObject objA=new Iom_jObject(CLASSA, OID2);
 		objA.setattrvalue("attrText", "lars");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		modelConfig.setConfigValue(CLASSA+".Constraint1", ValidationConfig.MSG, "My own error message.");
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -189,6 +191,7 @@ public class Configuration23Test {
 		Iom_jObject objA=new Iom_jObject(CLASSA, OID2);
 		objA.setattrvalue("attrText", "lars");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		modelConfig.setConfigValue(CLASSA+".Constraint1", ValidationConfig.MSG, "");
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -214,6 +217,7 @@ public class Configuration23Test {
 		Iom_jObject objA=new Iom_jObject(CLASSA, OID2);
 		objA.setattrvalue("attrText", "lars");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		modelConfig.setConfigValue(CLASSA+".Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
 		modelConfig.setConfigValue(CLASSA+".Constraint1", ValidationConfig.MSG, "My own error message.");
 		LogCollector logger=new LogCollector();
@@ -240,6 +244,7 @@ public class Configuration23Test {
 		Iom_jObject objA=new Iom_jObject(CLASSA, OID2);
 		objA.setattrvalue("attrText", "lars");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		modelConfig.setConfigValue(CLASSA+".Constraint1", ValidationConfig.CHECK, ValidationConfig.WARNING);
 		modelConfig.setConfigValue(CLASSA+".Constraint1", ValidationConfig.MSG, "");
 		LogCollector logger=new LogCollector();
@@ -268,6 +273,7 @@ public class Configuration23Test {
 		objC.setattrvalue("attrText3", "this");
 		objC.setattrvalue("attrText4", "this");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		modelConfig.setConfigValue(CLASSB+".Constraint1", ValidationConfig.CHECK,ValidationConfig.WARNING);
 		modelConfig.setConfigValue(CLASSB+".Constraint2", ValidationConfig.CHECK,ValidationConfig.WARNING);
 		modelConfig.setConfigValue(CLASSB+".Constraint3", ValidationConfig.CHECK,ValidationConfig.WARNING);
@@ -1246,6 +1252,7 @@ public class Configuration23Test {
 		Iom_jObject obj1=new Iom_jObject(CLASSL, OID2);
 		obj1.setattrvalue("subAttr", "Andreas");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		modelConfig.setConfigValue("AddExConModel.AddExConTopic.AddExConView"+".Constraint1", ValidationConfig.MSG, "This is my own Existence Constraint Error Message.");
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
@@ -1275,6 +1282,7 @@ public class Configuration23Test {
 		LogCollector logger=new LogCollector();
 		LogEventFactory errFactory=new LogEventFactory();
 		Settings settings=new Settings();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		modelConfig.setConfigValue(ValidationConfig.PARAMETER,ValidationConfig.ADDITIONAL_MODELS, "AddExConModel");
 		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
 		validator.validate(new StartTransferEvent());
@@ -1325,6 +1333,7 @@ public class Configuration23Test {
 		Iom_jObject obj1=new Iom_jObject(CLASSL, OID2);
 		obj1.setattrvalue("subAttr", "Andreas");
 		ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
 		modelConfig.setConfigValue("AddExConModel.AddExConTopic.AddExConView"+".Constraint1", ValidationConfig.CHECK, ValidationConfig.WARNING);
 		modelConfig.setConfigValue("AddExConModel.AddExConTopic.AddExConView"+".Constraint1", ValidationConfig.MSG, "");
 		LogCollector logger=new LogCollector();

@@ -2,7 +2,7 @@ INTERLIS 2.4;
 
 MODEL ObjectPool24_Test (en)
     AT "mailto:noreply@localhost" VERSION "2025-05-06" =
-    IMPORTS ObjectPool;
+    IMPORTS ObjectPool_V1_0;
 
     TOPIC Topic =
         CLASS ClassA =
@@ -11,7 +11,7 @@ MODEL ObjectPool24_Test (en)
 
         CLASS ClassB =
             MANDATORY CONSTRAINT allOfClassA:
-                INTERLIS.objectCount(ObjectPool.allObjects(>ClassA)) == 2;
+                INTERLIS.objectCount(ObjectPool_V1_0.allObjects(>ClassA)) == 2;
         END ClassB;
 
         VIEW ViewA
@@ -23,8 +23,56 @@ MODEL ObjectPool24_Test (en)
 
         CLASS ClassC =
             MANDATORY CONSTRAINT allOfViewA:
-                INTERLIS.objectCount(ObjectPool.allObjects(>ViewA)) == 1;
+                INTERLIS.objectCount(ObjectPool_V1_0.allObjects(>ViewA)) == 1;
         END ClassC;
+
     END Topic;
+
+    TOPIC FilterTopic =
+        DOMAIN
+            colors = (red, green, blue);
+
+        STRUCTURE StructBase =
+            numericAttr: 0..100;
+            blackboxAttr: BLACKBOX BINARY;
+        END StructBase;
+
+        STRUCTURE StructA EXTENDS StructBase =
+            textAttr: TEXT*256;
+        END StructA;
+
+        STRUCTURE StructB EXTENDS StructBase =
+            enumAttr: colors;
+        END StructB;
+
+        CLASS SomeClass EXTENDS StructBase =
+        END SomeClass;
+
+        CLASS FilterTest =
+            filterNumber: 0..100;
+            filterText: TEXT*256;
+            filterEnum: colors;
+            filterBlackbox: BLACKBOX BINARY;
+
+            inputObjects: BAG OF StructBase;
+            filterExpression: TEXT;
+            expectedCount: MANDATORY 0..100;
+            MANDATORY CONSTRAINT FilterTest: INTERLIS.objectCount(ObjectPool_V1_0.filter(inputObjects, filterExpression)) == expectedCount;
+        END FilterTest;
+
+        CLASS FilterAllObjectsTest =
+            filterExpression: TEXT;
+            expectedCount: MANDATORY 0..100;
+            MANDATORY CONSTRAINT FilterAllTest:
+                INTERLIS.objectCount
+                (
+                    ObjectPool_V1_0.filter
+                    (
+                        ObjectPool_V1_0.allObjects(>SomeClass),
+                        filterExpression
+                    )
+                ) == expectedCount;
+        END FilterAllObjectsTest;
+    END FilterTopic;
 
 END ObjectPool24_Test.

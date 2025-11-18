@@ -43,10 +43,15 @@ public class ValidatorTestHelper {
     }
 
     public static LogCollector validateObjects(TransferDescription td, String topic, IomObject... objects) {
-        return validateObjects(td, topic, DEFAULT_BASKET_ID, new ValidationConfig(), objects);
+        ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
+        return validateObjects(td, topic, DEFAULT_BASKET_ID, modelConfig, objects);
     }
 
     public static LogCollector validateObjects(TransferDescription td, String topic, String baskedId, ValidationConfig modelConfig, IomObject... objects) {
+        // Enable trace logging
+        EhiLogger.getInstance().setTraceFilter(false);
+
         LogCollector logger = new LogCollector();
         LogEventFactory errFactory = new LogEventFactory();
         PipelinePool pool = new PipelinePool();

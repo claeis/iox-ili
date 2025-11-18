@@ -439,7 +439,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			StartBasketEvent startBasketEvent = ((ch.interlis.iox.StartBasketEvent) event);
 			currentBasketId = startBasketEvent.getBid();
 			if(isValidId(currentBasketId)){
-			    objectPool.startBasket(currentBasketId,doValidation);
+	            if(!singlePass) {
+	                objectPool.startBasket(currentBasketId,doValidation);
+	            }
 			}
 			validateBasketEvent(startBasketEvent);
 		}else if(event instanceof ch.interlis.iox.ObjectEvent){
@@ -967,7 +969,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	private void iterateThroughAllObjects(){
 		HashSet<Type> types=new HashSet<Type>();
-		for (String basketId : objectPool.getDataBids()){
+		for (String basketId : objectPool.getOnlyDataBids()){
 			// iterate through iomObjects
 			Iterator<IomObject> objectIterator = (objectPool.getObjectsOfBasketId(basketId)).valueIterator();
 			updateCurrentBasket(basketId);
@@ -2062,9 +2064,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
                 return dmavtymTopologie.evaluateFunction(currentFunction, functionCallObj, parentObject,
                         validationKind, usageScope, iomObj, texttype, firstRole);
+            } else if (funcName.startsWith(ch.interlis.iox_j.validator.functions.ElementsFunctions.ELEMENTS_V1_0 + ".")) {
+                if (elementsFunctions == null) {
+                    elementsFunctions = new ch.interlis.iox_j.validator.functions.ElementsFunctions(this, td, validationConfig, errFact);
+                }
+
+                return elementsFunctions.evaluateFunction(currentFunction, functionCallObj, parentObject,
+                        validationKind, usageScope, iomObj, firstRole);
 			} else if (funcName.startsWith(ObjectPoolFunctions.OBJECTPOOL + ".")) {
 				if (objectPoolFunctions == null) {
-					objectPoolFunctions = new ObjectPoolFunctions(this, objectPool, errFact);
+					objectPoolFunctions = new ObjectPoolFunctions(this, td, objectPool, errFact);
 				}
 
 				return objectPoolFunctions.evaluateFunction(currentFunction, functionCallObj, parentObject,
@@ -2302,46 +2311,42 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                         }else {
                             String attrValue = iomObj.getattrvalue(currentAttrName);
                             if (attrValue != null) {
-                                if(attrRef.getAttr().isDomainIliUuid()) {
-                                    Type aliasedType = ((TypeAlias) type).getAliasing().getType();
-                                    return new Value(aliasedType, normalizeUUID(attrValue));
-                                }else if (attrValue.equals(Iom_jObject.TRUE)) {
-                                    return new Value(true);
-                                } else if (attrValue.equals(Iom_jObject.FALSE)) {
-                                    return new Value(false);
-                                // if null, then complex value.
-                                } else {
-                                    if (type instanceof TypeAlias) {
+                                if (currentObjects.size() == 1 && attrCount==1) {
+                                    if(attrRef.getAttr().isDomainIliUuid()) {
                                         Type aliasedType = ((TypeAlias) type).getAliasing().getType();
-                                        if (aliasedType instanceof EnumerationType) {
-                                            String refTypeName = ((TypeAlias) type)
-                                                    .getAliasing().getName();
-                                            return new Value(aliasedType, attrValue,
-                                                    refTypeName);
+                                        return new Value(aliasedType, normalizeUUID(attrValue));
+                                    }else if (attrRef.getAttr().isDomainBoolean()) {
+                                        if (attrValue.equals(Iom_jObject.TRUE)) {
+                                            return new Value(true);
+                                        } else if (attrValue.equals(Iom_jObject.FALSE)) {
+                                            return new Value(false);
                                         }
-                                        return new Value(aliasedType, attrValue);
+                                    } else if (type instanceof TypeAlias) {
+                                            Type aliasedType = ((TypeAlias) type).getAliasing().getType();
+                                            if (aliasedType instanceof EnumerationType) {
+                                                String domainName = ((TypeAlias) type)
+                                                        .getAliasing().getName();
+                                                return new Value(aliasedType, attrValue,
+                                                        domainName);
+                                            }
+                                            return new Value(aliasedType, attrValue);
                                     }
-                                    if (type instanceof EnumerationType) {
-                                        return new Value(type, attrValue);
-                                    }
-                                }
-                                if (currentObjects.size() == 1) {
                                     return new Value(type, attrValue);
                                 } else {
-                                    String[] attrValues = new String[currentObjects.size()];
-                                    int counter = 0;
+                                    List<String> attrValues = new ArrayList<String>();
                                     for (IomObject value : currentObjects) {
-                                        attrValue = value.getattrvalue(currentAttrName);
-                                        if (attrValue != null) {
-                                            attrValues[counter] = attrValue;
-                                            counter++;
+                                        for(int attri=0;attri<value.getattrvaluecount(currentAttrName);attri++) {
+                                            attrValue = value.getattrprim(currentAttrName,attri);
+                                            if (attrValue != null) {
+                                                attrValues.add(attrValue);
+                                            }
                                         }
                                     }
-                                    if (attrValues != null) {
-                                        return new Value(type, attrValues);
+                                    if (attrValues.size()>0) {
+                                        return new Value(type, attrValues.toArray(new String[attrValues.size()]));
                                     }
+                                    return Value.createUndefined();
                                 }
-                                
                             } else {
                                 List<IomObject> objects = new ArrayList<IomObject>();
                                 int attrValueCount = iomObj.getattrvaluecount(currentAttrName);
@@ -3185,6 +3190,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
 	private void validateExistenceConstraint(IomObject iomObj, ExistenceConstraint existenceConstraint) {
+        if(!allObjectsAccessible) {
+            // existence constraints koennen nur geprueft werden, wenn alle Objekte bekannt sind
+            return;
+        }
 		if(!ValidationConfig.OFF.equals(constraintValidation)){
 			String constraintName = getScopedName(existenceConstraint);
 			String checkConstraint = null;
@@ -3287,14 +3296,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     if (msg == null) {
                         msg=validationConfig.getConfigValue(constraintName, ValidationConfig.MSG);
                     }
-					if(msg!=null && msg.length()>0){
-						if (isVerbose) {
-							msg = String.format("%s %s", msg, getDisplayName(existenceConstraint));
-						}
-						logMsg(checkConstraint,msg);
-					} else {
-						logMsg(checkConstraint, rsrc.getString("validateExistenceConstraint.valueOfTheAttributeWasNotFoundInTheConditionClass"), getDisplayName(existenceConstraint), restrictedAttrName.toString(), iomObj.getobjecttag().toString());
-					}
+                    if(msg!=null && msg.length()>0){
+                        if (isVerbose) {
+                            msg = String.format("%s %s", msg, getDisplayName(existenceConstraint));
+                        }
+                        logMsg(checkConstraint,msg);
+                    } else {
+                        logMsg(checkConstraint, rsrc.getString("validateExistenceConstraint.valueOfTheAttributeWasNotFoundInTheConditionClass"), getDisplayName(existenceConstraint), restrictedAttrName.toString(), iomObj.getobjecttag().toString());
+                    }
 				}
 			}
 		}
@@ -3619,6 +3628,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private MinimalRuntimeSystem rtsFunction=null;
     private DmavtymTopologie dmavtymTopologie=null;
 	private ObjectPoolFunctions objectPoolFunctions=null;
+    private ch.interlis.iox_j.validator.functions.ElementsFunctions elementsFunctions=null;
 	
 	private void validateObject(IomObject iomObj,String attrPath,Viewable assocClass,boolean doValidation) throws IoxException {
 		// validate if object is null

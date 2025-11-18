@@ -132,8 +132,14 @@ public class ObjectPool {
 	}
 	
 	public Set<String> getDataBids(){
-		return dataBids;
+	    java.util.TreeSet<String> ret=new java.util.TreeSet<String>();
+	    ret.addAll(dataBids);
+        ret.addAll(refdataBids);
+		return ret;
 	}
+    public Set<String> getOnlyDataBids(){
+        return dataBids;
+    }
 	
 	public String getBidOfObject(String oid, Viewable classObj){
 	    if(classObj instanceof AbstractClassDef) {
@@ -142,7 +148,7 @@ public class ObjectPool {
 	            oid=Validator.normalizeUUID(oid);
 	        }
 	    }
-		for(String basketId : dataBids){
+		for(String basketId : getDataBids()){
 			Map<ObjectPoolKey, IomObject> collectionOfObjects = getCollectionOfObjects(basketId);
 			if(doItfOidPerTable){
 				IomObject object = collectionOfObjects.get(new ObjectPoolKey(oid, classObj, basketId));

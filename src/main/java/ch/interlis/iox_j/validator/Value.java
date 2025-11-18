@@ -24,7 +24,7 @@ public class Value {
 	private Type type=null;
 	private String value=null;
 	private String[] values=null;
-	private String refTypeName;
+	private String domainName;
 	private List<IomObject> complexObjects;
 	private RoleDef role=null;
 	private String oid=null;
@@ -79,10 +79,10 @@ public class Value {
 	private Value(){
 	}
 	
-	public Value(Type type, String valueStr, String refTypeName) {
+	public Value(Type type, String valueStr, String domainName) {
 		this.value = valueStr;
 		this.type=type;
-		this.refTypeName = refTypeName;
+		this.domainName = domainName;
 	}
 
 	public boolean isTrue(){
@@ -92,11 +92,11 @@ public class Value {
 		return booleanValue;
 	}
 	
-	public String getRefTypeName(){
+	public String getDomainName(){
 		if(skipEvaluation()){
 			throw new IllegalArgumentException();
 		}
-		return refTypeName;
+		return domainName;
 	}
 	
 	public Viewable getViewable(){
@@ -137,6 +137,11 @@ public class Value {
     public String[] getValues(){
         if(skipEvaluation()){
             throw new IllegalArgumentException();
+        }
+        if(values==null && value!=null) {
+            String ret[]=new String[1];
+            ret[0]=value;
+            return ret;
         }
         return values;
     }

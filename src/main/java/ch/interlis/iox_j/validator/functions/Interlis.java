@@ -113,7 +113,7 @@ public class Interlis {
                     // enumeration has to be ordered
                     if(enumerationType.isOrdered()){
                     // enumerations from same enumeration
-                    if(enumToCompare.getRefTypeName().equals(minEnum.getRefTypeName()) && (enumToCompare.getRefTypeName().equals(maxEnum.getRefTypeName()))){
+                    if(enumToCompare.getDomainName().equals(minEnum.getDomainName()) && (enumToCompare.getDomainName().equals(maxEnum.getDomainName()))){
                         int indexOfEnumToCompare = enumerationType.getValues().indexOf(enumToCompare.getValue());
                         int indexOfMinEnumValue = enumerationType.getValues().indexOf(minEnum.getValue());
                         int indexOfMaxEnumValue = enumerationType.getValues().indexOf(maxEnum.getValue());
@@ -160,6 +160,10 @@ public class Interlis {
             }
             if (value.isUndefined()){
                 return new Value(0);
+            }
+            String values[]=value.getValues();
+            if(values!=null) {
+                return new Value(value.getValues().length);
             }
             return new Value(value.getComplexObjects().size());
         } else if (currentFunction.getScopedName(null).equals("INTERLIS.isOfClass")){
