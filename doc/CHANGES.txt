@@ -2,6 +2,9 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.24.4 (2025-11-xx)
+-----------------------------
+
 iox-ili 1.24.3 (2025-11-18)
 -----------------------------
 - fix NPE with --singlePass (ilivalidator#452)
