@@ -222,6 +222,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private long objectCount=0l;
     private long structCount=0l;
 	private final Map<String, Domain> genericDomains = new HashMap<String, Domain>();
+    private boolean firstStartTransferEvent=true;
     /** mappings from xml-tags to Viewable|AttributeDef
      */
     private HashMap<String,Object> tag2class=null;
@@ -426,7 +427,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			return;
 		}
 		if (event instanceof ch.interlis.iox.StartTransferEvent){
-			errs.addEvent(errFact.logInfoMsg(rsrc.getString("validate.firstValidationPass")));
+		    if(firstStartTransferEvent) {
+	            errs.addEvent(errFact.logInfoMsg(getFirstPassMsg()));
+	            firstStartTransferEvent=false;
+		    }
 			if(doValidation) {
 	            validateInconsistentIliAndXMLVersion(event);
 			}
@@ -471,6 +475,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             }
 		}
 	}
+    protected String getFirstPassMsg() {
+        return rsrc.getString("validate.firstValidationPass");
+    }
     private void validateInconsistentIliAndXMLVersion(ch.interlis.iox.IoxEvent event) {
         String versionControl = settings.getValue(CONFIG_DO_XTF_VERIFYMODEL);
         if (versionControl != null && versionControl.equals(CONFIG_DO_XTF_VERIFYMODEL_DO) && event instanceof XtfStartTransferEvent) {            

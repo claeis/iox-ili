@@ -11,6 +11,7 @@ import ch.interlis.ili2c.config.FileEntry;
 import ch.interlis.ili2c.config.FileEntryKind;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iom_j.Iom_jObject;
+import ch.interlis.iox.IoxLogEvent;
 import ch.interlis.iox_j.EndBasketEvent;
 import ch.interlis.iox_j.EndTransferEvent;
 import ch.interlis.iox_j.ObjectEvent;
@@ -60,11 +61,39 @@ public class ReferenceData24Test {
         validator.addReferenceData(new ObjectEvent(iomObj));
         validator.addReferenceData(new EndBasketEvent());
         validator.addReferenceData(new EndTransferEvent());
+        validator.validate(new StartTransferEvent());
         validator.validate(new StartBasketEvent(ILI_TOPICA,"b2"));
         validator.validate(new EndBasketEvent());
         validator.validate(new EndTransferEvent());
         // Asserts
         assertEquals(0,logger.getErrs().size());
+    }
+    @Test
+    public void firstValidationPassMessage_Ok(){
+        ValidationConfig modelConfig=new ValidationConfig();
+        LogCollector logger=new LogCollector();
+        LogEventFactory errFactory=new LogEventFactory();
+        Settings settings=new Settings();
+        Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+        validator.addReferenceData(new StartTransferEvent());
+        validator.addReferenceData(new StartBasketEvent(ILI_TOPICB,"b1"));
+        validator.addReferenceData(new EndBasketEvent());
+        validator.addReferenceData(new EndTransferEvent());
+        validator.validate(new StartTransferEvent());
+        validator.validate(new StartBasketEvent(ILI_TOPICB,"b2"));
+        validator.validate(new EndBasketEvent());
+        validator.validate(new EndTransferEvent());
+        // Asserts
+        assertEquals(0,logger.getErrs().size());
+        String msg=validator.getFirstPassMsg();
+        int firstPassMsgCount=0;
+        for(IoxLogEvent info:logger.getInfo()) {
+            if(info.getRawEventMsg().equals(msg)) {
+                firstPassMsgCount++;
+            }
+        }
+        assertEquals(1,firstPassMsgCount);
+        
     }
     @Test
     public void missingAttr_Ok(){
