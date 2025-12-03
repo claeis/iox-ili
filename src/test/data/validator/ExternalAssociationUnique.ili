@@ -1,0 +1,19 @@
+INTERLIS 2.4;
+
+MODEL ExternalAssociationUnique (en) AT "http://www.interlis.ch/ili2c/tests/" VERSION "2025-02-10" =
+  TOPIC T =
+    CLASS Owner =
+      Id : TEXT*20;
+    END Owner;
+
+    CLASS Item =
+      Code : TEXT*10;
+    END Item;
+
+    ASSOCIATION Ownership (OID) =
+      OwnerRef (EXTERNAL) -- {0..*} Owner;
+      ItemRef -- {0..*} Item;
+      UNIQUE ConstraintOwnership : OwnerRef, ItemRef;
+    END Ownership;
+  END T;
+END ExternalAssociationUnique.
