@@ -23,8 +23,10 @@ import ch.interlis.iox_j.validator.ObjectPoolKey;
 import ch.interlis.iox_j.validator.Validator;
 import ch.interlis.iox_j.validator.Value;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +39,7 @@ public class ObjectPoolFunctions {
     private final ObjectPool objectPool;
     private final LogEventFactory logger;
     private final TransferDescription td;
+    private final HashMap<String, WeakReference<List<IomObject>>> allObjectsCache = new HashMap<String, WeakReference<List<IomObject>>>();
 
     public static final String OBJECTPOOL = "ObjectPool_V1_0";
 
@@ -77,6 +80,13 @@ public class ObjectPoolFunctions {
             return Value.createUndefined();
         }
 
+        String cacheKey = viewable.getScopedName();
+        WeakReference<List<IomObject>> cachedRefence = allObjectsCache.get(cacheKey);
+        List<IomObject> cachedObjects = cachedRefence == null ? null : cachedRefence.get();
+        if (cachedObjects != null) {
+            return new Value(cachedObjects);
+        }
+
         Projection projection = null;
         Viewable<?> objectClass = viewable;
         if (viewable instanceof Projection) {
@@ -96,6 +106,7 @@ public class ObjectPoolFunctions {
                 }
             }
         }
+        allObjectsCache.put(cacheKey, new WeakReference<List<IomObject>>(objects));
         return new Value(objects);
     }
 
