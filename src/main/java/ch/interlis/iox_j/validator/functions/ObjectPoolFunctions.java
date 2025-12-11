@@ -23,7 +23,7 @@ import ch.interlis.iox_j.validator.ObjectPoolKey;
 import ch.interlis.iox_j.validator.Validator;
 import ch.interlis.iox_j.validator.Value;
 
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,7 +39,7 @@ public class ObjectPoolFunctions {
     private final ObjectPool objectPool;
     private final LogEventFactory logger;
     private final TransferDescription td;
-    private final HashMap<String, WeakReference<List<IomObject>>> allObjectsCache = new HashMap<String, WeakReference<List<IomObject>>>();
+    private final HashMap<String, SoftReference<List<IomObject>>> allObjectsCache = new HashMap<String, SoftReference<List<IomObject>>>();
 
     public static final String OBJECTPOOL = "ObjectPool_V1_0";
 
@@ -81,7 +81,7 @@ public class ObjectPoolFunctions {
         }
 
         String cacheKey = viewable.getScopedName();
-        WeakReference<List<IomObject>> cachedRefence = allObjectsCache.get(cacheKey);
+        SoftReference<List<IomObject>> cachedRefence = allObjectsCache.get(cacheKey);
         List<IomObject> cachedObjects = cachedRefence == null ? null : cachedRefence.get();
         if (cachedObjects != null) {
             return new Value(cachedObjects);
@@ -106,7 +106,7 @@ public class ObjectPoolFunctions {
                 }
             }
         }
-        allObjectsCache.put(cacheKey, new WeakReference<List<IomObject>>(objects));
+        allObjectsCache.put(cacheKey, new SoftReference<List<IomObject>>(objects));
         return new Value(objects);
     }
 
