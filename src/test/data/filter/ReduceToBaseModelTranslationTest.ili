@@ -1,0 +1,46 @@
+INTERLIS 2.4;
+
+MODEL ModelEN (en)
+    AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
+
+    DOMAIN
+        Colors = (
+            red (dark_red, orange, crimson),
+            yellow,
+            green (light_green, dark_green)
+        );
+        AllColors = ALL OF Colors;
+
+    TOPIC TopicEN =
+        CLASS ClassEN =
+            count : 0 .. 100;
+            content : TEXT*20;
+            color : Colors;
+            allColors : AllColors;
+        END ClassEN;
+    END TopicEN;
+
+END ModelEN.
+
+MODEL ModelDE (de)
+    AT "http://www.interlis.ch/ili2c/tests/" VERSION "1"
+    TRANSLATION OF ModelEN ["1"] =
+
+    DOMAIN
+        Farben = (
+            rot (dunkelrot, orange, karmin),
+            gelb,
+            gruen (hellgruen, dunkelgruen)
+        );
+        AlleFarben = ALL OF Farben;
+
+    TOPIC TopicDE =
+        CLASS ClassDE =
+            anzahl : 0 .. 100;
+            inhalt : TEXT*20;
+            farbe : Farben;
+            alleFarben : AlleFarben;
+        END ClassDE;
+    END TopicDE;
+
+END ModelDE.
