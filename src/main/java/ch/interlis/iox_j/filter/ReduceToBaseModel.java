@@ -435,7 +435,16 @@ public class ReduceToBaseModel implements IoxFilter {
         }
         return src2dest;
     }
-	  public static void buildEnumList(java.util.Map<String,String> accu,String srcPrefix1,Enumeration srcEnumer,String destPrefix1,Enumeration destEnumer,String destEeName){
+
+    public static void buildEnumList(Map<String, String> accu, String srcPrefix1, Enumeration srcEnumer, String destPrefix1, Enumeration destEnumer, String destEeName) {
+        buildEnumList(accu, srcPrefix1, srcEnumer, destPrefix1, destEnumer, destEeName, false);
+    }
+
+    public static void buildEnumAllList(Map<String, String> accu, String srcPrefix1, Enumeration srcEnumer, String destPrefix1, Enumeration destEnumer, String destEeName) {
+        buildEnumList(accu, srcPrefix1, srcEnumer, destPrefix1, destEnumer, destEeName, true);
+    }
+
+    private static void buildEnumList(Map<String, String> accu, String srcPrefix1, Enumeration srcEnumer, String destPrefix1, Enumeration destEnumer, String destEeName, boolean includeNonLeaf) {
         String srcPrefix = "";
         String destPrefix = "";
         if (srcPrefix1.length() > 0) {
@@ -444,77 +453,36 @@ public class ReduceToBaseModel implements IoxFilter {
         if (destPrefix1!=null && destPrefix1.length() > 0) {
             destPrefix = destPrefix1 + ".";
         }
-        Iterator srcIter = srcEnumer.getElements();
-        Iterator destIter = null;
+        Iterator<Enumeration.Element> srcIter = srcEnumer.getElements();
+        Iterator<Enumeration.Element> destIter = null;
         if (destEnumer != null) {
             destIter = destEnumer.getElements();
         }
         while (srcIter.hasNext()) {
-            Enumeration.Element srcEe = (Enumeration.Element) srcIter.next();
+            Enumeration.Element srcEe = srcIter.next();
             Enumeration srcSubEnum = srcEe.getSubEnumeration();
             Enumeration destSubEnum = null;
             Enumeration.Element destEe = null;
             if (destIter != null) {
-                destEe = (Enumeration.Element) destIter.next();
+                destEe = destIter.next();
                 destSubEnum = destEe.getSubEnumeration();
-                if (destSubEnum == null) {
-                    destEeName = destPrefix + destEe.getName();
-                }
+                destEeName = destPrefix + destEe.getName();
             }
             if (srcSubEnum != null) {
-                if(destSubEnum!=null) {
+                if (destSubEnum != null) {
                     // ee is not leaf, add its name to prefix and add sub elements to accu
-                    buildEnumList(accu, srcPrefix + srcEe.getName(), srcSubEnum, destPrefix+destEe.getName(), destSubEnum, null);
-                }else {
+                    buildEnumList(accu, srcPrefix + srcEe.getName(), srcSubEnum, destPrefix + destEe.getName(), destSubEnum, null, includeNonLeaf);
+                } else {
                     // ee is not leaf, add its name to prefix and add sub elements to accu
-                    buildEnumList(accu, srcPrefix + srcEe.getName(), srcSubEnum, null, null, destEeName);
+                    buildEnumList(accu, srcPrefix + srcEe.getName(), srcSubEnum, null, null, destEeName, includeNonLeaf);
                 }
-            } else {
-                // ee is a leaf, add it to accu
+            }
+            if (srcSubEnum == null || includeNonLeaf) {
+                // ee is a leaf node or non-leaf nodes are included (type is defined as ALL OF enum)
                 accu.put(srcPrefix + srcEe.getName(), destEeName);
             }
         }
-	  }
-      public static void buildEnumAllList(java.util.Map<String,String> accu,String srcPrefix1,Enumeration srcEnumer,String destPrefix1,Enumeration destEnumer,String destEeName){
-          String srcPrefix = "";
-          String destPrefix = "";
-          if (srcPrefix1.length() > 0) {
-              srcPrefix = srcPrefix1 + ".";
-          }
-          if (destPrefix1!=null && destPrefix1.length() > 0) {
-              destPrefix = destPrefix1 + ".";
-          }
-          Iterator srcIter = srcEnumer.getElements();
-          Iterator destIter = null;
-          if (destEnumer != null) {
-              destIter = destEnumer.getElements();
-          }
-          while (srcIter.hasNext()) {
-              Enumeration.Element srcEe = (Enumeration.Element) srcIter.next();
-              Enumeration srcSubEnum = srcEe.getSubEnumeration();
-              Enumeration destSubEnum = null;
-              Enumeration.Element destEe = null;
-              if (destIter != null) {
-                  destEe = (Enumeration.Element) destIter.next();
-                  destSubEnum = destEe.getSubEnumeration();
-                  if (destSubEnum == null) {
-                      destEeName = destPrefix + destEe.getName();
-                  }
-              }
-              // add ee to accu
-              accu.put(srcPrefix + srcEe.getName(), destEeName);
-              if (srcSubEnum != null) {
-                  if(destSubEnum!=null) {
-                      // ee is not leaf, add its name to prefix and add sub elements to accu
-                      buildEnumList(accu, srcPrefix + srcEe.getName(), srcSubEnum, destPrefix+destEe.getName(), destSubEnum, null);
-                  }else {
-                      // ee is not leaf, add its name to prefix and add sub elements to accu
-                      buildEnumList(accu, srcPrefix + srcEe.getName(), srcSubEnum, null, null, destEeName);
-                  }
-              }
-          }
-        }
-	
+    }
 
 	@Override
 	public void close() {
