@@ -48,7 +48,7 @@ public class ReduceToBaseModelTest {
     }
 
     @Test
-    public void exportBaseIgnoresExtendedModel() throws IoxException {
+    public void reduceToBaseModelRemovesAdditionalAttributes() throws IoxException {
         List<Model> models = Collections.singletonList((Model) td.getElement(BASE_MODEL));
         reduceToBaseModel = new ReduceToBaseModel(models, td, settings);
 
@@ -60,6 +60,19 @@ public class ReduceToBaseModelTest {
         assertUnfiltered(new StartBasketEvent(EXTENDED_TOPIC, "b2"));
         assertReducedToBaseModel(createExtendedObject("test1", "base1Value", "cat1", "extended1Value", 100));
         assertReducedToBaseModel(createExtendedObject("test2", "", "cat2", "some text value", 50));
+        assertUnfiltered(new EndBasketEvent());
+
+        assertUnfiltered(new EndTransferEvent());
+    }
+
+    @Test
+    public void reduceToBaseModelRemovesClassesFromExtendedModel() throws IoxException {
+        List<Model> models = Collections.singletonList((Model) td.getElement(BASE_MODEL));
+        reduceToBaseModel = new ReduceToBaseModel(models, td, settings);
+
+        assertUnfiltered(new StartTransferEvent());
+
+        assertUnfiltered(new StartBasketEvent(EXTENDED_TOPIC, "b1"));
         assertRemoved(new ObjectEvent(createClassBObject("testB1", "B1")));
         assertRemoved(new ObjectEvent(createClassBObject("testB2", "B2")));
         assertUnfiltered(new EndBasketEvent());
@@ -68,7 +81,7 @@ public class ReduceToBaseModelTest {
     }
 
     @Test
-    public void exportExtendedIncludesAllModels() throws IoxException {
+    public void reduceToExtendedModelIsUnchanged() throws IoxException {
         List<Model> models = Collections.singletonList((Model) td.getElement(EXTENDED_MODEL));
         reduceToBaseModel = new ReduceToBaseModel(models, td, settings);
 
