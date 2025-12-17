@@ -5,6 +5,7 @@ ideas/open issues
 iox-ili 1.24.4 (2025-11-xx)
 -----------------------------
 - Validator: show only one "first pass" message with refdata
+- fix incomplete IoxUtility.cloneEvent(StartBasket)
 
 iox-ili 1.24.3 (2025-11-18)
 -----------------------------
