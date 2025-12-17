@@ -58,6 +58,7 @@ public class DmavtymTopologie {
     private final LogEventFactory logger;
     private final JtsextGeometryFactory geometryFactory = new JtsextGeometryFactory();
     private final HashMap<String, Double> pointToleranceCache = new HashMap<String, Double>();
+    private final HashMap<UnionKey, Geometry> unionCache = new HashMap<UnionKey, Geometry>();
 
     public DmavtymTopologie(Validator validator, TransferDescription td, IoxValidationConfig validationConfig, LogEventFactory logger) {
         this.validator = validator;
@@ -346,6 +347,22 @@ public class DmavtymTopologie {
     }
 
     private Geometry unionSurfaces(Collection<IomObject> objects, String attribute, String validationKind) throws IoxException {
+        Collection<String> objectIds = new ArrayList<String>(objects.size());
+        for (IomObject obj : objects) {
+            objectIds.add(obj.getobjectoid());
+        }
+        UnionKey key = new UnionKey(objectIds, attribute);
+        Geometry cached = unionCache.get(key);
+        if (cached != null) {
+            return cached;
+        }
+
+        Geometry union = calculateUnion(objects, attribute, validationKind);
+        unionCache.put(key, union);
+        return union;
+    }
+
+    private Geometry calculateUnion(Collection<IomObject> objects, String attribute, String validationKind) throws IoxException {
         Geometry[] surfaces = new Geometry[objects.size()];
         int i = 0;
         for (IomObject surfaceObject : objects) {
@@ -593,5 +610,30 @@ public class DmavtymTopologie {
         }
 
         return result;
+    }
+
+    private static final class UnionKey {
+        private final Collection<String> objectIds;
+        private final String attribute;
+
+        public UnionKey(Collection<String> objectIds, String attribute) {
+            this.objectIds = objectIds;
+            this.attribute = attribute;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            UnionKey other = (UnionKey) obj;
+            return attribute.equals(other.attribute) && objectIds.equals(other.objectIds);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = objectIds.hashCode();
+            result = 31 * result + attribute.hashCode();
+            return result;
+        }
     }
 }

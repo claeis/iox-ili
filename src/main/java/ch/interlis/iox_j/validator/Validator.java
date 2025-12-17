@@ -2263,6 +2263,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             IomObject targetObj = getReferencedObject(role, targetOid);
                             if (targetObj != null) {
                                 nextCurrentObjects.add(targetObj);
+                            } else if (role.isExternal() && allObjectsAccessible && roleDefValue != null && k == lastPathIndex) {
+                                // if the target object is external and not available in the pool, keep the reference so
+                                // uniqueness checks and similar evaluations can still work with the OID.
+                                nextCurrentObjects.add(roleDefValue);
                             }
                         }
                     }
