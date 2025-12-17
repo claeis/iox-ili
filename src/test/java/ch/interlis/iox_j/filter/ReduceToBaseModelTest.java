@@ -32,10 +32,12 @@ public class ReduceToBaseModelTest {
     private static final String BASE_MODEL = "BaseModel";
     private static final String BASE_TOPIC = BASE_MODEL + ".TopicA";
     private static final String BASE_CLASS = BASE_TOPIC + ".ClassA";
+    private static final String BASE_CLASS_B = BASE_TOPIC + ".ClassB";
     private static final String EXTENDED_MODEL = "ExtendedModel";
     private static final String EXTENDED_TOPIC = EXTENDED_MODEL + ".TopicA";
     private static final String EXTENDED_CLASS = EXTENDED_TOPIC + ".ClassA";
     private static final String EXTENDED_CLASS_B = EXTENDED_TOPIC + ".ClassB";
+    private static final String EXTENDED_CLASS_C = EXTENDED_TOPIC + ".ClassC";
 
     private TransferDescription td;
     private ReduceToBaseModel reduceToBaseModel;
@@ -48,19 +50,51 @@ public class ReduceToBaseModelTest {
     }
 
     @Test
+    public void reduceToBaseModelReducesEnumValue() throws IoxException {
+        List<Model> models = Collections.singletonList((Model) td.getElement(BASE_MODEL));
+        reduceToBaseModel = new ReduceToBaseModel(models, td, settings);
+
+        assertUnfiltered(new StartTransferEvent());
+
+        assertUnfiltered(new StartBasketEvent(EXTENDED_TOPIC, "b1"));
+        assertReducedColor("red", createExtendedObject("test1", "base1Value", null, "red.dark", "extended1Value", 100));
+        assertReducedColor("green", createExtendedObject("test2", "", null ,"green", "some text value", 50));
+        assertUnfiltered(new EndBasketEvent());
+
+        assertUnfiltered(new EndTransferEvent());
+    }
+
+    @Test
     public void reduceToBaseModelRemovesAdditionalAttributes() throws IoxException {
         List<Model> models = Collections.singletonList((Model) td.getElement(BASE_MODEL));
         reduceToBaseModel = new ReduceToBaseModel(models, td, settings);
 
         assertUnfiltered(new StartTransferEvent());
         assertBasketUnfiltered(CATALOGUE_TOPIC, "b1",
-                createCatalogueObject("cat1", "Name 1"),
-                createCatalogueObject("cat2", "Name 2"));
+                createObjectWithName(CATALOGUE_CLASS, "cat1", "Name 1"),
+                createObjectWithName(CATALOGUE_CLASS, "cat2", "Name 2"));
 
         assertUnfiltered(new StartBasketEvent(EXTENDED_TOPIC, "b2"));
-        assertReducedToBaseModel(createExtendedObject("test1", "base1Value", "cat1", "extended1Value", 100));
-        assertReducedToBaseModel(createExtendedObject("test2", "", "cat2", "some text value", 50));
+        assertReducedToBaseModel(createExtendedObject("test1", "base1Value", "cat1", "green", "extended1Value", 100));
+        assertReducedToBaseModel(createExtendedObject("test2", "", "cat2", "blue", "some text value", 50));
         assertUnfiltered(new EndBasketEvent());
+
+        assertUnfiltered(new EndTransferEvent());
+    }
+
+    @Test
+    public void reduceToBaseModelKeepsClassesFromBaseModel() throws IoxException {
+        List<Model> models = Collections.singletonList((Model) td.getElement(BASE_MODEL));
+        reduceToBaseModel = new ReduceToBaseModel(models, td, settings);
+
+        assertUnfiltered(new StartTransferEvent());
+
+        assertBasketUnfiltered(BASE_TOPIC, "b1",
+                createObjectWithName(BASE_CLASS_B, "testB1", "B1"),
+                createObjectWithName(BASE_CLASS_B, "testB2", "B2"));
+        assertBasketUnfiltered(EXTENDED_TOPIC, "b2",
+                createObjectWithName(EXTENDED_CLASS_B, "testExtendedB1", "B1"),
+                createObjectWithName(EXTENDED_CLASS_B, "testExtendedB2", "B2"));
 
         assertUnfiltered(new EndTransferEvent());
     }
@@ -73,8 +107,8 @@ public class ReduceToBaseModelTest {
         assertUnfiltered(new StartTransferEvent());
 
         assertUnfiltered(new StartBasketEvent(EXTENDED_TOPIC, "b1"));
-        assertRemoved(new ObjectEvent(createClassBObject("testB1", "B1")));
-        assertRemoved(new ObjectEvent(createClassBObject("testB2", "B2")));
+        assertRemoved(new ObjectEvent(createObjectWithName(EXTENDED_CLASS_C, "testC1", "C1")));
+        assertRemoved(new ObjectEvent(createObjectWithName(EXTENDED_CLASS_C, "testC2", "C2")));
         assertUnfiltered(new EndBasketEvent());
 
         assertUnfiltered(new EndTransferEvent());
@@ -87,37 +121,39 @@ public class ReduceToBaseModelTest {
 
         assertUnfiltered(new StartTransferEvent());
         assertBasketUnfiltered(CATALOGUE_TOPIC, "b1",
-                createCatalogueObject("cat1", "Name 1"),
-                createCatalogueObject("cat2", "Name 2"));
-        assertBasketUnfiltered(EXTENDED_TOPIC, "b2",
-                createExtendedObject("test1", "base1Value", "cat1", "extended1Value", 100),
-                createExtendedObject("test2", "", "cat2", "some text value", 50),
-                createClassBObject("testB1", "B1"),
-                createClassBObject("testB2", "B2"));
+                createObjectWithName(CATALOGUE_CLASS, "cat1", "Name 1"),
+                createObjectWithName(CATALOGUE_CLASS, "cat2", "Name 2"));
+        assertBasketUnfiltered(BASE_TOPIC, "b2",
+                createObjectWithName(BASE_CLASS_B, "testB1", "B1"),
+                createObjectWithName(BASE_CLASS_B, "testB2", "B2"));
+        assertBasketUnfiltered(EXTENDED_TOPIC, "b3",
+                createExtendedObject("test1", "base1Value", "cat1", "red.dark", "extended1Value", 100),
+                createExtendedObject("test2", "", "cat2", "green", "some text value", 50),
+                createObjectWithName(EXTENDED_CLASS_B, "testExtendedB1", "B1"),
+                createObjectWithName(EXTENDED_CLASS_B, "testExtendedB2", "B2"),
+                createObjectWithName(EXTENDED_CLASS_C, "testC1", "C1"),
+                createObjectWithName(EXTENDED_CLASS_C, "testC2", "C2"));
         assertUnfiltered(new EndTransferEvent());
     }
 
-    private IomObject createCatalogueObject(String oid, String name) {
-        IomObject obj = new Iom_jObject(CATALOGUE_CLASS, oid);
-        obj.setattrvalue("name", name);
-        return obj;
-    }
-
-    private IomObject createExtendedObject(String oid, String base1, String catalogueRef, String extended1, int extended2) {
+    private IomObject createExtendedObject(String oid, String base1, String catalogueRef, String color, String extended1, int extended2) {
         IomObject obj = new Iom_jObject(EXTENDED_CLASS, oid);
         obj.setattrvalue("attrBase1", base1);
-        IomObject reference = new Iom_jObject(Iom_jObject.REF, null);
-        reference.setobjectrefoid(catalogueRef);
-        IomObject refObj = new Iom_jObject(CATALOGUE_CLASS_REF, null);
-        refObj.addattrobj("Reference", reference);
-        obj.addattrobj("attrBase2", refObj);
+        if (catalogueRef != null) {
+            IomObject reference = new Iom_jObject(Iom_jObject.REF, null);
+            reference.setobjectrefoid(catalogueRef);
+            IomObject refObj = new Iom_jObject(CATALOGUE_CLASS_REF, null);
+            refObj.addattrobj("Reference", reference);
+            obj.addattrobj("attrBase2", refObj);
+        }
+        obj.setattrvalue("attrBase3", color);
         obj.setattrvalue("attrExtended1", extended1);
         obj.setattrvalue("attrExtended2", Integer.toString(extended2));
         return obj;
     }
 
-    private IomObject createClassBObject(String oid, String name) {
-        IomObject obj = new Iom_jObject(EXTENDED_CLASS_B, oid);
+    private IomObject createObjectWithName(String className, String oid, String name) {
+        IomObject obj = new Iom_jObject(className, oid);
         obj.setattrvalue("name", name);
         return obj;
     }
@@ -165,5 +201,15 @@ public class ReduceToBaseModelTest {
         // Filter removes extended attributes
         assertNull(baseObj.getattrvalue("attrExtended1"));
         assertNull(baseObj.getattrvalue("attrExtended2"));
+    }
+
+    private void assertReducedColor(String expectedColor, IomObject extendedObj) throws IoxException {
+        IoxEvent filteredEvent = reduceToBaseModel.filter(new ObjectEvent(new Iom_jObject(extendedObj)));
+        assertNotNull(filteredEvent);
+
+        IomObject baseObj = ((ObjectEvent) filteredEvent).getIomObject();
+        assertEquals(BASE_CLASS, baseObj.getobjecttag());
+
+        assertEquals(expectedColor, baseObj.getattrvalue("attrBase3"));
     }
 }

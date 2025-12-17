@@ -15,29 +15,46 @@ END TestCatalogue.
 MODEL BaseModel AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
     IMPORTS TestCatalogue;
 
+    DOMAIN
+        Color = (red, green, blue);
+
     TOPIC TopicA =
         DEPENDS ON TestCatalogue.Catalogues;
 
         CLASS ClassA =
             attrBase1 : TEXT*50;
-            attrBase2 : MANDATORY TestCatalogue.Catalogues.CatalogueClassRef;
+            attrBase2 : TestCatalogue.Catalogues.CatalogueClassRef;
+            attrBase3 : Color;
         END ClassA;
+
+        CLASS ClassB =
+            name : TEXT*50;
+        END ClassB;
     END TopicA;
 END BaseModel.
 
 MODEL ExtendedModel AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
     IMPORTS BaseModel;
 
+    DOMAIN
+        Color EXTENDS BaseModel.Color = (red (dark, light));
+
     TOPIC TopicA
         EXTENDS BaseModel.TopicA =
 
         CLASS ClassA (EXTENDED) =
+            attrBase1 (EXTENDED) : TEXT*20;
+            !! attrBase2 unchanged
+            attrBase3 (EXTENDED) : ExtendedModel.Color;
             attrExtended1 : TEXT*100;
             attrExtended2 : MANDATORY 0 .. 100;
         END ClassA;
 
-        CLASS ClassB =
+        !! ClassB unchanged
+
+        !! additional class
+        CLASS ClassC =
             name : TEXT*20;
-        END ClassB;
+        END ClassC;
     END TopicA;
 END ExtendedModel.
