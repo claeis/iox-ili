@@ -77,6 +77,8 @@ public class ReduceToBaseModelTest {
         assertUnfiltered(new StartBasketEvent(EXTENDED_TOPIC, "b2"));
         assertReducedToBaseModel(createExtendedObject("test1", "base1Value", "cat1", "green", "extended1Value", 100));
         assertReducedToBaseModel(createExtendedObject("test2", "", "cat2", "blue", "some text value", 50));
+        assertReducedToBaseModelClassB(createObjectWithName(EXTENDED_CLASS_B, "testExtendedB1", "B1"));
+        assertReducedToBaseModelClassB(createObjectWithName(EXTENDED_CLASS_B, "testExtendedB2", "B2"));
         assertUnfiltered(new EndBasketEvent());
 
         assertUnfiltered(new EndTransferEvent());
@@ -92,9 +94,6 @@ public class ReduceToBaseModelTest {
         assertBasketUnfiltered(BASE_TOPIC, "b1",
                 createObjectWithName(BASE_CLASS_B, "testB1", "B1"),
                 createObjectWithName(BASE_CLASS_B, "testB2", "B2"));
-        assertBasketUnfiltered(EXTENDED_TOPIC, "b2",
-                createObjectWithName(EXTENDED_CLASS_B, "testExtendedB1", "B1"),
-                createObjectWithName(EXTENDED_CLASS_B, "testExtendedB2", "B2"));
 
         assertUnfiltered(new EndTransferEvent());
     }
@@ -179,11 +178,24 @@ public class ReduceToBaseModelTest {
         assertNotNull(filteredEvent);
         IomObject filteredObj = ((ObjectEvent) filteredEvent).getIomObject();
         assertEquals(obj.getobjecttag(), filteredObj.getobjecttag());
-        assertEquals("Filtered object has a different attribute count", obj.getattrcount(), filteredObj.getattrcount());
-        for (int i = 0; i < obj.getattrcount(); i++) {
-            String attrName = obj.getattrname(i);
-            assertEquals("Attribute " + attrName + " is not equal", obj.getattrvalue(attrName), filteredObj.getattrvalue(attrName));
+        assertEqualAttributes(obj, filteredObj);
+    }
+
+    private void assertEqualAttributes(IomObject a, IomObject b) {
+        assertEquals("Filtered object has a different attribute count", a.getattrcount(), b.getattrcount());
+        for (int i = 0; i < a.getattrcount(); i++) {
+            String attrName = a.getattrname(i);
+            assertEquals("Attribute " + attrName + " is not equal", a.getattrvalue(attrName), b.getattrvalue(attrName));
         }
+    }
+
+    private void assertReducedToBaseModelClassB(IomObject extendedObj) throws IoxException {
+        IoxEvent filteredEvent = reduceToBaseModel.filter(new ObjectEvent(new Iom_jObject(extendedObj)));
+        assertNotNull(filteredEvent);
+
+        IomObject baseObj = ((ObjectEvent) filteredEvent).getIomObject();
+        assertEquals(BASE_CLASS_B, baseObj.getobjecttag());
+        assertEqualAttributes(extendedObj, baseObj);
     }
 
     private void assertReducedToBaseModel(IomObject extendedObj) throws IoxException {
