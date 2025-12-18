@@ -1,0 +1,62 @@
+INTERLIS 2.4;
+
+MODEL TestCatalogue AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
+    TOPIC Catalogues =
+        CLASS CatalogueClass =
+            name : MANDATORY TEXT;
+        END CatalogueClass;
+
+        STRUCTURE CatalogueClassRef =
+            Reference : MANDATORY REFERENCE TO (EXTERNAL) CatalogueClass;
+        END CatalogueClassRef;
+    END Catalogues;
+END TestCatalogue.
+
+MODEL BaseModel AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
+    IMPORTS TestCatalogue;
+
+    DOMAIN
+        Color = (red, green, blue);
+
+    TOPIC TopicA =
+        DEPENDS ON TestCatalogue.Catalogues;
+
+        CLASS ClassA =
+            attrBase1 : TEXT*50;
+            attrBase2 : TestCatalogue.Catalogues.CatalogueClassRef;
+            attrBase3 : Color;
+        END ClassA;
+
+        CLASS ClassB =
+            name : TEXT*50;
+        END ClassB;
+    END TopicA;
+END BaseModel.
+
+MODEL ExtendedModel AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
+    IMPORTS BaseModel;
+
+    DOMAIN
+        Color EXTENDS BaseModel.Color = (red (dark, light));
+
+    TOPIC TopicA
+        EXTENDS BaseModel.TopicA =
+
+        CLASS ClassA (EXTENDED) =
+            attrBase1 (EXTENDED) : TEXT*20;
+            !! attrBase2 unchanged
+            attrBase3 (EXTENDED) : ExtendedModel.Color;
+            attrExtended1 : TEXT*100;
+            attrExtended2 : MANDATORY 0 .. 100;
+        END ClassA;
+
+        !! ClassB unchanged
+        !!CLASS ClassB (EXTENDED) = das waere auch schon eine Aenderung!
+        !!END ClassB;
+
+        !! additional class
+        CLASS ClassC =
+            name : TEXT*20;
+        END ClassC;
+    END TopicA;
+END ExtendedModel.

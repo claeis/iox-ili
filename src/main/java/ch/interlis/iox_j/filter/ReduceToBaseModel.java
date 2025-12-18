@@ -225,7 +225,7 @@ public class ReduceToBaseModel implements IoxFilter {
         }
         Container destContainer=destStruct;
         Container srcContainer=srcStruct;
-        {
+        do {
             destContainer=destContainer.getContainer();
             srcContainer=srcContainer.getContainer();
             if(!srctag2destElement.containsKey(srcContainer.getScopedName())) {
@@ -341,11 +341,16 @@ public class ReduceToBaseModel implements IoxFilter {
 		}
 	}
 
-	
 	private Element getTranslatedElement(Element modelElement) {
-		Element destEle=(Element)srctag2destElement.get(modelElement.getScopedName());
-		return destEle;
+		String scopedName = modelElement.getScopedName();
+		if (srctag2destElement.containsKey(scopedName)) {
+			return (Element) srctag2destElement.get(scopedName);
+		}
+
+		// no translation or deletion defined, export as it is
+		return modelElement;
 	}
+
 	private void translateAttrValue(IomObject iomObj, AttributeDef srcAttr) {
 		String srcAttrName=srcAttr.getName();
 		int attrc=iomObj.getattrvaluecount(srcAttrName);
