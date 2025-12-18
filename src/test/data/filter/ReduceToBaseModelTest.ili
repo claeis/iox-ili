@@ -51,8 +51,8 @@ MODEL ExtendedModel AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
         END ClassA;
 
         !! ClassB unchanged
-        CLASS ClassB (EXTENDED) =
-        END ClassB;
+        !!CLASS ClassB (EXTENDED) = das waere auch schon eine Aenderung!
+        !!END ClassB;
 
         !! additional class
         CLASS ClassC =

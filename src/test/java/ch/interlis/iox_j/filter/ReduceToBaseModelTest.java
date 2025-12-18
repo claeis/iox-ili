@@ -36,7 +36,6 @@ public class ReduceToBaseModelTest {
     private static final String EXTENDED_MODEL = "ExtendedModel";
     private static final String EXTENDED_TOPIC = EXTENDED_MODEL + ".TopicA";
     private static final String EXTENDED_CLASS = EXTENDED_TOPIC + ".ClassA";
-    private static final String EXTENDED_CLASS_B = EXTENDED_TOPIC + ".ClassB";
     private static final String EXTENDED_CLASS_C = EXTENDED_TOPIC + ".ClassC";
 
     private TransferDescription td;
@@ -77,8 +76,8 @@ public class ReduceToBaseModelTest {
         assertUnfiltered(new StartBasketEvent(EXTENDED_TOPIC, "b2"));
         assertReducedToBaseModel(createExtendedObject("test1", "base1Value", "cat1", "green", "extended1Value", 100));
         assertReducedToBaseModel(createExtendedObject("test2", "", "cat2", "blue", "some text value", 50));
-        assertReducedToBaseModelClassB(createObjectWithName(EXTENDED_CLASS_B, "testExtendedB1", "B1"));
-        assertReducedToBaseModelClassB(createObjectWithName(EXTENDED_CLASS_B, "testExtendedB2", "B2"));
+        assertReducedToBaseModelClassB(createObjectWithName(BASE_CLASS_B, "testExtendedB1", "B1"));
+        assertReducedToBaseModelClassB(createObjectWithName(BASE_CLASS_B, "testExtendedB2", "B2"));
         assertUnfiltered(new EndBasketEvent());
 
         assertUnfiltered(new EndTransferEvent());
@@ -128,8 +127,8 @@ public class ReduceToBaseModelTest {
         assertBasketUnfiltered(EXTENDED_TOPIC, "b3",
                 createExtendedObject("test1", "base1Value", "cat1", "red.dark", "extended1Value", 100),
                 createExtendedObject("test2", "", "cat2", "green", "some text value", 50),
-                createObjectWithName(EXTENDED_CLASS_B, "testExtendedB1", "B1"),
-                createObjectWithName(EXTENDED_CLASS_B, "testExtendedB2", "B2"),
+                createObjectWithName(BASE_CLASS_B, "testExtendedB1", "B1"),
+                createObjectWithName(BASE_CLASS_B, "testExtendedB2", "B2"),
                 createObjectWithName(EXTENDED_CLASS_C, "testC1", "C1"),
                 createObjectWithName(EXTENDED_CLASS_C, "testC2", "C2"));
         assertUnfiltered(new EndTransferEvent());
