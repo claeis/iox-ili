@@ -152,7 +152,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private static final String ILI_LEGACYAREAREAS = "ILI_LEGACYAREAREAS";
     private static final String ENUM_TREE_VALUES = "ENUM_TREE_VALUES";
     private static final String VALUE_REF_THIS = "Value";
-    public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
+    public static final String ALL_OBJECTS_ACCESSIBLE=ValidationConfig.ALL_OBJECTS_ACCESSIBLE;
 	public static final String REGEX_FOR_ID_VALIDATION = "^[0-9a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
 	public static final String REGEX_FOR_TEXTOID_VALIDATION = "^[a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
 	public static final String REGEX_FOR_STANDARTOID_VALIDATION = "^[a-zA-Z][0-9a-zA-Z]*";
