@@ -2,10 +2,15 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
-iox-ili 1.24.4 (2025-11-xx)
+iox-ili 1.24.4 (2025-12-29)
 -----------------------------
 - Validator: show only one "first pass" message with refdata
 - fix incomplete IoxUtility.cloneEvent(StartBasket)
+- ReduceToBaseModel: Include modelelements without translation (ili2db#488)
+- ReduceToBaseModel: Include all nodes to translate enum with ALL OF (ili2db#578)
+- Validator: Fixes uniqueness check if target object is external (ilivalidator#448)
+- Validator: allObjects() performance improvements
+ 
 
 iox-ili 1.24.3 (2025-11-18)
 -----------------------------
