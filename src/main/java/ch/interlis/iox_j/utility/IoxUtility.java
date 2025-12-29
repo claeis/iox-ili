@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import ch.ehi.basics.logging.EhiLogger;
 import ch.ehi.basics.settings.Settings;
 import ch.interlis.ili2c.metamodel.Model;
+import ch.interlis.iom.IomConstants;
 import ch.interlis.iom.IomObject;
 import ch.interlis.iom_j.itf.ItfReader;
 import ch.interlis.iom_j.itf.ItfReader2;
@@ -232,7 +233,17 @@ public class IoxUtility {
         if(event instanceof StartTransferEvent) {
             event=new ch.interlis.iox_j.StartTransferEvent();
         }else if(event instanceof StartBasketEvent) {
-            event=new ch.interlis.iox_j.StartBasketEvent(((StartBasketEvent) event).getType(),((StartBasketEvent) event).getBid());
+            StartBasketEvent srcBasket=(StartBasketEvent)event;
+            ch.interlis.iox_j.StartBasketEvent destBasket=new ch.interlis.iox_j.StartBasketEvent(srcBasket.getType(),srcBasket.getBid());
+            destBasket.setConsistency(srcBasket.getConsistency());
+            destBasket.setKind(srcBasket.getKind());
+            destBasket.setStartstate(srcBasket.getStartstate());
+            destBasket.setEndstate(srcBasket.getEndstate()); 
+            destBasket.setTopicv(srcBasket.getTopicv());
+            if(srcBasket instanceof ch.interlis.iox_j.StartBasketEvent) {
+                destBasket.setFileMd5(((ch.interlis.iox_j.StartBasketEvent)srcBasket).getFileMd5());
+            }
+            event=destBasket;
         }else if(event instanceof ObjectEvent) {
             event=new ch.interlis.iox_j.ObjectEvent(new ch.interlis.iom_j.Iom_jObject(((ObjectEvent) event).getIomObject()));
         }else if(event instanceof EndBasketEvent) {

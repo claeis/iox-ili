@@ -152,7 +152,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private static final String ILI_LEGACYAREAREAS = "ILI_LEGACYAREAREAS";
     private static final String ENUM_TREE_VALUES = "ENUM_TREE_VALUES";
     private static final String VALUE_REF_THIS = "Value";
-    public static final String ALL_OBJECTS_ACCESSIBLE="allObjectsAccessible";
+    public static final String ALL_OBJECTS_ACCESSIBLE=ValidationConfig.ALL_OBJECTS_ACCESSIBLE;
 	public static final String REGEX_FOR_ID_VALIDATION = "^[0-9a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
 	public static final String REGEX_FOR_TEXTOID_VALIDATION = "^[a-zA-Z_][0-9a-zA-Z\\_\\.\\-]*";
 	public static final String REGEX_FOR_STANDARTOID_VALIDATION = "^[a-zA-Z][0-9a-zA-Z]*";
@@ -222,6 +222,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private long objectCount=0l;
     private long structCount=0l;
 	private final Map<String, Domain> genericDomains = new HashMap<String, Domain>();
+    private boolean firstStartTransferEvent=true;
     /** mappings from xml-tags to Viewable|AttributeDef
      */
     private HashMap<String,Object> tag2class=null;
@@ -426,7 +427,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			return;
 		}
 		if (event instanceof ch.interlis.iox.StartTransferEvent){
-			errs.addEvent(errFact.logInfoMsg(rsrc.getString("validate.firstValidationPass")));
+		    if(firstStartTransferEvent) {
+	            errs.addEvent(errFact.logInfoMsg(getFirstPassMsg()));
+	            firstStartTransferEvent=false;
+		    }
 			if(doValidation) {
 	            validateInconsistentIliAndXMLVersion(event);
 			}
@@ -471,6 +475,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             }
 		}
 	}
+    protected String getFirstPassMsg() {
+        return rsrc.getString("validate.firstValidationPass");
+    }
     private void validateInconsistentIliAndXMLVersion(ch.interlis.iox.IoxEvent event) {
         String versionControl = settings.getValue(CONFIG_DO_XTF_VERIFYMODEL);
         if (versionControl != null && versionControl.equals(CONFIG_DO_XTF_VERIFYMODEL_DO) && event instanceof XtfStartTransferEvent) {            
@@ -2256,6 +2263,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             IomObject targetObj = getReferencedObject(role, targetOid);
                             if (targetObj != null) {
                                 nextCurrentObjects.add(targetObj);
+                            } else if (role.isExternal() && allObjectsAccessible && roleDefValue != null && k == lastPathIndex) {
+                                // if the target object is external and not available in the pool, keep the reference so
+                                // uniqueness checks and similar evaluations can still work with the OID.
+                                nextCurrentObjects.add(roleDefValue);
                             }
                         }
                     }

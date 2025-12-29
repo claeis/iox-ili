@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:ExtUniq="http://www.interlis.ch/xtf/2.4/ExternalAssociationUnique">
+  <ili:headersection>
+    <ili:models>
+      <ili:model>ExternalAssociationUnique</ili:model>
+    </ili:models>
+    <ili:sender>iox-ili-test</ili:sender>
+  </ili:headersection>
+  <ili:datasection>
+    <ExtUniq:T ili:bid="b1">
+      <ExtUniq:Item ili:tid="i1">
+        <ExtUniq:Code>abc</ExtUniq:Code>
+      </ExtUniq:Item>
+      <ExtUniq:Ownership ili:tid="link1">
+        <ExtUniq:OwnerRef ili:ref="ExternalObjResolverMock.1" />
+        <ExtUniq:ItemRef ili:ref="i1" />
+      </ExtUniq:Ownership>
+      <ExtUniq:Ownership ili:tid="link2">
+        <ExtUniq:OwnerRef ili:ref="ExternalObjResolverMock.1" />
+        <ExtUniq:ItemRef ili:ref="i1" />
+      </ExtUniq:Ownership>
+    </ExtUniq:T>
+  </ili:datasection>
+</ili:transfer>
