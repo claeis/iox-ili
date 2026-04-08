@@ -2,6 +2,10 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.24.5 (2026-04-xx)
+-----------------------------
+- Xtf24Reader: local part cannot be "null" when creating a QName" (ili2fme#52)
+
 iox-ili 1.24.4 (2025-12-29)
 -----------------------------
 - Validator: show only one "first pass" message with refdata

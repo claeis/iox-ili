@@ -867,6 +867,9 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
 			}
 			// iliModel
 			Model model = (Model) modelObj;
+			if(model.getTranslationOf()!=null) {
+			    continue; // xtf24: only element names in original language
+			}
             String modelNameSpace = getModelXmlNamespace(model);
 			Iterator modelIterator = model.iterator();
 			while(modelIterator.hasNext()){
