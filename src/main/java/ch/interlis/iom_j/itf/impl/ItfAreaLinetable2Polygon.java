@@ -425,13 +425,14 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 			if(keepLinetables) {
 	            for(String tid:mainTids.keySet()){
 	                Polygon poly=polygons.get(tid);
-	                for(String lineTid:getTidAsArray(poly)){
+	                String lineTids[]=getTidAsArray(poly);
+	                for(String lineTid:lineTids){
 	                    IomObject line=getLineObject(lineTid);
                         if(line==null) {
-                            throw new IllegalStateException();
+                            throw new IllegalStateException("no line <"+lineTid+"> (mainObj "+tid+")");
                         }
 	                    if(line.getattrvaluecount(mainTableRef1)==0) {
-	                        IomObject ref=new Iom_jObject("REF",null);
+	                        IomObject ref=new Iom_jObject(Iom_jObject.REF,null);
 	                        ref.setobjectrefoid(tid);
 	                        line.addattrobj(mainTableRef1, ref);
 	                    }else if(line.getattrvaluecount(mainTableRef2)==0) {
@@ -439,11 +440,11 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
 	                        String ref1=ref.getobjectrefoid();
 	                        if(ref1.compareTo(tid)>0) {
 	                            ref.setobjectrefoid(tid);
-	                            ref=new Iom_jObject("REF",null);
+	                            ref=new Iom_jObject(Iom_jObject.REF,null);
 	                            ref.setobjectrefoid(ref1);
 	                            line.addattrobj(mainTableRef2, ref);
 	                        }else {
-                                ref=new Iom_jObject("REF",null);
+                                ref=new Iom_jObject(Iom_jObject.REF,null);
                                 ref.setobjectrefoid(tid);
                                 line.addattrobj(mainTableRef2, ref);
 	                        }
@@ -512,10 +513,14 @@ public class ItfAreaLinetable2Polygon implements Linetable2Polygon {
         return hitTids.toArray(new String[hitTids.size()]);
     }
     private String removeOverlapRemovalPrefix(String tidx) {
-        if(tidx.startsWith(CompoundCurve.MODIFIED_TID_TAG)) {
-            tidx=tidx.substring(CompoundCurve.MODIFIED_TID_TAG.length());
-        }else if(tidx.startsWith(CompoundCurve.OVERLAP_TID_TAG)) {
-            tidx=tidx.substring(CompoundCurve.OVERLAP_TID_TAG.length());
+        while(true) {
+            if(tidx.startsWith(CompoundCurve.MODIFIED_TID_TAG)) {
+                tidx=tidx.substring(CompoundCurve.MODIFIED_TID_TAG.length());
+            }else if(tidx.startsWith(CompoundCurve.OVERLAP_TID_TAG)) {
+                tidx=tidx.substring(CompoundCurve.OVERLAP_TID_TAG.length());
+            }else {
+                break;
+            }
         }
         return tidx;
     }

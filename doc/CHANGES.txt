@@ -5,6 +5,7 @@ ideas/open issues
 iox-ili 1.24.5 (2026-04-xx)
 -----------------------------
 - Xtf24Reader: local part cannot be "null" when creating a QName" (ili2fme#52)
+- ItfReader/ItfAreaLinetable2Polygon: fix failed to build polygons java.lang.IllegalStateException (ili2fme#53)
 
 iox-ili 1.24.4 (2025-12-29)
 -----------------------------
