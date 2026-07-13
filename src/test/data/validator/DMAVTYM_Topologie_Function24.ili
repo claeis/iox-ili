@@ -30,6 +30,26 @@ MODEL DMAVTYM_Topologie_Function24
             surface: Surface;
         END SurfaceClass;
 
+        STRUCTURE LineStructure =
+            line: Line;
+        END LineStructure;
+
+        CLASS BagOfLinesClass =
+            surface: Surface;
+            lineStructures: BAG {0..*} OF LineStructure;
+
+            MANDATORY CONSTRAINT linesCoverSurface_V1_0:
+                DMAVTYM_Topologie_V1_0.covers(THIS, >>surface, lineStructures, >>LineStructure->line);
+        END BagOfLinesClass;
+
+        CLASS BagOfDirectLinesClass =
+            surface: Surface;
+            lines: BAG {0..*} OF Line;
+
+            MANDATORY CONSTRAINT linesCoverSurface_V1_0:
+                DMAVTYM_Topologie_V1_0.covers(THIS, >>surface, lines, UNDEFINED);
+        END BagOfDirectLinesClass;
+
         CLASS LineClass =
             line: Line;
 

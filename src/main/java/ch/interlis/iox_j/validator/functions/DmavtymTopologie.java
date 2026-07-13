@@ -104,36 +104,45 @@ public class DmavtymTopologie {
     }
 
     private Value evaluateCovers(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
-        // All arguments must be defined
-        for (Value arg : actualArguments) {
-            if (arg.isUndefined()) {
-                return Value.createSkipEvaluation();
-            }
+        // Surface arguments and multiline objects must be defined (an empty BAG OF evaluates
+        // to UNDEFINED and is skipped). The multiline attribute may be UNDEFINED, indicating
+        // that the multiline objects already are line geometries.
+        if (actualArguments[0].isUndefined() || actualArguments[1].isUndefined()
+                || actualArguments[2].isUndefined()) {
+            return Value.createSkipEvaluation();
         }
 
         // Check the type of the arguments
         Collection<IomObject> surfaceObjects = actualArguments[0].getComplexObjects();
         String surfaceAttr = actualArguments[1].getValue();
         Collection<IomObject> multiLineObjects = actualArguments[2].getComplexObjects();
-        String multiLineAttr = actualArguments[3].getValue();
+        String multiLineAttr = actualArguments[3].isUndefined() ? null : actualArguments[3].getValue();
         if (surfaceObjects == null || surfaceObjects.size() != 1 || surfaceAttr == null
-                || multiLineObjects == null || multiLineObjects.size() != 1 || multiLineAttr == null) {
+                || multiLineObjects == null || multiLineObjects.isEmpty()) {
             return Value.createUndefined();
         }
 
         // Resolve attributes
         IomObject surfaceObject = surfaceObjects.iterator().next();
-        IomObject multiLineObject = multiLineObjects.iterator().next();
-        if (surfaceObject.getattrvaluecount(surfaceAttr) != 1 || multiLineObject.getattrvaluecount(multiLineAttr) != 1) {
+        if (surfaceObject.getattrvaluecount(surfaceAttr) != 1) {
             return Value.createUndefined();
         }
 
         // Convert the IOM objects to JTS objects
         CurvePolygon surface;
-        Collection<CompoundCurve> lines;
+        Collection<CompoundCurve> lines = new ArrayList<CompoundCurve>();
         try {
             surface = getSurface(surfaceObject.getattrobj(surfaceAttr, 0), validationKind);
-            lines = getLines(multiLineObject.getattrobj(multiLineAttr, 0));
+            for (IomObject multiLineObject : multiLineObjects) {
+                if (multiLineAttr == null) {
+                    lines.addAll(getLines(multiLineObject));
+                } else {
+                    if (multiLineObject.getattrvaluecount(multiLineAttr) != 1) {
+                        return Value.createUndefined();
+                    }
+                    lines.addAll(getLines(multiLineObject.getattrobj(multiLineAttr, 0)));
+                }
+            }
         } catch (Exception e) {
             EhiLogger.logError(e);
             return Value.createUndefined();
