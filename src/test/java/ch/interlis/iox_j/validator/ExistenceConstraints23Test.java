@@ -62,12 +62,24 @@ public class ExistenceConstraints23Test {
     private static final String EXISTENCE_CONSTRAINTS23_CONDITION_TOPIC_CONDITION_CLASS_STRUCTURE2 = EXISTENCE_CONSTRAINTS23_CONDITION_TOPIC+".ConditionClassStructure2";
     private static final String EXISTENCE_CONSTRAINTS23_CONDITION_STRUCTURE2 = EXISTENCE_CONSTRAINTS23_CONDITION+".structure2";
     private static final String EXISTENCE_CONSTRAINTS23_CONDITION_STRUCTURE = EXISTENCE_CONSTRAINTS23_CONDITION+".structure";
+
+    private static final String EXISTENCE_CONSTRAINTS23_ASSOC_REF = "ExistenceConstraints23AssocRef";
+    private static final String EXISTENCE_CONSTRAINTS23_ASSOC = "ExistenceConstraints23Assoc";
+    private static final String EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC = EXISTENCE_CONSTRAINTS23_ASSOC_REF+".Topic";
+    private static final String EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC = EXISTENCE_CONSTRAINTS23_ASSOC+".Topic";
+    private static final String EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC_KANTON = EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC+".Kanton";
+    private static final String EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC_GEMEINDE = EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC+".Gemeinde";
+    private static final String EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC_KANTON_GEMEINDE = EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC+".Kanton__Gemeinde";
+    private static final String EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC_GEMEINDE = EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC+".Gemeinde";
+    private static final String EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC_KANDIDAT = EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC+".Kandidat";
+    private static final String EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC_GEMEINDE_KANDIDATENSTIMMEN = EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC+".Gemeinde__Kandidatenstimmen";
     
     private TransferDescription td=null;
 	// OID
 	private final static String OID1 ="o1";
 	private final static String OID2 ="o2";
 	private final static String OID3 ="o3";
+	private final static String OID4 ="o4";
 	// START BASKET EVENT
 	private final static String BID1="b1";
 	private final static String BID2="b2";
@@ -82,6 +94,8 @@ public class ExistenceConstraints23Test {
 		ili2cConfig.addFileEntry(fileEntry);
 		FileEntry fileEntryCoords=new FileEntry("src/test/data/validator/ExistenceConstraints23Coords.ili", FileEntryKind.ILIMODELFILE);
 		ili2cConfig.addFileEntry(fileEntryCoords);
+		FileEntry fileEntryAssoc=new FileEntry("src/test/data/validator/ExistenceConstraints23Assoc.ili", FileEntryKind.ILIMODELFILE);
+		ili2cConfig.addFileEntry(fileEntryAssoc);
 		td=ch.interlis.ili2c.Ili2c.runCompiler(ili2cConfig);
 		assertNotNull(td);
 	}
@@ -1139,6 +1153,50 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndBasketEvent());
 		validator.validate(new StartBasketEvent(EXISTENCE_CONSTRAINTS23_TOPIC,BID2));
 		validator.validate(new ObjectEvent(objC));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// The value of Nummer exists in the condition class of the other model.
+	// Both baskets contain link objects of non-embedded associations, which must be skipped.
+	@Test
+	public void otherModelWithAssociationObjects_Ok() throws Exception{
+		Iom_jObject objKanton=new Iom_jObject(EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC_KANTON, OID1);
+		objKanton.setattrvalue("Name", "Appenzell Innerrhoden");
+		Iom_jObject objBedingung=new Iom_jObject(EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC_GEMEINDE, OID2);
+		objBedingung.setattrvalue("Name", "Appenzell");
+		objBedingung.setattrvalue("Nummer", "3101");
+		Iom_jObject objKantonGemeinde=new Iom_jObject(EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC_KANTON_GEMEINDE, null);
+		objKantonGemeinde.addattrobj("Kanton_R", "REF").setobjectrefoid(OID1);
+		objKantonGemeinde.addattrobj("Gemeinde_R", "REF").setobjectrefoid(OID2);
+		Iom_jObject objGemeinde=new Iom_jObject(EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC_GEMEINDE, OID3);
+		objGemeinde.setattrvalue("Name", "Appenzell");
+		objGemeinde.setattrvalue("Nummer", "3101");
+		Iom_jObject objKandidat=new Iom_jObject(EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC_KANDIDAT, OID4);
+		objKandidat.setattrvalue("Nummer", "1");
+		objKandidat.setattrvalue("Name", "Muster");
+		Iom_jObject objKandidatenstimmen=new Iom_jObject(EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC_GEMEINDE_KANDIDATENSTIMMEN, null);
+		objKandidatenstimmen.addattrobj("Gemeinde_R", "REF").setobjectrefoid(OID3);
+		objKandidatenstimmen.addattrobj("Kandidat_R", "REF").setobjectrefoid(OID4);
+		objKandidatenstimmen.setattrvalue("Stimmen", "856");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC,BID1));
+		validator.validate(new ObjectEvent(objKanton));
+		validator.validate(new ObjectEvent(objBedingung));
+		validator.validate(new ObjectEvent(objKantonGemeinde));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC,BID2));
+		validator.validate(new ObjectEvent(objGemeinde));
+		validator.validate(new ObjectEvent(objKandidat));
+		validator.validate(new ObjectEvent(objKandidatenstimmen));
 		validator.validate(new EndBasketEvent());
 		validator.validate(new EndTransferEvent());
 		// Asserts
@@ -2231,5 +2289,50 @@ public class ExistenceConstraints23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==0);
+	}
+	
+	// The value of Nummer does not exist in the condition class of the other model.
+	// Both baskets contain link objects of non-embedded associations, which must be skipped.
+	@Test
+	public void otherModelWithAssociationObjects_Fail() throws Exception{
+		Iom_jObject objKanton=new Iom_jObject(EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC_KANTON, OID1);
+		objKanton.setattrvalue("Name", "Appenzell Innerrhoden");
+		Iom_jObject objBedingung=new Iom_jObject(EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC_GEMEINDE, OID2);
+		objBedingung.setattrvalue("Name", "Appenzell");
+		objBedingung.setattrvalue("Nummer", "3101");
+		Iom_jObject objKantonGemeinde=new Iom_jObject(EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC_KANTON_GEMEINDE, null);
+		objKantonGemeinde.addattrobj("Kanton_R", "REF").setobjectrefoid(OID1);
+		objKantonGemeinde.addattrobj("Gemeinde_R", "REF").setobjectrefoid(OID2);
+		Iom_jObject objGemeinde=new Iom_jObject(EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC_GEMEINDE, OID3);
+		objGemeinde.setattrvalue("Name", "Appenzell");
+		objGemeinde.setattrvalue("Nummer", "3999");
+		Iom_jObject objKandidat=new Iom_jObject(EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC_KANDIDAT, OID4);
+		objKandidat.setattrvalue("Nummer", "1");
+		objKandidat.setattrvalue("Name", "Muster");
+		Iom_jObject objKandidatenstimmen=new Iom_jObject(EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC_GEMEINDE_KANDIDATENSTIMMEN, null);
+		objKandidatenstimmen.addattrobj("Gemeinde_R", "REF").setobjectrefoid(OID3);
+		objKandidatenstimmen.addattrobj("Kandidat_R", "REF").setobjectrefoid(OID4);
+		objKandidatenstimmen.setattrvalue("Stimmen", "856");
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ALL_OBJECTS_ACCESSIBLE, ValidationConfig.TRUE);
+		LogCollector logger=new LogCollector();
+		LogEventFactory errFactory=new LogEventFactory();
+		Settings settings=new Settings();
+		Validator validator=new Validator(td, modelConfig,logger,errFactory,settings);
+		validator.validate(new StartTransferEvent());
+		validator.validate(new StartBasketEvent(EXISTENCE_CONSTRAINTS23_ASSOC_REF_TOPIC,BID1));
+		validator.validate(new ObjectEvent(objKanton));
+		validator.validate(new ObjectEvent(objBedingung));
+		validator.validate(new ObjectEvent(objKantonGemeinde));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new StartBasketEvent(EXISTENCE_CONSTRAINTS23_ASSOC_TOPIC,BID2));
+		validator.validate(new ObjectEvent(objGemeinde));
+		validator.validate(new ObjectEvent(objKandidat));
+		validator.validate(new ObjectEvent(objKandidatenstimmen));
+		validator.validate(new EndBasketEvent());
+		validator.validate(new EndTransferEvent());
+		// Asserts
+		assertTrue(logger.getErrs().size()==1);
+		assertEquals("Existence constraint ExistenceConstraints23Assoc.Topic.Gemeinde.Constraint1 is violated! The value of the attribute Nummer of ExistenceConstraints23Assoc.Topic.Gemeinde was not found in the condition class.", logger.getErrs().get(0).getEventMsg());
 	}
 }

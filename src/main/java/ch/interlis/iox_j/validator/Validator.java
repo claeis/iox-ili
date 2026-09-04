@@ -3270,13 +3270,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				}
 				Iterator<ObjectPath> requiredInIterator = existenceConstraint.iteratorRequiredIn();
 				boolean valueExists = false;
-				Table classA = null;
-				Table otherClass = null;
+				Viewable otherClass = null;
 				while (!valueExists && requiredInIterator.hasNext()) {
-					classA = null;
 					ObjectPath otherAttrPath = (ObjectPath)requiredInIterator.next();
 					String otherAttrName = otherAttrPath.toString();
-					otherClass = (Table) otherAttrPath.getRoot();
+					otherClass = otherAttrPath.getRoot();
 					String attrValueThisObj = iomObj.getattrvalue(restrictedAttrName);
 					Iterator<String> basketIdIterator=objectPool.getDataBids().iterator();
 					while( !valueExists &&  basketIdIterator.hasNext()){
@@ -3289,44 +3287,44 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 							// do not validate.
 							} else {
 								Object modelElement=tag2class.get(otherIomObj.getobjecttag());
-								classA= (Table) modelElement;
+								// skip objects that are not instances of the condition class or of an extension of it (e.g. link objects)
+								if(!(modelElement instanceof Viewable) || !((Viewable) modelElement).isExtending(otherClass)){
+									continue;
+								}
 								// otherAttr defined?
 								if(otherIomObj.getattrvaluecount(otherAttrName)>0){
-									// validate if otherClass is extending by classA
-									if (classA.isExtending(otherClass)){
-										// if type is type of alias, validate instance of
-										if(type instanceof ReferenceType){
-											ReferenceType referenceType = (ReferenceType) type;
-											valueExists = equalsReferenceValue(iomObj, referenceType, otherIomObj, otherAttrName, restrictedAttrName);
-										} else if (type instanceof CoordType){
-											CoordType coordType = (CoordType) type;
-											valueExists = equalsCoordValue(iomObj, coordType, otherIomObj, otherAttrName, restrictedAttrName);
-										} else if (type instanceof PolylineType){
-											PolylineType polylineType = (PolylineType) type;
-											valueExists = equalsPolylineValue(iomObj, polylineType, otherIomObj, otherAttrName, restrictedAttrName);
-										} else if (type instanceof SurfaceOrAreaType){
-											SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
-											valueExists = equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, otherAttrName, restrictedAttrName);
-										} else if (type instanceof CompositionType){
-											if(iomObj.getattrvaluecount(restrictedAttrName)==otherIomObj.getattrvaluecount(restrictedAttrName)) {
-												 for(int structi=0;structi<iomObj.getattrvaluecount(restrictedAttrName);structi++){
-													 IomObject structEle=iomObj.getattrobj(restrictedAttrName, structi);
-													 IomObject otherStructEle=otherIomObj.getattrobj(restrictedAttrName, structi);
-													 if(structEle!=null && otherStructEle!=null) {
-														 valueExists = equalsStructEle(((CompositionType) type).getComponentType(),structEle, otherStructEle);
-														 if(!valueExists) {
-															 // werte nicht gleich; weiterfahren mit naechstem Hauptobject
-															 break;
-														 }
-													 }else {
+									// if type is type of alias, validate instance of
+									if(type instanceof ReferenceType){
+										ReferenceType referenceType = (ReferenceType) type;
+										valueExists = equalsReferenceValue(iomObj, referenceType, otherIomObj, otherAttrName, restrictedAttrName);
+									} else if (type instanceof CoordType){
+										CoordType coordType = (CoordType) type;
+										valueExists = equalsCoordValue(iomObj, coordType, otherIomObj, otherAttrName, restrictedAttrName);
+									} else if (type instanceof PolylineType){
+										PolylineType polylineType = (PolylineType) type;
+										valueExists = equalsPolylineValue(iomObj, polylineType, otherIomObj, otherAttrName, restrictedAttrName);
+									} else if (type instanceof SurfaceOrAreaType){
+										SurfaceOrAreaType surfaceOrAreaType = (SurfaceOrAreaType) type;
+										valueExists = equalsSurfaceOrAreaValue(iomObj, surfaceOrAreaType, otherIomObj, otherAttrName, restrictedAttrName);
+									} else if (type instanceof CompositionType){
+										if(iomObj.getattrvaluecount(restrictedAttrName)==otherIomObj.getattrvaluecount(restrictedAttrName)) {
+											 for(int structi=0;structi<iomObj.getattrvaluecount(restrictedAttrName);structi++){
+												 IomObject structEle=iomObj.getattrobj(restrictedAttrName, structi);
+												 IomObject otherStructEle=otherIomObj.getattrobj(restrictedAttrName, structi);
+												 if(structEle!=null && otherStructEle!=null) {
+													 valueExists = equalsStructEle(((CompositionType) type).getComponentType(),structEle, otherStructEle);
+													 if(!valueExists) {
+														 // werte nicht gleich; weiterfahren mit naechstem Hauptobject
 														 break;
 													 }
+												 }else {
+													 break;
 												 }
-											}
-										} else {
-											if(otherIomObj.getattrvalue(otherAttrName).equals(iomObj.getattrvalue(restrictedAttrName))){
-												valueExists = true;
-											}
+											 }
+										}
+									} else {
+										if(otherIomObj.getattrvalue(otherAttrName).equals(iomObj.getattrvalue(restrictedAttrName))){
+											valueExists = true;
 										}
 									}
 								}
