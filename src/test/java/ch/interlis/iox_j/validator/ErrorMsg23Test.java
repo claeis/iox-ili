@@ -252,7 +252,7 @@ public class ErrorMsg23Test {
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
 		IoxLogEvent err = logger.getErrs().get(0);
-		assertEquals("Msg TestKey",err.getEventMsg());
+		assertEquals("Msg TestKey ErrorMsgTest23.Topic.ClassD.constrA",err.getEventMsg());
 	}
 	
     @Test
@@ -272,7 +272,7 @@ public class ErrorMsg23Test {
         // Asserts
         assertTrue(logger.getErrs().size()==1);
         IoxLogEvent err = logger.getErrs().get(0);
-        assertEquals("Msg_lang TestKey",err.getEventMsg());
+        assertEquals("Msg_lang TestKey ErrorMsgTest23.Topic.ClassD.constrA",err.getEventMsg());
     }
 
 	// die Geometry Error Message muss die unten genannten Inhalte der Koordinaten: C1 und C2 enthalten.
@@ -388,12 +388,37 @@ public class ErrorMsg23Test {
 		assertLogContainsMessage(logger.getInfo(), "validate plausibility constraint ErrorMsgTest23.Topic.ClassI.LDESCREF...");
 
 		assertEquals(9, logger.getErrs().size());
-		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and mandatory constraint.");
-		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and existence constraint.");
-		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and unique.");
-		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and set constraint.");
-		assertLogContainsMessage(logger.getErrs(), "This is the custom message and plausibility constraint (<=).");
-		assertLogContainsMessage(logger.getErrs(), "This is the custom message and plausibility constraint (>=).");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and mandatory constraint. ErrorMsgTest23.Topic.ClassI.ENSINEPR");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and existence constraint. ErrorMsgTest23.Topic.ClassI.ORTERINE");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and unique. ErrorMsgTest23.Topic.ClassI.UPENDESA");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message for object with Attr OLOGBENS and set constraint. ErrorMsgTest23.Topic.ClassI.DOROHIGE");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message and plausibility constraint (<=). ErrorMsgTest23.Topic.ClassI.BROLETON");
+		assertLogContainsMessage(logger.getErrs(), "This is the custom message and plausibility constraint (>=). ErrorMsgTest23.Topic.ClassI.LDESCREF");
+	}
+
+	// Die sprachspezifische Meldung (ilivalid.msg_<lang>) hat Vorrang vor ilivalid.msg und wird
+	// ebenfalls um den Namen des Constraints ergaenzt.
+	@Test
+	public void constraintMessageIlivalidMsgLanguage_Fail() {
+		modelConfig.mergeIliMetaAttrs(td);
+		String actualLanguage = Locale.getDefault().getLanguage();
+		String msgLang = ValidationConfig.MSG + "_" + actualLanguage;
+		modelConfig.setConfigValue(ILI_CLASSI_WITH_ALL_FAILING_CONSTRAINTS_ILIVALID_MSG + ".DOROHIGE", msgLang, "Lang msg {Attr} set constraint.");
+		modelConfig.setConfigValue(ILI_CLASSI_WITH_ALL_FAILING_CONSTRAINTS_ILIVALID_MSG + ".ENSINEPR", msgLang, "Lang msg {Attr} mandatory constraint.");
+		modelConfig.setConfigValue(ILI_CLASSI_WITH_ALL_FAILING_CONSTRAINTS_ILIVALID_MSG + ".UPENDESA", msgLang, "Lang msg {Attr} unique.");
+		modelConfig.setConfigValue(ILI_CLASSI_WITH_ALL_FAILING_CONSTRAINTS_ILIVALID_MSG + ".BROLETON", msgLang, "Lang msg plausibility constraint (<=).");
+		modelConfig.setConfigValue(ILI_CLASSI_WITH_ALL_FAILING_CONSTRAINTS_ILIVALID_MSG + ".LDESCREF", msgLang, "Lang msg plausibility constraint (>=).");
+		modelConfig.setConfigValue(ILI_CLASSI_WITH_ALL_FAILING_CONSTRAINTS_ILIVALID_MSG + ".ORTERINE", msgLang, "Lang msg {Attr} existence constraint.");
+		fillAndValidateClassWithConstraints(ILI_CLASSI_WITH_ALL_FAILING_CONSTRAINTS_ILIVALID_MSG);
+
+		// Asserts
+		assertEquals(9, logger.getErrs().size());
+		assertLogContainsMessage(logger.getErrs(), "Lang msg OLOGBENS mandatory constraint. ErrorMsgTest23.Topic.ClassI.ENSINEPR");
+		assertLogContainsMessage(logger.getErrs(), "Lang msg OLOGBENS existence constraint. ErrorMsgTest23.Topic.ClassI.ORTERINE");
+		assertLogContainsMessage(logger.getErrs(), "Lang msg OLOGBENS unique. ErrorMsgTest23.Topic.ClassI.UPENDESA");
+		assertLogContainsMessage(logger.getErrs(), "Lang msg OLOGBENS set constraint. ErrorMsgTest23.Topic.ClassI.DOROHIGE");
+		assertLogContainsMessage(logger.getErrs(), "Lang msg plausibility constraint (<=). ErrorMsgTest23.Topic.ClassI.BROLETON");
+		assertLogContainsMessage(logger.getErrs(), "Lang msg plausibility constraint (>=). ErrorMsgTest23.Topic.ClassI.LDESCREF");
 	}
 
 	@Test
