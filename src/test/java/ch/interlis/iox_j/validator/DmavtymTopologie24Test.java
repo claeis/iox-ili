@@ -33,6 +33,8 @@ public class DmavtymTopologie24Test {
     private final static String CLASS_BAG_OF_SURFACES = TOPIC + ".BagOfSurfacesClass";
     private final static String STRUCT_SURFACE = TOPIC + ".SurfaceStructure";
     private final static String CLASS_BAG_OF_DIRECT_SURFACES = TOPIC + ".BagOfDirectSurfacesClass";
+    private final static String CLASS_LINE_REFERENCE = TOPIC + ".LineReferenceClass";
+    private final static String CLASS_BAG_OF_LINE_REFERENCES = TOPIC + ".BagOfLineReferencesClass";
     private final static String CLASS_MULTI_SURFACE_TOLERANCE = TOPIC + ".MultiSurfaceToleranceClass";
     private final static String CLASS_BAG_OF_SURFACES_TOLERANCE = TOPIC + ".BagOfSurfacesToleranceClass";
     private final static String CLASS_BAG_OF_LINES_TOLERANCE = TOPIC + ".BagOfLinesToleranceClass";
@@ -500,6 +502,106 @@ public class DmavtymTopologie24Test {
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
                 "MultiLineAttr contains unmatched line segment: (30.0 30.0, 50.0 50.0).",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfDirectSurfacesClass.linesCoverSurface_V1_0 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversLineReference() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_LINE_REFERENCE, "o1");
+        iomObj.addattrobj("referenceLine", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30"),
+                IomObjectHelper.createCoord("30", "10")));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("10", "30")),
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createCoord("30", "30"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversLineReferenceArc() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_LINE_REFERENCE, "o1");
+        iomObj.addattrobj("referenceLine", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("30", "10"),
+                IomObjectHelper.createArc("23", "19", "10", "30")));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createArc("19", "23", "30", "10"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversLineReferenceUnmatched() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_LINE_REFERENCE, "o1");
+        iomObj.addattrobj("referenceLine", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30")));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createCoord("30", "30"),
+                        IomObjectHelper.createCoord("30", "10"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "MultiLineAttr contains unmatched line segment: (30.0 30.0, 30.0 10.0).",
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineReferenceClass.linesCoverLine_V1_0 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversBagOfLineReferences() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_LINE_REFERENCES, "o1");
+        iomObj.addattrobj("referenceLines", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("10", "30"))));
+        iomObj.addattrobj("referenceLines", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("50", "50"),
+                IomObjectHelper.createCoord("70", "50"))));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("10", "10")));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("50", "50"),
+                IomObjectHelper.createCoord("70", "50")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversBagOfLineReferencesUnmatched() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_LINE_REFERENCES, "o1");
+        iomObj.addattrobj("referenceLines", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("10", "30"))));
+        iomObj.addattrobj("referenceLines", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("50", "50"),
+                IomObjectHelper.createCoord("70", "50"))));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("50", "50")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "MultiLineAttr contains unmatched line segment: (10.0 30.0, 50.0 50.0).",
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfLineReferencesClass.linesCoverLines_V1_0 is not true.");
         assertThat(logger.getWarn(), is(empty()));
     }
 

@@ -105,13 +105,13 @@ public class DmavtymTopologie {
 
     private Value evaluateCovers(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
         // Extract argument values
-        Collection<IomObject> surfaceObjects = actualArguments[0].isUndefined() ? null : actualArguments[0].getComplexObjects();
-        String surfaceAttr = actualArguments[1].isUndefined() ? null : actualArguments[1].getValue();
+        Collection<IomObject> referenceObjects = actualArguments[0].isUndefined() ? null : actualArguments[0].getComplexObjects();
+        String referenceAttr = actualArguments[1].isUndefined() ? null : actualArguments[1].getValue();
         Collection<IomObject> multiLineObjects = actualArguments[2].isUndefined() ? null : actualArguments[2].getComplexObjects();
         String multiLineAttr = actualArguments[3].isUndefined() ? null : actualArguments[3].getValue();
 
-        // No surface: the lines cannot be covered
-        if (surfaceObjects == null || surfaceObjects.isEmpty()) {
+        // No reference geometry: the lines cannot be covered
+        if (referenceObjects == null || referenceObjects.isEmpty()) {
             return new Value(false);
         }
 
@@ -121,17 +121,30 @@ public class DmavtymTopologie {
         }
 
         // Convert the IOM objects to JTS objects
-        Collection<CurvePolygon> surfaces = new ArrayList<CurvePolygon>();
+        Collection<CompoundCurve> referenceLines = new ArrayList<CompoundCurve>();
         Collection<CompoundCurve> lines = new ArrayList<CompoundCurve>();
         try {
-            for (IomObject surfaceObject : surfaceObjects) {
-                if (surfaceAttr == null) {
-                    surfaces.addAll(getSurfaces(surfaceObject, validationKind));
+            for (IomObject referenceObject : referenceObjects) {
+                IomObject attrValue;
+                if (referenceAttr == null) {
+                    attrValue = referenceObject;
                 } else {
-                    if (surfaceObject.getattrvaluecount(surfaceAttr) != 1) {
+                    if (referenceObject.getattrvaluecount(referenceAttr) != 1) {
                         return Value.createUndefined();
                     }
-                    surfaces.addAll(getSurfaces(surfaceObject.getattrobj(surfaceAttr, 0), validationKind));
+                    attrValue = referenceObject.getattrobj(referenceAttr, 0);
+                }
+                String objectTag = attrValue.getobjecttag();
+                if (objectTag.equals(Iom_jObject.MULTISURFACE)) {
+                    for (CurvePolygon surface : getSurfaces(attrValue, validationKind)) {
+                        for (CompoundCurveRing ring : getRings(surface)) {
+                            referenceLines.addAll(ring.getLines());
+                        }
+                    }
+                } else if (objectTag.equals(Iom_jObject.MULTIPOLYLINE) || objectTag.equals(Iom_jObject.POLYLINE)) {
+                    referenceLines.addAll(getLines(attrValue));
+                } else {
+                    return Value.createUndefined();
                 }
             }
             for (IomObject multiLineObject : multiLineObjects) {
@@ -149,23 +162,19 @@ public class DmavtymTopologie {
             return Value.createUndefined();
         }
 
-        // Add all surface segments to a hashset
-        HashMap<CurveSegment, Boolean> surfaceSegments = new HashMap<CurveSegment, Boolean>();
-        for (CurvePolygon surface : surfaces) {
-            for (CompoundCurveRing ring : getRings(surface)) {
-                for (CompoundCurve line : ring.getLines()) {
-                    for (CurveSegment segment : line.getSegments()) {
-                        surfaceSegments.put(segment, false);
-                    }
-                }
+        // Add all reference segments to a hashset
+        HashMap<CurveSegment, Boolean> referenceSegments = new HashMap<CurveSegment, Boolean>();
+        for (CompoundCurve referenceLine : referenceLines) {
+            for (CurveSegment segment : referenceLine.getSegments()) {
+                referenceSegments.put(segment, false);
             }
         }
 
-        // Check if all multiline lines are contained in the surfaceSegments hashset
+        // Check if all multiline lines are contained in the referenceSegments hashset
         boolean result = true;
         for (CompoundCurve line : lines) {
             for (CurveSegment segment : line.getSegments()) {
-                Boolean isSegmentVisited = surfaceSegments.get(segment);
+                Boolean isSegmentVisited = referenceSegments.get(segment);
                 if (isSegmentVisited == null) {
                     // No matching segment found
                     Coordinate point = segment.getStartPoint();
@@ -176,7 +185,7 @@ public class DmavtymTopologie {
                     Coordinate point = segment.getStartPoint();
                     logger.addEvent(logger.logWarningMsg("MultiLineAttr contains duplicate line segment: {0}.", point.x, point.y, point.z, segment.toString()));
                 } else {
-                    surfaceSegments.put(segment, true);
+                    referenceSegments.put(segment, true);
                 }
             }
         }

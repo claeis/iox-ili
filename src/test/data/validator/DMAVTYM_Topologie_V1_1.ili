@@ -24,12 +24,13 @@ TYPE MODEL DMAVTYM_Topologie_V1_1 (de)
   AT "https://models.geo.admin.ch/V_D/" VERSION "2026-02-26" =
 
   /**
-   * Tests if the line or multiline is fully covered by an outer or inner ring of the surface.
-   * The control points of all line segments need to match the surface points exactly.
-   * SurfaceObjects: objects containing a surface geometry.
-   * SurfaceAttr: the surface attribute of the SurfaceObjects.
-   * MultiLineObject: object containing the multiline geometry that should be covered by the surface geometry.
-   * MultiLineAttr: the multiline attribute of the MultiLineObject.
+   * Tests if the lines are fully covered by the reference geometries: an outer or inner ring of a
+   * surface or another line. The control points of all line segments need to match the points of
+   * the reference geometries exactly.
+   * SurfaceObjects: objects containing the reference geometries (surface or line); several objects are allowed, e.g. a BAG OF structures.
+   * SurfaceAttr: the surface or line attribute of the SurfaceObjects; UNDEFINED if the SurfaceObjects are the geometries.
+   * MultiLineObject: objects containing the line or multiline geometries that should be covered; several objects are allowed, e.g. a BAG OF structures.
+   * MultiLineAttr: the line or multiline attribute of the MultiLineObject; UNDEFINED if the MultiLineObject are the geometries.
    * Since 2025-05-06
    */
   FUNCTION covers(

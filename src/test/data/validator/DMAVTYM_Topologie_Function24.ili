@@ -79,6 +79,22 @@ MODEL DMAVTYM_Topologie_Function24
                 DMAVTYM_Topologie_V1_0.covers(surfaces, UNDEFINED, lines, UNDEFINED);
         END BagOfDirectSurfacesClass;
 
+        CLASS LineReferenceClass =
+            referenceLine: Line;
+            lines: Multiline;
+
+            MANDATORY CONSTRAINT linesCoverLine_V1_0:
+                DMAVTYM_Topologie_V1_0.covers(THIS, >>referenceLine, THIS, >>lines);
+        END LineReferenceClass;
+
+        CLASS BagOfLineReferencesClass =
+            referenceLines: BAG {0..*} OF LineStructure;
+            lines: BAG {0..*} OF Line;
+
+            MANDATORY CONSTRAINT linesCoverLines_V1_0:
+                DMAVTYM_Topologie_V1_0.covers(referenceLines, >>LineStructure->line, lines, UNDEFINED);
+        END BagOfLineReferencesClass;
+
         CLASS MultiSurfaceToleranceClass =
             surface: MultiSurface;
             lines: Multiline;
