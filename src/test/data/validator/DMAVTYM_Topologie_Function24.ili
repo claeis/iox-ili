@@ -14,6 +14,7 @@ MODEL DMAVTYM_Topologie_Function24
         Surface = SURFACE WITH (STRAIGHTS, ARCS) VERTEX Coord2 WITHOUT OVERLAPS > 0.002;
         Line = POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Coord2;
         Multiline = MULTIPOLYLINE WITH (STRAIGHTS, ARCS) VERTEX Coord2;
+        MultiSurface = MULTISURFACE WITH (STRAIGHTS, ARCS) VERTEX Coord2 WITHOUT OVERLAPS > 0.002;
 
     TOPIC Topic =
         CLASS ClassA =
@@ -49,6 +50,34 @@ MODEL DMAVTYM_Topologie_Function24
             MANDATORY CONSTRAINT linesCoverSurface_V1_0:
                 DMAVTYM_Topologie_V1_0.covers(THIS, >>surface, lines, UNDEFINED);
         END BagOfDirectLinesClass;
+
+        CLASS MultiSurfaceClass =
+            surface: MultiSurface;
+            lines: Multiline;
+
+            MANDATORY CONSTRAINT linesCoverSurface_V1_0:
+                DMAVTYM_Topologie_V1_0.covers(THIS, >>surface, THIS, >>lines);
+        END MultiSurfaceClass;
+
+        STRUCTURE SurfaceStructure =
+            surface: Surface;
+        END SurfaceStructure;
+
+        CLASS BagOfSurfacesClass =
+            surfaceStructures: BAG {0..*} OF SurfaceStructure;
+            lines: BAG {0..*} OF Line;
+
+            MANDATORY CONSTRAINT linesCoverSurface_V1_0:
+                DMAVTYM_Topologie_V1_0.covers(surfaceStructures, >>SurfaceStructure->surface, lines, UNDEFINED);
+        END BagOfSurfacesClass;
+
+        CLASS BagOfDirectSurfacesClass =
+            surfaces: BAG {0..*} OF Surface;
+            lines: BAG {0..*} OF Line;
+
+            MANDATORY CONSTRAINT linesCoverSurface_V1_0:
+                DMAVTYM_Topologie_V1_0.covers(surfaces, UNDEFINED, lines, UNDEFINED);
+        END BagOfDirectSurfacesClass;
 
         CLASS LineClass =
             line: Line;

@@ -104,35 +104,36 @@ public class DmavtymTopologie {
     }
 
     private Value evaluateCovers(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
-        // Surface arguments and multiline objects must be defined (an empty BAG OF evaluates
-        // to UNDEFINED and is skipped). The multiline attribute may be UNDEFINED, indicating
-        // that the multiline objects already are line geometries.
-        if (actualArguments[0].isUndefined() || actualArguments[1].isUndefined()
-                || actualArguments[2].isUndefined()) {
-            return Value.createSkipEvaluation();
-        }
-
-        // Check the type of the arguments
-        Collection<IomObject> surfaceObjects = actualArguments[0].getComplexObjects();
-        String surfaceAttr = actualArguments[1].getValue();
-        Collection<IomObject> multiLineObjects = actualArguments[2].getComplexObjects();
+        // Extract argument values
+        Collection<IomObject> surfaceObjects = actualArguments[0].isUndefined() ? null : actualArguments[0].getComplexObjects();
+        String surfaceAttr = actualArguments[1].isUndefined() ? null : actualArguments[1].getValue();
+        Collection<IomObject> multiLineObjects = actualArguments[2].isUndefined() ? null : actualArguments[2].getComplexObjects();
         String multiLineAttr = actualArguments[3].isUndefined() ? null : actualArguments[3].getValue();
-        if (surfaceObjects == null || surfaceObjects.size() != 1 || surfaceAttr == null
-                || multiLineObjects == null || multiLineObjects.isEmpty()) {
-            return Value.createUndefined();
+
+        // No surface: the lines cannot be covered
+        if (surfaceObjects == null || surfaceObjects.isEmpty()) {
+            return new Value(false);
         }
 
-        // Resolve attributes
-        IomObject surfaceObject = surfaceObjects.iterator().next();
-        if (surfaceObject.getattrvaluecount(surfaceAttr) != 1) {
-            return Value.createUndefined();
+        // No lines: there cannot be an unmatched line so return true
+        if (multiLineObjects == null || multiLineObjects.isEmpty()) {
+            return new Value(true);
         }
 
         // Convert the IOM objects to JTS objects
-        CurvePolygon surface;
+        Collection<CurvePolygon> surfaces = new ArrayList<CurvePolygon>();
         Collection<CompoundCurve> lines = new ArrayList<CompoundCurve>();
         try {
-            surface = getSurface(surfaceObject.getattrobj(surfaceAttr, 0), validationKind);
+            for (IomObject surfaceObject : surfaceObjects) {
+                if (surfaceAttr == null) {
+                    surfaces.addAll(getSurfaces(surfaceObject, validationKind));
+                } else {
+                    if (surfaceObject.getattrvaluecount(surfaceAttr) != 1) {
+                        return Value.createUndefined();
+                    }
+                    surfaces.addAll(getSurfaces(surfaceObject.getattrobj(surfaceAttr, 0), validationKind));
+                }
+            }
             for (IomObject multiLineObject : multiLineObjects) {
                 if (multiLineAttr == null) {
                     lines.addAll(getLines(multiLineObject));
@@ -150,15 +151,12 @@ public class DmavtymTopologie {
 
         // Add all surface segments to a hashset
         HashMap<CurveSegment, Boolean> surfaceSegments = new HashMap<CurveSegment, Boolean>();
-        for (CompoundCurve line : ((CompoundCurveRing) surface.getExteriorRing()).getLines()) {
-            for (CurveSegment segment : line.getSegments()) {
-                surfaceSegments.put(segment, false);
-            }
-        }
-        for (int i = 0; i < surface.getNumInteriorRing(); i++) {
-            for (CompoundCurve line : ((CompoundCurveRing) surface.getInteriorRingN(i)).getLines()) {
-                for (CurveSegment segment : line.getSegments()) {
-                    surfaceSegments.put(segment, false);
+        for (CurvePolygon surface : surfaces) {
+            for (CompoundCurveRing ring : getRings(surface)) {
+                for (CompoundCurve line : ring.getLines()) {
+                    for (CurveSegment segment : line.getSegments()) {
+                        surfaceSegments.put(segment, false);
+                    }
                 }
             }
         }
@@ -511,6 +509,30 @@ public class DmavtymTopologie {
         return Iox2jtsext.multisurface2JTS(multiSurface, 0.0, new OutParam<Boolean>(), logger, 0.0, validationKind);
     }
 
+    /**
+     * Converts a SURFACE or MULTISURFACE value to its polygons.
+     */
+    private Collection<CurvePolygon> getSurfaces(IomObject multiSurface, String validationKind) throws IoxException {
+        MultiPolygon multiPolygon = getMultiSurface(multiSurface, validationKind);
+        Collection<CurvePolygon> surfaces = new ArrayList<CurvePolygon>(multiPolygon.getNumGeometries());
+        for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
+            surfaces.add((CurvePolygon) multiPolygon.getGeometryN(i));
+        }
+        return surfaces;
+    }
+
+    /**
+     * Returns the outer and the inner rings of a surface.
+     */
+    private Collection<CompoundCurveRing> getRings(CurvePolygon surface) {
+        Collection<CompoundCurveRing> rings = new ArrayList<CompoundCurveRing>(surface.getNumInteriorRing() + 1);
+        rings.add((CompoundCurveRing) surface.getExteriorRing());
+        for (int i = 0; i < surface.getNumInteriorRing(); i++) {
+            rings.add((CompoundCurveRing) surface.getInteriorRingN(i));
+        }
+        return rings;
+    }
+
     private Value evaluatePointInPoints(String validationKind, String usageScope, IomObject mainObj, Value[] actualArguments) {
         Value argPointObjects = actualArguments[0];
         Value argPointAttr = actualArguments[1];
@@ -559,17 +581,8 @@ public class DmavtymTopologie {
                 } else if (objectTag.equals(Iom_jObject.MULTISURFACE)) {
                     CurvePolygon surface = getSurface(point, validationKind);
                     // Check every start and end point of the surface segments if they are contained inside the referencePointSet
-                    CompoundCurveRing exteriorRing = (CompoundCurveRing) surface.getExteriorRing();
-                    for (CompoundCurve line : exteriorRing.getLines()) {
-                        for (CurveSegment segment : line.getSegments()) {
-                            if (!referencePointSet.contains(segment.getStartPoint()) || !referencePointSet.contains(segment.getEndPoint())) {
-                                return new Value(false);
-                            }
-                        }
-                    }
-                    for (int ringIndex = 0; ringIndex < surface.getNumInteriorRing(); ringIndex++) {
-                        CompoundCurveRing interiorRing = (CompoundCurveRing) surface.getInteriorRingN(ringIndex);
-                        for (CompoundCurve line : interiorRing.getLines()) {
+                    for (CompoundCurveRing ring : getRings(surface)) {
+                        for (CompoundCurve line : ring.getLines()) {
                             for (CurveSegment segment : line.getSegments()) {
                                 if (!referencePointSet.contains(segment.getStartPoint()) || !referencePointSet.contains(segment.getEndPoint())) {
                                     return new Value(false);
