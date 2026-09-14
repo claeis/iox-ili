@@ -268,13 +268,13 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "MultiLineAttr contains unmatched line segment: (100.0 100.0, 142.0 142.0).",
-                "MultiLineAttr contains unmatched line segment: CIRCULARSTRING (100.0 100.0, 130.0 170.0, 200.0 200.0).",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_0 is not true.",
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_1 is not true.");
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
                 "MultiLineAttr contains unmatched line segment: (100.0 100.0, 142.0 142.0).",
                 "MultiLineAttr contains unmatched line segment: CIRCULARSTRING (100.0 100.0, 130.0 170.0, 200.0 200.0).",
-                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_1 is not true.");
-        assertThat(logger.getWarn(), is(empty()));
+                "MultiLineAttr contains unmatched line segment: (100.0 100.0, 142.0 142.0).",
+                "MultiLineAttr contains unmatched line segment: CIRCULARSTRING (100.0 100.0, 130.0 170.0, 200.0 200.0).");
     }
 
     @Test
@@ -288,11 +288,11 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "MultiLineAttr contains unmatched line segment: (10.0 15.0, 10.0 30.0).",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_0 is not true.",
-                "MultiLineAttr contains unmatched line segment: (10.0 15.0, 10.0 30.0).",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_1 is not true.");
-        assertThat(logger.getWarn(), is(empty()));
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (10.0 15.0, 10.0 30.0).",
+                "MultiLineAttr contains unmatched line segment: (10.0 15.0, 10.0 30.0).");
     }
 
     @Test
@@ -324,9 +324,9 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "MultiLineAttr contains unmatched line segment: (100.0 100.0, 200.0 200.0).",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfLinesClass.linesCoverSurface_V1_0 is not true.");
-        assertThat(logger.getWarn(), is(empty()));
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (100.0 100.0, 200.0 200.0).");
     }
 
     private IomObject createLineStructure(IomObject line) {
@@ -364,9 +364,9 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "MultiLineAttr contains unmatched line segment: (100.0 100.0, 200.0 200.0).",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfDirectLinesClass.linesCoverSurface_V1_0 is not true.");
-        assertThat(logger.getWarn(), is(empty()));
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (100.0 100.0, 200.0 200.0).");
     }
 
     @Test
@@ -431,9 +431,9 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "MultiLineAttr contains unmatched line segment: (30.0 30.0, 50.0 50.0).",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.MultiSurfaceClass.linesCoverSurface_V1_0 is not true.");
-        assertThat(logger.getWarn(), is(empty()));
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (30.0 30.0, 50.0 50.0).");
     }
 
     @Test
@@ -467,9 +467,9 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "MultiLineAttr contains unmatched line segment: (100.0 100.0, 200.0 200.0).",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfSurfacesClass.linesCoverSurface_V1_0 is not true.");
-        assertThat(logger.getWarn(), is(empty()));
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (100.0 100.0, 200.0 200.0).");
     }
 
     @Test
@@ -500,9 +500,9 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "MultiLineAttr contains unmatched line segment: (30.0 30.0, 50.0 50.0).",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfDirectSurfacesClass.linesCoverSurface_V1_0 is not true.");
-        assertThat(logger.getWarn(), is(empty()));
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (30.0 30.0, 50.0 50.0).");
     }
 
     @Test
@@ -559,9 +559,9 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "MultiLineAttr contains unmatched line segment: (30.0 30.0, 30.0 10.0).",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineReferenceClass.linesCoverLine_V1_0 is not true.");
-        assertThat(logger.getWarn(), is(empty()));
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (30.0 30.0, 30.0 10.0).");
     }
 
     @Test
@@ -600,9 +600,9 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "MultiLineAttr contains unmatched line segment: (10.0 30.0, 50.0 50.0).",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfLineReferencesClass.linesCoverLines_V1_0 is not true.");
-        assertThat(logger.getWarn(), is(empty()));
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (10.0 30.0, 50.0 50.0).");
     }
 
     @Test

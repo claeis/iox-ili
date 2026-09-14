@@ -178,7 +178,7 @@ public class DmavtymTopologie {
                 if (isSegmentVisited == null) {
                     // No matching segment found
                     Coordinate point = segment.getStartPoint();
-                    logger.addEvent(logger.logErrorMsg("MultiLineAttr contains unmatched line segment: {0}.", point.x, point.y, point.z, segment.toString()));
+                    logger.addEvent(logger.logWarningMsg("MultiLineAttr contains unmatched line segment: {0}.", point.x, point.y, point.z, segment.toString()));
                     result = false;
                 } else if (isSegmentVisited) {
                     // Segment already visited
