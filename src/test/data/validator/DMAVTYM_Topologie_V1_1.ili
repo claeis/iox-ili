@@ -34,7 +34,7 @@ TYPE MODEL DMAVTYM_Topologie_V1_1 (de)
    * Since 2025-05-06
    */
   FUNCTION covers(
-    SurfaceObjects: CLASS;
+    SurfaceObjects: OBJECTS OF ANYCLASS;
     SurfaceAttr: ATTRIBUTE;
     MultiLineObject: ANYSTRUCTURE;
     MultiLineAttr: ATTRIBUTE): BOOLEAN;
