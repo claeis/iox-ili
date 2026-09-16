@@ -1,6 +1,8 @@
 INTERLIS 2.4;
 
 MODEL ModelA AT "mailto:test@localhost" VERSION "2023-09-05" =
+    IMPORTS UNQUALIFIED Text_V2;
+
     TOPIC TopicA =
         CLASS ClassA =
             attr1 : MANDATORY 0..999;
@@ -8,4 +10,31 @@ MODEL ModelA AT "mailto:test@localhost" VERSION "2023-09-05" =
             UNIQUE (BASKET) UniqueConstraintBasket: attr1;
         END ClassA;
     END TopicA;
+
+    TOPIC UniqueCalculatedAttribute =
+        STRUCTURE Struct =
+            badge: TEXT;
+        END Struct;
+
+        CLASS A =
+            id: Struct;
+            text: TEXT;
+            uppercase (TRANSIENT): TEXT := toUpperCase(text);
+            renamedId: Struct := id;
+            UNIQUE CalculatedUniqueOnClass: uppercase;
+            UNIQUE UniqueIdBadgeOnClass: renamedId->badge;
+        END A;
+
+        VIEW B
+            PROJECTION OF A;
+            =
+            ATTRIBUTE
+                ALL OF A;
+                uppercaseView: TEXT := toUpperCase(text);
+                renamedIdView: Struct := id;
+            UNIQUE CalculatedUniqueOnView: uppercaseView;
+            UNIQUE UniqueIdBadgeOnView: renamedIdView->badge;
+        END B;
+    END UniqueCalculatedAttribute;
+
 END ModelA.

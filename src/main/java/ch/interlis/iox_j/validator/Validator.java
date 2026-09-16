@@ -2311,7 +2311,21 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     }
                     int attrCount = iomObj.getattrvaluecount(currentAttrName);
                     if (attrCount == 0) {
-                        return Value.createUndefined(); 
+                        // check for attribute defined by an expression
+                        Element element = td.getElement(iomObj.getobjecttag());
+                        if (element instanceof Viewable) {
+                            Value result = getCalculatedAttributeValue((Viewable<?>) element, iomObj, currentAttrName);
+                            if (k != lastPathIndex) {
+                                Collection<IomObject> objects = result.getComplexObjects();
+                                if (objects != null) {
+                                    nextCurrentObjects.addAll(objects);
+                                }
+                            } else {
+                                return result;
+                            }
+                        } else {
+                            return Value.createUndefined();
+                        }
                     } else {
                         // not the last pathEl?
                         if (k!=lastPathIndex) {
@@ -2424,6 +2438,25 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 return new Value(nextCurrentObjects);
             }
  
+        }
+        return Value.createUndefined();
+    }
+    /**
+     * Get the value of an attribute that is defined by a Factor
+     */
+    private Value getCalculatedAttributeValue(Viewable<?> viewable, IomObject currentObject, String attributeName) {
+        AttributeDef attributeDef = viewable.findAttribute(attributeName);
+        if (attributeDef instanceof LocalAttribute) {
+            LocalAttribute localAttribute = (LocalAttribute) attributeDef;
+            Evaluable[] basePaths = localAttribute.getBasePaths();
+            if (basePaths != null) {
+                for (Evaluable basePath : basePaths) {
+                    Value result = evaluateExpression(null, null, localAttribute.getScopedName(), currentObject, basePath, null);
+                    if (!result.skipEvaluation() && !result.isUndefined()) {
+                        return result;
+                    }
+                }
+            }
         }
         return Value.createUndefined();
     }
@@ -4019,8 +4052,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		    Object next = constraintIter.next();
 		    ObjectPath objectPathObj = (ObjectPath) next;
 		    PathEl[] pathElements = objectPathObj.getPathElements();
-		    
-		    Value value = getValueFromObjectPath(parentObject, currentObject, pathElements, role);
+
+            Value value;
+            // check if attribute is a calculated attribute on the container (possibly a view) of the constraint
+            Value calculatedValues = getCalculatedAttributeValue((Viewable<?>) constraint.getContainer(), currentObject, pathElements[0].getName());
+            if (!calculatedValues.skipEvaluation() && !calculatedValues.isUndefined()) {
+                if (pathElements.length > 1 && calculatedValues.getComplexObjects() != null) {
+                    value = getValueFromObjectPath(parentObject, calculatedValues.getComplexObjects().iterator().next(), Arrays.copyOfRange(pathElements, 1, pathElements.length), role);
+                } else {
+                    value = calculatedValues;
+                }
+            } else {
+                value = getValueFromObjectPath(parentObject, currentObject, pathElements, role);
+            }
+
 		    if(value.isUndefined()) {
 		        return null;
 		    }else if(value.skipEvaluation()) {

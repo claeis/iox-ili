@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ili:transfer xmlns:ili="http://www.interlis.ch/xtf/2.4/INTERLIS" 
+		xmlns:Translation24_de="http://www.interlis.ch/xtf/2.4/Translation24_de"
+		xmlns:Translation24_fr="http://www.interlis.ch/xtf/2.4/Translation24_fr"
+		>
+	<ili:headersection>
+		<ili:models>
+			<ili:model>Translation24_de</ili:model>
+			<ili:model>Translation24_fr</ili:model>
+		</ili:models>
+	</ili:headersection>
+	<ili:datasection>
+		<Translation24_de:TestA_de ili:bid="b1">
+		</Translation24_de:TestA_de>
+	</ili:datasection>
+</ili:transfer>

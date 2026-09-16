@@ -2,6 +2,14 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.24.5 (2026-09-16)
+-----------------------------
+- Xtf24Reader: local part cannot be "null" when creating a QName" (ili2fme#52)
+- ItfReader/ItfAreaLinetable2Polygon: fix failed to build polygons java.lang.IllegalStateException (ili2fme#53)
+- new function DMAVTYM_Topologie_V1_1.geometricFilter
+- resolve calculated attributes
+- Constraint function "covers" doesn't work correct with BAG OF lines (ilivalidator#465)
+
 iox-ili 1.24.4 (2025-12-29)
 -----------------------------
 - Validator: show only one "first pass" message with refdata

@@ -63,6 +63,96 @@
                     </geom:multipolyline>
                 </DMAVTYM_Topologie_Function24:lines>
             </DMAVTYM_Topologie_Function24:ClassA>
+            <DMAVTYM_Topologie_Function24:BagOfLinesClass ili:tid="b">
+                <DMAVTYM_Topologie_Function24:surface>
+                    <geom:surface>
+                        <geom:exterior>
+                            <geom:polyline>
+                                <geom:coord>
+                                    <geom:c1>10</geom:c1>
+                                    <geom:c2>10</geom:c2>
+                                </geom:coord>
+                                <geom:coord>
+                                    <geom:c1>30</geom:c1>
+                                    <geom:c2>10</geom:c2>
+                                </geom:coord>
+                                <geom:coord>
+                                    <geom:c1>30</geom:c1>
+                                    <geom:c2>30</geom:c2>
+                                </geom:coord>
+                                <geom:coord>
+                                    <geom:c1>10</geom:c1>
+                                    <geom:c2>30</geom:c2>
+                                </geom:coord>
+                                <geom:coord>
+                                    <geom:c1>10</geom:c1>
+                                    <geom:c2>10</geom:c2>
+                                </geom:coord>
+                            </geom:polyline>
+                        </geom:exterior>
+                    </geom:surface>
+                </DMAVTYM_Topologie_Function24:surface>
+                <DMAVTYM_Topologie_Function24:lineStructures>
+                    <DMAVTYM_Topologie_Function24:LineStructure>
+                        <DMAVTYM_Topologie_Function24:line>
+                            <geom:polyline>
+                                <geom:coord>
+                                    <geom:c1>10</geom:c1>
+                                    <geom:c2>30</geom:c2>
+                                </geom:coord>
+                                <geom:coord>
+                                    <geom:c1>30</geom:c1>
+                                    <geom:c2>30</geom:c2>
+                                </geom:coord>
+                            </geom:polyline>
+                        </DMAVTYM_Topologie_Function24:line>
+                    </DMAVTYM_Topologie_Function24:LineStructure>
+                    <DMAVTYM_Topologie_Function24:LineStructure>
+                        <DMAVTYM_Topologie_Function24:line>
+                            <geom:polyline>
+                                <geom:coord>
+                                    <geom:c1>30</geom:c1>
+                                    <geom:c2>30</geom:c2>
+                                </geom:coord>
+                                <geom:coord>
+                                    <geom:c1>30</geom:c1>
+                                    <geom:c2>10</geom:c2>
+                                </geom:coord>
+                            </geom:polyline>
+                        </DMAVTYM_Topologie_Function24:line>
+                    </DMAVTYM_Topologie_Function24:LineStructure>
+                </DMAVTYM_Topologie_Function24:lineStructures>
+            </DMAVTYM_Topologie_Function24:BagOfLinesClass>
+            <DMAVTYM_Topologie_Function24:BagOfLinesClass ili:tid="c">
+                <DMAVTYM_Topologie_Function24:surface>
+                    <geom:surface>
+                        <geom:exterior>
+                            <geom:polyline>
+                                <geom:coord>
+                                    <geom:c1>10</geom:c1>
+                                    <geom:c2>10</geom:c2>
+                                </geom:coord>
+                                <geom:coord>
+                                    <geom:c1>30</geom:c1>
+                                    <geom:c2>10</geom:c2>
+                                </geom:coord>
+                                <geom:coord>
+                                    <geom:c1>30</geom:c1>
+                                    <geom:c2>30</geom:c2>
+                                </geom:coord>
+                                <geom:coord>
+                                    <geom:c1>10</geom:c1>
+                                    <geom:c2>30</geom:c2>
+                                </geom:coord>
+                                <geom:coord>
+                                    <geom:c1>10</geom:c1>
+                                    <geom:c2>10</geom:c2>
+                                </geom:coord>
+                            </geom:polyline>
+                        </geom:exterior>
+                    </geom:surface>
+                </DMAVTYM_Topologie_Function24:surface>
+            </DMAVTYM_Topologie_Function24:BagOfLinesClass>
         </DMAVTYM_Topologie_Function24:Topic>
     </ili:datasection>
 </ili:transfer>

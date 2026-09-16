@@ -23,6 +23,19 @@ public class IomObjectHelper {
                 createCoord(x1, y1));
     }
 
+    /**
+     * Create a Multipolygon IomObject.
+     */
+    public static IomObject createMultiPolygon(IomObject... polygons) {
+        IomObject multisurface = new Iom_jObject("MULTISURFACE", null);
+        for (IomObject polygon : polygons) {
+            IomObject surface = polygon.getattrobj("surface", 0);
+            multisurface.addattrobj("surface", surface);
+        }
+
+        return multisurface;
+    }
+
     public static IomObject createPolygonFromBoundaries(IomObject... boundary) {
         IomObject surfaceValue = new Iom_jObject("SURFACE", null);
         for (IomObject b : boundary) {
