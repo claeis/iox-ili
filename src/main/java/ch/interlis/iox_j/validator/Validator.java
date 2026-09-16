@@ -740,6 +740,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                 iterateThroughAdditionalModels(additionalModels);
             }
             iterateThroughAllObjects();
+            // existence constraints are validated only in iterateThroughAllObjects(); release the coord values cache
+            existenceConstraintCoordValues.clear();
             validateAllAreas();
             validatePlausibilityConstraints();
         }
@@ -3261,13 +3263,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 				if(iomObj.getattrvaluecount(restrictedAttrName)==0){
 					return;
 				}
-				Type type = existenceConstraint.getRestrictedAttribute().getType();
-				// if type of alias, cast type to TypeAlias
-				if (type instanceof TypeAlias){
-					TypeAlias aliasType = (TypeAlias) type;
-					Domain domainAliasing = (Domain) aliasType.getAliasing();
-					type = (Type) domainAliasing.getType();
-				}
+				Type type = existenceConstraint.getRestrictedAttribute().getType().resolveAliases();
 				Iterator<ObjectPath> requiredInIterator = existenceConstraint.iteratorRequiredIn();
 				boolean valueExists = false;
 				Table classA = null;
@@ -3277,6 +3273,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 					ObjectPath otherAttrPath = (ObjectPath)requiredInIterator.next();
 					String otherAttrName = otherAttrPath.toString();
 					otherClass = (Table) otherAttrPath.getRoot();
+					// POLYLINE/SURFACE/AREA REQUIRED IN COORD: all control points of the geometry must exist in the coords
+					Type otherType = otherAttrPath.getType().resolveAliases();
+					if(type instanceof LineType && otherType instanceof CoordType){
+						HashSet<String> conditionCoordValues = getExistenceConstraintCoordValues(otherAttrPath, otherClass, otherAttrName);
+						IomObject geometry = iomObj.getattrobj(restrictedAttrName, 0);
+						valueExists = geometry==null || containsAllControlPoints(conditionCoordValues, geometry);
+						continue;
+					}
 					String attrValueThisObj = iomObj.getattrvalue(restrictedAttrName);
 					Iterator<String> basketIdIterator=objectPool.getDataBids().iterator();
 					while( !valueExists &&  basketIdIterator.hasNext()){
@@ -3656,6 +3660,80 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		}
 		return true;
+	}
+
+	// coord values of the condition attribute of an existence constraint of POLYLINE/SURFACE/AREA attribute against a COORD attribute
+	private final HashMap<ObjectPath, HashSet<String>> existenceConstraintCoordValues = new HashMap<ObjectPath, HashSet<String>>();
+
+	/**
+	 * Collects the values of the coord attribute otherAttrName of all objects of otherClass (and its subclasses)
+	 * as keys of getCoordKey(). The result is cached per required-in path.
+	 */
+	private HashSet<String> getExistenceConstraintCoordValues(ObjectPath otherAttrPath, Table otherClass, String otherAttrName){
+		HashSet<String> coordValues = existenceConstraintCoordValues.get(otherAttrPath);
+		if(coordValues!=null){
+			return coordValues;
+		}
+		coordValues = new HashSet<String>();
+		for(String basketId : objectPool.getDataBids()){
+			Iterator<IomObject> objectIterator = objectPool.getObjectsOfBasketId(basketId).valueIterator();
+			while(objectIterator.hasNext()){
+				IomObject otherIomObj = objectIterator.next();
+				if(otherIomObj.getattrvaluecount(otherAttrName)==0){
+					continue;
+				}
+				Object modelElement = tag2class.get(otherIomObj.getobjecttag());
+				if(!(modelElement instanceof Table) || !((Table) modelElement).isExtending(otherClass)){
+					continue;
+				}
+				IomObject coordValue = otherIomObj.getattrobj(otherAttrName, 0);
+				if(coordValue!=null){
+					String c1 = coordValue.getattrvalue(Iom_jObject.COORD_C1);
+					String c2 = coordValue.getattrvalue(Iom_jObject.COORD_C2);
+					String c3 = coordValue.getattrvalue(Iom_jObject.COORD_C3);
+					coordValues.add(getCoordKey(c1, c2, c3));
+				}
+			}
+		}
+		existenceConstraintCoordValues.put(otherAttrPath, coordValues);
+		return coordValues;
+	}
+
+	/**
+	 * Checks that all control points (the end points of all COORD and ARC elements nested anywhere in the
+	 * given geometry) are contained in coordValues. The intermediate point (A1/A2) of an ARC is not a
+	 * control point (reference manual 3.8.12.2) and is not checked.
+	 */
+	private boolean containsAllControlPoints(HashSet<String> coordValues, IomObject geometry){
+		String tag = geometry.getobjecttag();
+		if(Iom_jObject.COORD.equals(tag) || Iom_jObject.ARC.equals(tag)){
+			return coordValues.contains(getCoordKey(geometry.getattrvalue(Iom_jObject.COORD_C1), geometry.getattrvalue(Iom_jObject.COORD_C2), geometry.getattrvalue(Iom_jObject.COORD_C3)));
+		}
+		for(int i=0;i<geometry.getattrcount();i++){
+			String attrName = geometry.getattrname(i);
+			for(int j=0;j<geometry.getattrvaluecount(attrName);j++){
+				IomObject child = geometry.getattrobj(attrName, j);
+				if(child!=null && !containsAllControlPoints(coordValues, child)){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private String getCoordKey(String c1, String c2, String c3){
+		return normalizeCoordValue(c1) + "/" + normalizeCoordValue(c2) + "/" + normalizeCoordValue(c3);
+	}
+
+	private String normalizeCoordValue(String value){
+		if(value==null){
+			return "null";
+		}
+		try{
+			return new BigDecimal(value.trim()).stripTrailingZeros().toPlainString();
+		}catch(NumberFormatException e){
+			return value;
+		}
 	}
 
 	// HashMap of global unique constraints.
