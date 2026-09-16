@@ -14,6 +14,7 @@ MODEL DMAVTYM_Topologie_Function24
         Surface = SURFACE WITH (STRAIGHTS, ARCS) VERTEX Coord2 WITHOUT OVERLAPS > 0.002;
         Line = POLYLINE WITH (STRAIGHTS, ARCS) VERTEX Coord2;
         Multiline = MULTIPOLYLINE WITH (STRAIGHTS, ARCS) VERTEX Coord2;
+        MultiSurface = MULTISURFACE WITH (STRAIGHTS, ARCS) VERTEX Coord2 WITHOUT OVERLAPS > 0.002;
 
     TOPIC Topic =
         CLASS ClassA =
@@ -29,6 +30,102 @@ MODEL DMAVTYM_Topologie_Function24
         CLASS SurfaceClass =
             surface: Surface;
         END SurfaceClass;
+
+        STRUCTURE LineStructure =
+            line: Line;
+        END LineStructure;
+
+        CLASS BagOfLinesClass =
+            surface: Surface;
+            lineStructures: BAG {0..*} OF LineStructure;
+
+            MANDATORY CONSTRAINT linesCoverSurface_V1_0:
+                DMAVTYM_Topologie_V1_0.covers(THIS, >>surface, lineStructures, >>LineStructure->line);
+        END BagOfLinesClass;
+
+        CLASS BagOfDirectLinesClass =
+            surface: Surface;
+            lines: BAG {0..*} OF Line;
+
+            MANDATORY CONSTRAINT linesCoverSurface_V1_0:
+                DMAVTYM_Topologie_V1_0.covers(THIS, >>surface, lines, UNDEFINED);
+        END BagOfDirectLinesClass;
+
+        CLASS MultiSurfaceClass =
+            surface: MultiSurface;
+            lines: Multiline;
+
+            MANDATORY CONSTRAINT linesCoverSurface_V1_0:
+                DMAVTYM_Topologie_V1_0.covers(THIS, >>surface, THIS, >>lines);
+        END MultiSurfaceClass;
+
+        STRUCTURE SurfaceStructure =
+            surface: Surface;
+        END SurfaceStructure;
+
+        CLASS BagOfSurfacesClass =
+            surfaceStructures: BAG {0..*} OF SurfaceStructure;
+            lines: BAG {0..*} OF Line;
+
+            MANDATORY CONSTRAINT linesCoverSurface_V1_0:
+                DMAVTYM_Topologie_V1_0.covers(surfaceStructures, >>SurfaceStructure->surface, lines, UNDEFINED);
+        END BagOfSurfacesClass;
+
+        CLASS BagOfDirectSurfacesClass =
+            surfaces: BAG {0..*} OF Surface;
+            lines: BAG {0..*} OF Line;
+
+            MANDATORY CONSTRAINT linesCoverSurface_V1_0:
+                DMAVTYM_Topologie_V1_0.covers(surfaces, UNDEFINED, lines, UNDEFINED);
+        END BagOfDirectSurfacesClass;
+
+        CLASS LineReferenceClass =
+            referenceLine: Line;
+            lines: Multiline;
+
+            MANDATORY CONSTRAINT linesCoverLine_V1_0:
+                DMAVTYM_Topologie_V1_0.covers(THIS, >>referenceLine, THIS, >>lines);
+        END LineReferenceClass;
+
+        CLASS BagOfLineReferencesClass =
+            referenceLines: BAG {0..*} OF LineStructure;
+            lines: BAG {0..*} OF Line;
+
+            MANDATORY CONSTRAINT linesCoverLines_V1_0:
+                DMAVTYM_Topologie_V1_0.covers(referenceLines, >>LineStructure->line, lines, UNDEFINED);
+        END BagOfLineReferencesClass;
+
+        CLASS MultiSurfaceToleranceClass =
+            surface: MultiSurface;
+            lines: Multiline;
+
+            MANDATORY CONSTRAINT linesCoverSurface_V1_1:
+                DMAVTYM_Topologie_V1_1.coversWithTolerance(THIS, >>surface, THIS, >>lines, 0.002);
+        END MultiSurfaceToleranceClass;
+
+        CLASS BagOfSurfacesToleranceClass =
+            surfaceStructures: BAG {0..*} OF SurfaceStructure;
+            lines: BAG {0..*} OF Line;
+
+            MANDATORY CONSTRAINT linesCoverSurface_V1_1:
+                DMAVTYM_Topologie_V1_1.coversWithTolerance(surfaceStructures, >>SurfaceStructure->surface, lines, UNDEFINED, 0.002);
+        END BagOfSurfacesToleranceClass;
+
+        CLASS BagOfDirectSurfacesToleranceClass =
+            surfaces: BAG {0..*} OF Surface;
+            lines: BAG {0..*} OF Line;
+
+            MANDATORY CONSTRAINT linesCoverSurface_V1_1:
+                DMAVTYM_Topologie_V1_1.coversWithTolerance(surfaces, UNDEFINED, lines, UNDEFINED, 0.002);
+        END BagOfDirectSurfacesToleranceClass;
+
+        CLASS BagOfLinesToleranceClass =
+            surface: Surface;
+            lineStructures: BAG {0..*} OF LineStructure;
+
+            MANDATORY CONSTRAINT linesCoverSurface_V1_1:
+                DMAVTYM_Topologie_V1_1.coversWithTolerance(THIS, >>surface, lineStructures, >>LineStructure->line, 0.002);
+        END BagOfLinesToleranceClass;
 
         CLASS LineClass =
             line: Line;

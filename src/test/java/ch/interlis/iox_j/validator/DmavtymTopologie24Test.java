@@ -26,6 +26,19 @@ public class DmavtymTopologie24Test {
     private final static String CLASS_COMPARE_LINES = TOPIC + ".CompareLinesClass";
     private final static String CLASS_COMPARE_SURFACES = TOPIC + ".CompareSurfacesClass";
     private final static String CLASS_POINT = TOPIC + ".PointClass";
+    private final static String CLASS_BAG_OF_LINES = TOPIC + ".BagOfLinesClass";
+    private final static String STRUCT_LINE = TOPIC + ".LineStructure";
+    private final static String CLASS_BAG_OF_DIRECT_LINES = TOPIC + ".BagOfDirectLinesClass";
+    private final static String CLASS_MULTI_SURFACE = TOPIC + ".MultiSurfaceClass";
+    private final static String CLASS_BAG_OF_SURFACES = TOPIC + ".BagOfSurfacesClass";
+    private final static String STRUCT_SURFACE = TOPIC + ".SurfaceStructure";
+    private final static String CLASS_BAG_OF_DIRECT_SURFACES = TOPIC + ".BagOfDirectSurfacesClass";
+    private final static String CLASS_LINE_REFERENCE = TOPIC + ".LineReferenceClass";
+    private final static String CLASS_BAG_OF_LINE_REFERENCES = TOPIC + ".BagOfLineReferencesClass";
+    private final static String CLASS_MULTI_SURFACE_TOLERANCE = TOPIC + ".MultiSurfaceToleranceClass";
+    private final static String CLASS_BAG_OF_SURFACES_TOLERANCE = TOPIC + ".BagOfSurfacesToleranceClass";
+    private final static String CLASS_BAG_OF_LINES_TOLERANCE = TOPIC + ".BagOfLinesToleranceClass";
+    private final static String CLASS_BAG_OF_DIRECT_SURFACES_TOLERANCE = TOPIC + ".BagOfDirectSurfacesToleranceClass";
 
     private final static String TOPIC_POINT_IN_POINTS = MODEL + ".PointInPoints";
     private final static String CLASS_POINT_IN_POINTS_TEST = TOPIC_POINT_IN_POINTS + ".TestCase";
@@ -255,13 +268,13 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "MultiLineAttr contains unmatched line segment: (100.0 100.0, 142.0 142.0).",
-                "MultiLineAttr contains unmatched line segment: CIRCULARSTRING (100.0 100.0, 130.0 170.0, 200.0 200.0).",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_0 is not true.",
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_1 is not true.");
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
                 "MultiLineAttr contains unmatched line segment: (100.0 100.0, 142.0 142.0).",
                 "MultiLineAttr contains unmatched line segment: CIRCULARSTRING (100.0 100.0, 130.0 170.0, 200.0 200.0).",
-                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_1 is not true.");
-        assertThat(logger.getWarn(), is(empty()));
+                "MultiLineAttr contains unmatched line segment: (100.0 100.0, 142.0 142.0).",
+                "MultiLineAttr contains unmatched line segment: CIRCULARSTRING (100.0 100.0, 130.0 170.0, 200.0 200.0).");
     }
 
     @Test
@@ -275,11 +288,341 @@ public class DmavtymTopologie24Test {
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
-                "MultiLineAttr contains unmatched line segment: (10.0 15.0, 10.0 30.0).",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_0 is not true.",
-                "MultiLineAttr contains unmatched line segment: (10.0 15.0, 10.0 30.0).",
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.ClassA.linesCoverSurface_V1_1 is not true.");
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (10.0 15.0, 10.0 30.0).",
+                "MultiLineAttr contains unmatched line segment: (10.0 15.0, 10.0 30.0).");
+    }
+
+    @Test
+    public void coversBagOfLineStructures() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_LINES, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.addattrobj("lineStructures", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30"))));
+        iomObj.addattrobj("lineStructures", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("30", "30"),
+                IomObjectHelper.createCoord("30", "10"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
         assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversBagOfLineStructuresUnmatched() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_LINES, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.addattrobj("lineStructures", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30"))));
+        iomObj.addattrobj("lineStructures", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("100", "100"),
+                IomObjectHelper.createCoord("200", "200"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfLinesClass.linesCoverSurface_V1_0 is not true.");
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (100.0 100.0, 200.0 200.0).");
+    }
+
+    private IomObject createLineStructure(IomObject line) {
+        Iom_jObject lineStruct = new Iom_jObject(STRUCT_LINE, null);
+        lineStruct.addattrobj("line", line);
+        return lineStruct;
+    }
+
+    @Test
+    public void coversBagOfDirectLines() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_DIRECT_LINES, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30")));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("30", "30"),
+                IomObjectHelper.createCoord("30", "10")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversBagOfDirectLinesUnmatched() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_DIRECT_LINES, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30")));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("100", "100"),
+                IomObjectHelper.createCoord("200", "200")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfDirectLinesClass.linesCoverSurface_V1_0 is not true.");
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (100.0 100.0, 200.0 200.0).");
+    }
+
+    @Test
+    public void coversEmptyBagOfLineStructures() {
+        // BAG {0..*} without elements: the MultiLineObject argument is UNDEFINED, the constraint is skipped
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_LINES, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversMultiSurface() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_MULTI_SURFACE, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createMultiPolygon(
+                IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"),
+                IomObjectHelper.createRectangleGeometry("50", "50", "70", "70")));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createCoord("30", "30")),
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("50", "70"),
+                        IomObjectHelper.createCoord("70", "70"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversMultiSurfaceSecondPolygonOnly() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_MULTI_SURFACE, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createMultiPolygon(
+                IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"),
+                IomObjectHelper.createRectangleGeometry("50", "50", "70", "70")));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("50", "70"),
+                        IomObjectHelper.createCoord("70", "70"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversMultiSurfaceUnmatched() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_MULTI_SURFACE, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createMultiPolygon(
+                IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"),
+                IomObjectHelper.createRectangleGeometry("50", "50", "70", "70")));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createCoord("30", "30")),
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("30", "30"),
+                        IomObjectHelper.createCoord("50", "50"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.MultiSurfaceClass.linesCoverSurface_V1_0 is not true.");
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (30.0 30.0, 50.0 50.0).");
+    }
+
+    @Test
+    public void coversBagOfSurfaces() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_SURFACES, "o1");
+        iomObj.addattrobj("surfaceStructures", createSurfaceStructure(IomObjectHelper.createRectangleGeometry("10", "10", "30", "30")));
+        iomObj.addattrobj("surfaceStructures", createSurfaceStructure(IomObjectHelper.createRectangleGeometry("50", "50", "70", "70")));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30")));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("50", "70"),
+                IomObjectHelper.createCoord("70", "70")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversBagOfSurfacesUnmatched() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_SURFACES, "o1");
+        iomObj.addattrobj("surfaceStructures", createSurfaceStructure(IomObjectHelper.createRectangleGeometry("10", "10", "30", "30")));
+        iomObj.addattrobj("surfaceStructures", createSurfaceStructure(IomObjectHelper.createRectangleGeometry("50", "50", "70", "70")));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("50", "70"),
+                IomObjectHelper.createCoord("70", "70")));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("100", "100"),
+                IomObjectHelper.createCoord("200", "200")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfSurfacesClass.linesCoverSurface_V1_0 is not true.");
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (100.0 100.0, 200.0 200.0).");
+    }
+
+    @Test
+    public void coversBagOfDirectSurfaces() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_DIRECT_SURFACES, "o1");
+        iomObj.addattrobj("surfaces", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.addattrobj("surfaces", IomObjectHelper.createRectangleGeometry("50", "50", "70", "70"));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30")));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("50", "70"),
+                IomObjectHelper.createCoord("70", "70")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversBagOfDirectSurfacesUnmatched() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_DIRECT_SURFACES, "o1");
+        iomObj.addattrobj("surfaces", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.addattrobj("surfaces", IomObjectHelper.createRectangleGeometry("50", "50", "70", "70"));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("30", "30"),
+                IomObjectHelper.createCoord("50", "50")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfDirectSurfacesClass.linesCoverSurface_V1_0 is not true.");
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (30.0 30.0, 50.0 50.0).");
+    }
+
+    @Test
+    public void coversLineReference() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_LINE_REFERENCE, "o1");
+        iomObj.addattrobj("referenceLine", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30"),
+                IomObjectHelper.createCoord("30", "10")));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("10", "30")),
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("30", "10"),
+                        IomObjectHelper.createCoord("30", "30"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversLineReferenceArc() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_LINE_REFERENCE, "o1");
+        iomObj.addattrobj("referenceLine", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("30", "10"),
+                IomObjectHelper.createArc("23", "19", "10", "30")));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createArc("19", "23", "30", "10"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversLineReferenceUnmatched() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_LINE_REFERENCE, "o1");
+        iomObj.addattrobj("referenceLine", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30")));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createCoord("30", "30"),
+                        IomObjectHelper.createCoord("30", "10"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineReferenceClass.linesCoverLine_V1_0 is not true.");
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (30.0 30.0, 30.0 10.0).");
+    }
+
+    @Test
+    public void coversBagOfLineReferences() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_LINE_REFERENCES, "o1");
+        iomObj.addattrobj("referenceLines", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("10", "30"))));
+        iomObj.addattrobj("referenceLines", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("50", "50"),
+                IomObjectHelper.createCoord("70", "50"))));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("10", "10")));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("50", "50"),
+                IomObjectHelper.createCoord("70", "50")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversBagOfLineReferencesUnmatched() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_LINE_REFERENCES, "o1");
+        iomObj.addattrobj("referenceLines", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "10"),
+                IomObjectHelper.createCoord("10", "30"))));
+        iomObj.addattrobj("referenceLines", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("50", "50"),
+                IomObjectHelper.createCoord("70", "50"))));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("50", "50")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfLineReferencesClass.linesCoverLines_V1_0 is not true.");
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (10.0 30.0, 50.0 50.0).");
+    }
+
+    @Test
+    public void coversEmptyBagOfSurfaces() {
+        // BAG {0..*} without elements: there is no surface that could cover the lines
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_SURFACES, "o1");
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfSurfacesClass.linesCoverSurface_V1_0 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    private IomObject createSurfaceStructure(IomObject surface) {
+        Iom_jObject surfaceStruct = new Iom_jObject(STRUCT_SURFACE, null);
+        surfaceStruct.addattrobj("surface", surface);
+        return surfaceStruct;
     }
 
     @Test
@@ -422,6 +765,183 @@ public class DmavtymTopologie24Test {
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, surface, line);
         LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
                 "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.LineClass.lineCoversSurface_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceMultiSurface() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_MULTI_SURFACE_TOLERANCE, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createMultiPolygon(
+                IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"),
+                IomObjectHelper.createRectangleGeometry("50", "50", "70", "70")));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("50.001", "70"),
+                        IomObjectHelper.createCoord("70", "69.999"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceMultiSurfaceUnmatched() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_MULTI_SURFACE_TOLERANCE, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createMultiPolygon(
+                IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"),
+                IomObjectHelper.createRectangleGeometry("50", "50", "70", "70")));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("30", "30"),
+                        IomObjectHelper.createCoord("50", "50"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.MultiSurfaceToleranceClass.linesCoverSurface_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceBagOfSurfaces() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_SURFACES_TOLERANCE, "o1");
+        iomObj.addattrobj("surfaceStructures", createSurfaceStructure(IomObjectHelper.createRectangleGeometry("10", "10", "30", "30")));
+        iomObj.addattrobj("surfaceStructures", createSurfaceStructure(IomObjectHelper.createRectangleGeometry("50", "50", "70", "70")));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30.001"),
+                IomObjectHelper.createCoord("30", "30")));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("50", "70"),
+                IomObjectHelper.createCoord("69.999", "70")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceBagOfSurfacesUnmatched() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_SURFACES_TOLERANCE, "o1");
+        iomObj.addattrobj("surfaceStructures", createSurfaceStructure(IomObjectHelper.createRectangleGeometry("10", "10", "30", "30")));
+        iomObj.addattrobj("surfaceStructures", createSurfaceStructure(IomObjectHelper.createRectangleGeometry("50", "50", "70", "70")));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("50", "70"),
+                IomObjectHelper.createCoord("70", "70")));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("100", "100"),
+                IomObjectHelper.createCoord("200", "200")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfSurfacesToleranceClass.linesCoverSurface_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceBagOfDirectSurfaces() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_DIRECT_SURFACES_TOLERANCE, "o1");
+        iomObj.addattrobj("surfaces", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.addattrobj("surfaces", IomObjectHelper.createRectangleGeometry("50", "50", "70", "70"));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30.001"),
+                IomObjectHelper.createCoord("30", "30")));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("50", "70"),
+                IomObjectHelper.createCoord("69.999", "70")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceBagOfDirectSurfacesUnmatched() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_DIRECT_SURFACES_TOLERANCE, "o1");
+        iomObj.addattrobj("surfaces", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.addattrobj("surfaces", IomObjectHelper.createRectangleGeometry("50", "50", "70", "70"));
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("30", "30"),
+                IomObjectHelper.createCoord("50", "50")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfDirectSurfacesToleranceClass.linesCoverSurface_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceEmptyBagOfSurfaces() {
+        // BAG {0..*} without elements: there is no surface that could cover the lines
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_SURFACES_TOLERANCE, "o1");
+        iomObj.addattrobj("lines", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30")));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfSurfacesToleranceClass.linesCoverSurface_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceBagOfLineStructures() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_LINES_TOLERANCE, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.addattrobj("lineStructures", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30.001"),
+                IomObjectHelper.createCoord("30", "30"))));
+        iomObj.addattrobj("lineStructures", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("30", "30"),
+                IomObjectHelper.createCoord("29.999", "10"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceBagOfLineStructuresOnDifferentRings() {
+        // every line structure is checked on its own: one lies on the outer, one on the inner ring
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_LINES_TOLERANCE, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createRectangleBoundary("10", "10", "30", "30"),
+                IomObjectHelper.createRectangleBoundary("15", "15", "20", "20")));
+        iomObj.addattrobj("lineStructures", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30"))));
+        iomObj.addattrobj("lineStructures", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("15", "15"),
+                IomObjectHelper.createCoord("15", "20"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceBagOfLineStructuresUnmatched() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_LINES_TOLERANCE, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.addattrobj("lineStructures", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("10", "30"),
+                IomObjectHelper.createCoord("30", "30"))));
+        iomObj.addattrobj("lineStructures", createLineStructure(IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("100", "100"),
+                IomObjectHelper.createCoord("200", "200"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.BagOfLinesToleranceClass.linesCoverSurface_V1_1 is not true.");
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversWithToleranceEmptyBagOfLineStructures() {
+        // BAG {0..*} without elements: the MultiLineObject argument is UNDEFINED, the constraint is skipped
+        Iom_jObject iomObj = new Iom_jObject(CLASS_BAG_OF_LINES_TOLERANCE, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
         assertThat(logger.getWarn(), is(empty()));
     }
 
