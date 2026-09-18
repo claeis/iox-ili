@@ -1,0 +1,57 @@
+INTERLIS 2.3;
+
+!! Test models: existence constraint on a class of another model,
+!! while the transfer data contains association (link) objects of non-embedded associations.
+
+MODEL ExistenceConstraints23AssocRef
+  AT "mailto:noreply@localhost" VERSION "2026-01-01" =
+
+  TOPIC Topic =
+
+    CLASS Kanton =
+      Name : MANDATORY TEXT*50;
+    END Kanton;
+
+    CLASS Gemeinde =
+      Name : MANDATORY TEXT*50;
+      Nummer : MANDATORY 0 .. 19999;
+    END Gemeinde;
+
+    !! not embedded -> link objects are transferred as own objects
+    ASSOCIATION Kanton__Gemeinde =
+      Kanton_R -- {0..*} Kanton;
+      Gemeinde_R -- {0..*} Gemeinde;
+    END Kanton__Gemeinde;
+
+  END Topic;
+
+END ExistenceConstraints23AssocRef.
+
+MODEL ExistenceConstraints23Assoc
+  AT "mailto:noreply@localhost" VERSION "2026-01-01" =
+  IMPORTS ExistenceConstraints23AssocRef;
+
+  TOPIC Topic =
+    DEPENDS ON ExistenceConstraints23AssocRef.Topic;
+
+    CLASS Gemeinde =
+      Name : MANDATORY TEXT*50;
+      Nummer : MANDATORY 0 .. 19999;
+      EXISTENCE CONSTRAINT Nummer REQUIRED IN ExistenceConstraints23AssocRef.Topic.Gemeinde:Nummer;
+    END Gemeinde;
+
+    CLASS Kandidat =
+      Nummer : MANDATORY 0 .. 99999;
+      Name : MANDATORY TEXT*50;
+    END Kandidat;
+
+    !! not embedded (attribute and cardinalities) -> link objects are transferred as own objects
+    ASSOCIATION Gemeinde__Kandidatenstimmen =
+      Gemeinde_R -- {1..*} Gemeinde;
+      Kandidat_R -- {0..*} Kandidat;
+      Stimmen : MANDATORY 0 .. 1000000;
+    END Gemeinde__Kandidatenstimmen;
+
+  END Topic;
+
+END ExistenceConstraints23Assoc.
