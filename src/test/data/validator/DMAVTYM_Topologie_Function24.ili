@@ -4,6 +4,7 @@ MODEL DMAVTYM_Topologie_Function24
     AT "mailto:noreply@localhost" VERSION "2024-06-17" =
     IMPORTS DMAVTYM_Topologie_V1_1;
     IMPORTS DMAVTYM_Topologie_V1_0;
+    IMPORTS KGKCGC_DMAVTYM_Topologie_V1_1;
     IMPORTS ObjectPool_V1_0;
     IMPORTS Elements_V1_0;
 
@@ -26,6 +27,14 @@ MODEL DMAVTYM_Topologie_Function24
             MANDATORY CONSTRAINT linesCoverSurface_V1_1:
                 DMAVTYM_Topologie_V1_1.covers(THIS, >>surface, THIS, >>lines);
         END ClassA;
+
+        CLASS KgkcgcClassA =
+            surface: Surface;
+            lines: Multiline;
+
+            MANDATORY CONSTRAINT linesCoverSurface_KGKCGC_V1_1:
+                KGKCGC_DMAVTYM_Topologie_V1_1.covers(THIS, >>surface, THIS, >>lines);
+        END KgkcgcClassA;
 
         CLASS SurfaceClass =
             surface: Surface;

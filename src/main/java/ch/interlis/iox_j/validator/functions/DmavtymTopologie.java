@@ -48,6 +48,7 @@ import java.util.Set;
 public class DmavtymTopologie {
     public static final String DMAVTYM_Topologie_V1_0 = "DMAVTYM_Topologie_V1_0";
     public static final String DMAVTYM_Topologie_V1_1 = "DMAVTYM_Topologie_V1_1";
+    public static final String KGKCGC_DMAVTYM_Topologie_V1_1 = "KGKCGC_DMAVTYM_Topologie_V1_1";
 
     private interface GeometryEqualityFunction {
         boolean areEqual(Geometry geom1, Geometry geom2, double tolerance);
