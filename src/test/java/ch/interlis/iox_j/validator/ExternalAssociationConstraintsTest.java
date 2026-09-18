@@ -37,8 +37,8 @@ public class ExternalAssociationConstraintsTest {
         LogCollector logger = validate(false, item);
 
         assertEquals(0, logger.getErrs().size());
-        LogCollectorAssertions.AssertContainsInfo("ExternalAssociationConstraints.T.Item.OwnerAgeDefined not evaluated, target object of external role ExternalAssociationConstraints.T.Ownership.OwnerRef is not accessible", 1, logger);
-        LogCollectorAssertions.AssertContainsInfo("ExternalAssociationConstraints.T.Item.OwnerAdult not evaluated, target object of external role ExternalAssociationConstraints.T.Ownership.OwnerRef is not accessible", 1, logger);
+        LogCollectorAssertions.AssertContainsInfo("ExternalAssociationConstraints.T.Item.OwnerAgeDefined not evaluated, target object of external role ExternalAssociationConstraints.T.Ownership.OwnerRef is not accessible.", 1, logger);
+        LogCollectorAssertions.AssertContainsInfo("ExternalAssociationConstraints.T.Item.OwnerAdult not evaluated, target object of external role ExternalAssociationConstraints.T.Ownership.OwnerRef is not accessible.", 1, logger);
     }
 
     @Test
@@ -50,8 +50,8 @@ public class ExternalAssociationConstraintsTest {
         LogCollector logger = validate(false, item1, item2, item3);
 
         assertEquals(0, logger.getErrs().size());
-        LogCollectorAssertions.AssertContainsInfo("ExternalAssociationConstraints.T.Item.OwnerAgeDefined not evaluated, target object of external role ExternalAssociationConstraints.T.Ownership.OwnerRef is not accessible", 1, logger);
-        LogCollectorAssertions.AssertContainsInfo("ExternalAssociationConstraints.T.Item.OwnerAdult not evaluated, target object of external role ExternalAssociationConstraints.T.Ownership.OwnerRef is not accessible", 1, logger);
+        LogCollectorAssertions.AssertContainsInfo("ExternalAssociationConstraints.T.Item.OwnerAgeDefined not evaluated, target object of external role ExternalAssociationConstraints.T.Ownership.OwnerRef is not accessible.", 1, logger);
+        LogCollectorAssertions.AssertContainsInfo("ExternalAssociationConstraints.T.Item.OwnerAdult not evaluated, target object of external role ExternalAssociationConstraints.T.Ownership.OwnerRef is not accessible.", 1, logger);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class ExternalAssociationConstraintsTest {
         LogCollector logger = validate(false, contract);
 
         assertEquals(0, logger.getErrs().size());
-        LogCollectorAssertions.AssertContainsInfo("ExternalAssociationConstraints.T.ContractOwnership.ContractOwnerAgeDefined not evaluated, target object of external role ExternalAssociationConstraints.T.ContractOwnership.ContractOwnerRef is not accessible", 1, logger);
+        LogCollectorAssertions.AssertContainsInfo("ExternalAssociationConstraints.T.ContractOwnership.ContractOwnerAgeDefined not evaluated, target object of external role ExternalAssociationConstraints.T.ContractOwnership.ContractOwnerRef is not accessible.", 1, logger);
     }
 
     @Test
