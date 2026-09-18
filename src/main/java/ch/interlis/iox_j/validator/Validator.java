@@ -201,6 +201,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String currentMainOid=null;
 	private boolean autoSecondPass=true;
 	private boolean allObjectsAccessible=false;
+	// EXTERNAL role whose target object is not accessible; set by getValueFromObjectPath()
+	// when it skips the evaluation for that reason, reported by logInaccessibleExternalRole()
+	private RoleDef inaccessibleExternalRole=null;
 	private boolean isVerbose = false;
 	private Map<AttributeDef,ItfAreaPolygon2Linetable> areaAttrs=new HashMap<AttributeDef,ItfAreaPolygon2Linetable>();
 	private Map<AttributeDef, Boolean> areaAttrsAreSurfaceTopologiesValid = new HashMap<AttributeDef, Boolean>();
@@ -2126,7 +2129,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			ObjectPath objectPathObj = (ObjectPath) expression;
 			PathEl[] pathElements = objectPathObj.getPathElements();
 
-			return getValueFromObjectPath(parentObject, iomObj, pathElements, firstRole);
+			Value value = getValueFromObjectPath(parentObject, iomObj, pathElements, firstRole);
+			if (value.skipEvaluation()) {
+				logInaccessibleExternalRole(usageScope);
+			}
+			return value;
 		} else if(expression instanceof Objects) {
 			// objects
             if(allObjIterator==null){
@@ -2176,6 +2183,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	}
 	
     public Value getValueFromObjectPath(IomObject parentObject,IomObject iomObjStart, PathEl[] pathElements, RoleDef firstRole) {
+        inaccessibleExternalRole=null;
         if(iomObjStart==null) {
             return Value.createSkipEvaluation();
         }
@@ -2216,6 +2224,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             }else {
                                 if(role==firstRole) {
                                     IomObject targetObj = getReferencedObject(role, iomObj.getobjectrefoid());
+                                    if (targetObj == null && role.isExternal() && !allObjectsAccessible) {
+                                        // target object is not part of the validated data
+                                        inaccessibleExternalRole = role;
+                                        return Value.createSkipEvaluation();
+                                    }
                                     nextCurrentObjects.add(targetObj);
                                 }else {
                                     nextCurrentObjects.add(parentObject);
@@ -2266,10 +2279,16 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                             IomObject targetObj = getReferencedObject(role, targetOid);
                             if (targetObj != null) {
                                 nextCurrentObjects.add(targetObj);
-                            } else if (role.isExternal() && allObjectsAccessible && roleDefValue != null && k == lastPathIndex) {
-                                // if the target object is external and not available in the pool, keep the reference so
-                                // uniqueness checks and similar evaluations can still work with the OID.
-                                nextCurrentObjects.add(roleDefValue);
+                            } else if (role.isExternal() && roleDefValue != null) {
+                                if (!allObjectsAccessible) {
+                                    // target object is not part of the validated data; the path cannot be evaluated
+                                    inaccessibleExternalRole = role;
+                                    return Value.createSkipEvaluation();
+                                } else if (k == lastPathIndex) {
+                                    // the target object is external and not available in the pool; keep the reference
+                                    // so uniqueness checks and similar evaluations can still work with the OID.
+                                    nextCurrentObjects.add(roleDefValue);
+                                }
                             }
                         }
                     }
@@ -2443,6 +2462,23 @@ public class Validator implements ch.interlis.iox.IoxValidator {
  
         }
         return Value.createUndefined();
+    }
+    /**
+     * Reports once per usage scope and role that the last object path evaluation was skipped
+     * because the target object of an EXTERNAL role is not accessible.
+     * @param usageScope scoped name of the constraint the object path was evaluated for
+     */
+    private void logInaccessibleExternalRole(String usageScope) {
+        if (inaccessibleExternalRole == null) {
+            return;
+        }
+        String roleName = getScopedName(inaccessibleExternalRole);
+        inaccessibleExternalRole = null;
+        String key = "inaccessibleExternalRole:" + usageScope + ":" + roleName;
+        if (!constraintOutputReduction.contains(key)) {
+            constraintOutputReduction.add(key);
+            errs.addEvent(errFact.logInfoMsg(rsrc.getString("getValueFromObjectPath.externalObjectNotAccessible"), usageScope, roleName));
+        }
     }
     /**
      * Get the value of an attribute that is defined by a Factor
@@ -4144,10 +4180,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             } else {
                 value = getValueFromObjectPath(parentObject, currentObject, pathElements, role);
             }
+            logInaccessibleExternalRole(getScopedName(constraint));
 
-		    if(value.isUndefined()) {
+		    // isUndefined() must not be called on a skipEvaluation value
+		    if(value.skipEvaluation()) {
 		        return null;
-		    }else if(value.skipEvaluation()) {
+		    }else if(value.isUndefined()) {
 		        return null;
 		    }else if(value.getValue() != null) {
 			    values.add(value.getValue());
