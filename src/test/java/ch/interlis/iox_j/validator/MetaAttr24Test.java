@@ -57,7 +57,7 @@ public class MetaAttr24Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-        assertEquals("Bei Bedarf zwingend", logger.getWarn().get(0).getEventMsg());
+        assertEquals("Bei Bedarf zwingend MetaAttr24.TopicA.ClassA.Constraint1", logger.getWarn().get(0).getEventMsg());
 	}
 	
 }

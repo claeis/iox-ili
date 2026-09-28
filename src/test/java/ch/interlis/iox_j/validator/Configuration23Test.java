@@ -156,7 +156,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("My own error message.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("My own error message. Configuration23.Topic.ClassA.Constraint1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird, wenn die beiden constraint Attribute nicht uebereinstimmen, check=OFF und msg=NotEmpty.
@@ -232,7 +232,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("My own error message.", logger.getWarn().get(0).getEventMsg());
+		assertEquals("My own error message. Configuration23.Topic.ClassA.Constraint1", logger.getWarn().get(0).getEventMsg());
 	}
 
 	// Es soll getestet werden, ob die eigens definierte Fehlermeldung ausgegeben wird
@@ -484,7 +484,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This is my own error message!", logger.getErrs().get(0).getEventMsg());
+		assertEquals("This is my own error message! Configuration23.Topic.ClassE.Constraint1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet, ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn ValidationConfig.MSG leer ist.
@@ -601,7 +601,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This is my own error message!", logger.getErrs().get(0).getEventMsg());
+		assertEquals("This is my own error message! Configuration23.Topic.ClassF.Constraint1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet, ob eine Fehlermeldung ausgegeben wird, wenn der prozentual richtige Anteil bei 0% liegt und >= 50% erreicht werden muss, check=off, msg=notEmpty.
@@ -687,7 +687,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("My own Set Constraint.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("My own Set Constraint. Configuration23.Topic.ClassG.Constraint1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet die eigens erstellte Fehlermeldung ausgegeben wird, wenn der Pre-Constraint true ist und die Funktion: ObjectCount(ALL) false ist und die Config msg definiert, jedoch leer ist.
@@ -732,7 +732,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("My own Set Constraint.", logger.getWarn().get(0).getEventMsg());
+		assertEquals("My own Set Constraint. Configuration23.Topic.ClassG.Constraint1", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet die eigens erstellte Fehlermeldung ausgegeben wird,
@@ -847,7 +847,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("My own Set Constraint.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("My own Set Constraint. Configuration23.Topic.ClassH.Constraint1", logger.getErrs().get(0).getEventMsg());
 	}
 	
     @Test
@@ -967,7 +967,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("My own Set Constraint.", logger.getWarn().get(0).getEventMsg());
+		assertEquals("My own Set Constraint. Configuration23.Topic.ClassH.Constraint1", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigens erstellte Fehlermeldung ausgegeben wird,
@@ -1155,7 +1155,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This is my own error message!", logger.getErrs().get(0).getEventMsg());
+		assertEquals("This is my own error message! AddManConModel.AddManConTopic.AddManConView.Constraint1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob ein Fehler ausgegeben wird, wenn in einer VIEW ausserhalb des Models
@@ -1241,7 +1241,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This is my ErrorMessage.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("This is my ErrorMessage. AddSetConModel.AddSetConTopic.AddSetConView.Constraint1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg nicht leer ist.
@@ -1267,7 +1267,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This is my own Existence Constraint Error Message.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("This is my own Existence Constraint Error Message. AddExConModel.AddExConTopic.AddExConView.Constraint1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann und validationConfig msg definiert, jedoch leer ist.
@@ -1320,7 +1320,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("My Error Message.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("My Error Message. AddUnConModel.AddUnConTopic.AddUnConView.Constraint1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird,
@@ -1379,7 +1379,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("My Error Message.", logger.getWarn().get(0).getEventMsg());
+		assertEquals("My Error Message. AddUnConModel.AddUnConTopic.AddUnConView.Constraint1", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird, wenn die Value des Subattrs nicht in der View gefunden werden kann, msg=NotEmpty, check=off.
@@ -1455,7 +1455,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("This Function Error is written by my own.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("This Function Error is written by my own. Configuration23.Topic.ClassN.Constraint1", logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird,
@@ -1510,7 +1510,7 @@ public class Configuration23Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("This Function Error is written by my own.", logger.getWarn().get(0).getEventMsg());
+		assertEquals("This Function Error is written by my own. Configuration23.Topic.ClassN.Constraint1", logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob die eigen erstellte Fehlermeldung ausgegeben wird

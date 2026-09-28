@@ -233,7 +233,7 @@ public class Configuration10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getErrs().size()==1);
-		assertEquals("My own Set Constraint.",logger.getErrs().get(0).getEventMsg());
+		assertEquals("My own Set Constraint. Configuration10.Topic.ClassF.Constraint1",logger.getErrs().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob der eigens erstellte Fehler ausgegeben wird, wenn beide Values von einem Unique Attribute identisch sind und validationConfig msg leer ist.
@@ -343,7 +343,7 @@ public class Configuration10Test {
 		validator.validate(new EndTransferEvent());
 		// Asserts.
 		assertTrue(logger.getWarn().size()==1);
-		assertEquals("My own Set Constraint.",logger.getWarn().get(0).getEventMsg());
+		assertEquals("My own Set Constraint. Configuration10.Topic.ClassF.Constraint1",logger.getWarn().get(0).getEventMsg());
 	}
 	
 	// Es wird getestet ob der eigens erstellte Fehler ausgegeben wird
