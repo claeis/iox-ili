@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import ch.interlis.ili2c.generator.Interlis2Generator;
@@ -2683,8 +2684,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         }
 
         List<IomObject> listOfPolygons = new ArrayList<IomObject>();
+        Set<String> surfaceHolderTags = new HashSet<String>();
         for (IomObject obj : inputObjects) {
-            getStructElesFromAttrPath(fullPath, obj.getobjectoid(), listOfPolygons, obj, 0);
+            getStructElesFromAttrPath(fullPath, obj.getobjectoid(), listOfPolygons, obj, 0, surfaceHolderTags);
         }
 
         String mainObjTag = mainIomObj.getobjecttag();
@@ -2701,7 +2703,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             }
         }
 
-        List<IoxInvalidDataException> intersections = polygonPool.validate1(0.0);
+        double maxOverlap = 0.0;
+        if (fullPath != null && fullPath.length > 0) { // null if the path could not be parsed
+            maxOverlap = getAreAreasMaxOverlap(fullPath[fullPath.length - 1].getName(), surfaceHolderTags);
+        }
+        List<IoxInvalidDataException> intersections = polygonPool.validate1(maxOverlap);
         if (intersections != null && !intersections.isEmpty()) {
             if (!disableAreAreasMessages) {
                 for (IoxInvalidDataException ex : intersections) {
@@ -2727,6 +2733,39 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
         return new Value(true);
     }
+
+    /**
+     * Returns the most lenient overlap tolerance (WITHOUT OVERLAPS) of the surface attribute among the classes
+     * that hold the surfaces of the pool. An unknown class or attribute contributes no tolerance.
+     *
+     * @param surfaceAttrName name of the surface attribute
+     * @param surfaceHolderTags tags of the objects or structure elements that hold the surfaces of the pool
+     */
+    private double getAreAreasMaxOverlap(String surfaceAttrName, Set<String> surfaceHolderTags) {
+        double maxOverlap = 0.0;
+        for (String tag : surfaceHolderTags) {
+            Object holderClass = tag2class.get(tag);
+            if (holderClass instanceof Viewable) {
+                AttributeDef attr = ((Viewable) holderClass).findAttribute(surfaceAttrName);
+                maxOverlap = java.lang.Math.max(maxOverlap, getMaxOverlap(attr));
+            }
+        }
+        return maxOverlap;
+    }
+
+    private static double getMaxOverlap(AttributeDef attr) {
+        if (attr != null) {
+            Type type = attr.getDomainResolvingAliases();
+            if (type instanceof AbstractSurfaceOrAreaType) {
+                PrecisionDecimal maxOverlap = ((AbstractSurfaceOrAreaType) type).getMaxOverlap();
+                if (maxOverlap != null) {
+                    return maxOverlap.doubleValue();
+                }
+            }
+        }
+        return 0.0;
+    }
+
     public Value evaluateAreArea0(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction, String validationKind) {
         String mainObjTag=mainIomObj.getobjecttag();
         if(pathToStructEle == null){
@@ -2846,6 +2885,13 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     }
 
     private void getStructElesFromAttrPath(PathEl[] attrPath, String oidPrefix,Collection<IomObject> listOfFoundStructEles, IomObject iomObj, int currentPathElIdx) {
+        getStructElesFromAttrPath(attrPath, oidPrefix, listOfFoundStructEles, iomObj, currentPathElIdx, null);
+    }
+
+    /**
+     * @param holderTags if not null, receives the tags of the objects or structure elements that hold the found values
+     */
+    private void getStructElesFromAttrPath(PathEl[] attrPath, String oidPrefix,Collection<IomObject> listOfFoundStructEles, IomObject iomObj, int currentPathElIdx, Set<String> holderTags) {
         if (attrPath != null && currentPathElIdx < attrPath.length) {
             if(oidPrefix==null) {
                 oidPrefix="";
@@ -2864,8 +2910,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     // surface attr found, add polylines to polygonPool.
                     structEle.setobjectoid(oid);
                     listOfFoundStructEles.add(structEle);
+                    if (holderTags != null) {
+                        holderTags.add(iomObj.getobjecttag());
+                    }
                 } else {
-                    getStructElesFromAttrPath(attrPath, oid,listOfFoundStructEles, structEle, currentPathElIdx+1);
+                    getStructElesFromAttrPath(attrPath, oid,listOfFoundStructEles, structEle, currentPathElIdx+1, holderTags);
                 }
             }
         }
