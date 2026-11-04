@@ -3,11 +3,12 @@ CONTRACTED MODEL AreAreas23
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2016-11-09" =
   	IMPORTS INTERLIS_ext;
   	
+	DOMAIN
+		Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+					   70000.000 .. 310000.000 [INTERLIS.m],
+					ROTATION 2 -> 1;
+
 	TOPIC Topic=
-		DOMAIN
-			Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
-						   70000.000 .. 310000.000 [INTERLIS.m],
-						ROTATION 2 -> 1;
 
 		STRUCTURE StructA =
 			flaeche : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
@@ -50,5 +51,44 @@ CONTRACTED MODEL AreAreas23
 		END ClassF;
 		
 	END Topic;
+	
+	!! overlap tolerance of areAreas() (ilivalidator#468): each surface checked by areAreas() takes the
+	!! WITHOUT OVERLAPS tolerance from the class of its object or structure element; areAreas() uses the
+	!! largest of these tolerances for all surfaces it checks
+	TOPIC OverlapTolerance =
+
+		CLASS Base =
+			Geom : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.05;
+			!!@ name = GeomAreAreas
+			SET CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >> Geom);
+			!!@ name = GeomAreAreas3
+			SET CONSTRAINT INTERLIS_ext.areAreas3(ALL, UNDEFINED, "Geom");
+		END Base;
+
+		CLASS Strict EXTENDS Base =
+			Geom (EXTENDED) : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END Strict;
+
+		STRUCTURE Part =
+			Geom : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.05;
+		END Part;
+
+		STRUCTURE StrictPart EXTENDS Part =
+			Geom (EXTENDED) : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+		END StrictPart;
+
+		CLASS Holder =
+			Parts : BAG OF Part;
+			!!@ name = PartsGeomAreAreas
+			SET CONSTRAINT INTERLIS.areAreas(ALL, >> Parts, >> Part->Geom);
+		END Holder;
+
+		CLASS UnparsableTextPath =
+			Geom : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.05;
+			!!@ name = GeomAreAreas3
+			SET CONSTRAINT INTERLIS_ext.areAreas3(ALL, UNDEFINED, "Geom->");
+		END UnparsableTextPath;
+
+	END OverlapTolerance;
 	
 END AreAreas23.
