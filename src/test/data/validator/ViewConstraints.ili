@@ -116,3 +116,43 @@ MODEL ViewConstraintsExtending AT "http://www.interlis.ch/ili2c/tests/" VERSION 
         END ViewExtending;
     END ExtendingTopicA;
 END ViewConstraintsExtending.
+
+MODEL ViewConstraintsViewAttributes AT "http://www.interlis.ch/ili2c/tests/" VERSION "1" =
+    TOPIC TopicA =
+        CLASS ClassAttribute =
+            Name : TEXT*100;
+        END ClassAttribute;
+
+        VIEW ViewAttribute
+            PROJECTION OF ClassAttribute;
+            =
+            ALL OF ClassAttribute;
+
+            NameLength: 0..100 := INTERLIS.len(ClassAttribute->Name);
+
+            MANDATORY CONSTRAINT NameLengthAttribute : NameLength >= 4;
+        END ViewAttribute;
+
+        CLASS ClassTarget =
+            Name : TEXT*100;
+        END ClassTarget;
+
+        CLASS ClassSource =
+        END ClassSource;
+
+        ASSOCIATION SourceTarget =
+            Source -- {0..*} ClassSource;
+            Target -- {0..1} ClassTarget;
+        END SourceTarget;
+
+        VIEW ViewReference
+            PROJECTION OF RenamedSource ~ ClassSource;
+            =
+            ALL OF RenamedSource;
+
+            RenamedTarget: REFERENCE TO ClassTarget := RenamedSource->Target;
+
+            MANDATORY CONSTRAINT TargetNameLength : INTERLIS.len(RenamedTarget->Name) >= 4;
+        END ViewReference;
+    END TopicA;
+END ViewConstraintsViewAttributes.

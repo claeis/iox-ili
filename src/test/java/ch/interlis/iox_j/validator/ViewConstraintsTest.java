@@ -22,6 +22,11 @@ public class ViewConstraintsTest {
     private static final String CLASS_SET = SET_TOPIC + ".ClassSet";
     private static final String EXTENDING_TOPIC = "ViewConstraintsExtending.ExtendingTopicA";
     private static final String CLASS_EXTENDING = EXTENDING_TOPIC + ".ClassExtending";
+    private static final String VIEW_ATTRIBUTE_MODEL = "ViewConstraintsViewAttributes";
+    private static final String VIEW_ATTRIBUTE_TOPIC = VIEW_ATTRIBUTE_MODEL + ".TopicA";
+    private static final String CLASS_VIEW_ATTRIBUTE = VIEW_ATTRIBUTE_TOPIC + ".ClassAttribute";
+    private static final String CLASS_TARGET = VIEW_ATTRIBUTE_TOPIC + ".ClassTarget";
+    private static final String CLASS_SOURCE = VIEW_ATTRIBUTE_TOPIC + ".ClassSource";
 
     private TransferDescription td;
 
@@ -225,6 +230,68 @@ public class ViewConstraintsTest {
                 "Mandatory Constraint ViewConstraints.TopicA.ViewBase.LessThan100OrMoreThan200 is not true.",
                 "Mandatory Constraint ViewConstraintsExtending.ExtendingTopicA.ViewExtending.NewTextLength is not true."
         );
+    }
+
+    @Test
+    public void attributeConstraintOk() {
+        LogCollector logger = validateObjects(
+                VIEW_ATTRIBUTE_TOPIC,
+                createTestObjectName(CLASS_VIEW_ATTRIBUTE, "o1", "Some value"),
+                createTestObjectName(CLASS_VIEW_ATTRIBUTE, "o2", "Another value"),
+                createTestObjectName(CLASS_VIEW_ATTRIBUTE, "o3", "Some other value")
+        );
+
+        assertEquals(0, logger.getErrs().size());
+    }
+
+    @Test
+    public void attributeConstraintFails() {
+        LogCollector logger = validateObjects(
+                VIEW_ATTRIBUTE_TOPIC,
+                createTestObjectName(CLASS_VIEW_ATTRIBUTE, "o1", "Some value"),
+                createTestObjectName(CLASS_VIEW_ATTRIBUTE, "o2", "A"),
+                createTestObjectName(CLASS_VIEW_ATTRIBUTE, "o3", "1234")
+        );
+
+        AssertAllEventMessages(
+                logger.getErrs(),
+                "Mandatory Constraint ViewConstraintsViewAttributes.TopicA.ViewAttribute.NameLengthAttribute is not true."
+        );
+    }
+
+    @Test
+    public void referenceAttributeConstraintOk() {
+        LogCollector logger = validateObjects(
+                VIEW_ATTRIBUTE_TOPIC,
+                createTestObjectName(CLASS_TARGET, "t1", "Long enough"),
+                createTestObjectWithTarget(CLASS_SOURCE, "s1", "t1")
+        );
+
+        assertEquals(0, logger.getErrs().size());
+    }
+
+    @Test
+    public void referenceAttributeConstraintFails() {
+        LogCollector logger = validateObjects(
+                VIEW_ATTRIBUTE_TOPIC,
+                createTestObjectName(CLASS_TARGET, "t1", "Long enough"),
+                createTestObjectName(CLASS_TARGET, "t2", "A"),
+                createTestObjectWithTarget(CLASS_SOURCE, "s1", "t1"),
+                createTestObjectWithTarget(CLASS_SOURCE, "s2", "t2")
+        );
+
+        AssertAllEventMessages(
+                logger.getErrs(),
+                "Mandatory Constraint ViewConstraintsViewAttributes.TopicA.ViewReference.TargetNameLength is not true."
+        );
+    }
+
+    private IomObject createTestObjectWithTarget(String className, String oid, String targetOid) {
+        IomObject iomObj = new Iom_jObject(className, oid);
+        IomObject target = new Iom_jObject(Iom_jObject.REF, null);
+        target.setobjectrefoid(targetOid);
+        iomObj.addattrobj("Target", target);
+        return iomObj;
     }
 
     private IomObject createTestObjectName(String className, String oid, String name) {
