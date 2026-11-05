@@ -14,6 +14,7 @@ public class BasketStat{
 	private String basketId=null;
     private String basketEndState=null;
     private String fileMd5=null;
+    private boolean skipped=false;
 	public BasketStat(IoxStatistics statistics, String dataset,String file,
 			String topic, String iliBasketId, String iliBasketEndState,String fileMd5) {
 		this.statistics=statistics;
@@ -55,6 +56,12 @@ public class BasketStat{
 	}
     public String getFileMd5() {
         return fileMd5;
+    }
+    public boolean isSkipped() {
+        return skipped;
+    }
+    public void setSkipped(boolean skipped) {
+        this.skipped = skipped;
     }
 	
 }
