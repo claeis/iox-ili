@@ -185,7 +185,11 @@ public class Interlis {
             }
             Viewable paramObjectViewable = paramObject.getViewable();
             if (paramObject.getComplexObjects() != null) {
-                paramObjectViewable=(Viewable)td.getElement(paramObject.getComplexObjects().iterator().next().getobjecttag());                  
+                paramObjectViewable=(Viewable)td.getElement(paramObject.getComplexObjects().iterator().next().getobjecttag());
+            }
+            if (paramObjectViewable == null) {
+                // e.g. object not available, only a reference to it
+                return Value.createSkipEvaluation();
             }
             if(paramObjectViewable.equals(paramClass.getViewable())){
                 return new Value(true);

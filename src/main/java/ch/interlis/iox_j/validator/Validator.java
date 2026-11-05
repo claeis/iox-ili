@@ -2189,7 +2189,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         for (int k = 0; k < pathElements.length; k++) {
             for (IomObject iomObj:currentObjects) {
                 PathEl currentPathEl = pathElements[k];
-                if (currentPathEl instanceof PathElAbstractClassRole || currentPathEl instanceof PathElAssocRole || currentPathEl instanceof AssociationPath) {
+                if (isRolePathEl(currentPathEl)) {
                     if (currentPathEl instanceof PathElAbstractClassRole) {
                         PathElAbstractClassRole abstractClassRole = (PathElAbstractClassRole) currentPathEl;
                         role = (RoleDef) abstractClassRole.getRole();
@@ -2204,29 +2204,20 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     } else {
                         // IF embedded association and first PathEl of objectpath
                         if(parentObject!=null && k==0) {
-                            // IF last PathEl of objectpath
-                            if(k==lastPathIndex) {
-                                // THEN return embedded reference object
-                                if(role==firstRole) {
-                                    nextCurrentObjects.add(iomObj);
-                                }else {
-                                    // create/return a reference object to parent object
-                                    Iom_jObject ref = new Iom_jObject(Iom_jObject.REF, null);
-                                    ref.setobjectrefoid(parentObject.getobjectoid());
-                                    nextCurrentObjects.add(ref);
+                            if(role==firstRole) {
+                                IomObject targetObj = getReferencedObject(role, iomObj.getobjectrefoid());
+                                if (targetObj == null && k==lastPathIndex) {
+                                    // target object not available; return a reference object, so that UNIQUE can still work with the OID
+                                    targetObj = new Iom_jObject(Iom_jObject.REF, null);
+                                    targetObj.setobjectrefoid(iomObj.getobjectrefoid());
+                                } else if (targetObj == null && role.isExternal() && !allObjectsAccessible) {
+                                    // target object is not part of the validated data
+                                    inaccessibleExternalRole = role;
+                                    return Value.createSkipEvaluation();
                                 }
+                                nextCurrentObjects.add(targetObj);
                             }else {
-                                if(role==firstRole) {
-                                    IomObject targetObj = getReferencedObject(role, iomObj.getobjectrefoid());
-                                    if (targetObj == null && role.isExternal() && !allObjectsAccessible) {
-                                        // target object is not part of the validated data
-                                        inaccessibleExternalRole = role;
-                                        return Value.createSkipEvaluation();
-                                    }
-                                    nextCurrentObjects.add(targetObj);
-                                }else {
-                                    nextCurrentObjects.add(parentObject);
-                                }
+                                nextCurrentObjects.add(parentObject);
                             }
                         }else{
                             String targetOid = null;
@@ -2510,6 +2501,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             return null;
         }
         return attrValue.toLowerCase();
+    }
+    private static boolean isRolePathEl(PathEl pathEl) {
+        return pathEl instanceof PathElAbstractClassRole || pathEl instanceof PathElAssocRole || pathEl instanceof AssociationPath;
     }
     private boolean isBackward(Viewable srcObjClass, RoleDef role) {
         AssociationDef assoc=(AssociationDef) role.getContainer();
@@ -4185,6 +4179,9 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			    IomObject complexValue = value.getComplexObjects().iterator().next();
 			    if(complexValue.getobjectrefoid() != null) {
 			        values.add(complexValue.getobjectrefoid());
+			    } else if(parentObject != null && pathElements.length == 1 && isRolePathEl(pathElements[0])) {
+			        // role of an embedded association; compare the object by its OID
+			        values.add(complexValue.getobjectoid());
 			    } else {
 			        values.add(complexValue);
 			    }

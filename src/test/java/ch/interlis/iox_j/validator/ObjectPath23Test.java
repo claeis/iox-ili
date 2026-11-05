@@ -36,6 +36,7 @@ public class ObjectPath23Test {
     private final static String TOPIC_RECURSIVELY = "ObjectPath23.RekursivelyObject";
     private final static String TOPIC_FORWARD_WITH_MORETHANONE_LINKOBJ = "ObjectPath23.ForwardDirectionWithMoreThanOnelinkObj";
     private final static String TOPIC_EXPRESSION_SINGLE_VALUE = "ObjectPath23.ExpressionSingleValue";
+    private final static String TOPIC_EMBEDDED_ROLE = "ObjectPath23.EmbeddedRole";
     
     // CLASSES
     private final static String CLASSA = TOPIC_RECURSIVELY + ".ClassA";
@@ -61,6 +62,10 @@ public class ObjectPath23Test {
     private final static String CLASSU2 = TOPIC_EXPRESSION_SINGLE_VALUE + ".ClassU";
     private final static String CLASSS2 = TOPIC_EXPRESSION_SINGLE_VALUE + ".ClassS";
     private final static String CLASST2 = TOPIC_EXPRESSION_SINGLE_VALUE + ".ClassT";
+    private final static String CLASSA_EMBEDDED = TOPIC_EMBEDDED_ROLE + ".ClassA";
+    private final static String CLASSAP_EMBEDDED = TOPIC_EMBEDDED_ROLE + ".ClassAp";
+    private final static String CLASSB_EMBEDDED = TOPIC_EMBEDDED_ROLE + ".ClassB";
+    private final static String CLASSBP_EMBEDDED = TOPIC_EMBEDDED_ROLE + ".ClassBp";
     
     // ASSOCIATION
     private static final String ASSOC_MANY2MANY = TOPIC + ".many2many";
@@ -983,5 +988,49 @@ public class ObjectPath23Test {
         assertEquals(1, logger.getErrs().size());
         assertEquals("Mandatory Constraint ObjectPath23.RekursivelyObject.ClassA.Constraint1 is not true.",
                 logger.getErrs().get(0).getEventMsg());
+    }
+
+    @Test
+    public void embedded_roleAtEndOfPath_isOfClass_Ok() throws Exception {
+        Iom_jObject iomObjA = new Iom_jObject(CLASSAP_EMBEDDED, OID1);
+        Iom_jObject iomObjB = new Iom_jObject(CLASSBP_EMBEDDED, OID2);
+        iomObjB.addattrobj("role_a", "REF").setobjectrefoid(iomObjA.getobjectoid());
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_EMBEDDED_ROLE, BID, new ValidationConfig(), iomObjA, iomObjB);
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+    }
+
+    @Test
+    public void embedded_storedRoleAtEndOfPath_isOfClass_Fail() throws Exception {
+        Iom_jObject iomObjA = new Iom_jObject(CLASSA_EMBEDDED, OID1);
+        Iom_jObject iomObjB = new Iom_jObject(CLASSBP_EMBEDDED, OID2);
+        iomObjB.addattrobj("role_a", "REF").setobjectrefoid(iomObjA.getobjectoid());
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_EMBEDDED_ROLE, BID, new ValidationConfig(), iomObjA, iomObjB);
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Mandatory Constraint ObjectPath23.EmbeddedRole.ab.Constraint1 is not true.",
+                logger.getErrs().get(0).getEventMsg());
+    }
+
+    @Test
+    public void embedded_otherRoleAtEndOfPath_isOfClass_Fail() throws Exception {
+        Iom_jObject iomObjA = new Iom_jObject(CLASSAP_EMBEDDED, OID1);
+        Iom_jObject iomObjB = new Iom_jObject(CLASSB_EMBEDDED, OID2);
+        iomObjB.addattrobj("role_a", "REF").setobjectrefoid(iomObjA.getobjectoid());
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_EMBEDDED_ROLE, BID, new ValidationConfig(), iomObjA, iomObjB);
+        // Asserts
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("Mandatory Constraint ObjectPath23.EmbeddedRole.ab.Constraint2 is not true.",
+                logger.getErrs().get(0).getEventMsg());
+    }
+
+    @Test
+    public void embedded_storedRoleAtEndOfPath_targetMissing_isOfClass_Skip() throws Exception {
+        Iom_jObject iomObjB = new Iom_jObject(CLASSBP_EMBEDDED, OID2);
+        iomObjB.addattrobj("role_a", "REF").setobjectrefoid(OID1);
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_EMBEDDED_ROLE, BID, new ValidationConfig(), iomObjB);
+        // Asserts: only the missing target is reported, the constraint is not evaluated
+        assertEquals(1, logger.getErrs().size());
+        assertEquals("No object found with OID o1 in basket b1.", logger.getErrs().get(0).getEventMsg());
     }
 }

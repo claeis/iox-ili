@@ -2100,6 +2100,28 @@ public class UniqueConstraints23Test {
 	
 	}
 	
+	// Prueft, ob der eingebettete Unique-Constraint innerhalb der Association funktioniert,
+	// wenn das referenzierte Objekt fehlt.
+	// Da beide Objekte B dasselbe (fehlende) Objekt A referenzieren,
+	// wird erwartet, dass die Rolle: a1 ueber die OID verglichen wird und dieser Test eine Fehlermeldung ausgibt.
+	@Test
+	public void uniqueAttrValuesOfRole_InEmbeddedAssociation_TargetMissing_False() {
+		Iom_jObject obj_B_3=new Iom_jObject(EMBEDDED_CLASSB,OID3);
+		IomObject attrObj_AB=obj_B_3.addattrobj("a1", EMBEDDED_ASSOCAB);
+		attrObj_AB.setobjectrefoid(OID1);
+		
+		Iom_jObject obj_B_4=new Iom_jObject(EMBEDDED_CLASSB,OID4);
+		IomObject attrObj2_AB=obj_B_4.addattrobj("a1", EMBEDDED_ASSOCAB);
+		attrObj2_AB.setobjectrefoid(OID1);
+		
+		LogCollector logger=ValidatorTestHelper.validateObjects(td, EMBEDDED_TOPIC, BID, new ValidationConfig(), obj_B_3, obj_B_4);
+		// asserts
+		assertEquals(3,logger.getErrs().size());
+		assertEquals("No object found with OID o1 in basket b1.", logger.getErrs().get(0).getEventMsg());
+		assertEquals("Unique constraint UniqueConstraints23.EmbeddedUnique.assocAB.Constraint1 is violated! Values o1 already exist in Object: o3", logger.getErrs().get(1).getEventMsg());
+		assertEquals("No object found with OID o1 in basket b1.", logger.getErrs().get(2).getEventMsg());
+	}
+	
 	// Prueft, ob das eingebettete Unique-Constraint innerhalb der Association funktioniert.
 	// Da das Attribute: attrCD als UNIQUE definiert ist und die jeweiligen Werte unterschiedlich sind,
 	// wird erwartet, dass dieser Test funktioniert.
