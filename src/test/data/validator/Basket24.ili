@@ -4,12 +4,18 @@ MODEL Basket24
   AT "mailto:ce@eisenhutinformatik.ch" VERSION "2025-07-31" =
 	
 	TOPIC TopicA=
+		CLASS ClassA=
+		END ClassA;
 	END TopicA;
 	
 	TOPIC TopicB=
+		CLASS ClassB=
+		END ClassB;
 	END TopicB;
 
 	TOPIC TopicC=
+		CLASS ClassC=
+		END ClassC;
 	END TopicC;	
 	
 END Basket24.
