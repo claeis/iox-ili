@@ -29,13 +29,6 @@ public class IoxStatistics {
 			}
 		}
 	}
-
-	public void markCurrentBasketSkipped() {
-		if (basket != null) {
-			basket.setSkipped(true);
-		}
-	}
-
 	protected BasketStat createBasketStat(ch.interlis.iox.IoxEvent event) {
 	    String fileMd5=null;
 	    if(event instanceof ch.interlis.iox_j.StartBasketEvent) {
@@ -86,9 +79,6 @@ public class IoxStatistics {
 			}
             if(basketStat.getFileMd5()!=null) {
                 version=" fileVersion="+basketStat.getFileMd5();
-            }
-            if (basketStat.isSkipped()) {
-                version += " (skipped)";
             }
 			if(hideBid){
 				EhiLogger.logState(prefix+sep+basketStat.getTopic()+version);

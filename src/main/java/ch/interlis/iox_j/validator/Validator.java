@@ -433,7 +433,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(validationOff){
 			return;
 		}
-		if (isSkippingCurrentBasket()) {
+		if (skipCurrentBasket) {
 			if (event instanceof ch.interlis.iox.EndBasketEvent) {
 				skipCurrentBasket = false;
 			}
@@ -499,10 +499,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         errFact.setTid(event.getBid());
         errFact.setIliqname(event.getType());
         errs.addEvent(errFact.logInfoMsg(rsrc.getString("validate.skippedBasket"), event.getBid(), event.getType()));
-    }
-
-    public boolean isSkippingCurrentBasket() {
-        return skipCurrentBasket;
     }
 
     protected String getFirstPassMsg() {
