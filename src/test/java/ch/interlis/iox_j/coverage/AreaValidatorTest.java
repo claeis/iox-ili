@@ -191,6 +191,80 @@ public class AreaValidatorTest {
     }
 
     @Test
+    public void arcAndStraightSegmentWithSameControlPointsShortChordOverlap() throws IoxException {
+        // the chord (0.08) is shorter than CompoundCurve.ARC_MIN_DIRECTION_PT; the arc bulges 0.001 into B
+        AreaValidator areaValidator = validate(
+                toJts("A", p(b(c(0, 0), c(10, 0), c(10, 5), a(10.001, 5.04, 10, 5.08), c(10, 10), c(0, 10), c(0, 0)))),
+                toJts("B", p(b(c(10, 0), c(20, 0), c(20, 10), c(10, 10), c(10, 5.08), c(10, 5), c(10, 0)))));
+
+        assertThat(getInvalidLines(areaValidator), containsInAnyOrder(
+                "A: MULTICURVE (COMPOUNDCURVE (CIRCULARSTRING (10 5, 10.001 5.04, 10 5.08)))",
+                "B: MULTICURVE (COMPOUNDCURVE ((10 5.08, 10 5)))"));
+
+        assertIntersectionExceptions(areaValidator.createIntersectionExceptions("TEST"),
+                "polygons overlay tid1 A, tid2 B");
+    }
+
+    @Test
+    public void arcAndStraightSegmentWithSameControlPointsShortChordGap() throws IoxException {
+        // the chord (0.08) is shorter than CompoundCurve.ARC_MIN_DIRECTION_PT; the arc bulges 0.001 into A
+        AreaValidator areaValidator = validate(
+                toJts("A", p(b(c(0, 0), c(10, 0), c(10, 5), a(9.999, 5.04, 10, 5.08), c(10, 10), c(0, 10), c(0, 0)))),
+                toJts("B", p(b(c(10, 0), c(10, 5), c(10, 5.08), c(10, 10), c(20, 10), c(20, 0), c(10, 0)))));
+
+        assertThat(getInvalidLines(areaValidator), is(empty()));
+        assertThat(areaValidator.createIntersectionExceptions("TEST"), is(empty()));
+    }
+
+    @Test
+    public void arcTangentToStraightSegmentsAtBothControlPoints() throws IoxException {
+        // the arc of B (circle with centre (0,0) and radius 10) leaves A's corners (0,10) and (10,0) along A's edges
+        // and bends into A
+        AreaValidator areaValidator = validate(
+                toJts("A", p(rect(0, 0, 10, 10))),
+                toJts("B", p(b(c(0, 10), a(6, 8, 10, 0), c(20, 0), c(20, 20), c(0, 20), c(0, 10)))));
+
+        assertThat(getInvalidLines(areaValidator), containsInAnyOrder(
+                "A: MULTICURVE (COMPOUNDCURVE ((0 10, 10 10, 10 0)))",
+                "B: MULTICURVE (COMPOUNDCURVE (CIRCULARSTRING (0 10, 6 8, 10 0)))"));
+
+        assertIntersectionExceptions(areaValidator.createIntersectionExceptions("TEST"),
+                "polygons overlay tid1 A, tid2 B");
+    }
+
+    @Test
+    public void arcTangentToStraightSegmentsAtBothControlPointsLv95() throws IoxException {
+        // as arcTangentToStraightSegmentsAtBothControlPoints with a radius of 2; the rounding of the LV95
+        // coordinates turns the tangents of the arc against A's edges
+        AreaValidator areaValidator = validate(
+                toJts("A", p(rect(2600000, 1200000, 2600002, 1200002))),
+                toJts("B", p(b(c(2600000, 1200002), a(2600001.2, 1200001.6, 2600002, 1200000), c(2600004, 1200000),
+                        c(2600004, 1200004), c(2600000, 1200004), c(2600000, 1200002)))));
+
+        assertThat(getInvalidLines(areaValidator), containsInAnyOrder(
+                "A: MULTICURVE (COMPOUNDCURVE ((2600000 1200002, 2600002 1200002, 2600002 1200000)))",
+                "B: MULTICURVE (COMPOUNDCURVE (CIRCULARSTRING (2600000 1200002, 2600001.2 1200001.6, 2600002 1200000)))"));
+
+        assertIntersectionExceptions(areaValidator.createIntersectionExceptions("TEST"),
+                "polygons overlay tid1 A, tid2 B");
+    }
+
+    @Test
+    public void arcTangentToStraightSegmentBendingAwayLv95() throws IoxException {
+        // the arc of B (circle with centre (2600000, 1200001) and radius 1) leaves A's node (2600000, 1200000) along
+        // A's edge to (2600002, 1200000) and bends away from A; the rounding of the LV95 coordinates turns the
+        // tangent of the arc against A's edge
+        AreaValidator areaValidator = validate(
+                toJts("A", p(b(c(2599999, 1199999), c(2600002, 1199999), c(2600002, 1200000), c(2600000, 1200000),
+                        c(2599999, 1200000), c(2599999, 1199999)))),
+                toJts("B", p(b(c(2599999, 1200000), c(2600000, 1200000), a(2600000.6, 1200000.2, 2600000.8, 1200000.4),
+                        c(2600000.8, 1200002), c(2599999, 1200002), c(2599999, 1200000)))));
+
+        assertThat(getInvalidLines(areaValidator), is(empty()));
+        assertThat(areaValidator.createIntersectionExceptions("TEST"), is(empty()));
+    }
+
+    @Test
     public void oneCommonArcWithMidPointsRoundedDifferently() throws IoxException {
         // both mid points are on the circle with centre (0, 0) and radius 50, B's only up to the rounding to mm;
         // the arcs do not correspond, B's arc lies inside A by less than a mm
