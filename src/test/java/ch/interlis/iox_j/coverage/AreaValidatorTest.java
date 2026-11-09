@@ -1316,6 +1316,41 @@ public class AreaValidatorTest {
     }
 
     @Test
+    public void gapSmallerThanArcOverlapWithinTolerance_OneGap() throws IoxException {
+        // the arc of B (circle around (4,3), radius 5) dips 2 into A up to the crossing at (8,0) (overlap 11.18), then
+        // leaves a gap of 6.87 up to C
+        List<IoxInvalidDataException> gaps = findGaps(3.0,
+                toJts("A", p(rect(0, -10, 10, 0))),
+                toJts("B", p(b(c(0, 0), a(4, -2, 7, 7), c(7, 10), c(0, 10), c(0, 0)))),
+                toJts("C", p(b(c(10, -10), c(20, -10), c(20, 10), c(7, 10), c(7, 7), c(9, 7), c(10, 0), c(10, -10)))));
+
+        assertThat(gaps.size(), is(1));
+        // the boundary of the gap runs along the arc and the edge of A up to (0,0)
+        assertGap(gaps.get(0), 0, 0, "A", "B", "C");
+    }
+
+    @Test
+    public void arcOverlapWithinToleranceOpenToOutside_NoGap() throws IoxException {
+        // as gapSmallerThanArcOverlapWithinTolerance_OneGap without C: beyond the crossing at (8,0) is the outside
+        List<IoxInvalidDataException> gaps = findGaps(3.0,
+                toJts("A", p(rect(0, -10, 10, 0))),
+                toJts("B", p(b(c(0, 0), a(4, -2, 7, 7), c(7, 10), c(0, 10), c(0, 0)))));
+
+        assertThat(gaps, is(empty()));
+    }
+
+    @Test
+    public void enclaveWithArcOverlapWithinToleranceNotFilled_OneGap() throws IoxException {
+        // the inner ring of A has the shape of the gap of gapSmallerThanArcOverlapWithinTolerance_OneGap: its arc
+        // overlaps its own edge from (10,0) to (0,0) up to the crossing at (8,0)
+        List<IoxInvalidDataException> gaps = findGaps(3.0,
+                toJts("A", p(rect(-10, -10, 20, 20), b(c(0, 0), a(4, -2, 7, 7), c(9, 7), c(10, 0), c(0, 0)))));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), 0, 0, "A");
+    }
+
+    @Test
     public void lensBetweenArcsWithSameRadiusOnDifferentCircles_OneGap() throws IoxException {
         // both arcs connect (10,10) and (18,10) with radius 5: A ends at the short way round the circle with centre
         // (14,7), B starts at the long way round the circle with centre (14,13)
