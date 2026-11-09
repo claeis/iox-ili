@@ -27,6 +27,7 @@ import ch.interlis.iox.*;
 import ch.interlis.iox_j.jts.Iox2jtsException;
 import ch.interlis.iox_j.logging.LogEventFactory;
 import ch.interlis.iox_j.validator.LogCollector;
+import ch.interlis.iox_j.validator.ValidationConfig;
 
 public class ItfSurfaceLV95Test2 {
 
@@ -82,7 +83,7 @@ public class ItfSurfaceLV95Test2 {
 		LogEventFactory errFactory=new LogEventFactory();
 		errFactory.setLogger(logger);
 		Domain coordDomain = (Domain) td.getElement("Test2LV95.LKoord");
-		builder.validatePolygon("38", formAttr, polygon, errFactory, null, (AbstractCoordType) coordDomain.getType());
+		builder.validatePolygon("38", formAttr, polygon, errFactory, null, ValidationConfig.WARNING, (AbstractCoordType) coordDomain.getType());
 		assertEquals(0,logger.getErrs().size());
 	}
 	@Test

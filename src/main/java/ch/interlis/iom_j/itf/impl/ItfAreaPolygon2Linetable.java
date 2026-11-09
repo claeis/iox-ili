@@ -72,10 +72,10 @@ public class ItfAreaPolygon2Linetable {
 			}
 		}
 	}
-	public void addPolygon(String mainObjTid,String internalTid,IomObject iomPolygon,String validationType,LogEventFactory errs) throws IoxException {
+	public void addPolygon(String mainObjTid,String internalTid,IomObject iomPolygon,String validationType,String degeneratedArcValidationType,LogEventFactory errs) throws IoxException {
 		ArrayList<IomObject> ioxlines=ItfAreaPolygon2Linetable.getLinesFromPolygon(iomPolygon);
 		OutParam<Boolean> foundErrs=new OutParam<Boolean>();
-		Polygon polygon=Iox2jtsext.surface2JTS(iomPolygon, 0.0,foundErrs,errs,0.0,validationType);
+		Polygon polygon=Iox2jtsext.surface2JTS(iomPolygon, 0.0,foundErrs,errs,0.0,validationType,degeneratedArcValidationType);
 		if(polygon!=null){
 			if(internalTid!=null){
 				polygon.setUserData(internalTid);
@@ -86,7 +86,7 @@ public class ItfAreaPolygon2Linetable {
 		}
 		
 		for(IomObject ioxline:ioxlines){
-			CompoundCurve line=Iox2jtsext.polyline2JTS(ioxline, false, 0.0,foundErrs,errs,0.0,validationType,ValidationConfig.WARNING);
+			CompoundCurve line=Iox2jtsext.polyline2JTS(ioxline, false, 0.0,foundErrs,errs,0.0,validationType,degeneratedArcValidationType);
 			if(line!=null){
 				if(internalTid!=null){
 					line.setUserData(internalTid);
@@ -97,10 +97,10 @@ public class ItfAreaPolygon2Linetable {
 			}
 		}
 	}
-    public void addMultiPolygon(String mainObjTid,String internalTid,IomObject iomPolygon,String validationType,LogEventFactory errs) throws IoxException {
+    public void addMultiPolygon(String mainObjTid,String internalTid,IomObject iomPolygon,String validationType,String degeneratedArcValidationType,LogEventFactory errs) throws IoxException {
         ArrayList<IomObject> ioxlines=ItfAreaPolygon2Linetable.getLinesFromMultiPolygon(iomPolygon);
         OutParam<Boolean> foundErrs=new OutParam<Boolean>();
-        MultiPolygon multipolygon=Iox2jtsext.multisurface2JTS(iomPolygon, 0.0,foundErrs,errs,0.0,validationType);
+        MultiPolygon multipolygon=Iox2jtsext.multisurface2JTS(iomPolygon, 0.0,foundErrs,errs,0.0,validationType,degeneratedArcValidationType);
         if(multipolygon!=null){
             int polyc=multipolygon.getNumGeometries();
             for(int polyi=0;polyi<polyc;polyi++) {
@@ -115,7 +115,7 @@ public class ItfAreaPolygon2Linetable {
         }
         
         for(IomObject ioxline:ioxlines){
-            CompoundCurve line=Iox2jtsext.polyline2JTS(ioxline, false, 0.0,foundErrs,errs,0.0,validationType,ValidationConfig.WARNING);
+            CompoundCurve line=Iox2jtsext.polyline2JTS(ioxline, false, 0.0,foundErrs,errs,0.0,validationType,degeneratedArcValidationType);
             if(line!=null){
                 if(internalTid!=null){
                     line.setUserData(internalTid);
