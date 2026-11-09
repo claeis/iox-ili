@@ -542,6 +542,21 @@ public class AreaValidatorTest {
     }
 
     @Test
+    public void polygonFullyInsideArcLongerThanSemicircle() throws IoxException {
+        // A runs clockwise from (25,20) via (13,20) to (20,25), 289 degrees round (19,19), and back straight;
+        // the mid point is 199 degrees from the start point
+        AreaValidator areaValidator = validate(
+                toJts("A", p(b(c(25, 20), a(13, 20, 20, 25), c(25, 20)))),
+                toJts("B", p(rect(17, 15, 19, 17))));
+
+        assertThat(getInvalidLines(areaValidator), containsInAnyOrder(
+                "B: MULTICURVE (COMPOUNDCURVE ((17 15, 17 17, 19 17, 19 15, 17 15)))"));
+
+        assertIntersectionExceptions(areaValidator.createIntersectionExceptions("TEST"),
+                "polygons overlay tid1 A, tid2 B");
+    }
+
+    @Test
     public void polygonWithTwoSegmentsFullyInside() throws IoxException {
         AreaValidator areaValidator = validate(
                 toJts("A", p(rect(10, 10, 30, 30))),
