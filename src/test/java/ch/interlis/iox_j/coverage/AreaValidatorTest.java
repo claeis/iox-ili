@@ -1,7 +1,6 @@
 package ch.interlis.iox_j.coverage;
 
 import ch.interlis.iom.IomObject;
-import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
 import ch.interlis.iom_j.itf.impl.jtsext.io.WKTWriterJtsext;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.AreaValidator;
 import ch.interlis.iox.IoxException;
@@ -20,9 +19,14 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.StringEndsWith.endsWith;
+import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class AreaValidatorTest {
+    private static final double EPSILON = 1e-9;
+
     @Test
     public void disjoint() throws IoxException {
         AreaValidator areaValidator = validate(
@@ -1102,6 +1106,310 @@ public class AreaValidatorTest {
         assertThat(areaValidator.createIntersectionExceptions("TEST"), is(empty()));
     }
 
+    // gaps between the polygons (createGapExceptions)
+
+    @Test
+    public void adjacentSquares_NoGap() throws IoxException {
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(rect(0, 0, 10, 10))),
+                toJts("B", p(rect(10, 0, 20, 10))));
+
+        assertThat(gaps, is(empty()));
+    }
+
+    @Test
+    public void gridWithoutCenter_OneGap() throws IoxException {
+        List<Polygon> polygons = new ArrayList<Polygon>();
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                if (x != 1 || y != 1) {
+                    polygons.add(toJts("o" + x + y, p(rect(x * 10, y * 10, x * 10 + 10, y * 10 + 10))));
+                }
+            }
+        }
+
+        List<IoxInvalidDataException> gaps = findGaps(0.0, polygons.toArray(new Polygon[polygons.size()]));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), 10, 10, "o01", "o10", "o12", "o21");
+    }
+
+    @Test
+    public void enclaveNotFilled_OneGap() throws IoxException {
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(rect(0, 0, 30, 30), rect(10, 10, 20, 20))));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), 10, 10, "A");
+    }
+
+    @Test
+    public void enclaveFilled_NoGap() throws IoxException {
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(rect(0, 0, 30, 30), rect(10, 10, 20, 20))),
+                toJts("B", p(rect(10, 10, 20, 20))));
+
+        assertThat(gaps, is(empty()));
+    }
+
+    @Test
+    public void enclavePartlyFilled_OneGap() throws IoxException {
+        // B fills the lower half of the enclave; the enclave ring is split at (10,15) and (20,15)
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(rect(0, 0, 30, 30), b(c(10, 10), c(10, 15), c(10, 20), c(20, 20), c(20, 15), c(20, 10), c(10, 10)))),
+                toJts("B", p(b(c(10, 10), c(20, 10), c(20, 15), c(10, 15), c(10, 10)))));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), 10, 15, "A", "B");
+    }
+
+    @Test
+    public void islandInEnclave_OneGap() throws IoxException {
+        // the island does not touch the enclave; the gap is the space between them
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(rect(0, 0, 30, 30), rect(10, 10, 20, 20))),
+                toJts("B", p(rect(12, 12, 18, 18))));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), 10, 10, "A");
+    }
+
+    @Test
+    public void separateIslands_NoGap() throws IoxException {
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(rect(0, 0, 10, 10))),
+                toJts("B", p(rect(20, 0, 30, 10))));
+
+        assertThat(gaps, is(empty()));
+    }
+
+    @Test
+    public void touchingInOneCorner_NoGap() throws IoxException {
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(rect(0, 0, 10, 10))),
+                toJts("B", p(rect(10, 10, 20, 20))));
+
+        assertThat(gaps, is(empty()));
+    }
+
+    @Test
+    public void sliver_OneGap() throws IoxException {
+        // two squares 0.001 apart, closed by a bar at the bottom and at the top
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(rect(0, 1, 10, 11))),
+                toJts("B", p(rect(10.001, 1, 20, 11))),
+                toJts("C", p(b(c(0, 0), c(20, 0), c(20, 1), c(10.001, 1), c(10, 1), c(0, 1), c(0, 0)))),
+                toJts("D", p(b(c(0, 11), c(10, 11), c(10.001, 11), c(20, 11), c(20, 12), c(0, 12), c(0, 11)))));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), 10, 1, "A", "B", "C", "D");
+    }
+
+    @Test
+    public void gapTouchingOutsideInOnePoint_OneGap() throws IoxException {
+        // the gap (10,10)-(20,20) touches the unbounded outside only in (20,20)
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(b(c(0, 0), c(20, 0), c(20, 10), c(10, 10), c(10, 20), c(0, 20), c(0, 0)))),
+                toJts("B", p(b(c(20, 0), c(30, 0), c(30, 20), c(20, 20), c(20, 10), c(20, 0)))),
+                toJts("C", p(b(c(0, 20), c(10, 20), c(20, 20), c(20, 30), c(0, 30), c(0, 20)))));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), 10, 10, "A", "B", "C");
+    }
+
+    @Test
+    public void twoGapsTouchingInOnePoint_TwoGaps() throws IoxException {
+        // 3x3 grid without the center and without the upper right cell, the upper right cell is closed by D and E;
+        // both gaps touch in (20,20)
+        List<IoxInvalidDataException> gaps = sortByCoord(findGaps(0.0,
+                toJts("o00", p(rect(0, 0, 10, 10))),
+                toJts("o10", p(rect(10, 0, 20, 10))),
+                toJts("o20", p(rect(20, 0, 30, 10))),
+                toJts("o01", p(rect(0, 10, 10, 20))),
+                toJts("o21", p(rect(20, 10, 30, 20))),
+                toJts("o02", p(rect(0, 20, 10, 30))),
+                toJts("o12", p(rect(10, 20, 20, 30))),
+                toJts("D", p(b(c(30, 10), c(40, 10), c(40, 40), c(30, 40), c(30, 30), c(30, 20), c(30, 10)))),
+                toJts("E", p(b(c(10, 30), c(20, 30), c(30, 30), c(30, 40), c(10, 40), c(10, 30))))));
+
+        assertThat(gaps.size(), is(2));
+        assertGap(gaps.get(0), 10, 10, "o01", "o10", "o12", "o21");
+        assertGap(gaps.get(1), 20, 20, "D", "E", "o12", "o21");
+    }
+
+    @Test
+    public void sharedArc_NoGap() throws IoxException {
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(b(c(0, 0), c(10, 0), a(12, 5, 10, 10), c(0, 10), c(0, 0)))),
+                toJts("B", p(b(c(10, 0), c(20, 0), c(20, 10), c(10, 10), a(12, 5, 10, 0)))));
+
+        assertThat(gaps, is(empty()));
+    }
+
+    @Test
+    public void lensBetweenArcAndStraight_OneGap() throws IoxException {
+        // the arc of A bulges inwards (to x=8), the edge of B is straight
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(b(c(0, 0), c(10, 0), a(8, 5, 10, 10), c(0, 10), c(0, 0)))),
+                toJts("B", p(rect(10, 0, 20, 10))));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), 10, 0, "A", "B");
+    }
+
+    @Test
+    public void lensBetweenArcAndStraight_WithinOverlapTolerance_OneGap() throws IoxException {
+        // the arc of A bulges inwards by 0.001; the overlap tolerance does not make the two segments correspond
+        List<IoxInvalidDataException> gaps = findGaps(0.002,
+                toJts("A", p(b(c(0, 0), c(10, 0), a(9.999, 5, 10, 10), c(0, 10), c(0, 0)))),
+                toJts("B", p(rect(10, 0, 20, 10))));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), 10, 0, "A", "B");
+    }
+
+    @Test
+    public void lensBetweenArcAndStraightBelowLinearisation_OneGap() throws IoxException {
+        // arc height 0.0001 is below the linearisation precision of arcs
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(b(c(0, 0), c(10, 0), a(9.9999, 5, 10, 10), c(0, 10), c(0, 0)))),
+                toJts("B", p(rect(10, 0, 20, 10))));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), 10, 0, "A", "B");
+    }
+
+    @Test
+    public void lensBetweenArcWithShortChordAndStraight_OneGap() throws IoxException {
+        // the chord (0.08) is shorter than CompoundCurve.ARC_MIN_DIRECTION_PT; the arc of A bulges 0.001 into A
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(b(c(0, 0), c(10, 0), c(10, 5), a(9.999, 5.04, 10, 5.08), c(10, 10), c(0, 10), c(0, 0)))),
+                toJts("B", p(b(c(10, 0), c(10, 5), c(10, 5.08), c(10, 10), c(20, 10), c(20, 0), c(10, 0)))));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), 10, 5, "A", "B");
+    }
+
+    @Test
+    public void lensBetweenTwoArcs_WithinOverlapTolerance_OneGap() throws IoxException {
+        // the mid points differ by 0.001; the overlap tolerance does not make the two arcs correspond
+        List<IoxInvalidDataException> gaps = findGaps(0.002,
+                toJts("A", p(b(c(0, 0), c(10, 0), a(12, 5, 10, 10), c(0, 10), c(0, 0)))),
+                toJts("B", p(b(c(10, 0), c(20, 0), c(20, 10), c(10, 10), a(12.001, 5, 10, 0)))));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), 10, 0, "A", "B");
+    }
+
+    @Test
+    public void gapNextToArcsOverlappingWithinTolerance_OneGap() throws IoxException {
+        // the arcs of arcSegmentsOverlapOneIntersectionAtControlPointOverlapLowerThanMaxOverlap: A and B share (10,30)
+        // and overlap by 1.28 up to the crossing at (20,20); C closes the gap beyond the crossing
+        List<IoxInvalidDataException> gaps = findGaps(3.0,
+                toJts("A", p(b(c(10, 10), c(10, 30), a(20, 20, 25, 10), c(10, 10)))),
+                toJts("B", p(b(c(30, 30), c(30, 15), a(20, 20, 10, 30), c(30, 30)))),
+                toJts("C", p(b(c(25, 10), c(30, 10), c(30, 15), c(25, 10)))));
+
+        assertThat(gaps.size(), is(1));
+        // the boundary of the gap runs along both arcs up to (10,30)
+        assertGap(gaps.get(0), 10, 30, "A", "B", "C");
+    }
+
+    @Test
+    public void lensBetweenArcsWithSameRadiusOnDifferentCircles_OneGap() throws IoxException {
+        // both arcs connect (10,10) and (18,10) with radius 5: A ends at the short way round the circle with centre
+        // (14,7), B starts at the long way round the circle with centre (14,13)
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(b(c(0, 0), c(30, 0), c(30, 10), c(18, 10), a(14, 12, 10, 10), c(0, 10), c(0, 0)))),
+                toJts("B", p(b(c(0, 10), c(10, 10), a(14, 18, 18, 10), c(30, 10), c(30, 30), c(0, 30), c(0, 10)))));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), 10, 10, "A", "B");
+    }
+
+    @Test
+    public void arcTangentToIncomingEdge_OneGap() throws IoxException {
+        // at (0,0), the arc of B leaves with the same tangent as the top edge of A arrives from (10,0);
+        // the gap between them must be traced on its own, separate from the outer boundary
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(rect(0, -10, 10, 0))),
+                // quarter circle around (0,5) from (0,0) to (5,5)
+                toJts("B", p(b(c(0, 0), a(5.0 * Math.sin(Math.PI / 4.0), 5.0 - 5.0 * Math.cos(Math.PI / 4.0), 5, 5), c(10, 5), c(10, 20), c(0, 20), c(0, 0)))),
+                toJts("C", p(b(c(10, -10), c(20, -10), c(20, 20), c(10, 20), c(10, 5), c(10, 0), c(10, -10)))));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), 0, 0, "A", "B", "C");
+    }
+
+    @Test
+    public void outerBoundaryWithArcs_NoGap() throws IoxException {
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(b(c(0, 0), a(5, -2, 10, 0), c(10, 10), a(5, 12, 0, 10), c(0, 0)))),
+                toJts("B", p(b(c(10, 0), a(15, -3, 20, 0), c(20, 10), c(10, 10), c(10, 0)))));
+
+        assertThat(gaps, is(empty()));
+    }
+
+    @Test
+    public void arcWithPartLongerThanSemicircle_NoGap() throws IoxException {
+        // A runs clockwise from (25,20) via (13,20) to (20,25), 289 degrees round (19,19), and back straight;
+        // the mid point is 199 degrees from the start point
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(b(c(25, 20), a(13, 20, 20, 25), c(25, 20)))));
+
+        assertThat(gaps, is(empty()));
+    }
+
+    @Test
+    public void sliverAtLv95Coordinates_OneGap() throws IoxException {
+        // 0.1 mm x 1 m sliver; it must not get lost in the rounding of large coordinates
+        double x = 2600000.0;
+        double y = 1200000.0;
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(rect(x, y + 1, x + 10, y + 2))),
+                toJts("B", p(rect(x + 10.0001, y + 1, x + 20, y + 2))),
+                toJts("C", p(b(c(x, y), c(x + 20, y), c(x + 20, y + 1), c(x + 10.0001, y + 1), c(x + 10, y + 1), c(x, y + 1), c(x, y)))),
+                toJts("D", p(b(c(x, y + 2), c(x + 10, y + 2), c(x + 10.0001, y + 2), c(x + 20, y + 2), c(x + 20, y + 3), c(x, y + 3), c(x, y + 2)))));
+
+        assertThat(gaps.size(), is(1));
+        assertGap(gaps.get(0), x + 10, y + 1, "A", "B", "C", "D");
+    }
+
+    @Test
+    public void tinyIslandAtLv95Coordinates_NoGap() throws IoxException {
+        // 1 cm x 1 cm island; a rounding error in its area must not turn it into a gap
+        double x = 2600000.0;
+        double y = 1200000.0;
+        List<IoxInvalidDataException> gaps = findGaps(0.0,
+                toJts("A", p(rect(x, y, x + 10, y + 10))),
+                toJts("B", p(rect(x + 20, y + 20, x + 20.01, y + 20.01))));
+
+        assertThat(gaps, is(empty()));
+    }
+
+    @Test
+    public void gapsWithOverlap_Fail() throws IoxException {
+        // the boundary of the union is only known for a valid area partition
+        AreaValidator areaValidator = AreaValidator.validate(Arrays.asList(
+                toJts("A", p(rect(0, 0, 10, 10))),
+                toJts("B", p(rect(5, 0, 15, 10)))), 0.0);
+
+        assertThat(areaValidator.isValid(), is(false));
+        try {
+            areaValidator.createGapExceptions("TEST");
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+    }
+
+    @Test
+    public void noPolygons_NoGap() {
+        AreaValidator areaValidator = AreaValidator.validate(new ArrayList<Polygon>(), 0.0);
+
+        assertThat(areaValidator.isValid(), is(true));
+        assertThat(areaValidator.createGapExceptions("TEST"), is(empty()));
+    }
+
     // Functions to create geometries in a short and concise way
     private IomObject a(double a1, double a2, double c1, double c2) {
         return IomObjectHelper.createArc(Double.toString(a1), Double.toString(a2), Double.toString(c1), Double.toString(c2));
@@ -1263,9 +1571,8 @@ public class AreaValidatorTest {
     }
 
     private AreaValidator validate(Polygon... polygons) {
-        AreaValidator areaValidator = new AreaValidator((JtsextGeometryFactory) polygons[0].getFactory(), 3);
-        areaValidator.addPolygons(Arrays.asList(polygons));
-        areaValidator.validateAll();
+        AreaValidator areaValidator = AreaValidator.validate(Arrays.asList(polygons), 3);
+        assertThat(areaValidator.isValid(), is(areaValidator.createIntersectionExceptions("TEST").isEmpty()));
         return areaValidator;
     }
 
@@ -1280,5 +1587,64 @@ public class AreaValidatorTest {
         }
 
         return invalidLines;
+    }
+
+    private List<IoxInvalidDataException> findGaps(double maxOverlap, Polygon... polygons) {
+        List<Polygon> polygonList = Arrays.asList(polygons);
+        List<IoxInvalidDataException> gaps = validateAndFindGaps(polygonList, maxOverlap);
+
+        // the gaps must not depend on the order of the polygons, only the order in which they are reported may
+        List<Polygon> reversed = new ArrayList<Polygon>(polygonList);
+        Collections.reverse(reversed);
+        assertSameGaps(gaps, validateAndFindGaps(reversed, maxOverlap));
+        List<Polygon> rotated = new ArrayList<Polygon>(polygonList);
+        Collections.rotate(rotated, 1);
+        assertSameGaps(gaps, validateAndFindGaps(rotated, maxOverlap));
+
+        return gaps;
+    }
+
+    private static List<IoxInvalidDataException> validateAndFindGaps(List<Polygon> polygons, double maxOverlap) {
+        AreaValidator areaValidator = AreaValidator.validate(polygons, maxOverlap);
+        assertThat("test data must satisfy the area condition", areaValidator.isValid(), is(true));
+        return areaValidator.createGapExceptions("TEST");
+    }
+
+    private static void assertSameGaps(List<IoxInvalidDataException> expected, List<IoxInvalidDataException> actual) {
+        assertThat(actual.size(), is(expected.size()));
+        expected = sortByCoord(expected);
+        actual = sortByCoord(actual);
+        for (int i = 0; i < expected.size(); i++) {
+            assertThat(actual.get(i).getRawMessage(), is(expected.get(i).getRawMessage()));
+            assertThat(actual.get(i).getTid(), is(expected.get(i).getTid()));
+            assertThat(actual.get(i).getGeom().getattrvalue("C1"), is(expected.get(i).getGeom().getattrvalue("C1")));
+            assertThat(actual.get(i).getGeom().getattrvalue("C2"), is(expected.get(i).getGeom().getattrvalue("C2")));
+        }
+    }
+
+    /**
+     * @return the gaps sorted by their coordinate (and message, for gaps at the same coordinate)
+     */
+    private static List<IoxInvalidDataException> sortByCoord(List<IoxInvalidDataException> gaps) {
+        List<IoxInvalidDataException> sorted = new ArrayList<IoxInvalidDataException>(gaps);
+        Collections.sort(sorted, new Comparator<IoxInvalidDataException>() {
+            @Override
+            public int compare(IoxInvalidDataException gap1, IoxInvalidDataException gap2) {
+                int result = Double.compare(Double.parseDouble(gap1.getGeom().getattrvalue("C1")), Double.parseDouble(gap2.getGeom().getattrvalue("C1")));
+                if (result == 0) {
+                    result = Double.compare(Double.parseDouble(gap1.getGeom().getattrvalue("C2")), Double.parseDouble(gap2.getGeom().getattrvalue("C2")));
+                }
+                return result != 0 ? result : gap1.getRawMessage().compareTo(gap2.getRawMessage());
+            }
+        });
+        return sorted;
+    }
+
+    private static void assertGap(IoxInvalidDataException gap, double x, double y, String... tids) {
+        IomObject coord = gap.getGeom();
+        assertThat(Double.parseDouble(coord.getattrvalue("C1")), closeTo(x, EPSILON));
+        assertThat(Double.parseDouble(coord.getattrvalue("C2")), closeTo(y, EPSILON));
+        assertThat(gap.getTid(), is(tids[0]));
+        assertThat(gap.getRawMessage(), endsWith(", " + IoxInvalidDataException.formatTids(tids)));
     }
 }
