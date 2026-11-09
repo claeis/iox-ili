@@ -560,12 +560,22 @@ public class AreaValidator {
         return point.equals2D(segment.getStartPoint()) || point.equals2D(segment.getEndPoint());
     }
 
-    private static boolean isOnInside(Coordinate point, CurveSegment testSegment, CurveSegment firstSegment, CurveSegment secondSegment, double minDirectionPointDistance) {
-        Coordinate first = getDirectionPoint(point, firstSegment, minDirectionPointDistance);
-        Coordinate second = getDirectionPoint(point, secondSegment, minDirectionPointDistance);
-        Coordinate test = getDirectionPoint(point, testSegment, minDirectionPointDistance);
+    /**
+     * Checks if the test segment leaves the point outside of the angle from the first to the second segment, turning
+     * counterclockwise.
+     *
+     * @param overlap the length of an overlap of the segments within the tolerance that starts at the point, or 0.0
+     */
+    private static boolean isOnInside(Coordinate point, CurveSegment testSegment, CurveSegment firstSegment, CurveSegment secondSegment, double overlap) {
+        if (overlap > 0.0) {
+            // the tolerated overlap is on the other side near the point: compare the directions beyond it
+            Coordinate first = getDirectionPoint(point, firstSegment, overlap);
+            Coordinate second = getDirectionPoint(point, secondSegment, overlap);
+            Coordinate test = getDirectionPoint(point, testSegment, overlap);
+            return isOnInside(point, first, second, test);
+        }
 
-        return isOnInside(point, first, second, test);
+        return !NodeDirection.isCounterclockwiseBefore(point, firstSegment, testSegment, secondSegment);
     }
 
     private static boolean isOnInside(Coordinate origin, Coordinate p0, Coordinate p1, Coordinate testPoint) {
@@ -700,5 +710,100 @@ public class AreaValidator {
         public EdgeRing[] holes;
         public Polygon polygon;
         public IndexedPointInAreaLocator indexedPointInAreaLocator;
+    }
+
+    /**
+     * The direction in which a segment leaves a node: the angle of its tangent and its curvature. The curvature orders
+     * segments that leave the node with the same tangent, e.g. an arc that touches a straight segment.
+     * <p>
+     * Tangents count as the same if they differ by no more than the rounding of the coordinates can turn them:
+     * {@link #ROUNDING_ULPS} units in the last place of the node, over the distance that determines the direction.
+     */
+    private static class NodeDirection {
+        /** the rounding error of the coordinates and the centre of an arc, in units in the last place */
+        private static final double ROUNDING_ULPS = 16.0;
+
+        private final double angle;
+        private final double curvature;
+        private final double angleTolerance;
+
+        private NodeDirection(double angle, double curvature, double angleTolerance) {
+            this.angle = angle;
+            this.curvature = curvature;
+            this.angleTolerance = angleTolerance;
+        }
+
+        /**
+         * Turning counterclockwise around the node from the start segment, checks whether the first segment is reached
+         * before the second one. A segment with the same tangent as the start segment is reached right away if it bends
+         * more to the left than the start segment, otherwise last. Of two segments with the same tangent, the one
+         * bending more to the right is reached first.
+         *
+         * @param node the start or end point of all three segments
+         * @return true if first is reached before second
+         */
+        static boolean isCounterclockwiseBefore(Coordinate node, CurveSegment start, CurveSegment first, CurveSegment second) {
+            NodeDirection startDirection = leaving(start, node);
+            NodeDirection firstDirection = leaving(first, node);
+            NodeDirection secondDirection = leaving(second, node);
+            double firstAngle = startDirection.getAngleTo(firstDirection);
+            double secondAngle = startDirection.getAngleTo(secondDirection);
+            if (Math.abs(firstAngle - secondAngle) <= firstDirection.angleTolerance + secondDirection.angleTolerance) {
+                return firstDirection.curvature < secondDirection.curvature;
+            }
+            return firstAngle < secondAngle;
+        }
+
+        /**
+         * @param segment the segment leaving the node
+         * @param node the start or end point of the segment
+         * @return the direction in which the segment leaves the node
+         */
+        private static NodeDirection leaving(CurveSegment segment, Coordinate node) {
+            boolean atStart = segment.getStartPoint().equals2D(node);
+            if (CurveSegmentIntersector.isTrueArc(segment)) {
+                ArcSegment arc = (ArcSegment) segment;
+                Coordinate center = arc.getCenterPoint();
+                double rx = node.x - center.x;
+                double ry = node.y - center.y;
+                double curvature = 1.0 / Math.hypot(rx, ry);
+                // the tangent is determined by the three points of the arc
+                Coordinate mid = arc.getMidPoint();
+                double tolerance = getAngleTolerance(node, Math.min(mid.distance(arc.getStartPoint()), mid.distance(arc.getEndPoint())));
+                // the sign of an arc is negative if it runs counterclockwise from its start point to its end point
+                boolean counterclockwise = (arc.getSign() < 0.0) == atStart;
+                // walking counterclockwise around the center, the tangent is the radius turned to the left
+                return counterclockwise
+                        ? new NodeDirection(Math.atan2(rx, -ry), curvature, tolerance)
+                        : new NodeDirection(Math.atan2(-rx, ry), -curvature, tolerance);
+            }
+            Coordinate other = atStart ? segment.getEndPoint() : segment.getStartPoint();
+            return new NodeDirection(Math.atan2(other.y - node.y, other.x - node.x), 0.0, getAngleTolerance(node, node.distance(other)));
+        }
+
+        /**
+         * @param distance the distance between the points that determine the direction
+         * @return the angle by which the rounding of the coordinates at the node can turn the direction
+         */
+        private static double getAngleTolerance(Coordinate node, double distance) {
+            double rounding = Math.ulp(Math.max(1.0, Math.max(Math.abs(node.x), Math.abs(node.y))));
+            return ROUNDING_ULPS * rounding / distance;
+        }
+
+        /**
+         * @return the angle by which other is turned counterclockwise from this direction, between 0 and 2 pi
+         */
+        private double getAngleTo(NodeDirection other) {
+            // difference of two atan2 results: between -2 pi and 2 pi, so adding 2 pi once gives [0, 2 pi)
+            double angleTo = other.angle - angle;
+            if (angleTo < 0.0) {
+                angleTo += 2.0 * Math.PI;
+            }
+            double tolerance = angleTolerance + other.angleTolerance;
+            if (angleTo <= tolerance || angleTo >= 2.0 * Math.PI - tolerance) {
+                return other.curvature > curvature ? 0.0 : 2.0 * Math.PI;
+            }
+            return angleTo;
+        }
     }
 }
