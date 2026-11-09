@@ -326,8 +326,8 @@ public class AreaValidator {
      * <p>
      * The edges contained in one ring only form the boundary of the union of all polygons. They are walked with the
      * covered side on the left, turning at each node as sharply as possible to the right, so that faces touching in a
-     * single node stay separate; a clockwise ring encloses a gap. Arcs are not linearised. The area of a gap next to an
-     * overlap within the tolerance is reduced by the overlap, so a gap smaller than the overlap is not found.
+     * single node stay separate; a clockwise ring encloses a gap. Arcs are not linearised. Where two segments overlap
+     * within the tolerance, the ring crosses itself; the loop up to the crossing is covered twice and does not count.
      *
      * @param iliQualifiedName The qualified name of the INTERLIS class used for generation of {@link IoxInvalidDataException}s
      * @return one {@link IoxInvalidDataException} per gap, at the smallest control point of its boundary and with the
@@ -439,36 +439,79 @@ public class AreaValidator {
         return 0.0;
     }
 
-    private static double getSignedArea(List<Edge> ring) {
+    /**
+     * @return the end of the overlap of two segments that meet at the node, i.e. their second intersection, or null if
+     * they do not overlap (see {@link #getOverlapLength(CurveSegment, CurveSegment)})
+     */
+    private Coordinate getOverlapEnd(CurveSegment segment, CurveSegment other, Coordinate node) {
+        if (getOverlapLength(segment, other) == 0.0) {
+            return null;
+        }
+        // the intersector still holds both intersections: the node and the end of the overlap
+        Coordinate first = intersector.getIntersection(0);
+        Coordinate second = intersector.getIntersection(1);
+        return first.distance(node) > second.distance(node) ? first : second;
+    }
+
+    /**
+     * @return the signed area of the ring without the loops of overlaps within the tolerance; positive for
+     * counterclockwise rings
+     */
+    private double getSignedArea(List<Edge> ring) {
+        // the segments of the ring in walking order: segment i is walked from starts[i] to ends[i], in the direction of
+        // the segment if forward[i]
+        List<CurveSegment> segments = new ArrayList<CurveSegment>();
+        List<Boolean> forward = new ArrayList<Boolean>();
+        List<Coordinate> starts = new ArrayList<Coordinate>();
+        List<Coordinate> ends = new ArrayList<Coordinate>();
+        for (Edge edge : ring) {
+            List<CurveSegment> edgeSegments = edge.getSegments();
+            if (!edge.isForward()) {
+                Collections.reverse(edgeSegments);
+            }
+            for (CurveSegment segment : edgeSegments) {
+                segments.add(segment);
+                forward.add(edge.isForward());
+                starts.add(edge.isForward() ? segment.getStartPoint() : segment.getEndPoint());
+                ends.add(edge.isForward() ? segment.getEndPoint() : segment.getStartPoint());
+            }
+        }
+        // consecutive segments that overlap within the tolerance cross each other; the loop between their shared
+        // point and the crossing is covered twice and has the opposite orientation, so the ring is cut at the crossing
+        int n = segments.size();
+        for (int i = 0; i < n; i++) {
+            int j = (i + 1) % n;
+            Coordinate crossing = getOverlapEnd(segments.get(i), segments.get(j), ends.get(i));
+            if (crossing != null) {
+                ends.set(i, crossing);
+                starts.set(j, crossing);
+            }
+        }
+
         // relative to a node of the ring, so that large (e.g. LV95) coordinates do not cancel out small areas
         Coordinate origin = ring.get(0).getFrom();
         double area = 0.0;
-        for (Edge edge : ring) {
-            double edgeArea = 0.0;
-            for (CurveSegment segment : edge.getSegments()) {
-                edgeArea += getSignedArea(segment, origin);
-            }
-            // walking the edge against the direction of its segments reverses the sign
-            area += edge.isForward() ? edgeArea : -edgeArea;
+        for (int i = 0; i < n; i++) {
+            area += getSignedArea(segments.get(i), forward.get(i), starts.get(i), ends.get(i), origin);
         }
         return area;
     }
 
     /**
-     * @return the contribution of the segment, walked from its start point to its end point, to the signed area of a
-     * ring (shoelace term of the chord relative to the origin plus the circular segment of an arc); positive for
-     * counterclockwise rings
+     * @param forward true if the segment is walked from its start point to its end point
+     * @return the contribution of the part of the segment from the point from to the point to (both on the segment)
+     * to the signed area of a ring (shoelace term of the chord relative to the origin plus the circular segment of an
+     * arc); positive for counterclockwise rings
      */
-    private static double getSignedArea(CurveSegment segment, Coordinate origin) {
-        Coordinate from = segment.getStartPoint();
-        Coordinate to = segment.getEndPoint();
+    private static double getSignedArea(CurveSegment segment, boolean forward, Coordinate from, Coordinate to, Coordinate origin) {
         double area = ((from.x - origin.x) * (to.y - origin.y) - (to.x - origin.x) * (from.y - origin.y)) / 2.0;
         if (CurveSegmentIntersector.isTrueArc(segment)) {
             ArcSegment arc = (ArcSegment) segment;
             Coordinate center = arc.getCenterPoint();
-            double radius = CurveSegment.dist(center, from);
-            // the sign of an arc is negative if it runs counterclockwise from its start point to its end point
-            boolean ccw = arc.getSign() < 0.0;
+            double radius = CurveSegment.dist(center, segment.getStartPoint());
+            // the sign of an arc is negative if it runs counterclockwise from its start point to its end point;
+            // walked backwards, it runs the other way round
+            boolean ccw = (arc.getSign() < 0.0) == forward;
             double theta = Math.atan2(to.y - center.y, to.x - center.x) - Math.atan2(from.y - center.y, from.x - center.x);
             if (!ccw) {
                 theta = -theta;
