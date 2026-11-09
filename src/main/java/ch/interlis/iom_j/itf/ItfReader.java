@@ -807,6 +807,11 @@ public class ItfReader implements ch.interlis.iox.IoxReader,IoxIliReader{
             filterTopics.add(topicName);
         }
     }
+
+    @Override
+    public void setSkipTopicFilter(String[] topicNames) {
+    }
+
     @Override
     public String getMimeType() {
         return ITF_10;
