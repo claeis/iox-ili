@@ -1,6 +1,8 @@
 package ch.interlis.iom_j.itf.impl.jtsext.geom;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -70,4 +72,48 @@ public class ArcSegmentTest {
         assertEquals(endpt,coords[2]);
 	}
 
+	@Test
+	public void calculateMidPointArcUpToSemicircle() {
+		// circle with centre (0,0) and radius 5: the middle of the arc from (5,0) to (0,5) is at 45 degrees
+		ArcSegment seg=new ArcSegment(new Coordinate(5,0),new Coordinate(4,3),new Coordinate(0,5));
+		assertCoordinate(5/Math.sqrt(2),5/Math.sqrt(2),seg.calculateMidPoint());
+	}
+
+	@Test
+	public void calculateMidPointArcLongerThanSemicircle() {
+		// the long way from (5,0) to (0,5) on the circle with centre (0,0) and radius 5: the middle is at 225 degrees
+		ArcSegment seg=new ArcSegment(new Coordinate(5,0),new Coordinate(-4,-3),new Coordinate(0,5));
+		assertCoordinate(-5/Math.sqrt(2),-5/Math.sqrt(2),seg.calculateMidPoint());
+		ArcSegment reversed=new ArcSegment(new Coordinate(0,5),new Coordinate(-4,-3),new Coordinate(5,0));
+		assertCoordinate(-5/Math.sqrt(2),-5/Math.sqrt(2),reversed.calculateMidPoint());
+	}
+
+	@Test
+	public void calculateMidPointSemicircle() {
+		// circle with centre (3.1,4.2) and radius 5; the mid point (-0.9,7.2) is the middle of the arc
+		ArcSegment seg=new ArcSegment(new Coordinate(0.1,0.2),new Coordinate(-0.9,7.2),new Coordinate(6.1,8.2));
+		assertCoordinate(-0.9,7.2,seg.calculateMidPoint());
+	}
+
+	@Test
+	public void calculateMidPointStraightArc() {
+		// all three points on one line: the middle of the line, not the given mid point (0.5,0.5)
+		ArcSegment seg=new ArcSegment(new Coordinate(0,0),new Coordinate(0.5,0.5),new Coordinate(2,2));
+		assertCoordinate(1,1,seg.calculateMidPoint());
+	}
+
+	@Test
+	public void equals2DArcsLongerThanSemicircle() {
+		// both arcs take the long way from (5,0) to (0,5): a on the circle with centre (0,0), b on the circle with
+		// centre (-0.25,-0.25); the middles of the arcs, (-3.54,-3.54) and (-3.97,-3.97), differ by 0.43 in x and y
+		ArcSegment a=new ArcSegment(new Coordinate(5,0),new Coordinate(-4,-3),new Coordinate(0,5));
+		ArcSegment b=new ArcSegment(new Coordinate(5,0),new Coordinate(-2.5,-5),new Coordinate(0,5));
+		assertFalse(a.equals2D(b,0.4));
+		assertTrue(a.equals2D(b,0.45));
+	}
+
+	private static void assertCoordinate(double x,double y,Coordinate actual) {
+		assertEquals(x,actual.x,EPSILON);
+		assertEquals(y,actual.y,EPSILON);
+	}
 }
