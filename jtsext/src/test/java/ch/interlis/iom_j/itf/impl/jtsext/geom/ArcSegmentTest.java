@@ -112,6 +112,23 @@ public class ArcSegmentTest {
 		assertTrue(a.equals2D(b,0.45));
 	}
 
+	@Test
+	public void isEquivalentReversedArc() {
+		ArcSegment seg=new ArcSegment(new Coordinate(-4,0),new Coordinate(0,2),new Coordinate(4,0));
+		ArcSegment reversed=new ArcSegment(new Coordinate(4,0),new Coordinate(0,2),new Coordinate(-4,0));
+		assertTrue(seg.isEquivalent(reversed));
+		assertEquals(seg.hashCode(),reversed.hashCode());
+	}
+
+	@Test
+	public void isEquivalentSameRadiusOnDifferentCircles() {
+		// both arcs run clockwise from (-4,0) to (4,0) with radius 5: the short way round the circle with centre
+		// (0,-3) and the long way round the circle with centre (0,3)
+		ArcSegment shortWay=new ArcSegment(new Coordinate(-4,0),new Coordinate(0,2),new Coordinate(4,0));
+		ArcSegment longWay=new ArcSegment(new Coordinate(-4,0),new Coordinate(0,8),new Coordinate(4,0));
+		assertFalse(shortWay.isEquivalent(longWay));
+	}
+
 	private static void assertCoordinate(double x,double y,Coordinate actual) {
 		assertEquals(x,actual.x,EPSILON);
 		assertEquals(y,actual.y,EPSILON);

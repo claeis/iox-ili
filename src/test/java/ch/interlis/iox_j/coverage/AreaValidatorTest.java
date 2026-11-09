@@ -106,6 +106,22 @@ public class AreaValidatorTest {
     }
 
     @Test
+    public void twoCommonPointsConnectedByArcsWithSameRadiusOnDifferentCircles() throws IoxException {
+        // both arcs connect (10,10) and (18,10) with radius 5: A takes the long way round the circle with centre
+        // (14,13), B the short way round the circle with centre (14,7); A covers B above B's arc
+        AreaValidator areaValidator = validate(
+                toJts("A", p(b(c(10, 10), c(18, 10), a(14, 18, 10, 10)))),
+                toJts("B", p(b(c(10, 10), a(14, 12, 18, 10), c(30, 10), c(30, 30), c(0, 30), c(0, 10), c(10, 10)))));
+
+        assertThat(getInvalidLines(areaValidator), containsInAnyOrder(
+                "A: MULTICURVE (COMPOUNDCURVE (CIRCULARSTRING (18 10, 14 18, 10 10)))",
+                "B: MULTICURVE (COMPOUNDCURVE (CIRCULARSTRING (10 10, 14 12, 18 10)))"));
+
+        assertIntersectionExceptions(areaValidator.createIntersectionExceptions("TEST"),
+                "polygons overlay tid1 A, tid2 B");
+    }
+
+    @Test
     public void oneCommonArcWithDifferentMidPoints() throws IoxException {
         AreaValidator areaValidator = validate(
                 toJts("A", p(b(c(10, 10), c(10, 30), a(15, 20, 30, 10), c(10, 10)))),
