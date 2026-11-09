@@ -122,6 +122,7 @@ import ch.interlis.iom_j.itf.impl.ItfAreaPolygon2Linetable;
 import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.CompoundCurve;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.JtsextGeometryFactory;
+import ch.interlis.iom_j.itf.impl.jtsext.noding.AreaValidator;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.CompoundCurveNoder;
 import ch.interlis.iom_j.itf.impl.jtsext.noding.Intersection;
 import ch.interlis.iom_j.xtf.XtfStartTransferEvent;
@@ -2641,20 +2642,33 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
 	/**
 	 * @deprecated
-	 * Use {@link #evaluateAreArea(IomObject, Value, PathEl[], PathEl[], Function, String)} instead.
+	 * Use {@link #evaluateAreArea(IomObject, Value, PathEl[], PathEl[], Function, String, boolean)} instead.
 	 */
 	@Deprecated
 	public Value evaluateAreArea(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction) {
-		return evaluateAreArea(mainIomObj, value, pathToStructEle, pathToSurfaceAttr, currentFunction, null);
+		return evaluateAreArea(mainIomObj, value, pathToStructEle, pathToSurfaceAttr, currentFunction, null, false);
 	}
 
-    public Value evaluateAreArea(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction, String validationKind) {
+	/**
+	 * @deprecated
+	 * Use {@link #evaluateAreArea(IomObject, Value, PathEl[], PathEl[], Function, String, boolean)} instead.
+	 */
+	@Deprecated
+	public Value evaluateAreArea(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction, String validationKind) {
+		return evaluateAreArea(mainIomObj, value, pathToStructEle, pathToSurfaceAttr, currentFunction, validationKind, false);
+	}
+
+    /**
+     * @param withoutGaps true if the areas must also have no gaps (areAreasWithoutGaps); not supported by the legacy
+     * area check
+     */
+    public Value evaluateAreArea(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction, String validationKind, boolean withoutGaps) {
         if(legacyAreAreas) {
             return evaluateAreArea0(mainIomObj, value, pathToStructEle, pathToSurfaceAttr, currentFunction, validationKind);
         }
-        return evaluateAreArea1(mainIomObj, value, pathToStructEle, pathToSurfaceAttr, currentFunction, validationKind);
+        return evaluateAreArea1(mainIomObj, value, pathToStructEle, pathToSurfaceAttr, currentFunction, validationKind, withoutGaps);
     }
-    public Value evaluateAreArea1(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction, String validationKind) {
+    public Value evaluateAreArea1(IomObject mainIomObj, Value value, PathEl[] pathToStructEle, PathEl[] pathToSurfaceAttr, Function currentFunction, String validationKind, boolean withoutGaps) {
         PathEl[] fullPath;
         if (pathToStructEle == null) {
             fullPath = pathToSurfaceAttr;
@@ -2701,10 +2715,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         if (fullPath != null && fullPath.length > 0) { // null if the path could not be parsed
             maxOverlap = getAreAreasMaxOverlap(fullPath[fullPath.length - 1].getName(), surfaceHolderTags);
         }
-        List<IoxInvalidDataException> intersections = polygonPool.validate1(maxOverlap);
-        if (intersections != null && !intersections.isEmpty()) {
+        AreaValidator areaValidator = polygonPool.validateArea(maxOverlap);
+        if (!areaValidator.isValid()) {
             if (!disableAreAreasMessages) {
-                for (IoxInvalidDataException ex : intersections) {
+                for (IoxInvalidDataException ex : areaValidator.createIntersectionExceptions(mainObjTag)) {
                     String tid1 = ex.getTid();
                     String iliqname = ex.getIliqname();
                     errFact.setTid(tid1);
@@ -2725,7 +2739,34 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             return new Value(false);
         }
 
+        if (withoutGaps) {
+            return new Value(validateAreasWithoutGaps(areaValidator, mainObjTag, currentFunction));
+        }
         return new Value(true);
+    }
+
+    /**
+     * Checks that the areas have no gaps.
+     *
+     * @param areaValidator the result of the area validation, without violations
+     * @return false if there are gaps
+     */
+    private boolean validateAreasWithoutGaps(AreaValidator areaValidator, String mainObjTag, Function currentFunction) {
+        List<IoxInvalidDataException> gaps = areaValidator.createGapExceptions(mainObjTag);
+        if (gaps.isEmpty()) {
+            return true;
+        }
+        if (!disableAreAreasMessages) {
+            for (IoxInvalidDataException gap : gaps) {
+                errFact.setTid(gap.getTid());
+                errFact.setIliqname(gap.getIliqname());
+                errFact.setDefaultCoord(gap.getGeom());
+                logMsg(areaOverlapValidation, gap.getRawMessage());
+            }
+            setCurrentMainObj(null);
+        }
+        EhiLogger.traceState(mainObjTag + ":" + currentFunction.getScopedName(null) + " returned false");
+        return false;
     }
 
     /**

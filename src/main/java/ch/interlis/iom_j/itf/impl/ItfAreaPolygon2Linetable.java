@@ -130,6 +130,13 @@ public class ItfAreaPolygon2Linetable {
 	public List<IoxInvalidDataException> validate1(double maxOverlap)  {
 		return AreaValidator.validateArea(polygons, maxOverlap, iliqname);
 	}
+	/**
+	 * Validates the area condition like {@link #validate1(double)}, but returns the {@link AreaValidator} to query
+	 * the result.
+	 */
+	public AreaValidator validateArea(double maxOverlap)  {
+		return AreaValidator.validate(polygons, maxOverlap);
+	}
 	public List<IoxInvalidDataException> validate0(double maxOverlapDummy)  {
 		CompoundCurveNoder noder=new CompoundCurveNoder(recman,(java.util.List)lines,false);
 		noder.setEnableCommonSegments(true);
