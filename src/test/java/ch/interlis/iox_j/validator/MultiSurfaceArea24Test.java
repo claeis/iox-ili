@@ -386,4 +386,39 @@ public class MultiSurfaceArea24Test {
         assertEquals("missing outerboundary in geomAttr1 of object o1.", logger.getErrs().get(0).getEventMsg());
     }
 
+    @Test
+    public void multisurfaceDegeneratedArcValidationOff_Ok(){
+        Iom_jObject iomObj=new Iom_jObject(ILI_CLASS_A1, "o1");
+        iomObj.addattrobj(ILI_ATTR_GEOM1, IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("2530000.000", "1150000.000"),
+                        IomObjectHelper.createArc("2530005.000", "1150000.000", "2530010.000", "1150000.000"),
+                        IomObjectHelper.createCoord("2530010.000", "1150010.000"),
+                        IomObjectHelper.createCoord("2530000.000", "1150010.000"),
+                        IomObjectHelper.createCoord("2530000.000", "1150000.000"))));
+        ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEGENERATED_ARC_VALIDATION, ValidationConfig.OFF);
+        LogCollector logger=ValidatorTestHelper.validateObjects(td, ILI_TOPIC, "b1", modelConfig, iomObj);
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+        assertEquals(0, logger.getWarn().size());
+    }
+    @Test
+    public void multiareaDegeneratedArcValidationOff_Ok(){
+        Iom_jObject iomObj=new Iom_jObject(ILI_CLASS_A2, "o1");
+        iomObj.addattrobj(ILI_ATTR_GEOM1, IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("2530000.000", "1150000.000"),
+                        IomObjectHelper.createArc("2530005.000", "1150000.000", "2530010.000", "1150000.000"),
+                        IomObjectHelper.createCoord("2530010.000", "1150010.000"),
+                        IomObjectHelper.createCoord("2530000.000", "1150010.000"),
+                        IomObjectHelper.createCoord("2530000.000", "1150000.000"))));
+        ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEGENERATED_ARC_VALIDATION, ValidationConfig.OFF);
+        LogCollector logger=ValidatorTestHelper.validateObjects(td, ILI_TOPIC, "b1", modelConfig, iomObj);
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+        assertEquals(0, logger.getWarn().size());
+    }
+
 }
