@@ -308,14 +308,29 @@ public class ArcSegment extends CurveSegment {
 			return directionPt;
 		}
 	}
+	/**
+	 * Calculates the point in the middle of an arc.
+	 *
+	 * @param sign 1.0 if the arc runs clockwise from start to end, -1.0 if counter-clockwise, 0.0 if it is
+	 * straight or closed (see {@link #getSign()})
+	 * @return the point on the circle halfway between start and end, in the direction of the arc; for sign 0.0 the
+	 * point halfway between start and end on a straight line
+	 */
 	public static Coordinate calcArcPt(Coordinate start, Coordinate end,
 			Coordinate center, double radius, double sign) {
+		if(sign==0.0){
+			return new Coordinate((start.x+end.x)/2.0,(start.y+end.y)/2.0);
+		}
 		Coordinate midPt;
-		// calulate new mid pt
-		// Zentriwinkel zwischen start und end
-		double a=CurveSegment.dist(start.x,start.y,end.x,end.y);
-		// Richtung des Punktes auf dem halben Bogen 
-		double alpha=Math.atan2(start.x-center.x,start.y-center.y)+sign*Math.asin(a/2.0/radius);
+		// direction (clockwise from north) of start and end, seen from the center
+		double startDirection=Math.atan2(start.x-center.x,start.y-center.y);
+		double endDirection=Math.atan2(end.x-center.x,end.y-center.y);
+		// Richtung des Punktes auf dem halben Bogen
+		double alpha=(startDirection+endDirection)/2.0;
+		if(sign*(endDirection-startDirection)<=0.0){
+			// the arc runs the other way round, its middle is opposite
+			alpha+=Math.PI;
+		}
 		midPt=new Coordinate();
 		midPt.x=center.x + radius * Math.sin(alpha);
 		midPt.y=center.y + radius * Math.cos(alpha);
@@ -383,7 +398,14 @@ public class ArcSegment extends CurveSegment {
 		return calculateMidPoint().equals2D(otherArc.calculateMidPoint(), tolerance);
 	}
 
-	private Coordinate calculateMidPoint() {
+	/**
+	 * Calculates the point in the middle of the arc from its start point, end point and circle, independent of
+	 * where the mid point lies.
+	 *
+	 * @return the point on the arc halfway between start and end point; for a straight arc (see
+	 * {@link #isStraight()}) the middle of the straight line
+	 */
+	Coordinate calculateMidPoint() {
 		return calcArcPt(getNormalizedStartPoint(), getNormalizedEndPoint(), getCenterPoint(), getRadius(), getNormalizedSign());
 	}
 }
