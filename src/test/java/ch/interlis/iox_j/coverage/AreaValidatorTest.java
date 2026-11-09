@@ -44,6 +44,18 @@ public class AreaValidatorTest {
     }
 
     @Test
+    public void fourPolygonsAroundOneCommonPoint() throws IoxException {
+        AreaValidator areaValidator = validate(
+                toJts("A", p(rect(10, 10, 20, 20))),
+                toJts("B", p(rect(20, 10, 30, 20))),
+                toJts("C", p(rect(10, 20, 20, 30))),
+                toJts("D", p(rect(20, 20, 30, 30))));
+
+        assertThat(getInvalidLines(areaValidator), is(empty()));
+        assertThat(areaValidator.createIntersectionExceptions("TEST"), is(empty()));
+    }
+
+    @Test
     public void oneCommonStraightCWCW() throws IoxException {
         AreaValidator areaValidator = validate(
                 toJts("A", p(b(c(10, 10), c(10, 30), c(30, 10), c(10, 10)))),
@@ -104,6 +116,22 @@ public class AreaValidatorTest {
     }
 
     @Test
+    public void oneCommonArcSplitIntoTwoArcs() throws IoxException {
+        // all arc points on the circle with centre (10, 10) and radius 25
+        AreaValidator areaValidator = validate(
+                toJts("A", p(b(c(10, 10), c(10, 35), a(25, 30, 35, 10), c(10, 10)))),
+                toJts("B", p(b(c(35, 10), a(34, 17, 30, 25), a(25, 30, 10, 35), c(40, 40), c(35, 10)))));
+
+        assertThat(getInvalidLines(areaValidator), containsInAnyOrder(
+                "A: MULTICURVE (COMPOUNDCURVE (CIRCULARSTRING (10 35, 25 30, 35 10)))",
+                "B: MULTICURVE (COMPOUNDCURVE (CIRCULARSTRING (35 10, 34 17, 30 25), CIRCULARSTRING (30 25, 25 30, 10 35)))"));
+
+        assertIntersectionExceptions(areaValidator.createIntersectionExceptions("TEST"),
+                "Overlay coord1 (10.000, 35.000), coord2 (30.000, 25.000), tids A, B",
+                "Overlay coord1 (30.000, 25.000), coord2 (35.000, 10.000), tids A, B");
+    }
+
+    @Test
     public void arcSegmentsOverlapIntersectionsAtControlPoints() throws IoxException {
         AreaValidator areaValidator = validate(
                 toJts("A", p(b(c(10, 10), c(10, 30), a(23, 23, 30, 10), c(10, 10)))),
@@ -129,6 +157,49 @@ public class AreaValidatorTest {
 
         assertIntersectionExceptions(areaValidator.createIntersectionExceptions("TEST"),
                 "polygons overlay tid1 A, tid2 B");
+    }
+
+    @Test
+    public void arcAndStraightSegmentWithSameControlPointsOverlapLowerThanMaxOverlap() throws IoxException {
+        // the arc bulges 2 into B; although this is less than maxOverlap 3, the two segments do not correspond
+        AreaValidator areaValidator = validate(
+                toJts("A", p(b(c(10, 10), a(20, 12, 30, 10), c(30, 0), c(10, 0), c(10, 10)))),
+                toJts("B", p(rect(10, 10, 30, 20))));
+
+        assertThat(getInvalidLines(areaValidator), containsInAnyOrder(
+                "A: MULTICURVE (COMPOUNDCURVE (CIRCULARSTRING (10 10, 20 12, 30 10)))",
+                "B: MULTICURVE (COMPOUNDCURVE ((30 10, 10 10)))"));
+
+        assertIntersectionExceptions(areaValidator.createIntersectionExceptions("TEST"),
+                "polygons overlay tid1 A, tid2 B");
+    }
+
+    @Test
+    public void oneCommonArcWithMidPointsRoundedDifferently() throws IoxException {
+        // both mid points are on the circle with centre (0, 0) and radius 50, B's only up to the rounding to mm;
+        // the arcs do not correspond, B's arc lies inside A by less than a mm
+        AreaValidator areaValidator = validate(
+                toJts("A", p(b(c(0, 0), c(50, 0), a(30, 40, 0, 50), c(0, 0)))),
+                toJts("B", p(b(c(0, 50), a(35.355, 35.355, 50, 0), c(60, 60), c(0, 50)))));
+
+        assertThat(getInvalidLines(areaValidator), containsInAnyOrder(
+                "A: MULTICURVE (COMPOUNDCURVE (CIRCULARSTRING (50 0, 30 40, 0 50)))",
+                "B: MULTICURVE (COMPOUNDCURVE (CIRCULARSTRING (0 50, 35.355 35.355, 50 0)))"));
+
+        assertIntersectionExceptions(areaValidator.createIntersectionExceptions("TEST"),
+                "polygons overlay tid1 A, tid2 B");
+    }
+
+    @Test
+    public void polygonBetweenTwoArcsWithSameControlPoints() throws IoxException {
+        // A is a lens bounded by two arcs with the same control points
+        AreaValidator areaValidator = validate(
+                toJts("A", p(b(c(5, 10), a(10, 11, 15, 10), a(10, 9, 5, 10)))),
+                toJts("B", p(b(c(5, 10), c(5, 20), c(15, 20), c(15, 10), a(10, 11, 5, 10)))),
+                toJts("C", p(b(c(5, 10), a(10, 9, 15, 10), c(15, 0), c(5, 0), c(5, 10)))));
+
+        assertThat(getInvalidLines(areaValidator), is(empty()));
+        assertThat(areaValidator.createIntersectionExceptions("TEST"), is(empty()));
     }
 
     @Test
@@ -645,6 +716,142 @@ public class AreaValidatorTest {
                         rect(20, 20, 27, 27),
                         rect(13, 13, 20, 20))),
                 toJts("B", p(b(c(20, 20), c(27, 27), c(27, 20), c(20, 20)))));
+
+        assertThat(getInvalidLines(areaValidator), is(empty()));
+        assertThat(areaValidator.createIntersectionExceptions("TEST"), is(empty()));
+    }
+
+    @Test
+    public void polygonInsideHole() throws IoxException {
+        AreaValidator areaValidator = validate(
+                toJts("A", p(rect(10, 10, 40, 40), rect(20, 30, 30, 20))),
+                toJts("B", p(rect(22, 22, 28, 28))));
+
+        assertThat(getInvalidLines(areaValidator), is(empty()));
+        assertThat(areaValidator.createIntersectionExceptions("TEST"), is(empty()));
+    }
+
+    @Test
+    public void polygonInsideHoleTouchesHoleInOnePoint() throws IoxException {
+        AreaValidator areaValidator = validate(
+                toJts("A", p(rect(10, 10, 40, 40), rect(20, 30, 30, 20))),
+                toJts("B", p(b(c(20, 20), c(23, 27), c(27, 23), c(20, 20)))));
+
+        assertThat(getInvalidLines(areaValidator), is(empty()));
+        assertThat(areaValidator.createIntersectionExceptions("TEST"), is(empty()));
+    }
+
+    @Test
+    public void polygonInsideHoleTouchesReflexVertexOfHole() throws IoxException {
+        AreaValidator areaValidator = validate(
+                toJts("A", p(rect(10, 10, 40, 40), b(c(20, 20), c(20, 30), c(30, 30), c(30, 20), c(25, 25), c(20, 20)))),
+                toJts("B", p(b(c(25, 25), c(23, 28), c(27, 28), c(25, 25)))));
+
+        assertThat(getInvalidLines(areaValidator), is(empty()));
+        assertThat(areaValidator.createIntersectionExceptions("TEST"), is(empty()));
+    }
+
+    @Test
+    public void polygonOutsideHoleTouchesReflexVertexOfHole() throws IoxException {
+        AreaValidator areaValidator = validate(
+                toJts("A", p(rect(10, 10, 40, 40), b(c(20, 20), c(20, 30), c(30, 30), c(30, 20), c(25, 25), c(20, 20)))),
+                toJts("B", p(b(c(25, 25), c(24, 22), c(26, 22), c(25, 25)))));
+
+        assertThat(getInvalidLines(areaValidator), containsInAnyOrder(
+                "B: MULTICURVE (COMPOUNDCURVE ((25 25, 24 22, 26 22, 25 25)))"));
+
+        assertIntersectionExceptions(areaValidator.createIntersectionExceptions("TEST"),
+                "polygons overlay tid1 A, tid2 B");
+    }
+
+    @Test
+    public void polygonsInNestedHoles() throws IoxException {
+        AreaValidator areaValidator = validate(
+                toJts("A", p(rect(10, 10, 40, 40), rect(15, 35, 35, 15))),
+                toJts("B", p(rect(17, 17, 33, 33), rect(20, 30, 30, 20))),
+                toJts("C", p(rect(22, 22, 28, 28))));
+
+        assertThat(getInvalidLines(areaValidator), is(empty()));
+        assertThat(areaValidator.createIntersectionExceptions("TEST"), is(empty()));
+    }
+
+    @Test
+    public void polygonFillsHoleSameOrientation() throws IoxException {
+        AreaValidator areaValidator = validate(
+                toJts("A", p(rect(10, 10, 40, 40), rect(20, 20, 30, 30))),
+                toJts("B", p(rect(20, 20, 30, 30))));
+
+        assertThat(getInvalidLines(areaValidator), is(empty()));
+        assertThat(areaValidator.createIntersectionExceptions("TEST"), is(empty()));
+    }
+
+    @Test
+    public void twoPolygonsFillHole() throws IoxException {
+        AreaValidator areaValidator = validate(
+                toJts("A", p(rect(10, 10, 40, 40), b(c(20, 30), c(20, 20), c(25, 20), c(30, 20), c(30, 30), c(25, 30), c(20, 30)))),
+                toJts("B", p(rect(20, 20, 25, 30))),
+                toJts("C", p(rect(25, 20, 30, 30))));
+
+        assertThat(getInvalidLines(areaValidator), is(empty()));
+        assertThat(areaValidator.createIntersectionExceptions("TEST"), is(empty()));
+    }
+
+    @Test
+    public void twoPolygonsFillHoleWithoutVertexOnHole() throws IoxException {
+        AreaValidator areaValidator = validate(
+                toJts("B", p(rect(20, 20, 25, 30))),
+                toJts("C", p(rect(25, 20, 30, 30))),
+                toJts("A", p(rect(10, 10, 40, 40), rect(20, 30, 30, 20))));
+
+        assertThat(getInvalidLines(areaValidator), containsInAnyOrder(
+                "A: MULTICURVE (COMPOUNDCURVE ((20 20, 30 20)), COMPOUNDCURVE ((30 30, 20 30)))",
+                "B: MULTICURVE (COMPOUNDCURVE ((20 30, 25 30)), COMPOUNDCURVE ((25 20, 20 20)))",
+                "C: MULTICURVE (COMPOUNDCURVE ((25 30, 30 30)), COMPOUNDCURVE ((30 20, 25 20)))"));
+
+        assertIntersectionExceptions(areaValidator.createIntersectionExceptions("TEST"),
+                "Overlay coord1 (20.000, 20.000), coord2 (25.000, 20.000), tids A, B",
+                "Overlay coord1 (20.000, 30.000), coord2 (25.000, 30.000), tids A, B",
+                "Overlay coord1 (25.000, 20.000), coord2 (30.000, 20.000), tids A, C",
+                "Overlay coord1 (25.000, 30.000), coord2 (30.000, 30.000), tids A, C");
+    }
+
+    @Test
+    public void twoPolygonsFillSameHole() throws IoxException {
+        AreaValidator areaValidator = validate(
+                toJts("A", p(rect(10, 10, 40, 40), rect(20, 30, 30, 20))),
+                toJts("B", p(rect(20, 20, 30, 30))),
+                toJts("C", p(rect(20, 20, 30, 30))));
+
+        assertThat(getInvalidLines(areaValidator), containsInAnyOrder(
+                "B: MULTICURVE (COMPOUNDCURVE ((20 20, 20 30, 30 30, 30 20, 20 20)))",
+                "C: MULTICURVE (COMPOUNDCURVE ((20 20, 20 30, 30 30, 30 20, 20 20)))"));
+
+        assertIntersectionExceptions(areaValidator.createIntersectionExceptions("TEST"),
+                "polygons overlay tid1 B, tid2 C");
+    }
+
+    @Test
+    public void polygonOutsideHoleSharesHoleEdge() throws IoxException {
+        AreaValidator areaValidator = validate(
+                toJts("A", p(rect(10, 10, 40, 40), rect(20, 30, 30, 20))),
+                toJts("B", p(rect(30, 20, 35, 30))));
+
+        assertThat(getInvalidLines(areaValidator), containsInAnyOrder(
+                "A: MULTICURVE (COMPOUNDCURVE ((30 20, 30 30)))",
+                "B: MULTICURVE (COMPOUNDCURVE ((30 20, 30 30, 35 30, 35 20, 30 20)))"));
+
+        assertIntersectionExceptions(areaValidator.createIntersectionExceptions("TEST"),
+                "polygons overlay tid1 A, tid2 B");
+    }
+
+    @Test
+    public void polygonsInsideAndOutsideTouchHoleThatTouchesOuterBoundary() throws IoxException {
+        AreaValidator areaValidator = validate(
+                toJts("A", p(
+                        b(c(10, 10), c(10, 40), c(40, 40), c(40, 25), c(40, 10), c(10, 10)),
+                        b(c(40, 25), c(25, 20), c(25, 30), c(40, 25)))),
+                toJts("B", p(b(c(40, 25), c(30, 22), c(30, 28), c(40, 25)))),
+                toJts("C", p(b(c(40, 25), c(45, 30), c(45, 20), c(40, 25)))));
 
         assertThat(getInvalidLines(areaValidator), is(empty()));
         assertThat(areaValidator.createIntersectionExceptions("TEST"), is(empty()));
