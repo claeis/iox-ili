@@ -191,6 +191,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	private String areaOverlapValidation=null;
 	private String constraintValidation=null;
 	private String defaultGeometryTypeValidation=null;
+	private String degeneratedArcValidation=ValidationConfig.WARNING;
 	Pattern patternForIdValidation = null;
 	Pattern patternForTextOIdValidation = null;
 	Pattern patternForStandartOidValidation = null;
@@ -352,6 +353,10 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		areaOverlapValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.AREA_OVERLAP_VALIDATION);
 		constraintValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.CONSTRAINT_VALIDATION);
 		defaultGeometryTypeValidation=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEFAULT_GEOMETRY_TYPE_VALIDATION);
+		String degeneratedArcValidationParam=this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEGENERATED_ARC_VALIDATION);
+		if(degeneratedArcValidationParam!=null){
+			degeneratedArcValidation=degeneratedArcValidationParam;
+		}
 		if(!singlePass) {
 	        objectPool=new ObjectPool(doItfOidPerTable, errs, errFact, tag2class,objPoolManager);
 	        linkPool=new LinkPool(objPoolManager);
@@ -2683,7 +2688,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         ItfAreaPolygon2Linetable polygonPool = new ItfAreaPolygon2Linetable(mainObjTag, objPoolManager); // create new pool of polygons
         for (IomObject polygon : listOfPolygons) {
             try {
-                polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, errFact);
+                polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, degeneratedArcValidation, errFact);
             } catch (IoxException e) {
                 EhiLogger.logError(e);
                 return new Value(false); // when the input polygon causes an exception, areAreas is false
@@ -2780,7 +2785,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             }
             for (IomObject polygon : listOfPolygons) {
                 try {
-                    polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, errFact);
+                    polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, degeneratedArcValidation, errFact);
                 } catch (IoxException e) {
                     EhiLogger.logError(e);  
                 }
@@ -2840,7 +2845,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 
             for (IomObject polygon : listOfPolygons) {
                 try {
-                    polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, errFact);
+                    polygonPool.addPolygon(null, polygon.getobjectoid(), polygon, validationKind, degeneratedArcValidation, errFact);
                 } catch (IoxException e) {
                     EhiLogger.logError(e);
                 }
@@ -4581,7 +4586,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                                     }
 
                                                     if(surfaceTopologyValid) {
-                                                        allLines.addPolygon(currentMainOid, null, surfaceValue, validateGeometryType, errFact);
+                                                        allLines.addPolygon(currentMainOid, null, surfaceValue, validateGeometryType, degeneratedArcValidation, errFact);
                                                     }else {
                                                         // surface topology not valid
                                                         areaAttrsAreSurfaceTopologiesValid.put(attr, false);
@@ -4624,7 +4629,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                                                }
 
                                                if(surfaceTopologyValid) {
-                                                   allLines.addMultiPolygon(currentMainOid, null, surfaceValue, validateGeometryType, errFact);
+                                                   allLines.addMultiPolygon(currentMainOid, null, surfaceValue, validateGeometryType, degeneratedArcValidation, errFact);
                                                }else {
                                                    // surface topology not valid
                                                    areaAttrsAreSurfaceTopologiesValid.put(attr, false);
@@ -4863,10 +4868,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			if (coordType == null) {
 				return false;
 			}
-			surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, errFact, validateType, coordType);
+			surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validatePolygon(mainObjTid, attr, iomValue, errFact, validateType, degeneratedArcValidation, coordType);
             Polygon polygon=null;
             if(surfaceTopologyValid) {
-                polygon=Iox2jtsext.surface2JTS(iomValue,0.0);
+                // messages about the segments were already reported by validatePolygon()
+                polygon=Iox2jtsext.surface2JTS(iomValue,0.0,new OutParam<Boolean>(),errFact,0.0,ValidationConfig.OFF,ValidationConfig.OFF);
                 {
                     Envelope shell=polygon.getExteriorRing().getEnvelopeInternal();
                     for(int i=0;surfaceTopologyValid && i<polygon.getNumInteriorRing();i++) {
@@ -4912,7 +4918,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             if (coordType == null) {
                 return false;
             }
-            surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validateMultiPolygon(mainObjTid, attr, iomValue, errFact, validateType, coordType);
+            surfaceTopologyValid=ItfSurfaceLinetable2Polygon.validateMultiPolygon(mainObjTid, attr, iomValue, errFact, validateType, degeneratedArcValidation, coordType);
         } catch (IoxException e) {
             surfaceTopologyValid=false;
             errs.addEvent(errFact.logErrorMsg(e, rsrc.getString("validateSurfaceTopology.failedToValidatePolygon")));
@@ -4934,7 +4940,7 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		CompoundCurve seg=null;
 		try {
 		    OutParam<Boolean> foundErrs=new OutParam<Boolean>();
-			seg = Iox2jtsext.polyline2JTS(iomValue, false, 0.0,foundErrs,errFact,0.0,validateType,ValidationConfig.WARNING);
+			seg = Iox2jtsext.polyline2JTS(iomValue, false, 0.0,foundErrs,errFact,0.0,validateType,degeneratedArcValidation);
 			if(seg==null || foundErrs.value){
 				return;
 			}
@@ -5361,6 +5367,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 	public static void initItfValidation(Settings settings)
 	{
         settings.setValue(CONFIG_DO_ITF_OIDPERTABLE, CONFIG_DO_ITF_OIDPERTABLE_DO);
+	}
+	/** Severity of the message about an arc whose three points are on a straight line.
+	 * @return value of the parameter ValidationConfig.DEGENERATED_ARC_VALIDATION; ValidationConfig.WARNING if not set
+	 */
+	public String getDegeneratedArcValidation() {
+		return degeneratedArcValidation;
 	}
 	public long getObjectCount() {
 	    return objectCount;

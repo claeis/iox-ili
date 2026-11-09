@@ -320,14 +320,24 @@ public class Iox2jtsext {
     public static com.vividsolutions.jts.geom.Polygon surface2JTS(IomObject obj,double strokeP, OutParam<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType) //SurfaceOrAreaType type)
     throws IoxException
     {
-        return (com.vividsolutions.jts.geom.Polygon)surface2JTS_(obj,strokeP,foundErrs,errs,tolerance,validationType,false);
+        return surface2JTS(obj,strokeP,foundErrs,errs,tolerance,validationType,ValidationConfig.WARNING);
+    }
+    public static com.vividsolutions.jts.geom.Polygon surface2JTS(IomObject obj,double strokeP, OutParam<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType,String degeneratedArcValidationType)
+    throws IoxException
+    {
+        return (com.vividsolutions.jts.geom.Polygon)surface2JTS_(obj,strokeP,foundErrs,errs,tolerance,validationType,degeneratedArcValidationType,false);
     }
     public static com.vividsolutions.jts.geom.MultiPolygon multisurface2JTS(IomObject obj,double strokeP, OutParam<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType) //SurfaceOrAreaType type)
     throws IoxException
     {
-        return (com.vividsolutions.jts.geom.MultiPolygon)surface2JTS_(obj,strokeP,foundErrs,errs,tolerance,validationType,true);
+        return multisurface2JTS(obj,strokeP,foundErrs,errs,tolerance,validationType,ValidationConfig.WARNING);
     }
-	private static com.vividsolutions.jts.geom.Geometry surface2JTS_(IomObject obj,double strokeP, OutParam<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType,boolean isMultiSurface) //SurfaceOrAreaType type)
+    public static com.vividsolutions.jts.geom.MultiPolygon multisurface2JTS(IomObject obj,double strokeP, OutParam<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType,String degeneratedArcValidationType)
+    throws IoxException
+    {
+        return (com.vividsolutions.jts.geom.MultiPolygon)surface2JTS_(obj,strokeP,foundErrs,errs,tolerance,validationType,degeneratedArcValidationType,true);
+    }
+	private static com.vividsolutions.jts.geom.Geometry surface2JTS_(IomObject obj,double strokeP, OutParam<Boolean> foundErrs,LogEventFactory errs,double tolerance,String validationType,String degeneratedArcValidationType,boolean isMultiSurface) //SurfaceOrAreaType type)
 	throws IoxException
 	{
 		foundErrs.value=false;
@@ -370,7 +380,7 @@ public class Iox2jtsext {
 				for(int polylinei=0;polylinei<boundary.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE);polylinei++){
 					IomObject polyline=boundary.getattrobj(Iom_jObject.BOUNDARY_POLYLINE,polylinei);
 					OutParam<Boolean> lineErrs=new OutParam<Boolean>();
-					CompoundCurve jtsLine=polyline2JTS(polyline,true,strokeP,lineErrs,errs,tolerance,validationType,ValidationConfig.WARNING);
+					CompoundCurve jtsLine=polyline2JTS(polyline,true,strokeP,lineErrs,errs,tolerance,validationType,degeneratedArcValidationType);
 					if(lineErrs.value){
 						foundErrs.value=foundErrs.value || lineErrs.value;
 					}
@@ -395,13 +405,13 @@ public class Iox2jtsext {
 		return ret;
 	}
 	
-    public static ArrayList<CompoundCurve> surface2JTSCompoundCurves(IomObject obj,String validationType,double tolerance,LogEventFactory errFact) throws IoxException {
-        return surface2JTSCompoundCurves_(obj,validationType,tolerance,errFact,false);
+    public static ArrayList<CompoundCurve> surface2JTSCompoundCurves(IomObject obj,String validationType,String degeneratedArcValidationType,double tolerance,LogEventFactory errFact) throws IoxException {
+        return surface2JTSCompoundCurves_(obj,validationType,degeneratedArcValidationType,tolerance,errFact,false);
     }
-    public static ArrayList<CompoundCurve> multisurface2JTSCompoundCurves(IomObject obj,String validationType,double tolerance,LogEventFactory errFact) throws IoxException {
-        return surface2JTSCompoundCurves_(obj,validationType,tolerance,errFact,true);
+    public static ArrayList<CompoundCurve> multisurface2JTSCompoundCurves(IomObject obj,String validationType,String degeneratedArcValidationType,double tolerance,LogEventFactory errFact) throws IoxException {
+        return surface2JTSCompoundCurves_(obj,validationType,degeneratedArcValidationType,tolerance,errFact,true);
     }
-	private static ArrayList<CompoundCurve> surface2JTSCompoundCurves_(IomObject obj,String validationType,double tolerance,LogEventFactory errFact,boolean isMultiSurface) throws IoxException {
+	private static ArrayList<CompoundCurve> surface2JTSCompoundCurves_(IomObject obj,String validationType,String degeneratedArcValidationType,double tolerance,LogEventFactory errFact,boolean isMultiSurface) throws IoxException {
 		if(obj==null){
 			return null;
 		}
@@ -428,7 +438,7 @@ public class Iox2jtsext {
 				IomObject boundary=surface.getattrobj(Iom_jObject.SURFACE_BOUNDARY,boundaryi);
 				for(int polylinei=0;polylinei<boundary.getattrvaluecount(Iom_jObject.BOUNDARY_POLYLINE);polylinei++){
 					IomObject polyline=boundary.getattrobj(Iom_jObject.BOUNDARY_POLYLINE,polylinei);
-					CompoundCurve jtsLine=Iox2jtsext.polyline2JTS(polyline, false, 0.0,new OutParam<Boolean>(),errFact,tolerance,validationType, ValidationConfig.WARNING);
+					CompoundCurve jtsLine=Iox2jtsext.polyline2JTS(polyline, false, 0.0,new OutParam<Boolean>(),errFact,tolerance,validationType,degeneratedArcValidationType);
 					jtsLines.add(jtsLine);
 				}
 			}

@@ -798,4 +798,65 @@ public class Surface23Test {
 		// Asserts
 		assertThat(logger.getErrs(), is(empty()));
 	}
+
+	// prueft, ob die Meldung zu einem Kreisbogen, dessen Punkte auf einer Geraden liegen, konfigurierbar ist.
+	@Test
+	public void degeneratedArc_Ok(){
+		Iom_jObject obj=new Iom_jObject(ILI_CLASSC, OID1);
+		obj.addattrobj("surface2d", IomObjectHelper.createPolygonFromBoundaries(
+				IomObjectHelper.createBoundary(
+						IomObjectHelper.createCoord("480000.000", "70000.000"),
+						IomObjectHelper.createArc("480005.000", "70000.000", "480010.000", "70000.000"),
+						IomObjectHelper.createCoord("480010.000", "70010.000"),
+						IomObjectHelper.createCoord("480000.000", "70010.000"),
+						IomObjectHelper.createCoord("480000.000", "70000.000"))));
+
+		LogCollector logger = validateObjects(obj);
+
+		// Asserts
+		assertThat(logger.getErrs(), is(empty()));
+		LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+				"arc is straight at (480005.0, 70000.0, NaN)");
+	}
+
+	@Test
+	public void degeneratedArcValidationOff_Ok(){
+		Iom_jObject obj=new Iom_jObject(ILI_CLASSC, OID1);
+		obj.addattrobj("surface2d", IomObjectHelper.createPolygonFromBoundaries(
+				IomObjectHelper.createBoundary(
+						IomObjectHelper.createCoord("480000.000", "70000.000"),
+						IomObjectHelper.createArc("480005.000", "70000.000", "480010.000", "70000.000"),
+						IomObjectHelper.createCoord("480010.000", "70010.000"),
+						IomObjectHelper.createCoord("480000.000", "70010.000"),
+						IomObjectHelper.createCoord("480000.000", "70000.000"))));
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEGENERATED_ARC_VALIDATION, ValidationConfig.OFF);
+
+		LogCollector logger = validateObjects(modelConfig, obj);
+
+		// Asserts
+		assertThat(logger.getErrs(), is(empty()));
+		assertThat(logger.getWarn(), is(empty()));
+	}
+
+	@Test
+	public void degeneratedArcValidationOn_Fail(){
+		Iom_jObject obj=new Iom_jObject(ILI_CLASSC, OID1);
+		obj.addattrobj("surface2d", IomObjectHelper.createPolygonFromBoundaries(
+				IomObjectHelper.createBoundary(
+						IomObjectHelper.createCoord("480000.000", "70000.000"),
+						IomObjectHelper.createArc("480005.000", "70000.000", "480010.000", "70000.000"),
+						IomObjectHelper.createCoord("480010.000", "70010.000"),
+						IomObjectHelper.createCoord("480000.000", "70010.000"),
+						IomObjectHelper.createCoord("480000.000", "70000.000"))));
+		ValidationConfig modelConfig=new ValidationConfig();
+		modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEGENERATED_ARC_VALIDATION, ValidationConfig.ON);
+
+		LogCollector logger = validateObjects(modelConfig, obj);
+
+		// Asserts
+		assertThat(logger.getWarn(), is(empty()));
+		LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+				"arc is straight at (480005.0, 70000.0, NaN)");
+	}
 }

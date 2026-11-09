@@ -300,6 +300,26 @@ public class AreAreas23Test {
     }
     
     @Test
+    public void classE_allObjectE_DegeneratedArcValidationOff_Ok() {
+        Iom_jObject classE1 = new Iom_jObject(CLASSE, OID1);
+        classE1.setattrvalue("art", "a");
+        classE1.addattrobj("flaeche", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("480000.000", "70000.000"),
+                        IomObjectHelper.createArc("480005.000", "70000.000", "480010.000", "70000.000"),
+                        IomObjectHelper.createCoord("480010.000", "70010.000"),
+                        IomObjectHelper.createCoord("480000.000", "70010.000"),
+                        IomObjectHelper.createCoord("480000.000", "70000.000"))));
+
+        ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEGENERATED_ARC_VALIDATION, ValidationConfig.OFF);
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, BID, modelConfig, classE1);
+        // Asserts.
+        assertEquals(0, logger.getErrs().size());
+        assertEquals(0, logger.getWarn().size());
+    }
+
+    @Test
     public void overlapBelowTolerance_Ok() {
         LogCollector logger = ValidatorTestHelper.validateObjects(td, OVERLAP_TOPIC,
                 createGeomObject(BASE, "o1", createArcPolygon("75010.010")),

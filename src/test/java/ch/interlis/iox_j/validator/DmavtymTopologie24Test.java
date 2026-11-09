@@ -1640,4 +1640,29 @@ public class DmavtymTopologie24Test {
         assertThat(logger.getErrs(), is(empty()));
         assertThat(logger.getWarn(), is(empty()));
     }
+
+    @Test
+    public void coversDegeneratedArcValidationOff() {
+        Iom_jObject iomObj = new Iom_jObject(CLASSA, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createArc("20", "10", "30", "10"),
+                        IomObjectHelper.createCoord("30", "30"),
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createCoord("10", "10"))));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createArc("20", "10", "30", "10"),
+                        IomObjectHelper.createCoord("30", "30"),
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createCoord("10", "10"))));
+
+        ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEGENERATED_ARC_VALIDATION, ValidationConfig.OFF);
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, "b1", modelConfig, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
 }
