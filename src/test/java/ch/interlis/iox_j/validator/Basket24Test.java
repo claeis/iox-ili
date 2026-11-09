@@ -165,8 +165,6 @@ public class Basket24Test {
         assertEquals("should skip object of " + TOPIC_A, 1, validator.getObjectCount());
         assertThat(logger.getErrs(), is(empty()));
         LogCollectorAssertions.AssertContainsInfo("basket b1 of topic " + TOPIC_A + " is skipped from transfer", 1, logger);
-        LogCollectorAssertions.AssertContainsWarning("basket of " + TOPIC_A + " is marked as skipped for transfer and missing in ref data", 1, logger);
-        LogCollectorAssertions.AssertContainsWarning("basket of " + TOPIC_B + " is marked as skipped for transfer and missing in ref data", 1, logger);
     }
 
     @Test
@@ -198,9 +196,7 @@ public class Basket24Test {
         assertEquals("should keep object of " + TOPIC_C + " and ref data", 2, validator.getObjectCount());
         assertThat(logger.getErrs(), is(empty()));
         LogCollectorAssertions.AssertContainsInfo("basket b1 of topic " + TOPIC_A + " is skipped from transfer", 1, logger);
-        LogCollectorAssertions.AssertContainsWarning("basket of " + TOPIC_B + " is marked as skipped for transfer and missing in ref data", 1, logger);
         LogCollectorAssertions.AssertContainsInfo("basket refB1 of topic " + TOPIC_A + " is skipped from transfer", 0, logger);
-        LogCollectorAssertions.AssertContainsWarning("basket of " + TOPIC_A + " is marked as skipped for transfer and missing in ref data", 0, logger);
     }
 
     @Test
@@ -218,8 +214,6 @@ public class Basket24Test {
         assertEquals("should keep object of " + TOPIC_C + " and ref data", 2, validator.getObjectCount());
         assertThat(logger.getErrs(), is(empty()));
         LogCollectorAssertions.AssertContainsInfo("basket b1 of topic " + TOPIC_A + " is skipped from transfer", 1, logger);
-        LogCollectorAssertions.AssertContainsWarning("basket of " + TOPIC_A + " is marked as skipped for transfer and missing in ref data", 0, logger);
-        LogCollectorAssertions.AssertContainsWarning("basket of " + TOPIC_B + " is marked as skipped for transfer and missing in ref data", 1, logger);
     }
 
     @Test
@@ -235,8 +229,6 @@ public class Basket24Test {
         assertThat(logger.getErrs(), hasSize(1));
         LogCollectorAssertions.AssertContainsError("basket " + TOPIC_A + " is mandatory in transfer", 1, logger);
         LogCollectorAssertions.AssertContainsInfo("basket b1 of topic " + TOPIC_A + " is skipped from transfer", 1, logger);
-        LogCollectorAssertions.AssertContainsWarning("basket of " + TOPIC_A + " is marked as skipped for transfer and missing in ref data", 1, logger);
-        LogCollectorAssertions.AssertContainsWarning("basket of " + TOPIC_B + " is marked as skipped for transfer and missing in ref data", 1, logger);
     }
 
     private void validateBasketAAndC(Validator validator) {

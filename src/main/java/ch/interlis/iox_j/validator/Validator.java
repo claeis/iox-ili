@@ -759,11 +759,6 @@ public class Validator implements ch.interlis.iox.IoxValidator {
                     errs.addEvent(errFact.logErrorMsg(rsrc.getString("validateBasketEvent.mandatoryBasketMissing"), mandatoryBasket));
                 }
             }
-            for (String skippedBasket : skippedBaskets) {
-                if (!seenTopics.contains(skippedBasket)) {
-                    errs.addEvent(errFact.logWarningMsg(rsrc.getString("validate.skippedBasketMissingRefData"), skippedBasket));
-                }
-            }
             iterateThroughReferencedModels();
             String additionalModelsConfig = validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.ADDITIONAL_MODELS);
             if (additionalModelsConfig != null) {
