@@ -238,6 +238,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
     private java.util.Set<String> optionalBaskets=null;
     private java.util.Set<String> bannedBaskets=null;
     private java.util.Set<String> seenTopics=null;
+    private java.util.Set<String> skippedBaskets=null;
+    private boolean skipCurrentBasket =false;
 
 	@Deprecated
 	public Validator(TransferDescription td, IoxValidationConfig validationConfig,
@@ -345,6 +347,8 @@ public class Validator implements ch.interlis.iox.IoxValidator {
         if(!mandatoryBaskets.isEmpty() && !mandatoryBaskets.contains(ValidationConfig.ANY) && optionalBaskets.isEmpty() && !bannedBaskets.contains(ValidationConfig.ANY)) {
             optionalBaskets.add(ValidationConfig.ANY);
         }
+        skippedBaskets=new HashSet<String>();
+        parseBasketList(skippedBaskets, validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.SKIPPED_BASKETS));
 		validationOff=ValidationConfig.OFF.equals(this.validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.VALIDATION));
 		globalMultiplicity=validationConfig.getConfigValue(ValidationConfig.PARAMETER, ValidationConfig.MULTIPLICITY);
 		if(globalMultiplicity!=null && ValidationConfig.ON.equals(globalMultiplicity)){
@@ -435,6 +439,12 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 		if(validationOff){
 			return;
 		}
+		if (skipCurrentBasket) {
+			if (event instanceof ch.interlis.iox.EndBasketEvent) {
+				skipCurrentBasket = false;
+			}
+			return;
+		}
 		if (event instanceof ch.interlis.iox.StartTransferEvent){
 		    if(firstStartTransferEvent) {
 	            errs.addEvent(errFact.logInfoMsg(getFirstPassMsg()));
@@ -450,6 +460,11 @@ public class Validator implements ch.interlis.iox.IoxValidator {
 			}
 		} else if (event instanceof ch.interlis.iox.StartBasketEvent){
 			StartBasketEvent startBasketEvent = ((ch.interlis.iox.StartBasketEvent) event);
+			// skipped baskets skip data from the transfer but keep all reference data
+			if (doValidation && skippedBaskets.contains(startBasketEvent.getType())) {
+				skipBasket(startBasketEvent);
+				return;
+			}
 			currentBasketId = startBasketEvent.getBid();
 			if(isValidId(currentBasketId)){
 	            if(!singlePass) {
@@ -484,6 +499,14 @@ public class Validator implements ch.interlis.iox.IoxValidator {
             }
 		}
 	}
+
+    private void skipBasket(StartBasketEvent event) {
+        skipCurrentBasket = true;
+        errFact.setTid(event.getBid());
+        errFact.setIliqname(event.getType());
+        errs.addEvent(errFact.logInfoMsg(rsrc.getString("validate.skippedBasket"), event.getBid(), event.getType()));
+    }
+
     protected String getFirstPassMsg() {
         return rsrc.getString("validate.firstValidationPass");
     }

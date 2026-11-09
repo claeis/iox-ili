@@ -1,5 +1,6 @@
 package ch.interlis.iom_j.xtf;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.*;
 import java.io.File;
 import java.util.Map;
@@ -155,6 +156,58 @@ public class Xtf24ReaderTest {
         reader.close();
         reader=null;
     }
+
+	@Test
+	public void testSkipBasketFilter_Ok() throws IoxException {
+		Xtf24Reader reader = new Xtf24Reader(new File(TEST_IN,"MultipleBasketsAndObjects.xml"));
+		reader.setModel(td);
+		reader.setSkipTopicFilter(new String[] {"Test1.TopicB"});
+		IoxEvent event;
+		assertThat(reader.read(), instanceOf(StartTransferEvent.class));
+
+		event = reader.read();
+		assertThat(event, instanceOf(StartBasketEvent.class));
+		assertEquals("Test1.TopicA", ((StartBasketEvent) event).getType());
+		assertThat(reader.read(), instanceOf(ObjectEvent.class));
+		assertThat(reader.read(), instanceOf(ObjectEvent.class));
+		assertThat(reader.read(), instanceOf(EndBasketEvent.class));
+
+		event = reader.read();
+		assertThat(event, instanceOf(StartBasketEvent.class));
+		assertEquals("Test1.TopicC", ((StartBasketEvent) event).getType());
+		assertThat(reader.read(), instanceOf(ObjectEvent.class));
+		assertThat(reader.read(), instanceOf(ObjectEvent.class));
+		assertThat(reader.read(), instanceOf(EndBasketEvent.class));
+
+		assertThat(reader.read(), instanceOf(EndTransferEvent.class));
+		reader.close();
+	}
+
+	@Test
+	public void testSkipBasketFilterLast_Ok() throws IoxException {
+		Xtf24Reader reader = new Xtf24Reader(new File(TEST_IN,"MultipleBasketsAndObjects.xml"));
+		reader.setModel(td);
+		reader.setSkipTopicFilter(new String[] {"Test1.TopicC"});
+		IoxEvent event;
+		assertThat(reader.read(), instanceOf(StartTransferEvent.class));
+
+		event = reader.read();
+		assertThat(event, instanceOf(StartBasketEvent.class));
+		assertEquals("Test1.TopicA", ((StartBasketEvent) event).getType());
+		assertThat(reader.read(), instanceOf(ObjectEvent.class));
+		assertThat(reader.read(), instanceOf(ObjectEvent.class));
+		assertThat(reader.read(), instanceOf(EndBasketEvent.class));
+
+		event = reader.read();
+		assertThat(event, instanceOf(StartBasketEvent.class));
+		assertEquals("Test1.TopicB", ((StartBasketEvent) event).getType());
+		assertThat(reader.read(), instanceOf(ObjectEvent.class));
+		assertThat(reader.read(), instanceOf(ObjectEvent.class));
+		assertThat(reader.read(), instanceOf(EndBasketEvent.class));
+
+		assertThat(reader.read(), instanceOf(EndTransferEvent.class));
+		reader.close();
+	}
 	
 	// In diesem Test soll getestet werden, ob die topic (basketname, basket ID)
 	// mehrere Male erstellt werden kann, ohne dass dabei eine Fehlermeldung entsteht.

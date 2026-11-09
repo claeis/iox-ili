@@ -1,5 +1,6 @@
 package ch.interlis.iom_j.xtf;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.*;
 import java.io.File;
 import java.util.Map;
@@ -443,5 +444,43 @@ public class Xtf23ReaderTest {
         assertTrue(reader.read() instanceof  EndTransferEvent);
         reader.close();
         reader=null;
+    }
+
+    @Test
+    public void testSkipBasketFilterMiddle_Ok() throws IoxException {
+        Xtf23Reader reader = new Xtf23Reader(new File(TEST_IN,"MultipleBasketsAndObjects.xml"));
+        reader.setSkipTopicFilter(new String[] {"Test1.TopicB"});
+        assertThat(reader.read(), instanceOf(StartTransferEvent.class));
+
+        IoxEvent event = reader.read();
+        assertThat(event, instanceOf(StartBasketEvent.class));
+        assertEquals("Test1.TopicA", ((StartBasketEvent) event).getType());
+        assertThat(reader.read(), instanceOf(ObjectEvent.class));
+        assertThat(reader.read(), instanceOf(EndBasketEvent.class));
+
+        event = reader.read();
+        assertThat(event, instanceOf(StartBasketEvent.class));
+        assertEquals("Test1.TopicA", ((StartBasketEvent) event).getType());
+        assertThat(reader.read(), instanceOf(ObjectEvent.class));
+        assertThat(reader.read(), instanceOf(EndBasketEvent.class));
+
+        assertThat(reader.read(), instanceOf(EndTransferEvent.class));
+        reader.close();
+    }
+
+    @Test
+    public void testSkipBasketFilterFirstAndLast_Ok() throws IoxException {
+        Xtf23Reader reader = new Xtf23Reader(new File(TEST_IN,"MultipleBasketsAndObjects.xml"));
+        reader.setSkipTopicFilter(new String[] {"Test1.TopicA"});
+        assertThat(reader.read(), instanceOf(StartTransferEvent.class));
+
+        IoxEvent event = reader.read();
+        assertThat(event, instanceOf(StartBasketEvent.class));
+        assertEquals("Test1.TopicB", ((StartBasketEvent) event).getType());
+        assertThat(reader.read(), instanceOf(ObjectEvent.class));
+        assertThat(reader.read(), instanceOf(EndBasketEvent.class));
+
+        assertThat(reader.read(), instanceOf(EndTransferEvent.class));
+        reader.close();
     }
 }

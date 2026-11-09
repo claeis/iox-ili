@@ -151,6 +151,10 @@ public class Xtf23Reader0 implements IoxReader, IoxIliReader {
     }
 
     @Override
+    public void setSkipTopicFilter(String[] topicNames) {
+    }
+
+    @Override
     public void setModel(TransferDescription td) {
     }
 

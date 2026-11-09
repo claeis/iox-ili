@@ -44,6 +44,7 @@ public class ValidationConfig implements ch.interlis.iox.IoxValidationConfig {
 	public static final String MANDATORY_BASKETS = "mandatoryBaskets";
 	public static final String OPTIONAL_BASKETS="optionalBaskets";
 	public static final String BANNED_BASKETS="bannedBaskets";
+	public static final String SKIPPED_BASKETS="skippedBaskets";
 	public static final String CONSTRAINT_VALIDATION = "constraintValidation";
 	public static final String DEFAULT_GEOMETRY_TYPE_VALIDATION = "defaultGeometryTypeValidation";
 	public static final String ADDITIONAL_MODELS="additionalModels";

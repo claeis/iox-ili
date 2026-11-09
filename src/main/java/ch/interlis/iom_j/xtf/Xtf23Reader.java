@@ -1,7 +1,9 @@
 package ch.interlis.iom_j.xtf;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.namespace.QName;
@@ -60,6 +62,7 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 	private int oidSpaceSize=0;
 	private List<XtfModel> models=new ArrayList<XtfModel>();
     private java.util.Set<String> filterTopics=null;
+    private java.util.Set<String> skippedTopics;
     private boolean isXtf23Reader0_compatible=true;
     private boolean ili22=false;
 	private int state = START;
@@ -250,10 +253,13 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
                     throw new IoxSyntaxException(unexpectedXmlEvent2msg(readAheadEvent));
                 }
                 if(readAheadEvent.isStartElement()){
-                	state=AFTER_STARTBASKET;
-                	OutParam<IoxEvent> startBasketOut=new OutParam<IoxEvent>();
-		        	readAheadEvent=readStartBasket(readAheadEvent,startBasketOut);
-		        	return startBasketOut.value;
+					if (!skipsBasket()) {
+						state=AFTER_STARTBASKET;
+						OutParam<IoxEvent> startBasketOut=new OutParam<IoxEvent>();
+						readAheadEvent=readStartBasket(readAheadEvent,startBasketOut);
+						return startBasketOut.value;
+					}
+					// continue after end basket
 		        }else if(readAheadEvent.isEndElement()){
 					state=AFTER_ENDBASKET;
 					// see processing below
@@ -304,7 +310,10 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 			}
 			
 			// after end basket
-			if(state==AFTER_ENDBASKET) {
+			while(state==AFTER_ENDBASKET) {
+				if (skipsBasket()) {
+					continue;
+				}
 		    	if(readAheadEvent.isStartElement()){
 		    		state=AFTER_STARTBASKET;
 		    		OutParam<IoxEvent> startBasketOut=new OutParam<IoxEvent>();
@@ -338,6 +347,22 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
 			throw new IoxException(ex);
 		}
 		return null;
+	}
+
+	/**
+	 * Skips the basket ahead in the reader if it matches a skipped topic.
+	 */
+	private boolean skipsBasket() throws XMLStreamException, IoxSyntaxException {
+		if (readAheadEvent.isStartElement()) {
+			String topicName = getTopicFromQName(readAheadEvent.asStartElement().getName());
+			if (skippedTopics != null && skippedTopics.contains(topicName)) {
+				skip();
+				readAheadEvent = nextEvent(null);
+				state = AFTER_ENDBASKET;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private QName getQName(String localName) {
@@ -903,6 +928,25 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
         }
         return event;
     }
+
+	private XMLEvent skip() throws XMLStreamException, IoxSyntaxException {
+		int elementLevel = 0;
+		XMLEvent event = null;
+		for (event = nextEvent(event); !event.isEndDocument(); event = nextEvent(event)) {
+			switch (event.getEventType()) {
+				case XMLStreamConstants.START_ELEMENT:
+					elementLevel++;
+					break;
+				case XMLStreamConstants.END_ELEMENT:
+					elementLevel--;
+					break;
+			}
+			if (elementLevel < 0) {
+				break;
+			}
+		}
+		return event;
+	}
 	
 	/** Return appropriate error message
 	 * @param event
@@ -1277,6 +1321,14 @@ public class Xtf23Reader implements IoxReader ,IoxIliReader{
         this.filterTopics=new java.util.HashSet<String>();
         for(String topicName:topicNames) {
             filterTopics.add(topicName);
+        }
+    }
+
+    @Override
+    public void setSkipTopicFilter(String[] topicNames) {
+        skippedTopics = new HashSet<String>();
+        if (topicNames != null) {
+            Collections.addAll(skippedTopics, topicNames);
         }
     }
 
