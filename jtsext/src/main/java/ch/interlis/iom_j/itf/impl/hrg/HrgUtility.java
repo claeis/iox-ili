@@ -87,11 +87,8 @@ public static void CTRC3P_(double P1I,double P2I,double  S1I,double S2I,double Q
 		Z2O[0] =   (X2 + L1*N2 + Y2 + L2*M2)/ 2.00;
 		D1 = Z1O[0] - P1I;
 		D2 =  Z2O[0] - P2I;
-		SIGNO[0] = 1.00;
-		 
-		if(L1>0.0 || L2>0.0){
-			SIGNO[0] = -1.00;
-		}
+		// DetA = -(s - p) x (q - s): positive if p, s, q turn to the right, i.e. the arc runs clockwise
+		SIGNO[0] = DETAO[0] > 0.0 ? 1.00 : -1.00;
 	}else{
 		if(P1I==Q1I && P2I==Q2I){
 			//	CASE 	DetA == 0 with P == Q. This is equivalent to m = k*n with
