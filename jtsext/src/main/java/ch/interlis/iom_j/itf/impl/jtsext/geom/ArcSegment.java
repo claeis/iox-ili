@@ -2,6 +2,7 @@ package ch.interlis.iom_j.itf.impl.jtsext.geom;
 
 import ch.interlis.iom_j.itf.impl.hrg.HrgUtility;
 
+import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequences;
@@ -339,16 +340,22 @@ public class ArcSegment extends CurveSegment {
 
 	/**
 	 * Checks if the arcs are equivalent independent of their direction or where the mid-point is located:
-	 * same start and end point (in either order), same circle and the same part of the circle.
+	 * same start and end point (in either order), same radius, the center on the same side of the chord and the
+	 * same part of the circle.
 	 *
 	 * @param other the other {@link ArcSegment}
 	 * @return <code>true</code> if the arcs are equivalent, <code>false</code> otherwise
 	 */
 	public boolean isEquivalent(ArcSegment other) {
-		if (!getNormalizedStartPoint().equals(other.getNormalizedStartPoint())) return false;
-		if (!getNormalizedEndPoint().equals(other.getNormalizedEndPoint())) return false;
-		if (!getCenterPoint().equals2D(other.getCenterPoint())) return false;
-		return Double.compare(getNormalizedSign(), other.getNormalizedSign()) == 0;
+		Coordinate start = getNormalizedStartPoint();
+		Coordinate end = getNormalizedEndPoint();
+		if (!start.equals(other.getNormalizedStartPoint())) return false;
+		if (!end.equals(other.getNormalizedEndPoint())) return false;
+		if (Double.compare(getRadius(), other.getRadius()) != 0) return false;
+		if (Double.compare(getNormalizedSign(), other.getNormalizedSign()) != 0) return false;
+		// two circles with this radius pass through start and end, one on each side of the chord
+		return CGAlgorithms.computeOrientation(start, end, getCenterPoint())
+				== CGAlgorithms.computeOrientation(start, end, other.getCenterPoint());
 	}
 
 	@Override
@@ -365,6 +372,8 @@ public class ArcSegment extends CurveSegment {
 		long temp;
 		result = getNormalizedStartPoint().hashCode();
 		result = 31 * result + getNormalizedEndPoint().hashCode();
+		temp = Double.doubleToLongBits(getRadius());
+		result = 31 * result + (int) (temp ^ (temp >>> 32));
 		temp = Double.doubleToLongBits(getNormalizedSign());
 		result = 31 * result + (int) (temp ^ (temp >>> 32));
 		return result;
