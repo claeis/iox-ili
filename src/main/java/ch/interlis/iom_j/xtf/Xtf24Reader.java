@@ -3,7 +3,9 @@ package ch.interlis.iom_j.xtf;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -52,6 +54,7 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
     private ArrayList<String> models=new ArrayList<String>();
 	private Topic currentTopic=null;
     private java.util.Set<String> filterTopics=null;
+	private java.util.Set<String> skippedTopics;
 	private TransferDescription td;
 	private int state = STATE_START;
 	
@@ -296,7 +299,8 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                             throw new IoxSyntaxException("Unknown topic <"+element.getName()+">");
                         }
                     }else {
-                        if(filterTopics==null || filterTopics.contains(currentTopic.getScopedName())) {
+                        if((filterTopics==null || filterTopics.contains(currentTopic.getScopedName()))
+                                && (skippedTopics == null || !skippedTopics.contains(currentTopic.getScopedName()))) {
                             state=STATE_AFTER_STARTBASKET;
                             return createStartBasket(element); // create new basket
                         }else {
@@ -361,7 +365,8 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
                             throw new IoxSyntaxException("Unknown topic <"+element.getName()+">");
                         }
                     }else {
-                        if(filterTopics==null || filterTopics.contains(currentTopic.getScopedName())) {
+                        if((filterTopics==null || filterTopics.contains(currentTopic.getScopedName()))
+                                && (skippedTopics == null || !skippedTopics.contains(currentTopic.getScopedName()))) {
                             state=STATE_AFTER_STARTBASKET;
                             return createStartBasket(element); // create new basket
                         }else {
@@ -1470,6 +1475,14 @@ public class Xtf24Reader implements IoxReader ,IoxIliReader{
             for(String topicName:topicNames) {
                 filterTopics.add(topicName);
             }
+        }
+    }
+
+    @Override
+    public void setSkipTopicFilter(String[] topicNames) {
+        skippedTopics = new HashSet<String>();
+        if (topicNames != null) {
+            Collections.addAll(skippedTopics, topicNames);
         }
     }
 

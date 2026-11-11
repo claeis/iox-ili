@@ -1552,7 +1552,6 @@ public class Function23Test {
         assertEquals(0,logger.getErrs().size());
     }
     @Test
-    @Ignore("ilivalidator#336")
     public void isOfClass_EmbeddedRole_Ok(){
         Iom_jObject iomObjA=new Iom_jObject(ILI_ISOFCLASS_CLASSA, OBJ_OID1);
         Iom_jObject iomObjB=new Iom_jObject(ILI_ISOFCLASS_CLASSB, OBJ_OID2);
@@ -1574,7 +1573,6 @@ public class Function23Test {
         assertEquals(0,logger.getErrs().size());
     }
     @Test
-    @Ignore("ilivalidator#336")
     public void isOfClass_EmbeddedRole_Fail(){
         Iom_jObject iomObjA=new Iom_jObject(ILI_ISOFCLASS_CLASSA, OBJ_OID1);
         Iom_jObject iomObjB=new Iom_jObject(ILI_ISOFCLASS_CLASSB, OBJ_OID2);

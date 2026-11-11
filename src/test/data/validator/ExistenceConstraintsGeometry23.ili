@@ -1,0 +1,65 @@
+INTERLIS 2.3;
+
+!! EXISTENCE CONSTRAINT of a POLYLINE/SURFACE/AREA attribute against a COORD attribute
+MODEL ExistenceConstraintsGeometry23
+  AT "mailto:noreply@localhost" VERSION "2026-01-01" =
+
+  DOMAIN
+    Lkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+                    70000.000 .. 310000.000 [INTERLIS.m],
+                   ROTATION 2 -> 1;
+    Hkoord = COORD 480000.000 .. 850000.000 [INTERLIS.m],
+                    70000.000 .. 310000.000 [INTERLIS.m],
+                        0.000 .. 5000.000 [INTERLIS.m];
+    Linienzug = POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Lkoord;
+
+  TOPIC Topic =
+
+    CLASS Punkt =
+      Geometrie : Lkoord;
+    END Punkt;
+
+    CLASS PunktErweitert EXTENDS Punkt =
+      Name : TEXT*20;
+    END PunktErweitert;
+
+    CLASS Punkt3d =
+      Geometrie : Hkoord;
+    END Punkt3d;
+
+    CLASS Linie =
+      Geometrie : POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Lkoord;
+      EXISTENCE CONSTRAINT Geometrie REQUIRED IN Punkt:Geometrie;
+    END Linie;
+
+    CLASS Linie3d =
+      Geometrie : POLYLINE WITH (STRAIGHTS,ARCS) VERTEX Hkoord;
+      EXISTENCE CONSTRAINT Geometrie REQUIRED IN Punkt3d:Geometrie;
+    END Linie3d;
+
+    !! geometry type defined by a DOMAIN (like GeometryCHLV95_V1.Line)
+    CLASS LinieDomain =
+      Geometrie : Linienzug;
+      EXISTENCE CONSTRAINT Geometrie REQUIRED IN Punkt:Geometrie;
+    END LinieDomain;
+
+    !! several REQUIRED IN alternatives: control points in Punkt OR same polyline in Referenz
+    CLASS LinieAlternativ =
+      Geometrie : Linienzug;
+      Referenz : Linienzug;
+      EXISTENCE CONSTRAINT Geometrie REQUIRED IN Punkt:Geometrie OR LinieAlternativ:Referenz;
+    END LinieAlternativ;
+
+    CLASS Flaeche =
+      Geometrie : SURFACE WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+      EXISTENCE CONSTRAINT Geometrie REQUIRED IN Punkt:Geometrie;
+    END Flaeche;
+
+    CLASS Gebiet =
+      Geometrie : AREA WITH (STRAIGHTS,ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+      EXISTENCE CONSTRAINT Geometrie REQUIRED IN Punkt:Geometrie;
+    END Gebiet;
+
+  END Topic;
+
+END ExistenceConstraintsGeometry23.

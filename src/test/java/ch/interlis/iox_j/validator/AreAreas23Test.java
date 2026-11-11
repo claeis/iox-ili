@@ -50,6 +50,15 @@ public class AreAreas23Test {
     private final static String STRUCTB = TOPIC + ".StructB";
     private final static String STRUCTA = TOPIC + ".StructA";
 
+    // MODEL.TOPIC, CLASS / STRUCTURE (overlap tolerance)
+    private final static String OVERLAP_TOPIC = "AreAreas23.OverlapTolerance";
+    private final static String BASE = OVERLAP_TOPIC + ".Base";
+    private final static String STRICT = OVERLAP_TOPIC + ".Strict";
+    private final static String PART = OVERLAP_TOPIC + ".Part";
+    private final static String STRICT_PART = OVERLAP_TOPIC + ".StrictPart";
+    private final static String HOLDER = OVERLAP_TOPIC + ".Holder";
+    private final static String UNPARSABLE_TEXT_PATH = OVERLAP_TOPIC + ".UnparsableTextPath";
+
     // #########################################################//
     // ####################### SUCCESS #########################//
     // #########################################################//
@@ -290,6 +299,77 @@ public class AreAreas23Test {
         assertEquals(0, logger.getErrs().size());
     }
     
+    @Test
+    public void classE_allObjectE_DegeneratedArcValidationOff_Ok() {
+        Iom_jObject classE1 = new Iom_jObject(CLASSE, OID1);
+        classE1.setattrvalue("art", "a");
+        classE1.addattrobj("flaeche", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("480000.000", "70000.000"),
+                        IomObjectHelper.createArc("480005.000", "70000.000", "480010.000", "70000.000"),
+                        IomObjectHelper.createCoord("480010.000", "70010.000"),
+                        IomObjectHelper.createCoord("480000.000", "70010.000"),
+                        IomObjectHelper.createCoord("480000.000", "70000.000"))));
+
+        ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEGENERATED_ARC_VALIDATION, ValidationConfig.OFF);
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, BID, modelConfig, classE1);
+        // Asserts.
+        assertEquals(0, logger.getErrs().size());
+        assertEquals(0, logger.getWarn().size());
+    }
+
+    @Test
+    public void overlapBelowTolerance_Ok() {
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, OVERLAP_TOPIC,
+                createGeomObject(BASE, "o1", createArcPolygon("75010.010")),
+                createGeomObject(BASE, "o2", createStraightPolygon()));
+
+        assertEquals(0, logger.getErrs().size());
+    }
+
+    @Test
+    public void strictSubclassLast_UsesLenientBaseTolerance_Ok() {
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, OVERLAP_TOPIC,
+                createGeomObject(BASE, "o1", createStraightPolygon()),
+                createGeomObject(STRICT, "o2", createArcPolygon("75010.010")));
+
+        assertEquals(0, logger.getErrs().size());
+    }
+
+    @Test
+    public void strictSubclassFirst_UsesLenientBaseTolerance_Ok() {
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, OVERLAP_TOPIC,
+                createGeomObject(STRICT, "o1", createArcPolygon("75010.010")),
+                createGeomObject(BASE, "o2", createStraightPolygon()));
+
+        assertEquals(0, logger.getErrs().size());
+    }
+
+    // The path names the base structure (Part->Geom) explicitly. This checks that an extended structure
+    // with a stricter tolerance in the bag does not make the check stricter.
+    @Test
+    public void bagOfStructure_WithExtendedStructure_OverlapBelowTolerance_Ok() {
+        Iom_jObject holder1 = new Iom_jObject(HOLDER, "o1");
+        holder1.addattrobj("Parts", createGeomObject(STRICT_PART, null, createArcPolygon("75010.010")));
+        Iom_jObject holder2 = new Iom_jObject(HOLDER, "o2");
+        holder2.addattrobj("Parts", createGeomObject(PART, null, createStraightPolygon()));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, OVERLAP_TOPIC, holder1, holder2);
+
+        assertEquals(0, logger.getErrs().size());
+    }
+
+    // The unparsable path is logged by the function; no surfaces are found, so the constraint is true (as before #468).
+    @Test
+    public void areAreas3_UnparsableTextPath_Ok() {
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, OVERLAP_TOPIC,
+                createGeomObject(UNPARSABLE_TEXT_PATH, "o1", createArcPolygon("75010.100")),
+                createGeomObject(UNPARSABLE_TEXT_PATH, "o2", createStraightPolygon()));
+
+        assertEquals(0, logger.getErrs().size());
+    }
+
     // #############################################################//
     // ######################### FAIL ##############################//
     // #############################################################//
@@ -810,6 +890,62 @@ public class AreAreas23Test {
                 "Set Constraint AreAreas23.Topic.ClassE.Constraint1 is not true.");
     }
 
+    @Test
+    public void overlapAboveTolerance_Fail() {
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, OVERLAP_TOPIC,
+                createGeomObject(BASE, "o1", createArcPolygon("75010.100")),
+                createGeomObject(BASE, "o2", createStraightPolygon()));
+
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Intersection overlap 0.10005944515626197, coord1 (486010.238, 75010.000), coord2 (486020.000, 75010.000), tids o1/Geom[1], o2/Geom[1]",
+                "Intersection overlap 0.10005944515626197, coord1 (486010.238, 75010.000), coord2 (486020.000, 75010.000), tids o1/Geom[1], o2/Geom[1]",
+                "Set Constraint AreAreas23.OverlapTolerance.Base.GeomAreAreas is not true.",
+                "Set Constraint AreAreas23.OverlapTolerance.Base.GeomAreAreas3 is not true.");
+    }
+
+    // The constraints are defined in Base (0.05), but they check Strict objects (0.001) only.
+    @Test
+    public void strictSubclassOnly_UsesStrictTolerance_Fail() {
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, OVERLAP_TOPIC,
+                createGeomObject(STRICT, "o1", createArcPolygon("75010.010")),
+                createGeomObject(STRICT, "o2", createStraightPolygon()));
+
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Intersection overlap 0.010416655723815893, coord1 (486011.667, 75010.000), coord2 (486020.000, 75010.000), tids o1/Geom[1], o2/Geom[1]",
+                "Intersection overlap 0.010416655723815893, coord1 (486011.667, 75010.000), coord2 (486020.000, 75010.000), tids o1/Geom[1], o2/Geom[1]",
+                "Set Constraint AreAreas23.OverlapTolerance.Base.GeomAreAreas is not true.",
+                "Set Constraint AreAreas23.OverlapTolerance.Base.GeomAreAreas3 is not true.");
+    }
+
+    @Test
+    public void bagOfStructure_OverlapAboveTolerance_Fail() {
+        Iom_jObject holder1 = new Iom_jObject(HOLDER, "o1");
+        holder1.addattrobj("Parts", createGeomObject(PART, null, createArcPolygon("75010.100")));
+        Iom_jObject holder2 = new Iom_jObject(HOLDER, "o2");
+        holder2.addattrobj("Parts", createGeomObject(PART, null, createStraightPolygon()));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, OVERLAP_TOPIC, holder1, holder2);
+
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Intersection overlap 0.10005944515626197, coord1 (486010.238, 75010.000), coord2 (486020.000, 75010.000), tids o1/Parts[1]/Geom[1], o2/Parts[1]/Geom[1]",
+                "Set Constraint AreAreas23.OverlapTolerance.Holder.PartsGeomAreAreas is not true.");
+    }
+
+    // The path names the base structure Part (0.05), but the bag holds StrictPart elements (0.001) only.
+    @Test
+    public void bagOfStructure_StrictStructureOnly_UsesStrictTolerance_Fail() {
+        Iom_jObject holder1 = new Iom_jObject(HOLDER, "o1");
+        holder1.addattrobj("Parts", createGeomObject(STRICT_PART, null, createArcPolygon("75010.010")));
+        Iom_jObject holder2 = new Iom_jObject(HOLDER, "o2");
+        holder2.addattrobj("Parts", createGeomObject(STRICT_PART, null, createStraightPolygon()));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, OVERLAP_TOPIC, holder1, holder2);
+
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Intersection overlap 0.010416655723815893, coord1 (486011.667, 75010.000), coord2 (486020.000, 75010.000), tids o1/Parts[1]/Geom[1], o2/Parts[1]/Geom[1]",
+                "Set Constraint AreAreas23.OverlapTolerance.Holder.PartsGeomAreAreas is not true.");
+    }
+
     // #############################################################//
     // ######################### GENEREL ###########################//
     // #############################################################//
@@ -846,5 +982,30 @@ public class AreAreas23Test {
                         IomObjectHelper.createCoord(x2, y2),
                         IomObjectHelper.createCoord(x2, y1),
                         IomObjectHelper.createCoord(x1, y1)));
+    }
+
+    private static IomObject createGeomObject(String tag, String oid, IomObject geom) {
+        Iom_jObject obj = new Iom_jObject(tag, oid);
+        obj.addattrobj("Geom", geom);
+        return obj;
+    }
+
+    /**
+     * Rectangle (486010,75000)-(486020,75010) whose top edge is an arc from (486020,75010) through
+     * (486015,bulgeTopY) to (486010,75009.990). The arc overlaps {@link #createStraightPolygon()}, starting at
+     * the common vertex (486020,75010).
+     */
+    private static IomObject createArcPolygon(String bulgeTopY) {
+        return IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("486010.000", "75000.000"),
+                        IomObjectHelper.createCoord("486020.000", "75000.000"),
+                        IomObjectHelper.createCoord("486020.000", "75010.000"),
+                        IomObjectHelper.createArc("486015.000", bulgeTopY, "486010.000", "75009.990"),
+                        IomObjectHelper.createCoord("486010.000", "75000.000")));
+    }
+
+    private static IomObject createStraightPolygon() {
+        return IomObjectHelper.createRectangleGeometry("486010.000", "75010.000", "486020.000", "75020.000");
     }
 }

@@ -1,0 +1,37 @@
+INTERLIS 2.4;
+
+!! Constraints navigating an EXTERNAL role
+
+MODEL ExternalAssociationConstraints (en) AT "mailto:noreply@localhost" VERSION "2026-01-01" =
+  TOPIC T =
+
+    CLASS Owner =
+      Age : 0 .. 200;
+    END Owner;
+
+    CLASS Item =
+      Code : TEXT*10;
+    END Item;
+
+    ASSOCIATION Ownership =
+      ItemRef -- {0..*} Item;
+      OwnerRef (EXTERNAL) -- {0..1} Owner;
+    END Ownership;
+
+    CONSTRAINTS OF Item =
+      MANDATORY CONSTRAINT OwnerAgeDefined: DEFINED(THIS -> OwnerRef -> Age);
+      MANDATORY CONSTRAINT OwnerAdult: THIS -> OwnerRef -> Age >= 18;
+    END;
+
+    CLASS Contract =
+      Code : TEXT*10;
+    END Contract;
+
+    ASSOCIATION ContractOwnership =
+      ContractRef -- {0..*} Contract;
+      ContractOwnerRef (EXTERNAL) -- {0..1} Owner;
+      MANDATORY CONSTRAINT ContractOwnerAgeDefined: DEFINED(ContractOwnerRef -> Age);
+    END ContractOwnership;
+
+  END T;
+END ExternalAssociationConstraints.

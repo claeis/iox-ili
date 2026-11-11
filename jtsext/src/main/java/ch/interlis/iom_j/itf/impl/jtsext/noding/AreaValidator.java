@@ -1,10 +1,12 @@
 package ch.interlis.iom_j.itf.impl.jtsext.noding;
 
+import ch.ehi.basics.logging.EhiLogger;
 import ch.interlis.iom_j.itf.impl.ItfSurfaceLinetable2Polygon;
 import ch.interlis.iom_j.itf.impl.jtsext.algorithm.CurveSegmentIntersector;
 import ch.interlis.iom_j.itf.impl.jtsext.geom.*;
 import ch.interlis.iox_j.IoxIntersectionException;
 import ch.interlis.iox_j.IoxInvalidDataException;
+import ch.interlis.iox_j.jts.Jtsext2iox;
 import com.vividsolutions.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.Polygon;
@@ -15,6 +17,17 @@ import java.util.List;
 
 /**
  * Validates that a collection of {@link CurvePolygon}s satisfies the area condition.
+ * <p>
+ * Use {@link #validateArea(Collection, double, String)} if only the violations are needed. Otherwise
+ * {@link #validate(Collection, double)} returns the validated instance, whose results can be queried:
+ * <pre>
+ * AreaValidator areaValidator = AreaValidator.validate(polygons, maxOverlap);
+ * if (areaValidator.isValid()) {
+ *     List&lt;IoxInvalidDataException&gt; gaps = areaValidator.createGapExceptions(iliQualifiedName);
+ * } else {
+ *     List&lt;IoxInvalidDataException&gt; violations = areaValidator.createIntersectionExceptions(iliQualifiedName);
+ * }
+ * </pre>
  */
 public class AreaValidator {
     private static final byte NOT_SET = -1;
@@ -31,7 +44,7 @@ public class AreaValidator {
     private final List<Intersection> intersections = new ArrayList<Intersection>();
     private final Map<String, Set<String>> overlaps = new HashMap<String, Set<String>>();
 
-    public AreaValidator(JtsextGeometryFactory factory, double maxOverlap) {
+    private AreaValidator(JtsextGeometryFactory factory, double maxOverlap) {
         this.factory = factory;
         this.maxOverlap = maxOverlap;
     }
@@ -48,19 +61,31 @@ public class AreaValidator {
      * @return A list of {@link IoxInvalidDataException}s with an entry for each violation.
      */
     public static List<IoxInvalidDataException> validateArea(Collection<Polygon> polygons, double maxOverlap, String iliQualifiedName) {
-        if (polygons.isEmpty()) {
-            return Collections.emptyList();
-        }
+        return validate(polygons, maxOverlap).createIntersectionExceptions(iliQualifiedName);
+    }
 
-        JtsextGeometryFactory factory = (JtsextGeometryFactory) polygons.iterator().next().getFactory();
+    /**
+     * Validates that a collection of {@link CurvePolygon}s satisfies the area condition.
+     * <p>
+     * Invalid input polygons might lead to an incorrect result.
+     *
+     * @param polygons The {@link Polygon}s to validate, with the tid as user data
+     * @param maxOverlap The maximum allowed overlap for {@link ArcSegment}s sharing one control point
+     *
+     * @return the validated {@link AreaValidator}, to query with {@link #isValid()},
+     * {@link #createIntersectionExceptions(String)}, {@link #gatherInvalidGeometry()} and
+     * {@link #createGapExceptions(String)}
+     */
+    public static AreaValidator validate(Collection<Polygon> polygons, double maxOverlap) {
+        JtsextGeometryFactory factory = polygons.isEmpty() ? null : (JtsextGeometryFactory) polygons.iterator().next().getFactory();
         AreaValidator areaValidator = new AreaValidator(factory, maxOverlap);
 
         areaValidator.addPolygons(polygons);
         areaValidator.validateAll();
-        return areaValidator.createIntersectionExceptions(iliQualifiedName);
+        return areaValidator;
     }
 
-    public void addPolygons(Collection<Polygon> polygons) {
+    private void addPolygons(Collection<Polygon> polygons) {
         final Map<Edge, CurveSegment> segmentsMap = new HashMap<Edge, CurveSegment>();
         final Map<Coordinate, List<Edge>> nodes = new HashMap<Coordinate, List<Edge>>();
 
@@ -147,7 +172,7 @@ public class AreaValidator {
             }
 
             if (areaEdge == null) {
-                areaEdge = new Edge(segment);
+                areaEdge = new Edge(segment, i, edgeRing.next(i));
                 segmentsMap.put(areaEdge, segment);
                 startNode.add(areaEdge);
                 endNode.add(areaEdge);
@@ -191,16 +216,29 @@ public class AreaValidator {
                     adjNode.remove(edgeB);
                     adjNode.add(edgeA);
                     edgeA.toNode = edgeB.toNode;
+                    edgeA.toIndex = edgeB.toIndex;
                 } else {
                     List<Edge> adjNode = nodes.get(edgeB.fromNode);
                     adjNode.remove(edgeB);
                     adjNode.add(edgeA);
                     edgeA.fromNode = edgeB.fromNode;
+                    edgeA.fromIndex = edgeB.fromIndex;
                 }
             }
         }
     }
 
+    /**
+     * @return true if the polygons satisfy the area condition
+     */
+    public boolean isValid() {
+        return intersections.isEmpty() && overlaps.isEmpty();
+    }
+
+    /**
+     * @param iliQualifiedName The qualified name of the INTERLIS class used for generation of {@link IoxInvalidDataException}s
+     * @return A list of {@link IoxInvalidDataException}s with an entry for each violation; empty if {@link #isValid()}
+     */
     public List<IoxInvalidDataException> createIntersectionExceptions(String iliQualifiedName) {
         List<IoxInvalidDataException> invalidDataExceptions = new ArrayList<IoxInvalidDataException>();
 
@@ -218,6 +256,10 @@ public class AreaValidator {
         return invalidDataExceptions;
     }
 
+    /**
+     * @return the segments that violate the area condition, as one {@link MultiLineString} per polygon (with the tid
+     * as user data); empty if {@link #isValid()}
+     */
     public List<MultiLineString> gatherInvalidGeometry() {
         List<MultiLineString> invalidMultiLines = new ArrayList<MultiLineString>();
         for (Face face : faces) {
@@ -262,10 +304,7 @@ public class AreaValidator {
         return invalidLines;
     }
 
-    /**
-     * Validates all polygons. Get the result with {@link #createIntersectionExceptions(String)} or {@link #gatherInvalidGeometry()}.
-     */
-    public void validateAll() {
+    private void validateAll() {
         initializeEdgeState();
 
         STRtree index = new STRtree();
@@ -279,6 +318,244 @@ public class AreaValidator {
             adjacentFaces.remove(face);
             validateFace(face, adjacentFaces);
         }
+    }
+
+    /**
+     * Finds the gaps: the bounded faces that no polygon covers, e.g. a hole between neighbours or an enclave that no
+     * other polygon fills. The outside and the space between separate islands are not gaps.
+     * <p>
+     * The edges contained in one ring only form the boundary of the union of all polygons. They are walked with the
+     * covered side on the left, turning at each node as sharply as possible to the right, so that faces touching in a
+     * single node stay separate; a clockwise ring encloses a gap. Arcs are not linearised. Where two segments overlap
+     * within the tolerance, the ring crosses itself; the loop up to the crossing is covered twice and does not count.
+     *
+     * @param iliQualifiedName The qualified name of the INTERLIS class used for generation of {@link IoxInvalidDataException}s
+     * @return one {@link IoxInvalidDataException} per gap, at the smallest control point of its boundary and with the
+     * tids of the polygons around it, in the order of the first polygon on their boundary
+     * @throws IllegalStateException if the polygons do not satisfy the area condition (see {@link #isValid()})
+     */
+    public List<IoxInvalidDataException> createGapExceptions(String iliQualifiedName) {
+        if (!isValid()) {
+            throw new IllegalStateException("gaps can only be found if the polygons satisfy the area condition");
+        }
+        List<Edge> boundary = new ArrayList<Edge>();
+        Map<Coordinate, List<Edge>> outgoing = new HashMap<Coordinate, List<Edge>>();
+        for (EdgeRing ring : rings) {
+            for (Edge edge : ring.edges) {
+                if (!edge.isOnBoundary()) {
+                    continue;
+                }
+                boundary.add(edge);
+                List<Edge> edges = outgoing.get(edge.getFrom());
+                if (edges == null) {
+                    edges = new ArrayList<Edge>();
+                    outgoing.put(edge.getFrom(), edges);
+                }
+                edges.add(edge);
+            }
+        }
+
+        // start the rings in the order of the polygons, so that the gaps are reported in a deterministic order
+        Set<Edge> used = new HashSet<Edge>();
+        List<IoxInvalidDataException> gaps = new ArrayList<IoxInvalidDataException>();
+        for (Edge first : boundary) {
+            if (used.contains(first)) {
+                continue;
+            }
+            List<Edge> ring = traceRing(first, outgoing, used);
+            if (ring == null) {
+                EhiLogger.traceState("boundary of the area partition is not closed, starting at " + first.getFrom() + ", tid " + first.getFirstRing().userData);
+                continue;
+            }
+            if (getSignedArea(ring) < 0.0) {
+                gaps.add(createGapException(ring, iliQualifiedName));
+            }
+        }
+        return gaps;
+    }
+
+    /**
+     * @param first an edge that is not used yet
+     * @param used the edges already assigned to a ring; the edges of this ring are added
+     * @return the closed ring starting with first, or null if the boundary is not closed (inconsistent input)
+     */
+    private List<Edge> traceRing(Edge first, Map<Coordinate, List<Edge>> outgoing, Set<Edge> used) {
+        List<Edge> ring = new ArrayList<Edge>();
+        Edge current = first;
+        // each pass adds an unused edge to used, so the walk ends after at most as many passes as there are edges
+        do {
+            used.add(current);
+            ring.add(current);
+            current = getNext(current, outgoing.get(current.getTo()));
+        } while (current != null && current != first && !used.contains(current));
+        return current == first ? ring : null;
+    }
+
+    /**
+     * Returns the outgoing edge that keeps the uncovered side on the right with the sharpest right turn:
+     * the first one counterclockwise from the reverse direction of the incoming edge.
+     * All candidates take part (also used ones), so that the choice does not depend on the order of tracing.
+     */
+    private Edge getNext(Edge incoming, List<Edge> candidates) {
+        if (candidates == null) {
+            return null;
+        }
+        if (candidates.size() == 1) {
+            return candidates.get(0);
+        }
+        Coordinate node = incoming.getTo();
+        // the incoming edge, walked backwards from the node
+        CurveSegment back = incoming.getLastSegment();
+        List<CurveSegment> segments = new ArrayList<CurveSegment>();
+        segments.add(back);
+        for (Edge candidate : candidates) {
+            segments.add(candidate.getFirstSegment());
+        }
+        double overlapLength = 0.0;
+        for (int i = 0; i < segments.size(); i++) {
+            for (int j = i + 1; j < segments.size(); j++) {
+                overlapLength = Math.max(overlapLength, getOverlapLength(segments.get(i), segments.get(j)));
+            }
+        }
+
+        Edge best = null;
+        for (Edge candidate : candidates) {
+            if (best == null || NodeDirection.isCounterclockwiseBefore(node, back, candidate.getFirstSegment(), best.getFirstSegment(), overlapLength)) {
+                best = candidate;
+            }
+        }
+        return best;
+    }
+
+    /**
+     * @return the length of the overlap of two segments that share a point: the distance to their second intersection,
+     * unless that is the other control point of both; 0.0 if there is none
+     */
+    private double getOverlapLength(CurveSegment segment, CurveSegment other) {
+        intersector.computeIntersection(segment, other);
+        if (intersector.getIntersectionNum() == 2 && !(intersector.isIntersection(other.getStartPoint()) && intersector.isIntersection(other.getEndPoint()))) {
+            return intersector.getIntersection(0).distance(intersector.getIntersection(1));
+        }
+        return 0.0;
+    }
+
+    /**
+     * @return the end of the overlap of two segments that meet at the node, i.e. their second intersection, or null if
+     * they do not overlap (see {@link #getOverlapLength(CurveSegment, CurveSegment)})
+     */
+    private Coordinate getOverlapEnd(CurveSegment segment, CurveSegment other, Coordinate node) {
+        if (getOverlapLength(segment, other) == 0.0) {
+            return null;
+        }
+        // the intersector still holds both intersections: the node and the end of the overlap
+        Coordinate first = intersector.getIntersection(0);
+        Coordinate second = intersector.getIntersection(1);
+        return first.distance(node) > second.distance(node) ? first : second;
+    }
+
+    /**
+     * @return the signed area of the ring without the loops of overlaps within the tolerance; positive for
+     * counterclockwise rings
+     */
+    private double getSignedArea(List<Edge> ring) {
+        // the segments of the ring in walking order: segment i is walked from starts[i] to ends[i], in the direction of
+        // the segment if forward[i]
+        List<CurveSegment> segments = new ArrayList<CurveSegment>();
+        List<Boolean> forward = new ArrayList<Boolean>();
+        List<Coordinate> starts = new ArrayList<Coordinate>();
+        List<Coordinate> ends = new ArrayList<Coordinate>();
+        for (Edge edge : ring) {
+            List<CurveSegment> edgeSegments = edge.getSegments();
+            if (!edge.isForward()) {
+                Collections.reverse(edgeSegments);
+            }
+            for (CurveSegment segment : edgeSegments) {
+                segments.add(segment);
+                forward.add(edge.isForward());
+                starts.add(edge.isForward() ? segment.getStartPoint() : segment.getEndPoint());
+                ends.add(edge.isForward() ? segment.getEndPoint() : segment.getStartPoint());
+            }
+        }
+        // consecutive segments that overlap within the tolerance cross each other; the loop between their shared
+        // point and the crossing is covered twice and has the opposite orientation, so the ring is cut at the crossing
+        int n = segments.size();
+        for (int i = 0; i < n; i++) {
+            int j = (i + 1) % n;
+            Coordinate crossing = getOverlapEnd(segments.get(i), segments.get(j), ends.get(i));
+            if (crossing != null) {
+                ends.set(i, crossing);
+                starts.set(j, crossing);
+            }
+        }
+
+        // relative to a node of the ring, so that large (e.g. LV95) coordinates do not cancel out small areas
+        Coordinate origin = ring.get(0).getFrom();
+        double area = 0.0;
+        for (int i = 0; i < n; i++) {
+            area += getSignedArea(segments.get(i), forward.get(i), starts.get(i), ends.get(i), origin);
+        }
+        return area;
+    }
+
+    /**
+     * @param forward true if the segment is walked from its start point to its end point
+     * @return the contribution of the part of the segment from the point from to the point to (both on the segment)
+     * to the signed area of a ring (shoelace term of the chord relative to the origin plus the circular segment of an
+     * arc); positive for counterclockwise rings
+     */
+    private static double getSignedArea(CurveSegment segment, boolean forward, Coordinate from, Coordinate to, Coordinate origin) {
+        double area = ((from.x - origin.x) * (to.y - origin.y) - (to.x - origin.x) * (from.y - origin.y)) / 2.0;
+        if (CurveSegmentIntersector.isTrueArc(segment)) {
+            ArcSegment arc = (ArcSegment) segment;
+            Coordinate center = arc.getCenterPoint();
+            double radius = CurveSegment.dist(center, segment.getStartPoint());
+            // the sign of an arc is negative if it runs counterclockwise from its start point to its end point;
+            // walked backwards, it runs the other way round
+            boolean ccw = (arc.getSign() < 0.0) == forward;
+            double theta = Math.atan2(to.y - center.y, to.x - center.x) - Math.atan2(from.y - center.y, from.x - center.x);
+            if (!ccw) {
+                theta = -theta;
+            }
+            // difference of two atan2 results: between -2 pi and 2 pi, so adding 2 pi once gives (0, 2 pi]
+            if (theta <= 0.0) {
+                theta += 2.0 * Math.PI;
+            }
+            double circularSegment = radius * radius / 2.0 * (theta - Math.sin(theta));
+            // a counterclockwise arc bulges to the right of its chord, i.e. away from the ring interior
+            area += ccw ? circularSegment : -circularSegment;
+        }
+        return area;
+    }
+
+    /**
+     * @return the smallest control point of the ring, independent of where its tracing started
+     */
+    private static Coordinate getSmallestControlPoint(List<Edge> ring) {
+        Coordinate smallest = null;
+        for (Edge edge : ring) {
+            for (CurveSegment segment : edge.getSegments()) {
+                Coordinate point = edge.isForward() ? segment.getStartPoint() : segment.getEndPoint();
+                if (smallest == null || point.compareTo(smallest) < 0) {
+                    smallest = point;
+                }
+            }
+        }
+        return smallest;
+    }
+
+    private static IoxInvalidDataException createGapException(List<Edge> ring, String iliQualifiedName) {
+        Set<String> tids = new TreeSet<String>();
+        for (Edge edge : ring) {
+            Object tid = edge.getFirstRing().userData;
+            if (tid != null) {
+                tids.add(tid.toString());
+            }
+        }
+        Coordinate coord = getSmallestControlPoint(ring);
+        String message = String.format("Gap coord (%.3f, %.3f), %s", coord.x, coord.y,
+                IoxInvalidDataException.formatTids(tids.toArray(new String[tids.size()])));
+        return new IoxInvalidDataException(message, iliQualifiedName, tids.isEmpty() ? null : tids.iterator().next(),
+                Jtsext2iox.JTS2coord(new Coordinate(coord.x, coord.y)));
     }
 
     /**
@@ -466,10 +743,7 @@ public class AreaValidator {
             CurveSegment next = otherRing.getSegment(i);
             CurveSegment previous = otherRing.getSegment(otherRing.previous(i));
 
-            intersector.computeIntersection(previous, next);
-            if (intersector.getIntersectionNum() == 2 && !(intersector.isIntersection(next.getStartPoint()) && intersector.isIntersection(next.getEndPoint()))) {
-                distance = Math.max(distance, intersector.getIntersection(0).distance(intersector.getIntersection(1)));
-            }
+            distance = Math.max(distance, getOverlapLength(previous, next));
 
             // the segment might still be valid even if it is inside the shell, when it is also inside a hole
             boolean onInside = isOnInside(next.getStartPoint(), testSegment, previous, next, distance) ^ otherRing.isRightInside;
@@ -560,38 +834,14 @@ public class AreaValidator {
         return point.equals2D(segment.getStartPoint()) || point.equals2D(segment.getEndPoint());
     }
 
-    private static boolean isOnInside(Coordinate point, CurveSegment testSegment, CurveSegment firstSegment, CurveSegment secondSegment, double minDirectionPointDistance) {
-        Coordinate first = getDirectionPoint(point, firstSegment, minDirectionPointDistance);
-        Coordinate second = getDirectionPoint(point, secondSegment, minDirectionPointDistance);
-        Coordinate test = getDirectionPoint(point, testSegment, minDirectionPointDistance);
-
-        return isOnInside(point, first, second, test);
-    }
-
-    private static boolean isOnInside(Coordinate origin, Coordinate p0, Coordinate p1, Coordinate testPoint) {
-        double first = getAngle(origin, p0);
-        double second = getAngle(origin, p1);
-        double test = getAngle(origin, testPoint);
-
-        if (first < second) {
-            return second < test || test < first;
-        } else {
-            return second < test && test < first;
-        }
-    }
-
-    private static Coordinate getDirectionPoint(Coordinate origin, CurveSegment segment, double minDirectionPointDistance) {
-        boolean originAtStart = segment.getStartPoint().equals2D(origin);
-
-        if (segment instanceof ArcSegment) {
-            return ((ArcSegment) segment).getDirectionPt(originAtStart, minDirectionPointDistance + CompoundCurve.ARC_MIN_DIRECTION_PT);
-        } else {
-            return originAtStart ? segment.getEndPoint() : segment.getStartPoint();
-        }
-    }
-
-    private static double getAngle(Coordinate origin, Coordinate point) {
-        return Math.atan2(point.y - origin.y, point.x - origin.x);
+    /**
+     * Checks if the test segment leaves the point outside of the angle from the first to the second segment, turning
+     * counterclockwise.
+     *
+     * @param overlapLength the length of an overlap within the tolerance that starts at the point, or 0.0
+     */
+    private static boolean isOnInside(Coordinate point, CurveSegment testSegment, CurveSegment firstSegment, CurveSegment secondSegment, double overlapLength) {
+        return !NodeDirection.isCounterclockwiseBefore(point, firstSegment, testSegment, secondSegment, overlapLength);
     }
     
     /**
@@ -604,9 +854,86 @@ public class AreaValidator {
         final List<EdgeRing> edgeRings = new ArrayList<EdgeRing>();
         final List<EdgeRing> reversedEdgeRings = new ArrayList<EdgeRing>();
 
-        public Edge(CurveSegment segment) {
+        /**
+         * The segments of the edge in its first ring (see {@link #getFirstRing()}): from fromIndex up to toIndex
+         * (exclusive, wrapping around the end of the ring; all segments if both are equal).
+         */
+        int fromIndex;
+        int toIndex;
+
+        public Edge(CurveSegment segment, int fromIndex, int toIndex) {
             this.fromNode = segment.getStartPoint();
             this.toNode = segment.getEndPoint();
+            this.fromIndex = fromIndex;
+            this.toIndex = toIndex;
+        }
+
+        /**
+         * @return the ring that created the edge, in the direction of the edge; the only ring of an edge on the
+         * boundary
+         */
+        EdgeRing getFirstRing() {
+            return edgeRings.get(0);
+        }
+
+        /**
+         * @return true if only one ring contains the edge, i.e. the edge is on the boundary of the union of all
+         * polygons
+         */
+        boolean isOnBoundary() {
+            return edgeRings.size() + reversedEdgeRings.size() == 1;
+        }
+
+        /**
+         * @return true if the boundary edge is walked in the direction of its ring, i.e. the ring has the covered side
+         * on the left
+         */
+        boolean isForward() {
+            return !getFirstRing().isRightInside;
+        }
+
+        /**
+         * @return the start node of the boundary edge, walked with the covered side on the left
+         */
+        Coordinate getFrom() {
+            return isForward() ? fromNode : toNode;
+        }
+
+        /**
+         * @return the end node of the boundary edge, walked with the covered side on the left
+         */
+        Coordinate getTo() {
+            return isForward() ? toNode : fromNode;
+        }
+
+        /**
+         * @return the first segment of the boundary edge, walked with the covered side on the left
+         */
+        CurveSegment getFirstSegment() {
+            EdgeRing ring = getFirstRing();
+            return ring.getSegment(isForward() ? fromIndex : ring.previous(toIndex));
+        }
+
+        /**
+         * @return the last segment of the boundary edge, walked with the covered side on the left
+         */
+        CurveSegment getLastSegment() {
+            EdgeRing ring = getFirstRing();
+            return ring.getSegment(isForward() ? ring.previous(toIndex) : fromIndex);
+        }
+
+        /**
+         * @return the segments of the boundary edge, in the direction of its ring
+         */
+        List<CurveSegment> getSegments() {
+            List<CurveSegment> segments = new ArrayList<CurveSegment>();
+            EdgeRing ring = getFirstRing();
+            int i = fromIndex;
+            do {
+                segments.add(ring.getSegment(i));
+                i = ring.next(i);
+            } while (i != toIndex);
+            return segments;
         }
     }
     
@@ -700,5 +1027,133 @@ public class AreaValidator {
         public EdgeRing[] holes;
         public Polygon polygon;
         public IndexedPointInAreaLocator indexedPointInAreaLocator;
+    }
+
+    /**
+     * The direction in which a segment leaves a node: the angle of its tangent and its curvature. The curvature orders
+     * segments that leave the node with the same tangent, e.g. an arc that touches a straight segment.
+     * <p>
+     * Tangents count as the same if they differ by no more than the rounding of the coordinates can turn them:
+     * {@link #ROUNDING_ULPS} units in the last place of the node, over the distance that determines the direction.
+     */
+    private static class NodeDirection {
+        /** the rounding error of the coordinates and the centre of an arc, in units in the last place */
+        private static final double ROUNDING_ULPS = 16.0;
+
+        private final double angle;
+        private final double curvature;
+        private final double angleTolerance;
+
+        private NodeDirection(double angle, double curvature, double angleTolerance) {
+            this.angle = angle;
+            this.curvature = curvature;
+            this.angleTolerance = angleTolerance;
+        }
+
+        /**
+         * Turning counterclockwise around the node from the start segment, checks whether the first segment is reached
+         * before the second one. A segment with the same tangent as the start segment is reached right away if it bends
+         * more to the left than the start segment, otherwise last. Of two segments with the same tangent, the one
+         * bending more to the right is reached first.
+         *
+         * @param node the start or end point of all three segments
+         * @return true if first is reached before second
+         */
+        static boolean isCounterclockwiseBefore(Coordinate node, CurveSegment start, CurveSegment first, CurveSegment second) {
+            NodeDirection startDirection = leaving(start, node);
+            NodeDirection firstDirection = leaving(first, node);
+            NodeDirection secondDirection = leaving(second, node);
+            double firstAngle = startDirection.getAngleTo(firstDirection);
+            double secondAngle = startDirection.getAngleTo(secondDirection);
+            if (Math.abs(firstAngle - secondAngle) <= firstDirection.angleTolerance + secondDirection.angleTolerance) {
+                return firstDirection.curvature < secondDirection.curvature;
+            }
+            return firstAngle < secondAngle;
+        }
+
+        /**
+         * Like {@link #isCounterclockwiseBefore(Coordinate, CurveSegment, CurveSegment, CurveSegment)}, for segments
+         * that may overlap within the tolerance from the node on. Within such an overlap the segments may lie on the
+         * wrong side of each other, so the directions to points beyond the overlap are compared instead of the
+         * tangents.
+         *
+         * @param overlapLength the length of the longest overlap of the segments within the tolerance that starts at
+         * the node, or 0.0 to compare the tangents
+         */
+        static boolean isCounterclockwiseBefore(Coordinate node, CurveSegment start, CurveSegment first, CurveSegment second, double overlapLength) {
+            if (overlapLength <= 0.0) {
+                return isCounterclockwiseBefore(node, start, first, second);
+            }
+            double startAngle = getAngle(node, getDirectionPoint(node, start, overlapLength));
+            double firstAngle = getAngle(node, getDirectionPoint(node, first, overlapLength)) - startAngle;
+            double secondAngle = getAngle(node, getDirectionPoint(node, second, overlapLength)) - startAngle;
+            return (firstAngle < 0.0 ? firstAngle + 2.0 * Math.PI : firstAngle) < (secondAngle < 0.0 ? secondAngle + 2.0 * Math.PI : secondAngle);
+        }
+
+        private static Coordinate getDirectionPoint(Coordinate origin, CurveSegment segment, double minDirectionPointDistance) {
+            boolean originAtStart = segment.getStartPoint().equals2D(origin);
+
+            if (segment instanceof ArcSegment) {
+                return ((ArcSegment) segment).getDirectionPt(originAtStart, minDirectionPointDistance + CompoundCurve.ARC_MIN_DIRECTION_PT);
+            } else {
+                return originAtStart ? segment.getEndPoint() : segment.getStartPoint();
+            }
+        }
+
+        private static double getAngle(Coordinate origin, Coordinate point) {
+            return Math.atan2(point.y - origin.y, point.x - origin.x);
+        }
+
+        /**
+         * @param segment the segment leaving the node
+         * @param node the start or end point of the segment
+         * @return the direction in which the segment leaves the node
+         */
+        private static NodeDirection leaving(CurveSegment segment, Coordinate node) {
+            boolean atStart = segment.getStartPoint().equals2D(node);
+            if (CurveSegmentIntersector.isTrueArc(segment)) {
+                ArcSegment arc = (ArcSegment) segment;
+                Coordinate center = arc.getCenterPoint();
+                double rx = node.x - center.x;
+                double ry = node.y - center.y;
+                double curvature = 1.0 / Math.hypot(rx, ry);
+                // the tangent is determined by the three points of the arc
+                Coordinate mid = arc.getMidPoint();
+                double tolerance = getAngleTolerance(node, Math.min(mid.distance(arc.getStartPoint()), mid.distance(arc.getEndPoint())));
+                // the sign of an arc is negative if it runs counterclockwise from its start point to its end point
+                boolean counterclockwise = (arc.getSign() < 0.0) == atStart;
+                // walking counterclockwise around the center, the tangent is the radius turned to the left
+                return counterclockwise
+                        ? new NodeDirection(Math.atan2(rx, -ry), curvature, tolerance)
+                        : new NodeDirection(Math.atan2(-rx, ry), -curvature, tolerance);
+            }
+            Coordinate other = atStart ? segment.getEndPoint() : segment.getStartPoint();
+            return new NodeDirection(Math.atan2(other.y - node.y, other.x - node.x), 0.0, getAngleTolerance(node, node.distance(other)));
+        }
+
+        /**
+         * @param distance the distance between the points that determine the direction
+         * @return the angle by which the rounding of the coordinates at the node can turn the direction
+         */
+        private static double getAngleTolerance(Coordinate node, double distance) {
+            double rounding = Math.ulp(Math.max(1.0, Math.max(Math.abs(node.x), Math.abs(node.y))));
+            return ROUNDING_ULPS * rounding / distance;
+        }
+
+        /**
+         * @return the angle by which other is turned counterclockwise from this direction, between 0 and 2 pi
+         */
+        private double getAngleTo(NodeDirection other) {
+            // difference of two atan2 results: between -2 pi and 2 pi, so adding 2 pi once gives [0, 2 pi)
+            double angleTo = other.angle - angle;
+            if (angleTo < 0.0) {
+                angleTo += 2.0 * Math.PI;
+            }
+            double tolerance = angleTolerance + other.angleTolerance;
+            if (angleTo <= tolerance || angleTo >= 2.0 * Math.PI - tolerance) {
+                return other.curvature > curvature ? 0.0 : 2.0 * Math.PI;
+            }
+            return angleTo;
+        }
     }
 }

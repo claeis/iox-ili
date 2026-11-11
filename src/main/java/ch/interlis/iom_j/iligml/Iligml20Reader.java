@@ -1074,6 +1074,10 @@ public class Iligml20Reader implements IoxReader,IoxIliReader {
     }
 
     @Override
+    public void setSkipTopicFilter(String[] topicNames) {
+    }
+
+    @Override
     public String getMimeType() {
         return ILIGML_20;
     }

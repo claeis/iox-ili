@@ -153,6 +153,31 @@ public class Polyline23Test {
         assertEquals(480000.0,(double)ioxLogEvent.getGeomC1(),E);
         assertEquals(70000.0,(double)ioxLogEvent.getGeomC2(),E);
     }
+    @Test
+    public void degeneratedArc_Ok(){
+        Iom_jObject obj=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
+        obj.addattrobj("arcs2d", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("480000.000", "70000.000"),
+                IomObjectHelper.createArc("480005.000", "70000.000", "480010.000", "70000.000")));
+        LogCollector logger=ValidatorTestHelper.validateObjects(td, ILI_TOPIC, BID, new ValidationConfig(), obj);
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "arc is straight at (480005.0, 70000.0, NaN)");
+    }
+    @Test
+    public void degeneratedArcValidationOff_Ok(){
+        Iom_jObject obj=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
+        obj.addattrobj("arcs2d", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("480000.000", "70000.000"),
+                IomObjectHelper.createArc("480005.000", "70000.000", "480010.000", "70000.000")));
+        ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEGENERATED_ARC_VALIDATION, ValidationConfig.OFF);
+        LogCollector logger=ValidatorTestHelper.validateObjects(td, ILI_TOPIC, BID, modelConfig, obj);
+        // Asserts
+        assertEquals(0, logger.getErrs().size());
+        assertEquals(0, logger.getWarn().size());
+    }
 	
 	// Es wird getestet ob eine 3d Linie erstellt werden kann.
 	@Test
@@ -380,6 +405,21 @@ public class Polyline23Test {
 	//////////////////////////////// FAILING Tests ///////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////	
 	
+    @Test
+    public void degeneratedArcValidationOn_Fail(){
+        Iom_jObject obj=new Iom_jObject(ILI_CLASSB, OBJ_OID1);
+        obj.addattrobj("arcs2d", IomObjectHelper.createPolyline(
+                IomObjectHelper.createCoord("480000.000", "70000.000"),
+                IomObjectHelper.createArc("480005.000", "70000.000", "480010.000", "70000.000")));
+        ValidationConfig modelConfig=new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEGENERATED_ARC_VALIDATION, ValidationConfig.ON);
+        LogCollector logger=ValidatorTestHelper.validateObjects(td, ILI_TOPIC, BID, modelConfig, obj);
+        // Asserts
+        assertEquals(0, logger.getWarn().size());
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "arc is straight at (480005.0, 70000.0, NaN)");
+    }
+
 	// Es wird  getestet ob der Type von straights2d einer Linie vom Typ POLYLINE entspricht.
 	@Test
 	public void typeOfPolylineUnvalid_Fail(){

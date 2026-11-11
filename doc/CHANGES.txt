@@ -2,6 +2,20 @@ ideas/open issues
 ----------------------------
 - add xml validation
 
+iox-ili 1.24.6 (2026-11-11)
+-----------------------------
+- Implement areAreasWithoutGaps/areAreasWithoutGaps2 (#162)
+- Option to skip basket from transfer to use referenced data (ilivalidator#471)
+- Configurable severity of "arc is straight" messages (ilivalidator#473)
+- Resolve calculated attributes of views (ilivalidator#472)
+- AreAreas uses tolerance of geometry definition (ilivalidator#468)
+- evaluate embedded role object path (ilivalidator#336)
+- Fix ClassCastException in existence constraint with association objects (ilivalidator#397)
+- Append constraint name to custom constraint message (ilivalidator#289)
+- Skip constraints navigating inaccessible external objects (ilivalidator#460)
+- Support EXISTENCE CONSTRAINT of geometry required in coord (ilivalidator#358)
+- Support KGKCGC_DMAVTYM_Topologie_V1_1 functions
+
 iox-ili 1.24.5 (2026-09-16)
 -----------------------------
 - Xtf24Reader: local part cannot be "null" when creating a QName" (ili2fme#52)

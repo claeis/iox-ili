@@ -48,6 +48,7 @@ import java.util.Set;
 public class DmavtymTopologie {
     public static final String DMAVTYM_Topologie_V1_0 = "DMAVTYM_Topologie_V1_0";
     public static final String DMAVTYM_Topologie_V1_1 = "DMAVTYM_Topologie_V1_1";
+    public static final String KGKCGC_DMAVTYM_Topologie_V1_1 = "KGKCGC_DMAVTYM_Topologie_V1_1";
 
     private interface GeometryEqualityFunction {
         boolean areEqual(Geometry geom1, Geometry geom2, double tolerance);
@@ -531,15 +532,15 @@ public class DmavtymTopologie {
     }
 
     private CompoundCurve getLine(IomObject line) throws IoxException {
-        return Iox2jtsext.polyline2JTS(line, false, 0.0, new OutParam<Boolean>(), logger, 0.0, ValidationConfig.WARNING, ValidationConfig.WARNING);
+        return Iox2jtsext.polyline2JTS(line, false, 0.0, new OutParam<Boolean>(), logger, 0.0, ValidationConfig.WARNING, validator.getDegeneratedArcValidation());
     }
 
     private CurvePolygon getSurface(IomObject surface, String validationKind) throws IoxException {
-        return (CurvePolygon) Iox2jtsext.surface2JTS(surface, 0.0, new OutParam<Boolean>(), logger, 0.0, validationKind);
+        return (CurvePolygon) Iox2jtsext.surface2JTS(surface, 0.0, new OutParam<Boolean>(), logger, 0.0, validationKind, validator.getDegeneratedArcValidation());
     }
 
     private MultiPolygon getMultiSurface(IomObject multiSurface, String validationKind) throws IoxException {
-        return Iox2jtsext.multisurface2JTS(multiSurface, 0.0, new OutParam<Boolean>(), logger, 0.0, validationKind);
+        return Iox2jtsext.multisurface2JTS(multiSurface, 0.0, new OutParam<Boolean>(), logger, 0.0, validationKind, validator.getDegeneratedArcValidation());
     }
 
     /**

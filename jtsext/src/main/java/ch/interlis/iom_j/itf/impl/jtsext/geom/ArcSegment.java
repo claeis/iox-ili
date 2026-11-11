@@ -2,6 +2,7 @@ package ch.interlis.iom_j.itf.impl.jtsext.geom;
 
 import ch.interlis.iom_j.itf.impl.hrg.HrgUtility;
 
+import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequences;
@@ -308,14 +309,29 @@ public class ArcSegment extends CurveSegment {
 			return directionPt;
 		}
 	}
+	/**
+	 * Calculates the point in the middle of an arc.
+	 *
+	 * @param sign 1.0 if the arc runs clockwise from start to end, -1.0 if counter-clockwise, 0.0 if it is
+	 * straight or closed (see {@link #getSign()})
+	 * @return the point on the circle halfway between start and end, in the direction of the arc; for sign 0.0 the
+	 * point halfway between start and end on a straight line
+	 */
 	public static Coordinate calcArcPt(Coordinate start, Coordinate end,
 			Coordinate center, double radius, double sign) {
+		if(sign==0.0){
+			return new Coordinate((start.x+end.x)/2.0,(start.y+end.y)/2.0);
+		}
 		Coordinate midPt;
-		// calulate new mid pt
-		// Zentriwinkel zwischen start und end
-		double a=CurveSegment.dist(start.x,start.y,end.x,end.y);
-		// Richtung des Punktes auf dem halben Bogen 
-		double alpha=Math.atan2(start.x-center.x,start.y-center.y)+sign*Math.asin(a/2.0/radius);
+		// direction (clockwise from north) of start and end, seen from the center
+		double startDirection=Math.atan2(start.x-center.x,start.y-center.y);
+		double endDirection=Math.atan2(end.x-center.x,end.y-center.y);
+		// Richtung des Punktes auf dem halben Bogen
+		double alpha=(startDirection+endDirection)/2.0;
+		if(sign*(endDirection-startDirection)<=0.0){
+			// the arc runs the other way round, its middle is opposite
+			alpha+=Math.PI;
+		}
 		midPt=new Coordinate();
 		midPt.x=center.x + radius * Math.sin(alpha);
 		midPt.y=center.y + radius * Math.cos(alpha);
@@ -323,16 +339,23 @@ public class ArcSegment extends CurveSegment {
 	}
 
 	/**
-	 * Checks if the arcs are equivalent independent of their direction or where the mid-point is located.
+	 * Checks if the arcs are equivalent independent of their direction or where the mid-point is located:
+	 * same start and end point (in either order), same radius, the center on the same side of the chord and the
+	 * same part of the circle.
 	 *
 	 * @param other the other {@link ArcSegment}
 	 * @return <code>true</code> if the arcs are equivalent, <code>false</code> otherwise
 	 */
 	public boolean isEquivalent(ArcSegment other) {
-		if (!getNormalizedStartPoint().equals(other.getNormalizedStartPoint())) return false;
-		if (!getNormalizedEndPoint().equals(other.getNormalizedEndPoint())) return false;
+		Coordinate start = getNormalizedStartPoint();
+		Coordinate end = getNormalizedEndPoint();
+		if (!start.equals(other.getNormalizedStartPoint())) return false;
+		if (!end.equals(other.getNormalizedEndPoint())) return false;
 		if (Double.compare(getRadius(), other.getRadius()) != 0) return false;
-		return Double.compare(getNormalizedSign(), other.getNormalizedSign()) == 0;
+		if (Double.compare(getNormalizedSign(), other.getNormalizedSign()) != 0) return false;
+		// two circles with this radius pass through start and end, one on each side of the chord
+		return CGAlgorithms.computeOrientation(start, end, getCenterPoint())
+				== CGAlgorithms.computeOrientation(start, end, other.getCenterPoint());
 	}
 
 	@Override
@@ -383,7 +406,14 @@ public class ArcSegment extends CurveSegment {
 		return calculateMidPoint().equals2D(otherArc.calculateMidPoint(), tolerance);
 	}
 
-	private Coordinate calculateMidPoint() {
+	/**
+	 * Calculates the point in the middle of the arc from its start point, end point and circle, independent of
+	 * where the mid point lies.
+	 *
+	 * @return the point on the arc halfway between start and end point; for a straight arc (see
+	 * {@link #isStraight()}) the middle of the straight line
+	 */
+	Coordinate calculateMidPoint() {
 		return calcArcPt(getNormalizedStartPoint(), getNormalizedEndPoint(), getCenterPoint(), getRadius(), getNormalizedSign());
 	}
 }

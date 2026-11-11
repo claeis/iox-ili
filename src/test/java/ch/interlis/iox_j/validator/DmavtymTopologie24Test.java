@@ -21,6 +21,7 @@ public class DmavtymTopologie24Test {
     private final static String MODEL = "DMAVTYM_Topologie_Function24";
     private final static String TOPIC = MODEL + ".Topic";
     private final static String CLASSA = TOPIC + ".ClassA";
+    private final static String CLASS_KGKCGC_A = TOPIC + ".KgkcgcClassA";
     private final static String CLASS_SURFACE = TOPIC + ".SurfaceClass";
     private final static String CLASS_LINE = TOPIC + ".LineClass";
     private final static String CLASS_COMPARE_LINES = TOPIC + ".CompareLinesClass";
@@ -58,6 +59,9 @@ public class DmavtymTopologie24Test {
 
         FileEntry topologieV1_1_Ili = new FileEntry("src/test/data/validator/DMAVTYM_Topologie_V1_1.ili", FileEntryKind.ILIMODELFILE);
         ili2cConfig.addFileEntry(topologieV1_1_Ili);
+
+        FileEntry kgkcgcTopologieV1_1_Ili = new FileEntry("src/test/data/validator/KGKCGC_DMAVTYM_Topologie_V1_1.ili", FileEntryKind.ILIMODELFILE);
+        ili2cConfig.addFileEntry(kgkcgcTopologieV1_1_Ili);
 
         FileEntry objectPoolIli = new FileEntry("src/test/data/validator/ObjectPool_V1_0.ili", FileEntryKind.ILIMODELFILE);
         ili2cConfig.addFileEntry(objectPoolIli);
@@ -623,6 +627,36 @@ public class DmavtymTopologie24Test {
         Iom_jObject surfaceStruct = new Iom_jObject(STRUCT_SURFACE, null);
         surfaceStruct.addattrobj("surface", surface);
         return surfaceStruct;
+    }
+
+    @Test
+    public void coversKgkcgcModel() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_KGKCGC_A, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createCoord("30", "30"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversKgkcgcModelCollinearSegment() {
+        Iom_jObject iomObj = new Iom_jObject(CLASS_KGKCGC_A, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createRectangleGeometry("10", "10", "30", "30"));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("10", "15"),
+                        IomObjectHelper.createCoord("10", "30"))));
+
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, iomObj);
+        LogCollectorAssertions.AssertAllEventMessages(logger.getErrs(),
+                "Mandatory Constraint DMAVTYM_Topologie_Function24.Topic.KgkcgcClassA.linesCoverSurface_KGKCGC_V1_1 is not true.");
+        LogCollectorAssertions.AssertAllEventMessages(logger.getWarn(),
+                "MultiLineAttr contains unmatched line segment: (10.0 15.0, 10.0 30.0).");
     }
 
     @Test
@@ -1603,6 +1637,31 @@ public class DmavtymTopologie24Test {
         testObj2.setattrvalue("expectedCount", "0");
 
         LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC_GEOMETRIC_FILTER, surfaceObj, testObj1, testObj2);
+        assertThat(logger.getErrs(), is(empty()));
+        assertThat(logger.getWarn(), is(empty()));
+    }
+
+    @Test
+    public void coversDegeneratedArcValidationOff() {
+        Iom_jObject iomObj = new Iom_jObject(CLASSA, "o1");
+        iomObj.addattrobj("surface", IomObjectHelper.createPolygonFromBoundaries(
+                IomObjectHelper.createBoundary(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createArc("20", "10", "30", "10"),
+                        IomObjectHelper.createCoord("30", "30"),
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createCoord("10", "10"))));
+        iomObj.addattrobj("lines", IomObjectHelper.createMultiPolyline(
+                IomObjectHelper.createPolyline(
+                        IomObjectHelper.createCoord("10", "10"),
+                        IomObjectHelper.createArc("20", "10", "30", "10"),
+                        IomObjectHelper.createCoord("30", "30"),
+                        IomObjectHelper.createCoord("10", "30"),
+                        IomObjectHelper.createCoord("10", "10"))));
+
+        ValidationConfig modelConfig = new ValidationConfig();
+        modelConfig.setConfigValue(ValidationConfig.PARAMETER, ValidationConfig.DEGENERATED_ARC_VALIDATION, ValidationConfig.OFF);
+        LogCollector logger = ValidatorTestHelper.validateObjects(td, TOPIC, "b1", modelConfig, iomObj);
         assertThat(logger.getErrs(), is(empty()));
         assertThat(logger.getWarn(), is(empty()));
     }

@@ -247,4 +247,27 @@ MODEL ObjectPath23
 		
 	END RekursivelyObject;
 
+	TOPIC EmbeddedRole =
+
+		CLASS ClassA =
+		END ClassA;
+		CLASS ClassAp EXTENDS ClassA =
+		END ClassAp;
+		CLASS ClassB =
+		END ClassB;
+		CLASS ClassBp EXTENDS ClassB =
+		END ClassBp;
+
+		!! embedded into ClassB (attribute role_a)
+		ASSOCIATION ab =
+			role_a -- {0..1} ClassA;
+			role_b -- {0..*} ClassB;
+			!! role stored in the embedded link
+			MANDATORY CONSTRAINT INTERLIS.isOfClass(role_a, >ClassAp);
+			!! role pointing to the object holding the embedded link
+			MANDATORY CONSTRAINT INTERLIS.isOfClass(role_b, >ClassBp);
+		END ab;
+
+	END EmbeddedRole;
+
 END ObjectPath23.

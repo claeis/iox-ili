@@ -263,7 +263,7 @@ public class ItfSurfaceLinetable2Polygon implements Linetable2Polygon {
 			}
 		}
 	}
-    public static boolean validateMultiPolygon(String mainTid,AttributeDef surfaceAttr,IomObject polygon,LogEventFactory errFact,String validationType, AbstractCoordType controlPointType)
+    public static boolean validateMultiPolygon(String mainTid,AttributeDef surfaceAttr,IomObject polygon,LogEventFactory errFact,String validationType,String degeneratedArcValidationType, AbstractCoordType controlPointType)
             throws IoxException
     {
         String linetableIliqname=surfaceAttr.getContainer().getScopedName(null)+"."+surfaceAttr.getName();
@@ -284,7 +284,7 @@ public class ItfSurfaceLinetable2Polygon implements Linetable2Polygon {
         }
         
         JtsextGeometryFactory jtsFact=new JtsextGeometryFactory();
-        ArrayList<CompoundCurve> segv=Iox2jtsext.multisurface2JTSCompoundCurves(polygon, validationType, 0.0, errFact);
+        ArrayList<CompoundCurve> segv=Iox2jtsext.multisurface2JTSCompoundCurves(polygon, validationType, degeneratedArcValidationType, 0.0, errFact);
         if(segv==null){
             return true;
         }
@@ -314,7 +314,7 @@ public class ItfSurfaceLinetable2Polygon implements Linetable2Polygon {
         }
         return polygonValid;
     }
-	public static boolean validatePolygon(String mainTid,AttributeDef surfaceAttr,IomObject polygon,LogEventFactory errFact,String validationType, AbstractCoordType controlPointType)
+	public static boolean validatePolygon(String mainTid,AttributeDef surfaceAttr,IomObject polygon,LogEventFactory errFact,String validationType,String degeneratedArcValidationType, AbstractCoordType controlPointType)
 			throws IoxException
 	{
 		String linetableIliqname=surfaceAttr.getContainer().getScopedName(null)+"."+surfaceAttr.getName();
@@ -335,7 +335,7 @@ public class ItfSurfaceLinetable2Polygon implements Linetable2Polygon {
 		}
 		
 		JtsextGeometryFactory jtsFact=new JtsextGeometryFactory();
-		ArrayList<CompoundCurve> segv=Iox2jtsext.surface2JTSCompoundCurves(polygon, validationType, 0.0, errFact);
+		ArrayList<CompoundCurve> segv=Iox2jtsext.surface2JTSCompoundCurves(polygon, validationType, degeneratedArcValidationType, 0.0, errFact);
 		if(segv==null){
 			return true;
 		}

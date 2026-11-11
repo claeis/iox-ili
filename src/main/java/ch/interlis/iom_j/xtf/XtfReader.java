@@ -112,6 +112,11 @@ public class XtfReader implements IoxReader, IoxIliReader {
     }
 
     @Override
+    public void setSkipTopicFilter(String[] topicNames) {
+        ((IoxIliReader)reader).setSkipTopicFilter(topicNames);
+    }
+
+    @Override
     public void setModel(TransferDescription td) {
         ((IoxIliReader)reader).setModel(td);
     }

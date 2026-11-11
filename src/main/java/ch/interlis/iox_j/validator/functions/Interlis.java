@@ -185,7 +185,11 @@ public class Interlis {
             }
             Viewable paramObjectViewable = paramObject.getViewable();
             if (paramObject.getComplexObjects() != null) {
-                paramObjectViewable=(Viewable)td.getElement(paramObject.getComplexObjects().iterator().next().getobjecttag());                  
+                paramObjectViewable=(Viewable)td.getElement(paramObject.getComplexObjects().iterator().next().getobjecttag());
+            }
+            if (paramObjectViewable == null) {
+                // e.g. object not available, only a reference to it
+                return Value.createSkipEvaluation();
             }
             if(paramObjectViewable.equals(paramClass.getViewable())){
                 return new Value(true);
@@ -229,11 +233,23 @@ public class Interlis {
                 return Value.createSkipEvaluation();
             }
             return new Value((Viewable)td.getElement(targetViewable.getComplexObjects().iterator().next().getobjecttag()));
-        } else if (currentFunction.getScopedName(null).equals("INTERLIS.areAreas")){
+        } else if (currentFunction.getScopedName(null).equals("INTERLIS.areAreas")
+                || currentFunction.getScopedName(null).equals("INTERLIS.areAreasWithoutGaps")
+                || currentFunction.getScopedName(null).equals("INTERLIS.areAreasWithoutGaps2")){
             /*
              * FUNCTION areAreas (Objects: OBJECTS OF ANYCLASS; 
              *   SurfaceBag: ATTRIBUTE OF @ Objects RESTRICTION (BAG OF ANYSTRUCTURE);
              *   SurfaceAttr: ATTRIBUTE OF @ SurfaceBag RESTRICTION (SURFACE)): BOOLEAN;
+             *
+             * FUNCTION areAreasWithoutGaps (Objects: OBJECTS OF ANYCLASS;
+             *   SurfaceBag: ATTRIBUTE OF @ Objects RESTRICTION (BAG OF ANYSTRUCTURE);
+             *   SurfaceAttr: ATTRIBUTE OF @ SurfaceBag RESTRICTION (SURFACE)): BOOLEAN;
+             *
+             * FUNCTION areAreasWithoutGaps2 (Objects: OBJECTS OF ANYCLASS;
+             *   SurfaceBag: TEXT;
+             *   SurfaceAttr: TEXT): BOOLEAN;
+             *
+             * The paths are given as attribute paths or as TEXT; both evaluate to the path as text.
              */
             FunctionCall functionCall = (FunctionCall) expression;
             Evaluable[] arguments = functionCall.getArguments();
@@ -312,7 +328,9 @@ public class Interlis {
                 return functions.get(functionCall);
             }
 
-            Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction, validationKind);
+            boolean withoutGaps = currentFunction.getScopedName(null).equals("INTERLIS.areAreasWithoutGaps")
+                    || currentFunction.getScopedName(null).equals("INTERLIS.areAreasWithoutGaps2");
+            Value isArea = validator.evaluateAreArea(iomObj, argObjects, surfaceBagPath, surfaceAttrPath, currentFunction, validationKind, withoutGaps);
             functions.put(functionCall, isArea);
             return isArea;
         }

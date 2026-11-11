@@ -13,5 +13,9 @@ public interface IoxIliReader {
      * @param topicNames qualified ili-names of topics to read. All other topics are skipped.
      */
     public void setTopicFilter(String topicNames[]);
+    /** Skips the given topics.
+     * @param topicNames qualified ili-names of topics to skip.
+     */
+    public void setSkipTopicFilter(String[] topicNames);
     public String getMimeType();
 }
