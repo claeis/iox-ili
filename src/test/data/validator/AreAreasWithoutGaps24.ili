@@ -1,0 +1,39 @@
+INTERLIS 2.4;
+
+MODEL AreAreasWithoutGaps24
+    AT "mailto:noreply@localhost" VERSION "2026-11-04" =
+
+    DOMAIN
+        Lkoord = COORD 0.000 .. 1000.000 [INTERLIS.m],
+                       0.000 .. 1000.000 [INTERLIS.m],
+                       ROTATION 2 -> 1;
+
+    TOPIC Topic =
+
+        STRUCTURE Part =
+            Surface : SURFACE WITH (STRAIGHTS, ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+        END Part;
+
+        CLASS Direct =
+            Geometry : SURFACE WITH (STRAIGHTS, ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+            SET CONSTRAINT INTERLIS.areAreasWithoutGaps(ALL, UNDEFINED, >>Geometry);
+        END Direct;
+
+        CLASS Bag =
+            Parts : BAG {1..*} OF Part;
+            SET CONSTRAINT INTERLIS.areAreasWithoutGaps2(ALL, "Parts", "Surface");
+        END Bag;
+
+        CLASS Single =
+            Parts : BAG {1..*} OF Part;
+            MANDATORY CONSTRAINT INTERLIS.areAreasWithoutGaps2(THIS, "Parts", "Surface");
+        END Single;
+
+        CLASS Plain =
+            Geometry : SURFACE WITH (STRAIGHTS, ARCS) VERTEX Lkoord WITHOUT OVERLAPS > 0.001;
+            SET CONSTRAINT INTERLIS.areAreas(ALL, UNDEFINED, >>Geometry);
+        END Plain;
+
+    END Topic;
+
+END AreAreasWithoutGaps24.

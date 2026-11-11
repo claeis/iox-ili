@@ -35,6 +35,31 @@ public class CTRC3PTest {
 			  assertEquals(-1.0,SIGNO[0],EPSILON);
 	}
 	@Test
+	public void testRechtsDrehendTeilbogenUeberHalbkreis(){
+		// clockwise from (5,0) via (-7,0) to (0,5) round (-1,-1): the first part of the arc is longer than a
+		// semicircle, so the centre is left of the chord from (5,0) to (-7,0)
+		double Z1O[]=new double[1];
+		double Z2O[]=new double[1];
+		double DETAO[]=new double[1];
+		double SIGNO[]=new double[1];
+		HrgUtility.CTRC3P(5.0,0.0,  -7.0,0.0, 0.0,5.0, Z1O,Z2O,DETAO,SIGNO);
+		assertEquals(-1.0,Z1O[0],EPSILON);
+		assertEquals(-1.0,Z2O[0],EPSILON);
+		assertEquals(1.0,SIGNO[0],EPSILON);
+	}
+	@Test
+	public void testLinksDrehendTeilbogenUeberHalbkreis(){
+		// the same arc in the other direction
+		double Z1O[]=new double[1];
+		double Z2O[]=new double[1];
+		double DETAO[]=new double[1];
+		double SIGNO[]=new double[1];
+		HrgUtility.CTRC3P(0.0,5.0,  -7.0,0.0, 5.0,0.0, Z1O,Z2O,DETAO,SIGNO);
+		assertEquals(-1.0,Z1O[0],EPSILON);
+		assertEquals(-1.0,Z2O[0],EPSILON);
+		assertEquals(-1.0,SIGNO[0],EPSILON);
+	}
+	@Test
 	public void testGerade(){
 		double Z1O[]=new double[1];
 		double Z2O[]=new double[1];
